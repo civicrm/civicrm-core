@@ -1,3 +1,4 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}
 {/if}
@@ -8,8 +9,7 @@
 {ts}You have been added to the WAIT LIST for this event.{/ts}
 
 {if $isPrimary}
-{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}
+{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
 
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -20,9 +20,7 @@ a link to a web page where you can complete your registration.{/ts}
 {ts}Your registration has been submitted.{/ts}
 
 {if $isPrimary}
-{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}
+{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}
 
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -34,9 +32,6 @@ registration process.{/ts}
 {$pay_later_receipt}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
-{else}
-
-{ts}Please print this confirmation for your records.{/ts}
 {/if}
 
 
@@ -54,19 +49,7 @@ registration process.{/ts}
 {/if}
 
 {if $isShowLocation}
-{if $location.address.1.name}
-
-{$location.address.1.name}
-{/if}
-{if $location.address.1.street_address}{$location.address.1.street_address}
-{/if}
-{if $location.address.1.supplemental_address_1}{$location.address.1.supplemental_address_1}
-{/if}
-{if $location.address.1.supplemental_address_2}{$location.address.1.supplemental_address_2}
-{/if}
-{if $location.address.1.city}{$location.address.1.city} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}
-{/if}
-
+{$location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
 {if $location.phone.1.phone || $location.email.1.email}
@@ -75,7 +58,7 @@ registration process.{/ts}
 {foreach from=$location.phone item=phone}
 {if $phone.phone}
 
-{if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone}{/if}
+{if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone}{/if} {if $phone.phone_ext} {ts}ext.{/ts} {$phone.phone_ext}{/if}
 {/foreach}
 {foreach from=$location.email item=eventEmail}
 {if $eventEmail.email}
@@ -83,8 +66,11 @@ registration process.{/ts}
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
+{if $event.is_public}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
 {ts}Download iCalendar File:{/ts} {$icalFeed}
+{/if}
+
 {if $email}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -115,25 +101,51 @@ registration process.{/ts}
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
+{if $dataArray}
+{capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
+{capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
+{capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
+{/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
 {capture assign=ts_participant_total}{if $pricesetFieldsCount }{ts}Total Participants{/ts}{/if}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {$ts_total|string_format:"%10s"} {$ts_participant_total|string_format:"%10s"}
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $dataArray} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate|string_format:"%10s"} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"} {$ts_participant_total|string_format:"%10s"}
 ----------------------------------------------------------{if $pricesetFieldsCount }--------------------{/if}
 
 {foreach from=$value item=line}
 {if $pricesetFieldsCount }{capture assign=ts_participant_count}{$line.participant_count}{/capture}{/if}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney|string_format:"%10s"} {$line.line_total|crmMoney|string_format:"%10s"} {$ts_participant_count|string_format:"%10s"}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney|string_format:"%10s"} {if $dataArray} {$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate != "" || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if}  {$line.line_total+$line.tax_amount|crmMoney|string_format:"%10s"} {$ts_participant_count|string_format:"%10s"}
 {/foreach}
 {/if}
 {/foreach}
+
+{if $dataArray}
+{ts}Amount before Tax{/ts}: {$totalAmount-$totalTaxAmount|crmMoney:$currency}
+
+{foreach from=$dataArray item=value key=priceset}
+{if $priceset || $priceset == 0}
+{$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
+{else}
+{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
 {/if}
+{/foreach}
+{/if}
+{/if}
+
 {if $amount && !$lineItem}
 {foreach from=$amount item=amnt key=level}{$amnt.amount|crmMoney} {$amnt.label}
 {/foreach}
 {/if}
-{if $isPrimary }
 
-{ts}Total Amount{/ts}: {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
+{if $totalTaxAmount}
+{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
+{/if}
+{if $isPrimary}
+
+{if $balanceAmount}{ts}Total Paid{/ts}{else}{ts}Total Amount{/ts}{/if}: {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
+
+{if $balanceAmount}
+{ts}Balance{/ts}: {$balanceAmount|crmMoney}
+{/if}
 
 {if $pricesetFieldsCount }
       {assign var="count" value= 0}
@@ -145,14 +157,14 @@ registration process.{/ts}
         {/foreach}
         {if $lineItemCount < 1 }
         {assign var="lineItemCount" value=1}
-        {/if}	
+        {/if}
       {assign var="count" value=$count+$lineItemCount}
       {/if}
       {/foreach}
 
 {ts}Total Participants{/ts}: {$count}
 {/if}
-   
+
 {if $is_pay_later }
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -168,8 +180,8 @@ registration process.{/ts}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
 {/if}
-{if $contributionTypeName}
-{ts}Financial Type{/ts}: {$contributionTypeName}
+{if $financialTypeName}
+{ts}Financial Type{/ts}: {$financialTypeName}
 {/if}
 {if $trxn_id}
 {ts}Transaction #{/ts}: {$trxn_id}
@@ -180,7 +192,7 @@ registration process.{/ts}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $billingName}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
@@ -192,7 +204,7 @@ registration process.{/ts}
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $credit_card_type}
 ===========================================================
 {ts}Credit Card Information{/ts}
 

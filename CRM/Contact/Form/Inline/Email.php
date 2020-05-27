@@ -1,55 +1,46 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * form helper class for an Email object
+ * Form helper class for an Email object.
  */
 class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
-   * email addresses of the contact that is been viewed
+   * Email addresses of the contact that is been viewed.
+   * @var array
    */
-  private $_emails = array();
+  private $_emails = [];
 
   /**
-   * No of email blocks for inline edit
+   * No of email blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Whether this contact has a first/last/organization/household name
+   *
+   * @var bool
+   */
+  public $contactHasName;
+
+  /**
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -59,13 +50,19 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $email->contact_id = $this->_contactId;
 
     $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email, NULL);
+
+    // Check if this contact has a first/last/organization/household name
+    if ($this->_contactType == 'Individual') {
+      $this->contactHasName = (bool) (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'last_name')
+        || CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'first_name'));
+    }
+    else {
+      $this->contactHasName = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, strtolower($this->_contactType) . '_name');
+    }
   }
 
   /**
-   * build the form elements for an email object
-   *
-   * @return void
-   * @access public
+   * Build the form object elements for an email object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -75,9 +72,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     if (count($this->_emails) > 1) {
       $actualBlockCount = $totalBlocks = count($this->_emails);
       if ($totalBlocks < $this->_blockCount) {
-      $additionalBlocks = $this->_blockCount - $totalBlocks;
-      $totalBlocks += $additionalBlocks;
-    }
+        $additionalBlocks = $this->_blockCount - $totalBlocks;
+        $totalBlocks += $additionalBlocks;
+      }
       else {
         $actualBlockCount++;
         $totalBlocks++;
@@ -93,53 +90,55 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Email::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Email', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_Email', 'formRule'], $this);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields     posted values of the form
-   * @param array $errors     list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
+   * @param CRM_Contact_Form_Inline_Email $form
    *
-   * @return $errors
-   * @static
-   * @access public
+   * @return array
    */
-  static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('email', $fields) && is_array($fields['email'])) {
+  public static function formRule($fields, $errors, $form) {
+    $hasData = $hasPrimary = $errors = [];
+    if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            }
           }
         }
-
+      }
 
       if (empty($hasPrimary) && !empty($hasData)) {
         $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["email[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one email can be marked as primary.');
+        $errors["email[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one email can be marked as primary.');
       }
+    }
+    if (!$hasData && !$form->contactHasName) {
+      $errors["email[1][email]"] = ts('Contact with no name must have an email.');
     }
     return $errors;
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_emails)) {
       foreach ($this->_emails as $id => $value) {
         $defaults['email'][$id] = $value;
@@ -155,10 +154,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -166,9 +162,29 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     // Process / save emails
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['email']['isIdSet'] = TRUE;
+    foreach ($this->_emails as $count => $value) {
+      if (!empty($value['id']) && isset($params['email'][$count])) {
+        $params['email'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('email', $params);
+
+    // If contact has no name, set primary email as display name
+    // TODO: This should be handled in the BAO for the benefit of the api, etc.
+    if (!$this->contactHasName) {
+      foreach ($params['email'] as $email) {
+        if ($email['is_primary']) {
+          CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name', $email['email']);
+          CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'sort_name', $email['email']);
+          $this->ajaxResponse['reloadBlocks'] = ['#crm-contactname-content'];
+          break;
+        }
+      }
+    }
 
     $this->log();
     $this->response();
   }
+
 }

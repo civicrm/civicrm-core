@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $products}
@@ -33,7 +17,7 @@
       {if $premiumBlock.premiums_intro_text}
         <div id="premiums-intro" class="crm-section premiums_intro-section">
           {$premiumBlock.premiums_intro_text}
-        </div> 
+        </div>
       {/if}
     {/if}
 
@@ -63,22 +47,22 @@
             <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
           </div>
         </div>
-      {/if}          
+      {/if}
       {foreach from=$products item=row}
         <div class="premium {if $showPremium}premium-selectable{/if}" id="premium_id-{$row.id}" min_contribution="{$row.min_contribution}">
           <div class="premium-short">
-            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail}" alt="{$row.name}" /></div>{/if}
+            {if $row.thumbnail}<div class="premium-short-thumbnail"><img src="{$row.thumbnail}" alt="{$row.name|escape}" /></div>{/if}
             <div class="premium-short-content">{$row.name}</div>
             <div style="clear:both"></div>
           </div>
 
           <div class="premium-full">
-            <div class="premium-full-image">{if $row.image}<img src="{$row.image}" alt="{$row.name}" />{/if}</div>
+            <div class="premium-full-image">{if $row.image}<img src="{$row.image}" alt="{$row.name|escape}" />{/if}</div>
             <div class="premium-full-content">
               <div class="premium-full-title">{$row.name}</div>
               <div class="premium-full-disabled">
-                {ts 1=$row.min_contribution}You must contribute at least $%1 to get this item{/ts}<br/>
-                <input type="button" value="Contribute ${$row.min_contribution} Instead" amount="{$row.min_contribution}" />
+                {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
+                <input type="button" value="{ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}" amount="{$row.min_contribution}" />
               </div>
               <div class="premium-full-description">
                 {$row.description}
@@ -92,7 +76,7 @@
                 {/if}
               {else}
                 <div class="premium-full-options">
-                  <p><strong>{$row.options}</strong></p> 
+                  <p><strong>{$row.options}</strong></p>
                 </div>
               {/if}
               {if ( ($premiumBlock.premiums_display_min_contribution AND $context EQ "makeContribution") OR $preview EQ 1) AND $row.min_contribution GT 0 }
@@ -113,7 +97,7 @@
             <input type="checkbox" checked="checked" disabled="disabled" /> {$premiumBlock.premiums_nothankyou_label}
           </div>
         </div>
-      {/if}          
+      {/if}
       </div>
     {/strip}
 
@@ -123,35 +107,35 @@
       </div>
     {/if}
   </div>
-  
+
   {if $context EQ "makeContribution"}
     {literal}
-    <script> 
-      cj(function($){
+    <script>
+      CRM.$(function($) {
         var is_separate_payment = {/literal}{if $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
 
         // select a new premium
-        function select_premium(premium_id) { 
-          if(cj(premium_id).length) {
+        function select_premium(premium_id) {
+          if($(premium_id).length) {
             // hide other active premium
-            cj('.premium-full').hide();
-            cj('.premium-short').show();
+            $('.premium-full').hide();
+            $('.premium-short').show();
             // show this one
-            cj('.premium-short', cj(premium_id)).hide();
-            cj('.premium-full', cj(premium_id)).show();
+            $('.premium-short', $(premium_id)).hide();
+            $('.premium-full', $(premium_id)).show();
             // record this one
             var id_parts = premium_id.split('-');
-            cj('#selectProduct').val(id_parts[1]);
+            $('#selectProduct').val(id_parts[1]);
           }
         }
 
         // click premium to select
-        cj('.premium-short').click(function(){
-          select_premium( '#'+cj(cj(this).parent()).attr('id') );
+        $('.premium-short').click(function(){
+          select_premium( '#'+$($(this).parent()).attr('id') );
         });
 
         // select the default premium
-        var premium_id = cj('#selectProduct').val();
+        var premium_id = $('#selectProduct').val();
         if(premium_id == '') premium_id = 'no_thanks';
         select_premium('#premium_id-'+premium_id);
 
@@ -159,22 +143,27 @@
         function get_amount() {
           var amount;
 
+          if (typeof totalfee !== "undefined") {
+            return totalfee;
+          }
+
           // see if other amount exists and has a value
-          if(cj('.other_amount-content input').length) {
-            amount = Number(cj('.other_amount-content input').val());
+          if($('.other_amount-content input').length) {
+            amount = Number($('.other_amount-content input').val());
             if(isNaN(amount))
               amount = 0;
           }
 
           function check_price_set(price_set_radio_buttons) {
-            if(!amount) {
-              cj(price_set_radio_buttons).each(function(){
-                if(cj(this).attr('checked')) {
-                  amount = cj(this).attr('data-amount');
-                  if(amount) {
+            if (!amount) {
+              $(price_set_radio_buttons).each(function(){
+                if ($(this).prop('checked')) {
+                  amount = $(this).attr('data-amount');
+                  if (typeof amount !== "undefined") {
                     amount = Number(amount);
-                    if(isNaN(amount))
-                      amount = 0;
+                  }
+                  else {
+                    amount = 0;
                   }
                 }
               });
@@ -188,14 +177,11 @@
             amount = 0;
           }
 
-          // next, check for contribution amount price sets
-          check_price_set('.contribution_amount-content input[type="radio"]');
-
-          // next, check for membership level price set
-          check_price_set('.membership_amount-content input[type="radio"]'); 
-
           // make sure amount is a number at this point
           if(!amount) amount = 0;
+
+          // next, check for membership/contribution level price set
+          check_price_set('#priceset input[type="radio"]');
 
           // account for is_separate_payment
           if(is_separate_payment && additional_amount) {
@@ -209,54 +195,85 @@
         function update_premiums() {
           var amount = get_amount();
 
-          cj('.premium').each(function(){
-            var min_contribution = cj(this).attr('min_contribution');
+          $('.premium').each(function(){
+            var min_contribution = $(this).attr('min_contribution');
             if(amount < min_contribution) {
-              cj(this).addClass('premium-disabled');
+              $(this).addClass('premium-disabled');
             } else {
-              cj(this).removeClass('premium-disabled');
+              $(this).removeClass('premium-disabled');
             }
           });
         }
-        cj('.other_amount-content input').change(update_premiums);
-        cj('.contribution_amount-content input[type="radio"]').click(update_premiums);
-        cj('.membership_amount-content input[type="radio"]').click(update_premiums);
+        $('.other_amount-content input').change(update_premiums);
+        $('input, #priceset').change(update_premiums);
         update_premiums();
 
         // build a list of price sets
         var amounts = [];
         var price_sets = {};
-        cj('#priceset input[type="radio"]').each(function(){
-          var amount = Number(cj(this).attr('data-amount'));
-          if(!isNaN(amount)) {
-            amounts.push(amount);
+        $('input, #priceset  select,#priceset').each(function(){
+          if (this.tagName == 'SELECT') {
+            var selectID = $(this).attr('id');
+            var selectvalues = JSON.parse($(this).attr('price'));
+            Object.keys(selectvalues).forEach(function (key) {
+              var option = selectvalues[key].split(optionSep);
+              amount = Number(option[0]);
+              price_sets[amount] = '#' + selectID + '-' + key;
+              amounts.push(amount);
+            });
+          }
+          else {
+            var amount = Number($(this).attr('data-amount'));
+            if (!isNaN(amount)) {
+              amounts.push(amount);
 
-            var id = cj(this).attr('id');
-            price_sets[amount] = '#'+id;
+             var id = $(this).attr('id');
+             price_sets[amount] = '#'+id;
+            }
           }
         });
         amounts.sort(function(a,b){return a - b});
 
         // make contribution instead buttons work
-        cj('.premium-full-disabled input').click(function(){
-          var amount = Number(cj(this).attr('amount'));
-          if(price_sets[amount]) {
-            cj(price_sets[amount]).click();
+        $('.premium-full-disabled input').click(function(){
+          var amount = Number($(this).attr('amount'));
+          if (price_sets[amount]) {
+            if (!$(price_sets[amount]).length) {
+              var option =  price_sets[amount].split('-');
+              $(option[0]).val(option[1]);
+              $(option[0]).trigger('change');
+            }
+            else if ($(price_sets[amount]).attr('type') == 'checkbox') {
+               $(price_sets[amount]).prop("checked",true);
+               if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
+                 if (totalfee > 0) {
+                   totalfee += amount;
+                 }
+                 else {
+                   totalfee = amount;
+                 }
+                 display(totalfee);
+               }
+             }
+             else {
+               $(price_sets[amount]).click();
+               $(price_sets[amount]).trigger('click');
+             }
           } else {
             // is there an other amount input box?
-            if(cj('.other_amount-section input').length) {
+            if($('.other_amount-section input').length) {
               // is this a membership form with separate payment?
               if(is_separate_payment) {
                 var current_amount = 0;
-                if(cj('#priceset input[type="radio"]:checked').length) {
-                  current_amount = Number(cj('#priceset input[type="radio"]:checked').attr('data-amount'));
+                if($('#priceset input[type="radio"]:checked').length) {
+                  current_amount = Number($('#priceset input[type="radio"]:checked').attr('data-amount'));
                   if(!current_amount) current_amount = 0;
                 }
                 var new_amount = amount - current_amount;
-                cj('.other_amount-section input').val(new_amount.toFixed(2));
+                $('.other_amount-section input').val(new_amount.toFixed(2));
               } else {
-                cj('.other_amount-section input').click();
-                cj('.other_amount-section input').val(cj(this).attr('amount'));
+                $('.other_amount-section input').click();
+                $('.other_amount-section input').val($(this).attr('amount'));
               }
             } else {
               // find the next best price set
@@ -270,7 +287,28 @@
               if(!selected_price_set) {
                 selected_price_set = amounts[amounts.length-1];
               }
-              cj(price_sets[selected_price_set]).click();
+
+              if (!$(price_sets[selected_price_set]).length) {
+                var option =  price_sets[selected_price_set].split('-');
+                $(option[0]).val(option[1]);
+                $(option[0]).trigger('change');
+              }
+              else if ($(price_sets[selected_price_set]).attr('type') == 'checkbox') {
+                $(price_sets[selected_price_set]).prop("checked",true);
+                if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
+                  if (totalfee > 0) {
+                    totalfee += amount;
+                  }
+                  else {
+                    totalfee = amount;
+                  }
+                  display(totalfee);
+                }
+             }
+             else {
+               $(price_sets[selected_price_set]).click();
+               $(price_sets[selected_price_set]).trigger('click');
+             }
             }
           }
           update_premiums();
@@ -278,9 +316,9 @@
 
         // validation of premiums
         var error_message = '{/literal}{ts escape="js"}You must contribute more to get that item{/ts}{literal}';
-        cj.validator.addMethod('premiums', function(value, element, params){
-          var premium_id = cj('#selectProduct').val();
-          var premium$ = cj('#premium_id-'+premium_id);
+        $.validator.addMethod('premiums', function(value, element, params){
+          var premium_id = $('#selectProduct').val();
+          var premium$ = $('#premium_id-'+premium_id);
           if(premium$.length) {
             if(premium$.hasClass('premium-disabled')) {
               return false;
@@ -288,12 +326,12 @@
           }
           return true;
         }, error_message);
-        
+
         // add validation rules
         CRM.validate.functions.push(function(){
-          cj('#selectProduct').rules('add', 'premiums');
+          $('#selectProduct').rules('add', 'premiums');
         });
-        
+
         // need to use jquery validate's ignore option, so that it will not ignore hidden fields
         CRM.validate.params['ignore'] = '.ignore';
       });
@@ -303,7 +341,7 @@
   {else}
     {literal}
     <script>
-      cj(function(){
+      CRM.$(function($) {
         cj('.premium-short').hide();
         cj('.premium-full').show();
       });

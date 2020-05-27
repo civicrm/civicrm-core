@@ -5,9 +5,10 @@
   <name>civicrm_survey</name>
   <comment>Campaign Survey Details.</comment>
   <add>3.2</add>
-  
+
   <field>
     <name>id</name>
+    <title>Survey ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Survey id.</comment>
@@ -20,10 +21,11 @@
 
   <field>
       <name>title</name>
-      <title>Survey Title</title> 
+      <title>Survey Title</title>
       <type>varchar</type>
       <length>255</length>
       <required>true</required>
+      <localizable>true</localizable>
       <comment>Title of the Survey.</comment>
       <import>true</import>
       <add>3.3</add>
@@ -31,9 +33,15 @@
 
   <field>
     <name>campaign_id</name>
+    <title>Survey Campaign ID</title>
     <type>int unsigned</type>
-    <default>NULL</default>     
+    <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -43,15 +51,21 @@
     <add>3.3</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  
+
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type ID</title>  
-    <type>int unsigned</type> 
-    <default>NULL</default>                
-    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment> 
+    <title>Activity Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>
     <import>true</import>
-    <add>3.3</add> 
+    <add>3.3</add>
+    <pseudoconstant>
+      <optionGroupName>activity_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <index>
     <name>UI_activity_type_id</name>
@@ -61,80 +75,91 @@
 
   <field>
     <name>recontact_interval</name>
+    <title>Follow up Interval</title>
     <type>text</type>
     <comment>Recontact intervals for each status.</comment>
-    <htmlType>textarea</htmlType>
-    <rows>20</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
     <add>3.3</add>
   </field>
-  
+
   <field>
     <name>instructions</name>
+    <title>Instructions</title>
     <type>text</type>
+    <localizable>true</localizable>
     <comment>Script instructions for volunteers to use for the survey.</comment>
-    <htmlType>textarea</htmlType>
-    <rows>20</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
     <add>3.3</add>
   </field>
 
   <field>
     <name>release_frequency</name>
+    <title>Survey Hold Duration</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Number of days for recurrence of release.</comment>
     <add>3.3</add>
   </field>
-  
-  <field> 
+
+  <field>
     <name>max_number_of_contacts</name>
     <title>Maximum number of contacts</title>
-    <type>int unsigned</type> 
+    <type>int unsigned</type>
     <default>NULL</default>
-    <comment>Maximum number of contacts to allow for survey.</comment> 
+    <comment>Maximum number of contacts to allow for survey.</comment>
     <add>3.3</add>
   </field>
-  
-  <field> 
+
+  <field>
     <name>default_number_of_contacts</name>
     <title>Default number of contacts</title>
-    <type>int unsigned</type> 
+    <type>int unsigned</type>
     <default>NULL</default>
-    <comment>Default number of contacts to allow for survey.</comment> 
+    <comment>Default number of contacts to allow for survey.</comment>
     <add>3.3</add>
   </field>
-  
-  <field> 
-    <name>is_active</name> 
+
+  <field>
+    <name>is_active</name>
+    <title>Survey Is Active</title>
     <type>boolean</type>
-    <default>1</default>                
-    <comment>Is this survey enabled or disabled/cancelled?</comment> 
-    <add>3.3</add> 
+    <default>1</default>
+    <comment>Is this survey enabled or disabled/cancelled?</comment>
+    <add>3.3</add>
   </field>
-  
-  <field> 
-    <name>is_default</name> 
+
+  <field>
+    <name>is_default</name>
+    <title>Is Default Survey</title>
     <type>boolean</type>
-    <default>0</default>                
-    <comment>Is this default survey?</comment> 
-    <add>3.3</add> 
-  </field> 
-  
+    <default>0</default>
+    <comment>Is this default survey?</comment>
+    <add>3.3</add>
+  </field>
+
   <field>
     <name>created_id</name>
+    <title>Survey Created By</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this Survey.</comment>
     <add>3.3</add>
   </field>
   <foreignKey>
-      <name>created_id</name>
-      <table>civicrm_contact</table>
-      <key>id</key>
-      <add>3.3</add>
-      <onDelete>SET NULL</onDelete>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>3.3</add>
+    <onDelete>SET NULL</onDelete>
   </foreignKey>
-  
+
   <field>
     <name>created_date</name>
     <type>datetime</type>
@@ -142,9 +167,10 @@
     <comment>Date and time that Survey was created.</comment>
     <add>3.3</add>
   </field>
-  
+
   <field>
     <name>last_modified_id</name>
+    <title>Survey Modified</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who recently edited this Survey.</comment>
     <add>3.3</add>
@@ -156,9 +182,10 @@
     <add>3.3</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  
+
   <field>
     <name>last_modified_date</name>
+    <title>Survey Modified On</title>
     <type>datetime</type>
     <comment>Date and time that Survey was edited last time.</comment>
     <add>3.3</add>
@@ -166,6 +193,7 @@
 
   <field>
     <name>result_id</name>
+    <title>Survey Result</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Used to store option group id.</comment>
@@ -173,6 +201,7 @@
   </field>
   <field>
     <name>bypass_confirm</name>
+    <title>No Email Verification</title>
     <type>boolean</type>
     <default>0</default>
     <comment>Bypass the email verification.</comment>
@@ -191,11 +220,21 @@
     <name>thankyou_text</name>
     <title>Thank-you Text</title>
     <type>text</type>
-    <htmlType>textarea</htmlType>
-    <rows>8</rows>
-    <cols>60</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>8</rows>
+      <cols>60</cols>
+    </html>
     <localizable>true</localizable>
     <comment>text and html allowed. displayed above result on success page</comment>
     <add>4.2</add>
+  </field>
+  <field>
+    <name>is_share</name>
+    <title>Is shared through social media</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Can people share the petition through social media?</comment>
+    <add>4.4</add>
   </field>
 </table>

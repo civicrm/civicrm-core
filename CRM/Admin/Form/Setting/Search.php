@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,61 +21,79 @@
  */
 class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
+    'includeWildCardInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeEmailInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'searchPrimaryDetailsOnly' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeNickNameInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeAlphabeticalPager' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'includeOrderByClause' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'smartGroupCacheTimeout' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'quicksearch_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'contact_autocomplete_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'contact_reference_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
-  );
+    'enable_innodb_fts' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+  ];
 
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
 
-    $this->addYesNo('includeWildCardInName', ts('Automatic Wildcard'));
-    $this->addYesNo('includeEmailInName', ts('Include Email'));
-    $this->addYesNo('includeNickNameInName', ts('Include Nickname'));
-
-    $this->addYesNo('includeAlphabeticalPager', ts('Include Alphabetical Pager'));
-    $this->addYesNo('includeOrderByClause', ts('Include Order By Clause'));
-
-    $this->addElement('text', 'smartGroupCacheTimeout', ts('Smart group cache timeout'),
-      array('size' => 3, 'maxlength' => 5)
-    );
-
-    $types = array('Contact', 'Individual', 'Organization', 'Household');
-    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
-
-    $this->add('select', 'defaultSearchProfileID', ts('Default Contact Search Profile'),
-      array(
-        '' => ts('- select -')) + $profiles
-    );
-
-    // Autocomplete for Contact Search (quick search etc.)
-    $options = array(
-      ts('Contact Name') => 1) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
-        FALSE, FALSE, TRUE
-      ));
-    $this->addCheckBox('autocompleteContactSearch', ts('Autocomplete Contact Search'), $options,
-      NULL, NULL, NULL, NULL, array('&nbsp;&nbsp;')
-    );
-    $element = $this->getElement('autocompleteContactSearch');
-    $element->_elements[0]->_flagFrozen = TRUE;
-
-    // Autocomplete for Contact Reference (custom fields)
-    $optionsCR = array(
-      ts('Contact Name') => 1) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
-        FALSE, FALSE, TRUE
-      ));
-    $this->addCheckBox('autocompleteContactReference', ts('Contact Reference Options'), $optionsCR,
-      NULL, NULL, NULL, NULL, array('&nbsp;&nbsp;')
-    );
-    $element = $this->getElement('autocompleteContactReference');
-    $element->_elements[0]->_flagFrozen = TRUE;
-
     parent::buildQuickForm();
-  }
-}
 
+    // Option 1 can't be unchecked. @see self::enableOptionOne
+    $element = $this->getElement('contact_autocomplete_options');
+    $element->_elements[0]->setAttribute('disabled', 'disabled');
+
+    // Option 1 can't be unchecked. @see self::enableOptionOne
+    $element = $this->getElement('contact_reference_options');
+    $element->_elements[0]->setAttribute('disabled', 'disabled');
+  }
+
+  /**
+   * @return array
+   */
+  public static function getContactAutocompleteOptions() {
+    return [1 => ts('Contact Name')] + CRM_Core_OptionGroup::values('contact_autocomplete_options', FALSE, FALSE, TRUE);
+  }
+
+  /**
+   * @return array
+   */
+  public static function getAvailableProfiles() {
+    return ['' => ts('- none -')] + CRM_Core_BAO_UFGroup::getProfiles([
+      'Contact',
+      'Individual',
+      'Organization',
+      'Household',
+    ]);
+  }
+
+  /**
+   * @return array
+   */
+  public static function getContactReferenceOptions() {
+    return [1 => ts('Contact Name')] + CRM_Core_OptionGroup::values('contact_reference_options', FALSE, FALSE, TRUE);
+  }
+
+  /**
+   * Presave callback for contact_reference_options and contact_autocomplete_options.
+   *
+   * Ensures "1" is always contained in the array.
+   *
+   * @param $value
+   * @return bool
+   */
+  public static function enableOptionOne(&$value) {
+    $values = (array) CRM_Utils_Array::explodePadded($value);
+    if (!in_array(1, $values)) {
+      $value = CRM_Utils_Array::implodePadded(array_merge([1], $values));
+    }
+    return TRUE;
+  }
+
+}

@@ -1,54 +1,44 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'ezc/Base/src/ezc_bootstrap.php';
-require_once 'ezc/autoload/mail_autoload.php';
+/**
+ * Class CRM_Mailing_MailStore_Imap
+ */
 class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
   /**
-   * Connect to the supplied IMAP server and make sure the two mailboxes exist
+   * Connect to the supplied IMAP server and make sure the two mailboxes exist.
    *
-   * @param string $host      host to connect to
-   * @param string $username  authentication username
-   * @param string $password  authentication password
-   * @param bool   $ssl       whether to use IMAP or IMAPS
-   * @param string $folder    name of the inbox folder
+   * @param string $host
+   *   Host to connect to.
+   * @param string $username
+   *   Authentication username.
+   * @param string $password
+   *   Authentication password.
+   * @param bool $ssl
+   *   Whether to use IMAP or IMAPS.
+   * @param string $folder
+   *   Name of the inbox folder.
+   * @param bool $useXOAUTH2
+   *   Use XOAUTH2 authentication method
    *
-   * @return void
+   * @return \CRM_Mailing_MailStore_Imap
    */
-  function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX') {
+  public function __construct($host, $username, $password, $ssl = TRUE, $folder = 'INBOX', $useXOAUTH2 = FALSE) {
     // default to INBOX if an empty string
     if (!$folder) {
       $folder = 'INBOX';
@@ -60,14 +50,23 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
     }
 
-    $options = array('ssl' => $ssl, 'uidReferencing' => TRUE);
+    $options = [
+      'listLimit' => defined('MAIL_BATCH_SIZE') ? MAIL_BATCH_SIZE : 1000,
+      'ssl' => $ssl,
+      'uidReferencing' => TRUE,
+    ];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
-    $this->_transport->authenticate($username, $password);
+    if ($useXOAUTH2) {
+      $this->_transport->authenticate($username, $password, ezcMailImapTransport::AUTH_XOAUTH2);
+    }
+    else {
+      $this->_transport->authenticate($username, $password);
+    }
     $this->_transport->selectMailbox($folder);
 
-    $this->_ignored   = implode($this->_transport->getHierarchyDelimiter(), array($folder, 'CiviMail', 'ignored'));
-    $this->_processed = implode($this->_transport->getHierarchyDelimiter(), array($folder, 'CiviMail', 'processed'));
-    $boxes            = $this->_transport->listMailboxes();
+    $this->_ignored = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'ignored']);
+    $this->_processed = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'processed']);
+    $boxes = $this->_transport->listMailboxes();
 
     if ($this->_debug) {
       print 'mailboxes found: ' . implode(', ', $boxes) . "\n";
@@ -85,18 +84,17 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   /**
    * Expunge the messages marked for deletion, CRM-7356
    */
-  function expunge() {
+  public function expunge() {
     $this->_transport->expunge();
   }
 
   /**
-   * Move the specified message to the ignored folder
+   * Move the specified message to the ignored folder.
    *
-   * @param integer $nr  number of the message to move
-   *
-   * @return void
+   * @param int $nr
+   *   Number of the message to move.
    */
-  function markIgnored($nr) {
+  public function markIgnored($nr) {
     if ($this->_debug) {
       print "setting $nr as seen and moving it to the ignored mailbox\n";
     }
@@ -106,13 +104,12 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
   }
 
   /**
-   * Move the specified message to the processed folder
+   * Move the specified message to the processed folder.
    *
-   * @param integer $nr  number of the message to move
-   *
-   * @return void
+   * @param int $nr
+   *   Number of the message to move.
    */
-  function markProcessed($nr) {
+  public function markProcessed($nr) {
     if ($this->_debug) {
       print "setting $nr as seen and moving it to the processed mailbox\n";
     }
@@ -120,5 +117,5 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
     $this->_transport->copyMessages($nr, $this->_processed);
     $this->_transport->delete($nr);
   }
-}
 
+}

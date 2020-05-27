@@ -1,52 +1,38 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
   /**
-   * Function to build the form for Advance Settings.
+   * Build the form object for Advanced Settings.
    *
-   * @access public
-   *
-   * @return None
+   * @param CRM_Core_Form $form
    */
   public static function buildAdvanceSetting(&$form) {
+    $entityFields = [
+      'cancel_button_text',
+      'submit_button_text',
+    ];
+    $form->assign('advancedFieldsConverted', $entityFields);
+
     // should mapping be enabled for this group
     $form->addElement('checkbox', 'is_map', ts('Enable mapping for this profile?'));
 
     // should we allow updates on a exisitng contact
-    $options   = array();
+    $options = [];
     $options[] = $form->createElement('radio', NULL, NULL, ts('Issue warning and do not save'), 0);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Update the matching contact'), 1);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Allow duplicate contact to be created'), 2);
@@ -54,11 +40,12 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addGroup($options, 'is_update_dupe', ts('What to do upon duplicate match'));
     // we do not have any url checks to allow relative urls
     $form->addElement('text', 'post_URL', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_URL'));
+
+    $form->add('advcheckbox', 'add_cancel_button', ts('Include Cancel Button?'));
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
 
     // add select for groups
-    $group = array(
-      '' => ts('- select -')) + $form->_group;
+    $group = ['' => ts('- select -')] + $form->_group;
     $form->_groupElement = &$form->addElement('select', 'group', ts('Limit listings to a specific Group?'), $group);
 
     //add notify field
@@ -75,7 +62,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     // should we display a link to the website profile
     $config = CRM_Core_Config::singleton();
-    $form->addElement('checkbox', 'is_uf_link', ts('Include %1 user account information links in search results?', array(1 => $config->userFramework)));
+    $form->addElement('checkbox', 'is_uf_link', ts('Include %1 user account information links in search results?', [1 => $config->userFramework]));
 
     // want to create cms user
     $session = CRM_Core_Session::singleton();
@@ -84,20 +71,20 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
       $form->_cmsId = TRUE;
     }
 
-    $options   = array();
+    $options = [];
     $options[] = $form->createElement('radio', NULL, NULL, ts('No account create option'), 0);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Give option, but not required'), 1);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Account creation required'), 2);
 
-    $form->addGroup($options, 'is_cms_user', ts('%1 user account registration option?', array(1 => $config->userFramework)));
+    $form->addGroup($options, 'is_cms_user', ts('%1 user account registration option?', [1 => $config->userFramework]));
 
     // options for including Proximity Search in the profile search form
-    $proxOptions   = array();
+    $proxOptions = [];
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('None'), 0);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Required'), 2);
 
-    $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity search'));
+    $form->addGroup($proxOptions, 'is_proximity_search', ts('Proximity Search'));
   }
-}
 
+}

@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for displaying PCP information *}
@@ -41,13 +25,13 @@
     {foreach from = $links key = k item = v}
           <tr>
             <td>
-                <a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title}" {if $v.extra}{$v.extra}{/if}><strong>&raquo; {$v.name}</strong></a>
+                <a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title|escape:'html'}" {if $v.extra}{$v.extra}{/if}><strong><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$v.name}</strong></a>
        </td>
          <td>&nbsp;<cite>{$hints.$k}</cite></td>
       </tr>
         {/foreach}
        </table>
-     <div class="icon tip-icon"></div>
+     <i class="crm-i fa-lightbulb-o" aria-hidden="true"></i>
      <strong>{ts}Tip{/ts}</strong> - <span class="description">{ts}You must be logged in to your account to access the editing options above. (If you visit this page without logging in, you will be viewing the page in "live" mode - as your visitors and friends see it.){/ts}</span>
 </div>
 {/if}
@@ -82,7 +66,7 @@
       <div class="honor-roll-wrapper">
         <div class="honor-roll-title">{ts}HONOR ROLL{/ts}</div>
           <div class="honor_roll">
-              <marquee behavior="scroll" direction="up" id="pcp_roll"  scrolldelay="200" bgcolor="#fafafa">
+              <marquee behavior="scroll" direction="up" id="pcp_roll"  scrolldelay="200"  height="200" bgcolor="#fafafa">
                 {foreach from = $honor item = v}
                 <div class="pcp_honor_roll_entry">
                     <div class="pcp-honor_roll-nickname">{$v.nickname}</div>

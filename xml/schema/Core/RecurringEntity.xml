@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Core</base>
+  <class>RecurringEntity</class>
+  <name>civicrm_recurring_entity</name>
+  <add>4.6</add>
+  <log>true</log>
+  <field>
+      <name>id</name>
+      <title>ID</title>
+      <type>int unsigned</type>
+      <length>10</length>
+      <required>true</required>
+      <add>4.6</add>
+  </field>
+  <primaryKey>
+       <name>id</name>
+       <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+      <name>parent_id</name>
+      <type>int unsigned</type>
+      <length>10</length>
+      <title>Parent ID</title>
+      <required>true</required>
+      <comment>Recurring Entity Parent ID</comment>
+      <add>4.6</add>
+  </field>
+  <field>
+      <name>entity_id</name>
+      <type>int unsigned</type>
+      <length>10</length>
+      <title>Entity ID</title>
+      <comment>Recurring Entity Child ID</comment>
+      <add>4.6</add>
+  </field>
+  <field>
+      <name>entity_table</name>
+      <type>varchar</type>
+      <length>64</length>
+      <title>Entity Table</title>
+      <required>true</required>
+      <comment>Physical tablename for entity, e.g. civicrm_event</comment>
+      <add>4.6</add>
+  </field>
+  <field>
+      <name>mode</name>
+      <type>boolean</type>
+      <default>1</default>
+      <title>Cascade Type</title>
+      <required>true</required>
+      <comment>1-this entity, 2-this and the following entities, 3-all the entities</comment>
+      <add>4.6</add>
+  </field>
+</table>

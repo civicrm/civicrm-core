@@ -1,33 +1,16 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * This class generates form components generic to useradd
- *
+ * This class generates form components generic to useradd.
  */
 class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
 
@@ -39,42 +22,35 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   protected $_contactId;
 
   /**
-   * contact.display_name of contact for whom we are adding user
+   * Contact.display_name of contact for whom we are adding user
    *
    * @var int
-   * @public
    */
   public $_displayName;
 
   /**
-   * primary email of contact for whom we are adding user
+   * Primary email of contact for whom we are adding user.
    *
    * @var int
-   * @public
    */
   public $_email;
 
-  function preProcess() {
-    $params = $defaults = $ids = array();
+  public function preProcess() {
+    $params = $defaults = $ids = [];
 
-    $this->_contactId   = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $params['id']       = $params['contact_id'] = $this->_contactId;
-    $contact            = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $params['id'] = $params['contact_id'] = $this->_contactId;
+    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
     $this->_displayName = $contact->display_name;
-    $this->_email       = $contact->email;
-    CRM_Utils_System::setTitle(ts('Create User Record for %1', array(1 => $this->_displayName)));
+    $this->_email = $contact->email;
+    CRM_Utils_System::setTitle(ts('Create User Record for %1', [1 => $this->_displayName]));
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
+   * Set default values for the form.
    */
-  function setDefaultValues() {
-    $defaults = array();
+  public function setDefaultValues() {
+    $defaults = [];
     $defaults['contactID'] = $this->_contactId;
     $defaults['name'] = $this->_displayName;
     if (!empty($this->_email)) {
@@ -85,48 +61,41 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
-    $element = $this->add('text', 'name', ts('Full Name'), array('class' => 'huge'));
+    $element = $this->add('text', 'name', ts('Full Name'), ['class' => 'huge']);
     $element->freeze();
-    $this->add('text', 'cms_name', ts('Username'), array('class' => 'huge'));
+    $this->add('text', 'cms_name', ts('Username'), ['class' => 'huge']);
     $this->addRule('cms_name', 'Username is required', 'required');
-    $this->addRule('cms_name', 'Enter a valid username', 'minlength', 2);
-    $this->add('password', 'cms_pass', ts('Password'), array('class' => 'huge'));
-    $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), array('class' => 'huge'));
+    $this->add('password', 'cms_pass', ts('Password'), ['class' => 'huge']);
+    $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), ['class' => 'huge']);
     $this->addRule('cms_pass', 'Password is required', 'required');
-    $this->addRule(array('cms_pass', 'cms_confirm_pass'), 'ERROR: Password mismatch', 'compare');
-    $this->add('text', 'email', ts('Email:'), array('class' => 'huge'))->freeze();
+    $this->addRule(['cms_pass', 'cms_confirm_pass'], 'ERROR: Password mismatch', 'compare');
+    $this->add('text', 'email', ts('Email:'), ['class' => 'huge'])->freeze();
     $this->add('hidden', 'contactID');
 
     //add a rule to check username uniqueness
-    $this->addFormRule(array('CRM_Contact_Form_Task_Useradd', 'usernameRule'));
+    $this->addFormRule(['CRM_Contact_Form_Task_Useradd', 'usernameRule']);
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Add'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
     $this->setDefaults($this->setDefaultValues());
   }
 
   /**
-   *
-   * @access public
-   *
-   * @return None
+   * Post process function.
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -137,20 +106,22 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
   }
 
   /**
-   * Validation Rule
+   * Validation Rule.
    *
-   * @static
+   * @param array $params
+   *
+   * @return array|bool
    */
-  static function usernameRule($params) {
+  public static function usernameRule($params) {
     $config = CRM_Core_Config::singleton();
-    $errors = array();
-    $check_params = array(
+    $errors = [];
+    $check_params = [
       'name' => $params['cms_name'],
       'mail' => $params['email'],
-    );
+    ];
     $config->userSystem->checkUserNameEmailExists($check_params, $errors);
 
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

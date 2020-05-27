@@ -21,11 +21,11 @@ logSRT=SeleniumTestResult
 create_log()
 {
     cd $ORIGPWD/../test/
-    
-    PATH4LOG=`pwd` 
-    
-    if [ ! -d "Result" ] ; then 
-	mkdir Result
+
+    PATH4LOG=`pwd`
+
+    if [ ! -d "Result" ] ; then
+    mkdir Result
     fi
 }
 
@@ -49,7 +49,7 @@ run_seleniumTest()
     sub_menu
     echo "Enter Your Option: "
     read choice
-   
+
     cd $ORIGPWD/../test/selenium-ruby/CRM
     # Running Selenium (ruby) Tests
     ruby ruby_unit_tests.rb $choice
@@ -74,7 +74,7 @@ main_menu()
     clear
     echo
     echo " *********************** Select Method for Test *********************** "
-    echo 
+    echo
     echo "Options available: "
     echo "  UT   - Carry out Unit Tests"
     echo "  ST   - Carry out Stress Tests"
@@ -87,10 +87,10 @@ main_menu()
 sub_menu()
 {
     clear
-    
+
     echo
     echo " *********************** Select the Option *********************** "
-    echo 
+    echo
     echo "Options available: "
     echo "  1   : Contact Individual"
     echo "  2   : Contact Household"
@@ -130,48 +130,48 @@ run_option()
     # Following Case Structure is used for Executing Menuing System.
     case $1 in
     # Unit Tests
-	"UT" | "ut" | "Ut")
-	    echo "Running Unit Tests"; echo;
-	    run_UnitTest
-	    echo "Unit Tests Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logUT; echo;
-	    echo " **************************************************************************** ";
-	    ;;
-	
+  "UT" | "ut" | "Ut")
+      echo "Running Unit Tests"; echo;
+      run_UnitTest
+      echo "Unit Tests Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logUT; echo;
+      echo " **************************************************************************** ";
+      ;;
+
     # Stress Tests
-	"ST" | "st" | "St")
-	    echo "Running Stress Tests"; echo;
-	    run_stressTest
-	    echo "Stress Tests Successfully Completed."; echo;
-	    echo " **************************************************************************** ";
-	    ;;
-	
+  "ST" | "st" | "St")
+      echo "Running Stress Tests"; echo;
+      run_stressTest
+      echo "Stress Tests Successfully Completed."; echo;
+      echo " **************************************************************************** ";
+      ;;
+
     # Selenium (Ruby) Tests
-	"SRT" | "srt" | "Srt")
-	    echo "Running Selenium (Ruby) Tests"; echo;
-	    run_seleniumTest
-	    #echo "Selenium (Ruby) Testing Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logSRT; echo;
-	    echo " **************************************************************************** ";
-	    ;;
-        
-    # All the Tests will be Executed one after other 
-	"All" | "all" )
-	    echo "Running all three Tests i.e. Unit Tests, Web Tests, maxQ Tests, Stress Test and Selenium(Ruby) Tests"; echo;
-	    echo "Running Unit Tests"; echo;
-	    run_UnitTest
-	    echo "Unit Tests Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logUT; echo;
-	    echo "Running Stress Tests"; echo;
-	    run_stressTest
-	    echo "Stress Tests Successfully Completed."; echo;
-	    echo " **************************************************************************** ";
-	    echo "Running Selenium (ruby) Tests"; echo;
-	    run_seleniumTest
-	    #echo "Selenium (Ruby) Testing Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logSRT; echo;
-	    echo " **************************************************************************** ";
-	    ;;
-	*)
-	    echo "You have entered Invalid Option."; echo;
-	    exit
-	    ;;
+  "SRT" | "srt" | "Srt")
+      echo "Running Selenium (Ruby) Tests"; echo;
+      run_seleniumTest
+      #echo "Selenium (Ruby) Testing Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logSRT; echo;
+      echo " **************************************************************************** ";
+      ;;
+
+    # All the Tests will be Executed one after other
+  "All" | "all" )
+      echo "Running all three Tests i.e. Unit Tests, Web Tests, maxQ Tests, Stress Test and Selenium(Ruby) Tests"; echo;
+      echo "Running Unit Tests"; echo;
+      run_UnitTest
+      echo "Unit Tests Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logUT; echo;
+      echo "Running Stress Tests"; echo;
+      run_stressTest
+      echo "Stress Tests Successfully Completed."; echo;
+      echo " **************************************************************************** ";
+      echo "Running Selenium (ruby) Tests"; echo;
+      run_seleniumTest
+      #echo "Selenium (Ruby) Testing Successfully Completed. Log stored in the File : " $PATH4LOG/Result/$logSRT; echo;
+      echo " **************************************************************************** ";
+      ;;
+  *)
+      echo "You have entered Invalid Option."; echo;
+      exit
+      ;;
     esac
 }
 

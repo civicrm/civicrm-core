@@ -1,50 +1,33 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Core_Key {
-  static $_key = NULL;
+  public static $_key = NULL;
 
-  static $_sessionID = NULL;
+  public static $_sessionID = NULL;
 
   /**
-   * Generate a private key per session and store in session
+   * Generate a private key per session and store in session.
    *
-   * @return string private key for this session
-   * @static
-   * @access private
+   * @return string
+   *   private key for this session
    */
-  static function privateKey() {
+  public static function privateKey() {
     if (!self::$_key) {
       $session = CRM_Core_Session::singleton();
       self::$_key = $session->get('qfPrivateKey');
@@ -56,7 +39,10 @@ class CRM_Core_Key {
     return self::$_key;
   }
 
-  static function sessionID() {
+  /**
+   * @return mixed|null|string
+   */
+  public static function sessionID() {
     if (!self::$_sessionID) {
       $session = CRM_Core_Session::singleton();
       self::$_sessionID = $session->get('qfSessionID');
@@ -72,17 +58,17 @@ class CRM_Core_Key {
    * Generate a form key based on form name, the current user session
    * and a private key. Modelled after drupal's form API
    *
-   * @param string  $value       name of the form
-   * @paeam boolean $addSequence should we add a unique sequence number to the end of the key
+   * @param string $name
+   * @param bool $addSequence
+   *   Should we add a unique sequence number to the end of the key.
    *
-   * @return string       valid formID
-   * @static
-   * @acess public
+   * @return string
+   *   valid formID
    */
-  static function get($name, $addSequence = FALSE) {
+  public static function get($name, $addSequence = FALSE) {
     $privateKey = self::privateKey();
-    $sessionID  = self::sessionID();
-    $key        = md5($sessionID . $name . $privateKey);
+    $sessionID = self::sessionID();
+    $key = md5($sessionID . $name . $privateKey);
 
     if ($addSequence) {
       // now generate a random number between 1 and 100K and add it to the key
@@ -93,16 +79,16 @@ class CRM_Core_Key {
   }
 
   /**
-   * Validate a form key based on the form name
+   * Validate a form key based on the form name.
    *
-   * @param string $formKey
+   * @param string $key
    * @param string $name
+   * @param bool $addSequence
    *
-   * @return string $formKey if valid, else null
-   * @static
-   * @acess public
+   * @return string
+   *   if valid, else null
    */
-  static function validate($key, $name, $addSequence = FALSE) {
+  public static function validate($key, $name, $addSequence = FALSE) {
     if (!is_string($key)) {
       return NULL;
     }
@@ -125,7 +111,12 @@ class CRM_Core_Key {
     return $key;
   }
 
-  static function valid($key) {
+  /**
+   * @param $key
+   *
+   * @return bool
+   */
+  public static function valid($key) {
     // a valid key is a 32 digit hex number
     // followed by an optional _ and a number between 1 and 10000
     if (strpos('_', $key) !== FALSE) {
@@ -144,7 +135,7 @@ class CRM_Core_Key {
     }
 
     // ensure that hash is a 32 digit hex number
-    return preg_match('#[0-9a-f]{32}#i', $hash) ? TRUE : FALSE;
+    return (bool) preg_match('#[0-9a-f]{32}#i', $hash);
   }
-}
 
+}

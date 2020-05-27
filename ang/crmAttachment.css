@@ -1,0 +1,21 @@
+.crm-attachments {
+    border: 1px solid transparent;
+}
+
+.crm-attachments.nv-file-over {
+    border: 1px solid red;
+}
+
+.crm-attachments td.filename {
+    font-size: 0.8em;
+    font-family: 'Courier New', monospace;
+    vertical-align: middle;
+}
+
+.crm-attachments td.filename-new {
+    font-style: italic;
+}
+
+.crm-attachments td .crm-form-text {
+    width: 30em;
+}

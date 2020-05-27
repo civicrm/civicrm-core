@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,15 +21,12 @@
 
   <tr>
    <td>
-
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $formValues.receipt_text}
      <p>{$formValues.receipt_text|htmlize}</p>
     {else}
-     <p>{ts}Thanks for your support.{/ts}</p>
+     <p>{ts}Below you will find a receipt for this contribution.{/ts}</p>
     {/if}
-
-    <p>{ts}Please print this receipt for your records.{/ts}</p>
-
    </td>
   </tr>
   <tr>
@@ -39,6 +36,14 @@
       <th {$headerStyle}>
        {ts}Contribution Information{/ts}
       </th>
+     </tr>
+     <tr>
+      <td {$labelStyle}>
+       {ts}Contributor Name{/ts}
+      </td>
+      <td {$valueStyle}>
+       {contact.display_name}
+      </td>
      </tr>
      <tr>
       <td {$labelStyle}>
@@ -58,6 +63,11 @@
            <th>{ts}Item{/ts}</th>
            <th>{ts}Qty{/ts}</th>
            <th>{ts}Each{/ts}</th>
+           {if $getTaxDetails}
+             <th>{ts}Subtotal{/ts}</th>
+             <th>{ts}Tax Rate{/ts}</th>
+             <th>{ts}Tax Amount{/ts}</th>
+           {/if}
            <th>{ts}Total{/ts}</th>
           </tr>
           {foreach from=$value item=line}
@@ -71,8 +81,24 @@
             <td>
              {$line.unit_price|crmMoney:$currency}
             </td>
+            {if $getTaxDetails}
+              <td>
+                {$line.unit_price*$line.qty|crmMoney:$currency}
+              </td>
+              {if $line.tax_rate != "" || $line.tax_amount != ""}
+                <td>
+                  {$line.tax_rate|string_format:"%.2f"}%
+                </td>
+                <td>
+                  {$line.tax_amount|crmMoney:$currency}
+                </td>
+              {else}
+                <td></td>
+                <td></td>
+              {/if}
+            {/if}
             <td>
-             {$line.line_total|crmMoney:$currency}
+             {$line.line_total+$line.tax_amount|crmMoney:$currency}
             </td>
            </tr>
           {/foreach}
@@ -80,6 +106,39 @@
         </td>
        </tr>
       {/foreach}
+     {/if}
+     {if $getTaxDetails && $dataArray}
+       <tr>
+         <td {$labelStyle}>
+           {ts} Amount before Tax : {/ts}
+         </td>
+         <td {$valueStyle}>
+           {$formValues.total_amount-$totalTaxAmount|crmMoney:$currency}
+         </td>
+       </tr>
+
+      {foreach from=$dataArray item=value key=priceset}
+        <tr>
+        {if $priceset ||  $priceset == 0 || $value != ''}
+          <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+          <td>&nbsp;{$value|crmMoney:$currency}</td>
+        {else}
+          <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+          <td>&nbsp;{$value|crmMoney:$currency}</td>
+        {/if}
+        </tr>
+      {/foreach}
+     {/if}
+
+     {if isset($totalTaxAmount) && $totalTaxAmount !== 'null'}
+      <tr>
+        <td {$labelStyle}>
+          {ts}Total Tax Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+          {$totalTaxAmount|crmMoney:$currency}
+        </td>
+      </tr>
      {/if}
 
      <tr>
@@ -94,7 +153,7 @@
      {if $receive_date}
       <tr>
        <td {$labelStyle}>
-        {ts}Received Date{/ts}
+        {ts}Date Received{/ts}
        </td>
        <td {$valueStyle}>
         {$receive_date|truncate:10:''|crmDate}
@@ -171,6 +230,26 @@
       </tr>
      {/if}
 
+     {if $softCreditTypes and $softCredits}
+      {foreach from=$softCreditTypes item=softCreditType key=n}
+       <tr>
+        <th {$headerStyle}>
+         {$softCreditType}
+        </th>
+       </tr>
+       {foreach from=$softCredits.$n item=value key=label}
+         <tr>
+          <td {$labelStyle}>
+           {$label}
+          </td>
+          <td {$valueStyle}>
+           {$value}
+          </td>
+         </tr>
+        {/foreach}
+       {/foreach}
+     {/if}
+
      {if $customGroup}
       {foreach from=$customGroup item=value key=customName}
        <tr>
@@ -189,22 +268,6 @@
         </tr>
        {/foreach}
       {/foreach}
-     {/if}
-
-     {if $formValues.honor_first_name}
-      <tr>
-       <th {$headerStyle}>
-        {$formValues.honor_type}
-       </th>
-      </tr>
-      <tr>
-       <td colspan="2" {$valueStyle}>
-        {$formValues.honor_prefix} {$formValues.honor_first_name} {$formValues.honor_last_name}<br />
-        {if $formValues.honor_email}
-         {ts}Honoree Email{/ts}: {$formValues.honor_email}
-        {/if}
-       </td>
-      </tr>
      {/if}
 
      {if $formValues.product_name}

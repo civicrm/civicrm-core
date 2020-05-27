@@ -8,42 +8,47 @@
   <add>1.4</add>
   <drop>2.0</drop>
   <field>
-      <name>id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>SMS History ID</comment>
-       <add>1.4</add>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>SMS History ID</comment>
+    <add>1.4</add>
   </field>
   <primaryKey>
-       <name>id</name>
-       <autoincrement>true</autoincrement>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-       <name>message</name>
-       <type>text</type>
-       <comment>Contents of the SMS.</comment>
-       <htmlType>textarea</htmlType>
-       <rows>5</rows>
-       <cols>80</cols>
-       <add>1.4</add>
+    <name>message</name>
+    <type>text</type>
+    <comment>Contents of the SMS.</comment>
+    <html>
+      <type>TextArea</type>
+      <rows>5</rows>
+      <cols>80</cols>
+    </html>
+    <add>1.4</add>
   </field>
   <field>
-      <name>contact_id</name>
-      <type>int unsigned</type>
-      <required>true</required>
-      <comment>FK to Contact who is sending this SMS</comment>
-       <add>1.4</add>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Contact who is sending this SMS</comment>
+    <add>1.4</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
   </field>
   <foreignKey>
-       <name>contact_id</name>
-       <table>civicrm_contact</table>
-       <key>id</key>
-       <add>1.4</add>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>1.4</add>
   </foreignKey>
   <field>
-       <name>sent_date</name>
-       <type>date</type>
-       <comment>When was this SMS sent</comment>
-       <add>1.4</add>
+    <name>sent_date</name>
+    <type>date</type>
+    <comment>When was this SMS sent</comment>
+    <add>1.4</add>
   </field>
 </table>

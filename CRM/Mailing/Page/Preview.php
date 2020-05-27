@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,21 +21,19 @@
 class CRM_Mailing_Page_Preview extends CRM_Core_Page {
 
   /**
-   * run this page (figure out the action needed and perform it).
-   *
-   * @return void
+   * Run this page (figure out the action needed and perform it).
    */
-  function run() {
+  public function run() {
 
     $session = CRM_Core_Session::singleton();
 
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'text');
     $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'text');
 
-    $options = array();
+    $options = [];
     $session->getVars($options, "CRM_Mailing_Controller_Send_$qfKey");
 
-    //get the options if control come from search context, CRM-3711
+    // get the options if control come from search context, CRM-3711
     if (empty($options)) {
       $session->getVars($options, "CRM_Contact_Controller_Search_$qfKey");
     }
@@ -64,7 +44,7 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     $mailing = new CRM_Mailing_BAO_Mailing();
     if (!empty($options)) {
       $mailing->id = $options['mailing_id'];
-      $fromEmail = CRM_Utils_Array::value('from_email', $options);
+      $fromEmail = $options['from_email'] ?? NULL;
     }
 
     $mailing->find(TRUE);
@@ -76,9 +56,9 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
       $mailing->id
     );
 
-    //get details of contact with token value including Custom Field Token Values.CRM-3734
+    // get details of contact with token value including Custom Field Token Values.CRM-3734
     $returnProperties = $mailing->getReturnProperties();
-    $params = array('contact_id' => $session->get('userID'));
+    $params = ['contact_id' => $session->get('userID')];
 
     $details = CRM_Utils_Token::getTokenDetails($params,
       $returnProperties,
@@ -86,20 +66,20 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
       $mailing->getFlattenedTokens(),
       get_class($this)
     );
-
+    // $details[0] is an array of [ contactID => contactDetails ]
     $mime = &$mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
       TRUE, $details[0][$session->get('userID')], $attachments
     );
 
     if ($type == 'html') {
-      header('Content-Type: text/html; charset=utf-8');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/html; charset=utf-8');
       print $mime->getHTMLBody();
     }
     else {
-      header('Content-Type: text/plain; charset=utf-8');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain; charset=utf-8');
       print $mime->getTXTBody();
     }
     CRM_Utils_System::civiExit();
   }
-}
 
+}

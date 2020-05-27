@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This code is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 */
 
@@ -44,7 +28,7 @@ function run() {
 
   require_once 'Console/Getopt.php';
   $shortOptions = "n:p:k:pre";
-  $longOptions = array('name=', 'pass=', 'key=', 'prefix=');
+  $longOptions = ['name=', 'pass=', 'key=', 'prefix='];
 
   $getopt = new Console_Getopt();
   $args = $getopt->readPHPArgv();
@@ -52,12 +36,12 @@ function run() {
   array_shift($args);
   list($valid, $dontCare) = $getopt->getopt2($args, $shortOptions, $longOptions);
 
-  $vars = array(
+  $vars = [
     'name' => 'n',
     'pass' => 'p',
     'key' => 'k',
     'prefix' => 'pre',
-  );
+  ];
 
   foreach ($vars as $var => $short) {
     $$var = NULL;
@@ -68,7 +52,7 @@ function run() {
       }
     }
     if (!$$var) {
-      $$var = CRM_Utils_Array::value($var, $_REQUEST);
+      $$var = $_REQUEST[$var] ?? NULL;
     }
     $_REQUEST[$var] = $$var;
   }
@@ -84,6 +68,10 @@ function run() {
   processPhones($config, $prefix);
 }
 
+/**
+ * @param $config
+ * @param null $prefix
+ */
 function processPhones(&$config, $prefix = NULL) {
   // ignore null phones and phones that already match what we are doing
   $query = "
@@ -96,9 +84,10 @@ AND        phone NOT REGEXP '^[[:digit:]]{3}-[[:digit:]]{3}-[[:digit:]]{4}$'
   $dao = &CRM_Core_DAO::executeQuery($query);
 
   $updateQuery = "UPDATE civicrm_phone SET phone = %1 where id = %2";
-  $params = array(1 => array('', 'String'),
-    2 => array(0, 'Integer'),
-  );
+  $params = [
+    1 => ['', 'String'],
+    2 => [0, 'Integer'],
+  ];
   $totalPhone = $validPhone = $nonPrefixedPhone = 0;
   while ($dao->fetch()) {
     $newPhone = processPhone($dao->phone, $prefix);
@@ -113,6 +102,12 @@ AND        phone NOT REGEXP '^[[:digit:]]{3}-[[:digit:]]{3}-[[:digit:]]{4}$'
   }
 }
 
+/**
+ * @param $phone
+ * @param null $prefix
+ *
+ * @return bool|string
+ */
 function processPhone($phone, $prefix = NULL) {
   // eliminate all white space and non numeric charaters
   $cleanPhone = preg_replace('/[^\d]+/s', '', $phone);

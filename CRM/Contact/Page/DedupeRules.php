@@ -1,90 +1,73 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Dedupe_BAO_RuleGroup';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       $deleteExtra = ts('Are you sure you want to delete this Rule?');
 
       // helper variable for nicer formatting
-      $links = array();
+      $links = [];
 
       if (CRM_Core_Permission::check('merge duplicate contacts')) {
-        $links[CRM_Core_Action::VIEW] = array(
+        $links[CRM_Core_Action::VIEW] = [
           'name' => ts('Use Rule'),
           'url' => 'civicrm/contact/dedupefind',
           'qs' => 'reset=1&rgid=%%id%%&action=preview',
           'title' => ts('Use DedupeRule'),
-        );
+        ];
       }
       if (CRM_Core_Permission::check('administer dedupe rules')) {
-        $links[CRM_Core_Action::UPDATE] = array(
+        $links[CRM_Core_Action::UPDATE] = [
           'name' => ts('Edit Rule'),
           'url' => 'civicrm/contact/deduperules',
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit DedupeRule'),
-        );
-        $links[CRM_Core_Action::DELETE] = array(
+        ];
+        $links[CRM_Core_Action::DELETE] = [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/deduperules',
           'qs' => 'action=delete&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete DedupeRule'),
-        );
+        ];
       }
 
       self::$_links = $links;
@@ -93,25 +76,16 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Run the page
+   * Run the page.
    *
    * This method is called after the page is created. It checks for the type
    * of action and executes that action. Finally it calls the parent's run
    * method.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
-    // get the requested action, default to 'browse'
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
+  public function run() {
+    $id = $this->getIdAndAction();
 
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
-
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE);
     if ($context == 'nonDupe') {
       CRM_Core_Session::setStatus(ts('Selected contacts have been marked as not duplicates'), ts('Changes Saved'), 'success');
     }
@@ -121,91 +95,110 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     $this->assign('hasperm_merge_duplicate_contacts', CRM_Core_Permission::check('merge duplicate contacts'));
 
     // which action to take?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
-      $this->edit($action, $id);
+    if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
+      $this->edit($this->_action, $id);
     }
-    if ($action & CRM_Core_Action::DELETE) {
+    if ($this->_action & CRM_Core_Action::DELETE) {
       $this->delete($id);
     }
 
     // browse the rules
     $this->browse();
 
-    // parent run
-    return parent::run();
+    // This replaces parent run, but do parent's parent run
+    return CRM_Core_Page::run();
   }
 
   /**
-   * Browse all rule groups
-   *
-   * @return void
-   * @access public
+   * Browse all rule groups.
    */
-  function browse() {
+  public function browse() {
     // get all rule groups
-    $ruleGroups = array();
+    $ruleGroups = [];
     $dao = new CRM_Dedupe_DAO_RuleGroup();
-    $dao->orderBy('contact_type,used ASC');
+    $dao->orderBy('contact_type ASC, used ASC, title ASC');
     $dao->find();
 
+    $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();
     while ($dao->fetch()) {
-      $ruleGroups[$dao->contact_type][$dao->id] = array();
+      $ruleGroups[$dao->contact_type][$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $ruleGroups[$dao->contact_type][$dao->id]);
 
       // form all action links
       $action = array_sum(array_keys($this->links()));
       $links = self::links();
       /* if ($dao->is_default) {
-        unset($links[CRM_Core_Action::MAP]);
-        unset($links[CRM_Core_Action::DELETE]);
-        }*/
+      unset($links[CRM_Core_Action::MAP]);
+      unset($links[CRM_Core_Action::DELETE]);
+      }*/
 
       if ($dao->is_reserved) {
         unset($links[CRM_Core_Action::DELETE]);
       }
 
-      $ruleGroups[$dao->contact_type][$dao->id]['action'] = CRM_Core_Action::formLink($links, $action, array('id' => $dao->id));
-      CRM_Dedupe_DAO_RuleGroup::addDisplayEnums($ruleGroups[$dao->contact_type][$dao->id]);
-    }
+      $ruleGroups[$dao->contact_type][$dao->id]['action'] = CRM_Core_Action::formLink(
+        $links,
+        $action,
+        ['id' => $dao->id],
+        ts('more'),
+        FALSE,
+        'dedupeRule.manage.action',
+        'DedupeRule',
+        $dao->id
+      );
 
+      $ruleGroups[$dao->contact_type][$dao->id]['used_display'] = $dedupeRuleTypes[$ruleGroups[$dao->contact_type][$dao->id]['used']];
+    }
     $this->assign('brows', $ruleGroups);
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string  classname of edit form
+   * @return string
+   *   classname of edit form
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Contact_Form_DedupeRules';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string  name of this page
+   * @return string
+   *   name of this page
    */
-  function editName() {
+  public function editName() {
     return 'DedupeRules';
   }
 
   /**
-   * Get user context
+   * Get user context.
    *
-   * @return string  user context
+   * @param null $mode
+   *
+   * @return string
+   *   user context
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/contact/deduperules';
   }
 
-  function delete($id) {
+  /**
+   * @param int $id
+   */
+  public function delete($id) {
     $ruleDao = new CRM_Dedupe_DAO_Rule();
     $ruleDao->dedupe_rule_group_id = $id;
     $ruleDao->delete();
 
     $rgDao = new CRM_Dedupe_DAO_RuleGroup();
     $rgDao->id = $id;
-    $rgDao->delete();
+    if ($rgDao->find(TRUE)) {
+      $rgDao->delete();
+      CRM_Core_Session::setStatus(ts("The rule '%1' has been deleted.", [1 => $rgDao->title]), ts('Rule Deleted'), 'success');
+      CRM_Utils_System::redirect(CRM_Utils_System::url($this->userContext(), 'reset=1'));
+    }
   }
-}
 
+}

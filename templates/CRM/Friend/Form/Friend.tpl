@@ -1,30 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div id="form" class="crm-form-block crm-friend-manage-block">
-<div id="help">
+<div class="help">
   {if $context EQ 'Contribute'}
     {assign var=enduser value="contributor"}
     {assign var=pageType value="Online Contribution page"}
@@ -38,13 +22,10 @@
     {assign var=pageType value="Pledge Information page"}
     {ts}Tell a Friend gives registering pledge signers an easy way to spread the word about this pledge. The registration thank-you page will include a link to a form where they can enter their friends' email addresses, along with a personalized message. CiviCRM will record these solicitation activities, and will add the friends to your database.{/ts}
   {/if}
-  {ts}If sharing through social media is enabled, links allowing people to share with their social network will also be included on the Tell a Friend form (e.g. Facebook "Like", Google+, and Twitter). You can turn social media sharing on and off from the Settings tab.{/ts}
+  {ts}If sharing through social media is enabled, links allowing people to share with their social network will also be included on the Tell a Friend form (e.g. Facebook "Like" and Twitter). You can turn social media sharing on and off from the Settings tab.{/ts}
 </div>
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
-        <tr>
-           <td></td>
-        </tr>
         <tr class="crm-friend-manage-form-block-tf_is_active">
            <td class="label"">{$form.tf_is_active.html}</td>
            <td>{$form.tf_is_active.label}</td>
@@ -55,7 +36,7 @@
         <tr class="crm-friend-manage-form-block-tf_title">
      <td class="label">{$form.tf_title.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='title' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='title' id=$friendId}
          {/if}
            </td>
      <td>{$form.tf_title.html}
@@ -64,7 +45,7 @@
         <tr class="crm-friend-manage-form-block-intro">
      <td class="label">{$form.intro.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='intro' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='intro' id=$friendId}
          {/if}
      </td>
      <td>{$form.intro.html}<br />
@@ -75,7 +56,7 @@
         <tr class="crm-friend-manage-form-block-suggested_message">
      <td class="label">{$form.suggested_message.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='suggested_message' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='suggested_message' id=$friendId}
          {/if}
      </td>
      <td>{$form.suggested_message.html}<br />
@@ -93,13 +74,13 @@
         <tr class="crm-friend-manage-form-block-thankyou_title">
            <td class="label">{$form.tf_thankyou_title.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='tf_thankyou_title' id=$id}{/if}</td>
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='thankyou_title' id=$friendId}{/if}</td>
      <td>{$form.tf_thankyou_title.html}</td>
         </tr>
         <tr class="crm-friend-manage-form-block-thankyou_text">
      <td class="label">{$form.tf_thankyou_text.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='tf_thankyou_text' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='thankyou_text' id=$friendId}
          {/if}
      </td>
      <td>{$form.tf_thankyou_text.html}<br />
@@ -129,7 +110,3 @@
        }
 </script>
 {/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-

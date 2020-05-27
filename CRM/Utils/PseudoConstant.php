@@ -1,61 +1,52 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * Utilities for manipulating/inspecting CRM_*_PseudoConstant classes
+ * @package CRM
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
+ */
+
+/**
+ * Utilities for manipulating/inspecting CRM_*_PseudoConstant classes.
  */
 class CRM_Utils_PseudoConstant {
-  /*
-   * CiviCRM pseudoconstant classes for wrapper functions
+  /**
+   * CiviCRM pseudoconstant classes for wrapper functions.
+   * @var array
    */
-  private static $constantClasses = array(
+  private static $constantClasses = [
     'CRM_Core_PseudoConstant',
     'CRM_Event_PseudoConstant',
     'CRM_Contribute_PseudoConstant',
     'CRM_Member_PseudoConstant',
-    'CRM_Grant_PseudoConstant',
-  );
+  ];
 
   /**
-   * @var array ($name => $className)
+   * @var array
+   *   ($name => $className)
    */
   private static $constants = NULL;
 
   /**
-   * Get constant
+   * Get constant.
    *
    * Wrapper for Pseudoconstant methods. We use this so the calling function
    * doesn't need to know which class the Pseudoconstant is on
-   * (some are on the Contribute_Pseudoconsant Class etc
+   * (some are on the Contribute_Pseudoconstant Class etc
    *
-   * @access public
-   * @static
    *
-   * @return array - array reference of all relevant constant
+   * @param string $constant
+   *
+   * @return array
+   *   array reference of all relevant constant
    */
   public static function getConstant($constant) {
     $class = self::findConstantClass($constant);
@@ -65,16 +56,17 @@ class CRM_Utils_PseudoConstant {
   }
 
   /**
-   * Flush constant
+   * Flush constant.
    *
    * Wrapper for Pseudoconstant methods. We use this so the calling function
    * doesn't need to know which class the Pseudoconstant is on
    * (some are on the Contribute_Pseudoconsant Class etc
    *
-   * @access public
-   * @static
    *
-   * @return array - array reference of all relevant constant
+   * @param $constant
+   *
+   * @return array
+   *   array reference of all relevant constant
    */
   public static function flushConstant($constant) {
     $class = self::findConstantClass($constant);
@@ -89,13 +81,16 @@ class CRM_Utils_PseudoConstant {
   }
 
   /**
-   * Determine where a constant lives
+   * Determine where a constant lives.
    *
    * If there's a full, preloaded map, use it. Otherwise, use search
    * class space.
    *
-   * @param string $name constant-name
-   * @return string|NULL class-name
+   * @param string $constant
+   *   Constant-name.
+   *
+   * @return string|NULL
+   *   class-name
    */
   public static function findConstantClass($constant) {
     if (self::$constants !== NULL && isset(self::$constants[$constant])) {
@@ -115,11 +110,12 @@ class CRM_Utils_PseudoConstant {
    *
    * This may be inefficient and should generally be avoided.
    *
-   * @return array of string, constant names
+   * @return array
+   *   Array of string, constant names
    */
   public static function findConstants() {
     if (self::$constants === NULL) {
-      self::$constants = array();
+      self::$constants = [];
       foreach (self::$constantClasses as $class) {
         foreach (self::findConstantsByClass($class) as $constant) {
           self::$constants[$constant] = $class;
@@ -135,7 +131,10 @@ class CRM_Utils_PseudoConstant {
    *
    * This may be inefficient and should generally be avoided.
    *
-   * @return array of string, constant names
+   * @param $class
+   *
+   * @return array
+   *   Array of string, constant names
    */
   public static function findConstantsByClass($class) {
     $clazz = new ReflectionClass($class);
@@ -147,14 +146,15 @@ class CRM_Utils_PseudoConstant {
   }
 
   /**
-   * Flush all caches related to pseudo-constants. This may be inefficient
-   * and should generally be avoided.
+   * Flush all caches related to pseudo-constants.
    *
-   * @return void
+   * This may be inefficient and should generally be avoided.
    */
   public static function flushAll() {
     foreach (self::findConstants() as $constant) {
       self::flushConstant($constant);
     }
+    CRM_Core_PseudoConstant::flush();
   }
+
 }

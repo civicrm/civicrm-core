@@ -13,10 +13,10 @@
   <version>{$CiviCRMVersion}</version>
   <description>CiviCRM</description>
   <files folder="site">
-	  <filename>civicrm.php</filename>
-	  <filename>civicrm.html.php</filename>
-	  <folder>views</folder>
-	  <folder>elements</folder>
+    <filename>civicrm.php</filename>
+    <filename>civicrm.html.php</filename>
+    <folder>views</folder>
+    <folder>elements</folder>
   </files>
   <install>
     <queries>
@@ -32,8 +32,6 @@
     <files folder="admin">
       <filename>admin.civicrm.php</filename>
       <filename>civicrm.php</filename>
-      <filename>toolbar.civicrm.php</filename>
-      <filename>toolbar.civicrm.html.php</filename>
       <filename>configure.php</filename>
       <filename>access.xml</filename>
       <filename>config.xml</filename>

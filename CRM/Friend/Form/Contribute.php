@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -40,39 +24,36 @@
 class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
 
   /**
-   * tell a friend id in db
+   * Tell a friend id in db.
    *
    * @var int
    */
-  private $_friendId;
+  public $_friendId;
 
   public function preProcess() {
     parent::preProcess();
+    $this->setSelectedChild('friend');
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
-    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
-    CRM_Utils_System::setTitle(ts('Tell a Friend') . " ($title)");
-
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_id)) {
       $defaults['entity_table'] = 'civicrm_contribution_page';
       $defaults['entity_id'] = $this->_id;
       CRM_Friend_BAO_Friend::getValues($defaults);
-      $this->_friendId = CRM_Utils_Array::value('id', $defaults);
-      $defaults['tf_title'] = CRM_Utils_Array::value('title', $defaults);
-      $defaults['tf_is_active'] = CRM_Utils_Array::value('is_active', $defaults);
-      $defaults['tf_thankyou_title'] = CRM_Utils_Array::value('thankyou_title', $defaults);
-      $defaults['tf_thankyou_text'] = CRM_Utils_Array::value('thankyou_text', $defaults);
+      $this->_friendId = $defaults['id'] ?? NULL;
+      $defaults['tf_title'] = $defaults['title'] ?? NULL;
+      $defaults['tf_is_active'] = $defaults['is_active'] ?? NULL;
+      $defaults['tf_thankyou_title'] = $defaults['thankyou_title'] ?? NULL;
+      $defaults['tf_thankyou_text'] = $defaults['thankyou_text'] ?? NULL;
     }
 
     if (!$this->_friendId) {
@@ -87,22 +68,27 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
-   * @return None
-   * @access public
+   * @return void
    */
   public function buildQuickForm() {
+    if (isset($this->_id)) {
+      $defaults['entity_table'] = 'civicrm_contribution_page';
+      $defaults['entity_id'] = $this->_id;
+      CRM_Friend_BAO_Friend::getValues($defaults);
+      $this->_friendId = $defaults['id'] ?? NULL;
+    }
+
     CRM_Friend_BAO_Friend::buildFriendForm($this);
     parent::buildQuickForm();
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // get the submitted form values.
@@ -112,8 +98,8 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $formValues['entity_id'] = $this->_id;
     $formValues['title'] = $formValues['tf_title'];
     $formValues['is_active'] = CRM_Utils_Array::value('tf_is_active', $formValues, FALSE);
-    $formValues['thankyou_title'] = CRM_Utils_Array::value('tf_thankyou_title', $formValues);
-    $formValues['thankyou_text'] = CRM_Utils_Array::value('tf_thankyou_text', $formValues);
+    $formValues['thankyou_title'] = $formValues['tf_thankyou_title'] ?? NULL;
+    $formValues['thankyou_text'] = $formValues['tf_thankyou_text'] ?? NULL;
 
     if (($this->_action & CRM_Core_Action::UPDATE) && $this->_friendId) {
       $formValues['id'] = $this->_friendId;
@@ -127,10 +113,9 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Tell a Friend');
   }
-}
 
+}

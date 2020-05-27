@@ -41,7 +41,6 @@
     <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
     <desc>CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns - and customize text, amounts, types of information collected from contributors, etc.</desc>
     <adminGroup>CiviContribute</adminGroup>
-    <icon>admin/small/online_contribution_pages.png</icon>
     <weight>360</weight>
   </item>
   <item>
@@ -110,7 +109,6 @@
     <page_callback>CRM_Contribute_Page_ManagePremiums</page_callback>
     <desc>CiviContribute allows you to configure any number of Premiums which can be offered to contributors as incentives / thank-you gifts. Define the premiums you want to offer here.</desc>
     <adminGroup>CiviContribute</adminGroup>
-    <icon>admin/small/Premiums.png</icon>
     <weight>365</weight>
   </item>
   <item>
@@ -122,22 +120,28 @@
     <weight>580</weight>
   </item>
   <item>
+    <path>civicrm/payment</path>
+    <title>New Payment</title>
+    <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
     <path>civicrm/admin/financial/financialAccount</path>
     <title>Financial Accounts</title>
     <page_callback>CRM_Financial_Page_FinancialAccount</page_callback>
     <desc>Financial types are used to categorize contributions for reporting and accounting purposes. These are also referred to as Funds.</desc>
     <adminGroup>CiviContribute</adminGroup>
-    <icon>admin/small/contribution_types.png</icon>
     <weight>370</weight>
   </item>
   <item>
     <path>civicrm/admin/options/payment_instrument</path>
-    <title>Payment Instruments</title>
+    <title>Payment Methods</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <desc>You may choose to record the payment instrument used for each contribution. Common payment methods are installed by default (e.g. Check, Cash, Credit Card...). If your site requires additional payment methods, add them here.</desc>
-    <path_arguments>group=payment_instrument</path_arguments>
     <adminGroup>CiviContribute</adminGroup>
-    <icon>admin/small/payment_instruments.png</icon>
     <weight>380</weight>
   </item>
   <item>
@@ -145,10 +149,15 @@
     <title>Accepted Credit Cards</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <desc>Credit card options that will be offered to contributors using your Online Contribution pages.</desc>
-    <path_arguments>group=accept_creditcard</path_arguments>
     <adminGroup>CiviContribute</adminGroup>
-    <icon>admin/small/accepted_creditcards.png</icon>
     <weight>395</weight>
+  </item>
+  <item>
+    <path>civicrm/admin/options/soft_credit_type</path>
+    <title>Soft Credit Types</title>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <desc>Soft Credit Types that will be offered to contributors during soft credit contribution</desc>
+    <adminGroup>CiviContribute</adminGroup>
   </item>
   <item>
     <path>civicrm/contact/view/contribution</path>
@@ -210,11 +219,6 @@
     <access_arguments>make online contributions</access_arguments>
   </item>
   <item>
-    <path>civicrm/ajax/employer</path>
-    <page_callback>CRM_Contact_Page_AJAX::getPermissionedEmployer</page_callback>
-    <access_arguments>make online contributions</access_arguments>
-  </item>
-  <item>
     <path>civicrm/contribute/unsubscribe</path>
     <title>Cancel Subscription</title>
     <page_callback>CRM_Contribute_Form_CancelSubscription</page_callback>
@@ -272,5 +276,57 @@
     <title>Accounting Batch Export</title>
     <page_callback>CRM_Financial_Form_Export</page_callback>
     <weight>610</weight>
+  </item>
+  <item>
+    <path>civicrm/payment/view</path>
+    <title>View Payment</title>
+    <page_callback>CRM_Contribute_Page_PaymentInfo</page_callback>
+    <path_arguments>action=view</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/admin/setting/preferences/contribute</path>
+    <title>CiviContribute Component Settings</title>
+    <page_callback>CRM_Admin_Form_Preferences_Contribute</page_callback>
+    <desc>Configure global CiviContribute behaviors.</desc>
+    <access_arguments>access CiviContribute,administer CiviCRM</access_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice</path>
+    <title>PDF Invoice</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice::getPrintPDF</page_callback>
+    <access_callback>CRM_Core_Permission::checkDownloadInvoice</access_callback>
+    <page_type>1</page_type>
+    <weight>620</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/contribute/invoice/email</path>
+    <title>Email Invoice</title>
+    <page_callback>CRM_Contribute_Form_Task_Invoice</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <weight>630</weight>
+    <component>CiviContribute</component>
+  </item>
+  <item>
+    <path>civicrm/ajax/softcontributionlist</path>
+    <page_callback>CRM_Contribute_Page_AJAX::getSoftContributionRows</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/contribute/contributionrecur-payments</path>
+    <title>Recurring Contribution's Payments</title>
+    <page_callback>CRM_Contribute_Page_ContributionRecurPayments</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/membership/recurring-contributions</path>
+    <title>Membership Recurring Contributions</title>
+    <page_callback>CRM_Member_Page_RecurringContributions</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
   </item>
 </menu>

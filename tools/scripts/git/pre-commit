@@ -3,7 +3,7 @@
 # Note: This shell script should be designed and tested for cross-platform use
 
 # URL: https://github.com/totten/git-php-syntax-checker/
-# Author: Remigijus Jarmalavičius <remigijus@jarmalavicius.lt> 
+# Author: Remigijus Jarmalavičius <remigijus@jarmalavicius.lt>
 # Author: Vytautas Povilaitis <php-checker@vytux.lt>
 # License: GPLv3
 
@@ -26,12 +26,12 @@ do
     fi
 done
 if [ "$ERRORS_BUFFER" != "" ]; then
-    echo 
+    echo
     echo "These errors were found in try-to-commit files: "
     echo -e $ERRORS_BUFFER
-    echo 
+    echo
     echo "Can't commit, fix errors first."
     exit 1
 else
-    echo "Commited successfully."
+    echo "Committed successfully."
 fi

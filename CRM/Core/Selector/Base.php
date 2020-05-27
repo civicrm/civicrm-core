@@ -1,29 +1,13 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -32,14 +16,14 @@
  * and display names
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Core_Selector_Base {
 
   /**
-   * the sort order which is computed from the columnHeaders
+   * The sort order which is computed from the columnHeaders
    *
    * @var array
    */
@@ -60,18 +44,16 @@ class CRM_Core_Selector_Base {
   protected $_key;
 
   /**
-   * This function gets the attribute for the action that
+   * This function gets the attribute for the action that.
    * it matches.
    *
-   * @param string  match      the action to match against
-   * @param string  attribute  the attribute to return ( name, link, title )
+   * @param string $match the action to match against
+   * @param string $attribute the attribute to return ( name, link, title )
    *
-   * @return string            the attribute that matches the action if any
-   *
-   * @access public
-   *
+   * @return string
+   *   the attribute that matches the action if any
    */
-  function getActionAttribute($match, $attribute = 'name') {
+  public function getActionAttribute($match, $attribute = 'name') {
     $links = &$this->links();
 
     foreach ($link as $action => $item) {
@@ -94,35 +76,36 @@ class CRM_Core_Selector_Base {
    * qs      : the parameters to the above url along with any dynamic substitutions
    * title   : A more descriptive name, typically used in breadcrumbs / navigation
    */
-  static function &links() {
+  public static function &links() {
     return NULL;
   }
 
   /**
-   * compose the template file name from the class name
+   * Compose the template file name from the class name.
    *
-   * @param string $action the action being performed
+   * @param string $action
+   *   The action being performed.
    *
-   * @return string template file name
-   * @access public
+   * @return string
+   *   template file name
    */
-  function getTemplateFileName($action = NULL) {
+  public function getTemplateFileName($action = NULL) {
     return (str_replace('_', DIRECTORY_SEPARATOR, CRM_Utils_System::getClassName($this)) . ".tpl");
   }
 
   /**
-   * getter for the sorting direction for the fields which will be displayed on the form.
+   * Getter for the sorting direction for the fields which will be displayed on the form.
    *
-   * @param string action the action being performed
+   * @param string $action the action being performed
    *
-   * @return array the elements that can be sorted along with their properties
-   * @access public
+   * @return array
+   *   the elements that can be sorted along with their properties
    */
-  function &getSortOrder($action) {
+  public function &getSortOrder($action) {
     $columnHeaders = &$this->getColumnHeaders(NULL);
 
     if (!isset($this->_order)) {
-      $this->_order = array();
+      $this->_order = [];
       $start = 2;
       $firstElementNotFound = TRUE;
       if (!empty($columnHeaders)) {
@@ -148,36 +131,47 @@ class CRM_Core_Selector_Base {
   }
 
   /**
-   * setter for permission
+   * Setter for permission.
    *
    * @var string
-   * @access public
    */
   public function setPermission($permission) {
     $this->_permission = $permission;
   }
 
   /**
-   * get the display text in plain language for the search
+   * Get the display text in plain language for the search
    * to display on the results page
    *
-   * @return string
-   * @access public
+   * FIXME: the current internationalisation is bad, but should more or less work
+   * on most of "European" languages
+   *
+   * @return array
+   *   array of strings
    */
   public function getQill() {
     return NULL;
   }
 
+  /**
+   * @return null
+   */
   public function getSummary() {
     return NULL;
   }
 
+  /**
+   * @param $key
+   */
   public function setKey($key) {
     $this->_key = $key;
   }
 
+  /**
+   * @return string
+   */
   public function getKey() {
     return $this->_key;
   }
-}
 
+}

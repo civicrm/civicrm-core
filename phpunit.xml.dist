@@ -1,0 +1,44 @@
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+         stderr="true"
+         beStrictAboutTestsThatDoNotTestAnything="false"
+         bootstrap="tests/phpunit/CiviTest/bootstrap.php"
+>
+  <testsuites>
+    <testsuite name="api_v3_AllTests">
+      <directory>./tests/phpunit/api</directory>
+    </testsuite>
+    <testsuite name="CRM_AllTests">
+      <directory>./tests/phpunit/CRM</directory>
+    </testsuite>
+    <testsuite name="Civi_AllTests">
+      <directory>./tests/phpunit/Civi</directory>
+    </testsuite>
+    <testsuite name="WebTest_AllTests">
+      <directory>./tests/phpunit/WebTest</directory>
+    </testsuite>
+  </testsuites>
+
+  <filter>
+    <whitelist>
+      <directory suffix=".php">./CRM</directory>
+      <directory suffix=".php">./Civi</directory>
+      <directory suffix=".php">./api</directory>
+    </whitelist>
+  </filter>
+
+  <listeners>
+    <listener class="Civi\Test\CiviTestListener">
+      <arguments></arguments>
+    </listener>
+  </listeners>
+
+</phpunit>
+

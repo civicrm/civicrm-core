@@ -1,91 +1,74 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * Page for displaying list of Premiums
+ * Page for displaying list of Premiums.
  */
 class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Contribute_BAO_Premium';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to remove this product form this page?');
 
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=update&id=%%id%%&pid=%%pid%%&reset=1',
           'title' => ts('Edit Premium'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=preview&id=%%id%%&pid=%%pid%%',
           'title' => ts('Preview Premium'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Remove'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=delete&id=%%id%%&pid=%%pid%%',
           'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Disable Premium'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -96,12 +79,8 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -127,51 +106,53 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
   }
 
   /**
-   *
-   * @return void
-   * @access public
-   * @static
+   * Browse function.
    */
-  function browse() {
+  public function browse() {
     // get all custom groups sorted by weight
-    $premiums = array();
+    $premiums = [];
     $pageID = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0
     );
-    $dao               = new CRM_Contribute_DAO_Premium();
-    $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id    = $pageID;
-    $dao->find(TRUE);
-    $premiumID = $dao->id;
+    $premiumDao = new CRM_Contribute_DAO_Premium();
+    $premiumDao->entity_table = 'civicrm_contribution_page';
+    $premiumDao->entity_id = $pageID;
+    $premiumDao->find(TRUE);
+    $premiumID = $premiumDao->id;
     $this->assign('products', FALSE);
     $this->assign('id', $pageID);
     if (!$premiumID) {
       return;
     }
 
-    $dao = new CRM_Contribute_DAO_PremiumsProduct();
-    $dao->premiums_id = $premiumID;
-    $dao->orderBy('weight');
-    $dao->find();
+    $premiumsProductDao = new CRM_Contribute_DAO_PremiumsProduct();
+    $premiumsProductDao->premiums_id = $premiumID;
+    $premiumsProductDao->orderBy('weight');
+    $premiumsProductDao->find();
 
-    while ($dao->fetch()) {
+    while ($premiumsProductDao->fetch()) {
       $productDAO = new CRM_Contribute_DAO_Product();
-      $productDAO->id = $dao->product_id;
+      $productDAO->id = $premiumsProductDao->product_id;
       $productDAO->is_active = 1;
 
       if ($productDAO->find(TRUE)) {
-        $premiums[$productDAO->id] = array();
-        $premiums[$productDAO->id]['weight'] = $dao->weight;
+        $premiums[$productDAO->id] = [];
+        $premiums[$productDAO->id]['weight'] = $premiumsProductDao->weight;
         CRM_Core_DAO::storeValues($productDAO, $premiums[$productDAO->id]);
 
         $action = array_sum(array_keys($this->links()));
 
-        $premiums[$dao->product_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $pageID, 'pid' => $dao->id)
+        $premiums[$premiumsProductDao->product_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
+          ['id' => $pageID, 'pid' => $premiumsProductDao->id],
+          ts('more'),
+          FALSE,
+          'premium.contributionpage.row',
+          'Premium',
+          $premiumsProductDao->id
         );
-        //Financial Type
-        if (!empty($dao->financial_type_id)) {
-          $premiums[$productDAO->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue( 'CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name' );
+        // Financial Type
+        if (!empty($premiumsProductDao->financial_type_id)) {
+          $premiums[$productDAO->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Product', 'financial_type_id', $premiumsProductDao->financial_type_id);
         }
       }
     }
@@ -193,30 +174,35 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Contribute_Form_ContributionPage_Premium';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Configure Premiums';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
-}
 
+}

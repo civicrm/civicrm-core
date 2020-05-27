@@ -1,60 +1,39 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
   /**
-   * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('action', $this->_action);
     $this->assign('context', $this->_context);
 
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    CRM_Pledge_Page_Tab::setContext();
+    CRM_Pledge_Page_Tab::setContext($this);
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $this->edit();
-      // set page title
-      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
     else {
       $pledgeId = CRM_Utils_Request::retrieve('pledgeId', 'Positive', $this);
@@ -65,8 +44,8 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
       $this->assign('pledgeId', $pledgeId);
       $this->assign('contactId', $this->_contactId);
 
-      // check if we can process credit card contribs
-      CRM_Core_Payment::allowBackofficeCreditCard($this);
+      // check if we can process credit card contributions
+      $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
       // check is the user has view/edit signer permission
       $permission = 'view';
@@ -80,12 +59,11 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Payment',
       'Update Pledge Payment',
       $this->_action
@@ -98,5 +76,5 @@ class CRM_Pledge_Page_Payment extends CRM_Core_Page {
 
     return $controller->run();
   }
-}
 
+}

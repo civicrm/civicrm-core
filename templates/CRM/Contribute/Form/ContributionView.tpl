@@ -1,64 +1,79 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-contribution-view-form-block">
-<h3>{ts}View Contribution{/ts}</h3>
-
 <div class="action-link">
   <div class="crm-submit-buttons">
-    {if call_user_func(array('CRM_Core_Permission','check'), 'edit contributions')}
+    {if (call_user_func(array('CRM_Core_Permission','check'), 'edit contributions') && call_user_func(array('CRM_Core_Permission', 'check'), "edit contributions of type $financial_type") && $canEdit) ||
+    	(call_user_func(array('CRM_Core_Permission','check'), 'edit contributions') && $noACL)}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
       {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
       {/if}
       <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span>
-          <div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+          <i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span>
       </a>
+      {if $paymentButtonName}
+        <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$contact_id`"}'><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}{$paymentButtonName}{/ts}</a>
+      {/if}
     {/if}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
+    {if (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && call_user_func(array('CRM_Core_Permission', 'check'), "delete contributions of type $financial_type") && $canDelete)     || (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && $noACL)}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
       {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
         {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context&key=$searchKey"}
       {/if}
       <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}"><span>
-          <div class="icon delete-icon"></div>{ts}Delete{/ts}</span>
+          <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span>
       </a>
     {/if}
     {include file="CRM/common/formButtons.tpl" location="top"}
+    {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
+    {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
+    {if $invoicing}
+      <div class="css_right">
+        <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
+          <i class="crm-i fa-print" aria-hidden="true"></i>
+        {if $contribution_status != 'Refunded' && $contribution_status != 'Cancelled' }
+          {ts}Print Invoice{/ts}</a>
+        {else}
+          {ts}Print Invoice and Credit Note{/ts}</a>
+        {/if}
+        <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
+          <i class="crm-i fa-paper-plane" aria-hidden="true"></i>
+          {ts}Email Invoice{/ts}</a>
+      </div>
+    {/if}
   </div>
 </div>
 <table class="crm-info-panel">
+  {if $is_test}
+    <div class="help">
+      <strong>{ts}This is a TEST transaction{/ts}</strong>
+    </div>
+  {/if}
   <tr>
     <td class="label">{ts}From{/ts}</td>
-    <td class="bold">{$displayName}</td>
+    <td class="bold"><a href="{crmURL p='civicrm/contact/view' q="cid=$contact_id"}">{$displayName}</a></td>
   </tr>
   <tr>
     <td class="label">{ts}Financial Type{/ts}</td>
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
-  {if $lineItem}
+  <tr>
+    <td class="label">{ts}Source{/ts}</td>
+    <td>{$source}</td>
+  </tr>
+  <tr>
+    <td class="label">{ts}Received{/ts}</td>
+    <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
+  </tr>
+  {if $displayLineItems}
     <tr>
       <td class="label">{ts}Contribution Amount{/ts}</td>
       <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
@@ -72,13 +87,21 @@
   {else}
     <tr>
       <td class="label">{ts}Total Amount{/ts}</td>
-      <td><strong>{$total_amount|crmMoney:$currency}</strong>&nbsp;
+      <td><strong>{$total_amount|crmMoney:$currency}</strong>
         {if $contribution_recur_id}
-          <strong>{ts}Recurring Contribution{/ts}</strong>
+          <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
+            <strong>{ts}Recurring Contribution{/ts}</strong>
+          </a>
           <br/>
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
       </td>
+    </tr>
+  {/if}
+  {if $invoicing && $tax_amount}
+    <tr>
+      <td class="label">{ts 1=$taxTerm}Total %1 Amount{/ts}</td>
+      <td>{$tax_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
   {if $non_deductible_amount}
@@ -99,11 +122,12 @@
       <td>{$net_amount|crmMoney:$currency}</td>
     </tr>
   {/if}
-
-  <tr>
-    <td class="label">{ts}Received{/ts}</td>
-    <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
-  </tr>
+  {if $isDeferred AND $revenue_recognition_date}
+    <tr>
+      <td class="label">{ts}Revenue Recognition Date{/ts}</td>
+      <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
+    </tr>
+  {/if}
   {if $to_financial_account }
     <tr>
       <td class="label">{ts}Received Into{/ts}</td>
@@ -127,22 +151,24 @@
         <td>{$cancel_reason}</td>
       </tr>
     {/if}
+    {if $refund_trxn_id}
+      <tr>
+        <td class="label">{ts}Refund Transaction ID{/ts}</td>
+        <td>{$refund_trxn_id}</td>
+      </tr>
+    {/if}
   {/if}
   <tr>
-    <td class="label">{ts}Paid By{/ts}</td>
-    <td>{$payment_instrument}</td>
+    <td class="label">{ts}Payment Method{/ts}</td>
+    <td>{$payment_instrument}{if $payment_processor_name} ({$payment_processor_name}){/if}</td>
   </tr>
 
-  {if $payment_instrument eq 'Check'|ts}
+  {if $check_number}
     <tr>
       <td class="label">{ts}Check Number{/ts}</td>
       <td>{$check_number}</td>
     </tr>
   {/if}
-  <tr>
-    <td class="label">{ts}Source{/ts}</td>
-    <td>{$source}</td>
-  </tr>
 
   {if $campaign}
     <tr>
@@ -179,17 +205,17 @@
     </tr>
   {/if}
 
-  {if $invoice_id}
+  {if $invoice_number}
     <tr>
-      <td class="label">{ts}Invoice ID{/ts}</td>
-      <td>{$invoice_id}&nbsp;</td>
+      <td class="label">{ts}Invoice Number{/ts}</td>
+      <td>{$invoice_number}&nbsp;</td>
     </tr>
   {/if}
 
-  {if $honor_display}
+  {if $invoice_id}
     <tr>
-      <td class="label">{$honor_type}</td>
-      <td>{$honor_display}&nbsp;</td>
+      <td class="label">{ts}Invoice Reference{/ts}</td>
+      <td>{$invoice_id}&nbsp;</td>
     </tr>
   {/if}
 
@@ -199,25 +225,38 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
+  <tr>
+    <td class="label">{ts}Payment Details{/ts}</td>
+    <td>{include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}</td>
+  </tr>
+  {if $addRecordPayment}
+    <tr>
+      <td class='label'>{ts}Payment Summary{/ts}</td>
+      <td id='payment-info'></td>
+    </tr>
+  {/if}
 </table>
 
-{if $softContributions and !$pcp_id} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
-  <div class="crm-accordion-wrapper ">
+{if $softContributions && count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
+  <div class="crm-accordion-wrapper crm-soft-credit-pane">
     <div class="crm-accordion-header">
       {ts}Soft Credit{/ts}
     </div>
     <div class="crm-accordion-body">
-      <table class="crm-info-panel">
-        {foreach from=$softContributions.soft_credit item="softCont"}
-          {if $softCont }
-            <tr>
-              <td class="label">{ts}Soft Credit To{/ts}</td>
-              <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.soft_credit_to`"}"
-                     id="view_contact" title="{ts}View contact record{/ts}">{$softCont.softCreditToName}</a></td>
-              <td class="label">{ts}Amount{/ts}</td>
-              <td>{$softCont.soft_credit_amount|crmMoney:$currency}</td>
-            </tr>
-          {/if}
+      <table class="crm-info-panel crm-soft-credit-listing">
+        {foreach from=$softContributions item="softCont"}
+          <tr>
+            <td>
+              <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
+                 title="{ts}View contact record{/ts}">{$softCont.contact_name}
+              </a>
+            </td>
+            <td>{$softCont.amount|crmMoney:$currency}
+              {if $softCont.soft_credit_type_label}
+                ({$softCont.soft_credit_type_label})
+              {/if}
+            </td>
+          </tr>
         {/foreach}
       </table>
     </div>
@@ -251,14 +290,14 @@
       <table class="crm-info-panel">
         <tr>
           <td class="label">{ts}Personal Campaign Page{/ts}</td>
-          <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp}</a><br/>
+          <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp_title}</a><br/>
             <span class="description">{ts}Contribution was made through this personal campaign page.{/ts}</span>
           </td>
         </tr>
         <tr>
           <td class="label">{ts}Soft Credit To{/ts}</td>
-          <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$soft_credit_to`"}" id="view_contact"
-                 title="{ts}View contact record{/ts}">{$softCreditToName}</a></td>
+          <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$pcp_soft_credit_to_id`"}" id="view_contact"
+                 title="{ts}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
         </tr>
         <tr>
           <td class="label">{ts}In Public Honor Roll?{/ts}</td>
@@ -291,24 +330,30 @@
     </div>
   </fieldset>
 {/if}
+{if $addRecordPayment}
+  {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
+{/if}
 
 <div class="crm-submit-buttons">
-  {if call_user_func(array('CRM_Core_Permission','check'), 'edit contributions')}
+  {if (call_user_func(array('CRM_Core_Permission','check'), 'edit contributions') && call_user_func(array('CRM_Core_Permission', 'check'), "edit contributions of type $financial_type") && $canEdit) ||
+    	(call_user_func(array('CRM_Core_Permission','check'), 'edit contributions') && $noACL)}
     {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
     {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
     {/if}
-    <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span><div
-          class="icon edit-icon"></div>{ts}Edit{/ts}</span></a>
+    <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
+    {if $paymentButtonName}
+      <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$contact_id`"}'><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}{$paymentButtonName}{/ts}</a>
+    {/if}
   {/if}
-  {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute')}
+  {if (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && call_user_func(array('CRM_Core_Permission', 'check'), "delete contributions of type $financial_type") && $canDelete)     || (call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviContribute') && $noACL)}
     {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
     {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context&key=$searchKey"}
     {/if}
-    <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}"><span><div
-          class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
+    <a class="button" href="{crmURL p='civicrm/contact/view/contribution' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
   {/if}
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
+{crmScript file='js/crm.expandRow.js'}

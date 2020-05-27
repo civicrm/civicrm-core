@@ -1,107 +1,109 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
 
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class api_v3_OptionValueTest
+ * @group headless
+ */
 class api_v3_OptionValueTest extends CiviUnitTestCase {
-  protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
-  function setUp() {
-    $this->_apiversion = 3;
+  protected $_apiversion = 3;
+
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  function tearDown() {}
+  public function testGetCount() {
+    $result = $this->callAPISuccess('option_value', 'getcount', []);
+    $this->assertGreaterThan(100, $result);
+  }
 
   public function testGetOptionValueByID() {
-    $result = civicrm_api('option_value', 'get', array('id' => 1, 'version' => $this->_apiversion));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['id'], 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('option_value', 'get', ['id' => 1]);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['id']);
   }
 
   public function testGetOptionValueByValue() {
-    $result = civicrm_api('option_value', 'get', array('option_group_id' => 1, 'value' => '1', 'version' => $this->_apiversion));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['id'], 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('option_value', 'get', ['option_group_id' => 1, 'value' => '1']);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $result['id']);
   }
 
   /**
-   *  Test limit param
+   * Test limit param.
    */
-  function testGetOptionValueLimit() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('option_value', 'getcount', $params);
-    $this->assertGreaterThan(1, $result, "Check more than one exists In line " . __LINE__);
+  public function testGetOptionValueLimit() {
+    $params = [];
+    $result = $this->callAPISuccess('option_value', 'get', $params);
+    $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
     $params['options']['limit'] = 1;
-    $result = civicrm_api('option_value', 'getcount', $params);
-    $this->assertEquals(1, $result, "Check only 1 retrieved " . __LINE__);
+    $result = $this->callAPISuccess('option_value', 'get', $params);
+    $this->assertEquals(1, $result['count'], "Check only 1 retrieved " . __LINE__);
   }
 
   /**
-   *  Test offset param
+   * Test offset param.
    */
-  function testGetOptionValueOffSet() {
+  public function testGetOptionValueOffSet() {
 
-    $result = civicrm_api('option_value', 'getcount', array(
+    $result = $this->callAPISuccess('option_value', 'get', [
       'option_group_id' => 1,
-        'value' => '1',
-        'version' => $this->_apiversion,
-      ));
-    $result2 = civicrm_api('option_value', 'getcount', array(
+      'value' => '1',
+    ]);
+    $result2 = $this->callAPISuccess('option_value', 'get', [
       'option_group_id' => 1,
-        'value' => '1',
-        'version' => $this->_apiversion,
-        'options' => array('offset' => 1),
-      ));
-    $this->assertGreaterThan($result2, $result);
+      'value' => '1',
+      'options' => ['offset' => 1],
+    ]);
+    $this->assertGreaterThan($result2['count'], $result['count']);
   }
 
   /**
-   *  Test offset param
+   * Test offset param.
    */
-  function testGetSingleValueOptionValueSort() {
-    $description = "demonstrates use of Sort param (available in many api functions). Also, getsingle";
-    $subfile     = 'SortOption';
-    $result      = civicrm_api('option_value', 'getsingle', array(
+  public function testGetSingleValueOptionValueSort() {
+    $description = "Demonstrates use of Sort param (available in many api functions). Also, getsingle.";
+    $subfile = 'SortOption';
+    $result = $this->callAPISuccess('option_value', 'getsingle', [
       'option_group_id' => 1,
-        'version' => $this->_apiversion,
-        'options' => array(
-          'sort' => 'label ASC',
-          'limit' => 1,
-        ),
-      ));
-    $params = array(
+      'options' => [
+        'sort' => 'label ASC',
+        'limit' => 1,
+      ],
+    ]);
+    $params = [
       'option_group_id' => 1,
-      'version' => $this->_apiversion,
-      'options' => array(
+      'options' => [
         'sort' => 'label DESC',
         'limit' => 1,
-      ),
-    );
-    $result2 = civicrm_api('option_value', 'getsingle', $params);
-    $this->documentMe($params, $result2, __FUNCTION__, __FILE__, $description, $subfile);
+      ],
+    ];
+    $result2 = $this->callAPIAndDocument('option_value', 'getsingle', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertGreaterThan($result['label'], $result2['label']);
   }
 
   /**
    * Try to emulate a pagination: fetch the first page of 10 options, then fetch the second page with an offset of 9 (instead of 10) and check the start of the second page is the end of the 1st one.
    */
-  function testGetValueOptionPagination() {
+  public function testGetValueOptionPagination() {
     $pageSize = 10;
-    $page1 = civicrm_api('option_value', 'get', array('options' => array('limit' => $pageSize),
-        'version' => $this->_apiversion,
-      ));
-    $page2 = civicrm_api('option_value', 'get', array(
-      'options' => array('limit' => $pageSize,
-          // if you use it for pagination, option.offset=pageSize*pageNumber
-          'offset' => $pageSize - 1,
-        ),
-        'version' => $this->_apiversion,
-      ));
+    $page1 = $this->callAPISuccess('option_value', 'get', ['options' => ['limit' => $pageSize]]);
+    $page2 = $this->callAPISuccess('option_value', 'get', [
+      'options' => [
+        'limit' => $pageSize,
+        // if you use it for pagination, option.offset=pageSize*pageNumber
+        'offset' => $pageSize - 1,
+      ],
+    ]);
     $this->assertEquals($pageSize, $page1['count'], "Check only 10 retrieved in the 1st page " . __LINE__);
     $this->assertEquals($pageSize, $page2['count'], "Check only 10 retrieved in the 2nd page " . __LINE__);
 
@@ -112,191 +114,382 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   public function testGetOptionGroup() {
-    $params = array('option_group_id' => 1, 'version' => $this->_apiversion);
-    $result = civicrm_api('option_value', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertGreaterThan(1, $result['count'], 'In line ' . __LINE__);
+    $params = ['option_group_id' => 1];
+    $result = $this->callAPIAndDocument('option_value', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertGreaterThan(1, $result['count']);
   }
-  /*
-     * test that using option_group_name returns more than 1 & less than all
-     */
 
-
-
+  /**
+   * Test that using option_group_name returns more than 1 & less than all
+   */
   public function testGetOptionGroupByName() {
-    $activityTypesParams = array('option_group_name' => 'activity_type', 'version' => $this->_apiversion, 'option.limit' => 100);
-    $params              = array('version' => $this->_apiversion, 'option.limit' => 100);
-    $activityTypes       = civicrm_api('option_value', 'get', $activityTypesParams);
-    $result              = civicrm_api('option_value', 'get', $params);
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertGreaterThan(1, $activityTypes['count'], 'In line ' . __LINE__);
-    $this->assertGreaterThan($activityTypes['count'], $result['count'], 'In line ' . __LINE__);
+    $activityTypesParams = ['option_group_name' => 'activity_type', 'option.limit' => 100];
+    $params = ['option.limit' => 100];
+    $activityTypes = $this->callAPISuccess('option_value', 'get', $activityTypesParams);
+    $result = $this->callAPISuccess('option_value', 'get', $params);
+    $this->assertGreaterThan(1, $activityTypes['count']);
+    $this->assertGreaterThan($activityTypes['count'], $result['count']);
   }
+
   public function testGetOptionDoesNotExist() {
-    $result = civicrm_api('option_value', 'get', array('label' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB', 'version' => $this->_apiversion));
-    $this->assertEquals(0, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertEquals(0, $result['count'], 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('option_value', 'get', ['label' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB']);
+    $this->assertEquals(0, $result['count']);
   }
-/*
- * Check that domain_id is honoured
- */
+
+  /**
+   * Check that domain_id is honoured.
+   */
   public function testCreateOptionSpecifyDomain() {
-    $result = civicrm_api('option_group', 'get', array(
+    $result = $this->callAPISuccess('option_group', 'get', [
       'name' => 'from_email_address',
       'sequential' => 1,
-      'version' => $this->_apiversion,
-      'api.option_value.create' => array('domain_id' => 2, 'name' => 'my@y.com'),
-      ));
-    $this->assertAPISuccess($result);
+      'api.option_value.create' => ['domain_id' => 2, 'name' => 'my@y.com', 'value' => '10'],
+    ]);
+
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
-    $domain_id = civicrm_api('option_value', 'getvalue', array(
+    $domain_id = $this->callAPISuccess('option_value', 'getvalue', [
       'id' => $optionValueId,
-      'version' => $this->_apiversion,
       'return' => 'domain_id',
-    ));
+    ]);
     $this->assertEquals(2, $domain_id);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $optionValueId]);
   }
-  /*
-   * Check that component_id is honoured
-  */
+
+  /**
+   * Check that component_id is honoured.
+   */
   public function testCreateOptionSpecifyComponentID() {
-    $result = civicrm_api('option_group', 'get', array(
+    $result = $this->callAPISuccess('option_group', 'get', [
       'name' => 'from_email_address',
       'sequential' => 1,
-      'version' => $this->_apiversion,
-      'api.option_value.create' => array('component_id' => 2, 'name' => 'my@y.com'),
-    ));
+      'api.option_value.create' => ['component_id' => 2, 'name' => 'my@y.com'],
+    ]);
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
-    $component_id = civicrm_api('option_value', 'getvalue', array(
+    $component_id = $this->callAPISuccess('option_value', 'getvalue', [
       'id' => $optionValueId,
-      'version' => $this->_apiversion,
       'return' => 'component_id',
-    ));
+    ]);
     $this->assertEquals(2, $component_id);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $optionValueId]);
   }
-  /*
-   * Check that component  continues to be honoured
-  */
-  public function testCreateOptionSpecifyComponent() {
-    $result = civicrm_api('option_group', 'get', array(
-      'name' => 'from_email_address',
-      'sequential' => 1,
-      'version' => $this->_apiversion,
-      'api.option_value.create' => array(
-        'component_id' => 'CiviContribute',
-        'name' => 'my@y.com'
-       ),
 
-    ));
-    $this->assertAPISuccess($result);
-    $optionValueId = $result['values'][0]['api.option_value.create']['id'];
-    $component_id = civicrm_api('option_value', 'getvalue', array(
-      'id' => $optionValueId,
-      'version' => $this->_apiversion,
-      'return' => 'component_id',
-    ));
-    $this->assertEquals(2, $component_id);
-  }
-  /*
-   * Check that component string is honoured
-  */
+  /**
+   * Check that component string is honoured.
+   */
   public function testCreateOptionSpecifyComponentString() {
-    $result = civicrm_api('option_group', 'get', array(
+    $result = $this->callAPISuccess('option_group', 'get', [
       'name' => 'from_email_address',
       'sequential' => 1,
-      'version' => $this->_apiversion,
-      'api.option_value.create' => array(
+      'api.option_value.create' => [
         'component_id' => 'CiviContribute',
-        'name' => 'my@y.com'),
-
-    ));
+        'name' => 'my@y.com',
+      ],
+    ]);
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
-    $component_id = civicrm_api('option_value', 'getvalue', array(
+    $component_id = $this->callAPISuccess('option_value', 'getvalue', [
       'id' => $optionValueId,
-      'version' => $this->_apiversion,
       'return' => 'component_id',
-    ));
+    ]);
     $this->assertEquals(2, $component_id);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $optionValueId]);
   }
-  /*
-   * Check that domain_id is honoured
-  */
-  public function testCRM12133CreateOptionWeightNoValue() {
-    $optionGroup = civicrm_api(
-      'option_group', 'get', array(
+
+  /**
+   * Check that component is honoured when fetching options.
+   */
+  public function testGetOptionWithComponent() {
+    $components = Civi::settings()->get('enable_components');
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+    $this->callAPISuccess('option_group', 'get', [
       'name' => 'gender',
-      'sequential' => 1,
-      'version' => $this->_apiversion,
-    ));
+      'api.option_value.create' => [
+        'component_id' => 'CiviContribute',
+        'name' => 'Contrib',
+      ],
+    ]);
+    // Verify new option is present
+    $genders = $this->callAPISuccess('contact', 'getoptions', [
+      'field' => 'gender_id',
+      'context' => 'create',
+    ]);
+    $this->assertContains('Contrib', $genders['values']);
+
+    // Disable relevant component
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
+    CRM_Core_PseudoConstant::flush();
+    // New option should now be hidden for "create" context
+    $genders = $this->callAPISuccess('contact', 'getoptions', [
+      'field' => 'gender_id',
+      'context' => 'create',
+    ]);
+    $this->assertNotContains('Contrib', $genders['values']);
+    // New option should be visible for "get" context even with component disabled
+    $genders = $this->callAPISuccess('contact', 'getoptions', [
+      'field' => 'gender_id',
+      'context' => 'get',
+    ]);
+    $this->assertContains('Contrib', $genders['values']);
+
+    // Now disable all components and ensure we can still fetch options with no errors
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents([]);
+    CRM_Core_PseudoConstant::flush();
+    // New option should still be hidden for "create" context
+    $genders = $this->callAPISuccess('contact', 'getoptions', [
+      'field' => 'gender_id',
+      'context' => 'create',
+    ]);
+    $this->assertNotContains('Contrib', $genders['values']);
+
+    // Restore original state
+    CRM_Core_BAO_ConfigSetting::setEnabledComponents($components);
+  }
+
+  /**
+   * Check that domain_id is honoured.
+   */
+  public function testCRM12133CreateOptionWeightNoValue() {
+    $optionGroup = $this->callAPISuccess(
+      'option_group', 'get', [
+        'name' => 'gender',
+        'sequential' => 1,
+      ]
+    );
     $this->assertAPISuccess($optionGroup);
-    $params = array(
+    $params = [
       'option_group_id' => $optionGroup['id'],
       'label' => 'my@y.com',
-      'version' => $this->_apiversion,
       'weight' => 3,
-    );
-    $optionValue = civicrm_api('option_value', 'create',  $params);
+    ];
+    $optionValue = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue);
     $params['weight'] = 4;
-    $optionValue2 = civicrm_api('option_value', 'create',  $params );
+    $optionValue2 = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue2);
-    $options = civicrm_api('option_value', 'get', array('version' => 3, 'option_group_id' => $optionGroup['id']));
+    $options = $this->callAPISuccess('option_value', 'get', ['option_group_id' => $optionGroup['id']]);
     $this->assertNotEquals($options['values'][$optionValue['id']]['value'], $options['values'][$optionValue2['id']]['value']);
 
-  //cleanup
-    civicrm_api('option_value', 'delete', array('version' => 3, 'id' => $optionValue['id']));
-    civicrm_api('option_value', 'delete', array('version' => 3, 'id' => $optionValue2['id']));
+    //cleanup
+    $this->callAPISuccess('option_value', 'delete', ['id' => $optionValue['id']]);
+    $this->callAPISuccess('option_value', 'delete', ['id' => $optionValue2['id']]);
   }
 
-  /*
-   * Check that domain_id is honoured
-  */
+  /**
+   * Check that domain_id is honoured.
+   */
   public function testCreateOptionNoName() {
-    $optionGroup = civicrm_api('option_group', 'get', array(
+    $optionGroup = $this->callAPISuccess('option_group', 'get', [
       'name' => 'gender',
       'sequential' => 1,
-      'version' => $this->_apiversion,
-    ));
+    ]);
 
-    $params = array('option_group_id' => $optionGroup['id'], 'label' => 'my@y.com', 'version' => $this->_apiversion);
-    $optionValue = civicrm_api('option_value', 'create',  $params);
+    $params = ['option_group_id' => $optionGroup['id'], 'label' => 'my@y.com'];
+    $optionValue = $this->callAPISuccess('option_value', 'create', $params);
     $this->assertAPISuccess($optionValue);
     $this->getAndCheck($params, $optionValue['id'], 'option_value');
   }
-  /*
-   * Check that pseudoconstant reflects new value added
-  * and deleted
-  */
+
+  /**
+   * Check that pseudoconstant reflects new value added.
+   */
   public function testCRM11876CreateOptionPseudoConstantUpdated() {
-    $optionGroupID = civicrm_api('option_group', 'getvalue', array(
-      'version' => $this->_apiversion,
+    $optionGroupID = $this->callAPISuccess('option_group', 'getvalue', [
       'name' => 'payment_instrument',
-      'return' => 'id',)
-    );
-    $apiResult = civicrm_api('option_value', 'create', array(
-      'option_group_id' =>  $optionGroupID,
-      'label' => 'newest',
-      'version' => $this->_apiversion,
-    ));
+      'return' => 'id',
+    ]);
+    $newOption = (string) time();
+    $apiResult = $this->callAPISuccess('option_value', 'create', [
+      'option_group_id' => $optionGroupID,
+      'label' => $newOption,
+    ]);
 
-    $this->assertAPISuccess($apiResult);
-    $fields = civicrm_api('contribution', 'getoptions', array(
-      'version' => $this->_apiversion,
-      'field' => 'payment_instrument',
-      )
-    );
-    $this->assertTrue(in_array('newest', $fields['values']));
-    $deleteResult = civicrm_api('option_value', 'delete', array('id' => $apiResult['id'], 'version' => $this->_apiversion));
-    $this->assertAPISuccess($deleteResult);
-    $fields = civicrm_api('contribution', 'getoptions', array(
-      'version' => $this->_apiversion,
-      'field' => 'payment_instrument',
-      )
-    );
-    $this->assertFalse(in_array('newest', $fields['values']));
+    $fields = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
+    $this->assertTrue(in_array($newOption, $fields['values']));
+
+    $this->callAPISuccess('option_value', 'delete', ['id' => $apiResult['id']]);
+
+    $fields = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
+    $this->assertFalse(in_array($newOption, $fields['values']));
   }
-}
 
+  /**
+   * Update option value with 'id' parameter and the value to update
+   * and not passing option group id
+   */
+  public function testUpdateOptionValueNoGroupId() {
+    // create a option group
+    $og = $this->callAPISuccess('option_group', 'create', ['name' => 'our test Option Group', 'is_active' => 1]);
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => $og['id'], 'label' => 'test option value']
+    );
+    // update option value without 'option_group_id'
+    $res = $this->callAPISuccess('option_value', 'create', ['id' => $ov['id'], 'is_active' => 0]);
+    $val = $this->callAPISuccess('option_value', 'getvalue', [
+      'id' => $ov['id'],
+      'return' => 'is_active',
+    ]);
+    $this->assertEquals($val, 0, "update with no group id is not proper" . __LINE__);
+  }
+
+  /**
+   * Update option value with 'id' parameter and the value to update
+   * and as well as option group id
+   */
+  public function testUpdateOptionValueWithGroupId() {
+    // create a option group
+    $og = $this->callAPISuccess('option_group', 'create', [
+      'name' => 'our test Option Group for with group id',
+      'is_active' => 1,
+    ]);
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => $og['id'], 'label' => 'test option value']
+    );
+    // update option value without 'option_group_id'
+    $this->callAPISuccess('option_value', 'create', [
+      'id' => $ov['id'],
+      'option_group_id' => $og['id'],
+      'is_active' => 0,
+    ]);
+    $val = $this->callAPISuccess('option_value', 'getvalue', [
+      'id' => $ov['id'],
+      'return' => 'is_active',
+    ]);
+    $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
+  }
+
+  /**
+   * CRM-19346 Ensure that Option Values cannot share same value in the same option value group
+   */
+  public function testCreateOptionValueWithSameValue() {
+    $og = $this->callAPISuccess('option_group', 'create', [
+      'name' => 'our test Option Group for with group id',
+      'is_active' => 1,
+    ]);
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => $og['id'], 'label' => 'test option value']
+    );
+    // update option value without 'option_group_id'
+    $this->callAPIFailure('option_value', 'create',
+      ['option_group_id' => $og['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value']]
+    );
+  }
+
+  /**
+   * CRM-21737 Ensure that language Option Values CAN share same value.
+   */
+  public function testCreateOptionValueWithSameValueLanguagesException() {
+    $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => 'languages', 'label' => 'Quasi English', 'name' => 'en_Qu', 'value' => 'en']
+    );
+    $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => 'languages', 'label' => 'Semi English', 'name' => 'en_Se', 'value' => 'en']
+    );
+
+  }
+
+  public function testCreateOptionValueWithSameValueDiffOptionGroup() {
+    $og = $this->callAPISuccess('option_group', 'create', [
+      'name' => 'our test Option Group',
+      'is_active' => 1,
+    ]);
+    // create a option value
+    $ov = $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => $og['id'], 'label' => 'test option value']
+    );
+    $og2 = $this->callAPISuccess('option_group', 'create', [
+      'name' => 'our test Option Group 2',
+      'is_active' => 1,
+    ]);
+    // update option value without 'option_group_id'
+    $ov2 = $this->callAPISuccess('option_value', 'create',
+      ['option_group_id' => $og2['id'], 'label' => 'Test 2nd option value', 'value' => $ov['values'][$ov['id']]['value']]
+    );
+  }
+
+  /**
+   * Test to create and update payment method with financial account.
+   */
+  public function testCreateUpdateOptionValueForPaymentInstrument() {
+    $assetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
+      'return' => "id",
+      'financial_account_type_id' => "Asset",
+      'options' => ['limit' => 1],
+    ]);
+    // create new payment method with financial account
+    $ov = $this->callAPISuccess('OptionValue', 'create', [
+      'financial_account_id' => $assetFinancialAccountId,
+      'option_group_id' => "payment_instrument",
+      'label' => "Dummy Payment Method",
+    ]);
+
+    //check if relationship is created between Payment method and Financial Account
+    $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+
+    // update payment method to have different non-asset financial Account
+    $nonAssetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
+      'return' => "id",
+      'financial_account_type_id' => ['NOT IN' => ["Asset"]],
+      'options' => ['limit' => 1],
+    ]);
+    try {
+      $result = $this->callAPISuccess('OptionValue', 'create', [
+        'financial_account_id' => $nonAssetFinancialAccountId,
+        'id' => $ov['id'],
+      ]);
+      throw new API_Exception(ts('Should throw error.'));
+    }
+    catch (Exception $e) {
+      try {
+        $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
+          'return' => "account_relationship",
+          'entity_table' => "civicrm_option_value",
+          'entity_id' => $ov['id'],
+          'financial_account_id' => $nonAssetFinancialAccountId,
+        ]);
+        throw new API_Exception(ts('Should throw error.'));
+      }
+      catch (Exception $e) {
+        $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+      }
+    }
+    // update payment method to have different asset financial Account
+    $assetFinancialAccountId = $this->callAPISuccessGetValue('FinancialAccount', [
+      'return' => "id",
+      'financial_account_type_id' => "Asset",
+      'options' => ['limit' => 1],
+      'id' => ['NOT IN' => [$assetFinancialAccountId]],
+    ]);
+    $result = $this->callAPISuccess('OptionValue', 'create', [
+      'financial_account_id' => $assetFinancialAccountId,
+      'id' => $ov['id'],
+    ]);
+    //check if relationship is updated between Payment method and Financial Account
+    $this->checkPaymentMethodFinancialAccountRelationship($ov['id'], $assetFinancialAccountId);
+  }
+
+  /**
+   * Function to check relationship between FA and Payment method.
+   *
+   * @param int $paymentMethodId
+   * @param int $financialAccountId
+   */
+  protected function checkPaymentMethodFinancialAccountRelationship($paymentMethodId, $financialAccountId) {
+    $assetAccountRelValue = $this->callAPISuccessGetValue('EntityFinancialAccount', [
+      'return' => "account_relationship",
+      'entity_table' => "civicrm_option_value",
+      'entity_id' => $paymentMethodId,
+      'financial_account_id' => $financialAccountId,
+    ]);
+    $checkAssetAccountIs = $this->callAPISuccessGetValue('OptionValue', [
+      'return' => "id",
+      'option_group_id' => "account_relationship",
+      'name' => "Asset Account is",
+      'value' => $assetAccountRelValue,
+    ]);
+  }
+
+}

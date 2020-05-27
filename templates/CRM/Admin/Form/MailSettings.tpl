@@ -1,30 +1,13 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing email settings.  *}
-<h3>{if $action eq 1}{ts}New Email Settings{/ts}{elseif $action eq 2}{ts}Edit Email Settings{/ts}{else}{ts}Delete Email Settings{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-mail-settings-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {if $action eq 8}
@@ -68,7 +51,20 @@
 
   <tr class="crm-mail-settings-form-block-is_default"><td class="label">{$form.is_default.label}</td><td>{$form.is_default.html}</td></tr>
   <tr><td class="label">&nbsp;</td><td class="description">{ts}How this mail account will be used. Only one box may be used for bounce processing. It will also be used as the envelope email when sending mass mailings.{/ts}</td></tr>
+
+  <tr class="crm-mail-settings-form-block-activity_status"><td class="label">{$form.activity_status.label}</td><td>{$form.activity_status.html}</td></tr>
     </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if}
 </div>
+{literal}
+<script type="text/javascript">
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    function showActivityStatus() {
+      $('.crm-mail-settings-form-block-activity_status', $form).toggle($(this).val() === '0');
+    }
+    $('select[name=is_default]').each(showActivityStatus).change(showActivityStatus);
+  });
+</script>
+{/literal}

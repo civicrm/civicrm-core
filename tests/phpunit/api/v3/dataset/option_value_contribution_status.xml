@@ -67,7 +67,7 @@
       <value>1</value>          <!--  is_active  -->
       <null />                  <!--  component_id  -->
       <null />                  <!--  visibility_id  -->
-    </row>    
+    </row>
     <row>
       <value>66</value>        <!--  id  -->
       <value>11</value>         <!--  option_group_id  -->
@@ -101,7 +101,7 @@
       <value>1</value>          <!--  is_active  -->
       <null />                  <!--  component_id  -->
       <null />                  <!--  visibility_id  -->
-    </row>    
+    </row>
     <row>
       <value>63</value>        <!--  id  -->
       <value>11</value>         <!--  option_group_id  -->
@@ -118,6 +118,6 @@
       <value>1</value>          <!--  is_active  -->
       <null />                  <!--  component_id  -->
       <null />                  <!--  visibility_id  -->
-    </row>        
+    </row>
   </table>
 </dataset>

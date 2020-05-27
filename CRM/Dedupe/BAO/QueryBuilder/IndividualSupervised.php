@@ -1,20 +1,39 @@
 <?php
 
-// TODO: How to handle NULL values/records?
+/**
+ * TODO: How to handle NULL values/records?
+ * Class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised
+ */
 class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_QueryBuilder {
 
-  static function record($rg) {
+  /**
+   * Record - what do I do.
+   *
+   * @param object $rg
+   *
+   * @return array
+   */
+  public static function record($rg) {
 
-    $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params, array());
-    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, array());
+    $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params, []);
+    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, []);
 
-    $params = array(
-      1 => array(CRM_Utils_Array::value('first_name', $civicrm_contact, ''), 'String'),
-      2 => array(CRM_Utils_Array::value('last_name', $civicrm_contact, ''), 'String'),
-      3 => array(CRM_Utils_Array::value('email', $civicrm_email, ''), 'String'),
-    );
+    $params = [
+      1 => [
+        CRM_Utils_Array::value('first_name', $civicrm_contact, ''),
+        'String',
+      ],
+      2 => [
+        CRM_Utils_Array::value('last_name', $civicrm_contact, ''),
+        'String',
+      ],
+      3 => [
+        CRM_Utils_Array::value('email', $civicrm_email, ''),
+        'String',
+      ],
+    ];
 
-    return array(
+    return [
       "civicrm_contact.{$rg->name}.{$rg->threshold}" => CRM_Core_DAO::composeQuery("
                 SELECT contact.id as id1, {$rg->threshold} as weight
                 FROM civicrm_contact as contact
@@ -23,11 +42,18 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
                   AND first_name = %1
                   AND last_name = %2
                   AND email = %3", $params, TRUE),
-    );
+    ];
   }
 
-  static function internal($rg) {
-    $query = "
+  /**
+   * Internal - what do I do.
+   *
+   * @param object $rg
+   *
+   * @return array
+   */
+  public static function internal($rg) {
+    $query = self::filterQueryByContactList($rg->contactIds, "
             SELECT contact1.id as id1, contact2.id as id2, {$rg->threshold} as weight
             FROM civicrm_contact as contact1
               JOIN civicrm_email as email1 ON email1.contact_id=contact1.id
@@ -37,11 +63,11 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
               JOIN civicrm_email as email2 ON
                 email2.contact_id=contact2.id AND
                 email1.email=email2.email
-            WHERE contact1.contact_type = 'Individual'
-              AND " . self::internalFilters($rg);
-    return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
+            WHERE contact1.contact_type = 'Individual'");
+
+    return [
+      "civicrm_contact.{$rg->name}.{$rg->threshold}" => $query,
+    ];
   }
-};
 
-
-
+}

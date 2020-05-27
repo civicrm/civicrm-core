@@ -1,45 +1,44 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
+
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_PDF_Utils {
 
-  static function html2pdf(&$text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
+  /**
+   * @param array $text
+   *   List of HTML snippets.
+   * @param string $fileName
+   *   The logical filename to display.
+   *   Ex: "HelloWorld.pdf".
+   * @param bool $output
+   *   FALSE to display PDF. TRUE to return as string.
+   * @param null $pdfFormat
+   *   Unclear. Possibly PdfFormat or formValues.
+   *
+   * @return string|void
+   */
+  public static function html2pdf($text, $fileName = 'civicrm.pdf', $output = FALSE, $pdfFormat = NULL) {
     if (is_array($text)) {
       $pages = &$text;
     }
     else {
-      $pages = array($text);
+      $pages = [$text];
     }
     // Get PDF Page Format
     $format = CRM_Core_BAO_PdfFormat::getDefaultValues();
@@ -47,49 +46,54 @@ class CRM_Utils_PDF_Utils {
       // PDF Page Format parameters passed in
       $format = array_merge($format, $pdfFormat);
     }
-    else {
+    elseif (!empty($pdfFormat)) {
       // PDF Page Format ID passed in
       $format = CRM_Core_BAO_PdfFormat::getById($pdfFormat);
     }
-    $paperSize    = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
-    $paper_width  = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
+    $paperSize = CRM_Core_BAO_PaperSize::getByName($format['paper_size']);
+    $paper_width = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
     $paper_height = self::convertMetric($paperSize['height'], $paperSize['metric'], 'pt');
     // dompdf requires dimensions in points
-    $paper_size  = array(0, 0, $paper_width, $paper_height);
+    $paper_size = [0, 0, $paper_width, $paper_height];
     $orientation = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
-    $metric      = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
-    $t           = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
-    $r           = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
-    $b           = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
-    $l           = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
-    $margins     = array($metric,$t,$r,$b,$l);
+    $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
+    $t = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
+    $r = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
+    $b = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
+    $l = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
 
-    $config = CRM_Core_Config::singleton();
+    $margins = [$metric, $t, $r, $b, $l];
+
+    // Add a special region for the HTML header of PDF files:
+    $pdfHeaderRegion = CRM_Core_Region::instance('export-document-header', FALSE);
+    $htmlHeader = ($pdfHeaderRegion) ? $pdfHeaderRegion->render('', FALSE) : '';
+
     $html = "
 <html>
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
     <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric}; }</style>
-    <style type=\"text/css\">@import url({$config->userFrameworkResourceURL}css/print.css);</style>
+    <style type=\"text/css\">@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
+    {$htmlHeader}
   </head>
   <body>
     <div id=\"crm-container\">\n";
 
     // Strip <html>, <header>, and <body> tags from each page
-    $htmlElementstoStrip = array(
-      '@<head[^>]*?>.*?</head>@siu',
-      '@<body>@siu',
-      '@</body>@siu',
-      '@<html[^>]*?>@siu',
-      '@</html>@siu',
-      '@<!DOCTYPE[^>]*?>@siu',
-    );
-    $htmlElementsInstead = array('', '', '', '', '', '');
+
+    $htmlElementstoStrip = [
+      '<head[^>]*?>.*?</head>',
+      '<script[^>]*?>.*?</script>',
+      '<body>',
+      '</body>',
+      '<html[^>]*?>',
+      '</html>',
+      '<!DOCTYPE[^>]*?>',
+    ];
     foreach ($pages as & $page) {
-      $page = preg_replace($htmlElementstoStrip,
-        $htmlElementsInstead,
-        $page
-      );
+      foreach ($htmlElementstoStrip as $pattern) {
+        $page = mb_eregi_replace($pattern, '', $page);
+      }
     }
     // Glue the pages together
     $html .= implode("\n<div style=\"page-break-after: always\"></div>\n", $pages);
@@ -97,7 +101,7 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
-    if ($config->wkhtmltopdfPath) {
+    if (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
@@ -105,10 +109,81 @@ class CRM_Utils_PDF_Utils {
     }
   }
 
-  static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
-    require_once 'packages/dompdf/dompdf_config.inc.php';
-    spl_autoload_register('DOMPDF_autoload');
-    $dompdf = new DOMPDF();
+  /**
+   * Convert html to tcpdf.
+   *
+   * @deprecated
+   * @param $paper_size
+   * @param $orientation
+   * @param $margins
+   * @param $html
+   * @param $output
+   * @param $fileName
+   * @param $stationery_path
+   */
+  public static function _html2pdf_tcpdf($paper_size, $orientation, $margins, $html, $output, $fileName, $stationery_path) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_PDF::_html2pdf_dompdf');
+    return self::_html2pdf_dompdf($paper_size, $orientation, $margins, $html, $output, $fileName);
+    // Documentation on the TCPDF library can be found at: http://www.tcpdf.org
+    // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/
+    // Syntax borrowed from https://github.com/jake-mw/CDNTaxReceipts/blob/master/cdntaxreceipts.functions.inc
+    require_once 'tcpdf/tcpdf.php';
+    // This library is only in the 'packages' area as of version 4.5
+    require_once 'FPDI/fpdi.php';
+
+    $paper_size_arr = [$paper_size[2], $paper_size[3]];
+
+    $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
+    $pdf->Open();
+
+    if (is_readable($stationery_path)) {
+      $pdf->SetStationery($stationery_path);
+    }
+
+    $pdf->SetAuthor('');
+    $pdf->SetKeywords('CiviCRM.org');
+    $pdf->setPageUnit($margins[0]);
+    $pdf->SetMargins($margins[4], $margins[1], $margins[2], TRUE);
+
+    $pdf->setJPEGQuality('100');
+    $pdf->SetAutoPageBreak(TRUE, $margins[3]);
+
+    $pdf->AddPage();
+
+    $ln = TRUE;
+    $fill = FALSE;
+    $reset_parm = FALSE;
+    $cell = FALSE;
+    $align = '';
+
+    // output the HTML content
+    $pdf->writeHTML($html, $ln, $fill, $reset_parm, $cell, $align);
+
+    // reset pointer to the last page
+    $pdf->lastPage();
+
+    // close and output the PDF
+    $pdf->Close();
+    $pdf_file = 'CiviLetter' . '.pdf';
+    $pdf->Output($pdf_file, 'D');
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * @param $paper_size
+   * @param $orientation
+   * @param $html
+   * @param $output
+   * @param string $fileName
+   *
+   * @return string
+   */
+  public static function _html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName) {
+    // CRM-12165 - Remote file support required for image handling.
+    $options = new Options();
+    $options->set('isRemoteEnabled', TRUE);
+
+    $dompdf = new DOMPDF($options);
     $dompdf->set_paper($paper_size, $orientation);
     $dompdf->load_html($html);
     $dompdf->render();
@@ -117,11 +192,21 @@ class CRM_Utils_PDF_Utils {
       return $dompdf->output();
     }
     else {
+      // CRM-19183 remove .pdf extension from filename
+      $fileName = basename($fileName, ".pdf");
       $dompdf->stream($fileName);
     }
   }
 
-  static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
+  /**
+   * @param $paper_size
+   * @param $orientation
+   * @param $margins
+   * @param $html
+   * @param $output
+   * @param string $fileName
+   */
+  public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     require_once 'packages/snappy/src/autoload.php';
     $config = CRM_Core_Config::singleton();
     $snappy = new Knp\Snappy\Pdf($config->wkhtmltopdfPath);
@@ -137,16 +222,23 @@ class CRM_Utils_PDF_Utils {
       return $pdf;
     }
     else {
-      header('Content-Type: application/pdf');
-      header('Content-Disposition: attachment; filename="' . $fileName . '"');
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/pdf');
+      CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"');
       echo $pdf;
     }
   }
 
-  /*
-   * function to convert value from one metric to another
+  /**
+   * convert value from one metric to another.
+   *
+   * @param $value
+   * @param $from
+   * @param $to
+   * @param null $precision
+   *
+   * @return float|int
    */
-  static function convertMetric($value, $from, $to, $precision = NULL) {
+  public static function convertMetric($value, $from, $to, $precision = NULL) {
     switch ($from . $to) {
       case 'incm':
         $value *= 2.54;
@@ -202,116 +294,4 @@ class CRM_Utils_PDF_Utils {
     return $value;
   }
 
-  static function &pdflib($fileName,
-    $searchPath,
-    &$values,
-    $numPages = 1,
-    $echo     = TRUE,
-    $output   = 'College_Match_App',
-    $creator  = 'CiviCRM',
-    $author   = 'http://www.civicrm.org/',
-    $title    = '2006 College Match Scholarship Application'
-  ) {
-    try {
-      $pdf = new PDFlib();
-      $pdf->set_parameter("compatibility", "1.6");
-      $pdf->set_parameter("licensefile", "/home/paras/bin/license/pdflib.txt");
-
-      if ($pdf->begin_document('', '') == 0) {
-        CRM_Core_Error::statusBounce("PDFlib Error: " . $pdf->get_errmsg());
-      }
-
-      $config = CRM_Core_Config::singleton();
-      $pdf->set_parameter('resourcefile', $config->templateDir . '/Quest/pdf/pdflib.upr');
-      $pdf->set_parameter('textformat', 'utf8');
-
-      /* Set the search path for fonts and PDF files */
-
-      $pdf->set_parameter('SearchPath', $searchPath);
-
-      /* This line is required to avoid problems on Japanese systems */
-
-      $pdf->set_parameter('hypertextencoding', 'winansi');
-
-      $pdf->set_info('Creator', $creator);
-      $pdf->set_info('Author', $author);
-      $pdf->set_info('Title', $title);
-
-      $blockContainer = $pdf->open_pdi($fileName, '', 0);
-      if ($blockContainer == 0) {
-        CRM_Core_Error::statusBounce('PDFlib Error: ' . $pdf->get_errmsg());
-      }
-
-      for ($i = 1; $i <= $numPages; $i++) {
-        $page = $pdf->open_pdi_page($blockContainer, $i, '');
-        if ($page == 0) {
-          CRM_Core_Error::statusBounce('PDFlib Error: ' . $pdf->get_errmsg());
-        }
-
-        /* dummy page size */
-        $pdf->begin_page_ext(20, 20, '');
-
-        /* This will adjust the page size to the block container's size. */
-
-        $pdf->fit_pdi_page($page, 0, 0, 'adjustpage');
-
-
-        $status = array();
-        /* Fill all text blocks with dynamic data */
-
-        foreach ($values as $key => $value) {
-          if (is_array($value)) {
-            continue;
-          }
-
-          // pdflib does like the forward slash character, hence convert
-          $value = str_replace('/', '_', $value);
-
-          $res = $pdf->fill_textblock($page,
-            $key,
-            $value,
-            'embedding encoding=winansi'
-          );
-
-          /**
-           if ( $res == 0 ) {
-           CRM_Core_Error::debug( "$key, $value: $res", $pdf->get_errmsg( ) );
-           } else {
-           CRM_Core_Error::debug( "SUCCESS: $key, $value", null );
-           }
-           **/
-        }
-
-        $pdf->end_page_ext('');
-        $pdf->close_pdi_page($page);
-      }
-
-      $pdf->end_document('');
-      $pdf->close_pdi($blockContainer);
-
-      $buf = $pdf->get_buffer();
-      $len = strlen($buf);
-
-      if ($echo) {
-        header('Content-type: application/pdf');
-        header("Content-Length: $len");
-        header("Content-Disposition: inline; filename={$output}.pdf");
-        echo $buf;
-        CRM_Utils_System::civiExit();
-      }
-      else {
-        return $buf;
-      }
-    }
-    catch(PDFlibException$excp) {
-      CRM_Core_Error::statusBounce('PDFlib Error: Exception' .
-        "[" . $excp->get_errnum() . "] " . $excp->get_apiname() . ": " .
-        $excp->get_errmsg()
-      );
-    }
-    catch(Exception$excp) {
-      CRM_Core_Error::statusBounce("PDFlib Error: " . $excp->get_errmsg());
-    }
-  }
 }
-

@@ -1,88 +1,79 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-/*
+
+/**
  * Settings metadata file
  */
 
-return array(
-  'is_enabled' => array(
+return [
+  'is_enabled' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'is_enabled',
-    'type' => 'Integer',
-    'default' => null,
+    'title' => ts('Enable Multi Site Configuration'),
+    'html_type' => 'checkbox',
+    'type' => 'Boolean',
+    'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Multisite is enabled',
-    'help_text' => null,
-  ),
-  'domain_group_id' => array(
+    'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
+    'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
+    'help_text' => NULL,
+    'settings_pages' => ['multisite' => ['weight' => 10]],
+  ],
+  'domain_group_id' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'domain_group_id',
+    'title' => ts('Multisite Domain Group'),
     'type' => 'Integer',
-    'default' => null,
+    'html_type' => 'entity_reference',
+    'entity_reference_options' => ['entity' => 'Group', 'select' => ['minimumInputLength' => 0]],
+    'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => null,
-    'help_text' => null,
-  ),
-  'event_price_set_domain_id' => array(
+    'description' => ts('Contacts created on this site are added to this group'),
+    'help_text' => NULL,
+    'settings_pages' => ['multisite' => ['weight' => 20]],
+  ],
+  'event_price_set_domain_id' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'event_price_set_domain_id',
+    'title' => ts('Domain Event Price Set'),
     'type' => 'Integer',
-    'default' => null,
+    'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
-    'help_text' => null,
-  ),
-  'uniq_email_per_site' => array(
+    'help_text' => NULL,
+  ],
+  'uniq_email_per_site' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'uniq_email_per_site',
     'type' => 'Integer',
-    'default' => null,
+    'title' => ts('Unique Email per Domain?'),
+    'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
-    'help_text' => null,
-  ),
- );
+    'help_text' => NULL,
+  ],
+];

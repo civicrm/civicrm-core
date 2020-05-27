@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -53,52 +37,49 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
    *
-   * @return  array   array of action links that we need to display for the browse screen
-   * @access public
-   */ 
-  function &actionLinks() {
+   * @return array
+   *   array of action links that we need to display for the browse screen
+   */
+  public static function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::BROWSE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::BROWSE => [
           'name' => ts('View and Edit Custom Fields'),
           'url' => 'civicrm/admin/custom/group/field',
           'qs' => 'reset=1&action=browse&gid=%%id%%',
           'title' => ts('View and Edit Custom Fields'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/custom/group',
           'qs' => 'action=preview&reset=1&id=%%id%%',
           'title' => ts('Preview Custom Data Set'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
           'url' => 'civicrm/admin/custom/group',
           'qs' => 'action=update&reset=1&id=%%id%%',
           'title' => ts('Edit Custom Set'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomGroup' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Set'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomGroup' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Set'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/custom/group',
           'qs' => 'action=delete&reset=1&id=%%id%%',
           'title' => ts('Delete Custom Set'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
@@ -110,13 +91,9 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    *
-   * @param null
-   *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -157,15 +134,16 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * edit custom group
+   * Edit custom group.
    *
-   * @param int    $id       custom group id
-   * @param string $action   the action to be invoked
+   * @param int $id
+   *   Custom group id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function edit($id, $action) {
+  public function edit($id, $action) {
     // create a simple controller for editing custom data
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Group', ts('Custom Set'), $action);
 
@@ -179,14 +157,14 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   }
 
   /**
-   * Preview custom group
+   * Preview custom group.
    *
-   * @param int $id custom group id
+   * @param int $id
+   *   Custom group id.
    *
    * @return void
-   * @access public
    */
-  function preview($id) {
+  public function preview($id) {
     $controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Preview', ts('Preview Custom Data'), NULL);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/custom/group', 'action=browse'));
@@ -199,24 +177,27 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
   /**
    * Browse all custom data groups.
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // get all custom groups sorted by weight
-    $customGroup = array();
+    $customGroup = [];
     $dao = new CRM_Core_DAO_CustomGroup();
-
+    $dao->is_reserved = FALSE;
     $dao->orderBy('weight, title');
     $dao->find();
 
+    $customGroupExtends = CRM_Core_SelectValues::customGroupExtends();
+    $customGroupStyle = CRM_Core_SelectValues::customGroupStyle();
     while ($dao->fetch()) {
-      $customGroup[$dao->id] = array();
-      CRM_Core_DAO::storeValues($dao, $customGroup[$dao->id]);
+      $id = $dao->id;
+      $customGroup[$id] = [];
+      CRM_Core_DAO::storeValues($dao, $customGroup[$id]);
       // form all action links
-      $action = array_sum(array_keys($this->actionLinks()));
+      $action = array_sum(array_keys(self::actionLinks()));
 
       // update enable/disable links depending on custom_group properties.
       if ($dao->is_active) {
@@ -225,41 +206,43 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       else {
         $action -= CRM_Core_Action::DISABLE;
       }
-      $customGroup[$dao->id]['order'] = $customGroup[$dao->id]['weight'];
-      $customGroup[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array('id' => $dao->id)
+      $customGroup[$id]['order'] = $customGroup[$id]['weight'];
+      $customGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
+        ['id' => $id],
+        ts('more'),
+        FALSE,
+        'customGroup.row.actions',
+        'CustomGroup',
+        $id
       );
-    }
-
-    $customGroupExtends = CRM_Core_SelectValues::customGroupExtends();
-    foreach ($customGroup as $key => $array) {
-      CRM_Core_DAO_CustomGroup::addDisplayEnums($customGroup[$key]);
-      $customGroup[$key]['extends_display'] = $customGroupExtends[$customGroup[$key]['extends']];
+      if (!empty($customGroup[$id]['style'])) {
+        $customGroup[$id]['style_display'] = $customGroupStyle[$customGroup[$id]['style']];
+      }
+      $customGroup[$id]['extends_display'] = $customGroupExtends[$customGroup[$id]['extends']];
     }
 
     //fix for Displaying subTypes
-    $subTypes = array();
+    $subTypes = [];
 
     $subTypes['Activity'] = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
-        $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType( );
+    $subTypes['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
     $subTypes['Membership'] = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
     $subTypes['Event'] = CRM_Core_OptionGroup::values('event_type');
     $subTypes['Grant'] = CRM_Core_OptionGroup::values('grant_type');
     $subTypes['Campaign'] = CRM_Campaign_PseudoConstant::campaignType();
-    $subTypes['Participant'] = array();
-    $subTypes['ParticipantRole'] = CRM_Core_OptionGroup::values('participant_role');;
+    $subTypes['Participant'] = [];
+    $subTypes['ParticipantRole'] = CRM_Core_OptionGroup::values('participant_role');
     $subTypes['ParticipantEventName'] = CRM_Event_PseudoConstant::event();
     $subTypes['ParticipantEventType'] = CRM_Core_OptionGroup::values('event_type');
     $subTypes['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
     $subTypes['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
     $subTypes['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
 
-
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
     $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
     $relTypeHou = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
 
-    $allRelationshipType = array();
+    $allRelationshipType = [];
     $allRelationshipType = array_merge($relTypeInd, $relTypeOrg);
     $allRelationshipType = array_merge($allRelationshipType, $relTypeHou);
 
@@ -275,7 +258,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     $subTypes['Relationship'] = $allRelationshipType;
 
     $cSubTypes = CRM_Core_Component::contactSubTypes();
-    $contactSubTypes = array();
+    $contactSubTypes = [];
     foreach ($cSubTypes as $key => $value) {
       $contactSubTypes[$key] = $key;
     }
@@ -285,9 +268,9 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($subTypes);
 
     foreach ($customGroup as $key => $values) {
-      $subValue = CRM_Utils_Array::value('extends_entity_column_value', $customGroup[$key]);
-      $subName  = CRM_Utils_Array::value('extends_entity_column_id', $customGroup[$key]);
-      $type     = CRM_Utils_Array::value('extends', $customGroup[$key]);
+      $subValue = $customGroup[$key]['extends_entity_column_value'] ?? NULL;
+      $subName = $customGroup[$key]['extends_entity_column_id'] ?? NULL;
+      $type = $customGroup[$key]['extends'] ?? NULL;
       if ($subValue) {
         $subValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($subValue, 1, -1)
@@ -313,14 +296,14 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
               }
             }
             else {
-              $colValue = $colValue ? ($colValue . (isset($subTypes[$type][$sub]) ? ', ' . $subTypes[$type][$sub] : '')) : (isset($subTypes[$type][$sub]) ? $subTypes[$type][$sub] : '');
+              $colValue = $colValue ? ($colValue . (isset($subTypes[$type][$sub]) ? ', ' . $subTypes[$type][$sub] : '')) : ($subTypes[$type][$sub] ?? '');
             }
           }
         }
         $customGroup[$key]["extends_entity_column_value"] = $colValue;
       }
       else {
-        if (is_array(CRM_Utils_Array::value($type, $subTypes))) {
+        if (isset($subTypes[$type]) && is_array($subTypes[$type])) {
           $customGroup[$key]["extends_entity_column_value"] = ts("Any");
         }
       }
@@ -333,5 +316,5 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
 
     $this->assign('rows', $customGroup);
   }
-}
 
+}

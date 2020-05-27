@@ -1,55 +1,39 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * form helper class for an Phone object
+ * Form helper class for an Phone object.
  */
 class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
   /**
-   * phones of the contact that is been viewed
+   * Phones of the contact that is been viewed
+   * @var array
    */
-  private $_phones = array();
+  private $_phones = [];
 
   /**
    * No of phone blocks for inline edit
+   * @var int
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,10 +46,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for phone object
-   *
-   * @return void
-   * @access public
+   * Build the form object elements for phone object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -75,9 +56,9 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     if (count($this->_phones) > 1) {
       $actualBlockCount = $totalBlocks = count($this->_phones);
       if ($totalBlocks < $this->_blockCount) {
-      $additionalBlocks = $this->_blockCount - $totalBlocks;
-      $totalBlocks += $additionalBlocks;
-    }
+        $additionalBlocks = $this->_blockCount - $totalBlocks;
+        $totalBlocks += $additionalBlocks;
+      }
       else {
         $actualBlockCount++;
         $totalBlocks++;
@@ -93,33 +74,32 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Phone::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Phone', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_Phone', 'formRule']);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields     posted values of the form
-   * @param array $errors     list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
-   * @return $errors
-   * @static
-   * @access public
+   * @return array
    */
-  static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('phone', $fields) && is_array($fields['phone'])) {
-      $primaryID = null;
+  public static function formRule($fields, $errors) {
+    $hasData = $hasPrimary = $errors = [];
+    if (!empty($fields['phone']) && is_array($fields['phone'])) {
+      $primaryID = NULL;
       foreach ($fields['phone'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            if (!$primaryID &&
-              CRM_Utils_Array::value('phone', $blockValues)) {
-                $primaryID = $blockValues['phone'];
+            if (!$primaryID && !empty($blockValues['phone'])) {
+              $primaryID = $blockValues['phone'];
             }
           }
         }
@@ -130,20 +110,19 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["phone[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one phone can be marked as primary.');
+        $errors["phone[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one phone can be marked as primary.');
       }
     }
     return $errors;
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_phones)) {
       foreach ($this->_phones as $id => $value) {
         $defaults['phone'][$id] = $value;
@@ -158,10 +137,7 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -169,9 +145,16 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
     // Process / save phones
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['phone']['isIdSet'] = TRUE;
+    foreach ($this->_phones as $count => $value) {
+      if (!empty($value['id']) && isset($params['phone'][$count])) {
+        $params['phone'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('phone', $params);
 
     $this->log();
     $this->response();
   }
+
 }

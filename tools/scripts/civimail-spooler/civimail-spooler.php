@@ -1,5 +1,6 @@
 <?php
-$options = getopt('bc:ht:'); if (isset($options['h'])) {
+$options = getopt('bc:ht:');
+if (isset($options['h'])) {
   print ("\nUsage: php civimail-spooler.php [-bh] [-c <config>] [-t <period>]\n");
   print ("   -b  Run this process continuously\n");
   print ("   -c  Path to CiviCRM civicrm.settings.php\n");
@@ -17,7 +18,7 @@ require_once "$config_file";
 require_once "CRM/Core/Config.php";
 ');
 
-$config = &CRM_Core_Config::singleton();
+$config = CRM_Core_Config::singleton();
 
 /* Temporary permissioning hack for now */
 
@@ -34,12 +35,11 @@ if (isset($options['b'])) {
          * process into the background and provide init.d scripts */
 
 
-
-    CRM_Mailing_BAO_Job::runJobs();
+    CRM_Mailing_BAO_MailingJob::runJobs();
     sleep($config->mailerPeriod);
   }
 }
 else {
-  CRM_Mailing_BAO_Job::runJobs();
+  CRM_Mailing_BAO_MailingJob::runJobs();
 }
 

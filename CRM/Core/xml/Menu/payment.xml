@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<menu>
+  <item>
+    <path>civicrm/payment/form</path>
+    <access_callback>1</access_callback>
+    <page_callback>CRM_Financial_Form_Payment</page_callback>
+    <is_public>true</is_public>
+    <weight>0</weight>
+  </item>
+  <item>
+    <path>civicrm/payment/edit</path>
+    <page_callback>CRM_Financial_Form_PaymentEdit</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <component>CiviContribute</component>
+  </item>
+</menu>

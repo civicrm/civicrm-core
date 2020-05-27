@@ -5,6 +5,10 @@ CIVISOURCEDIR=
 # FIRST command line argument if given
 SCHEMA=schema/Schema.xml
 
+## define your database host and port here
+DBHOST=
+DBPORT=
+
 # define your database name here, will be overriden by
 # SECOND command line argument if given
 DBNAME=
@@ -42,3 +46,14 @@ DBLOAD=
 # cumbersome during development. To speed it up,
 # list the desired locales.
 # export CIVICRM_LOCALES=en_US,fr_FR
+
+# GenCode produces some CMS-specific config files
+# If omitted, defaults to drupal.
+GENCODE_CMS=""
+# GENCODE_CMS=drupal
+# GENCODE_CMS=wordpress
+
+# GenCode is relatively slow; and, usually, it only needs
+# to run if the gencode files have changed. Set
+# this option to enable caching (and speed up setup.sh)
+# export CIVICRM_GENCODE_DIGEST=/tmp/gencode.md5

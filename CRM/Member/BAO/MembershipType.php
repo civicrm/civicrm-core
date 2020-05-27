@@ -1,68 +1,49 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default Membership Type.
+   * @var int
    */
-  static $_defaultMembershipType = NULL;
+  public static $_defaultMembershipType = NULL;
 
-  static $_membershipTypeInfo = array();
+  public static $_membershipTypeInfo = [];
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Member_BAO_MembershipType object
-   * @access public
-   * @static
+   * @return CRM_Member_BAO_MembershipType
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->copyValues($params);
     if ($membershipType->find(TRUE)) {
@@ -73,112 +54,146 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return bool
+   *   true if we found and updated the object, else false
    */
-  static function setIsActive($id, $is_active) {
+  public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
   }
 
   /**
-   * function to add the membership types
+   * Add the membership types.
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids
+   *   Array contains the id (deprecated).
    *
-   * @access public
-   * @static
-   *
-   * @return object
+   * @return \CRM_Member_DAO_MembershipType
+   * @throws \CiviCRM_API3_Exception
    */
-  static function add(&$params, &$ids) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+  public static function add(&$params, $ids = []) {
+    // DEPRECATED Check if membershipType ID was passed in via $ids
+    if (empty($params['id'])) {
+      if (isset($ids['membershipType'])) {
+        Civi::log()->warning('Deprecated: Passing membershipType by $ids array in CRM_Member_BAO_MembershipType::add');
+      }
+      $params['id'] = $ids['membershipType'] ?? NULL;
+    }
+
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'MembershipType', CRM_Utils_Array::value('id', $params), $params);
+
+    $membershipTypeId = $params['id'] ?? NULL;
+
+    if (!$membershipTypeId) {
+      if (!isset($params['is_active'])) {
+        // do we need this?
+        $params['is_active'] = FALSE;
+      }
+      if (!isset($params['domain_id'])) {
+        $params['domain_id'] = CRM_Core_Config::domainID();
+      }
+    }
+
+    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an organization is changed.
+    $previousID = NULL;
+    if ($membershipTypeId) {
+      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeId, 'member_of_contact_id');
+    }
 
     // action is taken depending upon the mode
     $membershipType = new CRM_Member_DAO_MembershipType();
-
     $membershipType->copyValues($params);
-
-    $membershipType->domain_id = CRM_Core_Config::domainID();
-
-    $membershipType->id = CRM_Utils_Array::value('membershipType', $ids);
-
-    // $previousID is the old organization id for memberhip type i.e 'member_of_contact_id'. This is used when an oganization is changed.
-    $previousID = NULL;
-    if ($membershipType->id) {
-      $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType->id, 'member_of_contact_id');
-    }
-
     $membershipType->save();
 
-    self::createMembershipPriceField($params, $ids, $previousID, $membershipType->id);
+    if ($membershipTypeId) {
+      // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
+      // name etc - the presence of previous id tells us this is an update
+      $params = array_merge(civicrm_api3('membership_type', 'getsingle', ['id' => $membershipType->id]), $params);
+    }
+    self::createMembershipPriceField($params, $previousID, $membershipType->id);
     // update all price field value for quick config when membership type is set CRM-11718
-    if (CRM_Utils_Array::value('membershipType', $ids)) {
-      self::updateAllPriceFieldValue($ids['membershipType'], $params);
+    if ($membershipTypeId) {
+      self::updateAllPriceFieldValue($membershipTypeId, $params);
     }
 
+    CRM_Utils_Hook::post($hook, 'MembershipType', $membershipType->id, $membershipType);
+
+    self::flush();
     return $membershipType;
   }
 
   /**
-   * Function to delete membership Types
+   * Flush anywhere that membership types might be cached.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function flush() {
+    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
+    civicrm_api3('membership', 'getfields', ['cache_clear' => 1, 'fieldname' => 'membership_type_id']);
+    civicrm_api3('profile', 'getfields', ['action' => 'submit', 'cache_clear' => 1]);
+    Civi::cache('metadata')->clear();
+  }
+
+  /**
+   * Delete membership Types.
    *
    * @param int $membershipTypeId
-   * @static
+   *
+   * @throws CRM_Core_Exception
+   * @return bool|mixed
    */
-  static function del($membershipTypeId, $skipRedirect = FALSE) {
-    //check dependencies
-    $check      = FALSE;
-    $status     = array();
-    $dependancy = array(
+  public static function del($membershipTypeId) {
+    // Check dependencies.
+    $check = FALSE;
+    $status = [];
+    $dependency = [
       'Membership' => 'membership_type_id',
       'MembershipBlock' => 'membership_type_default',
-    );
+    ];
 
-    foreach ($dependancy as $name => $field) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, "CRM_Member_DAO_" . $name) . ".php");
-      eval('$dao = new CRM_Member_DAO_' . $name . '();');
+    foreach ($dependency as $name => $field) {
+      $baoString = 'CRM_Member_BAO_' . $name;
+      $dao = new $baoString();
       $dao->$field = $membershipTypeId;
+      /** @noinspection PhpUndefinedMethodInspection */
       if ($dao->find(TRUE)) {
         $check = TRUE;
         $status[] = $name;
       }
     }
     if ($check) {
-
-
       $cnt = 1;
       $message = ts('This membership type cannot be deleted due to following reason(s):');
       if (in_array('Membership', $status)) {
         $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
         $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
-        $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', array(1 => $findMembersURL, 2 => $deleteURL, 3 => $cnt));
+        $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', [
+          1 => $findMembersURL,
+          2 => $deleteURL,
+          3 => $cnt,
+        ]);
         $cnt++;
       }
 
       if (in_array('MembershipBlock', $status)) {
         $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
-        $message .= '<br/>' . ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', array(1 => $deleteURL, 2 => $cnt));
-      }
-      if (!$skipRedirect) {
-        $session = CRM_Core_Session::singleton();
-        CRM_Core_Session::setStatus($message, ts('Membership Not Deleted'), 'error');
-        return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/member/membershipType', 'reset=1&action=browse'));
-      }
-      else {
-        $error = array();
-        $error['is_error'] = 1;
-        //don't translate as api error message are not translated
-        $error['error_message'] = $message;
-        return $error;
+        $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', [
+          1 => $deleteURL,
+          2 => $cnt,
+        ]);
+        throw new CRM_Core_Exception($message);
       }
     }
-
+    CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipType', $membershipTypeId);
     //delete from membership Type table
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->id = $membershipTypeId;
@@ -186,31 +201,30 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     //fix for membership type delete api
     $result = FALSE;
     if ($membershipType->find(TRUE)) {
-      $membershipType->delete();
-      $result = TRUE;
+      return $membershipType->delete();
     }
 
     return $result;
   }
 
   /**
-   * Function to convert membership Type's 'start day' & 'rollover day' to human readable formats.
+   * Convert membership type's 'start day' & 'rollover day' to human readable formats.
    *
-   * @param array $membershipType an array of membershipType-details.
-   * @static
+   * @param array $membershipType
+   *   An array of membershipType-details.
    */
-  static function convertDayFormat(&$membershipType) {
-    $periodDays = array(
+  public static function convertDayFormat(&$membershipType) {
+    $periodDays = [
       'fixed_period_start_day',
       'fixed_period_rollover_day',
-    );
+    ];
     foreach ($membershipType as $id => $details) {
       foreach ($periodDays as $pDay) {
-        if (CRM_Utils_Array::value($pDay, $details)) {
+        if (!empty($details[$pDay])) {
           if ($details[$pDay] > 31) {
-            $month    = substr($details[$pDay], 0, strlen($details[$pDay]) - 2);
-            $day      = substr($details[$pDay], -2);
-            $monthMap = array(
+            $month = substr($details[$pDay], 0, strlen($details[$pDay]) - 2);
+            $day = substr($details[$pDay], -2);
+            $monthMap = [
               '1' => 'Jan',
               '2' => 'Feb',
               '3' => 'Mar',
@@ -223,7 +237,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
               '10' => 'Oct',
               '11' => 'Nov',
               '12' => 'Dec',
-            );
+            ];
             $membershipType[$id][$pDay] = $monthMap[$month] . ' ' . $day;
           }
           else {
@@ -235,13 +249,16 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to get membership Types
+   * Get membership Types.
    *
-   * @param int $membershipTypeId
-   * @static
+   * @deprecated  use getAllMembershipTypes.
+   *
+   * @param bool $public
+   *
+   * @return array
    */
-  static function getMembershipTypes($public = TRUE) {
-    $membershipTypes = array();
+  public static function getMembershipTypes($public = TRUE) {
+    $membershipTypes = [];
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->is_active = 1;
     if ($public) {
@@ -252,25 +269,26 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     while ($membershipType->fetch()) {
       $membershipTypes[$membershipType->id] = $membershipType->name;
     }
-    $membershipType->free();
     return $membershipTypes;
   }
 
   /**
-   * Function to get membership Type Details
+   * Get membership Type Details.
+   *
+   * @deprecated use getMembershipType.
    *
    * @param int $membershipTypeId
-   * @static
+   *
+   * @return array|null
    */
-  static function getMembershipTypeDetails($membershipTypeId) {
-    $membershipTypeDetails = array();
+  public static function getMembershipTypeDetails($membershipTypeId) {
+    $membershipTypeDetails = [];
 
     $membershipType = new CRM_Member_DAO_MembershipType();
     $membershipType->is_active = 1;
     $membershipType->id = $membershipTypeId;
     if ($membershipType->find(TRUE)) {
       CRM_Core_DAO::storeValues($membershipType, $membershipTypeDetails);
-      $membershipType->free();
       return $membershipTypeDetails;
     }
     else {
@@ -279,22 +297,30 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * Function to calculate start date and end date for new membership
+   * Calculate start date and end date for new membership.
    *
-   * @param int  $membershipTypeId membership type id
-   * @param date $joinDate member since ( in mysql date format )
-   * @param date $startDate start date ( in mysql date format )
-   * @param int  $numRenewTerms    how many membership terms are being added to end date (default is 1)
+   * @param int $membershipTypeId
+   *   Membership type id.
+   * @param string $joinDate
+   *   Member since ( in mysql date format ).
+   * @param string $startDate
+   *   Start date ( in mysql date format ).
+   * @param null $endDate
+   * @param int $numRenewTerms
+   *   How many membership terms are being added to end date (default is 1).
    *
-   * @return array associated array with  start date, end date and join date for the membership
-   * @static
+   * @return array
+   *   associated array with  start date, end date and join date for the membership
    */
   public static function getDatesForMembershipType($membershipTypeId, $joinDate = NULL, $startDate = NULL, $endDate = NULL, $numRenewTerms = 1) {
     $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeId);
 
-    // convert all dates to 'Y-m-d' format.
-    foreach (array(
-      'joinDate', 'startDate', 'endDate') as $dateParam) {
+    // Convert all dates to 'Y-m-d' format.
+    foreach ([
+      'joinDate',
+      'startDate',
+      'endDate',
+    ] as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
       }
@@ -315,15 +341,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $actualStartDate = $startDate;
     }
     elseif (CRM_Utils_Array::value('period_type', $membershipTypeDetails) == 'fixed') {
-      //calculate start date
-
-      // today is always join date, in case of Online join date
-      // is equal to current system date
-      $toDay = explode('-', $joinDate);
-
-      // get year from join date
+      // calculate start date
+      // if !$startDate then use $joinDate
+      $toDay = explode('-', (empty($startDate) ? $joinDate : $startDate));
       $year = $toDay[0];
       $month = $toDay[1];
+      $day = $toDay[2];
 
       if ($membershipTypeDetails['duration_unit'] == 'year') {
 
@@ -333,52 +356,14 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         );
         $startDay = substr($membershipTypeDetails['fixed_period_start_day'], -2);
 
-        $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year));
-
-        //get start rollover day
-        $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
-          strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
-        );
-        $rolloverDay = substr($membershipTypeDetails['fixed_period_rollover_day'], -2);
-
-        $fixedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
-
-        //CRM-7825 -membership date rules are :
-        //1. Membership should not be start in future.
-        //2. rollover window should be subset of membership window.
-
-        //store original fixed start date as per current year.
-        $actualStartDate = $fixedStartDate;
-
-        //store original fixed rollover date as per current year.
-        $actualRolloverDate = $fixedRolloverDate;
-
-        //make sure membership should not start in future.
-        if ($joinDate < $actualStartDate) {
+        if (date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year)) <= date('Y-m-d', mktime(0, 0, 0, $month, $day, $year))) {
+          $actualStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year));
+        }
+        else {
           $actualStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
         }
 
-        //get the fixed end date here.
-        $dateParts = explode('-', $actualStartDate);
-        $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
-            $dateParts[1],
-            $dateParts[2] - 1,
-            $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
-          ));
-
-        //make sure rollover window should be
-        //subset of membership period window.
-        if ($fixedEndDate < $actualRolloverDate) {
-          $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year - 1));
-        }
-        if ($actualRolloverDate < $actualStartDate) {
-          $actualRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year + 1));
-        }
-
-        //do check signup is in rollover window.
-        if ($actualRolloverDate <= $joinDate) {
-          $fixed_period_rollover = TRUE;
-        }
+        $fixed_period_rollover = self::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $actualStartDate);
 
         if (!$startDate) {
           $startDate = $actualStartDate;
@@ -388,10 +373,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         // Check if we are on or after rollover day of the month - CRM-10585
         // If so, set fixed_period_rollover TRUE so we increment end_date month below.
         $dateParts = explode('-', $actualStartDate);
-        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']){
-          $fixed_period_rollover = True;
+        if ($dateParts[2] >= $membershipTypeDetails['fixed_period_rollover_day']) {
+          $fixed_period_rollover = TRUE;
         }
-        
+
         // Start date is always first day of actualStartDate month
         if (!$startDate) {
           $actualStartDate = $startDate = $year . '-' . $month . '-01';
@@ -399,13 +384,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
 
-    //calculate end date if it is not passed by user
+    // Calculate end date if it is not passed by user.
     if (!$endDate) {
       //end date calculation
-      $date  = explode('-', $actualStartDate);
-      $year  = $date[0];
+      $date = explode('-', $actualStartDate);
+      $year = $date[0];
       $month = $date[1];
-      $day   = $date[2];
+      $day = $date[2];
 
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
@@ -443,44 +428,100 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
 
-    $membershipDates = array();
-
-    $dates = array(
-      'start_date' => 'startDate',
-      'end_date' => 'endDate',
-      'join_date' => 'joinDate',
-    );
-    foreach ($dates as $varName => $valName) {
-      $membershipDates[$varName] = CRM_Utils_Date::customFormat($$valName, '%Y%m%d');
-    }
+    $membershipDates = [
+      'start_date' => CRM_Utils_Date::customFormat($startDate, '%Y%m%d'),
+      'end_date' => CRM_Utils_Date::customFormat($endDate, '%Y%m%d'),
+      'join_date' => CRM_Utils_Date::customFormat($joinDate, '%Y%m%d'),
+    ];
 
     return $membershipDates;
   }
 
   /**
-   * Function to calculate start date and end date for renewal membership
+   * Does this membership start between the rollover date and the start of the next period.
+   * (in which case they will get an extra membership period)
+   *  ie if annual memberships run June - May & the rollover is in May memberships between
+   * May and June will return TRUE and between June and May will return FALSE
+   *
+   * @param string $startDate start date of current membership period
+   * @param array $membershipTypeDetails
+   * @param int $year
+   * @param string $actualStartDate
+   * @return bool is this in the window where the membership gets an extra part-period added
+   */
+  public static function isDuringFixedAnnualRolloverPeriod($startDate, $membershipTypeDetails, $year, $actualStartDate) {
+
+    $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
+      strlen($membershipTypeDetails['fixed_period_rollover_day']) - 2
+    );
+    $rolloverDay = substr($membershipTypeDetails['fixed_period_rollover_day'], -2);
+
+    $calculatedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year));
+
+    //CRM-7825 -membership date rules are :
+    //1. Membership should not be start in future.
+    //2. rollover window should be subset of membership window.
+
+    //get the fixed end date here.
+    $dateParts = explode('-', $actualStartDate);
+    $endDateOfFirstYearMembershipPeriod = date('Y-m-d', mktime(0, 0, 0,
+      $dateParts[1],
+      $dateParts[2] - 1,
+      $dateParts[0] + 1
+    ));
+
+    //we know the month and day of the rollover date but not the year (we're just
+    //using the start date year at the moment. So if it's after the end
+    // of the first year of membership then it's the next period & we'll adjust back a year. If it's
+    // before the start_date then it's too early & we'll adjust forward.
+    if ($endDateOfFirstYearMembershipPeriod < $calculatedRolloverDate) {
+      $calculatedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year - 1));
+    }
+    if ($calculatedRolloverDate < $actualStartDate) {
+      $calculatedRolloverDate = date('Y-m-d', mktime(0, 0, 0, $rolloverMonth, $rolloverDay, $year + 1));
+    }
+
+    if ($calculatedRolloverDate <= $startDate) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Calculate start date and end date for membership updates.
+   *
+   * Note that this function is called by the api for any membership update although it was
+   * originally written for renewal (which feels a bit fragile but hey....).
    *
    * @param int $membershipId
    * @param $changeToday
-   * @param int $membershipTypeID - if provided, overrides the membership type of the $membershipID membership
-   * @param int  $numRenewTerms    how many membership terms are being added to end date (default is 1)
+   *   If provided, specify an alternative date to use as "today" for renewal
+   * @param int $membershipTypeID
+   *   If provided, overrides the membership type of the $membershipID membership.
+   * @param int $numRenewTerms
+   *   How many membership terms are being added to end date (default is 1).
    *
    * CRM-7297 Membership Upsell - Added $membershipTypeID param to facilitate calculations of dates when membership type changes
    *
-   * @return Array array fo the start date, end date and join date of the membership
-   * @static
+   * @return array
+   *   array fo the start date, end date and join date of the membership
    */
   public static function getRenewalDatesForMembershipType($membershipId, $changeToday = NULL, $membershipTypeID = NULL, $numRenewTerms = 1) {
-    $params            = array('id' => $membershipId);
+    $params = ['id' => $membershipId];
     $membershipDetails = CRM_Member_BAO_Membership::getValues($params, $values);
-    $statusID          = $membershipDetails[$membershipId]->status_id;
+    $membershipDetails = $membershipDetails[$membershipId];
+    $statusID = $membershipDetails->status_id;
+    $membershipDates = [];
+    if (!empty($membershipDetails->join_date)) {
+      $membershipDates['join_date'] = CRM_Utils_Date::customFormat($membershipDetails->join_date, '%Y%m%d');
+    }
 
     $oldPeriodType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
+      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
 
     // CRM-7297 Membership Upsell
     if (is_null($membershipTypeID)) {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails[$membershipId]->membership_type_id);
+      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails->membership_type_id);
     }
     else {
       $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeID);
@@ -488,36 +529,39 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $statusDetails = CRM_Member_BAO_MembershipStatus::getMembershipStatus($statusID);
 
     if ($statusDetails['is_current_member'] == 1) {
-      $startDate = $membershipDetails[$membershipId]->start_date;
+      $startDate = $membershipDetails->start_date;
       // CRM=7297 Membership Upsell: we need to handle null end_date in case we are switching
       // from a lifetime to a different membership type
-      if (is_null($membershipDetails[$membershipId]->end_date)) {
+      if (is_null($membershipDetails->end_date)) {
         $date = date('Y-m-d');
       }
       else {
-        $date = $membershipDetails[$membershipId]->end_date;
+        $date = $membershipDetails->end_date;
       }
-      $date  = explode('-', $date);
+      $date = explode('-', $date);
+      // We have to add 1 day first in case it's the end of the month, then subtract afterwards
+      // eg. 2018-02-28 should renew to 2018-03-31, if we just added 1 month we'd get 2018-03-28
       $logStartDate = date('Y-m-d', mktime(0, 0, 0,
-          (double) $date[1],
-          (double)($date[2] + 1),
-          (double) $date[0]
-        ));
+        (double) $date[1],
+        (double) ($date[2] + 1),
+        (double) $date[0]
+      ));
 
-      $date  = explode('-', $logStartDate);
-      $year  = $date[0];
+      $date = explode('-', $logStartDate);
+      $year = $date[0];
       $month = $date[1];
-      $day   = $date[2];
+      $day = $date[2];
 
       switch ($membershipTypeDetails['duration_unit']) {
         case 'year':
           //need to check if the upsell is from rolling to fixed and adjust accordingly
-          if ($membershipTypeDetails['period_type'] == 'fixed' && $oldPeriodType == 'rolling' ) {
+          if ($membershipTypeDetails['period_type'] == 'fixed' && $oldPeriodType == 'rolling') {
             $month = substr($membershipTypeDetails['fixed_period_start_day'], 0, strlen($membershipTypeDetails['fixed_period_start_day']) - 2);
             $day = substr($membershipTypeDetails['fixed_period_start_day'], -2);
             $year += 1;
-          } else {
-          $year = $year + ($numRenewTerms * $membershipTypeDetails['duration_interval']);
+          }
+          else {
+            $year = $year + ($numRenewTerms * $membershipTypeDetails['duration_interval']);
           }
           break;
 
@@ -534,13 +578,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
       else {
         $endDate = date('Y-m-d', mktime(0, 0, 0,
-            $month,
-            $day - 1,
-            $year
-          ));
+          $month,
+          $day - 1,
+          $year
+        ));
       }
       $today = date('Y-m-d');
-      $membershipDates = array();
       $membershipDates['today'] = CRM_Utils_Date::customFormat($today, '%Y%m%d');
       $membershipDates['start_date'] = CRM_Utils_Date::customFormat($startDate, '%Y%m%d');
       $membershipDates['end_date'] = CRM_Utils_Date::customFormat($endDate, '%Y%m%d');
@@ -555,66 +598,53 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $renewalDates = self::getDatesForMembershipType($membershipTypeDetails['id'],
         $today, NULL, NULL, $numRenewTerms
       );
-      $membershipDates = array();
       $membershipDates['today'] = CRM_Utils_Date::customFormat($today, '%Y%m%d');
       $membershipDates['start_date'] = $renewalDates['start_date'];
       $membershipDates['end_date'] = $renewalDates['end_date'];
       $membershipDates['log_start_date'] = $renewalDates['start_date'];
+      // CRM-18503 - set join_date as today in case the membership type is fixed.
+      if ($membershipTypeDetails['period_type'] == 'fixed' && !isset($membershipDates['join_date'])) {
+        $membershipDates['join_date'] = $renewalDates['join_date'];
+      }
+    }
+    if (!isset($membershipDates['join_date'])) {
+      $membershipDates['join_date'] = $membershipDates['start_date'];
     }
 
     return $membershipDates;
   }
 
   /**
-   * Function to retrieve all Membership Types associated
-   * with an Organization
+   * Retrieve all Membership Types with Member of Contact id.
    *
-   * @param int $orgID  Id of Organization
-   *
-   * @return Array array of the details of membership types
-   * @static
+   * @param array $membershipTypes
+   *   array of membership type ids
+   * @return array
+   *   array of the details of membership types with Member of Contact id
    */
-  static function getMembershipTypesByOrg($orgID) {
-    $membershipTypes = array();
-    $dao = new CRM_Member_DAO_MembershipType();
-    $dao->member_of_contact_id = $orgID;
-    $dao->find();
-    while ($dao->fetch()) {
-      $membershipTypes[$dao->id] = array();
-      CRM_Core_DAO::storeValues($dao, $membershipTypes[$dao->id]);
-    }
-    return $membershipTypes;
-  }
-
-  /**
-   * Function to retrieve all Membership Types with Member of Contact id
-   *
-   * @param array membership types
-   *
-   * @return Array array of the details of membership types with Member of Contact id
-   * @static
-   */
-  static function getMemberOfContactByMemTypes($membershipTypes) {
-    $memTypeOrgs = array();
+  public static function getMemberOfContactByMemTypes($membershipTypes) {
+    $memTypeOrganizations = [];
     if (empty($membershipTypes)) {
-      return $memTypeOrgs;
+      return $memTypeOrganizations;
     }
 
     $result = CRM_Core_DAO::executeQuery("SELECT id, member_of_contact_id FROM civicrm_membership_type WHERE id IN (" . implode(',', $membershipTypes) . ")");
     while ($result->fetch()) {
-      $memTypeOrgs[$result->id] = $result->member_of_contact_id;
+      $memTypeOrganizations[$result->id] = $result->member_of_contact_id;
     }
 
-    return $memTypeOrgs;
+    return $memTypeOrganizations;
   }
 
-  /** The function returns all the Organization for  all membershiptypes .
-   *  @param  array      $allmembershipTypes       array of allMembershipTypes
-   *  with organization id Key - value pairs.
+  /**
+   * The function returns all the Organization for  all membershipTypes .
    *
+   * @param int $membershipTypeId
+   *
+   * @return array
    */
-  static function getMembershipTypeOrganization($membershipTypeId = NULL) {
-    $allmembershipTypes = array();
+  public static function getMembershipTypeOrganization($membershipTypeId = NULL) {
+    $allMembershipTypes = [];
 
     $membershipType = new CRM_Member_DAO_MembershipType();
 
@@ -624,59 +654,62 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $membershipType->find();
 
     while ($membershipType->fetch()) {
-      $allmembershipTypes[$membershipType->id] = $membershipType->member_of_contact_id;
+      $allMembershipTypes[$membershipType->id] = $membershipType->member_of_contact_id;
     }
-    return $allmembershipTypes;
+    return $allMembershipTypes;
   }
 
   /**
-   * Funtion to retrieve organization and associated membership
+   * Function to retrieve organization and associated membership
    * types
    *
-   * @return array arrays of organization and membership types
+   * @return array
+   *   arrays of organization and membership types
    *
-   * @static
-   * @access public
    */
-  static function getMembershipTypeInfo() {
+  public static function getMembershipTypeInfo() {
     if (!self::$_membershipTypeInfo) {
-      $orgs = $types = array();
+      $orgs = $types = [];
 
       $query = 'SELECT memType.id, memType.name, memType.member_of_contact_id, c.sort_name
         FROM civicrm_membership_type memType INNER JOIN civicrm_contact c ON c.id = memType.member_of_contact_id
         WHERE memType.is_active = 1 ';
-      $dao = CRM_Core_DAO::executeQuery( $query );
+      $dao = CRM_Core_DAO::executeQuery($query);
       while ($dao->fetch()) {
         $orgs[$dao->member_of_contact_id] = $dao->sort_name;
         $types[$dao->member_of_contact_id][$dao->id] = $dao->name;
       }
 
-      self::$_membershipTypeInfo = array($orgs, $types);
+      self::$_membershipTypeInfo = [$orgs, $types];
     }
     return self::$_membershipTypeInfo;
   }
 
+  /**
+   * @param array $params
+   * @param int $previousID
+   * @param int $membershipTypeId
+   */
+  public static function createMembershipPriceField($params, $previousID, $membershipTypeId) {
 
-  public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
+    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
 
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', 'default_membership_type_amount', 'id', 'name');
-
-    if (CRM_Utils_Array::value('member_of_contact_id', $params)) {
+    if (!empty($params['member_of_contact_id'])) {
       $fieldName = $params['member_of_contact_id'];
     }
     else {
       $fieldName = $previousID;
     }
-    $fieldLabel  = 'Membership Amount';
-    $optionsIds  = NULL;
-    $fieldParams = array(
+    $fieldLabel = 'Membership Amount';
+    $optionsIds = NULL;
+    $fieldParams = [
       'price_set_id ' => $priceSetId,
       'name' => $fieldName,
-    );
-    $results = array();
-    CRM_Price_BAO_Field::retrieve($fieldParams, $results);
+    ];
+    $results = [];
+    CRM_Price_BAO_PriceField::retrieve($fieldParams, $results);
     if (empty($results)) {
-      $fieldParams = array();
+      $fieldParams = [];
       $fieldParams['label'] = $fieldLabel;
       $fieldParams['name'] = $fieldName;
       $fieldParams['price_set_id'] = $priceSetId;
@@ -684,96 +717,164 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $fieldParams['is_display_amounts'] = $fieldParams['is_required'] = 0;
       $fieldParams['weight'] = $fieldParams['option_weight'][1] = 1;
       $fieldParams['option_label'][1] = $params['name'];
-      $fieldParams['option_description'][1] = CRM_Utils_Array::value('description', $params);
-      
+      $fieldParams['option_description'][1] = $params['description'] ?? NULL;
+
       $fieldParams['membership_type_id'][1] = $membershipTypeId;
       $fieldParams['option_amount'][1] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
-      $fieldParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
+      $fieldParams['financial_type_id'] = $params['financial_type_id'] ?? NULL;
 
       if ($previousID) {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
-        $fieldParams['option_id'] = CRM_Utils_Array::value('option_id', $optionsIds);
+        $fieldParams['option_id'] = $optionsIds['option_id'] ?? NULL;
       }
-      $priceField = CRM_Price_BAO_Field::create($fieldParams);
-    } 
+      CRM_Price_BAO_PriceField::create($fieldParams);
+    }
     else {
       $fieldID = $results['id'];
-      $fieldValueParams = array(
+      $fieldValueParams = [
         'price_field_id' => $fieldID,
         'membership_type_id' => $membershipTypeId,
-      );
-      $results = array();
-      CRM_Price_BAO_FieldValue::retrieve($fieldValueParams, $results);
+      ];
+      $results = [];
+      CRM_Price_BAO_PriceFieldValue::retrieve($fieldValueParams, $results);
       if (!empty($results)) {
-        $results['label']  = $results['name'] = $params['name'];
+        $results['label'] = $results['name'] = $params['name'];
         $results['amount'] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
-        $optionsIds['id']  = $results['id'];
-      } 
+      }
       else {
-        $results = array(
+        $results = [
           'price_field_id' => $fieldID,
           'name' => $params['name'],
           'label' => $params['name'],
           'amount' => empty($params['minimum_fee']) ? 0 : $params['minimum_fee'],
           'membership_type_id' => $membershipTypeId,
           'is_active' => 1,
-        );
+        ];
       }
 
       if ($previousID) {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
-        if (CRM_Utils_Array::value('option_id', $optionsIds)) {
-          $optionsIds['id'] = current(CRM_Utils_Array::value('option_id', $optionsIds));
+        if (!empty($optionsIds['option_id'])) {
+          $results['id'] = current($optionsIds['option_id']);
         }
       }
-      $results['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params);
-      $results['description'] = CRM_Utils_Array::value('description', $params);
-      CRM_Price_BAO_FieldValue::add($results, $optionsIds);
+      $results['financial_type_id'] = $params['financial_type_id'] ?? NULL;
+      $results['description'] = $params['description'] ?? NULL;
+      CRM_Price_BAO_PriceFieldValue::add($results);
     }
   }
 
-  /** This function updates all price field value for quick config
+  /**
+   * This function updates all price field value for quick config
    * price set which has membership type
    *
-   *  @param  integer      membership type id 
+   * @param int $membershipTypeId membership type id
    *
-   *  @param  integer      financial type id 
+   * @param array $params
    */
-  static function updateAllPriceFieldValue($membershipTypeId, $params) {
-    if (CRM_Utils_Array::value('minimum_fee', $params)){
-      $amount = $params['minimum_fee'];
-    }
-    else {
-      $amount = 0;
-    }
-
-    $updateValues = array(
-      2 => array('financial_type_id', 'financial_type_id', 'Integer'),
-      3 => array('label', 'name', 'String'),
-      4 => array('amount', 'minimum_fee', 'Float'),
-      5 => array('description', 'description', 'String'),
-    );
-
-    $queryParams = array(1 => array($membershipTypeId, 'Integer'));
-    foreach ($updateValues as $key => $value) { 
-      if (array_key_exists($value[1], $params)) {
-        $updateFields[] = "cpfv." . $value[0] . " = %$key";
-        if ($value[1] == 'minimum_fee') {
-          $fieldValue = $amount;
+  public static function updateAllPriceFieldValue($membershipTypeId, $params) {
+    $defaults = [];
+    $fieldsToUpdate = [
+      'financial_type_id' => 'financial_type_id',
+      'name' => 'label',
+      'minimum_fee' => 'amount',
+      'description' => 'description',
+      'visibility' => 'visibility_id',
+    ];
+    $priceFieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
+    $priceFieldValueBAO->membership_type_id = $membershipTypeId;
+    $priceFieldValueBAO->find();
+    while ($priceFieldValueBAO->fetch()) {
+      $updateParams = [
+        'id' => $priceFieldValueBAO->id,
+        'price_field_id' => $priceFieldValueBAO->price_field_id,
+      ];
+      //Get priceset details.
+      $fieldParams = ['fid' => $priceFieldValueBAO->price_field_id];
+      $setID = CRM_Price_BAO_PriceSet::getSetId($fieldParams);
+      $setParams = ['id' => $setID];
+      $setValues = CRM_Price_BAO_PriceSet::retrieve($setParams, $defaults);
+      if (!empty($setValues->is_quick_config) && $setValues->name != 'default_membership_type_amount') {
+        foreach ($fieldsToUpdate as $key => $value) {
+          if ($value == 'visibility_id' && !empty($params['visibility'])) {
+            $updateParams['visibility_id'] = CRM_Price_BAO_PriceField::getVisibilityOptionID(strtolower($params['visibility']));
+          }
+          else {
+            $updateParams[$value] = $params[$key] ?? NULL;
+          }
         }
-        else {
-          $fieldValue = $params[$value[1]];
-        }
-        $queryParams[$key] = array($fieldValue, $value[2]);
+        CRM_Price_BAO_PriceFieldValue::add($updateParams);
       }
     }
+  }
 
-    $query = "UPDATE `civicrm_price_field_value` cpfv
-INNER JOIN civicrm_price_field cpf on cpf.id = cpfv.price_field_id 
-INNER JOIN civicrm_price_set cps on cps.id = cpf.price_set_id
-SET " . implode(' , ', $updateFields) . " WHERE cpfv.membership_type_id = %1 
-AND cps.is_quick_config = 1 AND cps.name != 'default_membership_type_amount'";
-    CRM_Core_DAO::executeQuery($query, $queryParams);
-  } 
+  /**
+   * Cached wrapper for membership types.
+   *
+   * Since this is used from the batched script caching helps.
+   *
+   * Caching is by domain - if that hits any issues we should add a new function getDomainMembershipTypes
+   * or similar rather than 'just add another param'! but this is closer to earlier behaviour so 'should' be OK.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getAllMembershipTypes() {
+    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID();
+    if (!Civi::cache('metadata')->has($cacheString)) {
+      $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
+      $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+      $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related'];
+      // In order to avoid down-stream e-notices we undo api v3 filtering of NULL values. This is covered
+      // in Unit tests & ideally we might switch to apiv4 but I would argue we should build caching
+      // of metadata entities like this directly into apiv4.
+      foreach ($types as $id => $type) {
+        foreach ($keys as $key) {
+          if (!isset($type[$key])) {
+            $types[$id][$key] = NULL;
+          }
+        }
+        if (isset($type['contribution_type_id'])) {
+          unset($types[$id]['contribution_type_id']);
+        }
+        $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
+        $multiplier = 1;
+        if ($types[$id]['tax_rate'] !== 0.0) {
+          $multiplier += ($types[$id]['tax_rate'] / 100);
+        }
+        $types[$id]['minimum_fee_with_tax'] = (float) $types[$id]['minimum_fee'] * $multiplier;
+      }
+      Civi::cache('metadata')->set($cacheString, $types);
+    }
+    return Civi::cache('metadata')->get($cacheString);
+  }
+
+  /**
+   * Get a specific membership type (leveraging the cache).
+   *
+   * @param int $id
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getMembershipType($id) {
+    return self::getAllMembershipTypes()[$id];
+  }
+
+  /**
+   * Get an array of all membership types the contact is permitted to access.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getPermissionedMembershipTypes() {
+    $types = self::getAllMembershipTypes();
+    $financialTypes = NULL;
+    $financialTypes = CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+    foreach ($types as $id => $type) {
+      if (!isset($financialTypes[$type['financial_type_id']])) {
+        unset($types[$id]);
+      }
+    }
+    return $types;
+  }
+
 }
-

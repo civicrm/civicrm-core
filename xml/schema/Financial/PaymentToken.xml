@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="iso-8859-1" ?> 
+
+<table> 
+  <base>CRM/Financial</base> 
+  <class>PaymentToken</class> 
+  <name>civicrm_payment_token</name> 
+  <comment>Payment Token</comment> 
+  <add>4.6</add> 
+  <field> 
+    <name>id</name>
+    <uniqueName>payment_token_id</uniqueName>
+    <title>Payment Token ID</title>
+    <type>int unsigned</type> 
+    <required>true</required> 
+    <comment>Payment Token ID</comment> 
+    <add>4.6</add> 
+  </field> 
+  <primaryKey> 
+    <name>id</name> 
+    <autoincrement>true</autoincrement> 
+  </primaryKey> 
+  <field> 
+    <name>contact_id</name> 
+    <title>Contact ID</title> 
+    <type>int unsigned</type> 
+    <required>true</required> 
+    <comment>FK to Contact ID for the owner of the token</comment> 
+    <add>4.6</add> 
+  </field> 
+  <foreignKey> 
+    <name>contact_id</name> 
+    <table>civicrm_contact</table> 
+    <key>id</key> 
+    <add>4.6</add> 
+    <onDelete>CASCADE</onDelete> 
+  </foreignKey> 
+  <field> 
+    <name>payment_processor_id</name> 
+    <title>Payment Processor ID</title> 
+    <type>int unsigned</type> 
+    <required>true</required> 
+    <comment></comment> 
+    <add>4.6</add> 
+  </field> 
+  <foreignKey> 
+    <name>payment_processor_id</name> 
+    <table>civicrm_payment_processor</table> 
+    <key>id</key> 
+    <add>4.6</add> 
+    <onDelete>RESTRICT</onDelete> 
+  </foreignKey> 
+  <field> 
+    <name>token</name> 
+    <type>varchar</type>
+    <title>Token</title>
+    <length>255</length> 
+    <required>true</required> 
+    <comment>Externally provided token string</comment> 
+    <add>4.6</add> 
+  </field> 
+  <field> 
+    <name>created_date</name>
+    <title>Created Date</title>
+    <type>timestamp</type> 
+    <comment>Date created</comment>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>4.6</add> 
+  </field> 
+  <field> 
+    <name>created_id</name>
+    <title>Created ID</title>
+    <type>int unsigned</type>  
+    <comment>Contact ID of token creator</comment> 
+    <add>4.6</add> 
+  </field> 
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>4.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field> 
+    <name>expiry_date</name>
+    <title>Expiry Date</title>
+    <type>datetime</type> 
+    <comment>Date this token expires</comment> 
+    <add>4.6</add> 
+  </field> 
+  <field> 
+    <name>email</name>
+    <title>Email</title>
+    <length>255</length> 
+    <type>varchar</type> 
+    <comment>Email at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.6</add> 
+  </field> 
+ <field> 
+    <name>billing_first_name</name>
+    <title>Billing First Name</title>
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>Billing first name at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.6</add> 
+  </field> 
+ <field> 
+    <name>billing_middle_name</name> 
+    <title>Billing Middle Name</title>
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>Billing middle name at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.6</add> 
+  </field> 
+ <field> 
+    <name>billing_last_name</name> 
+    <title>Billing Last Name</title>
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>Billing last name at the time of token creation. Useful for fraud forensics</comment> 
+    <add>4.6</add> 
+  </field> 
+ <field> 
+    <name>masked_account_number</name>
+    <title>Masked Account Number</title>
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>Holds the part of the card number or account details that may be retained or displayed</comment> 
+    <add>4.6</add> 
+  </field> 
+  <field> 
+    <name>ip_address</name>
+    <title>IP Address</title>
+    <type>varchar</type> 
+    <length>255</length> 
+    <comment>IP used when creating the token. Useful for fraud forensics</comment> 
+    <add>4.6</add> 
+  </field> 
+</table> 

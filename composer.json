@@ -1,0 +1,262 @@
+{
+  "name": "civicrm/civicrm-core",
+  "description": "Open source constituent relationship management for non-profits, NGOs and advocacy organizations.",
+  "type": "library",
+  "license": "AGPL-3.0",
+  "authors": [
+    {
+      "name": "Coleman Watts",
+      "role": "Product Manager"
+    },
+    {
+      "name": "Joshua Gowans",
+      "role": "Project Manager"
+    },
+    {
+      "name": "Mathieu Lutfy",
+      "role": "Infrastructure"
+    },
+    {
+      "name": "Tim Otten",
+      "role": "Software Architect"
+    },
+    {
+      "name": "CiviCRM Community",
+      "homepage": "https://civicrm.org"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "PHPUnit_": ["packages/"],
+      "Civi": "",
+      "Civi\\": ["tests/phpunit/"]
+    },
+    "psr-4": {
+      "Civi\\": [".", "setup/src/"]
+    }
+  },
+  "include-path": ["vendor/tecnickcom"],
+  "config": {
+    "platform": {
+      "php": "7.1"
+    }
+  },
+  "require": {
+    "php": "~7.1",
+    "cache/integration-tests": "~0.16.0",
+    "dompdf/dompdf" : "0.8.*",
+    "electrolinux/phpquery": "^0.9.6",
+    "symfony/config": "^2.8.50 || ~3.0",
+    "symfony/polyfill-iconv": "~1.0",
+    "symfony/dependency-injection": "^2.8.50 || ~3.0",
+    "symfony/event-dispatcher": "^2.8.50 || ~3.0",
+    "symfony/filesystem": "^2.8.50 || ~3.0",
+    "symfony/process": "^2.8.50 || ~3.0",
+    "psr/log": "~1.0",
+    "symfony/finder": "^2.8.50 || ~3.0",
+    "tecnickcom/tcpdf" : "6.2.*",
+    "totten/ca-config": "~17.05",
+    "zetacomponents/base": "1.9.*",
+    "zetacomponents/mail": "1.9.*",
+    "marcj/topsort": "~1.1",
+    "phpoffice/phpword": "^0.15.0",
+    "pear/validate_finance_creditcard": "dev-master",
+    "civicrm/civicrm-cxn-rpc": "~0.19.01.08",
+    "pear/auth_sasl": "1.1.0",
+    "pear/net_smtp": "1.9.*",
+    "pear/net_socket": "1.0.*",
+    "pear/mail": "^1.4",
+    "guzzlehttp/guzzle": "^6.3",
+    "psr/simple-cache": "~1.0.1",
+    "cweagans/composer-patches": "~1.0",
+    "pear/log": "1.13.1",
+    "adrienrn/php-mimetyper": "0.2.2",
+    "civicrm/composer-downloads-plugin": "^2.0",
+    "league/csv": "^9.2",
+    "tplaner/when": "~3.0.0",
+    "xkerman/restricted-unserialize": "~1.1",
+    "typo3/phar-stream-wrapper": "^2 || ^3.0"
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh",
+      "bash tools/scripts/composer/pear-exception-fix.sh",
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/pear-mail-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
+    ],
+    "post-update-cmd": [
+      "bash tools/scripts/composer/dompdf-cleanup.sh",
+      "bash tools/scripts/composer/tcpdf-cleanup.sh",
+      "bash tools/scripts/composer/pear-exception-fix.sh",
+      "bash tools/scripts/composer/net-smtp-fix.sh",
+      "bash tools/scripts/composer/pear-mail-fix.sh",
+      "bash tools/scripts/composer/phpword-jquery.sh"
+    ]
+  },
+  "repositories": {
+    "tplaner-when-1ec099f421bff354cc5c929f83b94031423fc80": {
+      "type": "package",
+      "package": {
+        "version": "3.0.0+php53",
+        "dist": {"url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip", "type": "zip"},
+        "name": "tplaner/when",
+        "type": "library",
+        "description": "Date/Calendar recursion library.",
+        "keywords": ["recurrence", "date", "time", "DateTime"],
+        "homepage": "https://github.com/tplaner/When",
+        "license": "MIT",
+        "authors": [{"name": "Tom Planer", "email": "tplaner@gmail.com"}],
+        "require": {"php": ">=5.3.0"},
+        "require-dev": {"phpunit/phpunit": "~4.0"},
+        "autoload": {"psr-4": {"When\\": "src/"}}
+      }
+    }
+  },
+  "extra": {
+    "downloads": {
+      "*": {
+        "path": "bower_components/{$id}"
+      },
+      "angular": {
+        "url": "https://github.com/angular/bower-angular/archive/v1.5.11.zip"
+      },
+      "angular-bootstrap": {
+        "url": "https://github.com/angular-ui/bootstrap-bower/archive/2.5.0.zip"
+      },
+      "angular-file-upload": {
+        "url": "https://github.com/nervgh/angular-file-upload/archive/v1.1.6.zip",
+        "ignore": ["examples"]
+      },
+      "angular-jquery-dialog-service": {
+        "url": "https://github.com/totten/angular-jquery-dialog-service/archive/v0.8.0-civicrm-1.0.zip"
+      },
+      "angular-mocks": {
+        "url": "https://github.com/angular/bower-angular-mocks/archive/v1.5.11.zip"
+      },
+      "angular-route": {
+        "url": "https://github.com/angular/bower-angular-route/archive/v1.5.11.zip"
+      },
+      "angular-sanitize": {
+        "url": "https://github.com/angular/bower-angular-sanitize/archive/v1.5.11.zip"
+      },
+      "angular-ui-sortable": {
+        "url": "https://github.com/angular-ui/ui-sortable/archive/v0.19.0.zip"
+      },
+      "angular-ui-utils": {
+        "url": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip"
+      },
+      "angular-unsavedChanges": {
+        "url": "https://github.com/facultymatt/angular-unsavedChanges/archive/v0.1.1.zip",
+        "ignore": [".*", "node_modules", "bower_components", "test", "tests"]
+      },
+      "angular-xeditable": {
+        "url": "https://github.com/vitalets/angular-xeditable/archive/0.9.0.zip",
+        "ignore": [".*", "node_modules", "bower_components", "playground", "test", "libs", "docs", "zip", "src", "starter", "Gruntfile.js", "index.html", "jsdoc.conf.json", "package.json"]
+      },
+      "checklist-model": {
+        "url": "https://github.com/vitalets/checklist-model/archive/1.0.0.zip",
+        "ignore": [".*", "node_modules", "docs", "Gruntfile.js", "index.html", "package.json", "test"]
+      },
+      "ckeditor": {
+        "url": "https://github.com/ckeditor/ckeditor-releases/archive/4.14.0.zip"
+      },
+      "crossfilter-1.3.x": {
+        "url": "https://github.com/crossfilter/crossfilter/archive/1.3.14.zip",
+        "ignore": [".*", "node_modules", "bower_components", "src", "lib", "test", "component.json", "package.json", "index.js", "Makefile"]
+      },
+      "crossfilter2": {
+        "url": "https://github.com/crossfilter/crossfilter/archive/1.4.7.zip",
+        "ignore": [".*", "node_modules", "bower_components", "package.json", "index.js", "src", "component.json", "media", "test", "tests"]
+      },
+      "css-color-names": {
+        "url": "https://github.com/bahamas10/css-color-names/archive/v1.0.1.zip"
+      },
+      "d3": {
+        "url": "https://github.com/mbostock-bower/d3-bower/archive/v3.4.11.zip",
+        "ignore": [".DS_Store", ".git", ".gitignore", ".npmignore", ".travis.yml", "Makefile", "bin", "component.json", "index.js", "lib", "node_modules", "package.json", "src", "test"]
+      },
+      "d3-3.5.x": {
+        "url": "https://github.com/mbostock-bower/d3-bower/archive/v3.5.17.zip"
+      },
+      "datatables": {
+        "url": "https://github.com/DataTables/DataTables/archive/1.10.19.zip",
+        "ignore": ["/.*", "examples", "media/unit_testing", "composer.json", "dataTables.jquery.json", "package.json"]
+      },
+      "dc-2.1.x": {
+        "url": "https://github.com/NickQiZhu/dc.js/archive/2.1.10.zip",
+        "ignore": [".*", "style", "web", "*.json", "regression", "scripts", "spec", "src", "docs", "grunt", "Gruntfile.js", "Changelog.md", "welcome.md", "class-hierarchy.dot", "index.js", "CONTRIBUTING.md", "LICENSE_BANNER", "AUTHORS"]
+      },
+      "es6-promise": {
+        "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
+      },
+      "font-awesome": {
+        "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
+        "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
+      },
+      "marked": {
+        "url": "https://github.com/markedjs/marked/archive/v0.8.0.zip",
+        "ignore": [".*", "*.json", "*.md", "Makefile", "*/*"]
+      },
+      "google-code-prettify": {
+        "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
+        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile", "examples", "*.html", "run_prettify*js"]
+      },
+      "jquery": {
+        "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
+      },
+      "jquery-ui": {
+        "url": "https://github.com/components/jqueryui/archive/1.12.1.zip"
+      },
+      "jquery-validation": {
+        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.1.zip",
+        "ignore": [".*", "node_modules", "bower_components", "test", "demo", "lib"]
+      },
+      "jstree": {
+        "url": "https://github.com/vakata/jstree/archive/3.3.8.zip",
+        "ignore": [".*", "docs", "demo", "libs", "node_modules", "test", "libs", "jstree.jquery.json", "gruntfile.js", "package.json", "bower.json", "component.json", "LICENCE-MIT", "README.md"]
+      },
+      "lodash-compat": {
+        "url": "https://github.com/lodash/lodash-compat/archive/3.0.1.zip",
+        "ignore": [".*", "*.log", "*.md", "component.json", "package.json", "node_modules"]
+      },
+      "phantomjs-polyfill": {
+        "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
+      },
+      "select2": {
+        "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
+      },
+      "js-yaml": {
+        "url": "https://github.com/nodeca/js-yaml/archive/3.13.1.zip",
+        "ignore": ["benchmark", "bin", "demo", "examples", "lib", "support", "test"]
+      },
+      "smartmenus": {
+        "url": "https://github.com/vadikom/smartmenus/archive/1.1.0.zip",
+        "ignore": [".gitignore", "Gruntfile.js"]
+      }
+    },
+    "patches": {
+      "cache/integration-tests": {
+        "Allow adding tests": "https://github.com/php-cache/integration-tests/commit/05f97174c09364dc10c084a38ba0cfd5124f4cec.patch",
+        "Support PHPUnit 6+": "https://github.com/php-cache/integration-tests/commit/1ec7362962185df91d3d749bc3fa7e7b99cb9fc7.patch",
+        "Add tests for binary data round trip": "https://github.com/php-cache/integration-tests/commit/89cd7068e83aa776774bfc44f6bcba858c085616.patch"
+      },
+      "pear/mail": {
+        "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+      },
+      "pear/net_smtp": {
+        "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
+      },
+      "phpoffice/common": {
+        "Fix handling of libxml_disable_entity_loader": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
+      },
+      "phpoffice/phpword": {
+        "Fix handling of libxml_disable_entity_loader": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/phpword-libxml-fix-global-handling.patch"
+      },
+      "zetacomponents/mail": {
+        "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
+      }
+    }
+  }
+}

@@ -1,43 +1,31 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Report_Utils_Get {
 
-  static function getTypedValue($name, $type) {
-    $value = CRM_Utils_Array::value($name, $_GET);
+  /**
+   * @param string $name
+   * @param $type
+   *
+   * @return mixed|null
+   */
+  public static function getTypedValue($name, $type) {
+    $value = $_GET[$name] ?? NULL;
     if ($value === NULL) {
       return NULL;
     }
@@ -47,7 +35,14 @@ class CRM_Report_Utils_Get {
     );
   }
 
-  static function dateParam($fieldName, &$field, &$defaults) {
+  /**
+   * @param string $fieldName
+   * @param $field
+   * @param $defaults
+   *
+   * @return bool
+   */
+  public static function dateParam($fieldName, &$field, &$defaults) {
     // type = 12 (datetime) is not recognized by Utils_Type::escape() method,
     // and therefore the below hack
     $type = 4;
@@ -55,9 +50,12 @@ class CRM_Report_Utils_Get {
     $from = self::getTypedValue("{$fieldName}_from", $type);
     $to = self::getTypedValue("{$fieldName}_to", $type);
 
-    $relative = CRM_Utils_Array::value("{$fieldName}_relative", $_GET);
+    $relative = self::getTypedValue("{$fieldName}_relative", CRM_Utils_Type::T_STRING);
+    if ($relative !== NULL) {
+      $defaults["{$fieldName}_relative"] = $relative;
+    }
     if ($relative) {
-      list($from, $to) = CRM_Report_Form::getFromTo($relative, NULL, NULL);
+      list($from, $to) = CRM_Utils_Date::getFromTo($relative, NULL, NULL);
       $from = substr($from, 0, 8);
       $to = substr($to, 0, 8);
     }
@@ -85,7 +83,12 @@ class CRM_Report_Utils_Get {
     }
   }
 
-  static function stringParam($fieldName, &$field, &$defaults) {
+  /**
+   * @param string $fieldName
+   * @param $field
+   * @param $defaults
+   */
+  public static function stringParam($fieldName, &$field, &$defaults) {
     $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'like');
 
     switch ($fieldOP) {
@@ -94,6 +97,7 @@ class CRM_Report_Utils_Get {
       case 'ew':
       case 'nhas':
       case 'like':
+      case 'eq':
       case 'neq':
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Array::value('type', $field));
         if ($value !== NULL) {
@@ -106,10 +110,25 @@ class CRM_Report_Utils_Get {
       case 'nnll':
         $defaults["{$fieldName}_op"] = $fieldOP;
         break;
+
+      case 'in':
+      case 'notin':
+      case 'mhas':
+        $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Type::T_STRING);
+        if ($value !== NULL) {
+          $defaults["{$fieldName}_value"] = explode(",", $value);
+          $defaults["{$fieldName}_op"] = $fieldOP;
+        }
+        break;
     }
   }
 
-  static function intParam($fieldName, &$field, &$defaults) {
+  /**
+   * @param string $fieldName
+   * @param $field
+   * @param $defaults
+   */
+  public static function intParam($fieldName, &$field, &$defaults) {
     $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'eq');
 
     switch ($fieldOP) {
@@ -143,6 +162,11 @@ class CRM_Report_Utils_Get {
         }
         break;
 
+      case 'nll':
+      case 'nnll':
+        $defaults["{$fieldName}_op"] = $fieldOP;
+        break;
+
       case 'in':
       case 'notin':
         // send the type as string so that multiple values can also be retrieved from url.
@@ -160,20 +184,30 @@ class CRM_Report_Utils_Get {
     }
   }
 
-  static function processChart(&$defaults) {
-    $chartType = CRM_Utils_Array::value("charts", $_GET);
-    if (in_array($chartType, array(
-      'barChart', 'pieChart'))) {
+  /**
+   * @param $defaults
+   */
+  public static function processChart(&$defaults) {
+    $chartType = $_GET["charts"] ?? NULL;
+    if (in_array($chartType, [
+      'barChart',
+      'pieChart',
+    ])) {
       $defaults["charts"] = $chartType;
     }
   }
 
-  static function processFilter(&$fieldGrp, &$defaults) {
+  /**
+   * @param $fieldGrp
+   * @param $defaults
+   */
+  public static function processFilter(&$fieldGrp, &$defaults) {
     // process only filters for now
     foreach ($fieldGrp as $tableName => $fields) {
       foreach ($fields as $fieldName => $field) {
         switch (CRM_Utils_Array::value('type', $field)) {
           case CRM_Utils_Type::T_INT:
+          case CRM_Utils_Type::T_FLOAT:
           case CRM_Utils_Type::T_MONEY:
             self::intParam($fieldName, $field, $defaults);
             break;
@@ -192,8 +226,11 @@ class CRM_Report_Utils_Get {
     }
   }
 
-  //unset default filters
-  static function unsetFilters(&$defaults) {
+  /**
+   * unset default filters.
+   * @param $defaults
+   */
+  public static function unsetFilters(&$defaults) {
     static $unsetFlag = TRUE;
     if ($unsetFlag) {
       foreach ($defaults as $field_name => $field_value) {
@@ -210,7 +247,11 @@ class CRM_Report_Utils_Get {
     }
   }
 
-  static function processGroupBy(&$fieldGrp, &$defaults) {
+  /**
+   * @param $fieldGrp
+   * @param $defaults
+   */
+  public static function processGroupBy(&$fieldGrp, &$defaults) {
     // process only group_bys for now
     $flag = FALSE;
 
@@ -234,11 +275,19 @@ class CRM_Report_Utils_Get {
     }
   }
 
-  static function processFields(&$reportFields, &$defaults) {
+  /**
+   * @param $reportFields
+   * @param $defaults
+   */
+  public static function processFields(&$reportFields, &$defaults) {
     //add filters from url
     if (is_array($reportFields)) {
       if ($urlFields = CRM_Utils_Array::value("fld", $_GET)) {
         $urlFields = explode(',', $urlFields);
+      }
+      if (CRM_Utils_Array::value("ufld", $_GET) == 1) {
+        // unset all display columns
+        $defaults['fields'] = [];
       }
       if (!empty($urlFields)) {
         foreach ($reportFields as $tableName => $fields) {
@@ -251,5 +300,5 @@ class CRM_Report_Utils_Get {
       }
     }
   }
-}
 
+}

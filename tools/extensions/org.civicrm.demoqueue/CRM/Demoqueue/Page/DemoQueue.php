@@ -7,40 +7,44 @@ require_once 'CRM/Core/Page.php';
  */
 class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
   const QUEUE_NAME = 'demo-queue';
-  
+
   function run() {
-    $queue = CRM_Queue_Service::singleton()->create(array(
+    $queue = CRM_Queue_Service::singleton()->create([
       'type' => 'Sql',
       'name' => self::QUEUE_NAME,
       'reset' => TRUE,
-    ));
-    
+    ]);
+
     for ($i = 0; $i < 5; $i++) {
       $queue->createItem(new CRM_Queue_Task(
-        array('CRM_Demoqueue_Page_DemoQueue', 'doMyWork'), // callback
-        array($i, "Task $i takes $i second(s)"), // arguments
+        ['CRM_Demoqueue_Page_DemoQueue', 'doMyWork'], // callback
+        [$i, "Task $i takes $i second(s)"], // arguments
         "Task $i" // title
       ));
       if ($i == 2) {
         $queue->createItem(new CRM_Queue_Task(
-          array('CRM_Demoqueue_Page_DemoQueue', 'addMoreWork'), // callback
-          array(), // arguments
+          ['CRM_Demoqueue_Page_DemoQueue', 'addMoreWork'], // callback
+          [], // arguments
           "Add More Work" // title
         ));
       }
     }
-    
-    $runner = new CRM_Queue_Runner(array(
+
+    $runner = new CRM_Queue_Runner([
       'title' => ts('Demo Queue Runner'),
       'queue' => $queue,
-      'onEnd' => array('CRM_Demoqueue_Page_DemoQueue', 'onEnd'),
+      'onEnd' => ['CRM_Demoqueue_Page_DemoQueue', 'onEnd'],
       'onEndUrl' => CRM_Utils_System::url('civicrm/demo-queue/done'),
-    ));
+    ]);
     $runner->runAllViaWeb(); // does not return
   }
-  
+
   /**
    * Perform some business logic
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param $delay
+   * @param $message
+   * @return bool
    */
   static function doMyWork(CRM_Queue_TaskContext $ctx, $delay, $message) {
     sleep(1);
@@ -51,26 +55,29 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
     //throw new Exception('whoz'); // broken, exception
     return TRUE; // success
   }
-  
+
   /**
    * Perform some business logic
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
    */
   static function addMoreWork(CRM_Queue_TaskContext $ctx) {
     sleep(1);
     for ($i = 0; $i < 5; $i++) {
       $ctx->queue->createItem(new CRM_Queue_Task(
-        array('CRM_Demoqueue_Page_DemoQueue', 'doMyWork'), // callback
-        array($i, "Extra task $i takes $i second(s)"), // arguments
+        ['CRM_Demoqueue_Page_DemoQueue', 'doMyWork'], // callback
+        [$i, "Extra task $i takes $i second(s)"], // arguments
         "Extra Task $i" // title
-      ), array(
+      ), [
         'weight' => -1,
-      ));
+      ]);
     }
     return TRUE; // success
   }
-  
+
   /**
    * Handle the final step of the queue
+   * @param \CRM_Queue_TaskContext $ctx
    */
   static function onEnd(CRM_Queue_TaskContext $ctx) {
     //CRM_Utils_System::redirect('civicrm/demo-queue/done');

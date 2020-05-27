@@ -1,42 +1,59 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: $
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
-  function invoke($numParams,
-                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
-                  $fnSuffix
+  /**
+   * Invoke hooks.
+   *
+   * @param int $numParams
+   *   Number of parameters to pass to the hook.
+   * @param mixed $arg1
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg2
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg3
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg4
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg5
+   *   Parameter to be passed to the hook.
+   * @param mixed $arg6
+   *   Parameter to be passed to the hook.
+   * @param string $fnSuffix
+   *   Function suffix, this is effectively the hook name.
+   *
+   * @return mixed
+   */
+
+  /**
+   * @param int $numParams
+   * @param mixed $arg1
+   * @param mixed $arg2
+   * @param mixed $arg3
+   * @param mixed $arg4
+   * @param mixed $arg5
+   * @param mixed $arg6
+   * @param string $fnSuffix
+   *
+   * @return mixed
+   */
+  public function invokeViaUF(
+    $numParams,
+    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
+    $fnSuffix
   ) {
     // ensure that we are running in a joomla context
     // we've not yet figured out how to bootstrap joomla, so we should
@@ -44,6 +61,7 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
     if (defined('_JEXEC')) {
       //Invoke the Joomla plugin system to observe to civicrm events.
       jimport('joomla.plugin.helper');
+      jimport('cms.plugin.helper');
       JPluginHelper::importPlugin('civicrm');
 
       // get app based on cli or web
@@ -60,10 +78,10 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
         }
       }
 
-      $result = $app->triggerEvent($fnSuffix, array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5));
+      $result = $app->triggerEvent($fnSuffix, array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6));
 
       $moduleResult = $this->commonInvoke($numParams,
-        $arg1, $arg2, $arg3, $arg4, $arg5,
+        $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
         $fnSuffix, 'joomla');
       if (!empty($moduleResult) && is_array($moduleResult)) {
         if (empty($result)) {
@@ -79,10 +97,10 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       if (!empty($result)) {
         // collapse result returned from hooks
         // CRM-9XXX
-        $finalResult = array();
+        $finalResult = [];
         foreach ($result as $res) {
           if (!is_array($res)) {
-            $res = array($res);
+            $res = [$res];
           }
           $finalResult = array_merge($finalResult, $res);
         }
@@ -90,6 +108,12 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       }
       return $result;
     }
+    else {
+      // CRM-20904: We should still call Civi extension hooks even if Joomla isn't online yet.
+      return $this->commonInvoke($numParams,
+        $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
+        $fnSuffix, 'joomla');
+    }
   }
-}
 
+}

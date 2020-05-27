@@ -1,75 +1,115 @@
 #!/usr/bin/env php
 <?php
-/* PHPUnit
+
+/**
+ * In the past, Civi bundled a hacked copy of PHPUnit used like:
  *
- * Copyright (c) 2002-2008, Sebastian Bergmann <sb@sebastian-bergmann.de>.
- * All rights reserved.
+ *   cd tools
+ *   ./scripts/phpunit Some_Class_NameTest
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the name of Sebastian Bergmann nor the names of his
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRIC
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id: phpunit 522 2012-04-23 13:53:45Z deepak $
+ * This script is an adapter for backwards compatibility.
  */
 
-$GLOBALS['base_dir'] = dirname( dirname( dirname( __FILE__ ) ) );
-$tests_dir = $GLOBALS['base_dir']  . DIRECTORY_SEPARATOR . 'tests' . DIRECTORY_SEPARATOR . 'phpunit';
-$civi_pkgs_dir = $GLOBALS['base_dir'] .   DIRECTORY_SEPARATOR . 'packages';
-ini_set('safe_mode', 0);
-ini_set('include_path',
-        "{$GLOBALS['base_dir']}" . PATH_SEPARATOR .
-        "$tests_dir"            . PATH_SEPARATOR .
-        "$civi_pkgs_dir"        . PATH_SEPARATOR
-        . ini_get( 'include_path') );
+$argFilters = [];
 
-#  Relying on system timezone setting produces a warning,
-#  doing the following prevents the warning message
-if ( file_exists( '/etc/timezone' ) ) {
-    $timezone = trim( file_get_contents( '/etc/timezone' ) );
-    if ( ini_set('date.timezone', $timezone ) === false ) {
-        echo "ini_set( 'date.timezone', '$timezone' ) failed\n";
+if (PHP_SAPI !== 'cli') {
+  die("phpunit can only be run from command line.");
+}
+if (version_compare(PHP_VERSION, '7.0', '>=')) {
+  $phpunit = findCommand('phpunit6');
+  $argFilters[] = function ($argv) {
+    $pos = array_search('--tap', $argv);
+    if ($pos !== FALSE) {
+      array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
     }
+    return $argv;
+  };
+}
+elseif (version_compare(PHP_VERSION, '5.6', '>=')) {
+  $phpunit = findCommand('phpunit5');
+}
+else {
+  $phpunit = findCommand('phpunit4');
+}
+if (!$phpunit) {
+  $phpunit = findCommand('phpunit');
+}
+if (!$phpunit) {
+  echo "Plesae ensure that:\n";
+  echo " * PHPUnit is installed.\n";
+  echo " * The extensions for dbunit and selenium are installed.\n" ;
+  echo " * The command \"phpunit\" is in the PATH.\n";
+  echo "See also: https://github.com/civicrm/civicrm-buildkit/\n";
+  exit(127);
 }
 
-# Crank up the memory
-ini_set('memory_limit', '2G');
+chdir(dirname(dirname(__DIR__))); // civicrm-core root dir
 
-error_reporting( E_ALL );
+array_shift($argv);
 
-require 'PHPUnit/TextUI/Command.php';
+// Convert class names to file names
+$CIVICRM_UF = 'UnitTests';
+foreach ($argv as $k => $v) {
+  if (preg_match('/^(CRM_|api_v3_|api_v4_|EnvTest|WebTest_|E2E_)/', $v)) {
+    $argv[$k] = 'tests/phpunit/' . strtr($v, '_', '/') . '.php';
+  }
+  elseif (preg_match('/^Civi\\\\/', $v)) {
+    $argv[$k] = 'tests/phpunit/' . strtr($v, '\\', '/') . '.php';
+  }
 
-define('PHPUnit_MAIN_METHOD', 'PHPUnit_TextUI_Command::main');
+  if (preg_match('/^(WebTest|E2E)/', $v)) {
+    $CIVICRM_UF='';
+  }
+}
+putenv("CIVICRM_UF=$CIVICRM_UF");
 
-require dirname(__FILE__) . DIRECTORY_SEPARATOR .
-	'..' . DIRECTORY_SEPARATOR .
-	'..' . DIRECTORY_SEPARATOR .
-	'packages' . DIRECTORY_SEPARATOR .
-	'PHPUnit' . DIRECTORY_SEPARATOR .
-	'Autoload.php';
+// Transition: Make sure we use phpunit code from PATH, not
+// civicrm-packages.  This will be unnecessary once civicrm-packages is
+// updated.
+if (is_dir('packages/PHPUnit/')) {
+  if (!rename('packages/PHPUnit', 'packages/PHPUnit.bak')) {
+    echo "Failed to move aside stale copy of PHPUnit.\n";
+    exit(1);
+  }
+}
 
-PHPUnit_TextUI_Command::main( );
+foreach ($argFilters as $filter) {
+  $argv = $filter($argv);
+}
+
+$cmd =
+  findPhp() // In case this system has multiple copies of PHP, use the active/preferred one.
+  // . ' -ddisplay_errors=1'
+  . ' '
+  . escapeshellarg($phpunit)
+  . ' '
+  . implode(' ', array_map('escapeshellarg', $argv));
+passthru($cmd);
+
+function findPhp() {
+  // The autodetect behavior here is a potential point of contention. These two cases are hard to reconcile:
+  // 1. `php` is actually a wrapper script which delegates to another PHP binary and
+  //    passes options (such as INI's and PECL extensions). Subprocesses should use the wrapper script.
+  //    Examples: bitnami, bknix
+  // 2. There are multiple PHP binaries (eg `php55`, `php70`). Subprocesses should use
+  //    the final executable (regardless of its name).
+  //    Example: using MAMP and adding 'ln -s /Application/MAMP/.../php7.1.2/bin/php ~/bin/php71`
+  // Since the test infra uses a wrapper script like (1), we use autodetect logic that works there.
+  // If you're in situation (2), then set an env-var or just skip on using `tools/scripts/phpunit`.
+  if (getenv('PHP')) {
+    return getenv('PHP');
+  }
+  else {
+    return 'php';
+  }
+}
+
+function findCommand($name) {
+  $paths = explode(PATH_SEPARATOR, getenv('PATH'));
+  foreach ($paths as $path) {
+    if (file_exists("$path/$name")) {
+      return "$path/$name";
+    }
+  }
+  return NULL;
+}

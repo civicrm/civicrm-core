@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: civicspace
 -- ------------------------------------------------------
--- Server version	4.0.18-log
+-- Server version 4.0.18-log
 
 --
 -- Table structure for table `zipcodes`
@@ -20,7 +20,7 @@ CREATE TABLE zipcodes (
   KEY zip (zip),
   KEY latitude (latitude),
   KEY longitude (longitude)
-) ENGINE=MYISAM;
+) ENGINE=InnoDB;
 
 --
 -- Dumping data for table `zipcodes`

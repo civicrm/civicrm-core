@@ -1,98 +1,71 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Custom.php';
+/**
+ * Class CRM_Core_BAO_CustomValueTest
+ * @group headless
+ */
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'CustomValue BAOs',
-      'description' => 'Test all Core_BAO_CustomValue methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function testTypeCheckWithValidInput() {
+  public function testTypeCheckWithValidInput() {
 
-    $values = array();
-    $values = array(
+    $values = [
       'Memo' => 'Test1',
       'String' => 'Test',
       'Int' => 1,
       'Float' => 10.00,
       'Date' => '2008-06-24',
-      'Boolean' => True,
+      'Boolean' => TRUE,
       'StateProvince' => 'California',
       'Country' => 'US',
       'Link' => 'http://civicrm.org',
-    );
+    ];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
       if ($type == 'Date') {
         $this->assertEquals($valid, '2008-06-24', 'Checking type ' . $type . ' for returned CustomField Type.');
       }
       else {
-        $this->assertEquals($valid, true, 'Checking type ' . $type . ' for returned CustomField Type.');
+        $this->assertEquals($valid, TRUE, 'Checking type ' . $type . ' for returned CustomField Type.');
       }
     }
   }
 
-  function testTypeCheckWithInvalidInput() {
-    $values = array();
-    $values = array('check1' => 'chk');
+  public function testTypeCheckWithInvalidInput() {
+    $values = ['check1' => 'chk'];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
       $this->assertEquals($valid, NULL, 'Checking invalid type for returned CustomField Type.');
     }
   }
 
-  function testTypeCheckWithWrongInput() {
-    $values = array();
-    $values = array(
+  public function testTypeCheckWithWrongInput() {
+    $values = [
       'String' => 1,
       'Boolean' => 'US',
-    );
+    ];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
       $this->assertEquals($valid, NULL, 'Checking type ' . $type . ' for returned CustomField Type.');
     }
   }
 
-  function testTypeToFieldWithValidInput() {
-    $values = array();
-    $values = array(
+  public function testTypeToFieldWithValidInput() {
+    $values = [
       'String' => 'char_data',
       'File' => 'char_data',
       'Boolean' => 'int_data',
@@ -104,7 +77,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
       'Money' => 'decimal_data',
       'Date' => 'date_data',
       'Link' => 'char_data',
-    );
+    ];
 
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typeToField($type);
@@ -112,48 +85,47 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  function testTypeToFieldWithWrongInput() {
-    $values = array();
-    $values = array(
+  public function testTypeToFieldWithWrongInput() {
+    $values = [
       'String' => 'memo_data',
       'File' => 'date_data',
       'Boolean' => 'char_data',
-    );
+    ];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typeToField($type);
       $this->assertNotEquals($valid, $value, 'Checking type ' . $type . ' for returned CustomField Type.');
     }
   }
 
-  function testFixFieldValueOfTypeMemo() {
-    $customGroup = Custom::createGroup(array(), 'Individual');
+  public function fixCustomFieldValue() {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
 
-    $fields = array(
-      'groupId' => $customGroup->id,
-      'dataType' => 'Memo',
-      'htmlType' => 'TextArea',
-    );
+    $fields = [
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'Memo',
+      'html_type' => 'TextArea',
+      'default_value' => '',
+    ];
 
-    $customField = Custom::createField(array(), $fields);
+    $customField = $this->customFieldCreate($fields);
 
-    $custom = 'custom_' . $customField->id;
-    $params = array();
-    $params = array(
+    $custom = 'custom_' . $customField['id'];
+    $params = [
       'email' => 'abc@webaccess.co.in',
       $custom => 'note',
-    );
+    ];
 
-    CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
     $this->assertEquals($params[$custom], '%note%', 'Checking the returned value of type Memo.');
 
-    Custom::deleteField($customField);
-    Custom::deleteGroup($customGroup);
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
   }
 
-  function testFixFieldValueOfTypeMemoWithEmptyParams() {
-    $params = array();
-    $result = CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($params);
+  public function testFixCustomFieldValueWithEmptyParams() {
+    $params = [];
+    $result = CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
     $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
   }
-}
 
+}

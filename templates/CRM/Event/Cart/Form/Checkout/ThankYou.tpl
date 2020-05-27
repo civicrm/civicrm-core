@@ -80,6 +80,9 @@
       {if $line_item.location.address.1.supplemental_address_2}
         {$line_item.location.address.1.supplemental_address_2}
       {/if}
+      {if $line_item.location.address.1.supplemental_address_3}
+        {$line_item.location.address.1.supplemental_address_3}
+      {/if}
       {if $line_item.location.address.1.city}
         {$line_item.location.address.1.city}, {$line_item.location.address.1.state_province} {$line_item.location.address.1.postal_code}
       {/if}

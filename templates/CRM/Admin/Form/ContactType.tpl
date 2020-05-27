@@ -1,31 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing Contact Type  *}
 
-<h3>{if $action eq 1}{ts}New Contact Type{/ts}{elseif $action eq 2}{ts}Edit Contact Type{/ts}{else}{ts}Delete Contact Type{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contact-type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
@@ -41,7 +24,7 @@
         {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='label' id= $cid }
       {/if}
       </td>
-           
+
       <td>{$form.label.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-parent_id">
@@ -53,16 +36,16 @@
            {/if}
    </tr>
    <tr class="crm-contact-type-form-block-image_URL">
-      <td class="label">{$form.image_URL.label}</td>
-      <td>{$form.image_URL.html|crmAddClass:'huge40'}{help id="id-image_URL"}</td>
-   </tr> 
+      <td class="label">{$form.image_URL.label} {help id="id-image_URL"}</td>
+      <td>{$form.image_URL.html|crmAddClass:'huge40'}</td>
+   </tr>
    <tr class="crm-contact-type-form-block-description">
      <td class="label">{$form.description.label}
      {if $action eq 2}
        {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contact_type' field='description' id= $cid}
      {/if}
      </td>
-          
+
      <td>{$form.description.html}</td>
    </tr>
    <tr class="crm-contact-type-form-block-is_active">

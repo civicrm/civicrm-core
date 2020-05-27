@@ -1,36 +1,28 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {htxt id="id-from_email-title"}
   {ts}From Address{/ts}
 {/htxt}
 {htxt id="id-from_email"}
-<p>{ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, users with Administer CiviCRM permission can configure one or more general email addresses that can be selected as an alternative. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{if $params.logged_in_email_setting == "1"}
+  <p>{ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, users with Administer CiviCRM permission can configure one or more general email addresses that can be selected as an alternative. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{else}
+  <p>{ts}CiviCRM is currently configured to only use the defined From Email addresses. If you wish to be able to use the email address of the logged in user as the From Address you will need to set the setting "Allow mail from loged in contact" setting. Users with Administer CiviCRM can set this setting in the SMTP settings.{/ts}<p>
+  {if $params.isAdmin}
+    {capture assign="smtpUrl"}{crmURL p="civicrm/admin/setting/smtp" q="reset=1"}{/capture}
+    <p>{ts 1=$smtpUrl}Go to <a href='%1'>Settings - Outbound Mail</a> to enable the usage of the logged in contact's email address as the from email{/ts}</p>
+  {/if}
+{/if}
 {if $params.isAdmin}
-    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="group=from_email_address&reset=1"}{/capture}
-    <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+   {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+   <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
 {/if}
 {/htxt}
 
@@ -53,8 +45,7 @@
     {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
     </p>
 {/if}
-<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens,
-but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
+<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
 go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
 be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
 {/htxt}
@@ -69,25 +60,17 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 {if $params.tplFile EQ 'CRM/Mailing/Form/Upload.tpl'}
     <p>
     {ts}You will also use tokens to insert Unsubscribe, Opt out and Forwarding links in your message.{/ts}
-    {if $params.editor NEQ 'textarea'}
         {ts}Use these steps to insert clickable action links:{/ts}
         <ul>
             <li>{ts}Select the action token from the Insert Tokens pop-up list - e.g. Unsubscribe via web page - and insert into your message.{/ts}</li>
             <li>{ts 1='&#123;action.unsubscribeUrl&#125;}'}Highlight the token and copy it to your clipboard - e.g. %1.{/ts}</li>
             <li>{ts}Replace the token in your message with the text you want for the link - e.g. Click here to unsubscribe.{/ts}</li>
             <li>{ts}With the text highlighted, click the Insert/Edit Link icon in the editor toolbar.{/ts}</li>
-            {if $params.editor EQ 'fckeditor'}
-                <li>{ts}In the Link pop-up window select &lt;other&gt; for the &quot;Protocol&quot; (selecting &quot;http://&quot; will result in an invalid link).{/ts}</li>
-                <li>{ts}Paste the action token into the URL field and click OK.{/ts}</li>
-            {else}
-                <li>{ts}Paste the action token into the URL field and click Insert (or Update).{/ts}</li>
-            {/if}
+            <li>{ts}Paste the action token into the URL field and click Insert (or Update).{/ts}</li>
         </ul>
-    {/if}
     </p>
 {/if}
-<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens,
-but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
+<p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
 go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
 be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
 {/htxt}

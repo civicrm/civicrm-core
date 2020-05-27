@@ -1,39 +1,21 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CiviContributeProcessor {
-  static $_paypalParamsMapper = array(
+  public static $_paypalParamsMapper = array(
     //category    => array(paypal_param    => civicrm_field);
     'contact' => array(
       'salutation' => 'prefix_id',
@@ -74,44 +56,13 @@ class CiviContributeProcessor {
     ),
   );
 
-  static $_googleParamsMapper = array(
-    //category    => array(google_param    => civicrm_field);
-    'contact' => array(
-      'first-name' => 'first_name',
-      'last-name' => 'last_name',
-      'contact-name' => 'display_name',
-      'email' => 'email',
-    ),
-    'location' => array(
-      'address1' => 'street_address',
-      'address2' => 'supplemental_address_1',
-      'city' => 'city',
-      'postal-code' => 'postal_code',
-      'country-code' => 'country',
-    ),
-    'transaction' => array(
-      'total-charge-amount' => 'total_amount',
-      'google-order-number' => 'trxn_id',
-      'currency' => 'currency',
-      'item-name' => 'source',
-      'item-description' => 'note',
-      'timestamp' => 'receive_date',
-      'latest-charge-fee' => 'fee_amount',
-      'net-amount' => 'net_amount',
-      'times' => 'installments',
-      'period' => 'frequency_unit',
-      'frequency_interval' => 'frequency_interval',
-      'start_date' => 'start_date',
-      'modified_date' => 'modified_date',
-      'trxn_type' => 'trxn_type',
-      'amount' => 'amount',
-    ),
-  );
-
-  static $_csvParamsMapper = array(
-    // Note: if csv header is not present in the mapper, header itself
-    // is considered as a civicrm field.
-    //category    => array(csv_header      => civicrm_field);
+  /**
+   * Note: if csv header is not present in the mapper, header itself
+   * is considered as a civicrm field.
+   * category    => array(csv_header      => civicrm_field);
+   * @var array
+   */
+  public static $_csvParamsMapper = array(
     'contact' => array(
       'first_name' => 'first_name',
       'last_name' => 'last_name',
@@ -136,8 +87,13 @@ class CiviContributeProcessor {
     ),
   );
 
-  static
-  function paypal($paymentProcessor, $paymentMode, $start, $end) {
+  /**
+   * @param $paymentProcessor
+   * @param $paymentMode
+   * @param $start
+   * @param $end
+   */
+  public static function paypal($paymentProcessor, $paymentMode, $start, $end) {
     $url = "{$paymentProcessor['url_api']}nvp";
 
     $keyArgs = array(
@@ -180,13 +136,13 @@ class CiviContributeProcessor {
           // details about a transaction, let's make sure that it doesn't
           // already exist in the database.
           require_once 'CRM/Contribute/DAO/Contribution.php';
-          $dao = new CRM_Contribute_DAO_Contribution;
+          $dao = new CRM_Contribute_DAO_Contribution();
           $dao->trxn_id = $value;
           if ($dao->find(TRUE)) {
             preg_match('/(\d+)$/', $name, $matches);
-            $seq   = $matches[1];
+            $seq = $matches[1];
             $email = $result["l_email{$seq}"];
-            $amt   = $result["l_amt{$seq}"];
+            $amt = $result["l_amt{$seq}"];
             CRM_Core_Error::debug_log_message("Skipped (already recorded) - $email, $amt, $value ..<p>", TRUE);
             continue;
           }
@@ -208,7 +164,7 @@ class CiviContributeProcessor {
             continue;
           }
 
-          $params = CRM_Contribute_BAO_Contribution_Utils::formatAPIParams($trxnDetails,
+          $params = self::formatAPIParams($trxnDetails,
             self::$_paypalParamsMapper,
             'paypal'
           );
@@ -219,115 +175,47 @@ class CiviContributeProcessor {
             $params['transaction']['is_test'] = 0;
           }
 
-          if (CRM_Contribute_BAO_Contribution_Utils::processAPIContribution($params)) {
-            CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+          try {
+            if (self::processAPIContribution($params)) {
+              CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+            }
+            else {
+              CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+            }
           }
-          else {
+          catch (CiviCRM_API3_Exception $e) {
             CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
           }
         }
       }
       if ($result['l_errorcode0'] == '11002') {
-        $end             = $result['l_timestamp99'];
-        $end_time        = strtotime("{$end}", time());
-        $end_date        = date('Y-m-d\T00:00:00.00\Z', $end_time);
+        $end = $result['l_timestamp99'];
+        $end_time = strtotime("{$end}", time());
+        $end_date = date('Y-m-d\T00:00:00.00\Z', $end_time);
         $args['enddate'] = $end_date;
       }
     } while ($result['l_errorcode0'] == '11002');
   }
 
-  static
-  function google($paymentProcessor, $paymentMode, $start, $end) {
-    require_once "CRM/Contribute/BAO/Contribution/Utils.php";
-    require_once 'CRM/Core/Payment/Google.php';
-    $nextPageToken = TRUE;
-    $searchParams = array(
-      'start' => $start,
-      'end' => $end,
-      'notification-types' => array('charge-amount'),
-    );
-
-    $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor, $searchParams);
-
-    while ($nextPageToken) {
-      if ($response[0] == 'error') {
-        CRM_Core_Error::debug_log_message("GOOGLE ERROR: " .
-          $response[1]['error']['error-message']['VALUE'], TRUE
-        );
-      }
-      $nextPageToken = isset($response[1][$response[0]]['next-page-token']['VALUE']) ? $response[1][$response[0]]['next-page-token']['VALUE'] : FALSE;
-
-      if (is_array($response[1][$response[0]]['notifications']['charge-amount-notification'])) {
-
-        if (array_key_exists('google-order-number',
-            $response[1][$response[0]]['notifications']['charge-amount-notification']
-          )) {
-          // sometimes 'charge-amount-notification' itself is an absolute
-          // array and not array of arrays. This is the case when there is only one
-          // charge-amount-notification. Hack for this special case -
-          $chrgAmt = $response[1][$response[0]]['notifications']['charge-amount-notification'];
-          unset($response[1][$response[0]]['notifications']['charge-amount-notification']);
-          $response[1][$response[0]]['notifications']['charge-amount-notification'][] = $chrgAmt;
-        }
-
-        foreach ($response[1][$response[0]]['notifications']['charge-amount-notification']
-          as $amtData
-        ) {
-          $searchParams = array('order-numbers' => array($amtData['google-order-number']['VALUE']),
-            'notification-types' => array('risk-information', 'new-order', 'charge-amount'),
-          );
-          $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor,
-            $searchParams
-          );
-          // append amount information as well
-          $response[] = $amtData;
-
-          $params = CRM_Contribute_BAO_Contribution_Utils::formatAPIParams($response,
-            self::$_googleParamsMapper,
-            'google'
-          );
-          if ($paymentMode == 'test') {
-            $params['transaction']['is_test'] = 1;
-          }
-          else {
-            $params['transaction']['is_test'] = 0;
-          }
-          if (CRM_Contribute_BAO_Contribution_Utils::processAPIContribution($params)) {
-            CRM_Core_Error::debug_log_message("Processed - {$params['email']}, {$amtData['total-charge-amount']['VALUE']}, {$amtData['google-order-number']['VALUE']} ..<p>", TRUE);
-          }
-          else {
-            CRM_Core_Error::debug_log_message("Skipped - {$params['email']}, {$amtData['total-charge-amount']['VALUE']}, {$amtData['google-order-number']['VALUE']} ..<p>", TRUE);
-          }
-        }
-
-        if ($nextPageToken) {
-          $searchParams = array('next-page-token' => $nextPageToken);
-          $response = CRM_Core_Payment_Google::invokeAPI($paymentProcessor, $searchParams);
-        }
-      }
-    }
-  }
-
-  static
-  function csv() {
-    $csvFile   = '/home/deepak/Desktop/crm-4247.csv';
+  public static function csv() {
+    $csvFile = '/home/deepak/Desktop/crm-4247.csv';
     $delimiter = ";";
-    $row       = 1;
+    $row = 1;
 
     $handle = fopen($csvFile, "r");
     if (!$handle) {
-      CRM_Core_Error::fatal("Can't locate csv file.");
+      throw new CRM_Core_Exception("Can't locate csv file.");
     }
 
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
     while (($data = fgetcsv($handle, 1000, $delimiter)) !== FALSE) {
       if ($row !== 1) {
         $data['header'] = $header;
-        $params = CRM_Contribute_BAO_Contribution_Utils::formatAPIParams($data,
+        $params = self::formatAPIParams($data,
           self::$_csvParamsMapper,
           'csv'
         );
-        if (CRM_Contribute_BAO_Contribution_Utils::processAPIContribution($params)) {
+        if (self::processAPIContribution($params)) {
           CRM_Core_Error::debug_log_message("Processed - line $row of csv file .. {$params['email']}, {$params['transaction']['total_amount']}, {$params['transaction']['trxn_id']} ..<p>", TRUE);
         }
         else {
@@ -343,7 +231,7 @@ class CiviContributeProcessor {
         CRM_Core_Error::debug_log_message("Considering first row ( line $row ) as HEADER ..<p>", TRUE);
 
         if (empty($header)) {
-          CRM_Core_Error::fatal("Header is empty.");
+          throw new CRM_Core_Exception("Header is empty.");
         }
       }
       $row++;
@@ -351,8 +239,7 @@ class CiviContributeProcessor {
     fclose($handle);
   }
 
-  static
-  function process() {
+  public static function process() {
     require_once 'CRM/Utils/Request.php';
 
     $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'csv', 'REQUEST');
@@ -360,7 +247,6 @@ class CiviContributeProcessor {
 
     switch ($type) {
       case 'paypal':
-      case 'google':
         $start = CRM_Utils_Request::retrieve('start', 'String',
           CRM_Core_DAO::$_nullObject, FALSE, 31, 'REQUEST'
         );
@@ -368,7 +254,7 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 0, 'REQUEST'
         );
         if ($start < $end) {
-          CRM_Core_Error::fatal("Start offset can't be less than End offset.");
+          throw new CRM_Core_Exception("Start offset can't be less than End offset.");
         }
 
         $start = date('Y-m-d', time() - $start * 24 * 60 * 60) . 'T00:00:00.00Z';
@@ -381,7 +267,6 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 'live', 'REQUEST'
         );
 
-        require_once 'CRM/Financial/BAO/PaymentProcessor.php';
         $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $mode);
 
         CRM_Core_Error::debug_log_message("Start Date=$start,  End Date=$end, ppID=$ppID, mode=$mode <p>", TRUE);
@@ -392,21 +277,200 @@ class CiviContributeProcessor {
         return self::csv();
     }
   }
+
+  /**
+   * @param array $apiParams
+   * @param $mapper
+   * @param string $type
+   * @param bool $category
+   *
+   * @return array
+   */
+  public static function formatAPIParams($apiParams, $mapper, $type = 'paypal', $category = TRUE) {
+    $type = strtolower($type);
+
+    if (!in_array($type, array(
+      'paypal',
+      'csv',
+    ))
+    ) {
+      // return the params as is
+      return $apiParams;
+    }
+    $params = $transaction = array();
+
+    if ($type == 'paypal') {
+      foreach ($apiParams as $detail => $val) {
+        if (isset($mapper['contact'][$detail])) {
+          $params[$mapper['contact'][$detail]] = $val;
+        }
+        elseif (isset($mapper['location'][$detail])) {
+          $params['address'][1][$mapper['location'][$detail]] = $val;
+        }
+        elseif (isset($mapper['transaction'][$detail])) {
+          switch ($detail) {
+            case 'l_period2':
+              // Sadly, PayPal seems to send two distinct data elements in a single field,
+              // so we break them out here.  This is somewhat ugly and tragic.
+              $freqUnits = array(
+                'D' => 'day',
+                'W' => 'week',
+                'M' => 'month',
+                'Y' => 'year',
+              );
+              list($frequency_interval, $frequency_unit) = explode(' ', $val);
+              $transaction['frequency_interval'] = $frequency_interval;
+              $transaction['frequency_unit'] = $freqUnits[$frequency_unit];
+              break;
+
+            case 'subscriptiondate':
+            case 'timestamp':
+              // PayPal dates are in  ISO-8601 format.  We need a format that
+              // MySQL likes
+              $unix_timestamp = strtotime($val);
+              $transaction[$mapper['transaction'][$detail]] = date('YmdHis', $unix_timestamp);
+              break;
+
+            case 'note':
+            case 'custom':
+            case 'l_number0':
+              if ($val) {
+                $val = "[PayPal_field:{$detail}] {$val}";
+                $transaction[$mapper['transaction'][$detail]] = !empty($transaction[$mapper['transaction'][$detail]]) ? $transaction[$mapper['transaction'][$detail]] . " <br/> " . $val : $val;
+              }
+              break;
+
+            default:
+              $transaction[$mapper['transaction'][$detail]] = $val;
+          }
+        }
+      }
+
+      if (!empty($transaction) && $category) {
+        $params['transaction'] = $transaction;
+      }
+      else {
+        $params += $transaction;
+      }
+
+      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+
+      return $params;
+    }
+
+    if ($type == 'csv') {
+      $header = $apiParams['header'];
+      unset($apiParams['header']);
+      foreach ($apiParams as $key => $val) {
+        if (isset($mapper['contact'][$header[$key]])) {
+          $params[$mapper['contact'][$header[$key]]] = $val;
+        }
+        elseif (isset($mapper['location'][$header[$key]])) {
+          $params['address'][1][$mapper['location'][$header[$key]]] = $val;
+        }
+        elseif (isset($mapper['transaction'][$header[$key]])) {
+          $transaction[$mapper['transaction'][$header[$key]]] = $val;
+        }
+        else {
+          $params[$header[$key]] = $val;
+        }
+      }
+
+      if (!empty($transaction) && $category) {
+        $params['transaction'] = $transaction;
+      }
+      else {
+        $params += $transaction;
+      }
+
+      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+
+      return $params;
+    }
+
+  }
+
+  /**
+   * @deprecated function.
+   *
+   * This function has probably been defunct for quite a long time.
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function processAPIContribution($params) {
+    if (empty($params) || array_key_exists('error', $params)) {
+      return FALSE;
+    }
+
+    $params['contact_id'] = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', array(), FALSE);
+
+    $contact = civicrm_api3('Contact', 'create', $params);
+
+    // only pass transaction params to contribution::create, if available
+    if (array_key_exists('transaction', $params)) {
+      $params = $params['transaction'];
+      $params['contact_id'] = $contact['id'];
+    }
+
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      CRM_Utils_Array::value('id', $params, NULL),
+      'Contribution'
+    );
+    // create contribution
+
+    // if this is a recurring contribution then process it first
+    if ($params['trxn_type'] == 'subscrpayment') {
+      // see if a recurring record already exists
+      $recurring = new CRM_Contribute_BAO_ContributionRecur();
+      $recurring->processor_id = $params['processor_id'];
+      if (!$recurring->find(TRUE)) {
+        $recurring = new CRM_Contribute_BAO_ContributionRecur();
+        $recurring->invoice_id = $params['invoice_id'];
+        $recurring->find(TRUE);
+      }
+
+      // This is the same thing the CiviCRM IPN handler does to handle
+      // subsequent recurring payments to avoid duplicate contribution
+      // errors due to invoice ID. See:
+      // ./CRM/Core/Payment/PayPalIPN.php:200
+      if ($recurring->id) {
+        $params['invoice_id'] = md5(uniqid(rand(), TRUE));
+      }
+
+      $recurring->copyValues($params);
+      $recurring->save();
+      if (is_a($recurring, 'CRM_Core_Error')) {
+        return FALSE;
+      }
+      else {
+        $params['contribution_recur_id'] = $recurring->id;
+      }
+    }
+
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
+    if (!$contribution->id) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
 }
 
 // bootstrap the environment and run the processor
 session_start();
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 CRM_Utils_System::authenticateScript(TRUE);
 
 //log the execution of script
 CRM_Core_Error::debug_log_message('ContributionProcessor.php');
 
-require_once 'CRM/Core/Lock.php';
-$lock = new CRM_Core_Lock('CiviContributeProcessor');
+$lock = Civi::lockManager()->acquire('worker.contribute.CiviContributeProcessor');
 
 if ($lock->isAcquired()) {
   // try to unset any time limits
@@ -417,10 +481,9 @@ if ($lock->isAcquired()) {
   CiviContributeProcessor::process();
 }
 else {
-  throw new Exception('Could not acquire lock, another CiviMailProcessor process is running');
+  throw new Exception('Could not acquire lock, another CiviContributeProcessor process is running');
 }
 
 $lock->release();
 
 echo "Done processing<p>";
-

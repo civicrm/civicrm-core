@@ -1,0 +1,40 @@
+Delivered-To: my@example.com
+Received: by 10.2.13.84 with SMTP id 1234567890;
+        Wed, 19 Dec 2018 10:01:11 +0100 (CET)
+Return-Path: <>
+From: Postmaster@example.com
+To: b.2.1.aaaaaaaaaaaaaaaa@example.com
+Subject: Delivery Status Notification (Failure)
+Message-ID: <abc.def.fhi@example.com>
+Date: Wed, 19 Dec 2018 10:01:07 +0100
+MIME-Version: 1.0
+Content-Type: multipart/report; report-type=delivery-status; boundary="==IFJRGLKFGIR18927894UHRUHIHD"
+
+--==IFJRGLKFGIR18927894UHRUHIHD
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Your message
+
+  Subject: test
+
+was not delivered to:
+
+  my@example.com
+
+because:
+
+  Benutzer my (my@example.com) nicht im Domino-Verzeichnis aufgef=FChrt
+
+
+--==IFJRGLKFGIR18927894UHRUHIHD
+Content-Type: message/delivery-status
+
+Reporting-MTA: dns;srv.example.com
+
+Final-Recipient: rfc822;my@example.com
+Action: failed
+Status: 5.0.0
+Diagnostic-Code: X-Notes; Benutzer my (my@example.com) nicht im Domino-Verzeichnis aufgefÅhrt
+
+--==IFJRGLKFGIR18927894UHRUHIHD

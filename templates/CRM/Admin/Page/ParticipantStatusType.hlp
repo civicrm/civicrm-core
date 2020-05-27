@@ -1,0 +1,18 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-disabled_statuses-title"}
+  {ts}Disabled Statuses{/ts}
+{/htxt}
+{htxt id="id-disabled_statuses"}
+<p><strong>{ts}Waitlisting Statuses{/ts}</strong><br />
+{ts}To enable event waitlist management the following statuses must be enabled:{/ts} <strong>{ts}On waitlist{/ts}</strong>, <strong>{ts}Pending from waitlist{/ts}</strong>. {ts}Once these statuses are enabled, the event Info and Settings screen will have controls to enable (and configure) waitlisting.{/ts}</p>
+<p><strong>{ts}Approval Statuses{/ts}</strong><br />
+{ts}To enable event participation approval the following statuses must be enabled:{/ts} <strong>{ts}Awaiting approval{/ts}</strong>, <strong>{ts}Pending from approval{/ts}</strong>, <strong>{ts}Rejected{/ts}</strong>. {ts}Once these statuses are enabled, the event Online Registration screen will have controls to enable (and configure) participation approval.{/ts}</p>
+{/htxt}

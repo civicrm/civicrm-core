@@ -1,5 +1,13 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Cart
+ */
 class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
+
+  /**
+   * @var \CRM_Event_Cart_BAO_Cart
+   */
   public $cart;
 
   public $_action;
@@ -9,27 +17,25 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   public $participants;
 
   public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_action = CRM_Utils_Request::retrieveValue('action', 'String');
     $this->_mode = 'live';
     $this->loadCart();
 
     $this->checkWaitingList();
 
-    $locationTypes = CRM_Core_PseudoConstant::locationType();
-    $this->_bltID = array_search('Billing', $locationTypes);
-    $this->assign('bltID', $this->_bltID);
+    $this->assignBillingType();
 
-    $event_titles = array();
+    $event_titles = [];
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       $event_titles[] = $event_in_cart->event->title;
     }
-    $this->description = ts("Online Registration for %1", array(1 => implode(", ", $event_titles)));
+    $this->description = ts("Online Registration for %1", [1 => implode(", ", $event_titles)]);
     if (!isset($this->discounts)) {
-      $this->discounts = array();
+      $this->discounts = [];
     }
   }
 
-  function loadCart() {
+  public function loadCart() {
     if ($this->event_cart_id == NULL) {
       $this->cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
     }
@@ -40,16 +46,16 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     $this->stub_out_and_inherit();
   }
 
-  function stub_out_and_inherit() {
+  public function stub_out_and_inherit() {
     $transaction = new CRM_Core_Transaction();
 
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       if (empty($event_in_cart->participants)) {
-        $participant_params = array(
-            'cart_id' => $this->cart->id,
-            'event_id' => $event_in_cart->event_id,
-            'contact_id' => self::find_or_create_contact($this->getContactID()),
-        );
+        $participant_params = [
+          'cart_id' => $this->cart->id,
+          'event_id' => $event_in_cart->event_id,
+          'contact_id' => self::find_or_create_contact(),
+        ];
         $participant = CRM_Event_Cart_BAO_MerParticipant::create($participant_params);
         $participant->save();
         $event_in_cart->add_participant($participant);
@@ -59,7 +65,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     $transaction->commit();
   }
 
-  function checkWaitingList() {
+  public function checkWaitingList() {
     foreach ($this->cart->events_in_carts as $event_in_cart) {
       $empty_seats = $this->checkEventCapacity($event_in_cart->event_id);
       if ($empty_seats === NULL) {
@@ -72,7 +78,12 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     }
   }
 
-  function checkEventCapacity($event_id) {
+  /**
+   * @param int $event_id
+   *
+   * @return bool|int|null|string
+   */
+  public function checkEventCapacity($event_id) {
     $empty_seats = CRM_Event_BAO_Participant::eventFull($event_id, TRUE);
     if (is_numeric($empty_seats)) {
       return $empty_seats;
@@ -85,17 +96,15 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     }
   }
 
-  static function is_administrator() {
-    global $user;
-    return CRM_Core_Permission::check('administer CiviCRM');
-  }
-
-  function getContactID() {
-    //XXX when do we query 'cid' ?
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+  /**
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getContactID() {
+    $tempID = CRM_Utils_Request::retrieveValue('cid', 'Positive');
 
     //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    $userChecksum = CRM_Utils_Request::retrieveValue('cs', 'String');
     if ($userChecksum) {
       //check for anonymous user.
       $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
@@ -109,40 +118,48 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     return $session->get('userID');
   }
 
-  static function find_contact($fields) {
-    $dedupe_params = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-    $dedupe_params['check_permission'] = FALSE;
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupe_params, 'Individual');
-    if (is_array($ids)) {
-      return array_pop($ids);
-    }
-    else return NULL;
+  /**
+   * @param $fields
+   *
+   * @return mixed|null
+   */
+  public static function find_contact($fields) {
+    return CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE);
   }
 
-  static function find_or_create_contact($registeringContactID = NULL, $fields = array(
-    )) {
+  /**
+   * @param array $fields
+   *
+   * @return int|mixed|null
+   */
+  public static function find_or_create_contact($fields = []) {
     $contact_id = self::find_contact($fields);
 
     if ($contact_id) {
       return $contact_id;
     }
-    $contact_params = array(
-      'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
-      'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
-      'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
+    $contact_params = [
+      'email-Primary' => $fields['email'] ?? NULL,
+      'first_name' => $fields['first_name'] ?? NULL,
+      'last_name' => $fields['last_name'] ?? NULL,
       'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, TRUE),
-    );
-    $no_fields = array();
+    ];
+    $no_fields = [];
     $contact_id = CRM_Contact_BAO_Contact::createProfileContact($contact_params, $no_fields, NULL);
     if (!$contact_id) {
-      CRM_Core_Error::displaySessionError("Could not create or match a contact with that email address.  Please contact the webmaster.");
+      CRM_Core_Session::setStatus(ts("Could not create or match a contact with that email address. Please contact the webmaster."), '', 'error');
     }
     return $contact_id;
   }
 
-  function getValuesForPage($page_name) {
+  /**
+   * @param string $page_name
+   *
+   * @return mixed
+   */
+  public function getValuesForPage($page_name) {
     $container = $this->controller->container();
     return $container['values'][$page_name];
   }
-}
 
+}

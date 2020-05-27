@@ -1,82 +1,62 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class provides the functionality for batch profile update for contribution
+ * This class provides the functionality for batch profile update for contributions.
  */
 class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum contributions that should be allowed to update
-   *
+   * Maximum contributions that should be allowed to update
+   * @var int
    */
   protected $_maxContributions = 100;
 
   /**
-   * variable to store redirect path
-   *
+   * Variable to store redirect path
+   * @var string
    */
   protected $_userContext;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    CRM_Utils_System::setTitle(ts('Batch Update Contributions via Profile'));
+    CRM_Utils_System::setTitle(ts('Update multiple contributions'));
 
     $validate = FALSE;
     //validations
     if (count($this->_contributionIds) > $this->_maxContributions) {
-      CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Batch Update is %1. You have selected %2. Please select fewer contributions from your search results and try again.", array(1 => $this->_maxContributions, 2 => count($this->_contributionIds))), ts('Batch Update Error'), 'error');      
+      CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Update multiple contributions is %1. You have selected %2. Please select fewer contributions from your search results and try again.", [
+        1 => $this->_maxContributions,
+        2 => count($this->_contributionIds),
+      ]), ts('Update multiple records error'), 'error');
       $validate = TRUE;
     }
 
@@ -87,59 +67,48 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
-    $types = array('Contribution');
+    $types = ['Contribution'];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     if (empty($profiles)) {
-      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Batch Update via Profile. Navigate to Administer CiviCRM >> CiviCRM Profile to configure a Profile. Consult the online Administrator documentation for more information.", array(1 => $types[0])), 'Profile Required', 'error');
+      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple contributions. Navigate to Administer CiviCRM > Customize Data and Screens > CiviCRM Profile to configure a Profile. Consult the online Administrator documentation for more information.", [1 => $types[0]]), ts('Profile Required'), 'error');
       CRM_Utils_System::redirect($this->_userContext);
     }
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
-      array(
-        '' => ts('- select profile -')) + $profiles, TRUE
+      [
+        '' => ts('- select profile -'),
+      ] + $profiles, TRUE
     );
-    $this->addDefaultButtons(ts('Continue >>'));
+    $this->addDefaultButtons(ts('Continue'));
   }
 
   /**
-   * Add local and global form rules
-   *
-   * @access protected
-   *
-   * @return void
+   * Add local and global form rules.
    */
-  function addRules() {
-    $this->addFormRule(array('CRM_Contribute_Form_Task_PickProfile', 'formRule'));
+  public function addRules() {
+    $this->addFormRule(['CRM_Contribute_Form_Task_PickProfile', 'formRule']);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields posted values of the form
+   * @param array $fields
+   *   Posted values of the form.
    *
-   * @return array list of errors to be posted back to the form
-   * @static
-   * @access public
+   * @return array
+   *   list of errors to be posted back to the form
    */
-  static function formRule($fields) {
+  public static function formRule($fields) {
     return TRUE;
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -149,6 +118,5 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
     // also reset the batch page so it gets new values from the db
     $this->controller->resetPage('Batch');
   }
-  //end of function
-}
 
+}

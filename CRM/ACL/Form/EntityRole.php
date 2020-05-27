@@ -1,54 +1,23 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -57,28 +26,20 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       return;
     }
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_ACL_DAO_EntityRole');
-
-    $aclRoles = array('' => ts('- select -')) + CRM_Core_OptionGroup::values('acl_role');
+    $aclRoles = ['' => ts('- select -')] + CRM_Core_OptionGroup::values('acl_role');
     $this->add('select', 'acl_role_id', ts('ACL Role'),
       $aclRoles, TRUE
     );
 
-
-
-    $label = ts('Assigned To');
-    $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::staticGroup(FALSE, 'Access');
-    $this->add('select', 'entity_id', $label, $group, TRUE);
+    $label = ts('Assigned to');
+    $group = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::staticGroup(FALSE, 'Access');
+    $this->add('select', 'entity_id', $label, $group, TRUE, ['class' => 'crm-select2 huge']);
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form submission.
    */
   public function postProcess() {
     CRM_ACL_BAO_Cache::resetCache();
@@ -97,5 +58,5 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       CRM_ACL_BAO_EntityRole::create($params);
     }
   }
-}
 
+}

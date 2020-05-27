@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding event  *}
@@ -33,14 +17,9 @@
         </div>
     {/if}
 <div class="crm-block crm-form-block crm-event-manage-fee-form-block">
-{if $isQuick}
-    <div id="popupContainer">
-    {ts}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}
-    </div>
-{/if}
-<div class="crm-submit-buttons">
+  <div class="crm-submit-buttons">
    {include file="CRM/common/formButtons.tpl" location="top"}
-</div>
+  </div>
 
     <table class="form-layout">
        <tr class="crm-event-manage-fee-form-block-title">
@@ -88,30 +67,36 @@
 
         <table id="payLaterOptions" class="form-layout">
             <tr class="crm-event-manage-fee-form-block-pay_later_text">
-               <td class="label">{$form.pay_later_text.label}<span class="marker"> *</span> </td>
+               <td class="label">{$form.pay_later_text.label}<span class="crm-marker"> *</span> </td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_text' id=$id}{/if}{$form.pay_later_text.html|crmAddClass:big}
                </td>
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form.{/ts}</td>
+               <td class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-pay_later_receipt">
-               <td class="label">{$form.pay_later_receipt.label}<span class="marker"> *</span> </td>
+               <td class="label">{$form.pay_later_receipt.label}<span class="crm-marker"> *</span> </td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='pay_later_receipt' id=$id}{/if}{$form.pay_later_receipt.html|crmAddClass:big}
                </td>
             </tr>
-	    <tr>
+            <tr>
                 <td>&nbsp;</td>
                 <td class="description">{ts}Instructions added to Confirmation and Thank-you pages when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}
                 </td>
             </tr>
-	   
-  	    </table>
+            <tr>
+               <td class="extra-long-fourty label">{$form.is_billing_required.html}</td>
+               <td>
+                 {$form.is_billing_required.label}<br />
+                 <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
+               </td>
+            </tr>
+        </table>
 
         <table id="contributionType" class="form-layout">
             <tr class="crm-event-manage-fee-form-block-fee_label">
-               <td class="label">{$form.fee_label.label}<span class="marker"> *</span>
+               <td class="label">{$form.fee_label.label}<span class="crm-marker"> *</span>
                </td>
                <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='fee_label' id=$id}{/if}{$form.fee_label.html}
                </td>
@@ -122,12 +107,12 @@
                </td>
             </tr>
             <tr class="crm-event-manage-fee-form-block-financial_type_id">
-               <td class="label">{$form.financial_type_id.label}<span class="marker"> *</span></td>
+               <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span></td>
                <td>{$form.financial_type_id.html}</td>
             </tr>
             <tr>
                <td>&nbsp;</td>
-               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online.{/ts}
+               <td class="description">{ts}This financial type will be assigned to payments made by participants when they register online. If using a price set below note that the contribution record will have this financial type, however line items will be processed using the actual financial type selected for the price set item.{/ts}
                </td>
             </tr>
         </table>
@@ -151,10 +136,14 @@
 
         <div id="map-field" >
         <fieldset id="map-field"><legend>{ts}Regular Fees{/ts}</legend>
-        {ts}Use the table below to enter descriptive labels and amounts for up to ten event fee levels. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed. You can also configure one or more sets of discounted fees by checking "Discounts by Signup Date" below.{/ts}<br />
-  {if $isQuick}{ts}Click <a id='quickconfig' href='#'>here</a> if you want to configure the Regular Fees below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}{/if}
+        <span class="description">{ts}Use the table below to enter descriptive labels and amounts for up to ten event fee levels. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed. You can also configure one or more sets of discounted fees by checking "Discounts by Signup Date" below.{/ts}
+        <br />
+        {if $isQuick}
+          {ts}Click <a id='quickconfig' href='#'>here</a> if you want to configure the Regular Fees below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}
+        {/if}
+        </span>
         <table id="map-field-table">
-        <tr class="columnheader"><td scope="column">{ts}Fee Label{/ts}</td><td scope="column">{ts}Amount{/ts}</td><td scope="column">{ts}Default?{/ts}<br /><span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('default', 'Fee'); return false;" >{ts}clear{/ts}</a>)</span></td></tr>
+        <tr class="columnheader"><td scope="column">{ts}Fee Label{/ts}</td><td scope="column">{ts}Amount{/ts}</td><td scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</td></tr>
         {section name=loop start=1 loop=11}
            {assign var=idx value=$smarty.section.loop.index}
            <tr><td class="even-row crm-event-manage-fee-form-block-label_{$idx}">{$form.label.$idx.html}</td><td class="crm-event-manage-fee-form-block-value_{$idx}">{$form.value.$idx.html|crmMoney}</td><td class="even-row crm-event-manage-fee-form-block-default_{$idx}">{$form.default.$idx.html}</td></tr>
@@ -185,22 +174,22 @@
   {section name=rowLoop start=1 loop=6}
      {assign var=index value=$smarty.section.rowLoop.index}
      <tr id="discount_{$index}" class=" crm-event-manage-fee-form-block-discount_{$index} {if $index GT 1 AND empty( $form.discount_name[$index].value) } hiddenElement {/if} form-item {cycle values="odd-row,even-row"}">
-           <td>{if $index GT 1} <a onclick="showHideDiscountRow('discount_{$index}', false, {$index}); return false;" name="discount_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>{/if}
+           <td>{if $index GT 1} <a onclick="showHideDiscountRow('discount_{$index}', false, {$index}); return false;" name="discount_{$index}" href="#" class="form-link">{icon icon="fa-trash"}{ts}remove discount set{/ts}{/icon}</span></a>{/if}
            </td>
            <td class="crm-event-manage-fee-form-block-discount_name"> {$form.discount_name.$index.html}</td>
-           <td class="crm-event-manage-fee-form-block-discount_start_date"> {include file="CRM/common/jcalendar.tpl" elementName='discount_start_date' elementIndex=$index} </td>
-           <td class="crm-event-manage-fee-form-block-discount_end_date"> {include file="CRM/common/jcalendar.tpl" elementName='discount_end_date' elementIndex=$index} </td>
+           <td class="crm-event-manage-fee-form-block-discount_start_date"> {$form.discount_start_date.$index.html} </td>
+           <td class="crm-event-manage-fee-form-block-discount_end_date"> {$form.discount_end_date.$index.html} </td>
      </tr>
     {/section}
     </table>
         <div id="discountLink" class="add-remove-link">
-           <a onclick="showHideDiscountRow( 'discount', true);return false;" id="discountLink" href="#" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another discount set{/ts}</a>
+           <a onclick="showHideDiscountRow( 'discount', true);return false;" id="discountLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another discount set{/ts}</a>
         </div>
         {$form._qf_Fee_submit.html}
 
         {if $discountSection}
             <fieldset id="map-field"><legend>{ts}Discounted Fees{/ts}</legend>
-            <p>{ts}Use the table below to enter descriptive labels and amounts for up to ten discounted event fees for each discount set. <strong>Don't forget to click 'Save' when you are finished.</strong>{/ts}</p>
+            <span class="description">{ts}Use the table below to enter descriptive labels and amounts for up to ten discounted event fees for each discount set. <strong>Don't forget to click 'Save' when you are finished.</strong>{/ts}</span>
       <table id="map-field-table">
             <tr class="columnheader">
          <td scope="column">{ts}Fee Label{/ts}</td>
@@ -230,8 +219,8 @@
             {if $discountSection eq 2}
                 <script type="text/javascript">
                 {literal}
-                    cj( function() {
-                        cj('#discounted_label_1').focus( );
+                    CRM.$(function($) {
+                        $('#discounted_label_1').focus( );
                     });
                 {/literal}
                 </script>
@@ -246,6 +235,7 @@
 </div>
 </div>
 
+{include file="CRM/common/deferredFinancialType.tpl" context='Event'}
 {include file="CRM/common/showHide.tpl"}
 <script type="text/javascript">
     {if $price}
@@ -342,47 +332,23 @@
     invert              = 0
 }
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
 {if $isQuick}
 {literal}
 <script type="text/javascript">
-cj( document ).ready( function( ) {
-    cj("#popupContainer").hide();
-});
-cj("#quickconfig").click(function(){
-cj("#popupContainer").dialog({
-  title: "Selected Price Set",
-  width:400,
-  height:220,
-  modal: true,
-  overlay: {
-                 opacity: 0.5,
-                  background: "black"
-        },
-        buttons: {
-                   "Ok": function() {
-        var dataUrl  = {/literal}'{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_event&id=$eventId" }';
-        var redirectUrl = '{crmURL p="civicrm/admin/price/field" h=0 q="reset=1&action=browse&sid=" }';
-        {literal}
-       cj.ajax({
-      url: dataUrl,
-      async: false,
-      global: false,
-      success: function ( result ) {
-        if (result) {
-          window.location= redirectUrl+eval(result);
-        }
-      }
-       });
-                   },
-       "Close": function() {
-                     cj(this).dialog("close");
-                   }
-  }
-});
-return false;
-});
+  CRM.$(function($) {
+    $("#quickconfig").click(function(e) {
+      e.preventDefault();
+      CRM.confirm({
+        width: 400,
+        message: {/literal}"{ts escape='js'}Once you switch to using a Price Set, you won't be able to switch back to your existing settings below except by re-entering them. Are you sure you want to switch to a Price Set?{/ts}"{literal}
+      }).on('crmConfirm:yes', function() {
+          {/literal}
+          var dataUrl  = '{crmURL p="civicrm/ajax/rest" h=0 q="className=CRM_Core_Page_AJAX&fnName=setIsQuickConfig&context=civicrm_event&id=$eventId" }';
+          {literal}
+        $.getJSON(dataUrl).done(function(result) {window.location = CRM.url("civicrm/admin/price/field", {reset: 1, action: 'browse', sid: result});});
+        });
+      });
+    });
 </script>
 {/literal}
 {/if}

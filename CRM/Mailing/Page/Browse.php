@@ -1,37 +1,18 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -42,26 +23,23 @@
 class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
   /**
-   * the mailing id of the mailing we're operating on
+   * The mailing id of the mailing we're operating on
    *
-   * @int
-   * @access protected
+   * @var int
    */
   protected $_mailingId;
 
   /**
-   * the action that we are performing (in CRM_Core_Action terms)
+   * The action that we are performing (in CRM_Core_Action terms)
    *
-   * @int
-   * @access protected
+   * @var int
    */
   protected $_action;
 
@@ -71,10 +49,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public $_archived;
 
   /**
-   * scheduled mailing
+   * Scheduled mailing.
    *
-   * @boolean
-   * @access public
+   * @var bool
    */
   public $_scheduled;
 
@@ -83,15 +60,29 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   /**
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
+
     $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;
-    $this->_mailingId   = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
-    $this->_sms         = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
+    $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
+    $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
+
+    if ($this->_sms) {
+      // if this is an SMS page, check that the user has permission to browse SMS
+      if (!CRM_Core_Permission::check('send SMS')) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to send SMS'));
+      }
+    }
+    else {
+      // If this is not an SMS page, check that the user has an appropriate
+      // permission (specific permissions have been copied from
+      // CRM/Mailing/xml/Menu/Mailing.xml)
+      if (!CRM_Core_Permission::check([['access CiviMail', 'approve mailings', 'create mailings', 'schedule mailings']])) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to view this page.'));
+      }
+    }
+
     $this->assign('sms', $this->_sms);
     // check that the user has permission to access mailing id
     CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingId);
@@ -120,31 +111,28 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   }
 
   /**
-   * run this page (figure out the action needed and perform it).
-   *
-   * @return void
+   * Run this page (figure out the action needed and perform it).
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     $newArgs = func_get_args();
     // since we want only first function argument
     $newArgs = $newArgs[0];
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
-      $config = CRM_Core_Config::singleton();
-      CRM_Mailing_BAO_Job::runJobs_pre($config->mailerJobSize);
-      CRM_Mailing_BAO_Job::runJobs();
-      CRM_Mailing_BAO_Job::runJobs_post();
+      $mailerJobSize = Civi::settings()->get('mailerJobSize');
+      CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
+      CRM_Mailing_BAO_MailingJob::runJobs();
+      CRM_Mailing_BAO_MailingJob::runJobs_post();
     }
 
-    $this->_sortByCharacter =
-      CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
-
+    $this->_sortByCharacter
+      = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
 
     // CRM-11920 all should set sortByCharacter to null, not empty string
     if (strtolower($this->_sortByCharacter) == 'all' || !empty($_POST)) {
-      $this->_sortByCharacter = null;
-      $this->set('sortByCharacter', null);
+      $this->_sortByCharacter = NULL;
+      $this->set('sortByCharacter', NULL);
     }
 
     if (CRM_Utils_Array::value(3, $newArgs) == 'unscheduled') {
@@ -176,7 +164,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
     if ($this->_action & CRM_Core_Action::DISABLE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-        CRM_Mailing_BAO_Job::cancel($this->_mailingId);
+        CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
+        CRM_Core_Session::setStatus(ts('The mailing has been canceled.'), ts('Canceled'), 'success');
         CRM_Utils_System::redirect($context);
       }
       else {
@@ -188,12 +177,28 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
         $controller->run();
       }
     }
+    elseif ($this->_action & CRM_Core_Action::CLOSE) {
+      if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+      }
+      CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
+      CRM_Utils_System::redirect($context);
+    }
+    elseif ($this->_action & CRM_Core_Action::REOPEN) {
+      if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+      }
+      CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
+      CRM_Utils_System::redirect($context);
+    }
     elseif ($this->_action & CRM_Core_Action::DELETE) {
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
 
         // check for action permissions.
         if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-          CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
+          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
         }
 
         CRM_Mailing_BAO_Mailing::del($this->_mailingId);
@@ -209,9 +214,9 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       }
     }
     elseif ($this->_action & CRM_Core_Action::RENEW) {
-      //archive this mailing, CRM-3752.
+      // archive this mailing, CRM-3752.
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
-        //set is_archived to 1
+        // set is_archived to 1
         CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingId, 'is_archived', TRUE);
         CRM_Utils_System::redirect($context);
       }
@@ -237,11 +242,10 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       CRM_Core_Selector_Controller::TEMPLATE
     );
 
-
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    //hack to display results as per search
+    // hack to display results as per search
     $rows = $controller->getRows($controller);
 
     $this->assign('rows', $rows);
@@ -255,54 +259,28 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlString .= '/unscheduled';
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
-
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Draft and Unscheduled Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Draft and Unscheduled Mailings'));
-      }
     }
     elseif (CRM_Utils_Array::value(3, $newArgs) == 'archived') {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
-
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Archived Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Archived Mailings'));
-      }
     }
     elseif (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
       $urlString .= '/scheduled';
       $urlParams .= '&scheduled=true';
-
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Scheduled and Sent Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Scheduled and Sent Mailings'));
-      }
     }
-    else {
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Find Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Find Mailings'));
-      }
+    if ($this->get('sms')) {
+      CRM_Utils_System::setTitle(ts('Find Mass SMS'));
     }
 
-    $crmRowCount = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject);
-    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmRowCount = CRM_Utils_Request::retrieve('crmRowCount', 'Integer');
+    $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
     if ($crmRowCount || $crmPID) {
       $urlParams .= '&force=1';
       $urlParams .= $crmRowCount ? '&crmRowCount=' . $crmRowCount : '';
       $urlParams .= $crmPID ? '&crmPID=' . $crmPID : '';
     }
 
-    $crmSID = CRM_Utils_Request::retrieve('crmSID', 'Integer', CRM_Core_DAO::$_nullObject);
+    $crmSID = CRM_Utils_Request::retrieve('crmSID', 'Integer');
     if ($crmSID) {
       $urlParams .= '&crmSID=' . $crmSID;
     }
@@ -311,16 +289,15 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $url = CRM_Utils_System::url($urlString, $urlParams);
     $session->pushUserContext($url);
 
-    //CRM-6862 -run form cotroller after
-    //selector, since it erase $_POST
+    // CRM-6862 -run form cotroller after
+    // selector, since it erase $_POST
     $this->search();
 
     return parent::run();
   }
 
-  function search() {
-    if ($this->_action &
-      (CRM_Core_Action::ADD |
+  public function search() {
+    if ($this->_action & (CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE
       )
     ) {
@@ -337,19 +314,25 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $form->run();
   }
 
-  function whereClause(&$params, $sortBy = TRUE) {
-    $values = array();
+  /**
+   * @param array $params
+   * @param bool $sortBy
+   *
+   * @return string
+   */
+  public function whereClause(&$params, $sortBy = TRUE) {
+    $values = [];
 
-    $clauses = array();
+    $clauses = [];
     $title = $this->get('mailing_name');
-    //echo " name=$title  ";
+    // echo " name=$title  ";
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {
-        $params[1] = array($title, 'String', FALSE);
+        $params[1] = [$title, 'String', FALSE];
       }
       else {
-        $params[1] = array($title, 'String', TRUE);
+        $params[1] = [$title, 'String', TRUE];
       }
     }
 
@@ -362,12 +345,12 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $campainIds = $this->get('campaign_id');
     if (!CRM_Utils_System::isNull($campainIds)) {
       if (!is_array($campainIds)) {
-        $campaignIds = array($campaignIds);
+        $campaignIds = [$campaignIds];
       }
       $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
     }
 
     return implode(' AND ', $clauses);
   }
-}
 
+}

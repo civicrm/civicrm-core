@@ -1,66 +1,50 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This is the base Action class for all actions which we redefine. This is
  * integrated with the StateMachine, Controller and State objects
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 require_once 'HTML/QuickForm/Action.php';
+
+/**
+ * Class CRM_Core_QuickForm_Action
+ */
 class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
 
   /**
-   * reference to the state machine i belong to
+   * Reference to the state machine i belong to.
    * @var object
    */
   protected $_stateMachine;
 
   /**
-   * constructor
+   * Constructor.
    *
-   * @param object    $stateMachine    reference to state machine object
+   * @param object $stateMachine
+   *   Reference to state machine object.
    *
-   * @return object
-   * @access public
-   */ function __construct(&$stateMachine) {
+   * @return \CRM_Core_QuickForm_Action
+   */
+  public function __construct(&$stateMachine) {
     $this->_stateMachine = &$stateMachine;
   }
 
   /**
-   * returns the user to the top of the user context stack.
-   *
-   * @return void
-   * @access public
+   * Returns the user to the top of the user context stack.
    */
-  function popUserContext() {
+  public function popUserContext() {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
 
@@ -82,5 +66,5 @@ class CRM_Core_QuickForm_Action extends HTML_QuickForm_Action {
       CRM_Utils_System::redirect($destination);
     }
   }
-}
 
+}

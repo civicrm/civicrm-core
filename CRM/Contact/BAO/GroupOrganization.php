@@ -1,112 +1,76 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganization {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * takes an associative array and creates a groupOrganization object
+   * Takes an associative array and creates a groupOrganization object.
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return void
-   * @access public
-   * @static
+   * @return CRM_Contact_DAO_GroupOrganization
    */
-  static function add(&$params) {
-    $formatedValues = array();
-    self::formatValues($params, $formatedValues);
-    $dataExists = self::dataExists($formatedValues);
-    if (!$dataExists) {
+  public static function add(&$params) {
+    if (!empty($params['group_organization'])) {
+      $params['id'] = $params['group_organization'];
+    }
+    $dataExists = self::dataExists($params);
+    if (!$dataExists && empty($params['id'])) {
       return NULL;
     }
     $groupOrganization = new CRM_Contact_DAO_GroupOrganization();
-    $groupOrganization->copyValues($formatedValues);
+    $groupOrganization->copyValues($params);
+    if (!isset($params['id'])) {
+      // we have ensured we have group_id & organization_id so we can do a find knowing that
+      // this can only find a matching record
+      $groupOrganization->find(TRUE);
+    }
     $groupOrganization->save();
     return $groupOrganization;
   }
 
   /**
-   * Format the params
+   * Check if there is data to create the object.
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   * @param array  $formatedValues (reference ) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return void
-   * @access public
-   * @static
+   * @return bool
    */
-  static function formatValues(&$params, &$formatedValues) {
-    if (CRM_Utils_Array::value('group_organization', $params)) {
-      $formatedValues['id'] = $params['group_organization'];
-    }
-
-    if (CRM_Utils_Array::value('group_id', $params)) {
-      $formatedValues['group_id'] = $params['group_id'];
-    }
-
-    if (CRM_Utils_Array::value('organization_id', $params)) {
-      $formatedValues['organization_id'] = $params['organization_id'];
-    }
-  }
-
-  /**
-   * Check if there is data to create the object
-   *
-   * @param array  $params  (reference ) an assoc array of name/value pairs
-   *
-   * @return boolean
-   * @access public
-   * @static
-   */
-  static function dataExists($params) {
+  public static function dataExists($params) {
     // return if no data present
-    if (CRM_Utils_Array::value('organization_id', $params) &&
-      CRM_Utils_Array::value('group_id', $params)
-    ) {
+    if (!empty($params['organization_id']) && !empty($params['group_id'])) {
       return TRUE;
     }
     return FALSE;
   }
 
-  static function retrieve($groupID, &$defaults) {
+  /**
+   * @param int $groupID
+   * @param $defaults
+   */
+  public static function retrieve($groupID, &$defaults) {
     $dao = new CRM_Contact_DAO_GroupOrganization();
     $dao->group_id = $groupID;
     if ($dao->find(TRUE)) {
@@ -116,15 +80,13 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   }
 
   /**
-   * Method to check group organization relationship exist
+   * Method to check group organization relationship exist.
    *
-   * @param  int  $contactId
+   * @param int $contactID
    *
-   * @return boolean
-   * @access public
-   * @static
+   * @return bool
    */
-  static function hasGroupAssociated($contactID) {
+  public static function hasGroupAssociated($contactID) {
     $orgID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_GroupOrganization',
       $contactID, 'group_id', 'organization_id'
     );
@@ -135,14 +97,15 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   }
 
   /**
-   * Function to delete Group Organization
+   * Delete Group Organization.
    *
-   * @param int $groupOrganizationID group organization id that needs to be deleted
+   * @param int $groupOrganizationID
+   *   Group organization id that needs to be deleted.
    *
-   * @return $results   no of deleted group organization on success, false otherwise
-   * @access public
+   * @return int|null
+   *   no of deleted group organization on success, false otherwise
    */
-  static function deleteGroupOrganization($groupOrganizationID) {
+  public static function deleteGroupOrganization($groupOrganizationID) {
     $results = NULL;
     $groupOrganization = new CRM_Contact_DAO_GroupOrganization();
     $groupOrganization->id = $groupOrganizationID;
@@ -151,5 +114,5 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
 
     return $results;
   }
-}
 
+}

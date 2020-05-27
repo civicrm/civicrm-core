@@ -1,42 +1,23 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'api/api.php';
 
 /**
- * class to parse activity csv files
+ * Class to parse activity csv files.
  */
 class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
@@ -50,32 +31,47 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   /**
    * Array of successfully imported activity id's
    *
-   * @array
+   * @var array
    */
   protected $_newActivity;
 
   /**
-   * class constructor
+   * Class constructor.
+   *
+   * @param array $mapperKeys
+   * @param int $mapperLocType
+   * @param int $mapperPhoneType
    */
-  function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
+  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
   }
 
   /**
-   * the initializer code, called before the processing
-   *
-   * @return void
-   * @access public
+   * Function of undocumented functionality required by the interface.
    */
-  function init() {
+  protected function fini() {}
+
+  /**
+   * The initializer code, called before the processing.
+   */
+  public function init() {
+    $activityContact = CRM_Activity_BAO_ActivityContact::import();
+    $activityTarget['target_contact_id'] = $activityContact['contact_id'];
     $fields = array_merge(CRM_Activity_BAO_Activity::importableFields(),
-      CRM_Activity_BAO_ActivityTarget::import()
+      $activityTarget
     );
 
-    $fields = array_merge($fields, array('activity_label' => array('title' => ts('Activity Type Label'),
-          'headerPattern' => '/(activity.)?type label?/i',
-        )));
+    $fields = array_merge($fields, [
+      'source_contact_id' => [
+        'title' => ts('Source Contact'),
+        'headerPattern' => '/Source.Contact?/i',
+      ],
+      'activity_label' => [
+        'title' => ts('Activity Type Label'),
+        'headerPattern' => '/(activity.)?type label?/i',
+      ],
+    ]);
 
     foreach ($fields as $name => $field) {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
@@ -84,7 +80,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
-    $this->_newActivity = array();
+    $this->_newActivity = [];
 
     $this->setActiveFields($this->_mapperKeys);
 
@@ -119,46 +115,47 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   }
 
   /**
-   * handle the values in mapField mode
+   * Handle the values in mapField mode.
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean
-   * @access public
+   * @return bool
    */
-  function mapField(&$values) {
-    return CRM_Activity_Import_Parser::VALID;
+  public function mapField(&$values) {
+    return CRM_Import_Parser::VALID;
   }
 
   /**
-   * handle the values in preview mode
+   * Handle the values in preview mode.
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
-   * @access public
+   * @return bool
+   *   the result of this processing
    */
-  function preview(&$values) {
+  public function preview(&$values) {
     return $this->summary($values);
   }
 
   /**
-   * handle the values in summary mode
+   * Handle the values in summary mode.
    *
-   * @param array $values the array of values belonging to this line
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
-   * @access public
+   * @return bool
+   *   the result of this processing
    */
-  function summary(&$values) {
+  public function summary(&$values) {
     $erroneousField = NULL;
-    $response       = $this->setActiveFieldValues($values, $erroneousField);
-    $index          = -1;
-    $errorRequired  = FALSE;
+    $this->setActiveFieldValues($values, $erroneousField);
+    $index = -1;
 
     if ($this->_activityTypeIndex > -1 && $this->_activityLabelIndex > -1) {
       array_unshift($values, ts('Please select either Activity Type ID OR Activity Type Label.'));
-      return CRM_Activity_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
     elseif ($this->_activityLabelIndex > -1) {
       $index = $this->_activityLabelIndex;
@@ -176,14 +173,14 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     if ($errorRequired) {
       array_unshift($values, ts('Missing required fields'));
-      return CRM_Activity_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
     $params = &$this->getActiveFieldParams();
 
     $errorMessage = NULL;
 
-    //for date-Formats
+    // For date-Formats
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     if (!isset($params['source_contact_id'])) {
@@ -197,22 +194,22 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
             $params[$key] = $dateValue;
           }
           else {
-            CRM_Import_Parser_Contact::addToErrorMsg('Activity date', $errorMessage);
+            CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity date', $errorMessage);
           }
         }
       }
       elseif ($key == 'activity_engagement_level' && $val &&
         !CRM_Utils_Rule::positiveInteger($val)
       ) {
-        CRM_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
+        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
       }
     }
-    //date-Format part ends
+    // Date-Format part ends.
 
-    //checking error in custom data
-    $params['contact_type'] = isset($this->_contactType) ? $this->_contactType : 'Activity';
+    // Checking error in custom data.
+    $params['contact_type'] = $this->_contactType ?? 'Activity';
 
-    CRM_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
 
     if ($errorMessage) {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
@@ -221,71 +218,78 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       return CRM_Import_Parser::ERROR;
     }
 
-    return CRM_Activity_Import_Parser::VALID;
+    return CRM_Import_Parser::VALID;
   }
 
   /**
-   * handle the values in import mode
+   * Handle the values in import mode.
    *
-   * @param int $onDuplicate the code for what action to take on duplicates
-   * @param array $values the array of values belonging to this line
+   * @param int $onDuplicate
+   *   The code for what action to take on duplicates.
+   * @param array $values
+   *   The array of values belonging to this line.
    *
-   * @return boolean      the result of this processing
-   * @access public
+   * @return bool
+   *   the result of this processing
    */
-  function import($onDuplicate, &$values) {
-    // first make sure this is a valid line
+  public function import($onDuplicate, &$values) {
+    // First make sure this is a valid line
     $response = $this->summary($values);
 
-    if ($response != CRM_Activity_Import_Parser::VALID) {
+    if ($response != CRM_Import_Parser::VALID) {
       return $response;
     }
     $params = &$this->getActiveFieldParams();
     $activityLabel = array_search('activity_label', $this->_mapperKeys);
     if ($activityLabel) {
-      $params = array_merge($params, array('activity_label' => $values[$activityLabel]));
+      $params = array_merge($params, ['activity_label' => $values[$activityLabel]]);
     }
-    //for date-Formats
+    // For date-Formats.
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
     if (!isset($params['source_contact_id'])) {
       $params['source_contact_id'] = $session->get('userID');
     }
-    $formatted = array();
-    $customFields = CRM_Core_BAO_CustomField::getFields(CRM_Utils_Array::value('contact_type', $params));
+
+    $customFields = CRM_Core_BAO_CustomField::getFields('Activity');
 
     foreach ($params as $key => $val) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        if ($customFields[$customFieldID]['data_type'] == 'Date') {
-          CRM_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+        if ($key == 'activity_date_time' && $val) {
+          $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
         }
-        elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+        elseif (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Date') {
+          CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+        }
+        elseif (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
           $params[$key] = CRM_Utils_String::strtoboolstr($val);
         }
+      }
+      elseif ($key == 'activity_date_time') {
+        $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
       }
       elseif ($key == 'activity_subject') {
         $params['subject'] = $val;
       }
     }
-    //date-Format part ends
+    // Date-Format part ends.
     require_once 'CRM/Utils/DeprecatedUtils.php';
     $formatError = _civicrm_api3_deprecated_activity_formatted_param($params, $params, TRUE);
 
     if ($formatError) {
       array_unshift($values, $formatError['error_message']);
-      return CRM_Activity_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      CRM_Core_DAO::$_nullObject,
       NULL,
       'Activity'
     );
 
     if ($this->_contactIdIndex < 0) {
 
-      //retrieve contact id using contact dedupe rule.
-      //since we are support only individual's activity import.
+      // Retrieve contact id using contact dedupe rule.
+      // Since we are supporting only individual's activity import.
       $params['contact_type'] = 'Individual';
       $params['version'] = 3;
       $error = _civicrm_api3_deprecated_duplicate_formatted_contact($params);
@@ -294,28 +298,28 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         $matchedIDs = explode(',', $error['error_message']['params'][0]);
         if (count($matchedIDs) > 1) {
           array_unshift($values, 'Multiple matching contact records detected for this row. The activity was not imported');
-          return CRM_Activity_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
         else {
           $cid = $matchedIDs[0];
           $params['target_contact_id'] = $cid;
           $params['version'] = 3;
           $newActivity = civicrm_api('activity', 'create', $params);
-          if (CRM_Utils_Array::value('is_error', $newActivity)) {
+          if (!empty($newActivity['is_error'])) {
             array_unshift($values, $newActivity['error_message']);
-            return CRM_Activity_Import_Parser::ERROR;
+            return CRM_Import_Parser::ERROR;
           }
 
           $this->_newActivity[] = $newActivity['id'];
-          return CRM_Activity_Import_Parser::VALID;
+          return CRM_Import_Parser::VALID;
         }
       }
       else {
         // Using new Dedupe rule.
-        $ruleParams = array(
+        $ruleParams = [
           'contact_type' => 'Individual',
-          'used'         => 'Unsupervised',
-        );
+          'used' => 'Unsupervised',
+        ];
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
         $disp = NULL;
@@ -331,7 +335,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
           }
         }
 
-        if (CRM_Utils_Array::value('external_identifier', $params)) {
+        if (!empty($params['external_identifier'])) {
           if ($disp) {
             $disp .= "AND {$params['external_identifier']}";
           }
@@ -341,49 +345,40 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         }
 
         array_unshift($values, 'No matching Contact found for (' . $disp . ')');
-        return CRM_Activity_Import_Parser::ERROR;
+        return CRM_Import_Parser::ERROR;
       }
     }
     else {
-      if (CRM_Utils_Array::value('external_identifier', $params)) {
+      if (!empty($params['external_identifier'])) {
         $targetContactId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $params['external_identifier'], 'id', 'external_identifier'
         );
 
-        if (CRM_Utils_Array::value('target_contact_id', $params) &&
+        if (!empty($params['target_contact_id']) &&
           $params['target_contact_id'] != $targetContactId
         ) {
-          array_unshift($values, 'Mismatch of External identifier :' . $params['external_identifier'] . ' and Contact Id:' . $params['target_contact_id']);
-          return CRM_Activity_Import_Parser::ERROR;
+          array_unshift($values, 'Mismatch of External ID:' . $params['external_identifier'] . ' and Contact Id:' . $params['target_contact_id']);
+          return CRM_Import_Parser::ERROR;
         }
         elseif ($targetContactId) {
           $params['target_contact_id'] = $targetContactId;
         }
         else {
-          array_unshift($values, 'No Matching Contact for External identifier :' . $params['external_identifier']);
-          return CRM_Activity_Import_Parser::ERROR;
+          array_unshift($values, 'No Matching Contact for External ID:' . $params['external_identifier']);
+          return CRM_Import_Parser::ERROR;
         }
       }
 
       $params['version'] = 3;
       $newActivity = civicrm_api('activity', 'create', $params);
-      if (CRM_Utils_Array::value('is_error', $newActivity)) {
+      if (!empty($newActivity['is_error'])) {
         array_unshift($values, $newActivity['error_message']);
-        return CRM_Activity_Import_Parser::ERROR;
+        return CRM_Import_Parser::ERROR;
       }
 
       $this->_newActivity[] = $newActivity['id'];
-      return CRM_Activity_Import_Parser::VALID;
+      return CRM_Import_Parser::VALID;
     }
   }
 
-  /**
-   * the initializer code, called before the processing
-   *
-   * @return void
-   * @access public
-   */
-  function fini() {}
-
 }
-

@@ -1,37 +1,21 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $showCMS }{*true if is_cms_user field is set *}
    <fieldset class="crm-group crm_user-group">
       <div class="messages help cms_user_help-section">
    {if !$isCMS}
-      {ts}If you would like to create an account on this site, check the box below and enter a user name{/ts}{if $form.cms_pass} {ts}and a password{/ts}.{/if}
+      {ts}If you would like to create an account on this site, check the box below and enter a Username{/ts}{if $form.cms_pass} {ts}and a password{/ts}.{/if}
    {else}
-      {ts}Please enter a user name to create an account.{/ts}
+      {ts}Please enter a Username to create an account.{/ts}
    {/if}
-   {ts 1=$loginURL}If you already have an account, <a href='%1'>please login</a> before completing this form.{/ts}
+   {ts 1=$loginURL}If you already have an account <a href='%1'>please login</a> before completing this form.{/ts}
       </div>
       <div>{$form.cms_create_account.html} {$form.cms_create_account.label}</div>
       <div id="details" class="crm_user_signup-section">
@@ -44,7 +28,7 @@
              <div class="content">
                {$form.cms_name.html} <a id="checkavailability" href="#" onClick="return false;">{ts}<strong>Check Availability</strong>{/ts}</a>
                <span id="msgbox" style="display:none"></span><br />
-               <span class="description">{ts}Your preferred username; punctuation is not allowed except for periods, hyphens, and underscores.{/ts}</span>
+               <span class="description">{ts}Punctuation is not allowed in a Username with the exception of periods, hyphens and underscores.{/ts}</span>
              </div>
            </div>
 
@@ -56,6 +40,7 @@
              <div class="content">
                {$form.cms_pass.html}
              </div>
+             <div class="clear"></div>
              <div class="label">
                <label for="crm_confirm_pass-section">{$form.cms_confirm_pass.label}</label>
              </div>

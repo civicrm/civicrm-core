@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -42,7 +26,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
 
   protected $_pager;
 
-  function preProcess() {
+  public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
     // ensure that there is a particpant type for this
@@ -51,7 +35,7 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
       'participant_listing_id'
     );
     if (!$this->_participantListingID) {
-      CRM_Core_Error::fatal(ts("The Participant Listing feature is not currently enabled for this event."));
+      CRM_Core_Error::statusBounce(ts("The Participant Listing feature is not currently enabled for this event."));
     }
 
     // retrieve Event Title and include it in page title
@@ -59,13 +43,16 @@ class CRM_Event_Page_ParticipantListing_NameStatusAndDate extends CRM_Core_Page 
       $this->_id,
       'title'
     );
-    CRM_Utils_System::setTitle(ts('%1 - Participants', array(1 => $this->_eventTitle)));
+    CRM_Utils_System::setTitle(ts('%1 - Participants', [1 => $this->_eventTitle]));
 
     // we do not want to display recently viewed contacts since this is potentially a public page
     $this->assign('displayRecent', FALSE);
   }
 
-  function run() {
+  /**
+   * @return string
+   */
+  public function run() {
     $this->preProcess();
 
     $fromClause = "
@@ -77,7 +64,7 @@ INNER JOIN civicrm_event       ON civicrm_participant.event_id = civicrm_event.i
     $whereClause = "
 WHERE    civicrm_event.id = %1";
 
-    $params = array(1 => array($this->_id, 'Integer'));
+    $params = [1 => [$this->_id, 'Integer']];
     $this->pager($fromClause, $whereClause, $params);
     $orderBy = $this->orderBy();
 
@@ -95,21 +82,18 @@ SELECT   civicrm_contact.id                as contact_id    ,
 ORDER BY $orderBy
 LIMIT    $offset, $rowCount";
 
-    $rows         = array();
-    $object       = CRM_Core_DAO::executeQuery($query, $params);
-    $statusLookup = CRM_Event_PseudoConstant::participantStatus();
+    $rows = [];
+    $object = CRM_Core_DAO::executeQuery($query, $params);
+    $statusLookup = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     while ($object->fetch()) {
-      $status = CRM_Utils_Array::value($object->status_id, $statusLookup);
-      if ($status) {
-        $status = ts($status);
-      }
-      $row = array(
+      $status = $statusLookup[$object->status_id] ?? NULL;
+      $row = [
         'id' => $object->contact_id,
         'participantID' => $object->participant_id,
         'name' => $object->name,
         'status' => $status,
         'date' => $object->register_date,
-      );
+      ];
       $rows[] = $row;
     }
     $this->assign_by_ref('rows', $rows);
@@ -117,9 +101,14 @@ LIMIT    $offset, $rowCount";
     return parent::run();
   }
 
-  function pager($fromClause, $whereClause, $whereParams) {
+  /**
+   * @param $fromClause
+   * @param $whereClause
+   * @param array $whereParams
+   */
+  public function pager($fromClause, $whereClause, $whereParams) {
 
-    $params = array();
+    $params = [];
 
     $params['status'] = ts('Group') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
@@ -140,22 +129,28 @@ SELECT count( civicrm_contact.id )
     $this->assign_by_ref('pager', $this->_pager);
   }
 
-  function orderBy() {
+  /**
+   * @return string
+   */
+  public function orderBy() {
     static $headers = NULL;
     if (!$headers) {
-      $headers = array();
-      $headers[1] = array('name' => ts('Name'),
+      $headers = [];
+      $headers[1] = [
+        'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
-      );
-      $headers[2] = array('name' => ts('Status'),
+      ];
+      $headers[2] = [
+        'name' => ts('Status'),
         'sort' => 'civicrm_participant.status_id',
         'direction' => CRM_Utils_Sort::DONTCARE,
-      );
-      $headers[3] = array('name' => ts('Register Date'),
+      ];
+      $headers[3] = [
+        'name' => ts('Register Date'),
         'sort' => 'civicrm_participant.register_date',
         'direction' => CRM_Utils_Sort::DONTCARE,
-      );
+      ];
     }
     $sortID = NULL;
     if ($this->get(CRM_Utils_Sort::SORT_ID)) {
@@ -175,5 +170,5 @@ SELECT count( civicrm_contact.id )
 
     return $sort->orderBy();
   }
-}
 
+}

@@ -1,25 +1,9 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.3                                                |
--- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2013                                |
--- +--------------------------------------------------------------------+
--- | This file is a part of CiviCRM.                                    |
+-- | Copyright CiviCRM LLC. All rights reserved.                        |
 -- |                                                                    |
--- | CiviCRM is free software; you can copy, modify, and distribute it  |
--- | under the terms of the GNU Affero General Public License           |
--- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
--- |                                                                    |
--- | CiviCRM is distributed in the hope that it will be useful, but     |
--- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
--- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
--- | See the GNU Affero General Public License for more details.        |
--- |                                                                    |
--- | You should have received a copy of the GNU Affero General Public   |
--- | License and the CiviCRM Licensing Exception along                  |
--- | with this program; if not, contact CiviCRM LLC                     |
--- | at info[AT]civicrm[DOT]org. If you have questions about the        |
--- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- | This work is published under the GNU AGPLv3 license with some      |
+-- | permitted exceptions and without any warranty. For full license    |
+-- | and copyright information, see https://civicrm.org/licensing       |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from {$smarty.template}
@@ -52,14 +36,15 @@ CREATE TABLE `{$table.name}` (
 {if ! $first},{/if}
 {assign var='first' value=false}
 
-     `{$field.name}` {$field.sqlType} {if $field.required}{if $field.required == "false"}NULL{else}NOT NULL{/if}{/if} {if $field.autoincrement}AUTO_INCREMENT{/if} {if $field.default|count_characters}DEFAULT {$field.default}{/if} {if $field.comment}COMMENT '{$field.comment}'{/if}
+     `{$field.name}` {$field.sqlType}{if $field.collate} COLLATE {$field.collate}{/if} {if $field.required}{if $field.required == "false"}NULL{else}NOT NULL{/if}{/if} {if $field.autoincrement}AUTO_INCREMENT{/if} {if $field.default|count_characters}DEFAULT {$field.default}{/if} {if $field.comment}COMMENT '{ts escape=sql}{$field.comment}{/ts}'{/if}
 {/foreach} {* table.fields *}
 
 {if $table.primaryKey}
 {if ! $first},{/if}
 {assign var='first' value=false}
 
-    PRIMARY KEY ( `{$table.primaryKey.name}` )
+    {assign var='firstIndexField' value=true}
+    PRIMARY KEY ({foreach from=$table.primaryKey.field item=fieldName}{if $firstIndexField}{assign var='firstIndexField' value=false}{else},{/if}`{$fieldName}`{/foreach})
 {/if} {* table.primaryKey *}
 
 {if $table.index}

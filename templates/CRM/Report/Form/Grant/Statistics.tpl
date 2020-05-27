@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $section eq 1}
@@ -32,15 +16,14 @@
     <div class="crm-block crm-form-block crm-report-field-form-block">
         {include file="CRM/Report/Form/Fields.tpl" componentName='Grant'}
     </div>
-    
+
     <div class="crm-block crm-content-block crm-report-form-block">
         {*include actions*}
         {include file="CRM/Report/Form/Actions.tpl"}
 
         {*include the graph*}
         {include file="CRM/Report/Form/Layout/Graph.tpl"}
-    
-            
+
     {if $printOnly}
         <h1>{$reportTitle}</h1>
         <div id="report-date">{$reportDate}</div>
@@ -63,29 +46,29 @@
 
     <h3>{ts}Summary Statistics{/ts}</h2>
     <table class="report-layout display">
-      <tr> 
+      <tr>
         <th class="statistics" scope="row"></th>
-        <th class="statistics right" scope="row">Count</th>
-        <th class="statistics right" scope="row">Amount</th>
+        <th class="statistics right" scope="row">{ts}Count{/ts}</th>
+        <th class="statistics right" scope="row">{ts}Amount{/ts}</th>
       </tr>
         {foreach from=$totalStatistics.total_statistics key=key item=val}
            <tr>
              <td>{$val.title}</td>
              <td class="right">{$val.count}</td>
              <td class="right">{$val.amount|crmMoney}</td>
-           </tr>      
+           </tr>
         {/foreach}
     </table>
     {/if}
- 
+
     {if !empty($grantStatistics)}
     <h3>{ts}Statistics Breakdown{/ts}</h3>
     <table class="report-layout display">
       {foreach from=$grantStatistics item=values key=key}
        <tr>
          <th class="statistics" scope="row">{$values.title}</th>
-         <th class="statistics right" scope="row">Number of Grants (%)</th>
-         <th class="statistics right" scope="row">Total Amount (%)</th>
+         <th class="statistics right" scope="row">{ts}Number of Grants (%){/ts}</th>
+         <th class="statistics right" scope="row">{ts}Total Amount (%){/ts}</th>
        </tr>
          {foreach from=$values.value item=row key=field}
            <tr>
@@ -94,7 +77,7 @@
               <td class="right">
                 {foreach from=$row.currency key=fld item=val}
                    {$val.value|crmMoney:$fld} ({$val.percentage}%)&nbsp;&nbsp;
-                {/foreach} 
+                {/foreach}
               </td>
            </tr>
          {if $row.unassigned_count}
@@ -104,7 +87,7 @@
               <td class="right">
                 {foreach from=$row.unassigned_currency key=fld item=val}
                    {$val.value|crmMoney:$fld} ({$val.percentage}%)&nbsp;&nbsp;
-                {/foreach} 
+                {/foreach}
               </td>
            </tr>
          {/if}

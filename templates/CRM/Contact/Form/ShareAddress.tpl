@@ -1,163 +1,122 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* template for handling share address functionality*}
 <tr>
   <td>
-    {$form.address.$blockId.use_shared_address.html}{$form.address.$blockId.use_shared_address.label}{help id="id-sharedAddress" file="CRM/Contact/Form/Contact.hlp"}<br />
-    {if !empty($sharedAddresses.$blockId.shared_address_display)}
-      <span class="shared-address-display" id="shared-address-display-name-{$blockId}">
-        {$sharedAddresses.$blockId.shared_address_display.name}
-      </span>
-
-      <span class="shared-address-display" id="shared-address-display-{$blockId}" onclick="cj(this).hide( );cj('#shared-address-display-name-{$blockId}').hide( );cj('#shared-address-display-cancel-{$blockId}').show( );cj('#shared-address-{$blockId}').show( );">
-              {$sharedAddresses.$blockId.shared_address_display.address} <a href='#' onclick='return false;'>( {ts}Change current shared address{/ts} )</a>
-      </span>
-
-      <span id="shared-address-display-cancel-{$blockId}" class="hiddenElement" onclick="cj(this).hide( );cj('#shared-address-display-name-{$blockId}').show( );cj('#shared-address-display-{$blockId}').show( );cj('#shared-address-{$blockId}').hide( );">
-              <a href='#' onclick='return false;'>( {ts}Cancel{/ts} )</a>
-      </span>
-    {/if}
-
-    <table id="shared-address-{$blockId}" class="form-layout-compressed hiddenElement">
-      {include file="CRM/Contact/Form/NewContact.tpl" blockNo="$blockId"}
-    </table>
+    {$form.address.$blockId.use_shared_address.html}{$form.address.$blockId.use_shared_address.label} {help id="id-sharedAddress" file="CRM/Contact/Form/Contact.hlp"}
+    <div id="shared-address-{$blockId}" class="form-layout-compressed">
+      {$form.address.$blockId.master_contact_id.label}
+      {$form.address.$blockId.master_contact_id.html}
+      <div class="shared-address-add-relationship" style="display: none;">
+        {$form.address.$blockId.add_relationship.html}
+        {$form.address.$blockId.add_relationship.label}
+        <span class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</span>
+      </div>
+      <div class="shared-address-list">
+        {if !empty($sharedAddresses.$blockId.shared_address_display)}
+          {foreach item='sa' from=$sharedAddresses.$blockId.shared_address_display.options}
+            {assign var="sa_name" value="selected_shared_address-`$blockId`"}
+            {assign var="sa_id" value="`$sa_name`-`$sa.id`"}
+            <input type="radio" name="{$sa_name}" id="{$sa_id}" value="{$sa.id}" {if $sa.id eq $sharedAddresses.$blockId.shared_address_display.master_id}checked="checked"{/if}>
+            <label for="{$sa_id}">{$sa.display_text}</label>{if $sa.location_type}({$sa.location_type}){/if}<br/>
+          {/foreach}
+        {/if}
+      </div>
+    </div>
   </td>
 </tr>
 
 
 {literal}
 <script type="text/javascript">
-  function showHideSharedAddress( blockNo, showSelect ) {
-    // based on checkbox, show or hide
-    if ( cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).attr( 'checked') ) {
-      if ( showSelect && cj( '#shared-address-display-' + blockNo ).length == 0 ) {
-        cj( '#shared-address-' + blockNo ).show( );
-      }
-      cj( 'table#address_table_' + blockNo ).hide( );
-      cj( '#shared-address-display-' + blockNo ).show( );
-      cj( '#shared-address-display-name-' + blockNo ).show( );
-      cj( '#shared-address-display-cancel-' + blockNo ).hide( );
-      cj( '.crm-address-custom-set-block-' + blockNo).hide( );
-    } else {
-      cj( '#shared-address-' + blockNo ).hide( );
-      cj( 'table#address_table_' + blockNo ).show( );
-      cj( '#shared-address-display-' + blockNo ).hide( );
-      cj( '#shared-address-display-name-' + blockNo ).hide( );
-      cj( '#shared-address-display-cancel-' + blockNo ).hide( );
-      cj( '.crm-address-custom-set-block-' + blockNo).show( );
+  CRM.$(function($) {
+    var blockNo = {/literal}{$blockId}{literal},
+      contactType = {/literal}{$contactType|@json_encode}{literal},
+      $addRelationshipSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship'),
+      $employerSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship .employer'),
+      $employerLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-employer'),
+      $householdLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-household'),
+      $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
+      $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
+
+    function showHideSharedAddress() {
+      // based on checkbox, show or hide
+      var share = $(this).prop('checked');
+      $('#shared-address-' + blockNo).toggle(!!share);
+      $('table#address_table_' + blockNo +', .crm-address-custom-set-block-' + blockNo).toggle(!share);
     }
-  }
 
-cj( function( ) {
-    var blockNo = {/literal}{$blockId}{literal};
+    // "Use another contact's address" checkbox
+    $('#address\\[' + blockNo + '\\]\\[use_shared_address\\]').each(showHideSharedAddress).click(showHideSharedAddress);
 
-    // call this when form loads
-    showHideSharedAddress( blockNo, true );
-
-    // handle check / uncheck of checkbox
-    cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).click( function( ) {
-      showHideSharedAddress( blockNo, true );
+    // When an address is selected
+    $contentArea.off().on('click', 'input', function() {
+      $masterElement.val($(this).val());
     });
 
-    // start of code to add onchange event for hidden element
-    var contactHiddenElement = 'input[name="contact_select_id[' + blockNo +']"]';
+    // When shared contact is selected/unselected
+    $('input[name="address[' + blockNo +'][master_contact_id]"]').change(function() {
+      var $el = $(this),
+        sharedContactId = $el.val();
 
-    // store initial value
-    var _default  = cj( contactHiddenElement ).val();
+      $contentArea.html('');
+      $masterElement.val('');
 
-    // observe changes
-    cj( contactHiddenElement ).change(function( ) {
-      var sharedContactId = cj( this ).val( );
-      if ( !sharedContactId || isNaN( sharedContactId ) ) {
+      if (!sharedContactId || isNaN(sharedContactId)) {
+        $employerSection.hide();
+        $addRelationshipSection.hide();
+        $employerLabel.hide();
+        $householdLabel.hide();
         return;
       }
 
-      var addressHTML = '';
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/inline' h=0}"{literal};
+      var otherContactType = $el.select2('data').extra.contact_type;
+      $addRelationshipSection.toggle(contactType === 'Individual' && (otherContactType === 'Organization' || otherContactType === 'Household'));
+      $employerSection.toggle(contactType === 'Individual' && otherContactType === 'Organization');
 
-      addCiviOverlay('div.crm-address_' + blockNo);
+      // use the appropriate label
+      $employerLabel.toggle(contactType === 'Individual' && otherContactType === 'Organization');
+      $householdLabel.toggle(contactType === 'Individual' && otherContactType === 'Household');
 
-      cj.post( postUrl, {
-        'contact_id': sharedContactId,
-        'type': 'method',
-        'class_name': 'CRM_Contact_Page_AJAX',
-        'fn_name': 'getAddressDisplay'
+
+      $.post(CRM.url('civicrm/ajax/inline'), {
+          'contact_id': sharedContactId,
+          'type': 'method',
+          'class_name': 'CRM_Contact_Page_AJAX',
+          'fn_name': 'getAddressDisplay'
         },
-        function( response ) {
-          if ( response ) {
-            var selected = 'checked';
-            var addressExists = false;
+        function(response) {
+          // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+          if (response && $el.val() === sharedContactId) {
+            var selected = ' checked="checked"',
+              addressHTML = '';
 
-            cj.each( response, function( i, val ) {
-              if ( i > 1 ) {
+            $.each(response, function(i, val) {
+              if (addressHTML) {
                 selected = '';
               } else {
-                cj( 'input[name="address[' + blockNo + '][master_id]"]' ).val( val.id );
+                $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
               }
-
-              addressHTML = addressHTML + '<input type="radio" name="selected_shared_address-'+ blockNo +'" value=' + val.id + ' ' + selected +'>' + val.display_text + '<br/>';
-
-              addressExists = true;
+              var name = 'selected_shared_address-'+ blockNo,
+                id = name + '-' + val.id;
+              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
             });
 
-            if ( addressExists  ) {
-              cj( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
-              cj( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + addressHTML + '</td></tr>');
-              cj( 'input[name^=selected_shared_address-]' ).click( function( ) {
-
-              // get the block id
-              var elemId = cj(this).attr( 'name' ).split('-');
-              cj( 'input[name="address[' + elemId[1] + '][master_id]"]' ).val( cj(this).val( ) );
-              });
-            } else {
-              var helpText = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
-              cj( '#shared-address-' + blockNo + ' .shared-address-list' ).remove( );
-              cj( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + helpText + '</td></tr>');
+            if (!addressHTML) {
+              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts}"{literal} + ' <a target="_blank" href="' + CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId) + '">{/literal}{ts}Edit Contact Details{/ts}{literal}</a>';
             }
 
-            removeCiviOverlay('div.crm-address_' + blockNo);
+            $contentArea.html(addressHTML);
           }
         },'json');
     });
-
-
-    // continuous check for changed value
-    setInterval(function( ) {
-        if ( cj( contactHiddenElement ).val( ) != _default ) {
-        // trigger native
-        cj( contactHiddenElement ).change( );
-
-        // update stored value
-        _default = cj( contactHiddenElement ).val( );
-        }
-
-    }, 500);
-    // end of code to add onchange event for hidden element
-});
+  });
 </script>
 {/literal}
-
-

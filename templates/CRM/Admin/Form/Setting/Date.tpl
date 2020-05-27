@@ -1,32 +1,17 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-date-form-block">
-<div id="help">
-    {ts}Use this screen to configure formats for date display and date input fields. Defaults are provided for standard United States formats. Settings use standard POSIX specifiers.{/ts} {help id='date-format'}
+<div class="help">
+  {capture assign=crmURL}{crmURL p='civicrm/admin/setting/preferences/date' q='action=reset=1'}{/capture}
+    {ts 1=$crmURL}Use this screen to configure default formats for date display and date input fields throughout your site. Settings use standard POSIX specifiers. New installations are preconfigured with standard United States formats. You can override this default setting and define the range of allowed dates for specific field types at <a href="%1">Administer > Customize Data and Screens > Date Preferences</a>{/ts} {help id='date-format'}
 </div>
+<div class="crm-block crm-form-block crm-date-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <fieldset><legend>{ts}Date Display{/ts}</legend>
    <table class="form-layout-compressed">
@@ -50,6 +35,14 @@
           <td class="label">{$form.dateformatTime.label}</td>
           <td>{$form.dateformatTime.html}</td>
        </tr>
+       <tr class="crm-date-form-block-dateformatTime">
+          <td class="label">{$form.dateformatFinancialBatch.label}</td>
+          <td>{$form.dateformatFinancialBatch.html}</td>
+       </tr>
+       <tr class="crm-date-form-block-dateformatTime">
+          <td class="label">{$form.dateformatshortdate.label}</td>
+          <td>{$form.dateformatshortdate.html}</td>
+       </tr>
      </table>
 </fieldset>
 <fieldset><legend>{ts}Date Input Fields{/ts}</legend>
@@ -63,12 +56,13 @@
           <td>{$form.timeInputFormat.html}</td>
        </tr>
    </table>
-      <div class="action-link">
-      <a href="{crmURL p="civicrm/admin/setting/preferences/date" q="reset=1"}" id="advDateSetting" title="{ts}Manage available date ranges and input formats for different types of date fields.{/ts}">&raquo; {ts}Advanced Date Input Settings{/ts}</a>
-    </div>
 </fieldset>
-<fieldset><legend>{ts}Fiscal Year{/ts}</legend>
+<fieldset><legend>{ts}Calendar{/ts}</legend>
    <table class="form-layout-compressed">
+       <tr class="crm-date-form-block-weekBegins">
+         <td class="label">{$form.weekBegins.label}</td>
+         <td>{$form.weekBegins.html}</td>
+       </tr>
        <tr class="crm-date-form-block-fiscalYearStart">
           <td class="label">{$form.fiscalYearStart.label}</td>
           <td>{$form.fiscalYearStart.html}</td>

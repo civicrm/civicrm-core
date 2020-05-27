@@ -1,127 +1,126 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Case_XMLProcessor {
 
-  static protected $_xml;
+  /**
+   * FIXME: This does *NOT* belong in a static property, but we're too late in
+   * the 4.5-cycle to do the necessary cleanup.
+   *
+   * Format is [int $id => string $relTypeCname].
+   *
+   * @var array|null
+   */
+  public static $activityTypes = NULL;
 
-  function retrieve($caseType) {
+  /**
+   * @param $caseType
+   *
+   * @return FALSE|SimpleXMLElement
+   */
+  public function retrieve($caseType) {
+    return CRM_Case_XMLRepository::singleton()->retrieve($caseType);
+  }
+
+  /**
+   * This function was previously used to convert a case-type's
+   * machine-name to a file-name. However, it's mind-boggling
+   * that the file-name might be a munged version of the
+   * machine-name (which is itself a munged version of the
+   * display-name), and naming is now a more visible issue (since
+   * the overhaul of CaseType admin UI).
+   *
+   * Usage note: This is called externally by civix stubs as a
+   * sort of side-ways validation of the case-type's name
+   * (validation which was needed because of the unintuitive
+   * double-munge). We should update civix templates and then
+   * remove this function in Civi 4.6 or 5.0.
+   *
+   * @param string $caseType
+   * @return string
+   * @deprecated
+   * @see CRM_Case_BAO_CaseType::isValidName
+   */
+  public static function mungeCaseType($caseType) {
     // trim all spaces from $caseType
     $caseType = str_replace('_', ' ', $caseType);
     $caseType = CRM_Utils_String::munge(ucwords($caseType), '', 0);
+    return $caseType;
+  }
 
-    if (!CRM_Utils_Array::value($caseType, self::$_xml)) {
-      if (!self::$_xml) {
-        self::$_xml = array();
-      }
+  /**
+   * @param bool $indexName
+   * @param bool $all
+   *
+   * @return array
+   */
+  public static function &allActivityTypes($indexName = TRUE, $all = FALSE) {
+    if (self::$activityTypes === NULL) {
+      self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
+    }
+    return self::$activityTypes;
+  }
 
-      // first check custom templates directory
-      $fileName = NULL;
-      $config = CRM_Core_Config::singleton();
-      if (isset($config->customTemplateDir) &&
-        $config->customTemplateDir
-      ) {
-        // check if the file exists in the custom templates directory
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
-            $config->customTemplateDir,
-            'CRM',
-            'Case',
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
-      }
+  /**
+   * Get all relationship type display labels (not machine names)
+   *
+   * @param bool $fromXML
+   *   TODO: This parameter is always FALSE now so no longer needed.
+   *   Is this to be used for lookup of values from XML?
+   *   Relationships are recorded in XML from the perspective of the non-client
+   *   while relationships in the UI and everywhere else are from the
+   *   perspective of the client.  Since the XML can't be expected to be
+   *   switched, the direction needs to be translated.
+   * @return array
+   */
+  public function &allRelationshipTypes($fromXML = FALSE) {
+    if (!isset(Civi::$statics[__CLASS__]['reltypes'][$fromXML])) {
+      // Note this now includes disabled types too. The only place this
+      // function is being used is for comparison against a list, not
+      // displaying a dropdown list or something like that, so we need
+      // to include disabled.
+      $relationshipInfo = civicrm_api3('RelationshipType', 'get', [
+        'options' => ['limit' => 0],
+      ]);
 
-      if (!$fileName ||
-        !file_exists($fileName)
-      ) {
-        // check if file exists locally
-        $fileName = implode(DIRECTORY_SEPARATOR,
-          array(dirname(__FILE__),
-            'xml',
-            'configuration',
-            "$caseType.xml",
-          )
-        );
-
-        if (!file_exists($fileName)) {
-          // check if file exists locally
-          $fileName = implode(DIRECTORY_SEPARATOR,
-            array(dirname(__FILE__),
-              'xml',
-              'configuration.sample',
-              "$caseType.xml",
-            )
-          );
+      Civi::$statics[__CLASS__]['reltypes'][$fromXML] = [];
+      foreach ($relationshipInfo['values'] as $id => $info) {
+        Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_b_a'] = ($fromXML) ? $info['label_a_b'] : $info['label_b_a'];
+        /**
+         * Exclude if bidirectional
+         * (Why? I'm thinking this was for consistency with the dropdown
+         * in ang/crmCaseType.js where it would be needed to avoid seeing
+         * duplicates in the dropdown. Not sure if needed here but keeping
+         * as-is.)
+         */
+        if ($info['label_b_a'] !== $info['label_a_b']) {
+          Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_a_b'] = ($fromXML) ? $info['label_b_a'] : $info['label_a_b'];
         }
-        if (!file_exists($fileName)) {
-          return FALSE;
-        }
-      }
-
-      // read xml file
-      $dom = new DomDocument();
-      $dom->load($fileName);
-      $dom->xinclude();
-      self::$_xml[$caseType] = simplexml_import_dom($dom);
-    }
-    return self::$_xml[$caseType];
-  }
-
-  function &allActivityTypes($indexName = TRUE, $all = FALSE) {
-    static $activityTypes = NULL;
-    if (!$activityTypes) {
-      $activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
-    }
-    return $activityTypes;
-  }
-
-  function &allRelationshipTypes() {
-    static $relationshipTypes = array();
-
-    if (!$relationshipTypes) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType();
-
-      $relationshipTypes = array();
-      foreach ($relationshipInfo as $id => $info) {
-        $relationshipTypes[$id] = $info['label_b_a'];
       }
     }
 
-    return $relationshipTypes;
+    return Civi::$statics[__CLASS__]['reltypes'][$fromXML];
   }
+
+  /**
+   * FIXME: This should not exist
+   */
+  public static function flushStaticCaches() {
+    self::$activityTypes = NULL;
+    unset(Civi::$statics[__CLASS__]['reltypes']);
+  }
+
 }
-

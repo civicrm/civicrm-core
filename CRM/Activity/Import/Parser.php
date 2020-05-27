@@ -1,211 +1,70 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-
-
-
-abstract class CRM_Activity_Import_Parser {
-  CONST MAX_ERRORS = 250, MAX_WARNINGS = 25, VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128;
-
-  /**
-   * various parser modes
-   */
-  CONST MODE_MAPFIELD = 1, MODE_PREVIEW = 2, MODE_SUMMARY = 4, MODE_IMPORT = 8;
-
-  /**
-   * codes for duplicate record handling
-   */
-  CONST DUPLICATE_SKIP = 1, DUPLICATE_REPLACE = 2, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
+abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
-   * @access protected
-   * @var integer
-   */
-
   /**
-   * imported file size
+   * Imported file size.
+   * @var int
    */
   protected $_fileSize;
 
   /**
-   * seperator being used
+   * Separator being used.
+   * @var string
    */
   protected $_seperator;
 
   /**
-   * total number of lines in file
+   * Total number of lines in file.
+   * @var int
    */
   protected $_lineCount;
 
   /**
-   * total number of non empty lines
-   */
-  protected $_totalCount;
-
-  /**
-   * running total number of valid lines
-   */
-  protected $_validCount;
-
-  /**
-   * running total number of invalid rows
-   */
-  protected $_invalidRowCount;
-
-  /**
-   * maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
-
-  /**
-   * array of error lines, bounded by MAX_ERROR
-   */
-  protected $_errors;
-
-  /**
-   * total number of conflict lines
-   */
-  protected $_conflictCount;
-
-  /**
-   * array of conflict lines
-   */
-  protected $_conflicts;
-
-  /**
-   * total number of duplicate (from database) lines
-   */
-  protected $_duplicateCount;
-
-  /**
-   * array of duplicate lines
-   */
-  protected $_duplicates;
-
-  /**
-   * running total number of warnings
-   */
-  protected $_warningCount;
-
-  /**
-   * maximum number of warnings to store
-   */
-  protected $_maxWarningCount = self::MAX_WARNINGS;
-
-  /**
-   * array of warning lines, bounded by MAX_WARNING
-   */
-  protected $_warnings;
-
-  /**
-   * array of all the fields that could potentially be part
-   * of this import process
-   * @var array
-   */
-  protected $_fields;
-
-  /**
-   * array of the fields that are actually part of the import process
-   * the position in the array also dictates their position in the import
-   * file
-   * @var array
-   */
-  protected $_activeFields;
-
-  /**
-   * cache the count of active fields
+   * Whether the file has a column header or not.
    *
-   * @var int
-   */
-  protected $_activeFieldCount;
-
-  /**
-   * maximum number of non-empty/comment lines to process
-   *
-   * @var int
-   */
-  protected $_maxLinesToProcess;
-
-  /**
-   * cache of preview rows
-   *
-   * @var array
-   */
-  protected $_rows;
-
-  /**
-   * filename of error data
-   *
-   * @var string
-   */
-  protected $_errorFileName;
-
-  /**
-   * filename of conflict data
-   *
-   * @var string
-   */
-  protected $_conflictFileName;
-
-  /**
-   * filename of duplicate data
-   *
-   * @var string
-   */
-  protected $_duplicateFileName;
-
-  /**
-   * whether the file has a column header or not
-   *
-   * @var boolean
+   * @var bool
    */
   protected $_haveColumnHeader;
-  
-  function __construct() {
-    $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
-  }
 
-  abstract function init();
-  function run($fileName,
+  /**
+   * @param string $fileName
+   * @param string $seperator
+   * @param $mapper
+   * @param bool $skipColumnHeader
+   * @param int $mode
+   * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
+   *
+   * @return mixed
+   * @throws Exception
+   */
+  public function run(
+    $fileName,
     $seperator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
-    $mode             = self::MODE_PREVIEW,
-    $onDuplicate      = self::DUPLICATE_SKIP
+    $mode = self::MODE_PREVIEW,
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -227,17 +86,21 @@ abstract class CRM_Activity_Import_Parser {
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
-    $this->_errors    = array();
-    $this->_warnings  = array();
-    $this->_conflicts = array();
+    $this->_errors = [];
+    $this->_warnings = [];
+    $this->_conflicts = [];
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
     if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = array();
+      $this->_rows = [];
     }
     else {
       $this->_activeFieldCount = count($this->_activeFields);
+    }
+    if ($statusID) {
+      $this->progressImport($statusID);
+      $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
 
     while (!feof($fd)) {
@@ -256,7 +119,7 @@ abstract class CRM_Activity_Import_Parser {
         continue;
       }
 
-      /* trim whitespace around the values */
+      // Trim whitespace around the values.
 
       $empty = TRUE;
       foreach ($values as $k => $v) {
@@ -280,6 +143,9 @@ abstract class CRM_Activity_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         $returnCode = $this->import($onDuplicate, $values);
+        if ($statusID && (($this->_lineCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
+        }
       }
       else {
         $returnCode = self::ERROR;
@@ -303,14 +169,12 @@ abstract class CRM_Activity_Import_Parser {
 
       if ($returnCode & self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          if ($this->_haveColumnHeader) {
-            $recordNumber--;
-          }
-          array_unshift($values, $recordNumber);
-          $this->_errors[] = $values;
+        $recordNumber = $this->_lineCount;
+        if ($this->_haveColumnHeader) {
+          $recordNumber--;
         }
+        array_unshift($values, $recordNumber);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode & self::CONFLICT) {
@@ -325,8 +189,8 @@ abstract class CRM_Activity_Import_Parser {
 
       if ($returnCode & self::DUPLICATE) {
         if ($returnCode & self::MULTIPLE_DUPE) {
-          /* TODO: multi-dupes should be counted apart from singles
-                     * on non-skip action */
+          // TODO: multi-dupes should be counted apart from singles
+          // on non-skip action.
         }
         $this->_duplicateCount++;
         $recordNumber = $this->_lineCount;
@@ -354,7 +218,6 @@ abstract class CRM_Activity_Import_Parser {
 
     fclose($fd);
 
-
     if ($mode == self::MODE_PREVIEW || $mode == self::MODE_IMPORT) {
       $customHeaders = $mapper;
 
@@ -366,27 +229,24 @@ abstract class CRM_Activity_Import_Parser {
       }
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(ts('Line Number'),
-            ts('Reason'),
-          ),
+        $headers = array_merge(
+          [ts('Line Number'), ts('Reason')],
           $customHeaders
         );
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
-        $headers = array_merge(array(ts('Line Number'),
-            ts('Reason'),
-          ),
+        $headers = array_merge(
+          [ts('Line Number'), ts('Reason')],
           $customHeaders
         );
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(ts('Line Number'),
-            ts('View Activity History URL'),
-          ),
+        $headers = array_merge(
+          [ts('Line Number'), ts('View Activity History URL')],
           $customHeaders
         );
 
@@ -394,27 +254,15 @@ abstract class CRM_Activity_Import_Parser {
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
     return $this->fini();
   }
 
-  abstract function mapField(&$values);
-  abstract function preview(&$values);
-  abstract function summary(&$values);
-  abstract function import($onDuplicate, &$values);
-
-  abstract function fini();
-
   /**
-   * Given a list of the importable field keys that the user has selected
-   * set the active fields array to this list
+   * Given a list of the importable field keys that the user has selected set the active fields array to this list.
    *
-   * @param array mapped array of values
-   *
-   * @return void
-   * @access public
+   * @param array $fieldKeys
    */
-  function setActiveFields($fieldKeys) {
+  public function setActiveFields($fieldKeys) {
     $this->_activeFieldCount = count($fieldKeys);
     foreach ($fieldKeys as $key) {
       if (empty($this->_fields[$key])) {
@@ -426,51 +274,14 @@ abstract class CRM_Activity_Import_Parser {
     }
   }
 
-  /*function setActiveFieldLocationTypes( $elements ) 
-    {
-        for ($i = 0; $i < count( $elements ); $i++) {
-            $this->_activeFields[$i]->_hasLocationType = $elements[$i];
-        }
-    }
-    
-    function setActiveFieldPhoneTypes( $elements ) 
-    {
-        for ($i = 0; $i < count( $elements ); $i++) {
-            $this->_activeFields[$i]->_phoneType = $elements[$i];
-        }
-    }*/
-  function setActiveFieldValues($elements, &$erroneousField) {
-    $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
-    for ($i = 0; $i < $maxCount; $i++) {
-      $this->_activeFields[$i]->setValue($elements[$i]);
-    }
-
-    // reset all the values that we did not have an equivalent import element
-    for (; $i < $this->_activeFieldCount; $i++) {
-      $this->_activeFields[$i]->resetValue();
-    }
-
-    // now validate the fields and return false if error
-    $valid = self::VALID;
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (!$this->_activeFields[$i]->validate()) {
-        // no need to do any more validation
-        $erroneousField = $i;
-        $valid = self::ERROR;
-        break;
-      }
-    }
-    return $valid;
-  }
-
   /**
-   * function to format the field values for input to the api
+   * Format the field values for input to the api.
    *
-   * @return array (reference ) associative array of name/value pairs
-   * @access public
+   * @return array
+   *   (reference ) associative array of name/value pairs
    */
-  function &getActiveFieldParams() {
-    $params = array();
+  public function &getActiveFieldParams() {
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -483,41 +294,14 @@ abstract class CRM_Activity_Import_Parser {
     return $params;
   }
 
-  function getSelectValues() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_title;
-    }
-    return $values;
-  }
-
-  function getSelectTypes() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      if (isset($field->_hasLocationType)) {
-        $values[$name] = $field->_hasLocationType;
-      }
-    }
-    return $values;
-  }
-
-  function getHeaderPatterns() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_headerPattern;
-    }
-    return $values;
-  }
-
-  function getDataPatterns() {
-    $values = array();
-    foreach ($this->_fields as $name => $field) {
-      $values[$name] = $field->_dataPattern;
-    }
-    return $values;
-  }
-
-  function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
+  /**
+   * @param string $name
+   * @param $title
+   * @param int $type
+   * @param string $headerPattern
+   * @param string $dataPattern
+   */
+  public function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
     }
@@ -528,32 +312,19 @@ abstract class CRM_Activity_Import_Parser {
         $this->_fields[$name] = new CRM_Activity_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
       }
       else {
-        $this->_fields[$name] = new CRM_Import_Field($name, $title, $type, $headerPattern, $dataPattern, CRM_Utils_Array::value('hasLocationType', $tempField[$name]));
+        $this->_fields[$name] = new CRM_Contact_Import_Field($name, $title, $type, $headerPattern, $dataPattern, CRM_Utils_Array::value('hasLocationType', $tempField[$name]));
       }
     }
   }
 
   /**
-   * setter function
-   *
-   * @param int $max
-   *
-   * @return void
-   * @access public
-   */
-  function setMaxLinesToProcess($max) {
-    $this->_maxLinesToProcess = $max;
-  }
-
-  /**
-   * Store parser values
+   * Store parser values.
    *
    * @param CRM_Core_Session $store
    *
-   * @return void
-   * @access public
+   * @param int $mode
    */
-  function set($store, $mode = self::MODE_SUMMARY) {
+  public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
     $store->set('seperator', $this->_seperator);
@@ -585,21 +356,17 @@ abstract class CRM_Activity_Import_Parser {
         $store->set('duplicatesFileName', $this->_duplicateFileName);
       }
     }
-    //echo "$this->_totalCount,$this->_invalidRowCount,$this->_conflictCount,$this->_duplicateCount";
   }
 
   /**
-   * Export data to a CSV file
+   * Export data to a CSV file.
    *
-   * @param string $filename
+   * @param string $fileName
    * @param array $header
-   * @param data $data
-   *
-   * @return void
-   * @access public
+   * @param array $data
    */
-  static function exportCSV($fileName, $header, $data) {
-    $output = array();
+  public static function exportCSV($fileName, $header, $data) {
+    $output = [];
     $fd = fopen($fileName, 'w');
 
     foreach ($header as $key => $value) {
@@ -618,34 +385,4 @@ abstract class CRM_Activity_Import_Parser {
     fclose($fd);
   }
 
-  /**
-   * Remove single-quote enclosures from a value array (row)
-   *
-   * @param array $values
-   * @param string $enclosure
-   *
-   * @return void
-   * @static
-   * @access public
-   */
-  static function encloseScrub(&$values, $enclosure = "'") {
-    if (empty($values)) {
-      return;
-    }
-
-    foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*) $enclosure$/", '$1', $v);
-    }
-  }
-
-  function errorFileName($type) {
-    $fileName = CRM_Import_Parser::errorFileName($type);
-    return $fileName;
-  }
-
-  function saveFileName($type) {
-    $fileName = CRM_Import_Parser::saveFileName($type);
-    return $fileName;
-  }
 }
-

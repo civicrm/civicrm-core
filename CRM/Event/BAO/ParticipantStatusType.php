@@ -1,48 +1,43 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
-  static function add(&$params) {
+
+  /**
+   * @param array $params
+   *
+   * @return this|null
+   */
+  public static function add(&$params) {
     if (empty($params)) {
       return NULL;
     }
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->copyValues($params);
     return $dao->save();
   }
 
-  static function &create(&$params) {
+  /**
+   * @param array $params
+   *
+   * @return this|null
+   */
+  public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
     $statusType = self::add($params);
     if (is_a($statusType, 'CRM_Core_Error')) {
@@ -53,9 +48,14 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     return $statusType;
   }
 
-  static function deleteParticipantStatusType($id) {
+  /**
+   * @param int $id
+   *
+   * @return bool
+   */
+  public static function deleteParticipantStatusType($id) {
     // return early if there are participants with this status
-    $participant = new CRM_Event_DAO_Participant;
+    $participant = new CRM_Event_DAO_Participant();
     $participant->status_id = $id;
     if ($participant->find()) {
       return FALSE;
@@ -63,17 +63,25 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 
     CRM_Utils_Weight::delWeight('CRM_Event_DAO_ParticipantStatusType', $id);
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->id = $id;
-    $dao->find(TRUE);
+    if (!$dao->find()) {
+      return FALSE;
+    }
     $dao->delete();
     return TRUE;
   }
 
-  static function retrieve(&$params, &$defaults) {
+  /**
+   * @param array $params
+   * @param $defaults
+   *
+   * @return CRM_Event_DAO_ParticipantStatusType|null
+   */
+  public static function retrieve(&$params, &$defaults) {
     $result = NULL;
 
-    $dao = new CRM_Event_DAO_ParticipantStatusType;
+    $dao = new CRM_Event_DAO_ParticipantStatusType();
     $dao->copyValues($params);
     if ($dao->find(TRUE)) {
       CRM_Core_DAO::storeValues($dao, $defaults);
@@ -83,15 +91,25 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     return $result;
   }
 
-  static function setIsActive($id, $isActive) {
+  /**
+   * @param int $id
+   * @param $isActive
+   *
+   * @return bool
+   */
+  public static function setIsActive($id, $isActive) {
     return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
   }
 
-  public function process($params) {
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
+  public static function process($params) {
 
-    $returnMessages = array();
+    $returnMessages = [];
 
-    $participantRole = CRM_Event_PseudoConstant::participantRole();
     $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
     $expiredStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
     $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
@@ -99,12 +117,10 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     //build the required status ids.
     $statusIds = '(' . implode(',', array_merge(array_keys($pendingStatuses), array_keys($waitingStatuses))) . ')';
 
-    $participantDetails = $fullEvents = array();
+    $participantDetails = $fullEvents = [];
     $expiredParticipantCount = $waitingConfirmCount = $waitingApprovalCount = 0;
 
     //get all participant who's status in class pending and waiting
-    $query = "SELECT * FROM civicrm_participant WHERE status_id IN {$statusIds} ORDER BY register_date";
-
     $query = "
    SELECT  participant.id,
            participant.contact_id,
@@ -122,12 +138,12 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
 LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
     WHERE  participant.status_id IN {$statusIds}
      AND   (event.end_date > now() OR event.end_date IS NULL)
-     AND   event.is_active = 1 
- ORDER BY  participant.register_date, participant.id 
+     AND   event.is_active = 1
+ ORDER BY  participant.register_date, participant.id
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $participantDetails[$dao->id] = array(
+      $participantDetails[$dao->id] = [
         'id' => $dao->id,
         'event_id' => $dao->event_id,
         'status_id' => $dao->status_id,
@@ -140,7 +156,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
         'end_date' => $dao->end_date,
         'expiration_time' => $dao->expiration_time,
         'requires_approval' => $dao->requires_approval,
-      );
+      ];
     }
 
     if (!empty($participantDetails)) {
@@ -148,11 +164,11 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       foreach ($participantDetails as $participantId => $values) {
         //process the additional participant at the time of
         //primary participant, don't process separately.
-        if (CRM_Utils_Array::value('registered_by_id', $values)) {
+        if (!empty($values['registered_by_id'])) {
           continue;
         }
 
-        $expirationTime = CRM_Utils_Array::value('expiration_time', $values);
+        $expirationTime = $values['expiration_time'] ?? NULL;
         if ($expirationTime && array_key_exists($values['status_id'], $pendingStatuses)) {
 
           //get the expiration and registration pending time.
@@ -165,9 +181,9 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
             //lets get the transaction mechanism.
             $transaction = new CRM_Core_Transaction();
 
-            $ids       = array($participantId);
+            $ids = [$participantId];
             $expiredId = array_search('Expired', $expiredStatuses);
-            $results   = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
+            $results = CRM_Event_BAO_Participant::transitionParticipants($ids, $expiredId, $values['status_id'], TRUE, TRUE);
             $transaction->commit();
 
             if (!empty($results)) {
@@ -195,7 +211,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       foreach ($participantDetails as $participantId => $values) {
         //process the additional participant at the time of
         //primary participant, don't process separately.
-        if (CRM_Utils_Array::value('registered_by_id', $values)) {
+        if (!empty($values['registered_by_id'])) {
           continue;
         }
 
@@ -215,7 +231,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
               //get the additional participant if any.
               $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantId);
 
-              $allIds = array($participantId);
+              $allIds = [$participantId];
               if (!empty($additionalIds)) {
                 $allIds = array_merge($allIds, $additionalIds);
               }
@@ -226,7 +242,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
               if (($requiredSpaces <= $eventOpenSpaces) || ($eventOpenSpaces === NULL)) {
                 $transaction = new CRM_Core_Transaction();
 
-                $ids = array($participantId);
+                $ids = [$participantId];
                 $updateStatusId = array_search('Pending from waitlist', $pendingStatuses);
 
                 //lets take a call to make pending or need approval
@@ -287,7 +303,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       }
     }
 
-    return array('is_error' => 0, 'messages' => $returnMessages);
+    return ['is_error' => 0, 'messages' => $returnMessages];
   }
-}
 
+}

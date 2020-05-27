@@ -1,41 +1,31 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 4.1                                               |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2011                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This code is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
 */
-
 
 
 /*
  * This script recaches the display_name and sort_name values
  *
  */
+
+/**
+ * Class CRM_UpdateNameCache
+ */
 class CRM_UpdateNameCache {
+  /**
+   *
+   */
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {
-      require_once ("cli.php");
+      require_once("cli.php");
       $cli = new civicrm_cli();
       //if it doesn't die, it's authenticated
     }
@@ -71,12 +61,12 @@ class CRM_UpdateNameCache {
     $query = "SELECT * FROM civicrm_contact WHERE contact_type = 'Individual';";
     $dao = CRM_Core_DAO::executeQuery($query);
 
-    $prefixes = CRM_Core_PseudoConstant::individualPrefix();
-    $suffixes = CRM_Core_PseudoConstant::individualSuffix();
+    $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
-    $tokens = array();
+    $tokens = [];
     CRM_Utils_Hook::tokens($tokens);
-    $tokenFields = array();
+    $tokenFields = [];
     foreach ($tokens as $category => $catTokens) {
       foreach ($catTokens as $token) {
         $tokenFields[] = $token;
@@ -93,19 +83,20 @@ class CRM_UpdateNameCache {
 
     while ($dao->fetch()) {
       $contactID = $dao->id;
-      $params = array('first_name' => $dao->first_name,
+      $params = [
+        'first_name' => $dao->first_name,
         'middle_name' => $dao->middle_name,
         'last_name' => $dao->last_name,
         'prefix_id' => $dao->prefix_id,
         'suffix_id' => $dao->suffix_id,
-      );
+      ];
       $params['individual_prefix'] = $prefixes[$dao->prefix_id];
       $params['individual_suffix'] = $suffixes[$dao->suffix_id];
 
-      $sortName = CRM_Utils_Address::format($params, $sortFormat, FALSE, FALSE, TRUE, $tokenFields);
+      $sortName = CRM_Utils_Address::format($params, $sortFormat, FALSE, FALSE, $tokenFields);
       $sortName = trim(CRM_Core_DAO::escapeString($sortName));
 
-      $displayName = CRM_Utils_Address::format($params, $displayFormat, FALSE, FALSE, TRUE, $tokenFields);
+      $displayName = CRM_Utils_Address::format($params, $displayFormat, FALSE, FALSE, $tokenFields);
       $displayName = trim(CRM_Core_DAO::escapeString($displayName));
 
       //check for email

@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action & 1024}
@@ -29,7 +13,7 @@
 
 {include file="CRM/common/TrackingFields.tpl"}
 
-<div class="crm-block crm-event-confirm-form-block">
+<div class="crm-event-id-{$event.id} crm-block crm-event-confirm-form-block">
     {if $isOnWaitlist}
         <div class="help">
             {ts}Please verify the information below. <span class="bold">Then click 'Continue' to be added to the WAIT LIST for this event</span>. If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
@@ -39,14 +23,10 @@
             {ts}Please verify the information below. Then click 'Continue' to submit your registration. <span class="bold">Once approved, you will receive an email with a link to a web page where you can complete the registration process.</span>{/ts}
         </div>
     {else}
-        <div id="help">
+        <div class="help">
         {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
         {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
-            {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
-                {ts 1=$paymentProcessor.name}Click the <strong>%1</strong> button to checkout to Google, where you will select your payment method and complete the registration.{/ts}
-            {else}
-                {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
-            {/if }
+          {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
         {else}
             {ts}Otherwise, click the <strong>Continue</strong> button below to complete your registration.{/ts}
         {/if}
@@ -101,7 +81,7 @@
     </div>
     {/if}
 
-    {if $paidEvent}
+    {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
         <div class="crm-group event_fees-group">
             <div class="header-dark">
                 {$event.fee_label}
@@ -117,6 +97,12 @@
                   <div class="clear"></div>
                     {/foreach}
             </div>
+                {if $totalTaxAmount}
+                  <div class="crm-section no-label total-amount-section">
+                  <div class="content bold">{ts}Total {$taxTerm} Amount{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="clear"></div>
+                  </div>
+                {/if}
                 {if $totalAmount}
                 <div class="crm-section no-label total-amount-section">
                     <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
@@ -149,7 +135,7 @@
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
 
-    {if $contributeMode ne 'notify' and !$is_pay_later and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
       <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}
@@ -165,18 +151,20 @@
       </div>
     {/if}
 
-    {if $contributeMode eq 'direct' and ! $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $credit_card_type}
+      {crmRegion name="event-confirm-billing-block"}
         <div class="crm-group credit_card-group">
-            <div class="header-dark">
-                {ts}Credit Card Information{/ts}
-            </div>
-            <div class="crm-section no-label credit_card_details-section">
-                <div class="content">{$credit_card_type}</div>
+          <div class="header-dark">
+            {ts}Credit Card Information{/ts}
+          </div>
+          <div class="crm-section no-label credit_card_details-section">
+            <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
-            <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
+            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         </div>
+      {/crmRegion}
     {/if}
 
     {if $contributeMode NEQ 'notify'} {* In 'notify mode, contributor is taken to processor payment forms next *}
@@ -185,21 +173,6 @@
         {ts}Your registration will not be submitted until you click the <strong>Continue</strong> button. Please click the button one time only. If you need to change any details, click the Go Back button below to return to the previous screen.{/ts}
         </p>
     </div>
-    {/if}
-
-    {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout' and $paidEvent and !$is_pay_later and ! $isAmountzero and !$isOnWaitlist and !$isRequireApproval}
-        <fieldset><legend>{ts}Checkout with Google{/ts}</legend>
-            <div class="crm-section google_checkout-section">
-                <table class="form-layout-compressed">
-                  <tr>
-                    <td class="description">{ts}Click the Google Checkout button to continue.{/ts}</td>
-                  </tr>
-                  <tr>
-                    <td>{$form._qf_Confirm_next_checkout.html} <span style="font-size:11px; font-family: Arial, Verdana;">Checkout securely.  Pay without sharing your financial information. </span></td>
-                  </tr>
-                </table>
-            </div>
-        </fieldset>
     {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

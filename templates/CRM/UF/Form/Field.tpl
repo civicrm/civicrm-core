@@ -1,29 +1,12 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<h3>{if $action eq 8}{ts}Delete Field{/ts} - {$fieldTitle}{elseif $action eq 1}{ts}Add Field{/ts}{elseif $action eq 2}{ts}Edit Field{/ts} - {$fieldTitle}{/if}</h3>
 <div class="crm-block crm-form-block crm-uf-field-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
@@ -34,7 +17,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
-      <td class="label">{$form.field_name.label}</td>
+      <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
       <td>{$form.field_name.html}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
@@ -91,18 +74,15 @@
 
 {literal}
 <script type="text/javascript">
-var otherModule = new Array( );
-{/literal}{foreach from=$otherModules item="mval" key="mkey"}{literal}
-otherModule[{/literal}{$mkey}{literal}] = '{/literal}{$mval}{literal}';
-{/literal}{/foreach}{literal}
 
-cj(function($) {
+CRM.$(function($) {
+  var otherModule = {/literal}{$otherModules|@json_encode}{literal};
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
   else if( $.inArray( "Search Profile", otherModule ) > -1 ){
     $('#profile_visibility').show();
-    $("#in_selector").attr('checked',true);
+    $("#in_selector").prop('checked',true);
   }
   else if( $.inArray( "Profile", otherModule ) == -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').hide();
@@ -182,10 +162,10 @@ function showHideSeletorSearch() {
   if (cj("#visibility").val() == "User and User Admin Only") {
     is_search.hide();
     in_selector.hide();
-    cj("#is_searchable").attr('checked',false);
+    cj("#is_searchable").prop('checked',false);
   }
   else {
-    if (!cj("#is_view").attr('checked')) {
+    if (!cj("#is_view").prop('checked')) {
       is_search.show();
     }
     var fldName = cj("#field_name_1").val();
@@ -202,7 +182,7 @@ cj("#field_name_1").bind( 'change blur', function( ) {
   showHideSeletorSearch( );
 });
 
-cj( function( ) {
+CRM.$(function($) {
   cj("#field_name_1").addClass( 'huge' );
   viewOnlyShowHide( );
   cj("#is_view").click( function(){
@@ -216,7 +196,7 @@ cj("#field_name_1").change(
     multiSummaryToggle(cj(this).val());
   });
 
-cj( function( ) {
+CRM.$(function($) {
   var fieldId = cj("#field_name_1").val();
   multiSummaryToggle(fieldId);
 });
@@ -236,7 +216,7 @@ function multiSummaryToggle(customId) {
         }
         else {
           if (cj('#is_multi_summary').is(':checked')) {
-            cj('#is_multi_summary').removeAttr('checked');
+            cj('#is_multi_summary').prop('checked', false);
           }
           cj('.crm-uf-field-form-block-is_multi').hide();
         }
@@ -245,7 +225,7 @@ function multiSummaryToggle(customId) {
   }
   else {
     if (cj('#is_multi_summary').is(':checked')) {
-      cj('#is_multi_summary').removeAttr('checked');
+      cj('#is_multi_summary').prop('checked', false);
     }
     cj('.crm-uf-field-form-block-is_multi').hide();
   }
@@ -253,9 +233,9 @@ function multiSummaryToggle(customId) {
 
 function viewOnlyShowHide() {
   var is_search = cj('#is_search_label, #is_search_html');
-  if (cj("#is_view").attr('checked')) {
+  if (cj("#is_view").prop('checked')) {
     is_search.hide();
-    cj("#is_searchable").attr('checked', false);
+    cj("#is_searchable").prop('checked', false);
   }
   else if (cj("#visibility").val() != "User and User Admin Only")  {
     is_search.show();
@@ -306,6 +286,3 @@ function verify( ) {
 
 </script>
 {/literal}
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}

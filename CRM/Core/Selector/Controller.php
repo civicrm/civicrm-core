@@ -1,29 +1,13 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -35,83 +19,77 @@
  * implement the Selector/Api.interface.php class
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 class CRM_Core_Selector_Controller {
 
   /**
-   * constants to determine if we should store
+   * Constants to determine if we should store
    * the output in the session or template
    * @var int
    */
   // move the values from the session to the template
-  CONST SESSION = 1, TEMPLATE = 2,
-  TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
+  const SESSION = 1, TEMPLATE = 2,
+    TRANSFER = 4, EXPORT = 8, SCREEN = 16, PDF = 32;
 
   /**
-   * a CRM Object that implements CRM_Core_Selector_API
+   * A CRM Object that implements CRM_Core_Selector_API.
    * @var object
    */
   protected $_object;
 
-  /*
-     * the CRM_Utils_Sort object
-     * @var object
-     */
-
+  /**
+   * @var CRM_Utils_Sort
+   */
   protected $_sort;
 
-  /*
-     * the current column to sort on
-     * @var int
-     */
-
+  /**
+   * The current column to sort on
+   * @var int
+   */
   protected $_sortID;
 
-  /*
-     * the sortOrder array
-     * @var array
-     */
-
+  /**
+   * The sortOrder array
+   * @var array
+   */
   protected $_sortOrder;
 
-  /*
-     * the CRM_Utils_Pager object
-     * @var object
-     */
-
+  /**
+   * @var CRM_Utils_Pager
+   */
   protected $_pager;
 
-  /*
-     * the pageID
-     * @var int
-     */
-
+  /**
+   * The pageID
+   * @var int
+   */
   protected $_pageID;
 
-  /*
-     * offset
-     * @var int
-     */
-
+  /**
+   * Offset
+   * @var int
+   */
   protected $_pagerOffset;
 
   /**
-   * number of rows to return
+   * Number of rows to return
    * @var int
    */
   protected $_pagerRowCount;
 
   /**
-   * total number of rows
+   * Total number of rows
    * @var int
    */
   protected $_total;
 
-  /* the objectAction for the WebObject */
-
+  /**
+   * The objectAction for the WebObject
+   * @var int
+   */
   protected $_action;
 
   /**
@@ -126,7 +104,7 @@ class CRM_Core_Selector_Controller {
    * so the display routine needs to not do any work. (The
    * parent object takes care of the display)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_embedded = FALSE;
 
@@ -134,7 +112,7 @@ class CRM_Core_Selector_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_print = FALSE;
 
@@ -160,7 +138,7 @@ class CRM_Core_Selector_Controller {
   protected $_prefix;
 
   /**
-   * cache the smarty template for efficiency reasons
+   * Cache the smarty template for efficiency reasons
    *
    * @var CRM_Core_Smarty
    */
@@ -170,48 +148,55 @@ class CRM_Core_Selector_Controller {
    * Array of properties that the controller dumps into the output object
    *
    * @var array
-   * @static
    */
-  public static $_properties = array('columnHeaders', 'rows', 'rowsEmpty');
+  public static $_properties = ['columnHeaders', 'rows', 'rowsEmpty'];
 
   /**
    * Should we compute actions dynamically (since they are quite verbose)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_dynamicAction = FALSE;
 
   /**
-   * Class constructor
+   * Class constructor.
    *
-   * @param CRM_Core_Selector_API $object  an object that implements the selector API
-   * @param int               $pageID  default pageID
-   * @param int               $sortID  default sortID
-   * @param int               $action  the actions to potentially support
-   * @param CRM_Core_Page|CRM_Core_Form $store   place in session to store some values
-   * @param int               $output  what do we so with the output, session/template//both
+   * @param CRM_Core_Selector_API $object
+   *   An object that implements the selector API.
+   * @param int $pageID
+   *   Default pageID.
+   * @param int $sortID
+   *   Default sortID.
+   * @param int $action
+   *   The actions to potentially support.
+   * @param CRM_Core_Page|CRM_Core_Form $store place in session to store some values
+   * @param int $output
+   *   What do we so with the output, session/template//both.
    *
-   * @return Object
-   * @access public
-   */ function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
+   * @param null $prefix
+   * @param null $case
+   *
+   * @return \CRM_Core_Selector_Controller
+   */
+  public function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
 
     $this->_object = $object;
     $this->_pageID = $pageID ? $pageID : 1;
     $this->_sortID = $sortID ? $sortID : NULL;
     $this->_action = $action;
-    $this->_store  = $store;
+    $this->_store = $store;
     $this->_output = $output;
     $this->_prefix = $prefix;
-    $this->_case   = $case;
+    $this->_case = $case;
 
     // fix sortID
     if ($this->_sortID && strpos($this->_sortID, '_') === FALSE) {
       $this->_sortID .= '_u';
     }
 
-    $params = array(
+    $params = [
       'pageID' => $this->_pageID,
-    );
+    ];
 
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
@@ -222,9 +207,9 @@ class CRM_Core_Selector_Controller {
     $this->_sort = new CRM_Utils_Sort($this->_sortOrder, $this->_sortID);
 
     /*
-         * if we are in transfer mode, do not goto database, use the 
-         * session values instead
-         */
+     * if we are in transfer mode, do not goto database, use the
+     * session values instead
+     */
 
     if ($output == self::TRANSFER) {
       $params['total'] = $this->_store->get($this->_prefix . 'rowCount');
@@ -237,8 +222,8 @@ class CRM_Core_Selector_Controller {
     $this->_object->getPagerParams($action, $params);
 
     /*
-         * Set the default values of RowsPerPage
-         */
+     * Set the default values of RowsPerPage
+     */
 
     $storeRowCount = $store->get($this->_prefix . CRM_Utils_Pager::PAGE_ROWCOUNT);
     if ($storeRowCount) {
@@ -253,14 +238,15 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * have the GET vars changed, i.e. pageId or sortId that forces us to recompute the search values
+   * Have the GET vars changed, i.e. pageId or sortId that forces us to recompute the search values
    *
-   * @param int $reset are we being reset
+   * @param int $reset
+   *   Are we being reset.
    *
-   * @return boolean   if the GET params are different from the session params
-   * @access public
+   * @return bool
+   *   if the GET params are different from the session params
    */
-  function hasChanged($reset) {
+  public function hasChanged($reset) {
 
     /**
      * if we are in reset state, i.e the store is cleaned out, we return false
@@ -297,9 +283,8 @@ class CRM_Core_Selector_Controller {
    *
    *
    * @return void
-   *
    */
-  function run() {
+  public function run() {
 
     // get the column headers
     $columnHeaders = &$this->_object->getColumnHeaders($this->_action, $this->_output);
@@ -323,6 +308,7 @@ class CRM_Core_Selector_Controller {
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       if ($this->_output == self::EXPORT) {
         // export the rows.
+        CRM_Core_Error::deprecatedFunctionWarning('This code is believed to be unreachable & to be later removed. Please log how you reached it in gitlab');
         CRM_Core_Report_Excel::writeCSVFile($this->_object->getExportFileName(),
           $columnHeaders,
           $rows
@@ -339,18 +325,34 @@ class CRM_Core_Selector_Controller {
       // output requires paging/sorting capability
       $rows = self::getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
-      $rowsEmpty = count($rows) ? FALSE : TRUE;
-      $qill      = $this->getQill();
-      $summary   = $this->getSummary();
+      $reorderedHeaders = [];
+      $noWeightHeaders = [];
+      foreach ($columnHeaders as $key => $columnHeader) {
+        // So far only contribution selector sets weight, so just use key if not.
+        // Extension writers will need to fix other getColumnHeaders (or add a wrapper)
+        // to extend.
+        if (isset($columnHeader['weight'])) {
+          $reorderedHeaders[$columnHeader['weight']] = $columnHeader;
+        }
+        else {
+          $noWeightHeaders[$key] = $columnHeader;
+        }
+      }
+      ksort($reorderedHeaders);
+      // Merge headers not containing weight to ordered headers
+      $finalColumnHeaders = array_merge($reorderedHeaders, $noWeightHeaders);
+
+      $qill = $this->getQill();
+      $summary = $this->getSummary();
       // if we need to store in session, lets update session
       if ($this->_output & self::SESSION) {
-        $this->_store->set("{$this->_prefix}columnHeaders", $columnHeaders);
+        $this->_store->set("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         if ($this->_dynamicAction) {
           $this->_object->removeActions($rows);
         }
         $this->_store->set("{$this->_prefix}rows", $rows);
         $this->_store->set("{$this->_prefix}rowCount", $this->_total);
-        $this->_store->set("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        $this->_store->set("{$this->_prefix}rowsEmpty", !$rows);
         $this->_store->set("{$this->_prefix}qill", $qill);
         $this->_store->set("{$this->_prefix}summary", $summary);
       }
@@ -358,13 +360,12 @@ class CRM_Core_Selector_Controller {
         self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
         self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
 
-        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $columnHeaders);
+        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
-        self::$_template->assign("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        self::$_template->assign("{$this->_prefix}rowsEmpty", !$rows);
         self::$_template->assign("{$this->_prefix}qill", $qill);
         self::$_template->assign("{$this->_prefix}summary", $summary);
       }
-
 
       // always store the current pageID and sortID
       $this->_store->set($this->_prefix . CRM_Utils_Pager::PAGE_ID,
@@ -386,10 +387,12 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * function to retrieve rows.
+   * Retrieve rows.
    *
-   * @return array of rows
-   * @access public
+   * @param CRM_Core_Form $form
+   *
+   * @return array
+   *   Array of rows
    */
   public function getRows($form) {
     if ($form->_output == self::EXPORT || $form->_output == self::SCREEN) {
@@ -404,47 +407,47 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * default function for qill, if needed to be implemented, we
+   * Default function for qill, if needed to be implemented, we
    * expect the subclass to do it
    *
-   * @return string the status message
-   * @access public
+   * @return string
+   *   the status message
    */
   public function getQill() {
     return $this->_object->getQill();
   }
 
+  /**
+   * @return mixed
+   */
   public function getSummary() {
     return $this->_object->getSummary();
   }
 
   /**
-   * getter for pager
+   * Getter for pager.
    *
-   * @return object CRM_Utils_Pager
-   * @access public
+   * @return CRM_Utils_Pager
    */
-  function getPager() {
+  public function getPager() {
     return $this->_pager;
   }
 
   /**
-   * getter for sort
+   * Getter for sort.
    *
-   * @return object CRM_Utils_Sort
-   * @access public
+   * @return CRM_Utils_Sort
    */
-  function getSort() {
+  public function getSort() {
     return $this->_sort;
   }
 
   /**
-   * Move the variables from the session to the template
+   * Move the variables from the session to the template.
    *
    * @return void
-   * @access public
    */
-  function moveFromSessionToTemplate() {
+  public function moveFromSessionToTemplate() {
     self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
 
     $rows = $this->_store->get("{$this->_prefix}rows");
@@ -470,7 +473,7 @@ class CRM_Core_Selector_Controller {
       return;
     }
 
-    self::$_template->assign('tplFile', $this->_object->getTemplateFileName());
+    self::$_template->assign('tplFile', $this->_object->getHookedTemplateFileName());
     if ($this->_print) {
       $content = self::$_template->fetch('CRM/common/print.tpl');
     }
@@ -482,55 +485,59 @@ class CRM_Core_Selector_Controller {
   }
 
   /**
-   * setter for embedded
+   * Setter for embedded.
    *
-   * @param boolean $embedded
+   * @param bool $embedded
    *
    * @return void
-   * @access public
    */
-  function setEmbedded($embedded) {
+  public function setEmbedded($embedded) {
     $this->_embedded = $embedded;
   }
 
   /**
-   * getter for embedded
+   * Getter for embedded.
    *
-   * @return boolean return the embedded value
-   * @access public
+   * @return bool
+   *   return the embedded value
    */
-  function getEmbedded() {
+  public function getEmbedded() {
     return $this->_embedded;
   }
 
   /**
-   * setter for print
+   * Setter for print.
    *
-   * @param boolean $print
+   * @param bool $print
    *
    * @return void
-   * @access public
    */
-  function setPrint($print) {
+  public function setPrint($print) {
     $this->_print = $print;
   }
 
   /**
-   * getter for print
+   * Getter for print.
    *
-   * @return boolean return the print value
-   * @access public
+   * @return bool
+   *   return the print value
    */
-  function getPrint() {
+  public function getPrint() {
     return $this->_print;
   }
 
-  function setDynamicAction($value) {
+  /**
+   * @param $value
+   */
+  public function setDynamicAction($value) {
     $this->_dynamicAction = $value;
   }
 
-  function getDynamicAction() {
+  /**
+   * @return bool
+   */
+  public function getDynamicAction() {
     return $this->_dynamicAction;
   }
-}
 
+}

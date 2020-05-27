@@ -1,65 +1,67 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Bridge_OG_Utils {
-  CONST aclEnabled = 1, syncFromCiviCRM = 1;
+  const aclEnabled = 1, syncFromCiviCRM = 1;
 
-  static function aclEnabled() {
+  /**
+   * @return int
+   */
+  public static function aclEnabled() {
     return self::aclEnabled;
   }
 
   /**
-   * Switch to stop synchronization from CiviCRM
+   * Switch to stop synchronization from CiviCRM.
    * This was always false before, and is always true
    * now.  Most likely, this needs to be a setting.
    */
-  static function syncFromCiviCRM() {
+  public static function syncFromCiviCRM() {
     // make sure that acls are not enabled
     //RMT -- the following makes no f**king sense...
     //return ! self::aclEnabled & self::syncFromCiviCRM;
     return TRUE;
   }
 
-  static function ogSyncName($ogID) {
+  /**
+   * @param int $ogID
+   *
+   * @return string
+   */
+  public static function ogSyncName($ogID) {
     return "OG Sync Group :{$ogID}:";
   }
 
-  static function ogSyncACLName($ogID) {
+  /**
+   * @param int $ogID
+   *
+   * @return string
+   */
+  public static function ogSyncACLName($ogID) {
     return "OG Sync Group ACL :{$ogID}:";
   }
 
-  static function ogID($groupID, $abort = TRUE) {
+  /**
+   * @param int $groupID
+   * @param bool $abort
+   *
+   * @return int|null|string
+   * @throws Exception
+   */
+  public static function ogID($groupID, $abort = TRUE) {
     $source = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
       $groupID,
       'source'
@@ -77,7 +79,13 @@ class CRM_Bridge_OG_Utils {
     return NULL;
   }
 
-  static function contactID($ufID) {
+  /**
+   * @param int $ufID
+   *
+   * @return int
+   * @throws Exception
+   */
+  public static function contactID($ufID) {
     $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
     if ($contactID) {
       return $contactID;
@@ -94,16 +102,24 @@ class CRM_Bridge_OG_Utils {
     return $contactID;
   }
 
-  static function groupID($source, $title = NULL, $abort = FALSE) {
+  /**
+   * @param $source
+   * @param null $title
+   * @param bool $abort
+   *
+   * @return null|string
+   * @throws Exception
+   */
+  public static function groupID($source, $title = NULL, $abort = FALSE) {
     $query = "
 SELECT id
   FROM civicrm_group
  WHERE source = %1";
-    $params = array(1 => array($source, 'String'));
+    $params = [1 => [$source, 'String']];
 
     if ($title) {
       $query .= " OR title = %2";
-      $params[2] = array($title, 'String');
+      $params[2] = [$title, 'String'];
     }
 
     $groupID = CRM_Core_DAO::singleValueQuery($query, $params);
@@ -115,5 +131,5 @@ SELECT id
 
     return $groupID;
   }
-}
 
+}

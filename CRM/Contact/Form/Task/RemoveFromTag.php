@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,27 +21,23 @@
 class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
 
   /**
-   * name of the tag
+   * Name of the tag.
    *
    * @var string
    */
   protected $_name;
 
   /**
-   * all the tags in the system
+   * All the tags in the system.
    *
    * @var array
    */
   protected $_tags;
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     // add select for tag
     $this->_tags = CRM_Core_BAO_Tag::getTags();
     foreach ($this->_tags as $tagID => $tagName) {
@@ -67,17 +45,23 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
 
     $this->addDefaultButtons(ts('Remove Tags from Contacts'));
   }
 
-  function addRules() {
-    $this->addFormRule(array('CRM_Contact_Form_Task_RemoveFromTag', 'formRule'));
+  public function addRules() {
+    $this->addFormRule(['CRM_Contact_Form_Task_RemoveFromTag', 'formRule']);
   }
 
-  static function formRule($form, $rule) {
-    $errors = array();
+  /**
+   * @param CRM_Core_Form $form
+   * @param $rule
+   *
+   * @return array
+   */
+  public static function formRule($form, $rule) {
+    $errors = [];
     if (empty($form['tag']) && empty($form['contact_taglist'])) {
       $errors['_qf_default'] = "Please select atleast one tag.";
     }
@@ -85,25 +69,21 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $contactTags = $tagList = array();
+    $contactTags = $tagList = [];
 
     // check if contact tags exists
-    if (CRM_Utils_Array::value('tag', $params)) {
+    if (!empty($params['tag'])) {
       $contactTags = $params['tag'];
     }
 
     // check if tags are selected from taglists
-    if (CRM_Utils_Array::value('contact_taglist', $params)) {
+    if (!empty($params['contact_taglist'])) {
       foreach ($params['contact_taglist'] as $val) {
         if ($val) {
           if (is_numeric($val)) {
@@ -124,20 +104,28 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     // merge contact and taglist tags
     $allTags = CRM_Utils_Array::crmArrayMerge($contactTags, $tagList);
 
-    $this->_name = array();
+    $this->_name = [];
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
-      list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_contactIds, $key);
+      list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_contactIds, $key,
+        'civicrm_contact', FALSE);
 
-      $status = array(ts('%count contact un-tagged', array('count' => $removed, 'plural' => '%count contacts un-tagged')));
+      $status = [
+        ts('%count contact un-tagged', [
+          'count' => $removed,
+          'plural' => '%count contacts un-tagged',
+        ]),
+      ];
       if ($notRemoved) {
-        $status[] = ts('1 contact already did not have this tag', array('count' => $notRemoved, 'plural' => '%count contacts already did not have this tag'));
+        $status[] = ts('1 contact already did not have this tag', [
+          'count' => $notRemoved,
+          'plural' => '%count contacts already did not have this tag',
+        ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
     }
   }
-  //end of function
-}
 
+}

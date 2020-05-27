@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* CiviContribute DashBoard (launch page) *}
@@ -66,21 +50,20 @@
 
 <div class="float-right">
 <table class="form-layout-compressed">
-<tr>
+  <tr>
     <td>
-     <a href="{$configPagesURL}" class="button"><span>{ts}Manage Contribution Pages{/ts}
-       </span></a>
+      <a href="{$configPagesURL}" class="button no-popup"><span>{ts}Manage Contribution Pages{/ts}</span></a>
     </td>
-    <td><a href="{$newPageURL}" class="button"><span><div class="icon add-icon"></div>{ts}Add Contribution Page{/ts}
-        </span></a>
+    <td>
+      <a href="{$newPageURL}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a>
     </td>
-</tr>
+  </tr>
 </table>
 </div>
 {/if}
 </ul>
 <div id="chartData"></div>
-<div id="tableData"></div></div>
+</div>
 <div class="spacer"></div>
 
 {if $pager->_totalItems}
@@ -88,61 +71,5 @@
     <div>
         {include file="CRM/Contribute/Form/Selector.tpl" context="dashboard"}
     </div>
-{/if}{literal}
-<script type="text/javascript">
-
-cj(document).ready( function( ) {
-    getChart( );
-    cj('#chart_view').click(function( ) {
-        if ( cj('#chart_view').hasClass('ui-state-default') ) {
-            cj('#chart_view').removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
-            cj('#table_view').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
-            getChart( );
-            cj('#tableData').children().html('');
-        }
-    });
-    cj('#table_view').click(function( ) {
-        if ( cj('#table_view').hasClass('ui-state-default') ) {
-            cj('#table_view').removeClass('ui-state-default').addClass('ui-state-active ui-tabs-selected');
-            cj('#chart_view').removeClass('ui-state-active ui-tabs-selected').addClass('ui-state-default');
-            buildTabularView();
-            cj('#chartData').children().html('');
-        }
-    });
-});
-
-function getChart( ) {
-   var year        = cj('#select_year').val( );
-   var charttype   = cj('#chart_type').val( );
-   var date        = new Date()
-   var currentYear = date.getFullYear( );
-   if ( !charttype ) charttype = 'bvg';
-   if ( !year ) year           = currentYear;
-
-   var chartUrl = {/literal}"{crmURL p='civicrm/ajax/chart' q='snippet=4' h=0}"{literal};
-   chartUrl    += "&year=" + year + "&type=" + charttype;
-   cj.ajax({
-       url     : chartUrl,
-       async    : false,
-       success  : function(html){
-           cj( "#chartData" ).html( html );
-       }
-   });
-
-}
-
-function buildTabularView( ) {
-    var tableUrl = {/literal}"{crmURL p='civicrm/contribute/ajax/tableview' q='showtable=1&snippet=4' h=0}"{literal};
-    cj.ajax({
-        url      : tableUrl,
-        async    : false,
-        success  : function(html){
-            cj( "#tableData" ).html( html );
-        }
-    });
-}
-
-</script>
-{/literal}
-
+{/if}
 {/if}

@@ -1,0 +1,105 @@
+#!/bin/bash
+####################################################################
+function show_help() {
+  echo "Jeanine Matthews - Divergent Hunter"
+  echo "summary: Execute test suite in multiple ways and compare results"
+  echo "usage: env [var1=... var2=...] $0 [--bundled-full|--bf] [--bundled-indiv|--bi] [--standalone-full|--sf] [--standalone-indiv|--si] [--compare]"
+  echo "Optional variables:"
+  echo "  - CIVI: Path to Civi installation [$CIVI]"
+  echo "  - PHP: Path to PHP binary [$PHP]"
+  echo "  - PHPUNIT: Path to phpunit binary [$PHPUNIT]"
+  echo "  - TESTCLASS: PHP class name for the test case/suite [$TESTCLASS]"
+  echo "  - TESTPATH: Path for the test file/directory (Note: MUST match TESTCLASS) [$TESTPATH]"
+  echo "  - OUTDIR: Folder to which outputs are written [$OUTDIR]"
+}
+
+function reset_dir() {
+  [ -d "$1" ] && rm -rf "$1"
+  mkdir -p "$1"
+}
+
+####################################################################
+## Env
+export PHP=${PHP:-php}
+export PHPUNIT=${PHPUNIT:-phpunit}
+export TESTCLASS=${TESTCLASS:-api_v3_AllTests}
+export TESTPATH=${TESTPATH:-tests/phpunit/api/v3}
+export CIVI=$(realpath "${CIVI:-.}")
+export OUTDIR=$(realpath "${OUTDIR:-output}")
+
+####################################################################
+## Main
+if [ -z "$1" ];then
+  show_help
+  exit 1
+fi
+
+while [ -n "$1" ]; do
+  OPTION="$1"
+  shift
+
+  case "$OPTION" in
+    --bundled-full|--bf)
+      echo "[[ Prepare $OUTDIR/bundled-full ]]"
+
+      [ -d "packages/PHPUnit.bak" ] && mv "packages/PHPUnit.bak" "packages/PHPUnit"
+      if [ ! -d "$CIVI/packages/PHPUnit" ]; then
+        echo "Missing $CIVI/packages/PHPUnit"
+        exit 2
+      fi
+
+      reset_dir "$OUTDIR/bundled-full"
+
+      pushd "$CIVI/tools"
+        $PHP ./scripts/phpunit --tap --log-json "$OUTDIR/bundled-full/all.json" "$TESTCLASS"
+      popd
+      ;;
+
+    --bundled-indiv|--bi)
+      echo "[[ Prepare $OUTDIR/bundled-indiv ]]"
+
+      [ -d "packages/PHPUnit.bak" ] && mv "packages/PHPUnit.bak" "packages/PHPUnit"
+      if [ ! -d "$CIVI/packages/PHPUnit" ]; then
+        echo "Missing $CIVI/packages/PHPUnit"
+        exit 2
+      fi
+
+      reset_dir "$OUTDIR/bundled-indiv"
+
+      pushd "$CIVI/tools"
+        ./scripts/phpunit-indiv --civi --test-dir "../$TESTPATH" --json-dir "$OUTDIR/bundled-indiv"
+      popd
+
+      cat "$OUTDIR"/bundled-indiv/*-*.json > "$OUTDIR/bundled-indiv/all.json"
+      ;;
+
+    --standalone-full|--sf)
+      echo "[[ Prepare $OUTDIR/standalone-full ]]"
+      reset_dir "$OUTDIR/standalone-full"
+
+      pushd "$CIVI"
+        [ -d "packages/PHPUnit" ] && mv "packages/PHPUnit" "packages/PHPUnit.bak"
+        $PHP $(which $PHPUNIT) --tap --log-json "$OUTDIR/standalone-full/all.json" "$TESTPATH"
+        [ -d "packages/PHPUnit.bak" ] && mv "packages/PHPUnit.bak" "packages/PHPUnit"
+      popd
+      ;;
+
+    --standalone-indiv|--si)
+      echo "[[ Prepare $OUTDIR/standalone-indiv ]]"
+      reset_dir "$OUTDIR/standalone-indiv"
+
+      pushd "$CIVI"
+        [ -d "packages/PHPUnit" ] && mv "packages/PHPUnit" "packages/PHPUnit.bak"
+        ./tools/scripts/phpunit-indiv --test-dir "$TESTPATH" --json-dir "$OUTDIR/standalone-indiv"
+        [ -d "packages/PHPUnit.bak" ] && mv "packages/PHPUnit.bak" "packages/PHPUnit"
+      popd
+
+      cat "$OUTDIR"/standalone-indiv/*-*.json > "$OUTDIR/standalone-indiv/all.json"
+      ;;
+
+    --compare)
+      echo "[[ Compare all results in $OUTDIR ]]"
+      phpunit-compare "$OUTDIR"/*/all.json
+      ;;
+  esac
+done

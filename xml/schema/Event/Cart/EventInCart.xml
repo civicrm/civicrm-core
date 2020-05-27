@@ -6,6 +6,7 @@
   <name>civicrm_events_in_carts</name>
   <field>
     <name>id</name>
+    <title>Event In Cart</title>
     <uniqueName>event_in_cart_id</uniqueName>
     <type>int unsigned</type>
     <required>true</required>
@@ -18,6 +19,7 @@
   </primaryKey>
   <field>
     <name>event_id</name>
+    <title>Event</title>
     <type>int unsigned</type>
     <comment>FK to Event ID</comment>
     <add>4.1</add>
@@ -31,6 +33,7 @@
   </foreignKey>
   <field>
     <name>event_cart_id</name>
+    <title>Event In Cart</title>
     <type>int unsigned</type>
     <comment>FK to Event Cart ID</comment>
     <add>4.1</add>

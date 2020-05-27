@@ -1,101 +1,154 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-/**
- *  Class to print labels in Avery or custom formats
- * functionality and smarts to the base PDF_Label.
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- *
- *
  */
 
-require_once 'tcpdf/tcpdf.php';
+/**
+ * Class to print labels in Avery or custom formats
+ * functionality and smarts to the base PDF_Label.
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
+ */
+
+/**
+ * Class CRM_Utils_PDF_Label
+ */
 class CRM_Utils_PDF_Label extends TCPDF {
 
   // make these properties public due to
   // CRM-5880
-  // Default label format values
+  /**
+   * Default label format values
+   * @var array
+   */
   public $defaults;
-  // Current label format values
+  /**
+   * Current label format values
+   * @var array
+   */
   public $format;
-  // Name of format
+  /**
+   * Name of format
+   * @var string
+   */
   public $formatName;
-  // Left margin of labels
+  /**
+   * Left margin of labels
+   * @var float
+   */
   public $marginLeft;
-  // Top margin of labels
+  /**
+   * Top margin of labels
+   * @var float
+   */
   public $marginTop;
-  // Horizontal space between 2 labels
+  /**
+   * Horizontal space between 2 labels
+   * @var float
+   */
   public $xSpace;
-  // Vertical space between 2 labels
+  /**
+   * Vertical space between 2 labels
+   * @var float
+   */
   public $ySpace;
-  // Number of labels horizontally
+  /**
+   * Number of labels horizontally
+   * @var float
+   */
   public $xNumber;
-  // Number of labels vertically
+  /**
+   * Number of labels vertically
+   * @var float
+   */
   public $yNumber;
-  // Width of label
+  /**
+   * Width of label
+   * @var float
+   */
   public $width;
-  // Height of label
+  /**
+   * Height of label
+   * @var float
+   */
   public $height;
-  // Line Height of label - used in event code
+  /**
+   * Line Height of label - used in event code
+   * @var float
+   */
   public $lineHeight = 0;
-  // Space between text and left edge of label
+  /**
+   * Space between text and left edge of label
+   * @var float
+   */
   public $paddingLeft;
-  // Space between text and top edge of label
+  /**
+   * Space between text and top edge of label
+   * @var float
+   */
   public $paddingTop;
-  // Character size (in points)
+  /**
+   * Character size (in points)
+   * @var float
+   */
   public $charSize;
-  // Metric used for all PDF doc measurements
+  /**
+   * Metric used for all PDF doc measurements
+   * @var string
+   */
   public $metricDoc;
-  // Name of the font
+  /**
+   * Name of the font
+   * @var string
+   */
   public $fontName;
-  // 'B' bold, 'I' italic, 'BI' bold+italic
+  /**
+   * 'B' bold, 'I' italic, 'BI' bold+italic
+   * @var string
+   */
   public $fontStyle;
-  // Paper size name
+  /**
+   * Paper size name
+   * @var string
+   */
   public $paperSize;
-  // Paper orientation
+  /**
+   * Paper orientation
+   * @var string
+   */
   public $orientation;
-  // Paper dimensions array (w, h)
+  /**
+   * Paper dimensions array (w, h)
+   * @var array
+   */
   public $paper_dimensions;
-  // Counter for positioning labels
+  /**
+   * Counter for positioning labels
+   * @var float
+   */
   public $countX = 0;
-  // Counter for positioning labels
+  /**
+   * Counter for positioning labels
+   * @var float
+   */
   public $countY = 0;
 
   /**
-   * Constructor
+   * Constructor.
    *
-   * @param $format   Either the name of a Label Format in the Option Value table
+   * @param $format
+   *   Either the name of a Label Format in the Option Value table.
    *                  or an array of Label Format values.
-   * @param $unit     Unit of measure for the PDF document
-   *
-   * @access public
+   * @param string|\Unit $unit Unit of measure for the PDF document
    */
-  function __construct($format, $unit = 'mm') {
+  public function __construct($format, $unit = 'mm') {
     if (is_array($format)) {
       // Custom format
       $tFormat = $format;
@@ -116,18 +169,28 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $this->setPrintFooter(FALSE);
   }
 
-  function SetGenerator($objectinstance, $methodname = 'generateLabel') {
+  /**
+   * @param $objectinstance
+   * @param string $methodname
+   */
+  public function SetGenerator($objectinstance, $methodname = 'generateLabel') {
     $this->generatorMethod = $methodname;
     $this->generatorObject = $objectinstance;
   }
 
-  function getFormatValue($name, $convert = FALSE) {
+  /**
+   * @param string $name
+   * @param bool $convert
+   *
+   * @return float|int|mixed
+   */
+  public function getFormatValue($name, $convert = FALSE) {
     if (isset($this->format[$name])) {
       $value = $this->format[$name];
       $metric = $this->format['metric'];
     }
     else {
-      $value = CRM_Utils_Array::value($name, $this->defaults);
+      $value = $this->defaults[$name] ?? NULL;
       $metric = $this->defaults['metric'];
     }
     if ($convert) {
@@ -136,10 +199,13 @@ class CRM_Utils_PDF_Label extends TCPDF {
     return $value;
   }
 
-  /*
-   * Function to initialize label format settings
+  /**
+   * initialize label format settings.
+   *
+   * @param $format
+   * @param $unit
    */
-  function LabelSetFormat(&$format, $unit) {
+  public function LabelSetFormat(&$format, $unit) {
     $this->defaults = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $this->format = &$format;
     $this->formatName = $this->getFormatValue('name');
@@ -162,15 +228,19 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $paperSize = CRM_Core_BAO_PaperSize::getByName($this->paperSize);
     $w = CRM_Utils_PDF_Utils::convertMetric($paperSize['width'], $paperSize['metric'], $this->metricDoc);
     $h = CRM_Utils_PDF_Utils::convertMetric($paperSize['height'], $paperSize['metric'], $this->metricDoc);
-    $this->paper_dimensions = array($w, $h);
+    $this->paper_dimensions = [$w, $h];
   }
 
-  /*
-   * function to Generate the pdf of one label (can be modified using SetGenerator)
+  /**
+   * Generate the pdf of one label (can be modified using SetGenerator)
+   *
+   * @param string $text
    */
-  function generateLabel($text) {
-    $args = array(
-      'w' => $this->width,
+  public function generateLabel($text) {
+    // paddingLeft is used for both left & right padding so needs to be
+    // subtracted twice from width to get the width that is available for text
+    $args = [
+      'w' => $this->width - 2 * $this->paddingLeft,
       'h' => 0,
       'txt' => $text,
       'border' => 0,
@@ -184,7 +254,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
       'ishtml' => FALSE,
       'autopadding' => FALSE,
       'maxh' => $this->height,
-    );
+    ];
 
     CRM_Utils_Hook::alterMailingLabelParams($args);
 
@@ -209,15 +279,24 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
-  /*
-   * function to Print a label
+  /**
+   * Print a label.
+   *
+   * @param $texte
    */
-  function AddPdfLabel($texte) {
+  public function AddPdfLabel($texte) {
+    if ($this->countX == $this->xNumber) {
+      // Page full, we start a new one
+      $this->AddPage();
+      $this->countX = 0;
+      $this->countY = 0;
+    }
+
     $posX = $this->marginLeft + ($this->countX * ($this->width + $this->xSpace));
     $posY = $this->marginTop + ($this->countY * ($this->height + $this->ySpace));
     $this->SetXY($posX + $this->paddingLeft, $posY + $this->paddingTop);
     if ($this->generatorMethod) {
-      call_user_func_array(array($this->generatorObject, $this->generatorMethod), array($texte));
+      call_user_func_array([$this->generatorObject, $this->generatorMethod], [$texte]);
     }
     else {
       $this->generateLabel($texte);
@@ -229,34 +308,38 @@ class CRM_Utils_PDF_Label extends TCPDF {
       $this->countX++;
       $this->countY = 0;
     }
-
-    if ($this->countX == $this->xNumber) {
-      // Page full, we start a new one
-      $this->countX = 0;
-      $this->countY = 0;
-    }
-
-    // We are in a new page, then we must add a page
-    if (($this->countX == 0) and ($this->countY == 0)) {
-      $this->AddPage();
-    }
   }
 
-  function getFontNames() {
+  /**
+   * Get the available font names.
+   *
+   * @return array
+   */
+  public function getFontNames() {
     // Define labels for TCPDF core fonts
-    $fontLabel = array(
+    $fontLabel = [
       'courier' => ts('Courier'),
       'helvetica' => ts('Helvetica'),
       'times' => ts('Times New Roman'),
       'dejavusans' => ts('Deja Vu Sans (UTF-8)'),
-    );
+    ];
+
+    // Check to see if we have any additional fonts to add. You can specify more fonts in
+    // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']
+    // CRM-13307
+    $additionalFonts = Civi::settings()->get('additional_fonts');
+    if (is_array($additionalFonts)) {
+      $fontLabel = array_merge($fontLabel, $additionalFonts);
+    }
+
     $tcpdfFonts = $this->fontlist;
     foreach ($tcpdfFonts as $fontName) {
       if (array_key_exists($fontName, $fontLabel)) {
         $list[$fontName] = $fontLabel[$fontName];
       }
     }
+
     return $list;
   }
-}
 
+}

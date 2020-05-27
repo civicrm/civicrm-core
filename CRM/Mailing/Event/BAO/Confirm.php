@@ -1,58 +1,46 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Mail/mime.php';
+
+/**
+ * Class CRM_Mailing_Event_BAO_Confirm
+ */
 class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Confirm a pending subscription
+   * Confirm a pending subscription.
    *
-   * @param int $contact_id       The id of the contact
-   * @param int $subscribe_id     The id of the subscription event
-   * @param string $hash          The hash
+   * @param int $contact_id
+   *   The id of the contact.
+   * @param int $subscribe_id
+   *   The id of the subscription event.
+   * @param string $hash
+   *   The hash.
    *
-   * @return boolean              True on success
-   * @access public
-   * @static
+   * @return bool
+   *   True on success
    */
   public static function confirm($contact_id, $subscribe_id, $hash) {
     $se = &CRM_Mailing_Event_BAO_Subscribe::verify(
@@ -71,7 +59,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $details = CRM_Contact_BAO_GroupContact::getMembershipDetail($contact_id, $se->group_id);
     if ($details && $details->status == 'Added') {
       // This contact is already subscribed
-      return $details->title;
+      // lets return the group title
+      return CRM_Core_DAO::getFieldValue(
+        'CRM_Contact_DAO_Group',
+        $se->group_id,
+        'title'
+      );
     }
 
     $transaction = new CRM_Core_Transaction();
@@ -81,10 +74,11 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $ce->time_stamp = date('YmdHis');
     $ce->save();
 
-    CRM_Contact_BAO_GroupContact::updateGroupMembershipStatus(
-      $contact_id,
+    CRM_Contact_BAO_GroupContact::addContactsToGroup(
+      [$contact_id],
       $se->group_id,
       'Email',
+      'Added',
       $ce->id
     );
 
@@ -101,14 +95,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $group->id = $se->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->is_default = 1;
     $component->is_active = 1;
     $component->component_type = 'Welcome';
 
     $component->find(TRUE);
-
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
     $html = $component->body_html;
 
@@ -119,10 +111,10 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $bao            = new CRM_Mailing_BAO_Mailing();
+    $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $tokens         = $bao->getTokens();
+    $tokens = $bao->getTokens();
 
     $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
     $html = CRM_Utils_Token::replaceWelcomeTokens($html, $group->title, TRUE);
@@ -130,20 +122,21 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
     $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
 
-    $mailParams = array(
-      'groupName' => 'Mailing Event ' . $component->component_type, 'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+    $mailParams = [
+      'groupName' => 'Mailing Event ' . $component->component_type,
+      'subject' => $component->subject,
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'toEmail' => $email,
       'toName' => $display_name,
-      'replyTo' => "do-not-reply@$emailDomain",
-      'returnPath' => "do-not-reply@$emailDomain",
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
-    );
+    ];
     // send - ignore errors because the desired status change has already been successful
     $unused_result = CRM_Utils_Mail::send($mailParams);
 
     return $group->title;
   }
-}
 
+}

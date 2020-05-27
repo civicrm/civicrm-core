@@ -1,31 +1,31 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="id-is_multi_activity-title"}
-  {ts}Create Separate Activity Records?{/ts}
+{htxt id="separation-title"}
+  {ts}Activity Separation{/ts}
 {/htxt}
-{htxt id="id-is_multi_activity"}
-  <p>{ts}By default a single activity record will be created and linked to all the contacts listed above. However, if you think you might be editing the activity later - and entering different information for different contacts - check this box to create separate activity records.{/ts}</p>
+{htxt id="separation"}
+  <p>{ts}With separate activities, you can enter different activity information for different contacts after creating the activities.{/ts}</p>
+  <p>{ts}With a single activity, the activity information cannot be customized for each contact.{/ts}</p>
+{/htxt}
+
+{htxt id="assignee_contact_id"}
+  <p>
+    {ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
+  </p>
+{/htxt}
+
+{htxt id="sent_copy_email"}
+  <p>
+    {ts}When CiviCRM emails a copy of this activity to each assignees, that email will come from the contact listed under "Added By".{/ts}
+  </p>
+  <p>
+    {ts}If (in rare cases) that contact has no email address, then CiviCRM will send the email from the default "from" email address configured for this domain. And finally, if that email address has not been configured, then CiviCRM will send the email from the email address associated with the currently logged in user who creates this activity.{/ts}
+  </p>
 {/htxt}

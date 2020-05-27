@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+  <CustomGroups>
+    <CustomGroup>
+      <name>example</name>
+      <title>example</title>
+      <extends>Activity</extends>
+      <extends_entity_column_value_option_group>activity_type</extends_entity_column_value_option_group>
+      <extends_entity_column_value>Meeting</extends_entity_column_value>
+      <style>Inline</style>
+      <collapse_display>0</collapse_display>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_example_1</table_name>
+      <is_multiple>0</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <is_reserved>0</is_reserved>
+      <is_public>1</is_public>
+    </CustomGroup>
+  </CustomGroups>
+  <CustomFields>
+    <CustomField>
+      <name>test_textfield</name>
+      <label>Name1</label>
+      <data_type>String</data_type>
+      <html_type>Text</html_type>
+      <default_value>abc</default_value>
+      <is_required>1</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>4</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <column_name>name1_1</column_name>
+      <in_selector>0</in_selector>
+      <custom_group_name>example</custom_group_name>
+    </CustomField>
+  </CustomFields>
+</CustomData>

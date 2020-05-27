@@ -1,52 +1,32 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates form components for ContactSub Type
- *
+ * This class generates form components for ContactSub Type.
  */
 class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->setPageTitle(ts('Contact Type'));
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -77,21 +57,24 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     );
 
     $this->assign('cid', $this->_id);
-    $this->addFormRule(array('CRM_Admin_Form_ContactType', 'formRule'), $this);
+    $this->addFormRule(['CRM_Admin_Form_ContactType', 'formRule'], $this);
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @param $files
+   * @param $self
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $self) {
 
-    $errors = array();
+    $errors = [];
 
     if ($self->_id) {
       $contactName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $self->_id, 'name');
@@ -113,11 +96,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form submission.
    */
   public function postProcess() {
     CRM_Utils_System::flushCache();
@@ -147,8 +126,8 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     }
     $contactType = CRM_Contact_BAO_ContactType::add($params);
     CRM_Core_Session::setStatus(ts("The Contact Type '%1' has been saved.",
-        array(1 => $contactType->label)
-      ), ts('Saved'), 'success');
+      [1 => $contactType->label]
+    ), ts('Saved'), 'success');
   }
-}
 
+}

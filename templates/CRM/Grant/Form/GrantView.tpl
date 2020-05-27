@@ -1,30 +1,13 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for viewing grants *}
-<h3>{ts}View Grant{/ts}</h3>
 <div class="crm-block crm-content-block crm-grant-view-block">
     <div class="crm-submit-buttons">
         {if call_user_func(array('CRM_Core_Permission','check'), 'edit grants')}
@@ -32,14 +15,14 @@
             {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
                 {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context&key=$searchKey"}
             {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}" accesskey="e"><span><div class="icon edit-icon"></div> {ts}Edit{/ts}</span></a>
+            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
         {/if}
         {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviGrant')}
-    	    {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context"}
+          {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context"}
             {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
                 {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context&key=$searchKey"}
             {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
+            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
         {/if}
         {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
@@ -66,17 +49,17 @@
     <div class="crm-submit-buttons">
         {if call_user_func(array('CRM_Core_Permission','check'), 'edit grants')}
             {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context"}
-	        {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-	            {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context&key=$searchKey"}
-	        {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}" accesskey="e"><span><div class="icon edit-icon"></div> {ts}Edit{/ts}</span></a>
+          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
+              {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context&key=$searchKey"}
+          {/if}
+            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
         {/if}
         {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviGrant')}
-		    {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context"}
-	        {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-	            {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context&key=$searchKey"}
-	        {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}"><span><div class="icon delete-icon"></div>{ts}Delete{/ts}</span></a>
+        {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context"}
+          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
+              {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context&key=$searchKey"}
+          {/if}
+            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
         {/if}
         {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>

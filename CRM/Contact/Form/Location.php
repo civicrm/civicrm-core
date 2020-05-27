@@ -1,47 +1,29 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Location {
 
   /**
-   * Function to set variables up before form is built
+   * Set variables up before form is built.
    *
-   * @return void
+   * @param CRM_Core_Form $form
    */
-  static function preProcess(&$form) {
-    $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String', CRM_Core_DAO::$_nullObject);
-    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive', CRM_Core_DAO::$_nullObject);
+  public static function preProcess(&$form) {
+    $form->_addBlockName = CRM_Utils_Request::retrieve('block', 'String');
+    $additionalblockCount = CRM_Utils_Request::retrieve('count', 'Positive');
 
     $form->assign('addBlock', FALSE);
     if ($form->_addBlockName && $additionalblockCount) {
@@ -51,17 +33,17 @@ class CRM_Contact_Form_Location {
       $form->set($form->_addBlockName . '_Block_Count', $additionalblockCount);
     }
 
-    $className = CRM_Utils_System::getClassName($form);
-    if (in_array($className, array(
-      'CRM_Event_Form_ManageEvent_Location', 'CRM_Contact_Form_Domain'))) {
-      $form->_blocks = array('Address' => ts('Address'),
+    if (is_a($form, 'CRM_Event_Form_ManageEvent_Location')
+    || is_a($form, 'CRM_Contact_Form_Domain')) {
+      $form->_blocks = [
+        'Address' => ts('Address'),
         'Email' => ts('Email'),
         'Phone' => ts('Phone'),
-      );
+      ];
     }
 
     $form->assign('blocks', $form->_blocks);
-    $form->assign('className', $className);
+    $form->assign('className', CRM_Utils_System::getClassName($form));
 
     // get address sequence.
     if (!$addressSequence = $form->get('addressSequence')) {
@@ -72,26 +54,24 @@ class CRM_Contact_Form_Location {
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
-   * @return None
-   * @access public
+   * @param CRM_Core_Form $form
    */
-  static function buildQuickForm(&$form) {
+  public static function buildQuickForm(&$form) {
     // required for subsequent AJAX requests.
-    $ajaxRequestBlocks = array();
+    $ajaxRequestBlocks = [];
     $generateAjaxRequest = 0;
 
     //build 1 instance of all blocks, without using ajax ...
     foreach ($form->_blocks as $blockName => $label) {
-      require_once (str_replace('_', DIRECTORY_SEPARATOR, 'CRM_Contact_Form_Edit_' . $blockName) . '.php');
       $name = strtolower($blockName);
 
-      $instances = array(1);
-      if (CRM_Utils_Array::value($name, $_POST) && is_array($_POST[$name])) {
+      $instances = [1];
+      if (!empty($_POST[$name]) && is_array($_POST[$name])) {
         $instances = array_keys($_POST[$name]);
       }
-      elseif (property_exists($form, '_values') && CRM_Utils_Array::value($name, $form->_values) && is_array($form->_values[$name])) {
+      elseif (property_exists($form, '_values') && !empty($form->_values[$name]) && is_array($form->_values[$name])) {
         $instances = array_keys($form->_values[$name]);
       }
 
@@ -108,7 +88,7 @@ class CRM_Contact_Form_Location {
 
         $form->set($blockName . '_Block_Count', $instance);
         $formName = 'CRM_Contact_Form_Edit_' . $blockName;
-        $formName::buildQuickForm( $form );
+        $formName::buildQuickForm($form);
       }
     }
 
@@ -116,5 +96,5 @@ class CRM_Contact_Form_Location {
     $form->assign('generateAjaxRequest', $generateAjaxRequest);
     $form->assign('ajaxRequestBlocks', $ajaxRequestBlocks);
   }
-}
 
+}

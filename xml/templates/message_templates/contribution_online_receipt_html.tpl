@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="500" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,21 +21,19 @@
 
   <tr>
    <td>
-
+     {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $receipt_text}
      <p>{$receipt_text|htmlize}</p>
     {/if}
 
     {if $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
-    {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
   </tr>
   </table>
-  <table width="500" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
+  <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
 
      {if $amount}
 
@@ -56,6 +54,11 @@
             <th>{ts}Item{/ts}</th>
             <th>{ts}Qty{/ts}</th>
             <th>{ts}Each{/ts}</th>
+            {if $dataArray}
+             <th>{ts}Subtotal{/ts}</th>
+             <th>{ts}Tax Rate{/ts}</th>
+             <th>{ts}Tax Amount{/ts}</th>
+            {/if}
             <th>{ts}Total{/ts}</th>
            </tr>
            {foreach from=$value item=line}
@@ -69,8 +72,24 @@
              <td>
               {$line.unit_price|crmMoney:$currency}
              </td>
+             {if $getTaxDetails}
+              <td>
+               {$line.unit_price*$line.qty|crmMoney:$currency}
+              </td>
+              {if $line.tax_rate != "" || $line.tax_amount != ""}
+               <td>
+                {$line.tax_rate|string_format:"%.2f"}%
+               </td>
+               <td>
+                {$line.tax_amount|crmMoney:$currency}
+               </td>
+              {else}
+               <td></td>
+               <td></td>
+              {/if}
+             {/if}
              <td>
-              {$line.line_total|crmMoney:$currency}
+              {$line.line_total+$line.tax_amount|crmMoney:$currency}
              </td>
             </tr>
            {/foreach}
@@ -78,6 +97,39 @@
          </td>
         </tr>
        {/foreach}
+       {if $dataArray}
+        <tr>
+         <td {$labelStyle}>
+          {ts} Amount before Tax : {/ts}
+         </td>
+         <td {$valueStyle}>
+          {$amount-$totalTaxAmount|crmMoney:$currency}
+         </td>
+        </tr>
+
+        {foreach from=$dataArray item=value key=priceset}
+         <tr>
+          {if $priceset || $priceset == 0}
+           <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+          {else}
+           <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+           <td>&nbsp;{$value|crmMoney:$currency}</td>
+          {/if}
+         </tr>
+        {/foreach}
+
+       {/if}
+       {if $totalTaxAmount}
+        <tr>
+         <td {$labelStyle}>
+          {ts}Total Tax{/ts}
+         </td>
+         <td {$valueStyle}>
+          {$totalTaxAmount|crmMoney:$currency}
+         </td>
+        </tr>
+       {/if}
        <tr>
         <td {$labelStyle}>
          {ts}Total Amount{/ts}
@@ -89,6 +141,16 @@
 
       {else}
 
+      {if $totalTaxAmount}
+         <tr>
+           <td {$labelStyle}>
+             {ts}Total Tax Amount{/ts}
+           </td>
+           <td {$valueStyle}>
+             {$totalTaxAmount|crmMoney:$currency}
+           </td>
+         </tr>
+       {/if}
        <tr>
         <td {$labelStyle}>
          {ts}Amount{/ts}
@@ -125,49 +187,65 @@
       </tr>
      {/if}
 
-     {if $is_recur}
-      {if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
-       <tr>
+    {if $is_recur}
+      <tr>
         <td  colspan="2" {$labelStyle}>
-         {ts 1=$cancelSubscriptionUrl}This is a recurring contribution. You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
+          {ts}This is a recurring contribution.{/ts}
+          {if $cancelSubscriptionUrl}
+            {ts 1=$cancelSubscriptionUrl}You can cancel future contributions by <a href="%1">visiting this web page</a>.{/ts}
+          {/if}
         </td>
-        {if $updateSubscriptionBillingUrl}
-         <tr>
-         </tr>
-         <td colspan="2" {$labelStyle}>
-          {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
-         </td>
-        {/if} 
-       <tr>
-       </tr>
-        <td colspan="2" {$labelStyle}>
-         {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
-        </td>
-       </tr>
+      </tr>
+      {if $updateSubscriptionBillingUrl}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+        </tr>
       {/if}
-     {/if}
+      {if $updateSubscriptionUrl}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts 1=$updateSubscriptionUrl}You can update recurring contribution amount or change the number of installments for this recurring contribution by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+        </tr>
+      {/if}
+    {/if}
 
      {if $honor_block_is_active}
       <tr>
        <th {$headerStyle}>
-        {$honor_type}
+        {$soft_credit_type}
        </th>
       </tr>
-      <tr>
-       <td colspan="2" {$labelStyle}>
-        {$honor_prefix} {$honor_first_name} {$honor_last_name}
-       </td>
-      </tr>
-      {if $honor_email}
+      {foreach from=$honoreeProfile item=value key=label}
+        <tr>
+         <td {$labelStyle}>
+          {$label}
+         </td>
+         <td {$valueStyle}>
+          {$value}
+         </td>
+        </tr>
+      {/foreach}
+      {elseif $softCreditTypes and $softCredits}
+      {foreach from=$softCreditTypes item=softCreditType key=n}
        <tr>
-        <td {$labelStyle}>
-         {ts}Honoree Email{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$honor_email}
-        </td>
+        <th {$headerStyle}>
+         {$softCreditType}
+        </th>
        </tr>
-      {/if}
+       {foreach from=$softCredits.$n item=value key=label}
+         <tr>
+          <td {$labelStyle}>
+           {$label}
+          </td>
+          <td {$valueStyle}>
+           {$value}
+          </td>
+         </tr>
+        {/foreach}
+       {/foreach}
      {/if}
 
      {if $pcpBlock}
@@ -233,19 +311,7 @@
       </tr>
      {/if}
 
-     {if ! ($contributeMode eq 'notify' OR $contributeMode eq 'directIPN') and $is_monetary}
-      {if $is_pay_later}
-       <tr>
-        <th {$headerStyle}>
-         {ts}Registered Email{/ts}
-        </th>
-       </tr>
-       <tr>
-        <td colspan="2" {$valueStyle}>
-         {$email}
-        </td>
-       </tr>
-      {elseif $amount GT 0}
+     {if $billingName}
        <tr>
         <th {$headerStyle}>
          {ts}Billing Name and Address{/ts}
@@ -258,10 +324,20 @@
          {$email}
         </td>
        </tr>
-      {/if}
+     {elseif $email}
+       <tr>
+        <th {$headerStyle}>
+         {ts}Registered Email{/ts}
+        </th>
+       </tr>
+       <tr>
+        <td colspan="2" {$valueStyle}>
+         {$email}
+        </td>
+       </tr>
      {/if}
 
-     {if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
+     {if $credit_card_type}
       <tr>
        <th {$headerStyle}>
         {ts}Credit Card Information{/ts}

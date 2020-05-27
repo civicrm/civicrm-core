@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Base template for Open Case. May be used for other special activity types at some point ..
@@ -28,10 +12,6 @@
          2. Each activity type file can include its case fields in its own template, so that they will be included during activity edit.
 *}
 <div class="crm-block crm-form-block crm-case-form-block">
-
-{if $cdType }
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 
 {if $action neq 8 && $action neq 32768}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -51,7 +31,7 @@
 <table class="form-layout">
     {if $activityTypeDescription }
         <tr>
-            <div id="help">{$activityTypeDescription}</div>
+            <div class="help">{$activityTypeDescription}</div>
         </tr>
     {/if}
 {if $clientName}
@@ -61,7 +41,8 @@
     </tr>
 {elseif !$clientName and $action eq 1}
     {if $context eq 'standalone'}
-        {include file="CRM/Contact/Form/NewContact.tpl"}
+      <td class="label">{$form.client_id.label}</td>
+      <td class="view-value">{$form.client_id.html}</td>
     {/if}
 {/if}
 {* activity fields *}
@@ -75,11 +56,12 @@
 {if $form.activity_details.html}
     <tr class="crm-case-form-block-activity_details">
         <td class="label">{$form.activity_details.label}{help id="id-details" activityTypeFile=$activityTypeFile file="CRM/Case/Form/Case.hlp"}</td>
-        <td class="view-value">{if $defaultWysiwygEditor eq 0}{$form.activity_details.html|crmStripAlternatives|crmAddClass:huge40}{else}{$form.activity_details.html|crmStripAlternatives}{/if}</td>
+        <td class="view-value">{$form.activity_details.html|crmStripAlternatives}</td>
     </tr>
 {/if}
 
 {* custom data group *}
+{* This shows ACTIVITY custom fields, as opposed to CASE custom fields, so is not a duplicate of the other custom data block below. *}
 {if $groupTree}
     <tr>
        <td colspan="2">{include file="CRM/Custom/Form/CustomData.tpl"}</td>
@@ -103,7 +85,7 @@
       <td class="label">{$form.duration.label}</td>
       <td class="view-value">
         {$form.duration.html}
-         <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}
+         <span class="description">{ts}minutes{/ts}</span>
       </td>
     </tr>
 {/if}
@@ -112,52 +94,24 @@
     <tr class="crm-case-form-block-tag">
       <td class="label">{$form.tag.label}</td>
       <td class="view-value"><div class="crm-select-container">{$form.tag.html}</div>
-{literal}
-<script type="text/javascript">
-cj(".crm-case-form-block-tag select[multiple]").crmasmSelect({
-    addItemTarget: 'bottom',
-    animate: true,
-    highlight: true,
-    sortable: true,
-    respectParents: true
-});
-</script>
-{/literal}
       </td>
     </tr>
 {/if}
 
+{* This shows CASE custom fields, as opposed to ACTIVITY custom fields, so is not a duplicate of the other custom data block above. *}
 <tr class="crm-case-form-block-custom_data">
     <td colspan="2">
-        <div id="customData"></div>
+      {include file="CRM/common/customDataBlock.tpl"}
     </td>
 </tr>
 
-<tr class="crm-case-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='case'}</td></tr>
+<tr class="crm-case-form-block-tag_set">
+    {include file="CRM/common/Tagset.tpl" tagsetType='case' tableLayout=true}
+</tr>
 
 </table>
 {/if}
 
-{if $action eq 1}
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
-    {literal}
-      <script type="text/javascript">
-      cj(document).ready(function() {
-           var customDataSubType = cj('#case_type_id').val();
-           if ( customDataSubType ) {
-              CRM.buildCustomData( {/literal}'{$customDataType}'{literal}, customDataSubType );
-           } else {
-              CRM.buildCustomData( {/literal}'{$customDataType}'{literal} );
-           }
-       });
-       </script>
-     {/literal}
-{/if}
-
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-{/if}
 </div>

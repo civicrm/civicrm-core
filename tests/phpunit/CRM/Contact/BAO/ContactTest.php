@@ -1,93 +1,89 @@
 <?php
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'CiviTest/Contact.php';
-require_once 'CiviTest/Custom.php';
-class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'Contact BAOs',
-      'description' => 'Test all Contact_BAO_Contact methods.',
-      'group' => 'CiviCRM BAO Tests',
-    );
-  }
 
-  function setUp() {
+/**
+ * Class CRM_Contact_BAO_ContactTest
+ * @group headless
+ */
+class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
+
+  /**
+   * Set up function.
+   */
+  public function setUp() {
     parent::setUp();
   }
 
   /**
-   * test case for add( )
+   * Test case for add( ).
+   *
    * test with empty params.
    */
-  function testAddWithEmptyParams() {
-    $params = array( );
+  public function testAddWithEmptyParams() {
+    $params = [];
     $contact = CRM_Contact_BAO_Contact::add($params);
 
-    //Now check Contact object
+    // Now check Contact object.
     $this->assertNull($contact);
   }
 
   /**
-   * test case for add( )
-   * test with names
-   * (create and update modes)
+   * Test case for add( ).
+   *
+   * Test with names (create and update modes)
    */
-  function testAddWithNames() {
+  public function testAddWithNames() {
     $firstName = 'Shane';
-    $lastName  = 'Whatson';
-    $params    = array(
+    $lastName = 'Whatson';
+    $params = [
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
-    );
+    ];
 
     $contact = CRM_Contact_BAO_Contact::add($params);
 
-    //Now check $contact is object of contact DAO..
+    // Now check $contact is object of contact DAO.
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
     $this->assertEquals($firstName, $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($lastName, $contact->last_name, 'Check for last name creation.');
 
     $contactId = $contact->id;
 
-    //update and change first name and last name, using add( )
+    // Update and change first name and last name, using add( ).
     $firstName = 'Jane';
-    $params = array(
+    $params = [
       'first_name' => $firstName,
       'contact_type' => 'Individual',
       'contact_id' => $contactId,
-    );
+    ];
 
     $contact = CRM_Contact_BAO_Contact::add($params);
 
-    //Now check $contact is object of contact DAO..
+    // Now check $contact is object of contact DAO.
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
     $this->assertEquals($firstName, $contact->first_name, 'Check for updated first name.');
 
     $contactId = $contact->id;
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * test case for add( )
-   * test with all contact params
-   * (creat and update modes)
+   * Test case for add.
+   *
+   * Test with all contact params
+   * (create and update modes)
    */
-  function testAddWithAll() {
-    //take the common contact params
+  public function testAddWithAll() {
+    // Take the common contact params.
     $params = $this->contactParams();
 
     unset($params['location']);
     $prefComm = $params['preferred_communication_method'];
-
-    //create the contact using add()
     $contact = CRM_Contact_BAO_Contact::add($params);
     $contactId = $contact->id;
 
-    //Now check $contact is object of contact DAO..
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
 
-    //Now check values of object with params.
     $this->assertEquals($params['first_name'], $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($params['last_name'], $contact->last_name, 'Check for last name creation.');
     $this->assertEquals($params['middle_name'], $contact->middle_name, 'Check for middle name creation.');
@@ -117,7 +113,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $dbPrefComm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
       $contact->preferred_communication_method
     );
-    $checkPrefComm = array();
+    $checkPrefComm = [];
     foreach ($dbPrefComm as $key => $value) {
       if ($value) {
         $checkPrefComm[$value] = 1;
@@ -125,8 +121,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     }
     $this->assertAttributesEquals($checkPrefComm, $prefComm);
 
-    //now update the contact using add( )
-    $updateParams = array(
+    $updateParams = [
       'contact_type' => 'Individual',
       'first_name' => 'Jane',
       'middle_name' => 'abc',
@@ -137,43 +132,40 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'job_title' => 'software Developer',
       'gender_id' => 1,
       'is_deceased' => 1,
-      'website' => array(
-        1 => array(
+      'website' => [
+        1 => [
           'website_type_id' => 1,
           'url' => 'http://docs.civicrm.org',
-        ),
-      ),
+        ],
+      ],
       'contact_source' => 'test update contact',
       'external_identifier' => 111111111,
       'preferred_mail_format' => 'Both',
       'is_opt_out' => 0,
       'deceased_date' => '1981-03-03',
       'birth_date' => '1951-04-04',
-      'privacy' => array(
+      'privacy' => [
         'do_not_phone' => 0,
         'do_not_email' => 0,
         'do_not_mail' => 0,
         'do_not_trade' => 0,
-      ),
-      'preferred_communication_method' => array(
+      ],
+      'preferred_communication_method' => [
         '1' => 0,
         '2' => 1,
         '3' => 0,
         '4' => 1,
         '5' => 0,
-      ),
-    );
+      ],
+    ];
 
     $prefComm = $updateParams['preferred_communication_method'];
     $updateParams['contact_id'] = $contactId;
-    //create the contact using add()
     $contact = CRM_Contact_BAO_Contact::create($updateParams);
     $contactId = $contact->id;
 
-    //Now check $contact is object of contact DAO..
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
 
-    //Now check values of object with params.
     $this->assertEquals($updateParams['first_name'], $contact->first_name, 'Check for first name creation.');
     $this->assertEquals($updateParams['last_name'], $contact->last_name, 'Check for last name creation.');
     $this->assertEquals($updateParams['middle_name'], $contact->middle_name, 'Check for middle name creation.');
@@ -207,7 +199,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $dbPrefComm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
       $contact->preferred_communication_method
     );
-    $checkPrefComm = array();
+    $checkPrefComm = [];
     foreach ($dbPrefComm as $key => $value) {
       if ($value) {
         $checkPrefComm[$value] = 1;
@@ -215,22 +207,20 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     }
     $this->assertAttributesEquals($checkPrefComm, $prefComm);
 
-    //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * test case for add( )
-   * test with All contact types.
+   * Test case for add( ) with All contact types.
    */
-  function testAddWithAllContactTypes() {
+  public function testAddWithAllContactTypes() {
     $firstName = 'Bill';
-    $lastName  = 'Adams';
-    $params    = array(
+    $lastName = 'Adams';
+    $params = [
       'first_name' => $firstName,
       'last_name' => $lastName,
       'contact_type' => 'Individual',
-    );
+    ];
 
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($firstName, $contact->first_name, 'Check for first name creation.');
@@ -240,67 +230,68 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     //update and change first name and last name, using create()
     $firstName = 'Joan';
-    $params = array(
+    $params = [
       'first_name' => $firstName,
       'contact_type' => 'Individual',
       'contact_id' => $contactId,
-    );
+    ];
 
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($firstName, $contact->first_name, 'Check for updated first name.');
     $contactId = $contact->id;
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
 
     $householdName = 'Adams house';
-    $params = array(
+    $params = [
       'household_name' => $householdName,
       'contact_type' => 'Household',
-    );
+    ];
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($householdName, $contact->sort_name, 'Check for created household.');
     $contactId = $contact->id;
 
     //update and change name of household, using create
     $householdName = 'Joans home';
-    $params = array(
+    $params = [
       'household_name' => $householdName,
       'contact_type' => 'Household',
       'contact_id' => $contactId,
-    );
+    ];
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($householdName, $contact->sort_name, 'Check for updated household.');
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
 
     $organizationName = 'My Organization';
-    $params = array(
+    $params = [
       'organization_name' => $organizationName,
       'contact_type' => 'Organization',
-    );
+    ];
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($organizationName, $contact->sort_name, 'Check for created organization.');
     $contactId = $contact->id;
 
     //update and change name of organization, using create
     $organizationName = 'Your Changed Organization';
-    $params = array(
+    $params = [
       'organization_name' => $organizationName,
       'contact_type' => 'Organization',
       'contact_id' => $contactId,
-    );
+    ];
     $contact = CRM_Contact_BAO_Contact::add($params);
     $this->assertEquals($organizationName, $contact->sort_name, 'Check for updated organization.');
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * test case for create( )
-   * test with missing params.
+   * Test case for create.
+   *
+   * Test with missing params.
    */
-  function testCreateWithEmptyParams() {
-    $params = array(
+  public function testCreateWithEmptyParams() {
+    $params = [
       'first_name' => 'Bill',
       'last_name' => 'Adams',
-    );
+    ];
     $contact = CRM_Contact_BAO_Contact::create($params);
 
     //Now check Contact object
@@ -308,11 +299,12 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for create( )
-   * test with all params.
+   * Test case for create.
+   *
+   * Test with all params.
    * ( create and update modes ).
    */
-  function testCreateWithAll() {
+  public function testCreateWithAll() {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
@@ -330,107 +322,113 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($params['contact_type'], $contact->contact_type, 'Check for contact type creation.');
 
     //Now check DB for Address
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-    );
-    $compareParams = array('street_address' => CRM_Utils_Array::value('street_address', $params['address'][1]),
+    ];
+    $compareParams = [
+      'street_address' => $params['address'][1]['street_address'] ?? NULL,
       'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1',
         $params['address'][1]
       ),
       'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2',
         $params['address'][1]
       ),
-      'city' => CRM_Utils_Array::value('city', $params['address'][1]),
-      'postal_code' => CRM_Utils_Array::value('postal_code', $params['address'][1]),
-      'country_id' => CRM_Utils_Array::value('country_id', $params['address'][1]),
+      'supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3',
+        $params['address'][1]
+      ),
+      'city' => $params['address'][1]['city'] ?? NULL,
+      'postal_code' => $params['address'][1]['postal_code'] ?? NULL,
+      'country_id' => $params['address'][1]['country_id'] ?? NULL,
       'state_province_id' => CRM_Utils_Array::value('state_province_id',
         $params['address'][1]
       ),
-      'geo_code_1' => CRM_Utils_Array::value('geo_code_1', $params['address'][1]),
-      'geo_code_2' => CRM_Utils_Array::value('geo_code_2', $params['address'][1]),
-    );
+      'geo_code_1' => $params['address'][1]['geo_code_1'] ?? NULL,
+      'geo_code_2' => $params['address'][1]['geo_code_2'] ?? NULL,
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
     //Now check DB for Email
-    $compareParams = array('email' => CRM_Utils_Array::value('email', $params['email'][1]));
+    $compareParams = ['email' => CRM_Utils_Array::value('email', $params['email'][1])];
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
     //Now check DB for openid
-    $compareParams = array('openid' => CRM_Utils_Array::value('openid', $params['openid'][1]));
+    $compareParams = ['openid' => CRM_Utils_Array::value('openid', $params['openid'][1])];
     $this->assertDBCompareValues('CRM_Core_DAO_OpenID', $searchParams, $compareParams);
 
     //Now check DB for IM
-    $compareParams = array('name' => CRM_Utils_Array::value('name', $params['im'][1]),
-      'provider_id' => CRM_Utils_Array::value('provider_id', $params['im'][1]),
-    );
+    $compareParams = [
+      'name' => $params['im'][1]['name'] ?? NULL,
+      'provider_id' => $params['im'][1]['provider_id'] ?? NULL,
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
     //Now check DB for Phone
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][1]),
-    );
-    $compareParams = array('phone' => CRM_Utils_Array::value('phone', $params['phone'][1]));
+      'phone_type_id' => $params['phone'][1]['phone_type_id'] ?? NULL,
+    ];
+    $compareParams = ['phone' => CRM_Utils_Array::value('phone', $params['phone'][1])];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //Now check DB for Mobile
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][2]),
-    );
-    $compareParams = array('phone' => CRM_Utils_Array::value('phone', $params['phone'][2]));
+      'phone_type_id' => $params['phone'][2]['phone_type_id'] ?? NULL,
+    ];
+    $compareParams = ['phone' => CRM_Utils_Array::value('phone', $params['phone'][2])];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //Now check DB for Note
-    $searchParams = array(
+    $searchParams = [
       'entity_id' => $contactId,
       'entity_table' => 'civicrm_contact',
-    );
-    $compareParams = array('note' => $params['note']);
+    ];
+    $compareParams = ['note' => $params['note']];
     $this->assertDBCompareValues('CRM_Core_DAO_Note', $searchParams, $compareParams);
 
     //update the contact.
-    $updateParams = array(
+    $updateParams = [
       'first_name' => 'John',
       'last_name' => 'Doe',
       'contact_type' => 'Individual',
       'note' => 'new test note',
-    );
-    $updateParams['address'][1] = array(
+    ];
+    $updateParams['address'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'street_address' => 'Oberoi Garden',
       'supplemental_address_1' => 'A-wing:3037',
       'supplemental_address_2' => 'Andhery',
+      'supplemental_address_3' => 'Anywhere',
       'city' => 'Mumbai',
       'postal_code' => '12345',
       'country_id' => 1228,
       'state_province_id' => 1004,
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-    );
-    $updateParams['email'][1] = array(
+    ];
+    $updateParams['email'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'email' => 'john.doe@example.org',
-    );
+    ];
 
-    $updateParams['phone'][1] = array(
+    $updateParams['phone'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'phone_type_id' => 1,
       'phone' => '02115245336',
-    );
-    $updateParams['phone'][2] = array(
+    ];
+    $updateParams['phone'][2] = [
       'location_type_id' => 1,
       'phone_type_id' => 2,
       'phone' => '9766323895',
-    );
+    ];
 
     $updateParams['contact_id'] = $contactId;
     //create the contact with given params.
@@ -446,92 +444,91 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($updateParams['contact_type'], $contact->contact_type, 'Check for contact type creation.');
 
     //Now check DB for updated Address
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-    );
-    $compareParams = array(
+    ];
+    $compareParams = [
       'street_address' => 'Oberoi Garden',
       'supplemental_address_1' => 'A-wing:3037',
       'supplemental_address_2' => 'Andhery',
+      'supplemental_address_3' => 'Anywhere',
       'city' => 'Mumbai',
       'postal_code' => '12345',
       'country_id' => 1228,
       'state_province_id' => 1004,
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-    );
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
     //Now check DB for updated Email
-    $compareParams = array('email' => 'john.doe@example.org');
+    $compareParams = ['email' => 'john.doe@example.org'];
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
     //Now check DB for updated Phone
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
       'phone_type_id' => 1,
-    );
-    $compareParams = array('phone' => '02115245336');
+    ];
+    $compareParams = ['phone' => '02115245336'];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //Now check DB for updated Mobile
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'phone_type_id' => 2,
-    );
-    $compareParams = array('phone' => '9766323895');
+    ];
+    $compareParams = ['phone' => '9766323895'];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
-    //As we are not updating note
-    //Now check DB for New Note
-    $noteId = $this->assertDBNotNull('CRM_Core_DAO_Note', $updateParams['note'], 'id', 'note',
+    // As we are not updating note.
+    // Now check DB for New Note.
+    $this->assertDBNotNull('CRM_Core_DAO_Note', $updateParams['note'], 'id', 'note',
       'Database check for New created note '
     );
 
-    //delete all notes related to contact
+    // Delete all notes related to contact.
     CRM_Core_BAO_Note::cleanContactNotes($contactId);
 
-
-    //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact', 'civicrm_note'));
+    // Cleanup DB by deleting the contact.
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_note']);
   }
 
   /**
-   * test case for resolveDefaults( )
-   * test all pseudoConstant, stateProvince, country.
+   * Test case for resolveDefaults( ).
+   *
+   * Test all pseudoConstant, stateProvince, country.
    */
-  function testResolveDefaults() {
-    $params = array(
+  public function testResolveDefaults() {
+    $params = [
       'prefix_id' => 3,
       'suffix_id' => 2,
       'gender_id' => 2,
       'birth_date' => '1983-12-13',
-    );
+    ];
 
-    $params['address'][1] = array(
+    $params['address'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'country_id' => 1228,
       'state_province_id' => 1004,
-    );
+    ];
+    // @todo - we are testing this with $reverse = FALSE but it is never called that way!
     CRM_Contact_BAO_Contact::resolveDefaults($params);
 
     //check the resolve values.
-    $genders = CRM_Core_PseudoConstant::gender();
+    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     $this->assertEquals($genders[$params['gender_id']], $params['gender'], 'Check for gender.');
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
     $this->assertEquals($prefix[$params['prefix_id']], $params['prefix'], 'Check for prefix.');
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
     $this->assertEquals($suffix[$params['suffix_id']], $params['suffix'], 'Check for suffix.');
-    $this->assertEquals(CRM_Core_PseudoConstant::stateProvince($params['address'][1]['state_province_id']),
-      $params['address'][1]['state_province'],
-      'Check for state province.'
-    );
+    $this->assertEquals(1004, $params['address'][1]['state_province_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::country($params['address'][1]['country_id']),
       $params['address'][1]['country'],
       'Check for country.'
@@ -539,27 +536,34 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for retrieve( )
-   * test with all values.
+   * Test case for retrieve( ).
+   *
+   * Test with all values.
    */
-  function testRetrieve() {
+  public function testRetrieve() {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
-    $params['create_employer'] = 'Yahoo';
 
     //create the contact with given params.
     $contact = CRM_Contact_BAO_Contact::create($params);
     //Now check $contact is object of contact DAO..
     $this->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
     $contactId = $contact->id;
+    //create the organization contact with the given params.
+    $orgParams = [
+      'organization_name' => 'Test Organization ' . substr(sha1(rand()), 0, 4),
+      'contact_type' => 'Organization',
+    ];
+    $orgContact = CRM_Contact_BAO_Contact::add($orgParams);
+    $this->assertInstanceOf('CRM_Contact_DAO_Contact', $orgContact, 'Check for created object');
 
     //create employee of relationship.
-    CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contactId, $params['create_employer']);
+    CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contactId, $orgContact->id);
 
     //retrieve the contact values from database.
-    $values          = array();
-    $searchParams    = array('contact_id' => $contactId);
+    $values = [];
+    $searchParams = ['contact_id' => $contactId];
     $retrieveContact = CRM_Contact_BAO_Contact::retrieve($searchParams, $values);
 
     //Now check $retrieveContact is object of contact DAO..
@@ -574,8 +578,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($params['contact_type'], $values['contact_type'], 'Check for contact type creation.');
 
     //Now check values of address
-    // $this->assertAttributesEquals( CRM_Utils_Array::value( 'address', $params ),
-    // CRM_Utils_Array::value( 'address', $values ) );
+    $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['address']),
+      CRM_Utils_Array::value('1', $values['address'])
+    );
 
     //Now check values of email
     $this->assertAttributesEquals(CRM_Utils_Array::value('1', $params['email']),
@@ -606,7 +611,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $values['noteTotalCount'], 'Check for total note count');
 
     foreach ($values['note'] as $key => $val) {
-      $retrieveNote = CRM_Utils_Array::value('note', $val);
+      $retrieveNote = $val['note'] ?? NULL;
       //check the note value
       $this->assertEquals($params['note'], $retrieveNote, 'Check for note');
     }
@@ -615,58 +620,55 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $values['relationship']['totalCount'], 'Check for total relationship count');
     foreach ($values['relationship']['data'] as $key => $val) {
       //Now check values of Relationship organization.
-      $this->assertEquals($params['create_employer'], $val['name'], 'Check for organization');
+      $this->assertEquals($orgContact->id, $val['contact_id_b'], 'Check for organization');
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('cid', $val));
+      $this->contactDelete(CRM_Utils_Array::value('contact_id_b', $val));
     }
 
     //delete all notes related to contact
     CRM_Core_BAO_Note::cleanContactNotes($contactId);
 
-
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact'));
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact']);
   }
 
   /**
-   * test case for deleteContact( )
+   * Test case for deleteContact( ).
    */
-  function testDeleteContact() {
+  public function testDeleteContact() {
     $contactParams = $this->contactParams();
 
-    //create custom data
-    require_once 'CiviTest/Custom.php';
-    $customGroup = Custom::createGroup(array(), 'Individual');
-    $fields = array(
+    $customGroup = $this->customGroupCreate();
+    $fields = [
       'label' => 'testFld',
       'data_type' => 'String',
       'html_type' => 'Text',
-      'custom_group_id' => $customGroup->id,
-    );
+      'custom_group_id' => $customGroup['id'],
+    ];
     $customField = CRM_Core_BAO_CustomField::create($fields);
-    $contactParams['custom'] = array(
-      $customField->id => array(
-        -1 => array(
+    $contactParams['custom'] = [
+      $customField->id => [
+        -1 => [
           'value' => 'Test custom value',
           'type' => 'String',
           'custom_field_id' => $customField->id,
-          'custom_group_id' => $customGroup->id,
-          'table_name' => $customGroup->table_name,
+          'custom_group_id' => $customGroup['id'],
+          'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
           'column_name' => $customField->column_name,
           'file_id' => NULL,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     //create contact
     $contact = CRM_Contact_BAO_Contact::create($contactParams);
     $contactId = $contact->id;
 
-    //delete contact.
-    CRM_Contact_BAO_Contact::deleteContact($contactId);
+    //delete contact permanently.
+    $this->contactDelete($contactId);
 
     //Now check DB for location elements.
     //Now check DB for Address
@@ -696,12 +698,11 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'id', 'openid', 'Database check, openId deleted successfully.'
     );
 
-
     // Check that the custom field value is no longer present
-    $params = array(
+    $params = [
       'entityID' => $contactId,
       'custom_' . $customField->id => 1,
-    );
+    ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
     $this->assertEquals(CRM_Utils_Array::value("custom_" . $customField->id, $values), '',
       'Verify that the data value is empty for contact ' . $contactId
@@ -712,36 +713,34 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Contact_DAO_Contact', $contactId,
       'id', 'sort_name', 'Database check, contact deleted successfully.'
     );
-    $this->quickCleanup(array('civicrm_contact', 'civicrm_note'));
-    Custom::deleteGroup($customGroup);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_note']);
+    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
-   * test case for createProfileContac( )
-   * test with all params.
-   * ( create and update modes )
+   * Test case for createProfileContact.
    */
-  function testCreateProfileContact() {
+  public function testCreateProfileContact() {
     $fields = CRM_Contact_BAO_Contact::exportableFields('Individual');
 
     //current employer field for individual
-    $fields['organization_name'] = array(
+    $fields['organization_name'] = [
       'name' => 'organization_name',
       'where' => 'civicrm_organization.organization_name',
       'title' => 'Current Employer',
-    );
+    ];
     //get the common params
     $contactParams = $this->contactParams();
-    $unsetParams = array('location', 'gender_id', 'prefix_id', 'suffix_id', 'privacy');
+    $unsetParams = ['location', 'privacy'];
     foreach ($unsetParams as $param) {
       unset($contactParams[$param]);
     }
 
-    $profileParams = array(
+    $profileParams = [
       'organization_name' => 'Yahoo',
-      'gender' => '2',
-      'individual_prefix' => '3',
-      'individual_suffix' => '2',
+      'gender_id' => '2',
+      'prefix_id' => '3',
+      'suffix_id' => '2',
       'city-Primary' => 'Newark',
       'contact_type' => 'Individual',
       'country-Primary' => '1228',
@@ -765,15 +764,16 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'street_address-Primary' => 'Saint Helier St',
       'supplemental_address_1-Primary' => 'Hallmark Ct',
       'supplemental_address_2-Primary' => 'Jersey Village',
+      'supplemental_address_3-Primary' => 'My Town',
       'user_unique_id' => '123456789',
       'is_bulkmail' => '1',
       'world_region' => 'India',
-      'tag' => array(
+      'tag' => [
         '3' => '1',
         '4' => '1',
         '1' => '1',
-      ),
-    );
+      ],
+    ];
     $createParams = array_merge($contactParams, $profileParams);
 
     //create the contact using create profile contact.
@@ -821,9 +821,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
 
     $dbPrefComm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'preferred_communication_method', 'id', true)
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'preferred_communication_method', 'id', TRUE)
     );
-    $checkPrefComm = array();
+    $checkPrefComm = [];
     foreach ($dbPrefComm as $key => $value) {
       if ($value) {
         $checkPrefComm[$value] = 1;
@@ -832,55 +832,58 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertAttributesEquals($checkPrefComm, $params['preferred_communication_method']);
 
     //Now check DB for Address
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-    );
-    $compareParams = array('street_address' => CRM_Utils_Array::value('street_address-Primary', $profileParams),
-      'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1-Primary', $profileParams),
-      'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2-Primary', $profileParams),
-      'city' => CRM_Utils_Array::value('city-Primary', $profileParams),
-      'postal_code' => CRM_Utils_Array::value('postal_code-Primary', $profileParams),
-      'country_id' => CRM_Utils_Array::value('country-Primary', $profileParams),
-      'state_province_id' => CRM_Utils_Array::value('state_province-Primary', $profileParams),
-      'geo_code_1' => CRM_Utils_Array::value('geo_code_1-Primary', $profileParams),
-      'geo_code_2' => CRM_Utils_Array::value('geo_code_2-Primary', $profileParams),
-    );
+    ];
+    $compareParams = [
+      'street_address' => $profileParams['street_address-Primary'] ?? NULL,
+      'supplemental_address_1' => $profileParams['supplemental_address_1-Primary'] ?? NULL,
+      'supplemental_address_2' => $profileParams['supplemental_address_2-Primary'] ?? NULL,
+      'supplemental_address_3' => $profileParams['supplemental_address_3-Primary'] ?? NULL,
+      'city' => $profileParams['city-Primary'] ?? NULL,
+      'postal_code' => $profileParams['postal_code-Primary'] ?? NULL,
+      'country_id' => $profileParams['country-Primary'] ?? NULL,
+      'state_province_id' => $profileParams['state_province-Primary'] ?? NULL,
+      'geo_code_1' => $profileParams['geo_code_1-Primary'] ?? NULL,
+      'geo_code_2' => $profileParams['geo_code_2-Primary'] ?? NULL,
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
     //Now check DB for Email
-    $compareParams = array('email' => CRM_Utils_Array::value('email-Primary', $profileParams));
+    $compareParams = ['email' => CRM_Utils_Array::value('email-Primary', $profileParams)];
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
     //Now check DB for IM
-    $compareParams = array('name' => CRM_Utils_Array::value('im-Primary', $profileParams),
-      'provider_id' => CRM_Utils_Array::value('im-Primary-provider_id', $profileParams),
-    );
+    $compareParams = [
+      'name' => $profileParams['im-Primary'] ?? NULL,
+      'provider_id' => $profileParams['im-Primary-provider_id'] ?? NULL,
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
     //Now check DB for Phone
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-    );
-    $compareParams = array('phone' => CRM_Utils_Array::value('phone-Primary-1', $profileParams));
+    ];
+    $compareParams = ['phone' => CRM_Utils_Array::value('phone-Primary-1', $profileParams)];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //Now check DB for Mobile
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][2]),
-    );
-    $compareParams = array('phone' => CRM_Utils_Array::value('phone-Primary-2', $profileParams));
+      'phone_type_id' => $params['phone'][2]['phone_type_id'] ?? NULL,
+    ];
+    $compareParams = ['phone' => CRM_Utils_Array::value('phone-Primary-2', $profileParams)];
 
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //get the value of relationship
-    $values       = array();
-    $searchParams = array('contact_id' => $contactId);
+    $values = [];
+    $searchParams = ['contact_id' => $contactId];
     $relationship = CRM_Contact_BAO_Relationship::getValues($searchParams, $values);
     //Now check values of Relationship Count.
     $this->assertEquals(0, $values['relationship']['totalCount'], 'Check for total relationship count');
@@ -890,7 +893,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('cid', $val));
+      $this->contactDelete(CRM_Utils_Array::value('cid', $val));
     }
 
     //Now check values of tag ids.
@@ -902,7 +905,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertAttributesEquals($profileParams['tag'], $tagIds);
 
     //update Contact mode
-    $updateCParams = array(
+    $updateCParams = [
       'first_name' => 'john',
       'last_name' => 'doe',
       'contact_type' => 'Individual',
@@ -913,12 +916,12 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'job_title' => 'software Developer',
       'gender_id' => 1,
       'is_deceased' => 1,
-      'website' => array(
-        1 => array(
+      'website' => [
+        1 => [
           'website_type_id' => 1,
           'url' => 'http://civicrmUpdate.org',
-        ),
-      ),
+        ],
+      ],
       'contact_source' => 'test contact',
       'external_identifier' => 111222333,
       'preferred_mail_format' => 'Both',
@@ -927,24 +930,21 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'image_URL' => 'http://imageupdate.com',
       'deceased_date' => '1981-10-10',
       'birth_date' => '1951-11-11',
-      'privacy' => array(
+      'privacy' => [
         'do_not_phone' => 1,
         'do_not_email' => 1,
-      ),
-      'preferred_communication_method' => array(
+      ],
+      'preferred_communication_method' => [
         '1' => 0,
         '2' => 1,
         '3' => 0,
         '4' => 1,
         '5' => 0,
-      ),
-    );
+      ],
+    ];
 
-    $updatePfParams = array(
+    $updatePfParams = [
       'organization_name' => 'Google',
-      'gender' => '1',
-      'individual_prefix' => '2',
-      'individual_suffix' => '3',
       'city-Primary' => 'Mumbai',
       'contact_type' => 'Individual',
       'country-Primary' => '1228',
@@ -968,14 +968,15 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'street_address-Primary' => 'Oberoi Garden',
       'supplemental_address_1-Primary' => 'A-wing:3037',
       'supplemental_address_2-Primary' => 'Andhery',
+      'supplemental_address_3-Primary' => 'Anywhere',
       'user_unique_id' => '1122334455',
       'is_bulkmail' => '1',
       'world_region' => 'India',
-      'tag' => array(
+      'tag' => [
         '2' => '1',
         '5' => '1',
-      ),
-    );
+      ],
+    ];
 
     $createParams = array_merge($updateCParams, $updatePfParams);
 
@@ -1026,9 +1027,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
 
     $dbPrefComm = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'preferred_communication_method', 'id', true)
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'preferred_communication_method', 'id', TRUE)
     );
-    $checkPrefComm = array();
+    $checkPrefComm = [];
     foreach ($dbPrefComm as $key => $value) {
       if ($value) {
         $checkPrefComm[$value] = 1;
@@ -1037,54 +1038,57 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertAttributesEquals($checkPrefComm, $updateCParams['preferred_communication_method']);
 
     //Now check DB for Address
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-    );
-    $compareParams = array('street_address' => CRM_Utils_Array::value('street_address-Primary', $updatePfParams),
-      'supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1-Primary', $updatePfParams),
-      'supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2-Primary', $updatePfParams),
-      'city' => CRM_Utils_Array::value('city-Primary', $updatePfParams),
-      'postal_code' => CRM_Utils_Array::value('postal_code-Primary', $updatePfParams),
-      'country_id' => CRM_Utils_Array::value('country-Primary', $updatePfParams),
-      'state_province_id' => CRM_Utils_Array::value('state_province-Primary', $updatePfParams),
-      'geo_code_1' => CRM_Utils_Array::value('geo_code_1-Primary', $updatePfParams),
-      'geo_code_2' => CRM_Utils_Array::value('geo_code_2-Primary', $updatePfParams),
-    );
+    ];
+    $compareParams = [
+      'street_address' => $updatePfParams['street_address-Primary'] ?? NULL,
+      'supplemental_address_1' => $updatePfParams['supplemental_address_1-Primary'] ?? NULL,
+      'supplemental_address_2' => $updatePfParams['supplemental_address_2-Primary'] ?? NULL,
+      'supplemental_address_3' => $updatePfParams['supplemental_address_3-Primary'] ?? NULL,
+      'city' => $updatePfParams['city-Primary'] ?? NULL,
+      'postal_code' => $updatePfParams['postal_code-Primary'] ?? NULL,
+      'country_id' => $updatePfParams['country-Primary'] ?? NULL,
+      'state_province_id' => $updatePfParams['state_province-Primary'] ?? NULL,
+      'geo_code_1' => $updatePfParams['geo_code_1-Primary'] ?? NULL,
+      'geo_code_2' => $updatePfParams['geo_code_2-Primary'] ?? NULL,
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
 
     //Now check DB for Email
-    $compareParams = array('email' => CRM_Utils_Array::value('email-Primary', $updatePfParams));
+    $compareParams = ['email' => CRM_Utils_Array::value('email-Primary', $updatePfParams)];
     $this->assertDBCompareValues('CRM_Core_DAO_Email', $searchParams, $compareParams);
 
     //Now check DB for IM
-    $compareParams = array('name' => CRM_Utils_Array::value('im-Primary', $updatePfParams),
-      'provider_id' => CRM_Utils_Array::value('im-Primary-provider_id', $updatePfParams),
-    );
+    $compareParams = [
+      'name' => $updatePfParams['im-Primary'] ?? NULL,
+      'provider_id' => $updatePfParams['im-Primary-provider_id'] ?? NULL,
+    ];
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
     //Now check DB for Phone
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
       'is_primary' => 1,
-    );
-    $compareParams = array('phone' => CRM_Utils_Array::value('phone-Primary-1', $updatePfParams));
+    ];
+    $compareParams = ['phone' => CRM_Utils_Array::value('phone-Primary-1', $updatePfParams)];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //Now check DB for Mobile
-    $searchParams = array(
+    $searchParams = [
       'contact_id' => $contactId,
       'location_type_id' => 1,
-      'phone_type_id' => CRM_Utils_Array::value('phone_type_id', $params['phone'][2]),
-    );
-    $compareParams = array('phone' => CRM_Utils_Array::value('phone-Primary-2', $updatePfParams));
+      'phone_type_id' => $params['phone'][2]['phone_type_id'] ?? NULL,
+    ];
+    $compareParams = ['phone' => CRM_Utils_Array::value('phone-Primary-2', $updatePfParams)];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
     //get the value of relationship
-    $values       = array();
-    $searchParams = array('contact_id' => $contactId);
+    $values = [];
+    $searchParams = ['contact_id' => $contactId];
     $relationship = CRM_Contact_BAO_Relationship::getValues($searchParams, $values);
     //Now check values of Relationship Count.
     $this->assertEquals(0, $values['relationship']['totalCount'], 'Check for total relationship count');
@@ -1094,7 +1098,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
-      Contact::delete(CRM_Utils_Array::value('cid', $val));
+      $this->contactDelete(CRM_Utils_Array::value('cid', $val));
     }
 
     //Now check values of tag ids.
@@ -1105,13 +1109,13 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertAttributesEquals($updatePfParams['tag'], $tagIds);
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * test case for getContactDetails( )
+   * Test case for getContactDetails( ).
    */
-  function testGetContactDetails() {
+  public function testGetContactDetails() {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1121,24 +1125,23 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     //get the contact details
     $contactDetails = CRM_Contact_BAO_Contact::getContactDetails($contactId);
-    $compareParams = array(
+    $compareParams = [
       $params['first_name'] . ' ' . $params['last_name'],
       CRM_Utils_Array::value('email', $params['email'][1]),
       (bool ) $params['privacy']['do_not_email'],
-    );
+    ];
     //Now check the contact details
     $this->assertAttributesEquals($compareParams, $contactDetails);
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact'));
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact']);
   }
 
   /**
-   * test case for
-   * importableFields( ) and exportableFields( )
+   * Test case for importableFields( ) and exportableFields( ).
    */
-  function testFields() {
+  public function testFields() {
     $allImpFileds = CRM_Contact_BAO_Contact::importableFields('All');
     $allExpFileds = CRM_Contact_BAO_Contact::importableFields('All');
     //Now check all fields
@@ -1161,10 +1164,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * test case for getPrimaryEmail( )
-   *
+   * Test case for getPrimaryEmail.
    */
-  function testGetPrimaryEmail() {
+  public function testGetPrimaryEmail() {
     //get the contact params
     $params = $this->contactParams();
     $params['email'][2] = $params['email'][1];
@@ -1180,15 +1182,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($email, CRM_Utils_Array::value('email', $params['email'][2]), 'Check Primary Email');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact'));
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact']);
   }
 
   /**
-   * test case for getPrimaryOpenId( )
-   *
+   * Test case for getPrimaryOpenId( ).
    */
-  function testGetPrimaryOpenId() {
+  public function testGetPrimaryOpenId() {
     //get the contact params
     $params = $this->contactParams();
     $params['openid'][2] = $params['openid'][1];
@@ -1206,14 +1207,13 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($openID, strtolower($params['openid'][2]['openid']), 'Check Primary OpenID');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
-   * test case for matchContactOnEmail( )
-   *
+   * Test case for matchContactOnEmail( ).
    */
-  function testMatchContactOnEmail() {
+  public function testMatchContactOnEmail() {
     //get the contact params
     $params = $this->contactParams();
     //create contact
@@ -1227,15 +1227,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($contactId, $match->contact_id, 'Check For Matching Contact');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact'));
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact']);
   }
 
   /**
-   * test case for getContactType( )
-   *
+   * Test case for getContactType( ).
    */
-  function testGetContactType() {
+  public function testGetContactType() {
     //get the contact params
     $params = $this->contactParams();
     //create contact
@@ -1247,15 +1246,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($contactType, $params['contact_type'], 'Check For Contact Type');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact'));
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact']);
   }
 
   /**
-   * test case for displayName( )
-   *
+   * Test case for displayName( ).
    */
-  function testDisplayName() {
+  public function testDisplayName() {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1266,8 +1264,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //get display name.
     $dbDisplayName = CRM_Contact_BAO_Contact::displayName($contactId);
 
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];
@@ -1275,15 +1273,14 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($dbDisplayName, $paramsDisplayName, 'Check For Display Name');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
-    $this->quickCleanup(array('civicrm_contact'));
+    $this->contactDelete($contactId);
+    $this->quickCleanup(['civicrm_contact']);
   }
 
   /**
-   * test case for getDisplayAndImage( )
-   *
+   * Test case for getDisplayAndImage( ).
    */
-  function testGetDisplayAndImage() {
+  public function testGetDisplayAndImage() {
     //get the contact params
     $params = $this->contactParams();
 
@@ -1296,8 +1293,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $checkImage = CRM_Contact_BAO_Contact_Utils::getImage($params['contact_type'], FALSE, $contactId);
 
-    $prefix = CRM_Core_PseudoConstant::individualPrefix();
-    $suffix = CRM_Core_PseudoConstant::individualSuffix();
+    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];
@@ -1306,33 +1303,15 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($image, $checkImage, 'Check For Image');
 
     //cleanup DB by deleting the contact
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
-  //    /**
-  //     * test logged in user has permissions for
-  //     * various  operation types
-  //     */
-  //    function testPermissionedContact()
-  //    {
-  //        $contactId = Contact::createIndividual();
-  //        require_once 'CRM/Contact/BAO/Contact/Permission.php';
-  //        $userViewPermission = CRM_Contact_BAO_Contact_Permission::allow($contactId);
-  //        $this->assertEquals( $userViewPermission, true, 'Check user for view contact permission.' );
-  //
-  //        $userEditPermission = CRM_Contact_BAO_Contact_Permission::allow($contactId, CRM_Core_Permission::EDIT);
-  //        $this->assertEquals( $userEditPermission, true, 'Check user for edit contact permission.' );
-  //
-  //        Contact::delete($contactId);
-  //    }
-
   /**
-   * function to build common params
-   *
+   * Build common params.
    */
   private function contactParams() {
 
-    $params = array(
+    $params = [
       'first_name' => 'john',
       'last_name' => 'smith',
       'contact_type' => 'Individual',
@@ -1343,12 +1322,12 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'job_title' => 'software engg',
       'gender_id' => 2,
       'is_deceased' => 1,
-      'website' => array(
-        1 => array(
+      'website' => [
+        1 => [
           'website_type_id' => 1,
           'url' => 'http://civicrm.org',
-        ),
-      ),
+        ],
+      ],
       'contact_source' => 'test contact',
       'external_identifier' => 123456789,
       'preferred_mail_format' => 'Both',
@@ -1357,218 +1336,212 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'image_URL' => 'http://image.com',
       'deceased_date' => '1991-07-07',
       'birth_date' => '1961-06-06',
-      'privacy' => array(
+      'privacy' => [
         'do_not_phone' => 1,
         'do_not_email' => 1,
         'do_not_mail' => 1,
         'do_not_trade' => 1,
-      ),
-      'preferred_communication_method' => array(
+      ],
+      'preferred_communication_method' => [
         '1' => 1,
         '2' => 0,
         '3' => 1,
         '4' => 0,
         '5' => 1,
-      ),
-    );
+      ],
+    ];
 
-    $params['address'] = array();
-    $params['address'][1] = array(
+    $params['address'] = [];
+    $params['address'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'street_address' => 'Saint Helier St',
       'supplemental_address_1' => 'Hallmark Ct',
       'supplemental_address_2' => 'Jersey Village',
+      'supplemental_address_3' => 'My Town',
       'city' => 'Newark',
       'postal_code' => '01903',
       'country_id' => 1228,
       'state_province_id' => 1029,
       'geo_code_1' => '18.219023',
       'geo_code_2' => '-105.00973',
-    );
+    ];
 
-    $params['email'] = array();
-    $params['email'][1] = array(
+    $params['email'] = [];
+    $params['email'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'email' => 'john.smith@example.org',
-    );
+    ];
 
-
-    $params['phone'] = array();
-    $params['phone'][1] = array(
+    $params['phone'] = [];
+    $params['phone'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'phone_type_id' => 1,
       'phone' => '303443689',
-    );
-    $params['phone'][2] = array(
+    ];
+    $params['phone'][2] = [
       'location_type_id' => 1,
       'phone_type_id' => 2,
       'phone' => '9833910234',
-    );
+    ];
 
-    $params['openid'] = array();
-    $params['openid'][1] = array(
+    $params['openid'] = [];
+    $params['openid'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'openid' => 'http://civicrm.org/',
-    );
+    ];
 
-    $params['im'] = array();
-    $params['im'][1] = array(
+    $params['im'] = [];
+    $params['im'][1] = [
       'location_type_id' => 1,
       'is_primary' => 1,
       'name' => 'john.smith',
       'provider_id' => 1,
-    );
+    ];
 
     return $params;
   }
 
   /**
-   * Ensure that created_date and modified_date are set
+   * Ensure that created_date and modified_date are set.
    */
-  function testTimestamps_contact() {
+  public function testTimestampContact() {
     $test = $this;
-    $this->_testTimestamps(array(
+    $this->_testTimestamps([
       'UPDATE' => function ($contactId) use ($test) {
-        $params = array(
+        $params = [
           'first_name' => 'Testing',
           'contact_type' => 'Individual',
           'contact_id' => $contactId,
-        );
+        ];
         $contact = CRM_Contact_BAO_Contact::add($params);
         $test->assertInstanceOf('CRM_Contact_DAO_Contact', $contact, 'Check for created object');
       },
-    ));
+    ]);
   }
 
   /**
-   * Ensure that civicrm_contact.modified_date is updated when manipulating a phone record
+   * Ensure that civicrm_contact.modified_date is updated when manipulating a phone record.
    */
-  function testTimestamps_email() {
+  public function testTimestampsEmail() {
     $test = $this;
-    $this->_testTimestamps(array(
+    $this->_testTimestamps([
       'INSERT' => function ($contactId) use ($test) {
-        $params = array(
+        $params = [
           'email' => 'ex-1@example.com',
           'is_primary' => 1,
           'location_type_id' => 1,
           'contact_id' => $contactId,
-        );
+        ];
         CRM_Core_BAO_Email::add($params);
         $test->assertDBQuery('ex-1@example.com',
           'SELECT email FROM civicrm_email WHERE contact_id = %1 ORDER BY id DESC LIMIT 1',
-          array(1 => array($contactId, 'Integer'))
+          [1 => [$contactId, 'Integer']]
         );
       },
-
       'UPDATE' => function ($contactId) use ($test) {
         CRM_Core_DAO::executeQuery(
           'UPDATE civicrm_email SET email = "ex-2@example.com" WHERE contact_id = %1',
-          array(1 => array($contactId, 'Integer'))
+          [1 => [$contactId, 'Integer']]
         );
       },
-
       'DELETE' => function ($contactId) use ($test) {
         CRM_Core_DAO::executeQuery(
           'DELETE FROM civicrm_email WHERE contact_id = %1',
-          array(1 => array($contactId, 'Integer'))
+          [1 => [$contactId, 'Integer']]
         );
       },
-    ));
+    ]);
   }
 
   /**
-   * Ensure that civicrm_contact.modified_date is updated when manipulating an email
+   * Ensure that civicrm_contact.modified_date is updated when manipulating an email.
    */
-  function testTimestamps_phone() {
+  public function testTimestampsPhone() {
     $test = $this;
-    $this->_testTimestamps(array(
+    $this->_testTimestamps([
       'INSERT' => function ($contactId) use ($test) {
-        $params = array(
+        $params = [
           'phone' => '202-555-1000',
           'is_primary' => 1,
           'location_type_id' => 1,
           'contact_id' => $contactId,
-        );
+        ];
         CRM_Core_BAO_Phone::add($params);
         $test->assertDBQuery('202-555-1000',
           'SELECT phone FROM civicrm_phone WHERE contact_id = %1 ORDER BY id DESC LIMIT 1',
-          array(1 => array($contactId, 'Integer'))
+          [1 => [$contactId, 'Integer']]
         );
       },
-
       'UPDATE' => function ($contactId) use ($test) {
         CRM_Core_DAO::executeQuery(
           'UPDATE civicrm_phone SET phone = "202-555-2000" WHERE contact_id = %1',
-          array(1 => array($contactId, 'Integer'))
+          [1 => [$contactId, 'Integer']]
         );
       },
-
       'DELETE' => function ($contactId) use ($test) {
         CRM_Core_DAO::executeQuery(
           'DELETE FROM civicrm_phone WHERE contact_id = %1',
-          array(1 => array($contactId, 'Integer'))
+          [1 => [$contactId, 'Integer']]
         );
       },
-    ));
+    ]);
   }
 
   /**
-   * Ensure that civicrm_contact.modified_date is updated when contact-related
-   * custom data
+   * Ensure that civicrm_contact.modified_date is updated correctly.
+   *
+   * Looking at it when contact-related custom data is updated.
    */
-  function testTimestamps_custom() {
-    $customGroup = Custom::createGroup(array(), 'Individual');
-    $this->assertNotNull($customGroup);
-    $fields = array(
-      'groupId' => $customGroup->id,
+  public function testTimestampsCustom() {
+    $customGroup = $this->customGroupCreate();
+    $customGroup = $customGroup['values'][$customGroup['id']];
+    $fields = [
+      'custom_group_id' => $customGroup['id'],
       'data_type' => 'String',
       'html_type' => 'Text',
-    );
-    $customField = Custom::createField(array(), $fields);
-    $this->assertNotNull($customField);
-
+    ];
+    $customField = $this->customFieldCreate($fields);
+    $customField = $customField['values'][$customField['id']];
     $test = $this;
-    $this->_testTimestamps(array(
+    $this->_testTimestamps([
       'INSERT' => function ($contactId) use ($test, $customGroup, $customField) {
-        $result = civicrm_api('contact', 'create', array(
-          'version' => 3,
+        civicrm_api3('contact', 'create', [
           'contact_id' => $contactId,
-          'custom_' . $customField->id => 'test-1',
-        ));
-        $test->assertAPISuccess($result);
+          'custom_' . $customField['id'] => 'test-1',
+        ]);
       },
       'UPDATE' => function ($contactId) use ($test, $customGroup, $customField) {
         CRM_Core_DAO::executeQuery(
-          "UPDATE {$customGroup->table_name} SET {$customField->column_name} = 'test-2' WHERE entity_id = %1",
-          array(1 => array($contactId, 'Integer'))
+          "UPDATE {$customGroup['table_name']} SET {$customField['column_name']} = 'test-2' WHERE entity_id = %1",
+          [1 => [$contactId, 'Integer']]
         );
       },
       'DELETE' => function ($contactId) use ($test, $customGroup, $customField) {
         CRM_Core_DAO::executeQuery(
-          "DELETE FROM {$customGroup->table_name} WHERE entity_id = %1",
-          array(1 => array($contactId, 'Integer'))
+          "DELETE FROM {$customGroup['table_name']} WHERE entity_id = %1",
+          [1 => [$contactId, 'Integer']]
         );
       },
-    ));
-
-    Custom::deleteGroup($customGroup);
+    ]);
+    $this->quickCleanup(['civicrm_contact'], TRUE);
   }
 
   /**
-   * Helper for testing timestamp manipulation
+   * Helper for testing timestamp manipulation.
    *
    * Create a contact and perform a series of steps with it; after each
    * step, ensure that the contact's modified_date has increased.
    *
-   * @param $callbacks array ($name => $callable)
+   * @param array $callbacks
+   *   ($name => $callable).
    */
-  function _testTimestamps($callbacks) {
+  public function _testTimestamps($callbacks) {
     CRM_Core_DAO::triggerRebuild();
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
     $origTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);
     $this->assertRegexp('/^\d\d\d\d-\d\d-\d\d /', $origTimestamps['created_date']);
@@ -1577,7 +1550,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $prevTimestamps = $origTimestamps;
     foreach ($callbacks as $callbackName => $callback) {
-      sleep(1); // advance clock by 1 second to ensure timestamps change
+      // advance clock by 1 second to ensure timestamps change
+      sleep(1);
 
       $callback($contactId);
       $newTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);
@@ -1589,9 +1563,121 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       $prevTimestamps = $newTimestamps;
     }
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
+
+  /**
+   * Test case for UpdateProfileLocationLeak (CRM-20598).
+   */
+  public function testUpdateProfileLocationLeak() {
+    // create a simple contact with address and phone that share the same location type
+    $defaults = $this->contactParams();
+    $params = [
+      'first_name' => $defaults['first_name'],
+      'last_name' => $defaults['last_name'],
+      'contact_type' => 'Individual',
+      'address' => [1 => $defaults['address'][1]],
+      'phone' => [1 => $defaults['phone'][1]],
+    ];
+    $contact = CRM_Contact_BAO_Contact::create($params);
+    $contactId = $contact->id;
+
+    // now, update using a profile with phone, email, address... that share the same location type
+    $updatePfParams = [
+      'first_name' => $params['first_name'],
+      'last_name' => $params['first_name'],
+      'street_address-Primary' => $params['address'][1]['street_address'],
+      'state_province-Primary' => $params['address'][1]['state_province_id'],
+      'country-Primary' => $params['address'][1]['country_id'],
+      'phone-Primary-1' => $params['phone'][1]['phone'],
+      'phone_ext-Primary-1' => '345',
+    ];
+
+    //create the contact using create profile contact.
+    $fields = CRM_Contact_BAO_Contact::exportableFields('Individual');
+
+    $this->createLoggedInUser();
+    // now, emulate the contact update using a profile
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($updatePfParams, $fields, $contactId,
+      NULL, NULL, NULL, TRUE
+    );
+
+    //check the contact ids
+    $this->assertEquals($contactId, $contactID, 'check for Contact ids');
+    $phone = $this->callAPISuccess('Phone', 'getsingle', ['contact_id' => $contactID]);
+    $this->assertEquals('345', $phone['phone_ext']);
+    $this->assertEquals($params['phone'][1]['phone'], $phone['phone']);
+
+    //check the values in DB.
+    $searchParams = [
+      'contact_id' => $contactId,
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    ];
+    $compareParams = [
+      'street_address' => $updatePfParams['street_address-Primary'] ?? NULL,
+    ];
+    $this->assertDBCompareValues('CRM_Core_DAO_Address', $searchParams, $compareParams);
+
+    //cleanup DB by deleting the contact
+    $this->contactDelete($contactId);
+  }
+
+  /**
+   * Test that contact details are still displayed if no email is present.
+   *
+   * @throws \Exception
+   */
+  public function testContactEmailDetailsWithNoPrimaryEmail() {
+    $params = $this->contactParams();
+    unset($params['email']);
+    $contact = CRM_Contact_BAO_Contact::create($params);
+    $contactId = $contact->id;
+    $result = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId);
+    $this->assertEquals([$contact->display_name, NULL, NULL, NULL], $result);
+  }
+
+  /**
+   * dev/core#1605 State/province not copied on shared address
+   * 1. First, create contacts: A and B
+   * 2. Create an address for contact A
+   * 3. Use contact A's address for contact B's address
+   * ALL the address fields on address A should be copied to address B
+   */
+  public function testSharedAddressCopiesAllAddressFields() {
+    $contactIdA = $this->individualCreate([], 0);
+    $contactIdB = $this->individualCreate([], 1);
+
+    $addressParamsA = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+      'street_name' => 'Ambachtstraat',
+      'street_number' => '23',
+      'street_address' => 'Ambachtstraat 23',
+      'postal_code' => '6971 BN',
+      'country_id' => '1152',
+      'city' => 'Brummen',
+      'is_billing' => 1,
+      'state_province_id' => '3934',
+    ];
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    $addressParamsB[1] = [
+      'contact_id' => $contactIdB,
+      'master_id' => $addAddressA->id,
+      'use_shared_address' => 1,
+    ];
+
+    CRM_Contact_BAO_Contact_Utils::processSharedAddress($addressParamsB);
+    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB[1], FALSE);
+
+    foreach ($addAddressA as $key => $value) {
+      if (!in_array($key, ['id', 'contact_id', 'master_id', 'is_primary', 'is_billing', 'location_type_id', 'manual_geo_code'])) {
+        $this->assertEquals($addAddressA->$key, $addAddressB->$key);
+      }
+    }
+  }
+
 }
-
-
-

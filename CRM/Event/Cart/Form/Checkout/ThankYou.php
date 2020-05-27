@@ -1,7 +1,13 @@
 <?php
+
+/**
+ * Class CRM_Event_Cart_Form_Checkout_ThankYou
+ */
 class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
   public $line_items = NULL;
-  public $sub_total = 0; function buildLineItems() {
+  public $sub_total = 0;
+
+  public function buildLineItems() {
     foreach ($this->cart->events_in_carts as $event_in_cart) {
       $event_in_cart->load_location();
     }
@@ -9,17 +15,17 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
     foreach ($line_items as $line_item) {
       $event_in_cart = $this->cart->get_event_in_cart_by_event_id($line_item['event_id']);
 
-      $not_waiting_participants = array();
+      $not_waiting_participants = [];
       foreach ($event_in_cart->not_waiting_participants() as $participant) {
-        $not_waiting_participants[] = array(
+        $not_waiting_participants[] = [
           'display_name' => CRM_Contact_BAO_Contact::displayName($participant->contact_id),
-        );
+        ];
       }
-      $waiting_participants = array();
+      $waiting_participants = [];
       foreach ($event_in_cart->waiting_participants() as $participant) {
-        $waiting_participants[] = array(
+        $waiting_participants[] = [
           'display_name' => CRM_Contact_BAO_Contact::displayName($participant->contact_id),
-        );
+        ];
       }
 
       $line_item['event'] = $event_in_cart->event;
@@ -36,10 +42,10 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
     $this->assign('line_items', $this->line_items);
   }
 
-  function buildQuickForm() {
-    $defaults = array();
-    $ids = array();
-    $template_params_to_copy = array(
+  public function buildQuickForm() {
+    $defaults = [];
+    $ids = [];
+    $template_params_to_copy = [
       'billing_name',
       'billing_city',
       'billing_country',
@@ -49,7 +55,7 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
       'credit_card_exp_date',
       'credit_card_type',
       'credit_card_number',
-    );
+    ];
     foreach ($template_params_to_copy as $template_param_to_copy) {
       $this->assign($template_param_to_copy, $this->get($template_param_to_copy));
     }
@@ -68,10 +74,10 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
     //$this->assign( 'site_contact', "" );
   }
 
-  function preProcess() {
+  public function preProcess() {
     $this->event_cart_id = $this->get('last_event_cart_id');
     $this->loadCart();
     //$this->loadParticipants( );
   }
-}
 
+}

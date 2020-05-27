@@ -1,75 +1,72 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for Synchronizing CMS Users
- *
  */
 class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
 
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('OK'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('OK'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form submission.
    */
   public function postProcess() {
-    CRM_Core_BAO_CMSUser::synchronize();
-  }
-}
+    $result = CRM_Utils_System::synchronizeUsers();
 
+    $status = ts('Checked one user record.',
+        [
+          'count' => $result['contactCount'],
+          'plural' => 'Checked %count user records.',
+        ]
+      );
+    if ($result['contactMatching']) {
+      $status .= '<br />' . ts('Found one matching contact record.',
+          [
+            'count' => $result['contactMatching'],
+            'plural' => 'Found %count matching contact records.',
+          ]
+        );
+    }
+
+    $status .= '<br />' . ts('Created one new contact record.',
+        [
+          'count' => $result['contactCreated'],
+          'plural' => 'Created %count new contact records.',
+        ]
+      );
+    CRM_Core_Session::setStatus($status, ts('Synchronize Complete'), 'success');
+    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
+  }
+
+}

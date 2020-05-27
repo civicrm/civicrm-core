@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -39,13 +23,12 @@
 class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
   /**
-   * takes an associative array and creates a uf join object
+   * Takes an associative array and creates a uf join object.
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return object CRM_Core_DAO_UFJoin object
-   * @access public
-   * @static
+   * @return CRM_Core_DAO_UFJoin
    */
   public static function &create($params) {
     // see if a record exists with the same weight
@@ -66,10 +49,13 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     return $dao;
   }
 
+  /**
+   * @param array $params
+   */
   public static function deleteAll(&$params) {
-    $module      = CRM_Utils_Array::value('module', $params);
-    $entityTable = CRM_Utils_Array::value('entity_table', $params);
-    $entityID    = CRM_Utils_Array::value('entity_id', $params);
+    $module = $params['module'] ?? NULL;
+    $entityTable = $params['entity_table'] ?? NULL;
+    $entityID = $params['entity_id'] ?? NULL;
 
     if (empty($entityTable) ||
       empty($entityID) ||
@@ -78,10 +64,10 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
       return;
     }
 
-    $dao               = new CRM_Core_DAO_UFJoin();
-    $dao->module       = $module;
+    $dao = new CRM_Core_DAO_UFJoin();
+    $dao->module = $module;
     $dao->entity_table = $entityTable;
-    $dao->entity_id    = $entityID;
+    $dao->entity_id = $entityID;
     $dao->delete();
   }
 
@@ -89,14 +75,14 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * Given an assoc list of params, find if there is a record
    * for this set of params
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return int or null
-   * @access public
-   * @static
+   * @return int
+   *   or null
    */
   public static function findJoinEntryId(&$params) {
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       return $params['id'];
     }
 
@@ -104,10 +90,10 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
     // CRM-4377 (ab)uses the module column
     if (isset($params['module'])) {
-      $dao->module = CRM_Utils_Array::value('module', $params);
+      $dao->module = $params['module'];
     }
-    $dao->entity_table = CRM_Utils_Array::value('entity_table', $params);
-    $dao->entity_id = CRM_Utils_Array::value('entity_id', $params);
+    $dao->entity_table = $params['entity_table'] ?? NULL;
+    $dao->entity_id = $params['entity_id'] ?? NULL;
     // user reg / my account can have multiple entries, so we return if thats
     // the case. (since entity_table/id is empty in those cases
     if (!$dao->entity_table ||
@@ -115,7 +101,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
     ) {
       return NULL;
     }
-    $dao->weight = CRM_Utils_Array::value('weight', $params);
+    $dao->weight = $params['weight'] ?? NULL;
     if ($dao->find(TRUE)) {
       return $dao->id;
     }
@@ -126,39 +112,45 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * Given an assoc list of params, find if there is a record
    * for this set of params and return the group id
    *
-   * @param array $params (reference) an assoc array of name/value pairs
+   * @param array $params
+   *   (reference) an assoc array of name/value pairs.
    *
-   * @return int or null
-   * @access public
-   * @static
+   * @return int
+   *   or null
    */
   public static function findUFGroupId(&$params) {
 
     $dao = new CRM_Core_DAO_UFJoin();
 
-    $dao->entity_table = CRM_Utils_Array::value('entity_table', $params);
-    $dao->entity_id    = CRM_Utils_Array::value('entity_id', $params);
-    $dao->weight       = CRM_Utils_Array::value('weight', $params);
+    $dao->entity_table = $params['entity_table'] ?? NULL;
+    $dao->entity_id = $params['entity_id'] ?? NULL;
+    $dao->weight = $params['weight'] ?? NULL;
+    $dao->module = $params['module'] ?? NULL;
     if ($dao->find(TRUE)) {
       return $dao->uf_group_id;
     }
     return NULL;
   }
 
+  /**
+   * @param array $params
+   *
+   * @return array
+   */
   public static function getUFGroupIds(&$params) {
 
     $dao = new CRM_Core_DAO_UFJoin();
 
     // CRM-4377 (ab)uses the module column
     if (isset($params['module'])) {
-      $dao->module = CRM_Utils_Array::value('module', $params);
+      $dao->module = $params['module'];
     }
-    $dao->entity_table = CRM_Utils_Array::value('entity_table', $params);
-    $dao->entity_id = CRM_Utils_Array::value('entity_id', $params);
+    $dao->entity_table = $params['entity_table'] ?? NULL;
+    $dao->entity_id = $params['entity_id'] ?? NULL;
     $dao->orderBy('weight asc');
     $dao->find();
     $first = $firstActive = NULL;
-    $second = $secondActive = array();
+    $second = $secondActive = [];
 
     while ($dao->fetch()) {
       if ($dao->weight == 1) {
@@ -170,7 +162,19 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
         $secondActive[] = $dao->is_active;
       }
     }
-    return array($first, $second, $firstActive, $secondActive);
+    return [$first, $second, $firstActive, $secondActive];
   }
-}
 
+  /**
+   * Whitelist of possible values for the entity_table field
+   * @return array
+   */
+  public static function entityTables() {
+    return [
+      'civicrm_event' => 'Event',
+      'civicrm_contribution_page' => 'ContributionPage',
+      'civicrm_survey' => 'Survey',
+    ];
+  }
+
+}

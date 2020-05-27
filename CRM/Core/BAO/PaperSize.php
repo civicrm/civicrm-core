@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,78 +24,75 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class contains functions for managing Paper Sizes
+ * This class contains functions for managing Paper Sizes.
  */
 class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
 
   /**
-   * static holder for the Paper Size Option Group ID
+   * Static holder for the Paper Size Option Group ID.
+   * @var int
    */
   private static $_gid = NULL;
 
   /**
    * Paper Size fields stored in the 'value' field of the Option Value table.
+   * @var array
    */
-  private static $optionValueFields = array(
-    'metric' => array(
+  private static $optionValueFields = [
+    'metric' => [
       'name' => 'metric',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'mm',
-    ),
-    'width' => array(
+    ],
+    'width' => [
       'name' => 'width',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 612,
-    ),
-    'height' => array(
+    ],
+    'height' => [
       'name' => 'height',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 792,
-    ),
-  );
+    ],
+  ];
 
   /**
-   * Get Option Group ID for Paper Sizes
+   * Get Option Group ID for Paper Sizes.
    *
-   * @param void
-   *
-   * @return int  Group ID (null if Group ID doesn't exist)
-   * @access private
+   * @return int
+   *   Group ID (null if Group ID doesn't exist)
+   * @throws CRM_Core_Exception
    */
   private static function _getGid() {
     if (!self::$_gid) {
       self::$_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'paper_size', 'id', 'name');
       if (!self::$_gid) {
-        CRM_Core_Error::fatal(ts('Paper Size Option Group not found in database.'));
+        throw new CRM_Core_Exception(ts('Paper Size Option Group not found in database.'));
       }
     }
     return self::$_gid;
   }
 
   /**
-   * Add ordering fields to Paper Size list
+   * Add ordering fields to Paper Size list.
    *
-   * @param array (reference)   $list         List of Paper Sizes
-   * @param string              $returnURL    URL of page calling this function
+   * @param array $list List of Paper Sizes
+   * @param string $returnURL
+   *   URL of page calling this function.
    *
-   * @return array  (reference)   List of Paper Sizes
-   * @static
-   * @access public
    */
-  static function &addOrder(&$list, $returnURL) {
+  public static function &addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
     CRM_Utils_Weight::addOrder($list, 'CRM_Core_DAO_OptionValue', 'id', $returnURL, $filter);
   }
@@ -103,14 +100,14 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Retrieve list of Paper Sizes.
    *
-   * @param bool    $namesOnly    return simple list of names
+   * @param bool $namesOnly
+   *   Return simple list of names.
    *
-   * @return array  (reference)   Paper Size list
-   * @static
-   * @access public
+   * @return array
+   *   (reference)   Paper Size list
    */
-  static function &getList($namesOnly = FALSE) {
-    static $list = array();
+  public static function &getList($namesOnly = FALSE) {
+    static $list = [];
     if (self::_getGid()) {
       // get saved Paper Sizes from Option Value table
       $dao = new CRM_Core_DAO_OptionValue();
@@ -131,39 +128,38 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * retrieve the default Paper Size values
+   * Retrieve the default Paper Size values.
    *
-   * @param NULL
-   *
-   * @return array   Name/value pairs containing the default Paper Size values.
-   * @static
-   * @access public
+   * @return array
+   *   Name/value pairs containing the default Paper Size values.
    */
-  static function &getDefaultValues() {
-    $params = array('is_active' => 1, 'is_default' => 1);
-    $defaults = array();
+  public static function &getDefaultValues() {
+    $params = ['is_active' => 1, 'is_default' => 1];
+    $defaults = [];
     if (!self::retrieve($params, $defaults)) {
       foreach (self::$optionValueFields as $name => $field) {
         $defaults[$name] = $field['default'];
       }
-      $filter = array('option_group_id' => self::_getGid());
+      $filter = ['option_group_id' => self::_getGid()];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $filter);
     }
     return $defaults;
   }
 
   /**
-   * Get Paper Size from the DB
+   * Get Paper Size from the DB.
    *
-   * @param string $field   Field name to search by
-   * @param int    $val     Field value to search for
+   * @param string $field
+   *   Field name to search by.
+   * @param int $val
+   *   Field value to search for.
    *
-   * @return array  $values (reference) associative array of name/value pairs
-   * @access public
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
-  static function &getPaperFormat($field, $val) {
-    $params = array('is_active' => 1, $field => $val);
-    $paperFormat = array();
+  public static function &getPaperFormat($field, $val) {
+    $params = ['is_active' => 1, $field => $val];
+    $paperFormat = [];
     if (self::retrieve($params, $paperFormat)) {
       return $paperFormat;
     }
@@ -173,45 +169,48 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get Paper Size by Name
+   * Get Paper Size by Name.
    *
-   * @param int    $name   Paper Size name. Empty = get default Paper Size
+   * @param int $name
+   *   Paper Size name. Empty = get default Paper Size.
    *
-   * @return array  $values (reference) associative array of name/value pairs
-   * @access public
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
-  static function &getByName($name) {
+  public static function &getByName($name) {
     return self::getPaperFormat('name', $name);
   }
 
   /**
-   * Get Paper Size by ID
+   * Get Paper Size by ID.
    *
-   * @param int    $id   Paper Size id. 0 = get default Paper Size
+   * @param int $id
+   *   Paper Size id. 0 = get default Paper Size.
    *
-   * @return array  $values (reference) associative array of name/value pairs
-   * @access public
+   * @return array
+   *   (reference) associative array of name/value pairs
    */
-  static function &getById($id) {
+  public static function &getById($id) {
     return self::getPaperFormat('id', $id);
   }
 
   /**
-   * Get Paper Size field from associative array
+   * Get Paper Size field from associative array.
    *
-   * @param string              $field         name of a Paper Size field
-   * @param array (reference)   $values        associative array of name/value pairs containing
+   * @param string $field
+   *   Name of a Paper Size field.
+   * @param array $values associative array of name/value pairs containing
    *                                           Paper Size field selections
    *
+   * @param null $default
+   *
    * @return value
-   * @access public
-   * @static
    */
-  static function getValue($field, &$values, $default = NULL) {
+  public static function getValue($field, &$values, $default = NULL) {
     if (array_key_exists($field, self::$optionValueFields)) {
       switch (self::$optionValueFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-          return (int)CRM_Utils_Array::value($field, $values, $default);
+          return (int) CRM_Utils_Array::value($field, $values, $default);
 
         case CRM_Utils_Type::T_FLOAT:
           // Round float values to three decimal places and trim trailing zeros.
@@ -219,7 +218,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
           $f = sprintf('%05.3f', $values[$field]);
           $f = rtrim($f, '0');
           $f = rtrim($f, '.');
-          return (float)(empty($f) ? '0' : $f);
+          return (float) (empty($f) ? '0' : $f);
       }
       return CRM_Utils_Array::value($field, $values, $default);
     }
@@ -227,18 +226,18 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * paper size id. It also stores all the retrieved values in the default array.
+   * Retrieve DB object based on input parameters.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $values   (reference ) an assoc array to hold the flattened values
+   * It also stores all the retrieved values in the default array.
    *
-   * @return object CRM_Core_DAO_OptionValue object
-   * @access public
-   * @static
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $values
+   *   (reference ) an assoc array to hold the flattened values.
+   *
+   * @return CRM_Core_DAO_OptionValue
    */
-  static function retrieve(&$params, &$values) {
+  public static function retrieve(&$params, &$values) {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
     $optionValue->option_group_id = self::_getGid();
@@ -265,22 +264,21 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Save the Paper Size in the DB
+   * Save the Paper Size in the DB.
    *
-   * @param array (reference)   $values    associative array of name/value pairs
-   * @param int                 $id        id of the database record (null = new record)
-   *
-   * @return void
-   * @access public
+   * @param array $values associative array of name/value pairs
+   * @param int $id
+   *   Id of the database record (null = new record).
+   * @throws CRM_Core_Exception
    */
-  function savePaperSize(&$values, $id) {
+  public function savePaperSize(&$values, $id) {
     // get the Option Group ID for Paper Sizes (create one if it doesn't exist)
     $group_id = self::_getGid(TRUE);
 
     // clear other default if this is the new default Paper Size
     if ($values['is_default']) {
       $query = "UPDATE civicrm_option_value SET is_default = 0 WHERE option_group_id = $group_id";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
     if ($id) {
       // fetch existing record
@@ -315,37 +313,36 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
     // make sure serialized array will fit in the 'value' column
     $attribute = CRM_Core_DAO::getAttribute('CRM_Core_BAO_PaperSize', 'value');
     if (strlen($this->value) > $attribute['maxlength']) {
-      CRM_Core_Error::fatal(ts('Paper Size does not fit in database.'));
+      throw new CRM_Core_Exception(ts('Paper Size does not fit in database.'));
     }
     $this->save();
 
     // fix duplicate weights
-    $filter = array('option_group_id' => self::_getGid());
+    $filter = ['option_group_id' => self::_getGid()];
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $filter);
   }
 
   /**
-   * Function to delete a Paper Size
+   * Delete a Paper Size.
    *
-   * @param  int  $id     ID of the Paper Size to be deleted.
-   *
-   * @access public
-   * @static
+   * @param int $id
+   *   ID of the Paper Size to be deleted.
+   * @throws CRM_Core_Exception
    */
-  static function del($id) {
+  public static function del($id) {
     if ($id) {
       $dao = new CRM_Core_DAO_OptionValue();
       $dao->id = $id;
       if ($dao->find(TRUE)) {
         if ($dao->option_group_id == self::_getGid()) {
-          $filter = array('option_group_id' => self::_getGid());
+          $filter = ['option_group_id' => self::_getGid()];
           CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $id, $filter);
           $dao->delete();
           return;
         }
       }
     }
-    CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
   }
-}
 
+}

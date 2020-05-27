@@ -1,296 +1,237 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
 
-  protected $_addressField = FALSE;
-
-  protected $_customGroupExtends = array('Grant');
+  protected $_customGroupExtends = ['Grant'];
 
   protected $_add2groupSupported = FALSE;
-  function __construct() {
-    $this->_columns = array(
-      'civicrm_grant' =>
-      array(
+
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+    $this->_columns = [
+      'civicrm_grant' => [
         'dao' => 'CRM_Grant_DAO_Grant',
-        'fields' =>
-        array(
-          'summary_statistics' =>
-          array(
+        'fields' => [
+          'summary_statistics' => [
             'name' => 'id',
             'title' => ts('Summary Statistics'),
             'required' => TRUE,
-          ),
-          'grant_type_id' =>
-          array(
+          ],
+          'grant_type_id' => [
             'name' => 'grant_type_id',
             'title' => ts('By Grant Type'),
-          ),
-          'status_id' =>
-          array(
+          ],
+          'status_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'amount_total' =>
-          array(
+          ],
+          'amount_total' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'grant_report_received' =>
-          array(
+          ],
+          'grant_report_received' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'currency' =>
-          array(
+          ],
+          'currency' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' =>
-        array(
-          'application_received_date' =>
-          array(
+          ],
+        ],
+        'filters' => [
+          'application_received_date' => [
             'name' => 'application_received_date',
             'title' => ts('Application Received'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'decision_date' =>
-          array(
+          ],
+          'decision_date' => [
             'name' => 'decision_date',
             'title' => ts('Grant Decision'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'money_transfer_date' =>
-          array(
+          ],
+          'money_transfer_date' => [
             'name' => 'money_transfer_date',
             'title' => ts('Money Transferred'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'grant_due_date' =>
-          array(
+          ],
+          'grant_due_date' => [
             'name' => 'grant_due_date',
             'title' => ts('Grant Report Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'grant_type' =>
-          array(
+          ],
+          'grant_type' => [
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Grant_PseudoConstant::grantType(),
-          ),
-          'status_id' =>
-          array(
+            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
+          ],
+          'status_id' => [
             'name' => 'status_id',
             'title' => ts('Grant Status'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Grant_PseudoConstant::grantStatus(),
-          ),
-          'amount_requested' =>
-          array(
+            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
+          ],
+          'amount_requested' => [
             'name' => 'amount_requested',
             'title' => ts('Amount Requested'),
             'type' => CRM_Utils_Type::T_MONEY,
-          ),
-          'amount_granted' =>
-          array(
+          ],
+          'amount_granted' => [
             'name' => 'amount_granted',
             'title' => ts('Amount Granted'),
-          ),
-          'grant_report_received' =>
-          array(
+          ],
+          'grant_report_received' => [
             'name' => 'grant_report_received',
             'title' => ts('Report Received'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array('' => ts('- select -'),
+            'options' => [
+              '' => ts('- select -'),
               0 => ts('No'),
               1 => ts('Yes'),
-            ),
-          ),
-        ),
-      ),
-      'civicrm_contact' =>
-      array(
+            ],
+          ],
+        ],
+      ],
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' =>
-        array(
-          'id' =>
-          array(
+        'fields' => [
+          'id' => [
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'gender_id' =>
-          array(
+          ],
+          'gender_id' => [
             'name' => 'gender_id',
             'title' => ts('By Gender'),
-          ),
-          'contact_type' =>
-          array(
+          ],
+          'contact_type' => [
             'name' => 'contact_type',
             'title' => ts('By Contact Type'),
-          ),
-        ),
-        'filters' =>
-        array(
-          'gender_id' =>
-          array(
+          ],
+        ],
+        'filters' => [
+          'gender_id' => [
             'name' => 'gender_id',
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::gender(),
-          ),
-          'contact_type' =>
-          array(
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ],
+          'contact_type' => [
             'name' => 'contact_type',
             'title' => ts('Contact Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contact_BAO_ContactType::basicTypePairs(),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_world_region' =>
-      array(
+      ],
+      'civicrm_worldregion' => [
         'dao' => 'CRM_Core_DAO_Worldregion',
-        'fields' =>
-        array(
-          'id' =>
-          array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
-          ),
-          'name' =>
-          array(
+          ],
+          'name' => [
             'name' => 'name',
             'title' => ts('By World Region'),
-          ),
-        ),
-        'filters' =>
-        array(
-          'region_id' =>
-          array(
+          ],
+        ],
+        'filters' => [
+          'region_id' => [
             'name' => 'id',
             'title' => ts('World Region'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::worldRegion(),
-          ),
-        ),
-      ),
-      'civicrm_address' =>
-      array(
+          ],
+        ],
+      ],
+      'civicrm_address' => [
         'dao' => 'CRM_Core_DAO_Address',
-        'fields' =>
-        array(
-          'country_id' =>
-          array(
+        'fields' => [
+          'country_id' => [
             'name' => 'country_id',
             'title' => ts('By Country'),
-          ),
-        ),
-        'filters' =>
-        array(
-          'country_id' =>
-          array('title' => ts('Country'),
+          ],
+        ],
+        'filters' => [
+          'country_id' => [
+            'title' => ts('Country'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
     parent::__construct();
   }
 
-  function select() {
-    $select = array();
+  public function select() {
+    $select = [];
 
-    $this->_columnHeaders = array();
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
-      if (in_array($tableName, array(
-        'civicrm_address', 'civicrm_world_region'))) {
-        $this->_addressField = TRUE;
-      }
-
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          if (!empty($field['required']) ||
+            !empty($this->_params['fields'][$fieldName])
           ) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
           }
         }
       }
     }
+    $this->_selectClauses = $select;
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  function from() {
+  public function from() {
     $this->_from = "
         FROM civicrm_grant {$this->_aliases['civicrm_grant']}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                     ON ({$this->_aliases['civicrm_grant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  ) ";
-    if ($this->_addressField) {
+
+    $this->joinAddressFromContact();
+    $this->joinCountryFromAddress();
+    if ($this->isTableSelected('civicrm_worldregion')) {
       $this->_from .= "
-                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                         ON {$this->_aliases['civicrm_contact']}.id =
-                            {$this->_aliases['civicrm_address']}.contact_id AND
-                            {$this->_aliases['civicrm_address']}.is_primary = 1\n
-                  LEFT JOIN civicrm_country country
-                         ON {$this->_aliases['civicrm_address']}.country_id =
-                            country.id
-                  LEFT JOIN civicrm_worldregion {$this->_aliases['civicrm_world_region']}
-                         ON country.region_id =
-                            {$this->_aliases['civicrm_world_region']}.id";
+                  LEFT JOIN civicrm_worldregion {$this->_aliases['civicrm_worldregion']}
+                         ON {$this->_aliases['civicrm_country']}.region_id =
+                            {$this->_aliases['civicrm_worldregion']}.id";
     }
   }
 
-  function where() {
-    $approved = array_search( 'Approved', CRM_Grant_PseudoConstant::grantStatus( ) );
+  public function where() {
     $whereClause = "
 WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   AND {$this->_aliases['civicrm_grant']}.amount_total > 0";
-    $this->_where = $whereClause . " AND {$this->_aliases['civicrm_grant']}.status_id = {$approved} ";
+    $this->_where = $whereClause;
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -298,18 +239,19 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
 
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if (($fieldName == 'grant_report_received') &&
-              (CRM_Utils_Array::value("{$fieldName}_value", $this->_params) === 0)
+              (CRM_Utils_Array::value("{$fieldName}_value", $this->_params) ===
+                0)
             ) {
               $op = 'nll';
               $this->_params["{$fieldName}_value"] = NULL;
@@ -325,37 +267,39 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
           }
           if (!empty($clause)) {
             $clauses[] = $clause;
-            $this->_where .= " AND " . implode(' AND ', $clauses);
-            $this->_whereClause = $whereClause . " AND " . implode(' AND ', $clauses);
           }
         }
       }
     }
+    if (!empty($clauses)) {
+      $this->_where = "WHERE " . implode(' AND ', $clauses);
+      $this->_whereClause = $whereClause . " AND " . implode(' AND ', $clauses);
+    }
   }
 
-  function groupBy() {
+  public function groupBy() {
     $this->_groupBy = '';
 
-    if (CRM_Utils_Array::value('fields', $this->_params) &&
+    if (!empty($this->_params['fields']) &&
       is_array($this->_params['fields']) &&
       !empty($this->_params['fields'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
-              $this->_groupBy[] = $field['dbAlias'];
+            if (!empty($this->_params['fields'][$fieldName])) {
+              $groupBy[] = $field['dbAlias'];
             }
           }
         }
       }
     }
-    if (!empty($this->_groupBy)) {
-      $this->_groupBy = " GROUP BY " . implode(', ', $this->_groupBy);
+    if (!empty($groupBy)) {
+      $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
     }
   }
 
-  function postProcess() {
+  public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
 
@@ -376,15 +320,24 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     $this->endPostProcess($rows);
   }
 
-  function alterDisplay(&$rows) {
-    $totalStatistics     = $grantStatistics = array();
-    $totalStatistics     = parent::statistics($rows);
+  /**
+   * Alter display of rows.
+   *
+   * Iterate through the rows retrieved via SQL and make changes for display purposes,
+   * such as rendering contacts as links.
+   *
+   * @param array $rows
+   *   Rows generated by SQL, with an array for each row.
+   */
+  public function alterDisplay(&$rows) {
+    $totalStatistics = $grantStatistics = [];
+    $totalStatistics = parent::statistics($rows);
     $awardedGrantsAmount = $grantsReceived = $totalAmount = $awardedGrants = $grantReportsReceived = 0;
-    $grantStatistics     = array();
+    $grantStatistics = [];
 
-    $grantTypes = CRM_Grant_PseudoConstant::grantType();
-    $countries  = CRM_Core_PseudoConstant::country();
-    $gender     = CRM_Core_PseudoConstant::gender();
+    $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
+    $countries = CRM_Core_PseudoConstant::country();
+    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
 
     $grantAmountTotal = "
 SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
@@ -416,36 +369,34 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     }
     $values = CRM_Core_DAO::executeQuery($grantAmountAwarded);
     while ($values->fetch()) {
-      $awardedGrants       = $values->count;
+      $awardedGrants = $values->count;
       $awardedGrantsAmount = $values->totalAmount;
-      $amountGranted       = $values->grantedAmount;
+      $amountGranted = $values->grantedAmount;
     }
 
     foreach ($rows as $key => $values) {
-      if (CRM_Utils_Array::value('civicrm_grant_grant_report_received', $values)) {
+      if (!empty($values['civicrm_grant_grant_report_received'])) {
         $grantReportsReceived++;
       }
 
-      if (CRM_Utils_Array::value('civicrm_grant_grant_type_id', $values)) {
-        $grantType = CRM_Utils_Array::value($values['civicrm_grant_grant_type_id'], $grantTypes);
+      if (!empty($values['civicrm_grant_grant_type_id'])) {
+        $grantType = $grantTypes[$values['civicrm_grant_grant_type_id']] ?? NULL;
         $grantStatistics['civicrm_grant_grant_type_id']['title'] = ts('By Grant Type');
         self::getStatistics($grantStatistics['civicrm_grant_grant_type_id'], $grantType, $values,
           $awardedGrants, $awardedGrantsAmount
         );
       }
 
-      if (array_key_exists('civicrm_world_region_name', $values)) {
-        $region = CRM_Utils_Array::value('civicrm_world_region_name', $values);
-        $region = ($region) ? $region : 'Unassigned';
-        $grantStatistics['civicrm_world_region_name']['title'] = ts('By Region');
-        self::getStatistics($grantStatistics['civicrm_world_region_name'], $region, $values,
+      if (array_key_exists('civicrm_worldregion_name', $values)) {
+        $region = $values['civicrm_worldregion_name'] ?: 'Unassigned';
+        $grantStatistics['civicrm_worldregion_name']['title'] = ts('By Region');
+        self::getStatistics($grantStatistics['civicrm_worldregion_name'], $region, $values,
           $awardedGrants, $awardedGrantsAmount
         );
       }
 
       if (array_key_exists('civicrm_address_country_id', $values)) {
-        $country = CRM_Utils_Array::value($values['civicrm_address_country_id'], $countries);
-        $country = ($country) ? $country : 'Unassigned';
+        $country = $countries[$values['civicrm_address_country_id']] ?? 'Unassigned';
         $grantStatistics['civicrm_address_country_id']['title'] = ts('By Country');
         self::getStatistics($grantStatistics['civicrm_address_country_id'], $country, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -461,8 +412,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_contact_gender_id', $values)) {
-        $genderLabel = CRM_Utils_Array::value($values['civicrm_contact_gender_id'], $gender);
-        $genderLabel = ($genderLabel) ? $genderLabel : 'Unassigned';
+        $genderLabel = $gender[$values['civicrm_contact_gender_id']] ?? 'Unassigned';
         $grantStatistics['civicrm_contact_gender_id']['title'] = ts('By Gender');
         self::getStatistics($grantStatistics['civicrm_contact_gender_id'], $genderLabel, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -471,31 +421,34 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
 
       foreach ($values as $customField => $customValue) {
         if (strstr($customField, 'civicrm_value_')) {
-          $customFieldTitle = CRM_Utils_Array::value('title', $this->_columnHeaders[$customField]);
+          $customFieldTitle = $this->_columnHeaders[$customField]['title'] ?? NULL;
           $customGroupTitle = explode('_custom', strstr($customField, 'civicrm_value_'));
           $customGroupTitle = $this->_columns[$customGroupTitle[0]]['group_title'];
-          $grantStatistics[$customGroupTitle]['title'] = ts('By %1', array(1 => $customGroupTitle));
+          $grantStatistics[$customGroupTitle]['title'] = ts('By %1', [1 => $customGroupTitle]);
 
-          $customData = ($customValue) ? FALSE : TRUE;
           self::getStatistics($grantStatistics[$customGroupTitle], $customFieldTitle, $values,
-            $awardedGrants, $awardedGrantsAmount, $customData
+            $awardedGrants, $awardedGrantsAmount, !$customValue
           );
         }
       }
     }
 
-    $totalStatistics['total_statistics'] = array('grants_received' => array('title' => ts('Grant Requests Received'),
+    $totalStatistics['total_statistics'] = [
+      'grants_received' => [
+        'title' => ts('Grant Requests Received'),
         'count' => $grantsReceived,
         'amount' => $totalAmount,
-      ),
-      'grants_awarded' => array('title' => ts('Grants Awarded'),
+      ],
+      'grants_awarded' => [
+        'title' => ts('Grants Awarded'),
         'count' => $awardedGrants,
         'amount' => $amountGranted,
-      ),
-      'grants_report_received' => array('title' => ts('Grant Reports Received'),
+      ],
+      'grants_report_received' => [
+        'title' => ts('Grant Reports Received'),
         'count' => $grantReportsReceived,
-      ),
-    );
+      ],
+    ];
 
     $this->assign('totalStatistics', $totalStatistics);
     $this->assign('grantStatistics', $grantStatistics);
@@ -503,38 +456,40 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     if ($this->_outputMode == 'csv' ||
       $this->_outputMode == 'pdf'
     ) {
-      $row = array();
-      $this->_columnHeaders = array('civicrm_grant_total_grants' => array('title' => ts('Summary')),
-        'civicrm_grant_count' => array('title' => ts('Count')),
-        'civicrm_grant_amount' => array('title' => ts('Amount')),
-      );
+      $row = [];
+      $this->_columnHeaders = [
+        'civicrm_grant_total_grants' => ['title' => ts('Summary')],
+        'civicrm_grant_count' => ['title' => ts('Count')],
+        'civicrm_grant_amount' => ['title' => ts('Amount')],
+      ];
       foreach ($totalStatistics['total_statistics'] as $title => $value) {
-        $row[] = array(
+        $row[] = [
           'civicrm_grant_total_grants' => $value['title'],
           'civicrm_grant_count' => $value['count'],
           'civicrm_grant_amount' => $value['amount'],
-        );
+        ];
       }
 
       if (!empty($grantStatistics)) {
         foreach ($grantStatistics as $key => $value) {
-          $row[] = array(
+          $row[] = [
             'civicrm_grant_total_grants' => $value['title'],
             'civicrm_grant_count' => ts('Number of Grants') . ' (%)',
             'civicrm_grant_amount' => ts('Total Amount') . ' (%)',
-          );
+          ];
 
           foreach ($value['value'] as $field => $values) {
             foreach ($values['currency'] as $currency => $amount) {
-              $totalAmount[$currency] = $currency . $amount['value'] . "({$values['percentage']}%)";
+              $totalAmount[$currency] = $currency . $amount['value'] .
+                "({$values['percentage']}%)";
             }
             $totalAmt = implode(', ', $totalAmount);
-            $count    = (boolean)CRM_Utils_Array::value('count', $values, 0) ? $values['count'] . " ({$values['percentage']}%)" : '';
-            $row[]    = array(
+            $count = empty($values['count']) ? '' : "{$values['count']} ({$values['percentage']}%)";
+            $row[] = [
               'civicrm_grant_total_grants' => $field,
               'civicrm_grant_count' => $count,
               'civicrm_grant_amount' => $totalAmt,
-            );
+            ];
           }
         }
       }
@@ -542,28 +497,56 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     }
   }
 
-  static function getStatistics(&$grantStatistics, $fieldValue, $values,
+  /**
+   * @param $grantStatistics
+   * @param $fieldValue
+   * @param $values
+   * @param $awardedGrants
+   * @param $awardedGrantsAmount
+   * @param bool $customData
+   */
+  public static function getStatistics(
+    &$grantStatistics, $fieldValue, $values,
     $awardedGrants, $awardedGrantsAmount, $customData = FALSE
   ) {
     if (!$awardedGrantsAmount) {
       return;
     }
 
-    $currencies = CRM_Core_PseudoConstant::currencySymbols('symbol', 'name');
+    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', ['labelColumn' => 'symbol']);
     $currency = $currencies[$values['civicrm_grant_currency']];
 
     if (!$customData) {
+      if (!isset($grantStatistics['value'][$fieldValue]['currency'][$currency])
+        ||
+        !isset($grantStatistics['value'][$fieldValue]['currency'][$currency]['value'])
+      ) {
+        $grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] = 0;
+      }
       $grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] += $values['civicrm_grant_amount_total'];
-      $grantStatistics['value'][$fieldValue]['currency'][$currency]['percentage'] = round(($grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] / $awardedGrantsAmount) * 100);
+      $grantStatistics['value'][$fieldValue]['currency'][$currency]['percentage'] = round(($grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] /
+          $awardedGrantsAmount) * 100);
+      if (!isset($grantStatistics['value'][$fieldValue]['count'])) {
+        $grantStatistics['value'][$fieldValue]['count'] = 0;
+      }
       $grantStatistics['value'][$fieldValue]['count']++;
-      $grantStatistics['value'][$fieldValue]['percentage'] = round(($grantStatistics['value'][$fieldValue]['count'] / $awardedGrants) * 100);
+      $grantStatistics['value'][$fieldValue]['percentage'] = round(($grantStatistics['value'][$fieldValue]['count'] /
+          $awardedGrants) * 100);
     }
     else {
+      if (!isset($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency])
+        ||
+        !isset($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'])
+      ) {
+        $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] = 0;
+      }
       $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] += $values['civicrm_grant_amount_total'];
-      $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['percentage'] = round(($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] / $awardedGrantsAmount) * 100);
+      $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['percentage'] = round(($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] /
+          $awardedGrantsAmount) * 100);
       $grantStatistics['value'][$fieldValue]['unassigned_count']++;
-      $grantStatistics['value'][$fieldValue]['unassigned_percentage'] = round(($grantStatistics['value'][$fieldValue]['unassigned_count'] / $awardedGrants) * 100);
+      $grantStatistics['value'][$fieldValue]['unassigned_percentage'] = round(($grantStatistics['value'][$fieldValue]['unassigned_count'] /
+          $awardedGrants) * 100);
     }
   }
-}
 
+}

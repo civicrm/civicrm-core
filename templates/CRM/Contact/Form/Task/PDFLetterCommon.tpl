@@ -1,49 +1,48 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {*common template for compose PDF letters*}
 {if $form.template.html}
 <table class="form-layout-compressed">
     <tr>
-        <td class="label-left">{$form.template.label}</td>
-      <td>{$form.template.html}</td>
+      <td class="label-left">
+        {$form.template.label}
+        {help id="template" title=$form.template.label file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+      </td>
+      <td>
+        {$form.template.html} {ts}OR{/ts} {$form.document_file.html}
+      </td>
     </tr>
+    <tr>
+      <td class="label-left">{$form.subject.label}</td>
+      <td>{$form.subject.html}</td>
+    </tr>
+    {if $form.campaign_id}
+    <tr>
+      <td class="label-left">{$form.campaign_id.label}</td>
+      <td>{$form.campaign_id.html}</td>
+    </tr>
+    {/if}
 </table>
 {/if}
 
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
     <div class="crm-accordion-header">
         {$form.pdf_format_header.html}
     </div>
     <div class="crm-accordion-body">
-      <div class="crm-block crm-form-block crm-pdf-format-form-block">
+      <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
       <tr>
-        <td class="label-left">{$form.format_id.label}</td><td>{$form.format_id.html}{help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
-        <td colspan="2">&nbsp;</td>
-            </tr>
+        <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+        <td>{$form.format_id.html}</td>
+      </tr>
       <tr>
         <td class="label-left">{$form.paper_size.label}</td><td>{$form.paper_size.html}</td>
         <td class="label-left">{$form.orientation.label}</td><td>{$form.orientation.html}</td>
@@ -64,6 +63,12 @@
         <td class="label-left">{$form.margin_left.label}</td><td>{$form.margin_left.html}</td>
         <td class="label-left">{$form.margin_right.label}</td><td>{$form.margin_right.html}</td>
       </tr>
+      {* CRM-15883 Suppressing stationery until switch from DOMPDF.
+      <tr>
+        <td class="label-left">{$form.stationery.label}</td><td>{$form.stationery.html}</td>
+        <td colspan="2">&nbsp;</td>
+      </tr>
+      *}
     </table>
         <div id="bindFormat">{$form.bind_format.html}&nbsp;{$form.bind_format.label}</div>
         <div id="updateFormat" style="display: none">{$form.update_format.html}&nbsp;{$form.update_format.label}</div>
@@ -71,27 +76,26 @@
   </div>
 </div>
 
+<div class="crm-accordion-wrapper crm-document-accordion ">
+  <div class="crm-accordion-header">
+    {ts}Preview Document{/ts}
+  </div><!-- /.crm-accordion-header -->
+  <div class="crm-accordion-body">
+    <div id='document-preview'></div>
+  </div><!-- /.crm-accordion-body -->
+</div><!-- /.crm-accordion-wrapper -->
+
 <div class="crm-accordion-wrapper crm-html_email-accordion ">
 <div class="crm-accordion-header">
     {$form.html_message.label}
 </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
-  {if $action neq 4}
-  <span class="helpIcon" id="helphtml">
-  <a href="#" onClick="return showToken('Html', 1);">{$form.token1.label}</a>
-  {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp" tplFile=$tplFile isAdmin=$isAdmin editor=$editor}
-  <div id="tokenHtml" style="display:none;">
-      <input style="border:1px solid #999999;" type="text" id="filter1" size="20" name="filter1" onkeyup="filter(this, 1)"/><br />
-      <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
-      {$form.token1.html}
-  </div>
-  </span>
-  {/if}
+   <div class="helpIcon" id="helphtml">
+     <input class="crm-token-selector big" data-field="html_message" />
+     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+   </div>
     <div class="clear"></div>
     <div class='html'>
-  {if $editor EQ 'textarea'}
-      <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Configure &raquo; Global Settings &raquo; Site Preferences).{/ts}</div>
-  {/if}
   {$form.html_message.html}<br />
     </div>
 
@@ -112,12 +116,59 @@
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
+<table class="form-layout-compressed">
+  <tr>
+    <td class="label-left">{$form.document_type.label}</td>
+    <td>{$form.document_type.html}</td>
+  </tr>
+</table>
+
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
 {literal}
 <script type="text/javascript">
-cj(function() {
-    cj().crmAccordions();
+CRM.$(function($) {
+  var $form = $('form.{/literal}{$form.formClass}{literal}');
+
+  {/literal}{if $form.formName eq 'PDF'}{literal}
+    $('.crm-document-accordion').hide();
+    $('#document_file').on('change', function() {
+      if (this.value) {
+        $('.crm-html_email-accordion, .crm-document-accordion, .crm-pdf-format-accordion').hide();
+        cj('#document_type').closest('tr').hide();
+        $('#template').val('');
+      }
+    });
+  {/literal}{/if}{literal}
+
+
+  $('#format_id', $form).on('change', function() {
+    selectFormat($(this).val());
+  });
+  // After the pdf downloads, the user has to manually close the dialog (which would be nice to fix)
+  // But at least we can trigger the underlying list of activities to refresh
+  $('[name=_qf_PDF_submit]', $form).click(function() {
+    var $dialog = $(this).closest('.ui-dialog-content.crm-ajax-container');
+    if ($dialog.length) {
+      $dialog.on('dialogbeforeclose', function () {
+        $(this).trigger('crmFormSuccess');
+      });
+      $dialog.dialog('option', 'buttons', [{
+        text: {/literal}"{ts escape='js'}Done{/ts}"{literal},
+        icons: {primary: 'fa-times'},
+        click: function() {$(this).dialog('close');}
+      }]);
+    }
+  });
+  $('[name^=_qf_PDF_submit]', $form).click(function() {
+    CRM.status({/literal}"{ts escape='js'}Downloading...{/ts}"{literal});
+  });
+  showSaveDetails($('input[name=saveTemplate]', $form)[0]);
+
+  function showSaveTemplate() {
+    $('#updateDetails').toggle(!!$(this).val());
+  }
+  $('[name=template]', $form).each(showSaveTemplate).change(showSaveTemplate);
 });
 
 var currentWidth;
@@ -126,51 +177,13 @@ var currentMetric = document.getElementById('metric').value;
 showBindFormatChkBox();
 selectPaper( document.getElementById('paper_size').value );
 
-function tokenReplHtml ( )
-{
-    var token1 = cj("#token1").val( )[0];
-    var editor = {/literal}"{$editor}"{literal};
-    if ( editor == "tinymce" ) {
-        var content= tinyMCE.get('html_message').getContent() +token1;
-        tinyMCE.get('html_message').setContent(content);
-    } else if ( editor == "joomlaeditor" ) {
-        tinyMCE.execCommand('mceInsertContent',false, token1);
-        var msg       = document.getElementById(html_message).value;
-        var cursorlen = document.getElementById(html_message).selectionStart;
-        var textlen   = msg.length;
-        document.getElementById(html_message).value = msg.substring(0, cursorlen) + token1 + msg.substring(cursorlen, textlen);
-        var cursorPos = (cursorlen + token1.length);
-        document.getElementById(html_message).selectionStart = cursorPos;
-        document.getElementById(html_message).selectionEnd   = cursorPos;
-        document.getElementById(html_message).focus();
-  } else if ( editor == "ckeditor" ) {
-        oEditor = CKEDITOR.instances[html_message];
-        oEditor.insertHtml(token1.toString() );
-    } else if ( editor == "drupalwysiwyg" ) {
-        Drupal.wysiwyg.instances[html_message].insert(token1.toString());
-    } else {
-    var msg       = document.getElementById(html_message).value;
-        var cursorlen = document.getElementById(html_message).selectionStart;
-        var textlen   = msg.length;
-        document.getElementById(html_message).value = msg.substring(0, cursorlen) + token1 + msg.substring(cursorlen, textlen);
-        var cursorPos = (cursorlen + token1.length);
-        document.getElementById(html_message).selectionStart = cursorPos;
-        document.getElementById(html_message).selectionEnd   = cursorPos;
-        document.getElementById(html_message).focus();
-    }
-    verify();
-}
-
 function showBindFormatChkBox()
 {
     var templateExists = true;
     if ( document.getElementById('template') == null || document.getElementById('template').value == '' ) {
         templateExists = false;
     }
-    var formatExists = true;
-    if ( document.getElementById('format_id').value == 0 ) {
-        formatExists = false;
-    }
+    var formatExists = !!cj('#format_id').val();
     if ( templateExists && formatExists ) {
         document.getElementById("bindFormat").style.display = "block";
     } else if ( formatExists && document.getElementById("saveTemplate") != null && document.getElementById("saveTemplate").checked ) {
@@ -187,38 +200,43 @@ function showBindFormatChkBox()
 
 function showUpdateFormatChkBox()
 {
-    if ( document.getElementById('format_id').value != 0 ) {
-        document.getElementById("updateFormat").style.display = "block";
+    if (cj('#format_id').val()) {
+      cj("#updateFormat").show();
     }
 }
 
-function hideUpdateFormatChkBox()
-{
-    document.getElementById("update_format").checked = false;
-    document.getElementById("updateFormat").style.display = "none";
+function updateFormatLabel() {
+  cj('.pdf-format-header-label').html(cj('#format_id option:selected').text() || cj('#format_id').attr('placeholder'));
 }
 
-function selectFormat( val, bind )
-{
-    if ( val == null || val == 0 ) {
-        val = 0;
-        bind = false;
-    }
-    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
-    cj.post( dataUrl, {formatId: val}, function( data ) {
-        cj("#format_id").val( data.id );
-        cj("#paper_size").val( data.paper_size );
-        cj("#orientation").val( data.orientation );
-        cj("#metric").val( data.metric );
-        cj("#margin_top").val( data.margin_top );
-        cj("#margin_bottom").val( data.margin_bottom );
-        cj("#margin_left").val( data.margin_left );
-        cj("#margin_right").val( data.margin_right );
-        selectPaper( data.paper_size );
-        hideUpdateFormatChkBox();
-        document.getElementById('bind_format').checked = bind;
-        showBindFormatChkBox();
-    }, 'json');
+updateFormatLabel();
+
+function fillFormatInfo( data, bind ) {
+  cj("#format_id").val( data.id );
+  cj("#paper_size").val( data.paper_size );
+  cj("#orientation").val( data.orientation );
+  cj("#metric").val( data.metric );
+  cj("#margin_top").val( data.margin_top );
+  cj("#margin_bottom").val( data.margin_bottom );
+  cj("#margin_left").val( data.margin_left );
+  cj("#margin_right").val( data.margin_right );
+  selectPaper( data.paper_size );
+  cj("#update_format").prop({checked: false}).parent().hide();
+  document.getElementById('bind_format').checked = bind;
+  showBindFormatChkBox();
+}
+
+function selectFormat( val, bind ) {
+  updateFormatLabel();
+  if (!val) {
+    val = 0;
+    bind = false;
+  }
+
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
+  cj.post( dataUrl, {formatId: val}, function( data ) {
+    fillFormatInfo(data, bind);
+  }, 'json');
 }
 
 function selectPaper( val )
@@ -309,4 +327,3 @@ function showSaveDetails(chkbox)  {
 
 </script>
 {/literal}
-

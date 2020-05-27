@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,8 +29,8 @@
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
 {if $action eq 8}
-  <div class="messages status no-popup">  
-      <div class="icon inform-icon"></div> 
+  <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
         {ts 1=$formatName}WARNING: You are about to delete the PDF Page Format titled <strong>%1</strong>.{/ts}<p>{ts}This will remove the format from all Message Templates that use it. Do you want to continue?{/ts}</p>
   </div>
 {else}
@@ -60,16 +60,12 @@
         <td class="right">{$form.margin_left.label}</td><td>{$form.margin_left.html}</td>
         <td class="right">{$form.margin_right.label}</td><td>{$form.margin_right.html}</td>
     </tr>
-    <tr class="crm-pdfFormat-form-block-weight"> 
+    <tr class="crm-pdfFormat-form-block-weight">
         <td class="right">{$form.weight.label}</td><td colspan="3">{$form.weight.html}<br />
         <span class="description">{ts}Weight controls the order in which PDF Page Formats are displayed <br />in selection lists. Enter a positive or negative integer. Lower numbers <br />are displayed ahead of higher numbers.{/ts}</span>
         </td>
     </tr>
   </table>
-{/if} 
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
-
 {literal}
 <script type="text/javascript" >
 
@@ -143,3 +139,7 @@ function convertMetric( value, from, to ) {
 
 </script>
 {/literal}
+
+{/if}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

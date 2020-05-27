@@ -4,17 +4,13 @@ require_once 'CRM/Core/Config.php';
 require_once 'CRM/Core/Error.php';
 require_once 'CRM/Utils/Array.php';
 
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 // To keep backward compatibility for URLs generated
 // by CiviCRM < 1.7, we check for the q variable as well.
-if (isset($_GET['qid'])) {
-  $queue_id = CRM_Utils_Array::value('qid', $_GET);
-}
-else {
-  $queue_id = CRM_Utils_Array::value('q', $_GET);
-}
-$url_id = CRM_Utils_Array::value('u', $_GET);
+$queue_id = $_GET['qid'] ?? $_GET['q'] ?? NULL;
+
+$url_id = $_GET['u'] ?? NULL;
 
 if (!$url_id) {
   echo "Missing input parameters\n";
@@ -35,7 +31,7 @@ if (strlen($query_string) > 0) {
   $pieces = parse_url($url);
 
   if (isset($pieces['fragment'])) {
-  $url = str_replace('#' . $pieces['fragment'], '', $url);
+    $url = str_replace('#' . $pieces['fragment'], '', $url);
   }
 
   // Handle additional query string params.
@@ -54,4 +50,9 @@ if (strlen($query_string) > 0) {
   }
 }
 
-CRM_Utils_System::redirect($url);
+// CRM-18320 - Fix encoded ampersands (see CRM_Utils_System::redirect)
+$url = str_replace('&amp;', '&', $url);
+
+// CRM-17953 - The CMS is not bootstrapped so cannot use CRM_Utils_System::redirect
+header('Location: ' . $url);
+CRM_Utils_System::civiExit();

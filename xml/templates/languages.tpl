@@ -10,7 +10,7 @@ INSERT INTO `civicrm_option_group`
   (`name`, {localize field='title'}`title`{/localize}, {localize field='description'}`description`{/localize}, `is_reserved`, `is_active`)
 VALUES
   ('languages', {localize}'{ts escape="sql"}Languages{/ts}'{/localize}, {localize}'{ts escape="sql"}List of Languages{/ts}'{/localize}, 1, 1);
-  
+
 SELECT @option_group_id_languages      := max(id) from civicrm_option_group where name = 'languages';
 
 SELECT @counter := 0;
@@ -56,7 +56,8 @@ VALUES
   (@option_group_id_languages, 0, 1, 'cs_CZ', 'cs', {localize}'{ts escape="sql"}Czech{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'da_DK', 'da', {localize}'{ts escape="sql"}Danish{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'dv_MV', 'dv', {localize}'{ts escape="sql"}Divehi; Dhivehi; Maldivian;{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 1, 'nl_NL', 'nl', {localize}'{ts escape="sql"}Dutch{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'nl_NL', 'nl', {localize}'{ts escape="sql"}Dutch (Netherlands){/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'nl_BE', 'nl', {localize}'{ts escape="sql"}Dutch (Belgium){/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'dz_BT', 'dz', {localize}'{ts escape="sql"}Dzongkha{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'en_AU', 'en', {localize}'{ts escape="sql"}English (Australia){/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'en_CA', 'en', {localize}'{ts escape="sql"}English (Canada){/ts}'{/localize}, @counter := @counter + 1),
@@ -76,7 +77,7 @@ VALUES
   (@option_group_id_languages, 0, 1, 'de_DE', 'de', {localize}'{ts escape="sql"}German{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'de_CH', 'de', {localize}'{ts escape="sql"}German (Swiss){/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'el_GR', 'el', {localize}'{ts escape="sql"}Greek, Modern{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 0, 'gn_PY', 'gn', {localize}'{ts escape="sql"}Guaraní{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 0, 'gn_PY', 'gn', {localize}'{ts escape="sql"}Guarani­{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'gu_IN', 'gu', {localize}'{ts escape="sql"}Gujarati{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ht_HT', 'ht', {localize}'{ts escape="sql"}Haitian; Haitian Creole{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ha_NG', 'ha', {localize}'{ts escape="sql"}Hausa{/ts}'{/localize}, @counter := @counter + 1),
@@ -132,7 +133,7 @@ VALUES
   (@option_group_id_languages, 0, 0, 'mn_MN', 'mn', {localize}'{ts escape="sql"}Mongolian{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'na_NR', 'na', {localize}'{ts escape="sql"}Nauru{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'nv_US', 'nv', {localize}'{ts escape="sql"}Navajo, Navaho{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 1, 'nb_NO', 'nb', {localize}'{ts escape="sql"}Norwegian Bokmål{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'nb_NO', 'nb', {localize}'{ts escape="sql"}Norwegian BokmÃ¥l{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'nd_ZW', 'nd', {localize}'{ts escape="sql"}North Ndebele{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ne_NP', 'ne', {localize}'{ts escape="sql"}Nepali{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ng_NA', 'ng', {localize}'{ts escape="sql"}Ndonga{/ts}'{/localize}, @counter := @counter + 1),
@@ -147,8 +148,8 @@ VALUES
   (@option_group_id_languages, 0, 0, 'or_IN', 'or', {localize}'{ts escape="sql"}Oriya{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'os_GE', 'os', {localize}'{ts escape="sql"}Ossetian, Ossetic{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'pa_IN', 'pa', {localize}'{ts escape="sql"}Panjabi, Punjabi{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 0, 'pi_KH', 'pi', {localize}'{ts escape="sql"}Pāli{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 0, 'fa_IR', 'fa', {localize}'{ts escape="sql"}Persian (Iran){/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 0, 'pi_KH', 'pi', {localize}'{ts escape="sql"}Pali{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'fa_IR', 'fa', {localize}'{ts escape="sql"}Persian (Iran){/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'pl_PL', 'pl', {localize}'{ts escape="sql"}Polish{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ps_AF', 'ps', {localize}'{ts escape="sql"}Pashto, Pushto{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'pt_BR', 'pt', {localize}'{ts escape="sql"}Portuguese (Brazil){/ts}'{/localize}, @counter := @counter + 1),
@@ -164,7 +165,7 @@ VALUES
   (@option_group_id_languages, 0, 0, 'se_NO', 'se', {localize}'{ts escape="sql"}Northern Sami{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'sm_WS', 'sm', {localize}'{ts escape="sql"}Samoan{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'sg_CF', 'sg', {localize}'{ts escape="sql"}Sango{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 0, 'sr_RS', 'sr', {localize}'{ts escape="sql"}Serbian{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'sr_RS', 'sr', {localize}'{ts escape="sql"}Serbian{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'gd_GB', 'gd', {localize}'{ts escape="sql"}Scottish Gaelic; Gaelic{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'sn_ZW', 'sn', {localize}'{ts escape="sql"}Shona{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'si_LK', 'si', {localize}'{ts escape="sql"}Sinhala, Sinhalese{/ts}'{/localize}, @counter := @counter + 1),
@@ -195,7 +196,7 @@ VALUES
   (@option_group_id_languages, 0, 0, 'tw_GH', 'tw', {localize}'{ts escape="sql"}Twi{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ty_PF', 'ty', {localize}'{ts escape="sql"}Tahitian{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ug_CN', 'ug', {localize}'{ts escape="sql"}Uighur, Uyghur{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 0, 'uk_UA', 'uk', {localize}'{ts escape="sql"}Ukrainian{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'uk_UA', 'uk', {localize}'{ts escape="sql"}Ukrainian{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ur_PK', 'ur', {localize}'{ts escape="sql"}Urdu{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'uz_UZ', 'uz', {localize}'{ts escape="sql"}Uzbek{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 've_ZA', 've', {localize}'{ts escape="sql"}Venda{/ts}'{/localize}, @counter := @counter + 1),

@@ -1,36 +1,19 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<h3>{$activityTypeName}</h3>
 <div class="crm-block crm-content-block crm-activity-view-block">
       {if $activityTypeDescription}
-        <div id="help">{$activityTypeDescription}</div>
+        <div class="help">{$activityTypeDescription}</div>
       {/if}
       <table class="crm-info-panel">
         <tr>
-            <td class="label">{ts}Added By{/ts}</td><td class="view-value">{$values.source_contact}</td>
+            <td class="label">{ts}Added by{/ts}</td><td class="view-value">{$values.source_contact}</td>
         </tr>
        {if $values.target_contact_value}
            <tr>
@@ -39,7 +22,7 @@
        {/if}
        {if $values.mailingId}
            <tr>
-                <td class="label">{ts}With Contact{/ts}</td><td class="view-value"><a href="{$values.mailingId}" title="{ts}View Mailing Report{/ts}">&raquo;{ts}Mailing Report{/ts}</a></td>
+                <td class="label">{ts}With Contact{/ts}</td><td class="view-value"><a href="{$values.mailingId}" title="{ts}View Mailing Report{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>{ts}Mailing Report{/ts}</a></td>
            </tr>
        {/if}
         <tr>
@@ -101,7 +84,7 @@
                                   {$mailingReport.mailing.body_text|mb_truncate:30|escape|nl2br}
                                   <br />
                                   {if $values.mailingId}
-                                    <strong><a href='{$textViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+                                    <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
                                   {/if}
                               </td>
                           </tr>
@@ -114,7 +97,7 @@
                                   {$mailingReport.mailing.body_html|mb_truncate:30|escape|nl2br}
                                   <br/>
                                   {if $values.mailingId}
-                                    <strong><a href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+                                    <strong><a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
                                   {/if}
                               </td>
                           </tr>
@@ -147,4 +130,3 @@
      </table>
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-

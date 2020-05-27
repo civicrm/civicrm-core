@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -40,22 +24,28 @@
 class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
 
   /**
-   * ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * @var array
    */
-  var $contactIds = array();
+  public $contactIds = [];
 
   /**
-   * params to dedupe against (queries against the whole contact set otherwise)
+   * Params to dedupe against (queries against the whole contact set otherwise)
+   * @var array
    */
-  var $params = array();
+  public $params = [];
 
   /**
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @return string  SQL query performing the search
+   * @return string
+   *   SQL query performing the search
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  function sql() {
+  public function sql() {
     if ($this->params &&
       (!array_key_exists($this->rule_table, $this->params) ||
         !array_key_exists($this->rule_field, $this->params[$this->rule_table])
@@ -69,9 +59,22 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     // extend them; $where is an array of required conditions, $on and
     // $using are arrays of required field matchings (for substring and
     // full matches, respectively)
-    $where = array();
-    $on    = array("SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})");
-    $using = array($this->rule_field);
+    $where = [];
+    $on = ["SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})"];
+
+    $innerJoinClauses = [
+      "t1.{$this->rule_field} IS NOT NULL",
+      "t2.{$this->rule_field} IS NOT NULL",
+      "t1.{$this->rule_field} = t2.{$this->rule_field}",
+    ];
+    if ($this->getFieldType($this->rule_field) === CRM_Utils_Type::T_DATE) {
+      $innerJoinClauses[] = "t1.{$this->rule_field} > '1000-01-01'";
+      $innerJoinClauses[] = "t2.{$this->rule_field} > '1000-01-01'";
+    }
+    else {
+      $innerJoinClauses[] = "t1.{$this->rule_field} <> ''";
+      $innerJoinClauses[] = "t2.{$this->rule_field} <> ''";
+    }
 
     switch ($this->rule_table) {
       case 'civicrm_contact':
@@ -89,10 +92,10 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
         break;
 
       case 'civicrm_address':
-        $id      = 'contact_id';
-        $on[]    = 't1.location_type_id = t2.location_type_id';
-        $using[] = 'location_type_id';
-        if ($this->params['civicrm_address']['location_type_id']) {
+        $id = 'contact_id';
+        $on[] = 't1.location_type_id = t2.location_type_id';
+        $innerJoinClauses[] = 't1.location_type_id = t2.location_type_id';
+        if (!empty($this->params['civicrm_address']['location_type_id'])) {
           $locTypeId = CRM_Utils_Type::escape($this->params['civicrm_address']['location_type_id'], 'Integer', FALSE);
           if ($locTypeId) {
             $where[] = "t1.location_type_id = $locTypeId";
@@ -124,7 +127,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
           $id = 'entity_id';
         }
         else {
-          CRM_Core_Error::fatal("Unsupported rule_table for civicrm_dedupe_rule.id of {$this->id}");
+          throw new CRM_Core_Exception("Unsupported rule_table for civicrm_dedupe_rule.id of {$this->id}");
         }
         break;
     }
@@ -133,9 +136,11 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     // if there are params provided, id1 should be 0
     if ($this->params) {
       $select = "t1.$id id1, {$this->rule_weight} weight";
+      $subSelect = 'id1, weight';
     }
     else {
       $select = "t1.$id id1, t2.$id id2, {$this->rule_weight} weight";
+      $subSelect = 'id1, id2, weight';
     }
 
     // build FROM (and WHERE, if it's a parametrised search)
@@ -159,58 +164,72 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
         $from = "{$this->rule_table} t1 JOIN {$this->rule_table} t2 ON (" . implode(' AND ', $on) . ")";
       }
       else {
-        $from = "{$this->rule_table} t1 JOIN {$this->rule_table} t2 USING (" . implode(', ', $using) . ")";
+        $from = "{$this->rule_table} t1 INNER JOIN {$this->rule_table} t2 ON (" . implode(' AND ', $innerJoinClauses) . ")";
       }
     }
 
     // finish building WHERE, also limit the results if requested
     if (!$this->params) {
       $where[] = "t1.$id < t2.$id";
-      $where[] = "t1.{$this->rule_field} IS NOT NULL";
     }
+    $query = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
     if ($this->contactIds) {
-      $cids = array();
+      $cids = [];
       foreach ($this->contactIds as $cid) {
         $cids[] = CRM_Utils_Type::escape($cid, 'Integer');
       }
       if (count($cids) == 1) {
-        $where[] = "(t1.$id = {$cids[0]} OR t2.$id = {$cids[0]})";
+        $query .= " AND (t1.$id = {$cids[0]}) UNION $query AND t2.$id = {$cids[0]}";
       }
       else {
-        $where[] = "(t1.$id IN (" . implode(',', $cids) . ") OR t2.$id IN (" . implode(',', $cids) . "))";
+        $query .= " AND t1.$id IN (" . implode(',', $cids) . ")
+        UNION $query AND  t2.$id IN (" . implode(',', $cids) . ")";
       }
+      // The `weight` is ambiguous in the context of the union; put the whole
+      // thing in a subquery.
+      $query = "SELECT $subSelect FROM ($query) subunion";
     }
 
-    return "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
+    return $query;
   }
 
   /**
-   * To find fields related to a rule group.
+   * find fields related to a rule group.
    *
-   * @param array contains the rule group property to identify rule group
+   * @param array $params contains the rule group property to identify rule group
    *
-   * @return rule fields array associated to rule group
-   * @access public
+   * @return array
+   *   rule fields array associated to rule group
    */
-  static function dedupeRuleFields($params) {
-    $rgBao               = new CRM_Dedupe_BAO_RuleGroup();
-    $rgBao->used         = $params['used'];
+  public static function dedupeRuleFields($params) {
+    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao->used = $params['used'];
     $rgBao->contact_type = $params['contact_type'];
     $rgBao->find(TRUE);
 
     $ruleBao = new CRM_Dedupe_BAO_Rule();
     $ruleBao->dedupe_rule_group_id = $rgBao->id;
     $ruleBao->find();
-    $ruleFields = array();
+    $ruleFields = [];
     while ($ruleBao->fetch()) {
-      $ruleFields[] = $ruleBao->rule_field;
+      $field_name = $ruleBao->rule_field;
+      if ($field_name == 'phone_numeric') {
+        $field_name = 'phone';
+      }
+      $ruleFields[] = $field_name;
     }
     return $ruleFields;
   }
 
-  function validateContacts($cid, $oid) {
+  /**
+   * @param int $cid
+   * @param int $oid
+   *
+   * @return bool
+   */
+  public static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
-      return;
+      return NULL;
     }
     $exception = new CRM_Dedupe_DAO_Exception();
     $exception->contact_id1 = $cid;
@@ -221,7 +240,29 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
       $exception->contact_id2 = $cid;
     }
 
-    return $exception->find(TRUE) ? FALSE : TRUE;
+    return !$exception->find(TRUE);
   }
-}
 
+  /**
+   * Get the specification for the given field.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getFieldType($fieldName) {
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($this->rule_table));
+    if (!$entity) {
+      // This means we have stored a custom field rather than an entity name in rule_table, figure out the entity.
+      $entity = civicrm_api3('CustomGroup', 'getvalue', ['table_name' => $this->rule_table, 'return' => 'extends']);
+      if (in_array($entity, ['Individual', 'Household', 'Organization'])) {
+        $entity = 'Contact';
+      }
+      $fieldName = 'custom_' . civicrm_api3('CustomField', 'getvalue', ['column_name' => $fieldName, 'return' => 'id']);
+    }
+    $fields = civicrm_api3($entity, 'getfields', ['action' => 'create'])['values'];
+    return $fields[$fieldName]['type'];
+  }
+
+}

@@ -1,32 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting premium  *}
-<h3>{if $action eq 1}{ts}New Premium{/ts}{elseif $action eq 2}{ts}Edit Premium{/ts}{elseif $action eq 1024}{ts}Preview a Premium{/ts}{else}{ts}Delete Premium Product{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution-manage_premiums-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    {if $action eq 8}
       <div class="messages status no-popup">
           <div class="icon inform-icon"></div>
@@ -35,6 +17,8 @@
   {elseif $action eq 1024}
      {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="previewPremium"}
   {else}
+     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {crmRegion name="contribute-form-managepremiums-standard-fields"}
   <table class="form-layout-compressed">
      <tr class="crm-contribution-form-block-name">
   <td class="label">{$form.name.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_product' field='name' id=$productId}{/if}
@@ -60,16 +44,16 @@
       <td>
       <fieldset><div class="description">
         <p>{ts}You can give this premium a picture that will be displayed on the contribution page. Both a 50 x 50 pixel thumbnail image and a 200 x 200 pixel larger image will be displayed. Images must be in GIF, JPEG, or PNG format.{/ts}</p>
-        <p>{ts}You can upload an image from your computer OR enter a URL for an image already on the Web. If you chose to upload an image file, a 'thumbnail' version will be automatically created for you. If you don't have an image available at this time, you may also choose to display a 'No Image Available' icon - by selecting the 'default image'.{/ts}</p>
+        <p>{ts}You can upload an image from your computer OR enter a URL for an image already on the Web. If you chose to upload an image file, a 'thumbnail' version will be automatically created for you. If you don't have an image available at this time, you may also choose to display a 'No Image Available' icon by selecting the 'default image'.{/ts}</p>
                   </div>
   <table class="form-layout-compressed">
     {if $thumbnailUrl}<tr class="odd-row"><td class="describe-image" colspan="2"><strong>Current Image Thumbnail</strong><br /><img src="{$thumbnailUrl}" /></td></tr>{/if}
     <tr class="crm-contribution-form-block-imageOption"><td>{$form.imageOption.image.html}</td><td>{$form.uploadFile.html}</td></tr>
   <tr class="crm-contribution-form-block-imageOption-thumbnail"><td colspan="2">{$form.imageOption.thumbnail.html}</td></tr>
-    <tr id="imageURL"{if $action eq 2}class="show-row" {else} class="hide-row" {/if}>
+    <tr id="imageURL"{if $action neq 2} class="hiddenElement"{/if}>
         <td class="label">{$form.imageUrl.label}</td><td>{$form.imageUrl.html|crmAddClass:huge}</td>
     </tr>
-    <tr id="thumbnailURL"{if $action eq 2}class="show-row" {else} class="hide-row" {/if}>
+    <tr id="thumbnailURL"{if $action neq 2} class="hiddenElement"{/if}>
         <td class="label">{$form.thumbnailUrl.label}</td><td>{$form.thumbnailUrl.html|crmAddClass:huge}</td>
     </tr>
   <tr><td colspan="2">{$form.imageOption.default_image.html}</td></tr>
@@ -104,7 +88,7 @@
          {ts 1=$ftUrl}There are no financial types configured with linked 'Cost of Sales Premiums' and 'Premiums Inventory Account' accounts. If you want to generate accounting transactions which track the cost of premiums used <a href='%1'>click here</a> to configure financial types and accounts.{/ts}
        {else}
          {$form.financial_type_id.html}<br />
-	 <span class="description">{ts}Select a financial type that is linked to both a 'Cost of Sales Premiums Account' and a 'Premiums Inventory Account' if you want to generate accounting transactions to track the cost of premiums used.{/ts}</span>
+   <span class="description">{ts}Select a financial type that is linked to both a 'Cost of Sales Premiums Account' and a 'Premiums Inventory Account' if you want to generate accounting transactions to track the cost of premiums used.{/ts}</span>
        {/if}
        </td>
     </tr>
@@ -119,6 +103,8 @@
        <td class="html-adjust">{$form.is_active.html}</td>
     </tr>
   </table>
+  {/crmRegion}
+  {crmRegion name="contribute-form-managepremiums-other-fields"}
   <fieldset id="time-delimited" class="crm-collapsible {if empty($showSubscriptions)}collapsed{/if}">
     <legend class="collapsible-title">{ts}Subscription or Service Settings{/ts}</legend>
     <div>
@@ -150,6 +136,7 @@
       </table>
     </div>
   </fieldset>
+  {/crmRegion}
  {/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
@@ -171,8 +158,6 @@ function add_upload_file_block(parms) {
 
   }
 }
-
-cj().crmAccordions();
 
 {/literal}
 </script>

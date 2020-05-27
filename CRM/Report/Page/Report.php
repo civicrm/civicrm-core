@@ -1,51 +1,29 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * Page for invoking report templates
+ * Page for invoking report templates.
  */
 class CRM_Report_Page_Report extends CRM_Core_Page {
 
   /**
-   * run this page (figure out the action needed and perform it).
-   *
-   * @return void
+   * Run this page (figure out the action needed and perform it).
    */
-  function run() {
+  public function run() {
     if (!CRM_Core_Permission::check('administer Reports')) {
       return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/report/list', 'reset=1'));
     }
@@ -53,7 +31,7 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     $optionVal = CRM_Report_Utils_Report::getValueFromUrl();
 
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value',
-      'String', FALSE
+      'String', FALSE, TRUE
     );
 
     $extKey = strpos(CRM_Utils_Array::value('name', $templateInfo), '.');
@@ -67,7 +45,7 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     }
 
     if (strstr(CRM_Utils_Array::value('name', $templateInfo), '_Form') || !is_null($reportClass)) {
-      CRM_Utils_System::setTitle($templateInfo['label'] . ' - Template');
+      CRM_Utils_System::setTitle(ts('%1 - Template', [1 => $templateInfo['label']]));
       $this->assign('reportTitle', $templateInfo['label']);
 
       $session = CRM_Core_Session::singleton();
@@ -83,5 +61,5 @@ class CRM_Report_Page_Report extends CRM_Core_Page {
     }
     return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/report/list', 'reset=1'));
   }
-}
 
+}

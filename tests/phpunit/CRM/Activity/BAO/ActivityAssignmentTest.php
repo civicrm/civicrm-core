@@ -1,45 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  * Test class for CRM_Activity_BAO_ActivityAssignment BAO
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
+ * @group headless
  */
 class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
 
   /**
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
-   *
-   * @access protected
    */
   protected function setUp() {
     parent::setUp();
@@ -48,15 +28,14 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @access protected
    */
-  protected function tearDown() {}
+  protected function tearDown() {
+  }
 
   /**
-   *  Pass zero as an id and make sure no Assignees are retrieved
+   *  Pass zero as an id and make sure no Assignees are retrieved.
    */
-  function testRetrieveAssigneeIdsByActivityIdNoId() {
+  public function testRetrieveAssigneeIdsByActivityIdNoId() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(0);
 
@@ -64,19 +43,19 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass null as an id and make sure no Assignees are retrieved
+   *  Pass null as an id and make sure no Assignees are retrieved.
    */
-  function testRetrieveAssigneeIdsByActivityIdNullId() {
+  public function testRetrieveAssigneeIdsByActivityIdNullId() {
     $activity = $this->activityCreate();
-    $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(Null);
+    $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId(NULL);
 
     $this->assertEquals(count($activityId), 0, '0 assignees retrieved using null');
   }
 
   /**
-   *  Pass a string as an id and make sure no Assignees are retrieved
+   *  Pass a string as an id and make sure no Assignees are retrieved.
    */
-  function testRetrieveAssigneeIdsByActivityIdString() {
+  public function testRetrieveAssigneeIdsByActivityIdString() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId('test');
 
@@ -86,7 +65,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass a known activity id as an id and make sure 1 Assignees is retrieved
    */
-  function testRetrieveAssigneeIdsByActivityIdOneId() {
+  public function testRetrieveAssigneeIdsByActivityIdOneId() {
     $activity = $this->activityCreate();
     $activityId = CRM_Activity_BAO_ActivityAssignment::retrieveAssigneeIdsByActivityId($activity['id']);
 
@@ -94,9 +73,9 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass zero as an id and make sure no Assignees are retrieved
+   *  Pass zero as an id and make sure no Assignees are retrieved.
    */
-  function testGetAssigneeNamesNoId() {
+  public function testGetAssigneeNamesNoId() {
     $activity = $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(0);
 
@@ -104,11 +83,11 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Pass Null as an id and make sure no Assignees are retrieved
+   *  Pass Null as an id and make sure no Assignees are retrieved.
    */
-  function testGetAssigneeNamesNullId() {
+  public function testGetAssigneeNamesNullId() {
     $activity = $this->activityCreate();
-    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(Null);
+    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(NULL);
 
     $this->assertEquals(count($assignees), 0, '0 assignee names retrieved');
   }
@@ -116,10 +95,10 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   /**
    *  Pass a known activity id as an id and make sure 1 Assignees is retrieved
    */
-  function testGetAssigneeNamesOneId() {
+  public function testGetAssigneeNamesOneId() {
     $activity = $this->activityCreate();
-    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity['id']);
+    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$activity['id']]);
     $this->assertEquals(count($assignees), 1, '1 assignee names retrieved');
   }
-}
 
+}

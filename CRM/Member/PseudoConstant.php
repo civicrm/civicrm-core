@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -40,32 +24,32 @@
 class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * membership types
+   * Membership types.
    * @var array
-   * @static
    */
   private static $membershipType;
 
   /**
-   * membership types
+   * Membership types.
    * @var array
-   * @static
    */
   private static $membershipStatus;
 
   /**
-   * Get all the membership types
+   * Get all the membership types.
    *
-   * @access public
    *
-   * @return array - array reference of all membership types if any
-   * @static
+   * @param int $id
+   * @param bool $force
+   *
+   * @return array
+   *   array reference of all membership types if any
    */
-  public static function &membershipType($id = NULL, $force = FALSE) {
+  public static function membershipType($id = NULL, $force = TRUE) {
     if (!self::$membershipType || $force) {
       CRM_Core_PseudoConstant::populate(self::$membershipType,
         'CRM_Member_DAO_MembershipType',
-        FALSE, 'name', 'is_active', NULL, 'weight', 'id', TRUE
+        FALSE, 'name', 'is_active', NULL, 'weight', 'id'
       );
     }
     if ($id) {
@@ -81,16 +65,22 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the membership statuss
+   * Get all the membership statuss.
    *
-   * @access public
    *
-   * @return array - array reference of all membership statuss if any
-   * @static
+   * @param int $id
+   * @param null $cond
+   * @param string $column
+   * @param bool $force
+   *
+   * @param bool $allStatus
+   *
+   * @return array
+   *   array reference of all membership statuses if any
    */
-  public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE) {
+  public static function &membershipStatus($id = NULL, $cond = NULL, $column = 'name', $force = FALSE, $allStatus = FALSE) {
     if (self::$membershipStatus === NULL) {
-      self::$membershipStatus = array();
+      self::$membershipStatus = [];
     }
 
     $cacheKey = $column;
@@ -100,13 +90,13 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
     if (!isset(self::$membershipStatus[$cacheKey]) || $force) {
       CRM_Core_PseudoConstant::populate(self::$membershipStatus[$cacheKey],
         'CRM_Member_DAO_MembershipStatus',
-        FALSE, $column, 'is_active', $cond, 'weight'
+        $allStatus, $column, 'is_active', $cond, 'weight'
       );
     }
 
     $value = NULL;
     if ($id) {
-      $value = CRM_Utils_Array::value($id, self::$membershipStatus[$cacheKey]);
+      $value = self::$membershipStatus[$cacheKey][$id] ?? NULL;
     }
     else {
       $value = self::$membershipStatus[$cacheKey];
@@ -119,14 +109,16 @@ class CRM_Member_PseudoConstant extends CRM_Core_PseudoConstant {
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
-   * @access public
-   * @static
    *
-   * @param boolean $name pseudoconstant to be flushed
-   *
+   * @param bool|string $name pseudoconstant to be flushed
    */
-  public static function flush($name) {
-    self::$$name = NULL;
+  public static function flush($name = 'cache') {
+    if (isset(self::$$name)) {
+      self::$$name = NULL;
+    }
+    // The preferred source of membership pseudoconstants is in fact the Core class.
+    // which buildOptions accesses - better flush that too.
+    CRM_Core_PseudoConstant::flush();
   }
-}
 
+}

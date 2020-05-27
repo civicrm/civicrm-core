@@ -1,0 +1,18 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="id-label_format-text"}
+  {ts}Label Formats{/ts}
+{/htxt}
+{htxt id="id-label_format"}
+  {capture assign=labelURL}{crmURL p='civicrm/admin/labelFormats' q='reset=1&action=browse'}{/capture}
+  <p>
+    {ts 1=$labelURL}Select a pre-defined name badge label format from the list. Label formats control paper size and page configuration (e.g. 2 labels per row, 4 per column). New label formats may require additional programming to produce expected results for event badges.{/ts}
+  </p>
+{/htxt}

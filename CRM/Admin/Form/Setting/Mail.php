@@ -1,86 +1,64 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates form components for CiviMail
+ * This class generates form components for CiviMail.
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
+  protected $_settings = [
+    'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'mailerJobsMax' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'verpSeparator' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+  ];
+
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
-    $this->addElement('text', 'verpSeparator', ts('VERP Separator'));
-    $this->addElement('text', 'mailerBatchLimit', ts('Mailer Batch Limit'));
-    $this->addElement('text', 'mailThrottleTime', ts('Mailer Throttle Time'));
-    $this->addElement('text', 'mailerJobSize', ts('Mailer Job Size'));
-    $this->addElement('advcheckbox', 'replyTo', ts('Enable Custom Reply-To'));
-    $this->addElement('text', 'mailerJobsMax', ts('Mailer CRON job limit'));
-    $check = TRUE;
+    $this->addFormRule(['CRM_Admin_Form_Setting_Mail', 'formRule']);
 
-    // redirect to Administer Section After hitting either Save or Cancel button.
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-    
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Mail', 'formRule'));
-    $this->addRule('mailerBatchLimit', ts('Must be an integer'), 'integer');
-    $this->addRule('mailThrottleTime', ts('Must be an integer'), 'integer');
-    $this->addRule('mailerJobSize', ts('Must be an integer'), 'integer');
-    $this->addRule('mailerJobsMax', ts('Must be an integer'), 'integer');            
-
-    parent::buildQuickForm($check);
+    parent::buildQuickForm();
   }
-  
-  static function formRule($fields) {
-    $errors = array();
+
+  /**
+   * @param $fields
+   *
+   * @return array|bool
+   */
+  public static function formRule($fields) {
+    $errors = [];
 
     if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
       if (CRM_Utils_Array::value('mailerJobSize', $fields) < 1000) {
         $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
       }
       elseif (CRM_Utils_Array::value('mailerJobSize', $fields) <
-        CRM_Utils_Array::value('mailerBatchLimit', $fields)) {
+        CRM_Utils_Array::value('mailerBatchLimit', $fields)
+      ) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
       }
     }
-    
+
     return empty($errors) ? TRUE : $errors;
   }
-}
 
+}

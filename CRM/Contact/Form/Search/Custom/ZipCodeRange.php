@@ -1,50 +1,50 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
-  function __construct(&$formValues) {
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
+
+  /**
+   * Class constructor.
+   *
+   * @param array $formValues
+   */
+  public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+    $this->_columns = [
+      // If possible, don't use aliases for the columns you select.
+      // You can prefix columns with table aliases, if needed.
+      //
+      // If you don't do this, selecting individual records from the
+      // custom search result won't work if your results are sorted on the
+      // aliased colums.
+      // (This is why we map Contact ID on contact_a.id, and not on contact_id).
+      ts('Contact ID') => 'contact_a.id',
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
       ts('Zip') => 'postal_code',
-    );
+    ];
   }
 
-  function buildForm(&$form) {
+  /**
+   * @param CRM_Core_Form $form
+   */
+  public function buildForm(&$form) {
     $form->add('text',
       'postal_code_low',
       ts('Postal Code Start'),
@@ -66,23 +66,54 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('postal_code_low', 'postal_code_high'));
+    $form->assign('elements', ['postal_code_low', 'postal_code_high']);
   }
 
-  function summary() {
-    $summary = array();
+  /**
+   * @return array
+   */
+  public function summary() {
+    $summary = [];
     return $summary;
   }
 
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL
+   *
+   * @return string
+   */
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
+  public function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
+      // Don't change sort order when $justIDs is TRUE, see CRM-14920.
     }
     else {
+      // We select contact_a.id twice. Once as contact_a.id,
+      // because it is used to fill the prevnext_cache. And once
+      // as contact_a.id, for the patch of CRM-16587 to work when
+      // the results are sorted on contact ID.
       $selectClause = "
 contact_a.id           as contact_id ,
+contact_a.id           as id ,
 contact_a.sort_name    as sort_name  ,
 email.email            as email   ,
 address.postal_code    as postal_code
@@ -94,18 +125,28 @@ address.postal_code    as postal_code
     );
   }
 
-  function from() {
-    return "
+  /**
+   * @return string
+   */
+  public function from() {
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM      civicrm_contact contact_a
 LEFT JOIN civicrm_address address ON ( address.contact_id       = contact_a.id AND
                                        address.is_primary       = 1 )
 LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
-                                       email.is_primary = 1 )
+                                       email.is_primary = 1 ) {$this->_aclFrom}
 ";
+    return $from;
   }
 
-  function where($includeContactIDs = FALSE) {
-    $params = array();
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
+  public function where($includeContactIDs = FALSE) {
+    $params = [];
 
     $low = CRM_Utils_Array::value('postal_code_low',
       $this->_formValues
@@ -123,22 +164,28 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     }
 
     $where = "ROUND(address.postal_code) >= %1 AND ROUND(address.postal_code) <= %2";
-    $params = array(1 => array(trim($low), 'Integer'),
-      2 => array(trim($high), 'Integer'),
-    );
+    $params = [
+      1 => [trim($low), 'Integer'],
+      2 => [trim($high), 'Integer'],
+    ];
 
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
     return $this->whereClause($where, $params);
   }
 
-  function setDefaultValues() {
-    return array();
-  }
-
-  function templateFile() {
+  /**
+   * @return string
+   */
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
-  function setTitle($title) {
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -146,5 +193,12 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

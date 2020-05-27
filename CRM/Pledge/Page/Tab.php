@@ -1,69 +1,54 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   public $_permission = NULL;
   public $_contactId = NULL;
 
   /**
-   * This function is called when action is browse
-   *
-   * return null
-   * @access public
+   * called when action is browse.
    */
-  function browse() {
+  public function browse() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Search', ts('Pledges'), $this->_action);
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('context', 'pledge');
+    $controller->set('limit', '25');
     $controller->process();
     $controller->run();
 
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
+      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('pledge', $this->_contactId);
+      // Refresh other tabs with related data
+      $this->ajaxResponse['updateTabs'] = [
+        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
+        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
+      ];
     }
   }
 
   /**
-   * This function is called when action is view
+   * called when action is view.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function view() {
+  public function view() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_PledgeView',
       'View Pledge',
       $this->_action
@@ -76,12 +61,11 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is called when action is update or new
+   * called when action is update or new.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function edit() {
+  public function edit() {
     $controller = new CRM_Core_Controller_Simple('CRM_Pledge_Form_Pledge',
       'Create Pledge',
       $this->_action
@@ -93,10 +77,10 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
-  function preProcess() {
-    $context       = CRM_Utils_Request::retrieve('context', 'String', $this);
+  public function preProcess() {
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
-    $this->_id     = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if ($context == 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
@@ -107,9 +91,6 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
-
-      // set page title
-      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
 
     $this->assign('action', $this->_action);
@@ -122,18 +103,17 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * This function is the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
     // check if we can process credit card registration
-    CRM_Core_Payment::allowBackofficeCreditCard($this);
+    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
 
-    $this->setContext();
+    self::setContext($this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
@@ -154,11 +134,16 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
-  function setContext() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
+  /**
+   * Get context.
+   *
+   * @param $form
+   */
+  public static function setContext(&$form) {
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form, FALSE, 'search');
 
-    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
-    //validate the qfKey
+    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
+    // validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
     }
@@ -184,7 +169,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'pledge':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$this->_contactId}&selectedChild=pledge"
+          "reset=1&force=1&cid={$form->_contactId}&selectedChild=pledge"
         );
         break;
 
@@ -194,7 +179,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'activity':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$this->_contactId}&selectedChild=activity"
+          "reset=1&force=1&cid={$form->_contactId}&selectedChild=activity"
         );
         break;
 
@@ -204,8 +189,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       default:
         $cid = NULL;
-        if ($this->_contactId) {
-          $cid = '&cid=' . $this->_contactId;
+        if ($form->_contactId) {
+          $cid = '&cid=' . $form->_contactId;
         }
         $url = CRM_Utils_System::url('civicrm/pledge/search',
           'force=1' . $cid
@@ -215,5 +200,5 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }
-}
 
+}

@@ -7,7 +7,7 @@
 <body>
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -28,8 +28,7 @@
       <li><a href="{$loginUrl}">{ts}Login to your account{/ts}</a></li>
       <li><a href="{$pcpInfoURL}">{ts}Go to your page{/ts}</a></li>
      </ol>
-     <p>{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit
-your page, tell friends, and update your contact info.{/ts}</p>
+     <p>{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit your page, tell friends, and update your contact info.{/ts}</p>
 
      {if $isTellFriendEnabled}
       <p><a href="{$pcpTellFriendURL}">{ts}After logging in, you can use this form to promote your fundraising page{/ts}</a></p>
@@ -41,8 +40,7 @@ your page, tell friends, and update your contact info.{/ts}</p>
 
     {elseif $pcpStatus eq 'Not Approved'}
 
-     <p>{ts}Your personal campaign page has been reviewed. There were some issues with the content
-which prevented us from approving the page. We are sorry for any inconvenience.{/ts}</p>
+     <p>{ts}Your personal campaign page has been reviewed. There were some issues with the content which prevented us from approving the page. We are sorry for any inconvenience.{/ts}</p>
      {if $pcpNotifyEmailAddress}
       <p>{ts}Please contact our site administrator for more information{/ts}: {$pcpNotifyEmailAddress}</p>
      {/if}

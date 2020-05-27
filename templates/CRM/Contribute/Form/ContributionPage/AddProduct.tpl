@@ -1,32 +1,17 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="contribute-form-contributionpage-addproduct-main"}
 {capture assign=managePremiumsURL}{crmURL p='civicrm/admin/contribute/managePremiums' q="reset=1"}{/capture}
 <h3>{if $action eq 2 }{ts}Add Products to This Page{/ts} {elseif $action eq 1024}{ts}Preview{/ts}{else} {ts}Remove Products from this Page{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution-add_product-form-block">
-  <div id="help">
+  <div class="help">
     {if $action eq 1024}
       {ts}This is a preview of this product as it will appear on your Contributions page(s).{/ts}
     {else}
@@ -49,11 +34,11 @@
       <td class="label">{$form.financial_type_id.label}</td>
       <td>
       {if !$financialType }
-		    {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialType' q="reset=1"}{/capture}
+        {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialType' q="reset=1"}{/capture}
         {ts 1=$ftUrl}There are no financial types configured with linked 'Cost of Sales Premiums' and 'Premiums Inventory Account' accounts. If you want to generate accounting transactions which track the cost of premiums used <a href='%1'>click here</a> to configure financial types and accounts.{/ts}
-	    {else}		
-        {$form.financial_type_id.html}{help id="id-financial_type-product"}
-      {/if}		
+      {else}
+        {$form.financial_type_id.html} {help id="id-financial_type-product"} <a name='resetfinancialtype' id="resetfinancialtype" style="display: none;">{ts}Reset to default for selected product{/ts}</a>
+      {/if}
       </td>
     </tr>
     <tr class="crm-contribution-form-block-weight"><td class="label">{$form.weight.label}</td><td class="html-adjust">{$form.weight.html}<br />
@@ -72,41 +57,42 @@
 {/if} {* $action ne view *}
 </div>
 
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-<script language="JavaScript" type="text/javascript">
+<script type="text/javascript">
 {literal}
-function getFinancialType()
-{
-{/literal}
-	 productID         = "#product_id";
-	 financialTypeID    = "#financial_type_id"	 
-	 callbackURL        = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialType'}"	
-{literal}
-            
-    	    var check          = cj(productID).val();
-	        callbackURL = callbackURL+"&_value="+check;
-                cj.ajax({
-                         url: callbackURL,
-                         context: document.body,
-                         success: function( data, textStatus ){
-			 data = eval(data);//get json array
-                              if ( data != null ) {
-			       cj(financialTypeID).val(data);
-			         
-			     }
-			    
-			}
-	       	});
-		
-	}
 
-cj(document).ready(function(){ 
-		getFinancialType(); 
+  CRM.$(function($) {
 
-		cj("#product_id").change( function(){
-			   getFinancialType(); 
-		});		    
-});	
+    function getFinancialType(set) {
+      var callbackURL = CRM.url('civicrm/ajax/rest', {
+        className: 'CRM_Financial_Page_AJAX',
+        fnName: 'jqFinancialType',
+        _value: $("#product_id").val()
+      });
+      $.ajax({
+        url: callbackURL,
+        success: function( data, textStatus ){
+          data = eval(data);//get json array
+          if ((data != null) && (set)) {
+            $("#financial_type_id").val(data);
+          }
+
+          if (data == $("#financial_type_id").val()) {
+            $("#resetfinancialtype").hide();
+          }
+          else {
+            $("#resetfinancialtype").show();
+          }
+        }
+      });
+    }
+
+    getFinancialType(false);
+    $("#product_id").change(function() { getFinancialType(true); });
+    $("#resetfinancialtype").click(function() { getFinancialType(true); });
+    $("#financial_type_id").change(function() { getFinancialType(false); });
+});
 {/literal}
 </script>
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-addproduct-post"}
+{/crmRegion}

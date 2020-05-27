@@ -1,47 +1,41 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * Convenience class for PHP-Gettext compatibility.
  */
 class CRM_Core_I18n_NativeGettext {
-  function translate($string) {
+
+  /**
+   * @param $string
+   *
+   * @return string
+   */
+  public function translate($string) {
     return gettext($string);
   }
 
   /**
    * Based on php-gettext, since native gettext does not support this as is.
+   *
+   * @param $context
+   * @param $text
+   *
+   * @return string
    */
-  function pgettext($context, $text) {
+  public function pgettext($context, $text) {
     $key = $context . chr(4) . $text;
     $ret = $this->translate($key);
 
@@ -53,8 +47,15 @@ class CRM_Core_I18n_NativeGettext {
     }
   }
 
-  function ngettext($text, $plural, $count) {
+  /**
+   * @param $text
+   * @param $plural
+   * @param $count
+   *
+   * @return string
+   */
+  public function ngettext($text, $plural, $count) {
     return ngettext($text, $plural, $count);
   }
-}
 
+}

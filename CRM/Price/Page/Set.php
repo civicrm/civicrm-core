@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -44,7 +28,7 @@
 class CRM_Price_Page_Set extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
    */
@@ -53,62 +37,59 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @param null
-   *
-   * @return  array   array of action links that we need to display for the browse screen
-   * @access public
-   */ function &actionLinks() {
+   * @return array
+   *   array of action links that we need to display for the browse screen
+   */
+  public function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to delete this price set?');
       $copyExtra = ts('Are you sure you want to make a copy of this price set?');
-      self::$_actionLinks = array(
-        CRM_Core_Action::BROWSE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::BROWSE => [
           'name' => ts('View and Edit Price Fields'),
           'url' => 'civicrm/admin/price/field',
           'qs' => 'reset=1&action=browse&sid=%%sid%%',
           'title' => ts('View and Edit Price Fields'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/price',
           'qs' => 'action=preview&reset=1&sid=%%sid%%',
           'title' => ts('Preview Price Set'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
           'url' => 'civicrm/admin/price',
           'qs' => 'action=update&reset=1&sid=%%sid%%',
           'title' => ts('Edit Price Set'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%sid%%,\'' . 'CRM_Price_BAO_Set' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Set'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%sid%%,\'' . 'CRM_Price_BAO_Set' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Set'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/price',
           'qs' => 'action=delete&reset=1&sid=%%sid%%',
           'title' => ts('Delete Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
-        ),
-        CRM_Core_Action::COPY => array(
+        ],
+        CRM_Core_Action::COPY => [
           'name' => ts('Copy Price Set'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=copy&sid=%%sid%%',
           'title' => ts('Make a Copy of Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
@@ -120,13 +101,9 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    *
-   * @param null
-   *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // get the requested action
     $action = CRM_Utils_Request::retrieve('action', 'String',
       // default to 'browse'
@@ -140,7 +117,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
     );
 
     if ($sid) {
-      CRM_Price_BAO_Set::checkPermission($sid);
+      CRM_Price_BAO_PriceSet::checkPermission($sid);
     }
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
@@ -150,7 +127,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $this->preview($sid);
     }
     elseif ($action & CRM_Core_Action::COPY) {
-      $session = CRM_Core_Session::singleton();
       CRM_Core_Session::setStatus(ts('A copy of the price set has been created'), ts('Saved'), 'success');
       $this->copy();
     }
@@ -158,14 +134,12 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
 
       // if action is delete do the needful.
       if ($action & (CRM_Core_Action::DELETE)) {
-        $usedBy = CRM_Price_BAO_Set::getUsedBy($sid);
+        $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
 
         if (empty($usedBy)) {
           // prompt to delete
-          $session = CRM_Core_Session::singleton();
-          $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/price', 'action=browse'));
+          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/price', 'action=browse'));
           $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_DeleteSet', 'Delete Price Set', NULL);
-          // $id = CRM_Utils_Request::retrieve('sid', 'Positive', $this, false, 0);
           $controller->set('sid', $sid);
           $controller->setEmbedded(TRUE);
           $controller->process();
@@ -175,14 +149,15 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           // add breadcrumb
           $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
           CRM_Utils_System::appendBreadCrumb(ts('Price Sets'), $url);
-          $this->assign('usedPriceSetTitle', CRM_Price_BAO_Set::getTitle($sid));
+          $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceSet::getTitle($sid));
           $this->assign('usedBy', $usedBy);
 
-          $comps = array(
+          $comps = [
             'Event' => 'civicrm_event',
             'Contribution' => 'civicrm_contribution_page',
-          );
-          $priceSetContexts = array();
+            'EventTemplate' => 'civicrm_event_template',
+          ];
+          $priceSetContexts = [];
           foreach ($comps as $name => $table) {
             if (array_key_exists($table, $usedBy)) {
               $priceSetContexts[] = $name;
@@ -200,15 +175,16 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * edit price set
+   * Edit price set.
    *
-   * @param int    $id       price set id
-   * @param string $action   the action to be invoked
+   * @param int $sid
+   *   Price set id.
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function edit($sid, $action) {
+  public function edit($sid, $action) {
     // create a simple controller for editing price sets
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Set', ts('Price Set'), $action);
 
@@ -222,17 +198,17 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * Preview price set
+   * Preview price set.
    *
-   * @param int $id price set id
+   * @param int $sid
+   *   Price set id.
    *
    * @return void
-   * @access public
    */
-  function preview($sid) {
+  public function preview($sid) {
     $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_Preview', ts('Preview Price Set'), NULL);
-    $session    = CRM_Core_Session::singleton();
-    $context    = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $session = CRM_Core_Session::singleton();
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     if ($context == 'field') {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/price/field', "action=browse&sid={$sid}"));
     }
@@ -246,36 +222,42 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   }
 
   /**
-   * Browse all price sets
+   * Browse all price sets.
    *
-   * @param string $action   the action to be invoked
+   * @param string $action
+   *   The action to be invoked.
    *
    * @return void
-   * @access public
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // get all price sets
-    $priceSet = array();
-    $comps = array('CiviEvent' => ts('Event'),
+    $priceSet = [];
+    $comps = [
+      'CiviEvent' => ts('Event'),
       'CiviContribute' => ts('Contribution'),
       'CiviMember' => ts('Membership'),
-    );
+    ];
 
-    $dao = new CRM_Price_DAO_Set();
-    if (CRM_Price_BAO_Set::eventPriceSetDomainID()) {
+    $dao = new CRM_Price_DAO_PriceSet();
+    if (CRM_Price_BAO_PriceSet::eventPriceSetDomainID()) {
       $dao->domain_id = CRM_Core_Config::domainID();
     }
     $dao->is_quick_config = 0;
     $dao->find();
     while ($dao->fetch()) {
-      $priceSet[$dao->id] = array();
+      $priceSet[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $priceSet[$dao->id]);
 
       $compIds = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Utils_Array::value('extends', $priceSet[$dao->id])
       );
-      $extends = array();
-      foreach ($compIds as $compId) $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
+      $extends = [];
+      //CRM-10225
+      foreach ($compIds as $compId) {
+        if (!empty($comps[CRM_Core_Component::getComponentName($compId)])) {
+          $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
+        }
+      }
       $priceSet[$dao->id]['extends'] = implode(', ', $extends);
 
       // form all action links
@@ -296,30 +278,34 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $actionLinks = self::actionLinks();
       //CRM-10117
       if ($dao->is_reserved) {
-        $actionLinks[CRM_Core_Action::BROWSE]['name'] = 'View Price Fields';
+        $actionLinks[CRM_Core_Action::BROWSE]['name'] = ts('View Price Fields');
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
-        array('sid' => $dao->id)
+        ['sid' => $dao->id],
+        ts('more'),
+        FALSE,
+        'priceSet.row.actions',
+        'PriceSet',
+        $dao->id
       );
     }
     $this->assign('rows', $priceSet);
   }
 
   /**
-   * This function is to make a copy of a price set, including
+   * make a copy of a price set, including
    * all the fields in the page
    *
    * @return void
-   * @access public
    */
-  function copy() {
+  public function copy() {
     $id = CRM_Utils_Request::retrieve('sid', 'Positive',
       $this, TRUE, 0, 'GET'
     );
 
-    CRM_Price_BAO_Set::copy($id);
+    CRM_Price_BAO_PriceSet::copy($id);
 
     CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
   }
-}
 
+}

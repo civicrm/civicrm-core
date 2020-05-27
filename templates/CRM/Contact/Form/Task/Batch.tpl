@@ -1,30 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="batch-update crm-form-block crm-contact-task-batch-form-block">
-  <div id="help">
+  <div class="help">
   {ts}Update field values for each contact as needed. Click <strong>Update Contacts</strong> below to save all your changes. To set a field to the same value for ALL rows, enter that value for the first contact and then click the <strong>Copy icon</strong> (next to the column title).{/ts}
   </div>
   <table class="crm-copy-fields">
@@ -35,7 +19,7 @@
       {if $field.skipDisplay}
         {continue}
       {/if}
-      <td><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</td>
+      <td>{copyIcon name=$field.name title=$field.title}{$field.title}</td>
     {/foreach}
     </tr>
     </thead>
@@ -73,8 +57,6 @@
             </table>
           {/strip}
         </td>
-      {elseif ( $fields.$n.data_type eq 'Date') or ( $n eq 'birth_date' ) or ( $n eq 'deceased_date' ) }
-        <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$cid batchUpdate=1}</td>
       {elseif $n|substr:0:5 eq 'phone'}
         <td class="compressed">
           {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
@@ -96,4 +78,3 @@
 
 {*include batch copy js js file*}
 {include file="CRM/common/batchCopy.tpl"}
-

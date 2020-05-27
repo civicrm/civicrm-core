@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Designer) CRM.Designer = {};
 
   // TODO Optimize this class
@@ -96,8 +95,11 @@
      * @return {CRM.Designer.PaletteFieldModel}
      */
     getFieldByName: function(entityName, fieldName) {
+      if (fieldName.indexOf('formatting') === 0) {
+        fieldName = 'formatting';
+      }
       return this.find(function(paletteFieldModel) {
-        return (paletteFieldModel.get('entityName') == entityName && paletteFieldModel.get('fieldName') == fieldName);
+        return ((!entityName || paletteFieldModel.get('entityName') == entityName) && paletteFieldModel.get('fieldName') == fieldName);
       });
     },
 
@@ -114,4 +116,4 @@
       return fieldsByEntitySection;
     }
   });
-})(cj);
+})(CRM.$, CRM._);

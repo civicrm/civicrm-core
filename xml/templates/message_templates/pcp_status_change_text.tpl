@@ -13,8 +13,7 @@
 2. {ts}Click or paste this link into your browser to go to your page{/ts}:
 {$pcpInfoURL}
 
-{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit
-your page, tell friends, and update your contact info.{/ts}
+{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit your page, tell friends, and update your contact info.{/ts}
 
 {if $isTellFriendEnabled}
 
@@ -35,8 +34,7 @@ your page, tell friends, and update your contact info.{/ts}
 
 ============================
 
-{ts}Your personal campaign page has been reviewed. There were some issues with the content
-which prevented us from approving the page. We are sorry for any inconvenience.{/ts}
+{ts}Your personal campaign page has been reviewed. There were some issues with the content which prevented us from approving the page. We are sorry for any inconvenience.{/ts}
 
 {if $pcpNotifyEmailAddress}
 

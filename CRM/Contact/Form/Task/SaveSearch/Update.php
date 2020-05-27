@@ -1,51 +1,29 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class provides the functionality to update a saved search
- *
+ * This class provides the functionality to update a saved search.
  */
 class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_SaveSearch {
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
+  public function preProcess() {
     parent::preProcess();
 
     $this->_id = $this->get('ssID');
@@ -59,22 +37,26 @@ class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_Save
   }
 
   /**
-   * This function sets the default values for the form.
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return None
+   * Set default values for the form.
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
 
-    $defaults = array();
-    $params = array();
+    $defaults = [];
+    $params = [];
 
-    $params = array('saved_search_id' => $this->_id);
+    $params = ['saved_search_id' => $this->_id];
     CRM_Contact_BAO_Group::retrieve($params, $defaults);
 
+    if (!empty($defaults['group_type'])) {
+      $types = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+        substr($defaults['group_type'], 1, -1)
+      );
+      $defaults['group_type'] = array();
+      foreach ($types as $type) {
+        $defaults['group_type'][$type] = 1;
+      }
+    }
     return $defaults;
   }
-}
 
+}

@@ -1,29 +1,13 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * @file HelloTest.php
@@ -39,36 +23,51 @@
  * UR DOIN IT RIGHT!
  */
 
-require_once 'PHPUnit/Framework/TestCase.php';
-class HelloTest extends PHPUnit_Framework_TestCase {
-  // contains the object handle of the string class
-  var $abc;
-  function __construct($name = NULL) {
+/**
+ * Class HelloTest
+ */
+class HelloTest extends PHPUnit\Framework\TestCase {
+  /**
+   * contains the object handle of the string class
+   * @var string
+   */
+  public $abc;
+
+  /**
+   * @param string|null $name
+   */
+  public function __construct($name = NULL) {
     parent::__construct($name);
   }
 
-  // called before the test functions will be executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
-  function setUp() {
+  /**
+   * Called before the test functions will be executed.
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here
+   */
+  public function setUp() {
     // create a new instance of String with the
     // string 'abc'
     $this->abc = "hello";
   }
 
-  // called after the test functions are executed
-  // this function is defined in PHPUnit_TestCase and overwritten
-  // here
-  function tearDown() {
+  /**
+   * Called after the test functions are executed.
+   * this function is defined in PHPUnit_TestCase and overwritten
+   * here.
+   */
+  public function tearDown() {
     // delete your instance
     unset($this->abc);
   }
 
-  // test the toString function
-  function testHello() {
+  /**
+   * test the toString function.
+   */
+  public function testHello() {
     $result = $this->abc;
     $expected = 'hello';
     $this->assertEquals($result, $expected);
   }
-}
 
+}

@@ -1,0 +1,43 @@
+.crmCaseType .grip-n-drag {
+    vertical-align: middle;
+    cursor: move;
+}
+
+.crmCaseType .fa-pencil {
+    margin: 0.2em 0.2em 0 0;
+    cursor: pointer;
+}
+
+.crmCaseType .fa-trash {
+    margin: 0.56em 0.2em 0 0;
+    cursor: pointer;
+}
+
+.crmCaseType .ui-tabs-nav li .crm-i {
+    float: left;
+}
+
+.crmCaseType .ui-tabs-nav select {
+    float: right;
+}
+
+.crmCaseType tr.addRow td {
+    background: #ddddff;
+    padding: 0.5em 1em;
+}
+
+.crmCaseType input.number {
+    width: 3.5em;
+}
+
+.crmCaseType .add-activity {
+    width: 50%;
+}
+
+.crmCaseType table td select {
+    width: 10em;
+}
+
+tr.forked {
+    font-weight: bold;
+}

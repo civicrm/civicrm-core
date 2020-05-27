@@ -43,6 +43,12 @@
     <access_arguments>access uploaded files</access_arguments>
   </item>
   <item>
+     <path>civicrm/contact/imagefile</path>
+     <title>Get Image File</title>
+     <page_callback>CRM_Contact_Page_ImageFile</page_callback>
+     <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
      <path>civicrm/contact/search/basic</path>
      <title>Find Contacts</title>
      <page_arguments>mode=256</page_arguments>
@@ -73,16 +79,12 @@
      <weight>16</weight>
   </item>
   <item>
-     <path>civicrm/contact/search/simple</path>
-     <title>Simple Search</title>
-     <page_callback>CRM_Contact_Form_Search_Simple</page_callback>
-  </item>
-  <item>
      <path>civicrm/contact/add</path>
      <title>New Contact</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM;edit my contact;view my contact</access_arguments>
      <page_callback>CRM_Contact_Form_Contact</page_callback>
      <page_arguments>addSequence=1</page_arguments>
-     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/contact/add/individual</path>
@@ -119,6 +121,7 @@
      <path>civicrm/contact/merge</path>
      <title>Merge Contact</title>
      <page_callback>CRM_Contact_Form_Merge</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
   </item>
   <item>
      <path>civicrm/contact/email</path>
@@ -141,6 +144,8 @@
      <path>civicrm/contact/view</path>
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Contact Summary</title>
+     <access_callback>CRM_Core_Permission::checkMenu</access_callback>
+     <access_arguments>access CiviCRM;edit my contact;view my contact</access_arguments>
      <page_callback>CRM_Contact_Page_View_Summary</page_callback>
   </item>
   <item>
@@ -171,7 +176,7 @@
      <path_arguments>action=add</path_arguments>
      <title>Activities</title>
      <page_callback>CRM_Contact_Form_Task_PDF</page_callback>
-  </item> 
+  </item>
   <item>
      <path>civicrm/contact/view/rel</path>
      <path_arguments>cid=%%cid%%</path_arguments>
@@ -185,9 +190,10 @@
      <page_callback>CRM_Contact_Page_View_GroupContact</page_callback>
   </item>
   <item>
-     <path>civicrm/contact/view/sunlight</path>
-     <title>Sunlight</title>
-     <page_callback>CRM_Contact_Page_View_Sunlight</page_callback>
+    <path>civicrm/contact/view/smartgroup</path>
+    <path_arguments>cid=%%cid%%</path_arguments>
+    <title>Smart Groups</title>
+    <page_callback>CRM_Contact_Page_View_ContactSmartGroup</page_callback>
   </item>
   <item>
      <path>civicrm/contact/view/note</path>
@@ -241,20 +247,11 @@
      <page_callback>CRM_Dashlet_Page_Blog</page_callback>
   </item>
   <item>
-    <path>civicrm/ajax/state</path>
-    <page_callback>CRM_Core_Page_AJAX_Location::state</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
+     <path>civicrm/dashlet/getting-started</path>
+     <title>CiviCRM Resources</title>
+     <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
   </item>
-  <item>
-    <path>civicrm/ajax/country</path>
-    <page_callback>CRM_Core_Page_AJAX_Location::country</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
-    <path>civicrm/ajax/search</path>
-    <page_callback>CRM_Contact_Page_AJAX::search</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
-</item>
+
 <item>
      <path>civicrm/ajax/relation</path>
      <page_callback>CRM_Contact_Page_AJAX::relationship</page_callback>
@@ -267,11 +264,6 @@
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
-     <path>civicrm/ajax/contact</path>
-     <page_callback>CRM_Contact_Page_AJAX::contact</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
      <path>civicrm/ajax/custom</path>
      <page_callback>CRM_Contact_Page_AJAX::customField</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
@@ -279,12 +271,6 @@
 <item>
      <path>civicrm/ajax/customvalue</path>
      <page_callback>CRM_Contact_Page_AJAX::deleteCustomValue</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <page_type>3</page_type>
-</item>
-<item>
-     <path>civicrm/ajax/ed</path>
-     <page_callback>CRM_Contact_Page_AJAX::enableDisable</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>3</page_type>
 </item>
@@ -304,11 +290,6 @@
      <access_callback>1</access_callback>
 </item>
 <item>
-     <path>civicrm/ajax/auto</path>
-     <page_callback>CRM_Contact_Page_AJAX::autocomplete</page_callback>
-     <access_callback>1</access_callback>
-</item>
-<item>
      <path>civicrm/ajax/subtype</path>
      <page_callback>CRM_Contact_Page_AJAX::buildSubTypes</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
@@ -322,11 +303,6 @@
 <item>
      <path>civicrm/ajax/signature</path>
      <page_callback>CRM_Contact_Page_AJAX::getSignature</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
-     <path>civicrm/ajax/relationshipcontacts</path>
-     <page_callback>CRM_Contact_Page_AJAX::relationshipContacts</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
@@ -367,7 +343,6 @@
    <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
    <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
    <adminGroup>Manage</adminGroup>
-   <icon>admin/small/duplicate_matching.png</icon>
    <weight>105</weight>
 </item>
 <item>
@@ -379,6 +354,12 @@
 <item>
    <path>civicrm/ajax/dedupefind</path>
    <page_callback>CRM_Contact_Page_AJAX::getDedupes</page_callback>
+   <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+  <path>civicrm/contact/dedupemerge</path>
+   <title>Batch Merge Duplicate Contacts</title>
+   <page_callback>CRM_Contact_Page_DedupeMerge</page_callback>
    <access_arguments>merge duplicate contacts</access_arguments>
 </item>
 <item>
@@ -394,11 +375,6 @@
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
-     <path>civicrm/ajax/relationshipContactTypeList</path>
-     <page_callback>CRM_Contact_Page_AJAX::relationshipContactTypeList</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
     <path>civicrm/contact/view/useradd</path>
     <path_arguments>cid=%%cid%%</path_arguments>
     <title>Add User</title>
@@ -410,9 +386,25 @@
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
+     <path>civicrm/ajax/toggleDedupeSelect</path>
+     <page_callback>CRM_Contact_Page_AJAX::toggleDedupeSelect</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
+     <path>civicrm/ajax/flipDupePairs</path>
+     <page_callback>CRM_Contact_Page_AJAX::flipDupePairs</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
+</item>
+<item>
   <path>civicrm/activity/sms/add</path>
   <path_arguments>action=add</path_arguments>
   <title>Activities</title>
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
+  <access_arguments>send SMS</access_arguments>
 </item>
+  <item>
+    <path>civicrm/ajax/contactrelationships</path>
+    <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
+    <access_arguments>access CiviCRM;view my contact</access_arguments>
+  </item>
 </menu>

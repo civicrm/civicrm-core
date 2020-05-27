@@ -1,67 +1,59 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-/*
- * @see http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Specifications+-++Batches#CiviAccountsSpecifications-Batches-%C2%A0Overviewofimplementation
+/**
+ * @link http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Specifications+-++Batches#CiviAccountsSpecifications-Batches-%C2%A0Overviewofimplementation
  */
 class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat {
 
-  // Tab character. Some people's editors replace tabs with spaces so I'm scared to use actual tabs.
-  // Can't set it here using chr() because static. Same thing if a const. So it's set in constructor.
-  static $SEPARATOR;
-
-  // For this phase, we always output these records too so that there isn't data referenced in the journal entries that isn't defined anywhere.
-  // Possibly in the future this could be selected by the user.
-  public static $complementaryTables = array(
-    'ACCNT',
-    'CUST',
-  );
+  /**
+   * Tab character. Some people's editors replace tabs with spaces so I'm scared to use actual tabs.
+   * Can't set it here using chr() because static. Same thing if a const. So it's set in constructor.
+   * @var string
+   */
+  public static $SEPARATOR;
 
   /**
-   * class constructor
+   * For this phase, we always output these records too so that there isn't data
+   * referenced in the journal entries that isn't defined anywhere.
+   *
+   * Possibly in the future this could be selected by the user.
+   * @var array
    */
-  function __construct() {
+  public static $complementaryTables = [
+    'ACCNT',
+    'CUST',
+  ];
+
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
     parent::__construct();
     self::$SEPARATOR = chr(9);
   }
 
-  function export( $exportParams ) {
-    parent::export( $exportParams );
+  /**
+   * @param array $exportParams
+   */
+  public function export($exportParams) {
+    parent::export($exportParams);
 
-    foreach( self::$complementaryTables as $rct ) {
+    foreach (self::$complementaryTables as $rct) {
       $func = "export{$rct}";
       $this->$func();
     }
@@ -72,17 +64,37 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
     $this->output();
   }
 
-  function putFile($out) {
+  /**
+   * @param null $fileName
+   */
+  public function output($fileName = NULL) {
+    $tplFile = $this->getHookedTemplateFileName();
+    $out = self::getTemplate()->fetch($tplFile);
+    $fileName = $this->putFile($out);
+    self::createActivityExport($this->_batchIds, $fileName);
+  }
+
+  /**
+   * @param $out
+   *
+   * @return string
+   */
+  public function putFile($out) {
     $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir.'Financial_Transactions_'.$this->_batchIds.'_'.date('YmdHis').'.'.$this->getFileExtension();
-    $this->_downloadFile[] = $config->customFileUploadDir.CRM_Utils_File::cleanFileName(basename($fileName));
+    $fileName = $config->uploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
+    $this->_downloadFile[] = $config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($fileName));
     $buffer = fopen($fileName, 'w');
     fwrite($buffer, $out);
     fclose($buffer);
     return $fileName;
   }
 
-  function generateExportQuery($batchId) {
+  /**
+   * @param int $batchId
+   *
+   * @return Object
+   */
+  public function generateExportQuery($batchId) {
 
     $sql = "SELECT
       ft.id as financial_trxn_id,
@@ -125,68 +137,71 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
       LEFT JOIN civicrm_financial_item fi ON fi.id = efti.entity_id
       WHERE eb.batch_id = ( %1 )";
 
-    $params = array(1 => array($batchId, 'String'));
-    $dao = CRM_Core_DAO::executeQuery( $sql, $params );
+    $params = [1 => [$batchId, 'String']];
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
     return $dao;
   }
 
-  function makeIIF($export) {
+  /**
+   * @param $export
+   */
+  public function makeExport($export) {
     // Keep running list of accounts and contacts used in this batch, since we need to
     // include those in the output. Only want to include ones used in the batch, not everything in the db,
     // since would increase the chance of messing up user's existing Quickbooks entries.
     foreach ($export as $batchId => $dao) {
-      $accounts = $contacts = $journalEntries = $exportParams = array();
+      $accounts = $contacts = $journalEntries = $exportParams = [];
       $this->_batchIds = $batchId;
       while ($dao->fetch()) {
         // add to running list of accounts
         if (!empty($dao->from_account_id) && !isset($accounts[$dao->from_account_id])) {
-          $accounts[$dao->from_account_id] = array(
+          $accounts[$dao->from_account_id] = [
             'name' => $this->format($dao->from_account_name),
             'account_code' => $this->format($dao->from_account_code),
             'description' => $this->format($dao->from_account_description),
             'type' => $this->format($dao->from_account_type_code),
-          );
+          ];
         }
         if (!empty($dao->to_account_id) && !isset($accounts[$dao->to_account_id])) {
-          $accounts[$dao->to_account_id] = array(
+          $accounts[$dao->to_account_id] = [
             'name' => $this->format($dao->to_account_name),
             'account_code' => $this->format($dao->to_account_code),
             'description' => $this->format($dao->to_account_description),
             'type' => $this->format($dao->to_account_type_code),
-          );
+          ];
         }
 
         // add to running list of contacts
         if (!empty($dao->contact_from_id) && !isset($contacts[$dao->contact_from_id])) {
-          $contacts[$dao->contact_from_id] = array(
+          $contacts[$dao->contact_from_id] = [
             'name' => $this->format($dao->contact_from_name),
             'first_name' => $this->format($dao->contact_from_first_name),
             'last_name' => $this->format($dao->contact_from_last_name),
-          );
+          ];
         }
 
         if (!empty($dao->contact_to_id) && !isset($contacts[$dao->contact_to_id])) {
-          $contacts[$dao->contact_to_id] = array(
+          $contacts[$dao->contact_to_id] = [
             'name' => $this->format($dao->contact_to_name),
             'first_name' => $this->format($dao->contact_to_first_name),
             'last_name' => $this->format($dao->contact_to_last_name),
-          );
+          ];
         }
 
         // set up the journal entries for this financial trxn
-        $journalEntries[$dao->financial_trxn_id] = array(
-          'to_account' => array(
+        $journalEntries[$dao->financial_trxn_id] = [
+          'to_account' => [
             'trxn_date' => $this->format($dao->trxn_date, 'date'),
-            'trxn_id' =>  $this->format($dao->trxn_id),
+            'trxn_id' => $this->format($dao->trxn_id),
             'account_name' => $this->format($dao->to_account_name),
             'amount' => $this->format($dao->debit_total_amount, 'money'),
             'contact_name' => $this->format($dao->contact_to_name),
             'payment_instrument' => $this->format($dao->payment_instrument),
             'check_number' => $this->format($dao->check_number),
-          ),
-          'splits' => array(),
-        );
+          ],
+          'splits' => [],
+        ];
 
         /*
          * splits has two possibilities depending on FROM account
@@ -220,46 +235,45 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
             WHERE eft.entity_table = 'civicrm_financial_item'
             AND eft.financial_trxn_id = %1";
 
-          $itemParams = array( 1 => array( $dao->financial_trxn_id, 'Integer' ) );
+          $itemParams = [1 => [$dao->financial_trxn_id, 'Integer']];
 
-          $itemDAO = CRM_Core_DAO::executeQuery( $item_sql, $itemParams );
+          $itemDAO = CRM_Core_DAO::executeQuery($item_sql, $itemParams);
           while ($itemDAO->fetch()) {
             // add to running list of accounts
             if (!empty($itemDAO->account_id) && !isset($accounts[$itemDAO->account_id])) {
-              $accounts[$itemDAO->account_id] = array(
+              $accounts[$itemDAO->account_id] = [
                 'name' => $this->format($itemDAO->account_name),
                 'account_code' => $this->format($itemDAO->account_code),
                 'description' => $this->format($itemDAO->account_description),
                 'type' => $this->format($itemDAO->account_type_code),
-              );
+              ];
             }
 
             if (!empty($itemDAO->contact_id) && !isset($contacts[$itemDAO->contact_id])) {
-              $contacts[$itemDAO->contact_id] = array(
+              $contacts[$itemDAO->contact_id] = [
                 'name' => $this->format($itemDAO->contact_name),
                 'first_name' => $this->format($itemDAO->contact_first_name),
                 'last_name' => $this->format($itemDAO->contact_last_name),
-              );
+              ];
             }
 
             // add split line for this item
-            $journalEntries[$dao->financial_trxn_id]['splits'][$itemDAO->financial_item_id] = array(
+            $journalEntries[$dao->financial_trxn_id]['splits'][$itemDAO->financial_item_id] = [
               'trxn_date' => $this->format($itemDAO->transaction_date, 'date'),
               'spl_id' => $this->format($itemDAO->financial_item_id),
               'account_name' => $this->format($itemDAO->account_name),
-              'amount' => '-' .$this->format($itemDAO->amount, 'money'),
+              'amount' => '-' . $this->format($itemDAO->amount, 'money'),
               'contact_name' => $this->format($itemDAO->contact_name),
               'payment_instrument' => $this->format($itemDAO->payment_instrument),
               'description' => $this->format($itemDAO->description),
               'check_number' => $this->format($itemDAO->check_number),
               'currency' => $this->format($itemDAO->currency),
-            );
+            ];
           } // end items loop
-          $itemDAO->free();
         }
         else {
           // In this case, split record just uses the FROM account from the trxn, and there's only one record here
-          $journalEntries[$dao->financial_trxn_id]['splits'][] = array(
+          $journalEntries[$dao->financial_trxn_id]['splits'][] = [
             'trxn_date' => $this->format($dao->trxn_date, 'date'),
             'spl_id' => $this->format($dao->financial_trxn_id),
             'account_name' => $this->format($dao->from_account_name),
@@ -269,66 +283,82 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
             'payment_instrument' => $this->format($dao->payment_instrument),
             'check_number' => $this->format($dao->check_number),
             'currency' => $this->format($dao->currency),
-          );
+          ];
         }
       }
-      $exportParams = array(
+      $exportParams = [
         'accounts' => $accounts,
         'contacts' => $contacts,
         'journalEntries' => $journalEntries,
-      );
+      ];
       self::export($exportParams);
     }
     parent::initiateDownload();
   }
 
-  function exportACCNT() {
-    self::assign( 'accounts', $this->_exportParams['accounts'] );
+  public function exportACCNT() {
+    self::assign('accounts', $this->_exportParams['accounts']);
   }
 
-  function exportCUST() {
-    self::assign( 'contacts', $this->_exportParams['contacts'] );
+  public function exportCUST() {
+    self::assign('contacts', $this->_exportParams['contacts']);
   }
 
-  function exportTRANS() {
-    self::assign( 'journalEntries', $this->_exportParams['journalEntries'] );
+  public function exportTRANS() {
+    self::assign('journalEntries', $this->_exportParams['journalEntries']);
   }
 
-  function getMimeType() {
+  /**
+   * @return string
+   */
+  public function getMimeType() {
     return 'application/octet-stream';
   }
 
-  function getFileExtension() {
+  /**
+   * @return string
+   */
+  public function getFileExtension() {
     return 'iif';
   }
 
-  function getTemplateFileName() {
+  /**
+   * @return string
+   */
+  public function getHookedTemplateFileName() {
     return 'CRM/Financial/ExportFormat/IIF.tpl';
   }
 
-  /*
-   * $s the input string
-   * $type can be string, date, or notepad
+  /**
+   * @param string $s
+   *   the input string
+   * @param string $type
+   *   type can be string, date, or notepad
+   *
+   * @return bool|mixed|string
    */
-  static function format($s, $type = 'string') {
+  public static function format($s, $type = 'string') {
     // If I remember right there's a couple things:
     // NOTEPAD field needs to be surrounded by quotes and then get rid of double quotes inside, also newlines should be literal \n, and ditch any ascii 0x0d's.
     // Date handling has changed over the years. It used to only understand mm/dd/yy but I think now it might depend on your OS settings. Sometimes mm/dd/yyyy works but sometimes it wants yyyy/mm/dd, at least where I had used it.
     // In all cases need to do something with tabs in the input.
 
-    $s1 = str_replace( self::$SEPARATOR, '\t', $s );
-    switch( $type ) {
+    $s1 = str_replace(self::$SEPARATOR, '\t', $s);
+    switch ($type) {
       case 'date':
-        $sout = date( 'Y/m/d', strtotime( $s1 ) );
+        $dateFormat = Civi::settings()->get('dateformatFinancialBatch');
+        $sout = CRM_Utils_Date::customFormat($s1, $dateFormat);
         break;
+
       case 'money':
-        $sout = CRM_Utils_Money::format($s, null, null, true);
+        $sout = CRM_Utils_Money::format($s, NULL, NULL, TRUE);
         break;
+
       case 'string':
       case 'notepad':
-        $s2 = str_replace( "\n", '\n', $s1 );
-        $s3 = str_replace( "\r", '', $s2 );
-        $s4 = str_replace( '"', "'", $s3 );
+        $s2 = str_replace("\n", '\n', $s1);
+        $s3 = str_replace("\r", '', $s2);
+        $s4 = str_replace('"', "'", $s3);
         if ($type == 'notepad') {
           $sout = '"' . $s4 . '"';
         }
@@ -340,4 +370,5 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
 
     return $sout;
   }
+
 }

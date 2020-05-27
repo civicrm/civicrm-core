@@ -1,7 +1,7 @@
-{* 
+{*
 Display a table of remotely-available extensions
 
-Depends: CRM/common/enableDisable.tpl and CRM/common/jsortable.tpl 
+Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 *}
 {if $remoteExtensionRows}
   <div id="extensions-addnew">
@@ -20,7 +20,7 @@ Depends: CRM/common/enableDisable.tpl and CRM/common/jsortable.tpl
         {if $localExtensionRows[$extKey]}
           {continue}
         {/if}
-        <tr id="addnew-row_{$row.id}" class="crm-extensions crm-extensions_{$row.id}">
+        <tr id="addnew-row_{$row.file}" class="crm-extensions crm-extensions_{$row.file}">
           <td class="crm-extensions-label">
               <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>({$row.key})
           </td>
@@ -28,7 +28,7 @@ Depends: CRM/common/enableDisable.tpl and CRM/common/jsortable.tpl
           <td class="crm-extensions-description">{$row.type|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
-        <tr class="hiddenElement" id="crm-extensions-details-addnew-{$row.id}">
+        <tr class="hiddenElement" id="crm-extensions-details-addnew-{$row.file}">
             <td>
                 {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
             </td>

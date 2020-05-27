@@ -4,7 +4,7 @@
   <item>
      <path>civicrm/profile</path>
      <access_callback>1</access_callback>
-     <page_callback>CRM_Core_Invoke::profile</page_callback>
+     <page_callback>CRM_Profile_Page_Router</page_callback>
      <is_public>true</is_public>
      <weight>0</weight>
   </item>
@@ -12,7 +12,7 @@
      <path>civicrm/profile/create</path>
      <title>CiviCRM Profile Create</title>
      <access_callback>1</access_callback>
-     <page_callback>CRM_Core_Invoke::profile</page_callback>
+     <page_callback>CRM_Profile_Page_Router</page_callback>
      <is_public>true</is_public>
      <weight>0</weight>
   </item>

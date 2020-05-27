@@ -1,41 +1,26 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {htxt id='id-advanced-intro-title'}
 {ts}Advanced Search{/ts}
 {/htxt}
 {htxt id='id-advanced-intro'}
-    <p>{ts}Use <strong>&#37;</strong> wildcard(s) for partial matches. EXAMPLE: Enter 'Volunteer&#37;' as your Activity Type to match any activity whose type is 'Volunteer' + any other words (e.g. Volunteer for Open House).{/ts}</p>
-    <p>{ts}If multiple boxes are checked for Contact Types, Groups, Tags and Location Types, the selections are combined as <strong>OR</strong> criteria (e.g. checking 'Group A' and 'Group B' will find contacts who are either in 'Group A' OR 'Group B'). All other search fields are combined as <strong>AND</strong> criteria (e.g. selecting Tag is 'Age' AND Country is 'Canada' returns only those contacts who meet both criteria).{/ts}</p>
+  <p>{ts}Use <strong>&#37;</strong> wildcard(s) for partial matches. EXAMPLE: Enter 'Volunteer&#37;' as your Activity Type to match any activity whose type is 'Volunteer' + any other words (e.g. Volunteer for Open House).{/ts}</p>
+  <p>{ts}When multiple options are selected within a search field the selections are combined using <strong>OR</strong> criteria (e.g. selecting both 'Group A' and 'Group B' will find contacts who are either in 'Group A' OR 'Group B' or in both).</p>
+  <p>By default the different search fields are combined using the <strong>AND</strong> Search Operator (e.g. selecting Tag is 'Age' AND Country is 'Canada' returns only those contacts who meet both criteria). You can override the Search Operator default for combining different fields in the Search Settings.{/ts}</p>
 {/htxt}
 
 {htxt id='id-advanced-smart-title'}
 {ts}Smart Group{/ts}
 {/htxt}
 {htxt id='id-advanced-smart'}
-    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Update Smart Group</strong> from the '- more actions -' drop-down menu, and then click Go.{/ts}</p>
+    <p>{ts}If you've changed search criteria for this 'smart group' and want to save your changes, select <strong>Group - update smart group</strong> from the '- more actions -' drop-down menu{/ts}</p>
 {/htxt}
 
 {htxt id="id-privacy-title"}
@@ -61,10 +46,10 @@
 {/htxt}
 
 {htxt id="id-search-views-title"}
-{ts}Profile Views{/ts}
+{ts}Views For Display Contacts{/ts}
 {/htxt}
 {htxt id="id-search-views"}
-    <p>{ts}You can modify the columns displayed in your search results by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/the-user-interface/profiles"}</p>
+    <p>{ts}If you are displaying the search results as contacts, you can modify the columns displayed by creating a Profile containing a different set of contact fields and then selecting that Profile here. For example you may want to include columns for Gender and Date of Birth, while eliminating Country.{/ts} {docURL page="user/organising-your-data/profiles"}</p>
 {/htxt}
 
 {htxt id="id-search-operator-title"}
@@ -78,8 +63,15 @@
 {ts}Target Contact Group{/ts}
 {/htxt}
 {htxt id="id-relationship-target-group"}
-    <p>{ts}Use this filter to limit search results to relationships where the related contacts are part of a specific group or groups.
-    For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
+    <p>{ts}Use this filter to limit search results to relationships where the related contacts are part of a specific group or groups. For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
+{/htxt}
+
+{htxt id="id-relationship-active-period-title"}
+{ts}Active Period{/ts}
+{/htxt}
+{htxt id="id-relationship-active-period"}
+    <p>{ts}Use this filter to limit search results to relationships which were active during the specified time period (e.g. this is useful if you need to search all volunteer relationships that were active during 2014).{/ts}</p>
+    <p>{ts}By definition a relationship is active if any of these conditions occurs: (1) Start Date <= Current Date <= End Date (2) Start Date <= Current Date and End Date is not defined (3) Start Date is not defined and Current Date <= End Date{/ts}</p>
 {/htxt}
 
 {htxt id="id-all-tags-title"}
@@ -102,4 +94,18 @@
 {htxt id="is-test"}
     <p>{ts}In the process of setting up CiviCRM components or configuring pages and profiles, you might have created test contributions, activities, participants, pledges, etc.{/ts}</p>
     <p>{ts}Once you have finished your testing, it is a good idea to clean up by finding your test records and deleting them.{/ts}</p>
+{/htxt}
+
+{htxt id="processor-id-title"}
+{ts}Processor ID{/ts}
+{/htxt}
+{htxt id="processor-id"}
+    <p>{ts}This is the payment processor's own ID for the recurring contribution. Ideally it should be unique, but in practice may not be.{/ts}</p>
+{/htxt}
+
+{htxt id="transaction-id-title"}
+{ts}Transaction ID{/ts}
+{/htxt}
+{htxt id="transaction-id"}
+    <p>{ts}Unique reference for the recurring contribution. May be made up of other fields, e.g. bank ID, account number, etc.{/ts}</p>
 {/htxt}

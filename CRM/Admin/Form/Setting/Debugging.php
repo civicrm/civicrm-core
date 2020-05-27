@@ -1,64 +1,48 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates form components for Error Handling and Debugging
- *
+ * This class generates form components for Error Handling and Debugging.
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
+  protected $_settings = [
+    'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'assetCache' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'environment' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+  ];
+
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));
-
-    $config = CRM_Core_Config::singleton();
-
-    $this->addYesNo('debug', ts('Enable Debugging'));
-    if ($config->userSystem->is_drupal == '1') {
-      $this->addYesNo('userFrameworkLogging', ts('Enable Drupal Watchdog Logging'));
+    if (CRM_Core_Config::singleton()->userSystem->supports_UF_Logging == '1') {
+      $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME;
     }
-    $this->addYesNo('backtrace', ts('Display Backtrace'));
-    $this->addElement('text', 'fatalErrorTemplate', ts('Fatal Error Template'));
-    $this->addElement('text', 'fatalErrorHandler', ts('Fatal Error Handler'));
 
     parent::buildQuickForm();
+    if (Civi::settings()->getMandatory('environment') !== NULL) {
+      $element = $this->getElement('environment');
+      $element->freeze();
+      CRM_Core_Session::setStatus(ts('The environment settings have been disabled because it has been overridden in the settings file.'), ts('Environment settings'), 'info');
+    }
   }
-}
 
+}

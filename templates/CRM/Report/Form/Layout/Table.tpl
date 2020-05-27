@@ -1,51 +1,35 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if (!$chartEnabled || !$chartSupported )&& $rows}
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl" location="top" noForm=0}
+            {include file="CRM/common/pager.tpl" location="top"}
         </div>
     {/if}
     <table class="report-layout display">
         {capture assign="tableHeader"}
             {foreach from=$columnHeaders item=header key=field}
                 {assign var=class value=""}
-                {if $header.type eq 1024 OR $header.type eq 1}
+                {if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512}
                 {assign var=class value="class='reports-header-right'"}
                 {else}
                     {assign var=class value="class='reports-header'"}
                 {/if}
                 {if !$skip}
                    {if $header.colspan}
-                       <th colspan={$header.colspan}>{$header.title}</th>
+                       <th colspan={$header.colspan}>{$header.title|escape}</th>
                       {assign var=skip value=true}
                       {assign var=skipCount value=`$header.colspan`}
                       {assign var=skipMade  value=1}
                    {else}
-                       <th {$class}>{$header.title}</th>
+                       <th {$class}>{$header.title|escape}</th>
                    {assign var=skip value=false}
                    {/if}
                 {else} {* for skip case *}
@@ -68,6 +52,7 @@
             {assign var=columnCount value=$columnHeaders|@count}
             {assign var=l value=$smarty.ldelim}
             {assign var=r value=$smarty.rdelim}
+            {assign var=pageBroke value=0}
             {foreach from=$sections item=section key=column name=sections}
                 {counter assign="h"}
                 {$l}isValueChange value=$row.{$column} key="{$column}" assign=isValueChanged{$r}
@@ -80,14 +65,24 @@
                     {$l}else{$r}
                         {$l}assign var=printValue value=$row.{$column}{$r}
                     {$l}/if{$r}
+                    {$l}if $rowid neq 0{$r}
+                      {if $section.pageBreak}
+                        {$l}if $pageBroke >= {$h} or $pageBroke == 0{$r}
+                          </table>
+                          <div class="page-break"></div>
+                          <table class="report-layout display">
+                        {$l}/if{$r}
+                        {$l}assign var=pageBroke value={$h}{$r}
+                      {/if}
+                    {$l}/if{$r}
+                    <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}"><th colspan="{$columnCount}">
 
-                    <tr><th colspan="{$columnCount}">
-                        <h{$h}>{$section.title}: {$l}$printValue|default:"<em>none</em>"{$r}
+                        <h{$h}>{$section.title|escape}: {$l}$printValue|default:"<em>none</em>"{$r}
                             ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
                         </h{$h}>
                     </th></tr>
                     {if $smarty.foreach.sections.last}
-                        <tr>{$l}$tableHeader{$r}</tr>
+                        <tr class="crm-report-sectionCols">{$l}$tableHeader{$r}</tr>
                     {/if}
                 {$l}/if{$r}
             {/foreach}
@@ -99,9 +94,10 @@
                 {foreach from=$columnHeaders item=header key=field}
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
-                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
+                    {assign var=fieldClass value=$field|cat:"_class"}
+                    <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
                         {if $row.$fieldLink}
-                            <a title="{$row.$fieldHover}" href="{$row.$fieldLink}">
+                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if $row.$fieldClass} class="{$row.$fieldClass}"{/if}>
                         {/if}
 
                         {if $row.$field eq 'Subtotal'}
@@ -112,7 +108,7 @@
                             {elseif $header.group_by eq 'YEAR'}
                                 {$row.$field|crmDate:$config->dateformatYear}
                             {else}
-                                {if $header.type & 4}
+                                {if $header.type == 4}
                                    {$row.$field|truncate:10:''|crmDate}
                                 {else}
                                    {$row.$field|crmDate}
@@ -123,7 +119,7 @@
                                 <span class="nowrap">{$row.$field|crmMoney:$row.$currencyColumn}</span>
                             {else}
                                 <span class="nowrap">{$row.$field|crmMoney}</span>
-				                   {/if}
+                           {/if}
                         {else}
                             {$row.$field}
                         {/if}
@@ -152,7 +148,7 @@
     </table>
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl"  noForm=0}
+            {include file="CRM/common/pager.tpl" }
         </div>
     {/if}
 {/if}

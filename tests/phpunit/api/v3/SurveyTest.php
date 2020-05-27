@@ -1,103 +1,103 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+ */
 
 /**
  *  Test APIv3 civicrm_survey_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Campaign
+ * @package CiviCRM_APIv3
+ * @subpackage API_Campaign
  */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * All API should contain at minimum a success test for each
+ * function - in this case - create, get & delete
+ * In addition any extra functionality should be tested & documented
+ *
+ * Failure tests should be added for specific api behaviours but note that
+ * many generic patterns are tested in the syntax conformance test
+ *
+ * @author eileen
+ *
+ * @group headless
+ */
 class api_v3_SurveyTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $params;
-  protected $id;
-  public $DBResetRequired = FALSE; function setUp() {
-    $this->_apiversion = 3;
-    $phoneBankActivity = civicrm_api('Option_value', 'Get', array('label' => 'PhoneBank', 'version' => $this->_apiversion, 'sequential' => 1));
-    $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];
-    $this->params = array(
-      'version' => 3,
+  protected $entity = 'survey';
+  public $DBResetRequired = FALSE;
+
+  public function setUp() {
+    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', [
+      'label' => 'PhoneBank',
+      'return' => 'value',
+    ], 'integer');
+    $this->useTransaction();
+    $this->enableCiviCampaign();
+    $this->params = [
       'title' => "survey title",
       'activity_type_id' => $phoneBankActivityTypeID,
       'max_number_of_contacts' => 12,
       'instructions' => "Call people, ask for money",
-    );
+    ];
     parent::setUp();
   }
 
-  function tearDown() {}
-
+  /**
+   * Test create function succeeds.
+   */
   public function testCreateSurvey() {
-    $result = civicrm_api('survey', 'create', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('survey', 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
+  /**
+   * Test get function succeeds.
+   *
+   * This is actually largely tested in the get
+   * action on create. Add extra checks for any 'special' return values or
+   * behaviours
+   */
   public function testGetSurvey() {
-
-    $result = civicrm_api('survey', 'get', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
-    $this->id = $result['id'];
+    $this->createTestEntity();
+    $result = $this->callAPIAndDocument('survey', 'get', $this->params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
+  /**
+   * Check the delete function succeeds.
+   */
   public function testDeleteSurvey() {
-    $entity = civicrm_api('survey', 'get', $this->params);
-    $result = civicrm_api('survey', 'delete', array('version' => 3, 'id' => $entity['id']));
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $checkDeleted = civicrm_api('survey', 'get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
+    $entity = $this->createTestEntity();
+    $result = $this->callAPIAndDocument('survey', 'delete', ['id' => $entity['id']], __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->entity, 'get', []);
+    $this->assertEquals(0, $checkDeleted['count']);
   }
 
+  /**
+   * Test & document chained delete pattern.
+   *
+   * Note that explanation of the pattern
+   * is best put in the $description variable as it will then be displayed in the
+   * test generated examples. (these are to be found in the api/examples folder).
+   */
   public function testGetSurveyChainDelete() {
-    $description = "demonstrates get + delete in the same call";
-    $subfile     = 'ChainedGetDelete';
-    $params      = array(
-      'version' => 3,
+    $description = "Demonstrates get + delete in the same call.";
+    $subfile = 'ChainedGetDelete';
+    $params = [
       'title' => "survey title",
       'api.survey.delete' => 1,
-    );
-    $result = civicrm_api('survey', 'create', $this->params);
-    $result = civicrm_api('survey', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(0, civicrm_api('survey', 'getcount', array('version' => 3)), 'In line ' . __LINE__);
+    ];
+    $result = $this->callAPISuccess('survey', 'create', $this->params);
+    $result = $this->callAPIAndDocument('survey', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', []));
   }
-}
 
+}

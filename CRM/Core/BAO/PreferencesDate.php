@@ -1,66 +1,46 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * static holder for the default LT
+   * Static holder for the default LT.
+   * @var string
    */
-  static $_defaultPreferencesDate = NULL;
+  public static $_defaultPreferencesDate = NULL;
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Core_BAO_PreferencesDate object on success, null otherwise
-   * @access public
-   * @static
+   * @return CRM_Core_BAO_PreferencesDate|null
+   *   object on success, null otherwise
    */
-  static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults) {
     $dao = new CRM_Core_DAO_PreferencesDate();
     $dao->copyValues($params);
     if ($dao->find(TRUE)) {
@@ -71,30 +51,52 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
-   *
-   * @return Object             DAO object on sucess, null otherwise
-   *
-   * @access public
-   * @static
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
+   * @throws CRM_Core_Exception
    */
-  static function setIsActive($id, $is_active) {
-    CRM_Core_Error::fatal();
+  public static function setIsActive($id, $is_active) {
+    throw new CRM_Core_Exception('Cannot call setIsActive function');
   }
 
   /**
-   * Function to delete preference dates
+   * Delete preference dates.
    *
-   * @param  int  $id
-   *
-   * @access public
-   * @static
+   * @param int $id
+   * @throws CRM_Core_Exception
    */
-  static function del($id) {
-    CRM_Core_Error::fatal();
+  public static function del($id) {
+    throw new CRM_Core_Exception('Cannot call del function');
   }
-}
 
+  /**
+   * (Setting Callback - On Change)
+   * Respond to changes in the "timeInputFormat" setting.
+   *
+   * @param array $oldValue
+   *   List of component names.
+   * @param array $newValue
+   *   List of component names.
+   * @param array $metadata
+   *   Specification of the setting (per *.settings.php).
+   */
+  public static function onChangeSetting($oldValue, $newValue, $metadata) {
+    if ($oldValue == $newValue) {
+      return;
+    }
+
+    $query = "
+UPDATE civicrm_preferences_date
+SET    time_format = %1
+WHERE  time_format IS NOT NULL
+AND    time_format <> ''
+";
+    $sqlParams = [1 => [$newValue, 'String']];
+    CRM_Core_DAO::executeQuery($query, $sqlParams);
+  }
+
+}

@@ -1,81 +1,42 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
- * File for the CiviCRM APIv3 participant functions
+ * This api exposes CiviCRM participant payments.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Participant
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Participant.php 30486 2010-11-02 16:12:09Z shot $
- *
  */
 
 /**
- * Files required for this package
- */
-require_once 'CRM/Event/BAO/ParticipantPayment.php';
-
-/**
- * Create a Event Participant Payment
+ * Create a Event Participant Payment.
  *
  * This API is used for creating a Participant Payment of Event.
- * Required parameters : participant_id, contribution_id.
+ * Required parameters: participant_id, contribution_id.
  *
- * @param   array  $params     an associative array of name/value property values of civicrm_participant_payment
- * @example ParticipantPaymentCreate.php
- * {@example ParticipantPaymentCreate.php 0}
+ * @param array $params
+ *   An associative array of name/value property values of civicrm_participant_payment.
  *
- * @return array of newly created payment property values.
- * {@getfields ParticipantPayment_create}
- * @access public
+ * @return array
  */
 function civicrm_api3_participant_payment_create($params) {
-
-  $ids = array();
-  if (CRM_Utils_Array::value('id', $params)) {
-    $ids['id'] = $params['id'];
-  }
-  $participantPayment = CRM_Event_BAO_ParticipantPayment::create($params, $ids);
-
-  $payment = array();
-  _civicrm_api3_object_to_array($participantPayment, $payment[$participantPayment->id]);
-
-  return civicrm_api3_create_success($payment, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ParticipantPayment');
 }
 
 /**
- * Adjust Metadata for Create action
- * 
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_participant_payment_create_spec(&$params) {
   $params['participant_id']['api.required'] = 1;
@@ -83,16 +44,12 @@ function _civicrm_api3_participant_payment_create_spec(&$params) {
 }
 
 /**
- * Deletes an existing Participant Payment
+ * Deletes an existing Participant Payment.
  *
- * This API is used for deleting a Participant Payment
+ * @param array $params
  *
- * @param  Int  $participantPaymentID   Id of the Participant Payment to be deleted
- *
- * @return array API result
- * @example ParticipantPaymentDelete.php
- * {@getfields ParticipantPayment_delete}
- * @access public
+ * @return array
+ *   API result
  */
 function civicrm_api3_participant_payment_delete($params) {
   $participant = new CRM_Event_BAO_ParticipantPayment();
@@ -100,17 +57,14 @@ function civicrm_api3_participant_payment_delete($params) {
 }
 
 /**
- * Retrieve one / all contribution(s) / participant(s) linked to a
- * contrbution.
+ * Retrieve one or more participant payment records.
  *
- * @param  array   $params  input parameters
+ * @param array $params
+ *   Input parameters.
  *
- * @return array  array of properties, if error an array with an error id and error message
- *  @example ParticipantPaymentGet
- * {@getfields ParticipantPayment_get}
- * @access public
+ * @return array
+ *   array of properties, if error an array with an error id and error message
  */
 function civicrm_api3_participant_payment_get($params) {
   return _civicrm_api3_basic_get('CRM_Event_DAO_ParticipantPayment', $params);
 }
-

@@ -1,0 +1,93 @@
+/* Styles specific to search forms and search results */
+
+.crm-container div#searchForm {
+  height: auto;
+  width: 100%;
+}
+
+.crm-container div#searchForm table.form-layout {
+  border-spacing: 0;
+}
+
+.crm-container div#searchForm table.form-layout td {
+  padding: 4px;
+  border: 1px solid #DDDDDD;
+}
+
+/* top submit button on advanced search */
+.adv-search-top-submit span.crm-button {
+  float: right !important;
+}
+
+/* alpha filter styles */
+#crm-container #alpha-filter ul {
+  border-collapse: collapse;
+  padding: 0;
+  list-style-type: none;
+  margin: 3px;
+  height: auto;
+  width: auto;
+}
+
+.crm-container div#alpha-filter {
+  background-color: #CDE8FE;
+  margin: 4px 0 5px;
+  padding: 2px;
+  text-align: left;
+}
+
+.crm-container #alpha-filter li {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  color: #AAAAAA;
+  display: inline;
+  font-size: 15px;
+  font-weight: normal;
+  height: auto;
+  margin: 0 1px;
+  padding: 2px 5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.crm-container #alpha-filter a {
+  border-bottom: 1px dotted #2A71B4;
+  color: #2A71B4;
+  font-weight: normal;
+}
+
+/* CRM-20945 Remove underline to show active pager */
+.crm-container #alpha-filter a.active {
+  border-bottom: none;
+  color: #41477E;
+  font-weight: bold;
+}
+
+.advanced-search-fields {
+  display: grid;
+  grid-template-columns: [col] repeat(3, calc(100% / 3 - 10px));
+  width: 100%;
+}
+
+.advanced-search-fields .search-field {
+  padding: 5px;
+}
+
+.advanced-search-fields .search-field__span-2 {
+  grid-column: col / span 2;
+}
+.advanced-search-fields .search-field__span-3 {
+  grid-column: col / span 3;
+}
+
+.advanced-search-fields .search-field__checkbox {
+  display: flex;
+}
+
+.advanced-search-fields .search-field__checkbox input[type="checkbox"] {
+  order: -1;
+}
+
+.advanced-search-fields .search-field__checkbox label {
+  padding-right: 5px;
+}

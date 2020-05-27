@@ -1,75 +1,58 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
-  protected $_formValues; function __construct(&$formValues) {
-    $this->_formValues = $formValues;
+  protected $_formValues;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
+
+  /**
+   * Class constructor.
+   *
+   * @param array $formValues
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function __construct(&$formValues) {
+    $this->_formValues = self::formatSavedSearchFields($formValues);
 
     /**
      * Define the columns for search result rows
      */
-    $this->_columns = array(
+    $this->_columns = [
       ts('Name') => 'sort_name',
-      ts('Status') => 'activity_status',
-      ts('Activity Type') => 'activity_type',
+      ts('Status') => 'activity_status_id',
+      ts('Activity Type') => 'activity_type_id',
       ts('Activity Subject') => 'activity_subject',
       ts('Scheduled By') => 'source_contact',
       ts('Scheduled Date') => 'activity_date',
-      ts(' ') => 'activity_id',
-      ts('  ') => 'activity_type_id',
-      ts('   ') => 'case_id',
+      ' ' => 'activity_id',
+      '   ' => 'case_id',
       ts('Location') => 'location',
       ts('Duration') => 'duration',
       ts('Details') => 'details',
       ts('Assignee') => 'assignee',
-    );
-
-    $this->_groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
-      'activity_status',
-      'id',
-      'name'
-    );
+    ];
 
     //Add custom fields to columns array for inclusion in export
-    $groupTree = &CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL,
-      NULL, '', NULL
-    );
-
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
 
     //use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree);
 
     //cycle through custom fields and assign to _columns array
     foreach ($groupTree as $key) {
@@ -78,10 +61,12 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
         $this->_columns[$fieldlabel] = $field['column_name'];
       }
     }
-    //end custom fields
   }
 
-  function buildForm(&$form) {
+  /**
+   * @param CRM_Core_Form $form
+   */
+  public function buildForm(&$form) {
 
     /**
      * You can define a custom title for the search form
@@ -101,7 +86,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     );
 
     // Select box for Activity Type
-    $activityType = array('' => ' - select activity - ') + CRM_Core_PseudoConstant::activityType();
+    $activityType = ['' => ' - select activity - '] + CRM_Core_PseudoConstant::activityType();
 
     $form->add('select', 'activity_type_id', ts('Activity Type'),
       $activityType,
@@ -109,7 +94,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     );
 
     // textbox for Activity Status
-    $activityStatus = array('' => ' - select status - ') + CRM_Core_PseudoConstant::activityStatus();
+    $activityStatus = ['' => ' - select status - '] + CRM_Core_PseudoConstant::activityStatus();
 
     $form->add('select', 'activity_status_id', ts('Activity Status'),
       $activityStatus,
@@ -117,9 +102,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     );
 
     // Activity Date range
-    $form->addDate('start_date', ts('Activity Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
-
+    $form->add('datepicker', 'start_date', ts('Activity Date From'), [], FALSE, ['time' => FALSE]);
+    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, ['time' => FALSE]);
 
     // Contact Name field
     $form->add('text', 'sort_name', ts('Contact Name'));
@@ -128,23 +112,38 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array(
-      'contact_type', 'activity_subject', 'activity_type_id',
-        'activity_status_id', 'start_date', 'end_date', 'sort_name',
-      ));
+    $form->assign('elements', [
+      'contact_type',
+      'activity_subject',
+      'activity_type_id',
+      'activity_status_id',
+      'start_date',
+      'end_date',
+      'sort_name',
+    ]);
   }
 
   /**
    * Define the smarty template used to layout the search form and results listings.
    */
-  function templateFile() {
+  public function templateFile() {
     return 'CRM/Contact/Form/Search/Custom/ActivitySearch.tpl';
   }
 
   /**
-   * Construct the search query
+   * Construct the search query.
+   *
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
    */
-  function all($offset = 0, $rowcount = 0, $sort = NULL,
+  public function all(
+    $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
 
@@ -160,10 +159,9 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
                 activity.id                 as activity_id,
                 activity.activity_type_id   as activity_type_id,
                 contact_b.sort_name         as source_contact,
-                ov1.label                   as activity_type,
                 activity.subject            as activity_subject,
                 activity.activity_date_time as activity_date,
-                ov2.label                   as activity_status,
+                activity.status_id          as activity_status_id,
                 cca.case_id                 as case_id,
                 activity.location           as location,
                 activity.duration           as duration,
@@ -182,10 +180,10 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     }
 
     // add custom group fields to SELECT and FROM clause
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL, NULL, '', NULL);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
 
     foreach ($groupTree as $key) {
-      if ($key['extends'] == 'Activity') {
+      if (!empty($key['extends']) && $key['extends'] === 'Activity') {
         $select .= ", " . $key['table_name'] . ".*";
         $from .= " LEFT JOIN " . $key['table_name'] . " ON " . $key['table_name'] . ".entity_id = activity.id";
       }
@@ -199,6 +197,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       // Define ORDER BY for query in $sort, with default value
       if (!empty($sort)) {
         if (is_string($sort)) {
+          $sort = CRM_Utils_Type::escape($sort, 'String');
           $sql .= " ORDER BY $sort ";
         }
         else {
@@ -209,54 +208,79 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
         $sql .= 'ORDER BY contact_a.sort_name, activity.activity_date_time DESC, activity.activity_type_id, activity.status_id, activity.subject';
       }
     }
+    else {
+      //CRM-14107, since there could be multiple activities against same contact,
+      //we need to provide GROUP BY on contact id to prevent duplicacy on prev/next entries
+      $sql .= 'GROUP BY contact_a.id
+ORDER BY contact_a.sort_name';
+    }
 
     if ($rowcount > 0 && $offset >= 0) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowcount = CRM_Utils_Type::escape($rowcount, 'Int');
       $sql .= " LIMIT $offset, $rowcount ";
     }
     return $sql;
   }
 
-  // Alters the date display in the Activity Date Column. We do this after we already have
-  // the result so that sorting on the date column stays pertinent to the numeric date value
-  function alterRow(&$row) {
+  /**
+   * Alters the date display in the Activity Date Column. We do this after we already have
+   * the result so that sorting on the date column stays pertinent to the numeric date value
+   * @param $row
+   */
+  public function alterRow(&$row) {
     $row['activity_date'] = CRM_Utils_Date::customFormat($row['activity_date'], '%B %E%f, %Y %l:%M %P');
+    $row['activity_type_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_type_id', $row['activity_type_id']);
+    $row['activity_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_status_id', $row['activity_status_id']);
   }
 
-  // Regular JOIN statements here to limit results to contacts who have activities.
-  function from() {
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+  /**
+   * Regular JOIN statements here to limit results to contacts who have activities.
+   * @return string
+   */
+  public function from() {
+    $this->buildACLClause('contact_a');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-    return "
-        civicrm_contact contact_a
-            JOIN civicrm_activity activity
-                 ON contact_a.id = activity.source_contact_id
-            JOIN civicrm_option_value ov1
-                 ON activity.activity_type_id = ov1.value AND ov1.option_group_id = 2
-            JOIN civicrm_option_value ov2
-                 ON activity.status_id = ov2.value AND ov2.option_group_id = {$this->_groupId}
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+
+    $from = "
+        civicrm_activity activity
+            LEFT JOIN civicrm_activity_contact target
+                 ON activity.id = target.activity_id AND target.record_type_id = {$targetID}
+            JOIN civicrm_contact contact_a
+                 ON contact_a.id = target.contact_id
+            LEFT JOIN civicrm_activity_contact sourceContact
+                 ON activity.id = sourceContact.activity_id AND sourceContact.record_type_id = {$sourceID}
             JOIN civicrm_contact contact_b
-                 ON activity.source_contact_id = contact_b.id
+                 ON sourceContact.contact_id = contact_b.id
             LEFT JOIN civicrm_case_activity cca
                  ON activity.id = cca.activity_id
             LEFT JOIN civicrm_activity_contact assignment
                  ON activity.id = assignment.activity_id AND assignment.record_type_id = {$assigneeID}
             LEFT JOIN civicrm_contact contact_c
-                 ON assignment.contact_id = contact_c.id ";
+                 ON assignment.contact_id = contact_c.id {$this->_aclFrom}";
+
+    return $from;
   }
 
-  /*
-     * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
-     *
-     */
-  function where($includeContactIDs = FALSE) {
-    $clauses = array();
+  /**
+   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
+   *
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
+  public function where($includeContactIDs = FALSE) {
+    $clauses = [];
 
     // add contact name search; search on primary name, source contact, assignee
     $contactname = $this->_formValues['sort_name'];
     if (!empty($contactname)) {
-      $dao         = new CRM_Core_DAO();
+      $dao = new CRM_Core_DAO();
       $contactname = $dao->escape($contactname);
-      $clauses[]   = "(contact_a.sort_name LIKE '%{$contactname}%' OR
+      $clauses[] = "(contact_a.sort_name LIKE '%{$contactname}%' OR
                            contact_b.sort_name LIKE '%{$contactname}%' OR
                            contact_c.display_name LIKE '%{$contactname}%')";
     }
@@ -268,8 +292,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     }
 
     if (!empty($subject)) {
-      $dao       = new CRM_Core_DAO();
-      $subject   = $dao->escape($subject);
+      $dao = new CRM_Core_DAO();
+      $subject = $dao->escape($subject);
       $clauses[] = "activity.subject LIKE '%{$subject}%'";
     }
 
@@ -281,26 +305,16 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       $clauses[] = "activity.activity_type_id = {$this->_formValues['activity_type_id']}";
     }
 
-    $startDate = $this->_formValues['start_date'];
-    if (!empty($startDate)) {
-      $startDate .= '00:00:00';
-      $startDateFormatted = CRM_Utils_Date::processDate($startDate);
-      if ($startDateFormatted) {
-        $clauses[] = "activity.activity_date_time >= $startDateFormatted";
-      }
+    if (!empty($this->_formValues['start_date'])) {
+      $clauses[] = "activity.activity_date_time >= '{$this->_formValues['start_date']} 00:00:00'";
     }
 
-    $endDate = $this->_formValues['end_date'];
-    if (!empty($endDate)) {
-      $endDate .= '23:59:59';
-      $endDateFormatted = CRM_Utils_Date::processDate($endDate);
-      if ($endDateFormatted) {
-        $clauses[] = "activity.activity_date_time <= $endDateFormatted";
-      }
+    if (!empty($this->_formValues['end_date'])) {
+      $clauses[] = "activity.activity_date_time <= '{$this->_formValues['end_date']} 23:59:59'";
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -315,30 +329,51 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       }
     }
 
+    if ($this->_aclWhere) {
+      $clauses[] = " {$this->_aclWhere} ";
+    }
     return implode(' AND ', $clauses);
   }
 
   /*
    * Functions below generally don't need to be modified
    */
-  function count() {
+
+  /**
+   * @inheritDoc
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function count() {
     $sql = $this->all();
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $returnSQL Not used; included for consistency with parent; SQL is always returned
+   *
+   * @return string
+   */
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
-  function &columns() {
+  /**
+   * @return array
+   */
+  public function &columns() {
     return $this->_columns;
   }
 
-  function setTitle($title) {
+  /**
+   * @param $title
+   */
+  public function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -347,8 +382,42 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     }
   }
 
-  function summary() {
+  /**
+   * @return null
+   */
+  public function summary() {
     return NULL;
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildACLClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Format saved search fields for this custom group.
+   *
+   * Note this is a function to facilitate the transition to jcalendar for
+   * saved search groups. In time it can be stripped out again.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  public static function formatSavedSearchFields($formValues) {
+    $dateFields = [
+      'start_date',
+      'end_date',
+    ];
+    foreach ($formValues as $element => $value) {
+      if (in_array($element, $dateFields) && !empty($value)) {
+        $formValues[$element] = date('Y-m-d', strtotime($value));
+      }
+    }
+
+    return $formValues;
+  }
+
+}

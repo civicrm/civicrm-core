@@ -1,162 +1,175 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  * Class contains api test cases for "civicrm_payment_processor"
  *
+ * @group headless
  */
 class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_paymentProcessorType;
-  protected $_apiversion;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
-  function get_info() {
-    return array(
-      'name' => 'PaymentProcessor Create',
-      'description' => 'Test all PaymentProcessor Create API methods.',
-      'group' => 'CiviCRM API Tests',
-    );
-  }
 
-  function setUp() {
+  /**
+   * Set up class.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
+    $this->useTransaction(TRUE);
     // Create dummy processor
-    $params = array(
-      'version' => $this->_apiversion,
+    $params = [
       'name' => 'API_Test_PP_Type',
       'title' => 'API Test Payment Processor Type',
       'class_name' => 'CRM_Core_Payment_APITest',
       'billing_mode' => 'form',
       'is_recur' => 0,
-    );
-    $result = civicrm_api('payment_processor_type', 'create', $params);
+      'payment_instrument_id' => 2,
+    ];
+    $result = $this->callAPISuccess('payment_processor_type', 'create', $params);
     $this->_paymentProcessorType = $result['id'];
-    $this->_params = array(
-      'version' => $this->_apiversion,
+    $this->_params = [
       'name' => 'API Test PP',
       'payment_processor_type_id' => $this->_paymentProcessorType,
       'class_name' => 'CRM_Core_Payment_APITest',
       'is_recur' => 0,
       'domain_id' => 1,
-    );
-  }
-
-  function tearDown() {
-
-    $tablesToTruncate = array(
-      'civicrm_payment_processor',
-      'civicrm_payment_processor_type',
-    );
-    $this->quickCleanup($tablesToTruncate);
-  }
-
-  ///////////////// civicrm_payment_processor_add methods
-
-  /**
-   * check with no name
-   */
-  function testPaymentProcessorCreateWithoutName() {
-    $payProcParams = array(
-      'is_active' => 1,
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('payment_processor', 'create', $payProcParams);
-
-    $this->assertEquals($result['is_error'], 1);
+    ];
   }
 
   /**
-   * create payment processor
+   * Check create with no name specified.
+   * @dataProvider versionThreeAndFour
    */
-  function testPaymentProcessorCreate() {
+  public function testPaymentProcessorCreateWithoutName($version) {
+    $this->_apiversion = $version;
+    $this->callAPIFailure('payment_processor', 'create', ['is_active' => 1]);
+  }
+
+  /**
+   * Create payment processor.
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentProcessorCreate($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
-    $result = civicrm_api('payment_processor', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertNotNull($result['id'], 'in line ' . __LINE__);
+    $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccessGetSingle('EntityFinancialAccount', ['entity_table' => 'civicrm_payment_processor', 'entity_id' => $result['id']]);
 
-    // mutate $params to match expected return value
-    unset($params['version']);
-    //assertDBState compares expected values in $result to actual values in the DB
-    $this->assertDBState('CRM_Financial_DAO_PaymentProcessor', $result['id'], $params);
-    return $result['id'];
+    // Test that the option values are flushed so ths can be used straight away.
+    $this->callAPISuccess('ContributionRecur', 'create', [
+      'contact_id' => $this->individualCreate(),
+      'amount' => 5,
+      'financial_type_id' => 'Donation',
+      'payment_processor_id' => 'API Test PP',
+      'frequency_interval' => 1,
+    ]);
+    $this->getAndCheck($params, $result['id'], 'PaymentProcessor');
+    $this->assertEquals(2, $result['values'][$result['id']]['payment_instrument_id']);
   }
 
   /**
-   * Test  using example code
+   * Update payment processor.
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
-  function testPaymentProcessorCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessorCreate.php';
+  public function testPaymentProcessorUpdate($version) {
+    $this->_apiversion = $version;
+    $params = $this->_params;
+    $params['payment_instrument_id'] = 1;
+    $result = $this->callAPISuccess('payment_processor', 'create', $params);
+    $this->assertNotNull($result['id']);
+
+    $updateParams = [
+      'id' => $result['id'],
+      'name' => 'Update API Test',
+    ];
+    $this->assertDBState('CRM_Financial_DAO_PaymentProcessor', $result['id'], $params);
+    $this->callAPISuccess('payment_processor', 'create', $updateParams);
+    $result = $this->callAPISuccess('payment_processor', 'get', ['id' => $result['id']]);
+
+    $expectedResult = [
+      'id' => $result['id'],
+      'domain_id' => $params['domain_id'],
+      'name' => $updateParams['name'],
+      'payment_processor_type_id' => $params['payment_processor_type_id'],
+      'is_default' => 0,
+      'is_test' => 0,
+      'class_name' => $params['class_name'],
+      'billing_mode' => 1,
+      'is_recur' => $params['is_recur'],
+      'payment_type' => 1,
+      'payment_instrument_id' => 1,
+      'is_active' => 1,
+    ];
+    if ($version === 4) {
+      // In APIv3 If a field is default NULL it is not returned.
+      foreach ($result['values'][$result['id']] as $field => $value) {
+        if (is_null($value)) {
+          unset($result['values'][$result['id']][$field]);
+        }
+      }
+    }
+    $this->checkArrayEquals($expectedResult, $result['values'][$result['id']]);
+  }
+
+  /**
+   * Test  using example code.
+   */
+  public function testPaymentProcessorCreateExample() {
+    require_once 'api/v3/examples/PaymentProcessor/Create.ex.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
-    $this->assertEquals($result['is_error'], 0);
+    $this->assertAPISuccess($result);
   }
 
-  ///////////////// civicrm_payment_processor_delete methods
-
   /**
-   * check payment processor type delete
+   * Check payment processor delete.
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
-  function testPaymentProcessorDelete() {
-    $id = $this->testPaymentProcessorCreate();
-    // create sample payment processor type.
-    $params = array(
-      'id' => $id,
-      'version' => $this->_apiversion,
-    );
+  public function testPaymentProcessorDelete($version) {
+    $this->_apiversion = $version;
+    $result = $this->callAPISuccess('payment_processor', 'create', $this->_params);
+    $params = [
+      'id' => $result['id'],
+    ];
 
-    $result = civicrm_api('payment_processor', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['is_error'], 0);
+    $this->callAPIAndDocument('payment_processor', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
-  ///////////////// civicrm_payment_processors_get methods
-
   /**
-   * check with valid params array.
+   * Check with valid params array.
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
-  function testPaymentProcessorsGet() {
+  public function testPaymentProcessorsGet($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     $params['user_name'] = 'test@test.com';
-    civicrm_api('payment_processor', 'create', $params);
+    $this->callAPISuccess('payment_processor', 'create', $params);
 
-    $params = array(
+    $params = [
       'user_name' => 'test@test.com',
-      'version' => $this->_apiversion,
-    );
-    $results = civicrm_api('payment_processor', 'get', $params);
+    ];
+    $results = $this->callAPISuccess('payment_processor', 'get', $params);
 
-    $this->assertEquals(0, $results['is_error'], ' in line ' . __LINE__);
-    $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
-    $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name'], ' in line ' . __LINE__);
+    $this->assertEquals(1, $results['count']);
+    $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name']);
   }
-}
 
+}

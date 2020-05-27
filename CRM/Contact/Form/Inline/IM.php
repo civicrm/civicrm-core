@@ -1,55 +1,39 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * form helper class for an IM object
+ * Form helper class for an IM object.
  */
 class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
 
   /**
-   * ims of the contact that is been viewed
+   * Ims of the contact that is been viewed.
+   * @var array
    */
-  private $_ims = array();
+  private $_ims = [];
 
   /**
-   * No of im blocks for inline edit
+   * No of im blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 
   /**
-   * call preprocess
+   * Call preprocess.
    */
   public function preProcess() {
     parent::preProcess();
@@ -62,10 +46,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * build the form elements for im object
-   *
-   * @return void
-   * @access public
+   * Build the form object elements for im object.
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -93,32 +74,31 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_IM::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_IM', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Inline_IM', 'formRule']);
   }
 
   /**
-   * global validation rules for the form
+   * Global validation rules for the form.
    *
-   * @param array $fields     posted values of the form
-   * @param array $errors     list of errors to be posted back to the form
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $errors
+   *   List of errors to be posted back to the form.
    *
-   * @return $errors
-   * @static
-   * @access public
+   * @return array
    */
-  static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('im', $fields) && is_array($fields['im'])) {
+  public static function formRule($fields, $errors) {
+    $hasData = $hasPrimary = $errors = [];
+    if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            if (!$primaryID &&
-              CRM_Utils_Array::value('im', $blockValues)) {
-                $primaryID = $blockValues['im'];
+            if (!$primaryID && !empty($blockValues['im'])) {
+              $primaryID = $blockValues['im'];
             }
           }
         }
@@ -129,20 +109,19 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
       }
 
       if (count($hasPrimary) > 1) {
-        $errors["im[".array_pop($hasPrimary)."][is_primary]"] = ts('Only one IM can be marked as primary.');
+        $errors["im[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one IM can be marked as primary.');
       }
     }
     return $errors;
   }
 
   /**
-   * set defaults for the form
+   * Set defaults for the form.
    *
    * @return array
-   * @access public
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_ims)) {
       foreach ($this->_ims as $id => $value) {
         $defaults['im'][$id] = $value;
@@ -157,10 +136,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   }
 
   /**
-   * process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -168,9 +144,16 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
     // Process / save IMs
     $params['contact_id'] = $this->_contactId;
     $params['updateBlankLocInfo'] = TRUE;
+    $params['im']['isIdSet'] = TRUE;
+    foreach ($this->_ims as $count => $value) {
+      if (!empty($value['id']) && isset($params['im'][$count])) {
+        $params['im'][$count]['id'] = $value['id'];
+      }
+    }
     CRM_Core_BAO_Block::create('im', $params);
 
     $this->log();
     $this->response();
   }
+
 }

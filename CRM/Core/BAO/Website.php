@@ -1,126 +1,120 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class contain function for Website handling
+ * This class contain function for Website handling.
  */
 class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
   /**
-   * takes an associative array and adds im
+   * Create or update Website record.
    *
-   * @param array  $params         (reference ) an assoc array of name/value pairs
-   *
-   * @return object       CRM_Core_BAO_Website object on success, null otherwise
-   * @access public
-   * @static
+   * @param array $params
+   * @return CRM_Core_DAO_Website
    */
-  static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Website', CRM_Utils_Array::value('id', $params), $params);
-
-    $website = new CRM_Core_DAO_Website();
-    $website->copyValues($params);
-    $website->save();
-
-    CRM_Utils_Hook::post($hook, 'Website', $website->id, $website);
-    return $website;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
-   * process website
+   * Create website.
    *
-   * @param array $params associated array
-   * @param int   $contactID contact id
+   * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
    *
-   * @return void
-   * @access public
-   * @static
+   * @param array $params
+   * @param int $contactID
+   * @param bool $skipDelete
+   *
+   * @return bool|CRM_Core_BAO_Website
    */
-  static function create(&$params, $contactID, $skipDelete) {
+  public static function create($params, $contactID = NULL, $skipDelete = NULL) {
+    if ($skipDelete !== NULL || ($contactID && !is_array($contactID))) {
+      \Civi::log()->warning(ts('Calling website:create with vars other than $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
+      return self::process($params, $contactID, $skipDelete);
+    }
+    foreach ($params as $key => $value) {
+      if (is_numeric($key)) {
+        \Civi::log()->warning(ts('Calling website:create for multiple websites $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
+        return self::process($params, $contactID, $skipDelete);
+      }
+    }
+    return self::add($params);
+  }
+
+  /**
+   * Process website.
+   *
+   * @param array $params
+   * @param int $contactID
+   *   Contact id.
+   *
+   * @param bool $skipDelete
+   *
+   * @return bool
+   */
+  public static function process($params, $contactID, $skipDelete) {
     if (empty($params)) {
       return FALSE;
     }
-    
+
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
-      $websiteId = CRM_Utils_Array::value('id', $values);
-      if ($websiteId) {
-        if (array_key_exists($websiteId, $ids)) {
-          unset($ids[$websiteId]);
-        }
-        else {
-          unset($values['id']);
-        }
+      $id = $values['id'] ?? NULL;
+      if (array_key_exists($id, $ids)) {
+        unset($ids[$id]);
       }
-
-      if (!CRM_Utils_Array::value('id', $values) &&
-        is_array($ids) && !empty($ids)
-      ) {
+      if (empty($values['id']) && is_array($ids) && !empty($ids)) {
         foreach ($ids as $id => $value) {
-          if (($value['website_type_id'] == $values['website_type_id']) 
-            && CRM_Utils_Array::value('url', $value)) {
+          if (($value['website_type_id'] == $values['website_type_id'])) {
             $values['id'] = $id;
             unset($ids[$id]);
-            break;
           }
         }
       }
-      $values['contact_id'] = $contactID;
-      if ( CRM_Utils_Array::value('url', $values) ) {
+      if (!empty($values['url'])) {
+        $values['contact_id'] = $contactID;
         self::add($values);
       }
-    }
-    
-    if ($skipDelete && !empty($ids)) {
-      self::del(array_keys($ids));
+      elseif ($skipDelete && !empty($values['id'])) {
+        self::del($values['id']);
+      }
     }
   }
 
   /**
-   * Delete website
+   * Delete website.
    *
-   * @param array $ids website ids
+   * @param int $id
    *
-   * @return void
-   * @static
+   * @return bool
    */
-  static function del($ids) {
-    $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';
-    CRM_Core_DAO::executeQuery($query);
-    // FIXME: we should return false if the del was unsuccessful
+  public static function del($id) {
+    $obj = new self();
+    $obj->id = $id;
+    $obj->find();
+    if ($obj->fetch()) {
+      $params = [];
+      CRM_Utils_Hook::pre('delete', 'Website', $id, $params);
+      $obj->delete();
+    }
+    else {
+      return FALSE;
+    }
+    CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
     return TRUE;
   }
 
@@ -128,21 +122,20 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param array entityBlock input parameters to find object
+   * @param array $params
+   * @param $values
    *
-   * @return boolean
-   * @access public
-   * @static
+   * @return bool
    */
-  static function &getValues(&$params, &$values) {
-    $websites            = array();
-    $website             = new CRM_Core_DAO_Website();
+  public static function &getValues(&$params = [], &$values = []) {
+    $websites = [];
+    $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
     $website->find();
 
     $count = 1;
     while ($website->fetch()) {
-      $values['website'][$count] = array();
+      $values['website'][$count] = [];
       CRM_Core_DAO::storeValues($website, $values['website'][$count]);
 
       $websites[$count] = $values['website'][$count];
@@ -153,15 +146,17 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   }
 
   /**
-   * Get all the websites for a specified contact_id
+   * Get all the websites for a specified contact_id.
    *
-   * @param int $id the contact id
+   * @param int $id
+   *   The contact id.
    *
-   * @return array  the array of website details
-   * @access public
-   * @static
+   * @param bool $updateBlankLocInfo
+   *
+   * @return array
+   *   the array of website details
    */
-  static function allWebsites($id, $updateBlankLocInfo = FALSE) {
+  public static function allWebsites($id, $updateBlankLocInfo = FALSE) {
     if (!$id) {
       return NULL;
     }
@@ -170,16 +165,16 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 SELECT  id, website_type_id
   FROM  civicrm_website
  WHERE  civicrm_website.contact_id = %1';
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
-    $websites = $values = array();
-    $dao      = CRM_Core_DAO::executeQuery($query, $params);
-    $count    = 1;
+    $websites = $values = [];
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'id' => $dao->id,
         'website_type_id' => $dao->website_type_id,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $websites[$count++] = $values;
@@ -190,5 +185,5 @@ SELECT  id, website_type_id
     }
     return $websites;
   }
-}
 
+}

@@ -1,6 +1,6 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
 
-{ts}Thank you for your generous pledge. Please print this acknowledgment for your records.{/ts}
+{ts}Thank you for your generous pledge.{/ts}
 
 ===========================================================
 {ts}Pledge Information{/ts}
@@ -32,16 +32,6 @@
 
 {ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions
 or need to modify your payment schedule.{/ts}
-
-{if $honor_block_is_active}
-===========================================================
-{$honor_type}
-===========================================================
-{$honor_prefix} {$honor_first_name} {$honor_last_name}
-{if $honor_email}
-{ts}Honoree Email{/ts}: {$honor_email}
-{/if}
-{/if}
 
 {if $customGroup}
 {foreach from=$customGroup item=value key=customName}

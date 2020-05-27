@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2010                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
@@ -36,7 +20,7 @@
   {ts}Intro Content{/ts}
 {/htxt}
 {htxt id="id-intro_msg"}
-{ts}Enter content for the introductory message. This will be displayed below the page title. You can include images, as long as they are already uploaded to a server - click the "Image" button in the button bar.{/ts}
+{ts}Enter content for the introductory message. This will be displayed below the page title. You can include images, as long as they are already uploaded to a server: click the "Image" button in the button bar.{/ts}
 {/htxt}
 
 {htxt id="id-footer_msg-title"}
@@ -73,7 +57,7 @@
 {htxt id="id-is_organization"}
 <p>{ts}When enabled, this feature allows users to identify an organization as the donor or member. Logged in users will be given a choice of selecting from a list of organizations that they have a permissioned relationship with OR entering a new organization. Anonymous users are prompted to enter the organization name. If a matching organization is found using your site's configured unsupervised duplicate matching rules for Organizations, the contribution or membership will be linked to that organization. Otherwise a new organization contact record is created.{/ts}</p>
 {capture assign="profileURL"}{crmURL p='civicrm/admin/uf/group' q='reset=1'}{/capture}
-<p>{ts 1=$profileURL}The organization data collected from users is controlled by the Organization Profile selected below. You can use the default "On Behalf Of Organization" profile, or any other profile with type 'Contact' and/or 'Organization' (<a href="%1">Administer > Customize > CiviCRM Profile</a>). The profile must include Organization Name and Email Address.{/ts}</p>
+<p>{ts 1=$profileURL}The organization data collected from users is controlled by the Organization Profile selected below. You can use the default "On Behalf Of Organization" profile, or any other profile with type 'Contact' and/or 'Organization' (<a href="%1">Administer > Customize Data and Screens > Profiles</a>). The profile must include Organization Name and Email Address.{/ts}</p>
 {/htxt}
 
 {htxt id="id-is_share-title"}
@@ -81,6 +65,5 @@
 {/htxt}
 {htxt id="id-is_share"}
 <p>{ts}When enabled, links allowing people to share this online contribution page with their social network will be displayed (e.g. Facebook "Like", Google+, and Twitter).{/ts}</p>
-<p>{ts}Social media links will be included on the Contribution page, Thank-you page, Tell-a-Friend page (if enabled), and in contribution receipt emails.{/ts}</p>
+<p>{ts}Social media links will be included on the Contribution Thank-you page, Tell-a-Friend page (if enabled), and in contribution receipt emails.{/ts}</p>
 {/htxt}
-

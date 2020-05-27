@@ -1,81 +1,54 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates form components for Mapping and Geocoding
- *
+ * This class generates form components for Mapping and Geocoding.
  */
 class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
 
+  protected $_settings = [
+    'mapAPIKey' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+    'mapProvider' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+    'geoAPIKey' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+    'geoProvider' => CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME,
+  ];
+
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Mapping and Geocoding Providers'));
-
-    $map = CRM_Core_SelectValues::mapProvider();
-    $geo = CRM_Core_SelectValues::geoProvider();
-    $this->addElement('select', 'mapProvider', ts('Mapping Provider'), array('' => '- select -') + $map, array('onChange' => 'showHideMapAPIkey( this.value );'));
-    $this->add('text', 'mapAPIKey', ts('Map Provider Key'), NULL);
-    $this->addElement('select', 'geoProvider', ts('Geocoding Provider'), array('' => '- select -') + $geo);
-    $this->add('text', 'geoAPIKey', ts('Geo Provider Key'), NULL);
-
     parent::buildQuickForm();
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields) {
-    $errors = array();
+  public static function formRule($fields) {
+    $errors = [];
 
     if (!CRM_Utils_System::checkPHPVersion(5, FALSE)) {
       $errors['_qf_default'] = ts('Mapping features require PHP version 5 or greater');
-    }
-
-    if (!$fields['mapAPIKey'] && ($fields['mapProvider'] != '' && $fields['mapProvider'] == 'Yahoo')) {
-      $errors['mapAPIKey'] = "Map Provider key is a required field.";
     }
 
     if ($fields['mapProvider'] == 'OpenStreetMaps' && $fields['geoProvider'] == '') {
@@ -86,16 +59,12 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
   }
 
   /**
-   * This function is used to add the rules (mainly global rules) for form.
+   * Add the rules (mainly global rules) for form.
+   *
    * All local rules are added near the element
-   *
-   * @param null
-   *
-   * @return void
-   * @access public
    */
-  function addRules() {
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Mapping', 'formRule'));
+  public function addRules() {
+    $this->addFormRule(['CRM_Admin_Form_Setting_Mapping', 'formRule']);
   }
-}
 
+}

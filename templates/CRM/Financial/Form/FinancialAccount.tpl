@@ -1,30 +1,13 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting financial type  *}
-<h3>{if $action eq 1}{ts}New Financial Account{/ts}{elseif $action eq 2}{ts}Edit Financial Account{/ts}{else}{ts}Delete Financial Account{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-contribution_type-form-block crm-financial_type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
@@ -43,14 +26,14 @@
       <td class="html-adjust">{$form.description.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-organisation_name">
-      <td class="label">{$form.contact_name.label}&nbsp;{help id="id-financial-owner" file="CRM/Contact/Form/Contact.hlp"}</td>
-      <td class="html-adjust">{$form.contact_name.html|crmReplace:class:twenty}<br />
+      <td class="label">{$form.contact_id.label}&nbsp;{help id="id-financial-owner" file="CRM/Financial/Form/FinancialAccount.hlp"}</td>
+      <td class="html-adjust">{$form.contact_id.html}<br />
         <span class="description">{ts}Use this field to indicate the organization that owns this account.{/ts}</span>
       </td>
     </tr>
     <tr class="crm-contribution-form-block-financial_account_type_id">
       <td class="label">{$form.financial_account_type_id.label}</td>
-      <td class="html-adjust">{$form.financial_account_type_id.html|crmReplace:class:twenty}</td>
+      <td class="html-adjust">{$form.financial_account_type_id.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-accounting_code">
       <td class="label">{$form.accounting_code.label}</td>
@@ -59,7 +42,7 @@
       </td>
     </tr>
     <tr class="crm-contribution-form-block-account_type_code">
-      <td class="label">{$form.account_type_code.label}</td>
+      <td class="label">{$form.account_type_code.label}&nbsp;{help id="id-account-type-code" file="CRM/Financial/Form/FinancialAccount.hlp"}</td>
       <td class="html-adjust">{$form.account_type_code.html}<br />
         <span class="description">{ts}Enter an account type code for this account. Account type codes are required for QuickBooks integration and will be included in all accounting batch exports.{/ts}</span>
       </td>
@@ -77,13 +60,13 @@
     <tr class="crm-contribution-form-block-is_tax">
       <td class="label">{$form.is_tax.label}</td>
       <td class="html-adjust">{$form.is_tax.html}<br />
-        <span class="description">{ts}Does this account hold taxes collected? NB: for information only - not used by core CiviCRM.{/ts}</span>
+        <span class="description">{ts}Does this account hold taxes collected?{/ts}</span>
       </td>
     </tr>
     <tr class="crm-contribution-form-block-tax_rate">
       <td class="label">{$form.tax_rate.label}</td>
       <td class="html-adjust">{$form.tax_rate.html}<br />
-        <span class="description">{ts}The default rate used to calculate the taxes collected into this account (e.g. for tax rate of 8.27%, enter 8.27). NB: for information only - not used by core CiviCRM.{/ts}</span>
+        <span class="description">{ts}The default rate used to calculate the taxes collected into this account (e.g. for tax rate of 8.27%, enter 8.27).{/ts}</span>
       </td>
     </tr>
     <tr class="crm-contribution-form-block-is_default">
@@ -96,43 +79,3 @@
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>
-
-{literal}
-<script type="text/javascript">
-var dataUrl        = "{/literal}{$dataURL}{literal}";
-cj('#contact_name').autocomplete( dataUrl, {
-  width        : 250,
-  selectFirst  : false,
-  matchCase    : true,
-  matchContains: true,
-  max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-}).result( function(event, data, formatted) {
-  ( parseInt( data[1] ) ) ? cj( "#contact_id" ).val( data[1] ) : cj( "#contact_id" ).val('');
-});
-
-// remove current account owner id when current owner removed.
-cj("form").submit(function() {
-  if (!cj('#contact_name').val()) cj( "#contact_id" ).val('');
-});
-
-//current employer default setting
-var employerId = "{/literal}{$organisationId}{literal}";
-if ( employerId ) {
-  var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1&id=" }{literal}" + employerId ;
-  cj.ajax({
-    url     : dataUrl,
-    async   : false,
-    success : function(html){
-      //fixme for showing address in div
-      htmlText = html.split( '|' , 2);
-      cj('input#contact_name').val(htmlText[0]);
-      cj('input#contact_id').val(htmlText[1]);
-    }
-  });
-}
-
-cj("input#contact_name").click( function( ) {
-  cj("input#contact_id").val('');
-});
-</script>
-{/literal}

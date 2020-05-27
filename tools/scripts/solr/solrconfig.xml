@@ -44,7 +44,7 @@
     <maxMergeDocs>2147483647</maxMergeDocs>
     <maxFieldLength>10000</maxFieldLength>
 
-    <!-- If true, unlock any held write or commit locks on startup. 
+    <!-- If true, unlock any held write or commit locks on startup.
          This defeats the locking mechanism that allows multiple
          processes to safely access a lucene index, and should be
          used with care. -->
@@ -59,8 +59,8 @@
          org.apache.solr.(search|update|request|core|analysis)
      -->
 
-    <!-- autocommit pending docs if certain criteria are met 
-    <autoCommit> 
+    <!-- autocommit pending docs if certain criteria are met
+    <autoCommit>
       <maxDocs>10000</maxDocs>
     </autoCommit>
     -->
@@ -82,7 +82,7 @@
     </listener>
     -->
     <!-- A postOptimize event is fired only after every optimize command, useful
-         in conjunction with index distribution to only distribute optimized indicies 
+         in conjunction with index distribution to only distribute optimized indices
     <listener event="postOptimize" class="solr.RunExecutableListener">
       <str name="exe">snapshooter</str>
       <str name="dir">solr/bin</str>
@@ -99,7 +99,7 @@
         queries.  An exception is thrown if exceeded.  -->
     <maxBooleanClauses>1024</maxBooleanClauses>
 
-    
+
     <!-- Cache used by SolrIndexSearcher for filters (DocSets),
          unordered sets of *all* documents that match a query.
          When a new searcher is opened, its caches may be prepopulated
@@ -228,7 +228,7 @@
     <!-- default values for query parameters -->
      <lst name="defaults">
        <str name="echoParams">explicit</str>
-       <!-- 
+       <!--
        <int name="rows">10</int>
        <str name="fl">*</str>
        <str name="version">2.1</str>
@@ -237,7 +237,7 @@
   </requestHandler>
 
   <!-- DisMaxRequestHandler allows easy searching across multiple fields
-       for simple user-entered phrases. 
+       for simple user-entered phrases.
        see http://wiki.apache.org/solr/DisMaxRequestHandler
    -->
   <requestHandler name="dismax" class="solr.DisMaxRequestHandler" >
@@ -263,7 +263,7 @@
   <!-- queryResponseWriter plugins... query responses will be written using the
     writer specified by the 'wt' request parameter matching the name of a registered
     writer.
-    The "standard" writer is the default and will be used if 'wt' is not specified 
+    The "standard" writer is the default and will be used if 'wt' is not specified
     in the request. XMLResponseWriter will be used if nothing is specified here.
     The json, python, and ruby writers are also available by default.
 
@@ -277,13 +277,13 @@
 
   <!-- XSLT response writer transforms the XML output by any xslt file found
        in Solr's conf/xslt directory.  Changes to xslt files are checked for
-       every xsltCacheLifetimeSeconds.  
+       every xsltCacheLifetimeSeconds.
    -->
   <queryResponseWriter name="xslt" class="org.apache.solr.request.XSLTResponseWriter">
     <int name="xsltCacheLifetimeSeconds">5</int>
-  </queryResponseWriter> 
-    
-  <!-- config for the admin interface --> 
+  </queryResponseWriter>
+
+  <!-- config for the admin interface -->
   <admin>
     <defaultQuery>civicrm</defaultQuery>
     <gettableFiles>solrconfig.xml schema.xml admin-extra.html</gettableFiles>

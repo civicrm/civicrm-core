@@ -1,26 +1,29 @@
 <?php
-// $Id$
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
 
-function civicrm_api3_generic_getActions($params) {
-  civicrm_api3_verify_mandatory($params, NULL, array('entity'));
-  $r = civicrm_api('Entity', 'Get', array('version' => 3));
-  $entity = CRM_Utils_String::munge($params['entity']);
-  if (!in_array($entity, $r['values'])) {
-    return civicrm_api3_create_error("Entity " . $entity . " invalid. Use api.entity.get to have the list", array('entity' => $r['values']));
-  }
-  _civicrm_api_loadEntity($entity);
+/**
+ * @package CiviCRM_APIv3
+ */
 
-  $functions     = get_defined_functions();
-  $actions       = array();
-  $prefix        = 'civicrm_api3_' . strtolower($entity) . '_';
-  $prefixGeneric = 'civicrm_api3_generic_';
-  foreach ($functions['user'] as $fct) {
-    if (strpos($fct, $prefix) === 0) {
-      $actions[] = substr($fct, strlen($prefix));
-    }
-    elseif (strpos($fct, $prefixGeneric) === 0) {
-      $actions[] = substr($fct, strlen($prefixGeneric));
-    }
-  }
-  return civicrm_api3_create_success($actions);
+/**
+ * Get available api actions.
+ *
+ * @param array $apiRequest
+ *
+ * @return array
+ * @throws API_Exception
+ */
+function civicrm_api3_generic_getActions($apiRequest) {
+  civicrm_api3_verify_mandatory($apiRequest, NULL, ['entity']);
+  $mfp = \Civi::service('magic_function_provider');
+  $actions = $mfp->getActionNames($apiRequest['version'], $apiRequest['entity']);
+  return civicrm_api3_create_success($actions, $apiRequest['params'], $apiRequest['entity'], 'getactions');
 }

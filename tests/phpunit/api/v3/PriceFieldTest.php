@@ -1,107 +1,201 @@
 <?php
-// $Id$
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class api_v3_PriceFieldTest
+ * @group headless
+ */
 class api_v3_PriceFieldTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $_params;
   protected $id = 0;
   protected $priceSetID = 0;
   protected $_entity = 'price_field';
-  public $_eNoticeCompliant = TRUE;
-  public $DBResetRequired = TRUE;
 
+  /**
+   * Set up for test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
-    // put stuff here that should happen before all tests in this unit
-    $priceSetparams = array(
-      'version' => 3,
-      #     [domain_id] =>
+    $priceSetparams = [
       'name' => 'default_goat_priceset',
-      'title' => 'Goat accomodation',
+      'title' => 'Goat accommodation',
       'is_active' => 1,
-      'help_pre' => "Where does your goat sleep",
-      'help_post' => "thank you for your time",
+      'help_pre' => 'Where does your goat sleep',
+      'help_post' => 'thank you for your time',
       'extends' => 2,
       'financial_type_id' => 1,
       'is_quick_config' => 1,
       'is_reserved' => 1,
-    );
+    ];
 
-    $price_set = civicrm_api('price_set', 'create',$priceSetparams);
+    $price_set = $this->callAPISuccess('price_set', 'create', $priceSetparams);
     $this->priceSetID = $price_set['id'];
 
-    $this->_params = array(
-      'version' => $this->_apiversion,
+    $this->_params = [
       'price_set_id' => $this->priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
       'html_type' => 'Text',
       'is_enter_qty' => 1,
       'is_active' => 1,
-    );
+    ];
   }
 
-  function tearDown() {
-    $tablesToTruncate = array(
-        'civicrm_contact',
-        'civicrm_contribution',
-    );
+  /**
+   * Clean up after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown() {
+    $tablesToTruncate = [
+      'civicrm_contact',
+      'civicrm_contribution',
+    ];
     $this->quickCleanup($tablesToTruncate);
 
-    $delete = civicrm_api('PriceSet','delete', array(
-      'version' => 3,
-      'id' => $this->priceSetID,
-    ));
-
-    $this->assertAPISuccess($delete);
+    $this->callAPISuccess('PriceSet', 'delete', ['id' => $this->priceSetID]);
+    parent::tearDown();
   }
 
-  public function testCreatePriceField() {
-    $result = civicrm_api($this->_entity, 'create', $this->_params);
-    $this->id = $result['id'];
-    $this->documentMe($this->_params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+  /**
+   * Basic create test.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreatePriceField(int $version) {
+    $this->_apiversion = $version;
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
 
-  public function testGetBasicPriceField() {
-    $createResult = civicrm_api($this->_entity, 'create', $this->_params);
+  /**
+   * Basic get test.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetBasicPriceField(int $version) {
+    $this->_apiversion = $version;
+    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->id = $createResult['id'];
     $this->assertAPISuccess($createResult);
-    $getParams = array(
-      'version' => $this->_apiversion,
+    $getParams = [
       'name' => 'contribution_amount',
-    );
-    $getResult = civicrm_api($this->_entity, 'get', $getParams);
-    $this->documentMe($getParams, $getResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($getResult, 'In line ' . __LINE__);
-    $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
-    civicrm_api('price_field','delete', array('version' => 3, 'id' => $createResult['id']));
+    ];
+    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $getResult['count']);
+    $this->callAPISuccess('price_field', 'delete', ['id' => $createResult['id']]);
   }
 
-  public function testDeletePriceField() {
-    $startCount = civicrm_api($this->_entity, 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
-    $createResult = civicrm_api($this->_entity, 'create', $this->_params);
-    $deleteParams = array('version' => $this->_apiversion, 'id' => $createResult['id']);
-    $deleteResult = civicrm_api($this->_entity, 'delete', $deleteParams);
-    $this->documentMe($deleteParams, $deleteResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
-    $endCount = civicrm_api($this->_entity, 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
-    $this->assertEquals($startCount, $endCount, 'In line ' . __LINE__);
+  /**
+   * Basic delete test.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeletePriceField($version) {
+    $this->_apiversion = $version;
+    $startCount = $this->callAPISuccess($this->_entity, 'getcount', []);
+    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $deleteParams = ['id' => $createResult['id']];
+    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->assertAPISuccess($deleteResult);
+    $endCount = $this->callAPISuccess($this->_entity, 'getcount', []);
+    $this->assertEquals($startCount, $endCount);
   }
 
-  public function testGetFieldsPriceField() {
-    $result = civicrm_api($this->_entity, 'getfields', array('version' => $this->_apiversion, 'action' => 'create'));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['values']['options_per_line']['type']);
+  /**
+   * Basic getfields test.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetFieldsPriceField(int $version) {
+    $this->_apiversion = $version;
+    $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
+    $this->assertEquals('number of options per line for checkbox and radio', $result['values']['options_per_line']['description']);
+  }
+
+  /**
+   * Test updating the label of a text price field.
+   *
+   * CRM-19741 - ensure price field value label is also updated.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdatePriceFieldLabel(int $version) {
+    $this->_apiversion = $version;
+    $field = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $expectedLabel = 'Rose Variety';
+    $this->updateLabel($field, $expectedLabel);
+  }
+
+  /**
+   * Test that value label only updates if field type is html (CRM-19741).
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdatePriceFieldLabelNotUpdateField(int $version) {
+    $this->_apiversion = $version;
+    $expectedLabel = 'juicy and healthy';
+    $field = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['html_type' => 'Radio']));
+    $this->updateLabel($field, $expectedLabel);
+  }
+
+  /**
+   * Update the label using the api, check against expected final label.
+   *
+   * @param array $field
+   * @param string $expectedLabel
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function updateLabel(array $field, string $expectedLabel) {
+    $this->callAPISuccess('PriceFieldValue', 'create', [
+      'price_field_id' => $field['id'],
+      'name' => 'rye grass',
+      'label' => 'juicy and healthy',
+      'amount' => 1,
+      'financial_type_id' => 1,
+    ]);
+    $this->callAPISuccess($this->_entity, 'create', ['id' => $field['id'], 'label' => 'Rose Variety']);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'get', ['price_field_id' => $field['id']]);
+    $this->assertEquals($expectedLabel, $priceFieldValue['values'][$priceFieldValue['id']]['label']);
+    $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $priceFieldValue['id']]);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $field['id']]);
   }
 
 }
-

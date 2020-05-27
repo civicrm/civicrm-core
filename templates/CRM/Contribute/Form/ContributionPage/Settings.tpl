@@ -1,31 +1,15 @@
 
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
-<div id="help">
+{crmRegion name="contribute-form-contributionpage-settings-main"}
+<div class="help">
     {if $action eq 0}
         <p>{ts}This is the first step in creating a new online Contribution Page. You can create one or more different Contribution Pages for different purposes, audiences, campaigns, etc. Each page can have it's own introductory message, pre-configured contribution amounts, custom data collection fields, etc.{/ts}</p>
         <p>{ts}In this step, you will configure the page title, financial type (donation, campaign contribution, etc.), goal amount, and introductory message. You will be able to go back and modify all aspects of this page at any time after completing the setup wizard.{/ts}</p>
@@ -33,12 +17,17 @@
         {ts}Use this form to edit the page title, financial type (e.g. donation, campaign contribution, etc.), goal amount, introduction, and status (active/inactive) for this online contribution page.{/ts}
     {/if}
 </div>
+<div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
+
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
   <tr class="crm-contribution-contributionpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>
+            <span class="description">{ts}This title will be displayed at the top of the page unless the frontend title field is filled out.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
+  </tr>
+  <tr class="crm-contribution-contributionpage-settings-form-block-frontend-title"><td class="label">{$form.contribution_page_frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='frontend_title' id=$contributionPageID}{/if}</td><td>{$form.contribution_page_frontend_title.html}<br/>
             <span class="description">{ts}This title will be displayed at the top of the page.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
   </tr>
-  <tr class="crm-contribution-contributionpage-settings-form-block-financial_type_id"><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}<br />	
+  <tr class="crm-contribution-contributionpage-settings-form-block-financial_type_id"><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}<br />
             <span class="description">{ts}Select the corresponding financial type for contributions made using this page.{/ts}</span> {help id="id-financial_type"}</td>
   </tr>
 
@@ -57,7 +46,7 @@
                     {if $invalidProfiles}
                       {ts 1=$profileURL}You must <a href="%1">configure a valid organization profile</a> in order to allow individuals to contribute on behalf of an organization. Valid profiles include Contact and / or Organization fields, and may include Contribution and Membership fields.{/ts}
                     {else}
-                      {ts 1=$profileURL}To change the organization data collected use the "On Behalf Of Organization" profile (<a href="%1">Administer > Customize > CiviCRM Profile</a>).{/ts}
+                      {ts 1=$profileURL}To change the organization data collected use the "On Behalf Of Organization" profile (<a href="%1">Administer > Customize Data and Screens > Profiles</a>).{/ts}
                     {/if}
                 </td>
             </tr>
@@ -68,7 +57,7 @@
               </tr>
             {/if}
             <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
-                <td class="label">{$form.for_organization.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='for_organization' id=$contributionPageID}{/if}</td>
+                <td class="label">{$form.for_organization.label}</td>
                 <td>{$form.for_organization.html}<br />
                     <span class="description">{ts}Text displayed next to the checkbox on the contribution form.{/ts}</span>
                 </td>
@@ -93,28 +82,53 @@
   </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-start_date">
       <td class ="label">{$form.start_date.label} {help id="id-start_date"}</td>
-      <td>
-          {include file="CRM/common/jcalendar.tpl" elementName=start_date}
-      </td>
+      <td>{$form.start_date.html}</td>
     </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-end_date">
       <td class ="label">{$form.end_date.label}</td>
-      <td>
-          {include file="CRM/common/jcalendar.tpl" elementName=end_date}
-      </td>
+      <td>{$form.end_date.html}</td>
     </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_is_active">
       <td>&nbsp;</td><td>{$form.honor_block_is_active.html}{$form.honor_block_is_active.label} {help id="id-honoree_section"}</td>
   </tr>
 </table>
 <table class="form-layout-compressed" id="honor">
-    <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_title"><td class="label">{$form.honor_block_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='honor_block_title' id=$contributionPageID}{/if}</td><td>{$form.honor_block_title.html}<br />
-      <span class="description">{ts}Title for the Honoree section (e.g. &quot;Honoree Information&quot;).{/ts}</span></td>
+    <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_title">
+        <td class="label">
+            {$form.honor_block_title.label}
+       </td>
+       <td>
+           {$form.honor_block_title.html}<br />
+           <span class="description">{ts}Title for the Honoree section (e.g. &quot;Honoree Information&quot;).{/ts}</span>
+       </td>
+   </tr>
+   <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_text">
+       <td class="label">
+           {crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}
+           {$form.honor_block_text.label}
+       </td>
+       <td>
+           {$form.honor_block_text.html}<br />
+           <span class="description">{ts}Optional explanatory text for the Honoree section (displayed above the Honoree fields).{/ts}</span>
+       </td>
   </tr>
-  <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_text">
-      <td class="label">{$form.honor_block_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='honor_block_text' id=$contributionPageID}{/if}</td><td>{$form.honor_block_text.html}<br />
-      <span class="description">{ts}Optional explanatory text for the Honoree section (displayed above the Honoree fields).{/ts}</span></td>
+  <tr class="crm-contribution-contributionpage-settings-form-block-honor_soft_credit_types">
+      <td class="label">
+          {$form.soft_credit_types.label}
+      </td>
+      <td>
+        {$form.soft_credit_types.html}
+      </td>
   </tr>
+  <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
+      <td class="label">
+          {$form.honoree_profile.label}
+      </td>
+      <td class="html-adjust">
+          {$form.honoree_profile.html}
+          <span class="description">{ts}Profile to be included in the honoree section{/ts}</span>
+      </td>
+   </tr>
 </table>
 <table class="form-layout-compressed">
         <tr class="crm-contribution-contributionpage-settings-form-block-is_confirm_enabled">
@@ -126,16 +140,20 @@
         <td>&nbsp;</td>
         <td>{$form.is_share.html} {$form.is_share.label} {help id="id-is_share"}</td>
       </tr>
-    <tr class="crm-contribution-contributionpage-settings-form-block-is_active"><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>{$form.is_active.html} {$form.is_active.label}<br />
+        <tr class="crm-contribution-contributionpage-settings-form-block-is_active">
+        <td>&nbsp;</td>  
+        <td>{$form.is_active.html} {$form.is_active.label}</td>
+      </tr>
   {if $contributionPageID}
-        <span class="description">
-          {if $config->userSystem->is_drupal EQ '1'}
+        <tr class="crm-contribution-contributionpage-settings-form-block-info_link">
+        <td>&nbsp;</td>  
+        <td class="description">
+          {if $config->userSystem->is_drupal || $config->userFramework EQ 'WordPress'}
               {ts}When your page is active, you can link people to the page by copying and pasting the following URL:{/ts}<br />
-              <strong>{crmURL a=true p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}</strong>
+              <strong>{crmURL a=1 fe=1 p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}</strong>
           {elseif $config->userFramework EQ 'Joomla'}
               {ts 1=$title}When your page is active, create front-end links to the contribution page using the Menu Manager. Select <strong>Administer CiviCRM &raquo; CiviContribute &raquo; Manage Contribution Pages</strong> and select <strong>%1</strong> for the contribution page.{/ts}
           {/if}
-    </span>
       {/if}
   </td>
   </tr>
@@ -173,7 +191,6 @@
      }
  {/literal}
 </script>
-
-{* include jscript to warn if unsaved form field changes *}
-{include file="CRM/common/formNavigate.tpl"}
-
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-settings-post"}
+{/crmRegion}

@@ -1,28 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contribute-pcp-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
 
 {if $pcpInfo}
@@ -35,7 +21,7 @@
     <th>{ts}In Support of{/ts}</th>
     <th>{ts}Campaign Ends{/ts}</th>
     <th>{ts}Status{/ts}</th>
-    <th></th>
+    {if !$userChecksum} <th></th> {/if}
   </tr>
 
   {foreach from=$pcpInfo item=row}
@@ -44,7 +30,9 @@
         <td>{$row.pageTitle}</td>
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
         <td>{$row.pcpStatus}</td>
-        <td>{$row.action|replace:'xx':$row.pcpId}</td>
+        {if !$userChecksum}
+          <td>{$row.action|replace:'xx':$row.pcpId}</td>
+        {/if}
   </tr>
   {/foreach}
 </table>
@@ -56,7 +44,6 @@
   {ts}You do not have any active Personal Campaign pages.{/ts}
 </div>
 {/if}
-
 
 {if $pcpBlock}
 {strip}
@@ -77,7 +64,7 @@
 
   {foreach from=$pcpBlock item=row}
   <tr class="{cycle values="odd-row,even-row"}">
-    <td><a href="{crmURL p='civicrm/contribute/transact' q="id=`$row.pageId`&reset=1"}" title="{ts}View campaign page{/ts}">{$row.pageTitle}</a></td>
+    <td>{if $row.component eq 'contribute'}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$row.pageId`&reset=1"}" title="{ts}View campaign page{/ts}">{else}<a href="{crmURL p='civicrm/event/register' q="id=`$row.pageId`&reset=1"}" title="{ts}View campaign page{/ts}">{/if}{$row.pageTitle}</a></td>
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
     <td>{$row.action|replace:'xx':$row.pageId}</td>
   </tr>
@@ -88,3 +75,5 @@
 {/if}
 
 </div>
+{crmRegion name="crm-contribute-pcp-userdashboard-post"}
+{/crmRegion}

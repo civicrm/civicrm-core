@@ -18,7 +18,7 @@
 
 <!-- This is the Solr schema file. This file should be named "schema.xml" and
  should be in the conf directory under the solr home
- (i.e. ./solr/conf/schema.xml by default) 
+ (i.e. ./solr/conf/schema.xml by default)
  or located where the classloader for the Solr webapp can find it.
 
  For more information, on how to customize this file, please see
@@ -42,7 +42,7 @@
        org.apache.solr.analysis package.
     -->
 
-    <!-- The StrField type is not analyzed, but indexed/stored verbatim.  
+    <!-- The StrField type is not analyzed, but indexed/stored verbatim.
        - StrField and TextField support an optional compressThreshold which
        limits compression (if enabled in the derived fields) to values which
        exceed a certain size (in characters).
@@ -63,7 +63,7 @@
        - If sortMissingLast="false" and sortMissingFirst="false" (the default),
          then default lucene sorting will be used which places docs without the
          field first in an ascending sort and last in a descending sort.
-    -->    
+    -->
 
 
     <!-- numeric field types that store and index the text
@@ -87,7 +87,7 @@
 
     <!-- The format for this date field is of the form 1995-12-31T23:59:59Z, and
          is a more restricted form of the canonical representation of dateTime
-         http://www.w3.org/TR/xmlschema-2/#dateTime    
+         http://www.w3.org/TR/xmlschema-2/#dateTime
          The trailing "Z" designates UTC time and is mandatory.
          Optional fractional seconds are allowed: 1995-12-31T23:59:59.999Z
          All other components are mandatory.
@@ -102,7 +102,7 @@
                NOW/DAY+6MONTHS+3DAYS
                   ... 6 months and 3 days in the future from the start of
                       the current day
-                      
+
          Consult the DateField javadocs for more information.
       -->
     <fieldtype name="date" class="solr.DateField" sortMissingLast="true" omitNorms="true"/>
@@ -230,6 +230,7 @@
    <field name="street_address"         type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="supplemental_address_1" type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="supplemental_address_2" type="text" indexed="true" stored="false" multiValued="true"/>
+   <field name="supplemental_address_3" type="text" indexed="true" stored="false" multiValued="true"/>
    <field name="city"                   type="text" indexed="true" stored="false" multiValued="true"/>
 
    <field name="county"                 type="text" indexed="true" stored="false" multiValued="true"/>
@@ -285,6 +286,7 @@
    <copyField source="street_address"         dest="address"/>
    <copyField source="supplemental_address_1" dest="address"/>
    <copyField source="supplemental_address_2" dest="address"/>
+   <copyField source="supplemental_address_3" dest="address"/>
    <copyField source="city"                   dest="address"/>
    <copyField source="county"                 dest="address"/>
    <copyField source="state"                  dest="address"/>
@@ -309,6 +311,7 @@
    <copyField source="street_address"         dest="text"/>
    <copyField source="supplemental_address_1" dest="text"/>
    <copyField source="supplemental_address_2" dest="text"/>
+   <copyField source="supplemental_address_3" dest="text"/>
    <copyField source="city"                   dest="text"/>
    <copyField source="county"                 dest="text"/>
    <copyField source="state"                  dest="text"/>

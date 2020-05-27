@@ -1,61 +1,40 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This implements the profile page for all contacts. It uses a selector
- * object to do the actual dispay. The fields displayd are controlled by
+ * This implements the profile page for all contacts.
+ *
+ * It uses a selector object to do the actual display. The fields displayed are controlled by
  * the admin
  */
 class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
   /**
-   * all the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
-   * @access protected
    */
   protected $_fields;
 
   /**
-   * run this page (figure out the action needed and perform it).
-   *
-   * @return void
+   * Run this page (figure out the action needed and perform it).
    */
-  function run() {
-    $selector = &new CRM_Mailing_Selector_Event(
+  public function run() {
+    $selector = new CRM_Mailing_Selector_Event(
       CRM_Utils_Request::retrieve('event', 'String', $this),
       CRM_Utils_Request::retrieve('distinct', 'Boolean', $this),
       CRM_Utils_Request::retrieve('mid', 'Positive', $this),
@@ -65,8 +44,10 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     $mailing_id = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
 
-    //assign backurl
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    // check that the user has permission to access mailing id
+    CRM_Mailing_BAO_Mailing::checkPermission($mailing_id);
+
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     if ($context == 'activitySelector') {
       $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -78,8 +59,16 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
       $backUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=mailing");
       $backUrlTitle = ts('Back to Mailing');
     }
+    elseif ($context == 'angPage') {
+      $angPage = CRM_Utils_Request::retrieve('angPage', 'String', $this);
+      if (!preg_match(':^[a-zA-Z0-9\-_/]+$:', $angPage)) {
+        throw new CRM_Core_Exception('Malformed return URL');
+      }
+      $backUrl = CRM_Utils_System::url('civicrm/a/#/' . $angPage);
+      $backUrlTitle = ts('Back to Report');
+    }
     else {
-      $backUrl = CRM_Utils_System::url('civicrm/mailing', 'reset=1');
+      $backUrl = CRM_Utils_System::url('civicrm/mailing/report', "reset=1&mid={$mailing_id}");
       $backUrlTitle = ts('Back to Report');
     }
 
@@ -111,5 +100,5 @@ class CRM_Mailing_Page_Event extends CRM_Core_Page {
 
     return parent::run();
   }
-}
 
+}

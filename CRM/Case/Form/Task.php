@@ -1,173 +1,71 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates task actions for CiviEvent
- *
+ * This class generates form task actions for CiviCase.
  */
-class CRM_Case_Form_Task extends CRM_Core_Form {
+class CRM_Case_Form_Task extends CRM_Core_Form_Task {
 
   /**
-   * the task being performed
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The additional clause that we restrict the search with
-   *
+   * Must be set to entity table name (eg. civicrm_participant) by child class
    * @var string
    */
-  protected $_componentClause = NULL;
-
+  public static $tableName = 'civicrm_case';
   /**
-   * The array that holds all the component ids
-   *
-   * @var array
+   * Must be set to entity shortname (eg. event)
+   * @var string
    */
-  protected $_componentIds;
+  public static $entityShortname = 'case';
 
   /**
-   * The array that holds all the case ids
-   *
-   * @var array
-   */
-  protected $_caseIds;
-
-  /**
-   * build all the data structures needed to build the form
-   *
-   * @param
-   *
-   * @return void
-   * @access public
-   */
-  function preProcess() {
-    self::preProcessCommon($this);
-  }
-
-  static function preProcessCommon(&$form, $useTable = FALSE) {
-    $form->_caseIds = array();
-
-    $values = $form->controller->exportValues($form->get('searchFormName'));
-
-    $form->_task = $values['task'];
-    $caseTasks = CRM_Case_Task::tasks();
-    $form->assign('taskName', $caseTasks[$form->_task]);
-
-    $ids = array();
-    if ($values['radio_ts'] == 'ts_sel') {
-      foreach ($values as $name => $value) {
-        if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
-        }
-      }
-    }
-    else {
-      $queryParams = $form->get('queryParams');
-      $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
-        CRM_Contact_BAO_Query::MODE_CASE
-      );
-      $query->_distinctComponentClause = " ( civicrm_case.id )";
-      $query->_groupByComponentClause = " GROUP BY civicrm_case.id ";
-      $result = $query->searchQuery(0, 0, NULL);
-      while ($result->fetch()) {
-        $ids[] = $result->case_id;
-      }
-    }
-
-    if (!empty($ids)) {
-      $form->_componentClause = ' civicrm_case.id IN ( ' . implode(',', $ids) . ' ) ';
-      $form->assign('totalSelectedCases', count($ids));
-    }
-
-    $form->_caseIds = $form->_componentIds = $ids;
-
-    //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/case/search', $urlParams));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-          $urlParams
-        ));
-    }
-  }
-
-  /**
-   * Given the signer id, compute the contact id
-   * since its used for things like send email
+   * @inheritDoc
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_caseIds,
-      'civicrm_case'
+    // @todo Parameters shouldn't be needed and should be class member
+    // variables instead, set appropriately by each subclass.
+    $this->_contactIds = $this->getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
     );
   }
 
   /**
-   * simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
+   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
    *
-   * @param string $title title of the main button
-   * @param string $type  button type for the form after processing
-   *
-   * @return void
-   * @access public
+   * @return int
    */
-  function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+  public function getQueryMode() {
+    return CRM_Contact_BAO_Query::MODE_CASE;
   }
-}
 
+  /**
+   * Override of CRM_Core_Form_Task::orderBy()
+   *
+   * @return string
+   */
+  public function orderBy() {
+    if (empty($this->_entityIds)) {
+      return '';
+    }
+    $order_array = [];
+    foreach ($this->_entityIds as $item) {
+      // Ordering by conditional in mysql. This evaluates to 0 or 1, so we
+      // need to order DESC to get the '1'.
+      $order_array[] = 'case_id = ' . CRM_Core_DAO::escapeString($item) . ' DESC';
+    }
+    return 'ORDER BY ' . implode(',', $order_array);
+  }
+
+}

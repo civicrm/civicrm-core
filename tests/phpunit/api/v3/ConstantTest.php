@@ -4,13 +4,13 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: ConstantTest.php 31254 2010-12-15 10:09:29Z eileen $
- *   @package CiviCRM_APIv3
- *   @subpackage API_Constant
+ * @version   $Id: ConstantTest.php 31254 2010-12-15 10:09:29Z eileen $
+ * @package CiviCRM_APIv3
+ * @subpackage API_Constant
  *
  *   This file is part of CiviCRM
  *
@@ -30,126 +30,93 @@
  */
 
 /**
- *  Include class definitions
- */
-require_once 'CiviTest/CiviUnitTestCase.php';
-require_once 'api/v3/Constant.php';
-require_once 'CRM/Core/I18n.php';
-require_once 'CRM/Utils/Cache.php';
-
-/**
  *  Test APIv3 civicrm_activity_* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Constant
+ * @package CiviCRM_APIv3
+ * @subpackage API_Constant
+ * @group headless
  */
 class api_v3_ConstantTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
-  public $_eNoticeCompliant = TRUE;
 
   /**
-   *  Constructor
+   * Test setup for every test.
    *
-   *  Initialize configuration
-   */ function __construct() {
-    parent::__construct();
-  }
-
-  /**
-   *  Test setup for every test
-   *
-   *  Connect to the database, truncate the tables that will be used
-   *  and redirect stdin to a temporary file
+   * Connect to the database, truncate the tables that will be used
+   * and redirect stdin to a temporary file
    */
   public function setUp() {
     //  Connect to the database
     parent::setUp();
-    $this->_apiversion = 3;
   }
 
   /**
-   *  Test civicrm_constant_get( ) for unknown constant
+   * Test civicrm_constant_get( ) for unknown constant
    */
   public function testUnknownConstant() {
-    $result = civicrm_api('constant', 'get', array(
+    $result = $this->callAPIFailure('constant', 'get', [
       'name' => 'thisTypeDoesNotExist',
-        'version' => $this->_apiversion,
-      ));
-    $this->assertEquals(1, $result['is_error'], "In line " . __LINE__);
+    ]);
   }
 
   /**
-   *  Test civicrm_constant_get( 'activityStatus' )
+   * Test civicrm_constant_get( 'activityStatus' )
    */
   public function testActivityStatus() {
 
-    $result = civicrm_api('constant', 'get', array(
+    $result = $this->callAPISuccess('constant', 'get', [
       'name' => 'activityStatus',
-        'version' => $this->_apiversion,
-      ));
+    ]);
 
     $this->assertTrue($result['count'] > 5, "In line " . __LINE__);
     $this->assertContains('Scheduled', $result['values'], "In line " . __LINE__);
     $this->assertContains('Completed', $result['values'], "In line " . __LINE__);
     $this->assertContains('Cancelled', $result['values'], "In line " . __LINE__);
 
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
-   *  Test civicrm_constant_get( 'activityType' )
+   * Test civicrm_constant_get( 'activityType' )
    */
   public function testActivityType() {
-
-    $parameters = array(TRUE, FALSE, TRUE);
-
-    $result = civicrm_api('constant', 'get', array(
+    $result = $this->callAPIAndDocument('constant', 'get', [
       'name' => 'activityType',
-        'version' => $this->_apiversion,
-      ));
+    ], __FUNCTION__, __FILE__, NULL, NULL, 'get');
     $this->assertTrue($result['count'] > 2, "In line " . __LINE__);
     $this->assertContains('Meeting', $result['values'], "In line " . __LINE__);
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
-   *  Test civicrm_constant_get( 'locationType' )
+   * Test civicrm_address_getoptions( 'location_type_id' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testLocationTypeGet() {
+  public function testLocationTypeGet($version) {
+    $this->_apiversion = $version;
     // needed to get rid of cached values from previous tests
-    CRM_Core_PseudoConstant::flush('locationType');
+    CRM_Core_PseudoConstant::flush();
 
-
-
-    $params = array(
-      'name' => 'locationType',
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('constant', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    $params = [
+      'field' => 'location_type_id',
+    ];
+    $result = $this->callAPIAndDocument('address', 'getoptions', $params, __FUNCTION__, __FILE__);
     $this->assertTrue($result['count'] > 3, "In line " . __LINE__);
     $this->assertContains('Home', $result['values'], "In line " . __LINE__);
     $this->assertContains('Work', $result['values'], "In line " . __LINE__);
     $this->assertContains('Main', $result['values'], "In line " . __LINE__);
     $this->assertContains('Billing', $result['values'], "In line " . __LINE__);
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
-   *  Test civicrm_constant_get( 'phoneType' )
+   * Test civicrm_phone_getoptions( 'phone_type_id' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testPhoneType() {
-    $parameters = array(TRUE, FALSE, TRUE);
-    $result = civicrm_api('constant', 'get', array(
-      'name' => 'phoneType',
-        'version' => $this->_apiversion,
-      ));
+  public function testPhoneType($version) {
+    $this->_apiversion = $version;
+    $params = [
+      'field' => 'phone_type_id',
+    ];
+    $result = $this->callAPIAndDocument('phone', 'getoptions', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(5, $result['count'], "In line " . __LINE__);
     $this->assertContains('Phone', $result['values'], "In line " . __LINE__);
@@ -157,32 +124,25 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
     $this->assertContains('Fax', $result['values'], "In line " . __LINE__);
     $this->assertContains('Pager', $result['values'], "In line " . __LINE__);
     $this->assertContains('Voicemail', $result['values'], "In line " . __LINE__);
-
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
 
   /**
-   *  Test civicrm_constant_get( 'mailProtocol' )
+   * Test civicrm_constant_get( 'mailProtocol' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testmailProtocol() {
-
-
-    $parameters = array(TRUE, FALSE, TRUE);
-
-    $result = civicrm_api('constant', 'get', array(
-      'name' => 'mailProtocol',
-        'version' => $this->_apiversion,
-      ));
+  public function testmailProtocol($version) {
+    $this->_apiversion = $version;
+    $params = [
+      'field' => 'protocol',
+    ];
+    $result = $this->callAPIAndDocument('mail_settings', 'getoptions', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals(4, $result['count'], "In line " . __LINE__);
     $this->assertContains('IMAP', $result['values'], "In line " . __LINE__);
     $this->assertContains('Maildir', $result['values'], "In line " . __LINE__);
     $this->assertContains('POP3', $result['values'], "In line " . __LINE__);
     $this->assertContains('Localdir', $result['values'], "In line " . __LINE__);
-    $this->assertTrue(empty($result['is_error']),
-      "In line " . __LINE__
-    );
   }
+
 }

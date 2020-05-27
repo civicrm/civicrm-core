@@ -1,68 +1,49 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
 
 /**
- * This class generates form components for processing a ontribution
- *
+ * This class generates form components for processing a contribution.
  */
 class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
-   *Variable defined for Contribution Page Id
-   *
+   * Variable defined for Contribution Page Id.
+   * @var int
    */
-
   public $_pageId = NULL;
   public $_id = NULL;
   public $_component = NULL;
 
   /**
-   * are we in single form mode or wizard mode?
+   * Are we in single form mode or wizard mode?
    *
-   * @var boolean
-   * @access protected
+   * @var bool
    */
   public $_single;
 
   public function preProcess() {
-    $session          = CRM_Core_Session::singleton();
-    $config           = CRM_Core_Config::singleton();
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
-    $this->_pageId    = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
+    $session = CRM_Core_Session::singleton();
+    $config = CRM_Core_Config::singleton();
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_pageId = CRM_Utils_Request::retrieve('pageId', 'Positive', $this);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this);
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     if (!$this->_pageId && $config->userFramework == 'Joomla' && $config->userFrameworkFrontend) {
       $this->_pageId = $this->_id;
@@ -72,7 +53,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       $contactID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $this->_id, 'contact_id');
     }
 
-    $this->_contactID = isset($contactID) ? $contactID : $session->get('userID');
+    $this->_contactID = $contactID ?? CRM_Core_Session::getLoggedInContactID();
     if (!$this->_pageId) {
       if (!$this->_id) {
         $msg = ts('We can\'t load the requested web page due to an incomplete link. This can be caused by using your browser\'s Back button or by using an incomplete or invalid link.');
@@ -107,17 +88,18 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
   }
 
-  function setDefaultValues() {
-    if (!$this->_contactID) {
-      return;
-    }
-    $stateCountryMap = array();
-    foreach ($this->_fields as $name => $dontcare) {
-      $fields[$name] = 1;
-    }
+  /**
+   * @return array
+   */
+  public function setDefaultValues() {
+    $this->_defaults = [];
+    if ($this->_contactID) {
+      foreach ($this->_fields as $name => $dontcare) {
+        $fields[$name] = 1;
+      }
 
-    CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
-
+      CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
+    }
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
@@ -127,29 +109,14 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
           );
         }
       }
-      if ((substr($name, 0, 14) === 'state_province') || (substr($name, 0, 7) === 'country') || (substr($name, 0, 6) === 'county')) {
-        list($fieldName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$fieldName] = $name;
-      }
-
-      // also take care of state country widget
-      if (!empty($stateCountryMap)) {
-        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $this->_defaults);
-      }
     }
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
     return $this->_defaults;
   }
 
   /**
-   * Function to build the form
+   * Build the form object.
    *
-   * @return None
-   * @access public
+   * @return void
    */
   public function buildQuickForm() {
     $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
@@ -161,7 +128,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($id, $this->_contactID)) {
         $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD);
       }
-      $this->addFormRule(array('CRM_PCP_Form_PCPAccount', 'formRule'), $this);
+      $this->addFormRule(['CRM_PCP_Form_PCPAccount', 'formRule'], $this);
     }
     else {
       CRM_Core_BAO_CMSUser::buildForm($this, $id, TRUE);
@@ -179,7 +146,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
         }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE);
         $this->_fields[$key] = $field;
-        if ($field['add_captcha']) {
+
+        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+        if ($field['add_captcha'] && !$this->_contactID) {
           $addCaptcha = TRUE;
         }
       }
@@ -191,7 +160,6 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-
     if ($this->_component == 'contribute') {
       $this->assign('campaignName', CRM_Contribute_PseudoConstant::contributionPage($this->_pageId));
     }
@@ -200,43 +168,46 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
 
     if ($this->_single) {
-      $button = array(
-        array('type' => 'next',
+      $button = [
+        [
+          'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      );
+        ],
+      ];
     }
     else {
-      $button[] = array(
+      $button[] = [
         'type' => 'next',
-        'name' => ts('Continue >>'),
+        'name' => ts('Continue'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-      );
+      ];
     }
-    $this->addFormRule(array('CRM_PCP_Form_PCPAccount', 'formRule'), $this);
+    $this->addFormRule(['CRM_PCP_Form_PCPAccount', 'formRule'], $this);
     $this->addButtons($button);
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
+   * @param $self
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields, $files, $self) {
-    $errors = array();
+  public static function formRule($fields, $files, $self) {
+    $errors = [];
     foreach ($fields as $key => $value) {
       if (strpos($key, 'email-') !== FALSE && !empty($value)) {
         $ufContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFMatch', $value, 'contact_id', 'uf_name');
@@ -249,11 +220,10 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   /**
-   * Function to process the form
+   * Process the form submission.
    *
-   * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->getName());
@@ -272,7 +242,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
             $isPrimary = 1;
           }
 
-          $params['email'] = array();
+          $params['email'] = [];
           $params['email'][1]['email'] = $value;
           $params['email'][1]['location_type_id'] = $locTypeId;
           $params['email'][1]['is_primary'] = $isPrimary;
@@ -280,12 +250,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'Unsupervised');
-    if ($ids) {
-      $this->_contactID = $ids['0'];
-    }
-    $contactID = &CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
+    $this->_contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
+
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);
 
     if (!empty($params['email'])) {
@@ -294,5 +261,5 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
     CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params, $contactID, 'email');
   }
-}
 
+}

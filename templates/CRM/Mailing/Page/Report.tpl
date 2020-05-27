@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <fieldset>
@@ -35,13 +19,16 @@
         <td>{$report.event_totals.delivered} ({$report.event_totals.delivered_rate|string_format:"%0.2f"}%)</td>
         <td>{$report.event_totals.actionlinks.delivered}</td></tr>
   {if $report.mailing.open_tracking}
-    <tr><td class="label"><a href="{$report.event_totals.links.opened}">{ts}Tracked Opens{/ts}</a></td>
-        <td>{$report.event_totals.opened}</td>
+    <tr><td class="label"><a href="{$report.event_totals.links.opened}&distinct=1">{ts}Unique Opens{/ts}</a></td>
+        <td>{$report.event_totals.opened} ({$report.event_totals.opened_rate|string_format:"%0.2f"}%)</td>
+        <td>{$report.event_totals.actionlinks.opened_unique}</td></tr>
+    <tr><td class="label"><a href="{$report.event_totals.links.opened}">{ts}Total Opens{/ts}</a></td>
+        <td>{$report.event_totals.total_opened}</td>
         <td>{$report.event_totals.actionlinks.opened}</td></tr>
   {/if}
   {if $report.mailing.url_tracking}
     <tr><td class="label"><a href="{$report.event_totals.links.clicks}">{ts}Click-throughs{/ts}</a></td>
-        <td>{$report.event_totals.url}</td>
+        <td>{$report.event_totals.url} ({$report.event_totals.clickthrough_rate|string_format:"%0.2f"}%)</td>
         <td>{$report.event_totals.actionlinks.clicks}</td></tr>
   {/if}
   <tr><td class="label"><a href="{$report.event_totals.links.forward}">{ts}Forwards{/ts}</a></td>
@@ -71,7 +58,7 @@
   {/strip}
 {else}
     <div class="messages status no-popup">
-        {ts}<strong>Delivery has not yet begun for this mailing.</strong> If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.{/ts} {docURL page="user/initial-set-up/email-system-configuration"}
+        {ts}<strong>Delivery has not yet begun for this mailing.</strong> If the scheduled delivery date and time is past, ask the system administrator or technical support contact for your site to verify that the automated mailer task ('cron job') is running - and how frequently.{/ts} {docURL page="user/advanced-configuration/email-system-configuration"}
     </div>
 {/if}
 </fieldset>
@@ -145,13 +132,15 @@
 <th><a href="{$report.event_totals.links.clicks}">{ts}Clicks{/ts}</a></th>
 <th><a href="{$report.event_totals.links.clicks_unique}">{ts}Unique Clicks{/ts}</a></th>
 <th>{ts}Success Rate{/ts}</th>
-<th>{ts}URL{/ts}</th></tr>
+<th>{ts}URL{/ts}</th>
+<th>{ts}Report{/ts}</th></tr>
 {foreach from=$report.click_through item=row}
 <tr class="{cycle values="odd-row,even-row"}">
 <td>{if $row.clicks > 0}<a href="{$row.link}">{$row.clicks}</a>{else}{$row.clicks}{/if}</td>
 <td>{if $row.unique > 0}<a href="{$row.link_unique}">{$row.unique}</a>{else}{$row.unique}{/if}</td>
 <td>{$row.rate|string_format:"%0.2f"}%</td>
 <td><a href="{$row.url}">{$row.url}</a></td>
+<td><a href="{$row.report}">Report</a></td>
 </tr>
 {/foreach}
 </table>
@@ -169,7 +158,7 @@
   <td>
     {$report.mailing.body_text|mb_truncate:30|escape|nl2br}
     <br />
-    <strong><a href='{$textViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
   </td>
 </tr>
 {/if}
@@ -178,9 +167,7 @@
 <tr>
   <td class="label nowrap">{ts}HTML Message{/ts}</td>
   <td>
-    {$report.mailing.body_html|mb_truncate:30|escape|nl2br}
-    <br/>
-    <strong><a href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <a class="crm-popup" href='{$htmlViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a>
   </td>
 </tr>
 {/if}
@@ -217,7 +204,7 @@
 
 <tr><td class="label">{ts}Open tracking{/ts}</td><td>{if $report.mailing.open_tracking}{ts}On{/ts}{else}{ts}Off{/ts}{/if}</td></tr>
 <tr><td class="label">{ts}URL Click-through tracking{/ts}</td><td>{if $report.mailing.url_tracking}{ts}On{/ts}{else}{ts}Off{/ts}{/if}</td></tr>
-
+{if $public_url}<td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>{/if}
 {if $report.mailing.campaign}
 <tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
 {/if}
@@ -226,10 +213,5 @@
 {/strip}
 </fieldset>
 <div class="action-link">
-    <a href="{$backUrl}" >&raquo; {$backUrlTitle}</a>
+    <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {$backUrlTitle}</a>
 </div>
-
-
-
-
-

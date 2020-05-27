@@ -1,88 +1,64 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class is for activity assignment functions
- *
+ * This class is for activity assignment functions.
  */
 class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * class constructor
+   * Class constructor.
    */
-  function __construct() {
+  public function __construct() {
     parent::__construct();
   }
 
   /**
-   * funtion to add activity target
+   * Add activity target.
    *
-   * @param array  $activity_id           (reference ) an assoc array of name/value pairs
-   * @param array  $target_contact_id     (reference ) the array that holds all the db ids
+   * @param array $params
    *
-   * @return object activity type of object that is added
-   * @access public
-   *
+   * @return object
+   *   activity type of object that is added
    */
   public static function create(&$params) {
     $target = new CRM_Activity_BAO_ActivityContact();
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-    
+
     $target->copyValues($params);
-    $target->record_type_id = $targetID ;
+    $target->record_type_id = $targetID;
     return $target->save();
   }
 
   /**
-   * function to retrieve id of target contact by activity_id
+   * Retrieve id of target contact by activity_id.
    *
-   * @param int    $id  ID of the activity
+   * @param int $activity_id
    *
    * @return mixed
-   *
-   * @access public
-   *
    */
-  static function retrieveTargetIdsByActivityId($activity_id) {
-    $targetArray = array();
+  public static function retrieveTargetIdsByActivityId($activity_id) {
+    $targetArray = [];
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $targetArray;
     }
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     $sql = "
@@ -93,7 +69,12 @@ WHERE      activity_id = %1
 AND        record_type_id = $targetID
 AND        civicrm_contact.is_deleted = 0
 ";
-    $target = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
+    $target = CRM_Core_DAO::executeQuery($sql, [
+      1 => [
+        $activity_id,
+        'Integer',
+      ],
+    ]);
     while ($target->fetch()) {
       $targetArray[] = $target->contact_id;
     }
@@ -101,22 +82,19 @@ AND        civicrm_contact.is_deleted = 0
   }
 
   /**
-   * function to retrieve names of target contact by activity_id
+   * Retrieve names of target contact by activity_id.
    *
-   * @param int    $id  ID of the activity
+   * @param int $activityID
    *
    * @return array
-   *
-   * @access public
-   *
    */
-  static function getTargetNames($activityID) {
-    $targetNames = array();
+  public static function getTargetNames($activityID) {
+    $targetNames = [];
 
     if (empty($activityID)) {
       return $targetNames;
     }
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     $query = "
@@ -127,7 +105,7 @@ WHERE      civicrm_activity_contact.activity_id = %1
 AND        civicrm_activity_contact.record_type_id = $targetID
 AND        contact_a.is_deleted = 0
 ";
-    $queryParam = array(1 => array($activityID, 'Integer'));
+    $queryParam = [1 => [$activityID, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $queryParam);
     while ($dao->fetch()) {
@@ -136,5 +114,5 @@ AND        contact_a.is_deleted = 0
 
     return $targetNames;
   }
-}
 
+}

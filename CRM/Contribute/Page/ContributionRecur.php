@@ -1,113 +1,110 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Main page for viewing Recurring Contributions.
- *
  */
 class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
-  static $_links = NULL;
-  public $_permission = NULL;
-  public $_contactId = NULL;
+  use CRM_Core_Page_EntityPageTrait;
 
   /**
-   * View details of a recurring contribution
-   *
-   * @return void
-   * @access public
-   */ function view() {
-    $recur = new CRM_Contribute_DAO_ContributionRecur();
-    $recur->id = $this->_id;
-    if ($recur->find(TRUE)) {
-      $values = array();
-      CRM_Core_DAO::storeValues($recur, $values);
-      // if there is a payment processor ID, get the name of the payment processor
-      if (CRM_Utils_Array::value('payment_processor_id', $values)) {
-        $values['payment_processor'] = CRM_Core_DAO::getFieldValue(
-          'CRM_Financial_DAO_PaymentProcessor',
-          $values['payment_processor_id'],
-          'name'
-        );
-      }
-      // get contribution status label
-      if (CRM_Utils_Array::value('contribution_status_id', $values)) {
-        $values['contribution_status'] = CRM_Core_OptionGroup::getLabel('contribution_status', $values['contribution_status_id']);
-      }
-
-      $this->assign('recur', $values);
-    }
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'ContributionRecur';
   }
 
-  function preProcess() {
-    $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
-    $this->_action    = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
-    $this->_id        = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->assign('contactId', $this->_contactId);
-
-    // check logged in url permission
-    CRM_Contact_Page_View::checkUserPermission($this);
-
-    // set page title
-    CRM_Contact_Page_View::setTitle($this->_contactId);
-
-    $this->assign('action', $this->_action);
-
-    if ($this->_permission == CRM_Core_Permission::EDIT && !CRM_Core_Permission::check('edit contributions')) {
-      // demote to view since user does not have edit contrib rights
-      $this->_permission = CRM_Core_Permission::VIEW;
-      $this->assign('permission', 'view');
-    }
+  protected function getDefaultAction() {
+    return 'view';
   }
 
   /**
-   * This function is the main function that is called when the page loads,
+   * View details of a recurring contribution.
+   */
+  public function view() {
+    if (empty($this->getEntityId())) {
+      CRM_Core_Error::statusBounce('Recurring contribution not found');
+    }
+
+    try {
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', [
+        'id' => $this->getEntityId(),
+      ]);
+    }
+    catch (Exception $e) {
+      CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->getEntityId());
+    }
+
+    $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
+      CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
+    );
+    $idFields = ['contribution_status_id', 'campaign_id', 'financial_type_id'];
+    foreach ($idFields as $idField) {
+      if (!empty($contributionRecur[$idField])) {
+        $contributionRecur[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $contributionRecur[$idField]);
+      }
+    }
+
+    // Add linked membership
+    $membership = civicrm_api3('Membership', 'get', [
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+    if (!empty($membership['count'])) {
+      $membershipDetails = reset($membership['values']);
+      $contributionRecur['membership_id'] = $membershipDetails['id'];
+      $contributionRecur['membership_name'] = $membershipDetails['membership_name'];
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionRecur', NULL, $contributionRecur['id']);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contributionRecur['id']);
+
+    $this->assign('recur', $contributionRecur);
+
+    $displayName = CRM_Contact_BAO_Contact::displayName($contributionRecur['contact_id']);
+    $this->assign('displayName', $displayName);
+
+    // Check if this is default domain contact CRM-10482
+    if (CRM_Contact_BAO_Contact::checkDomainContact($contributionRecur['contact_id'])) {
+      $displayName .= ' (' . ts('default organization') . ')';
+    }
+
+    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
+    CRM_Utils_System::setTitle(ts('View Recurring Contribution from') . ' ' . $displayName);
+  }
+
+  public function preProcess() {
+    $this->preProcessQuickEntityPage();
+  }
+
+  /**
+   * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
    *
-   * return null
-   * @access public
+   * @return null
    */
-  function run() {
+  public function run() {
     $this->preProcess();
 
-    if ($this->_action & CRM_Core_Action::VIEW) {
+    if ($this->isViewContext()) {
       $this->view();
     }
 
     return parent::run();
   }
-}
 
+}

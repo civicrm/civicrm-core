@@ -6,12 +6,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: GroupTestDataProvider.php 23715 2009-09-21 06:35:47Z shot $
- *   @package CiviCRM
+ * @version   $Id: GroupTestDataProvider.php 23715 2009-09-21 06:35:47Z shot $
+ * @package CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -33,71 +33,150 @@
 /**
  *  Provide data to the CRM_Contact_BAO_QueryTest class
  *
- *  @package CiviCRM
+ * @package CiviCRM
  */
 class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
 
   /**
-   *  @var integer
+   * Current count.
+   *
+   * @var int
    */
   private $i = 0;
 
   /**
-   *  @var mixed[]
+   * @var mixed[]
    *  This dataset describes various form values and what contact
    *  IDs should be selected when the form values are applied to the
    *  database in dataset.xml
    */
-  private $dataset = array(
+  private $dataset = [
     //  Include static group 3
-    array('fv' => array('group' => array('3' => 1)),
-      'id' => array(
-        '17', '18', '19', '20', '21',
-        '22', '23', '24',
-      ),
-    ),
+    [
+      'fv' => ['group' => '3'],
+      'id' => [
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+      ],
+    ],
     //  Include static group 5
-    array('fv' => array('group' => array('5' => 1)),
-      'id' => array(
-        '13', '14', '15', '16', '21',
-        '22', '23', '24',
-      ),
-    ),
+    [
+      'fv' => ['group' => '5'],
+      'id' => [
+        '13',
+        '14',
+        '15',
+        '16',
+        '21',
+        '22',
+        '23',
+        '24',
+      ],
+    ],
     //  Include static groups 3 and 5
-    array(
-      'fv' => array('group' => array('3' => 1,
-          '5' => 1,
-        )),
-      'id' => array(
-        '13', '14', '15', '16', '17', '18',
-        '19', '20', '21', '22', '23', '24',
-      ),
-    ),
+    [
+      'fv' => ['group' => ['3', '5']],
+      'id' => [
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+      ],
+    ],
+    //  Include static groups 3 and 5 in legacy format
+    [
+      'fv' => ['group' => ['3' => 1, '5' => 1]],
+      'id' => [
+        '13',
+        '14',
+        '15',
+        '16',
+        '17',
+        '18',
+        '19',
+        '20',
+        '21',
+        '22',
+        '23',
+        '24',
+      ],
+    ],
     //  Include tag 7
-    array('fv' => array('tag' => array('7' => 1)),
-      'id' => array(
-        '11', '12', '15', '16',
-        '19', '20', '23', '24',
-      ),
-    ),
+    [
+      'fv' => ['tag' => '7'],
+      'id' => [
+        '11',
+        '12',
+        '15',
+        '16',
+        '19',
+        '20',
+        '23',
+        '24',
+      ],
+    ],
     //  Include tag 9
-    array('fv' => array('tag' => array('9' => 1)),
-      'id' => array(
-        '10', '12', '14', '16',
-        '18', '20', '22', '24',
-      ),
-    ),
+    [
+      'fv' => ['tag' => ['9' => 1]],
+      'id' => [
+        '10',
+        '12',
+        '14',
+        '16',
+        '18',
+        '20',
+        '22',
+        '24',
+      ],
+    ],
     //  Include tags 7 and 9
-    array(
-      'fv' => array('tag' => array('7' => 1,
-          '9' => 1,
-        )),
-      'id' => array(
-        '10', '11', '12', '14', '15', '16',
-        '18', '19', '20', '22', '23', '24',
-      ),
-    ),
-  );
+    [
+      'fv' => ['tag' => ['7', '9']],
+      'id' => [
+        '10',
+        '11',
+        '12',
+        '14',
+        '15',
+        '16',
+        '18',
+        '19',
+        '20',
+        '22',
+        '23',
+        '24',
+      ],
+    ],
+    // gender_id 1 = 'Female'
+    [
+      'fv' => ['gender_id' => 1],
+      'id' => ['9', '20', '22'],
+    ],
+    // prefix_id 2 = 'Ms.'
+    [
+      'fv' => ['prefix_id' => 2],
+      'id' => ['10', '13'],
+    ],
+    // suffix_id 6 = 'V'
+    [
+      'fv' => ['suffix_id' => 6],
+      'id' => ['16', '19', '20', '21'],
+    ],
+  ];
 
   public function _construct() {
     $this->i = 0;
@@ -107,20 +186,26 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     $this->i = 0;
   }
 
+  /**
+   * @return array
+   */
   public function current() {
     $count = count($this->dataset[$this->i]['id']);
-    $ids   = $this->dataset[$this->i]['id'];
-    $full  = array();
+    $ids = $this->dataset[$this->i]['id'];
+    $full = [];
     foreach ($this->dataset[$this->i]['id'] as $key => $value) {
-      $full[] = array(
+      $full[] = [
         'contact_id' => $value,
         'contact_type' => 'Individual',
         'sort_name' => "Test Contact $value",
-      );
+      ];
     }
-    return array($this->dataset[$this->i]['fv'], $count, $ids, $full);
+    return [$this->dataset[$this->i]['fv'], $count, $ids, $full];
   }
 
+  /**
+   * @return int
+   */
   public function key() {
     return $this->i;
   }
@@ -129,18 +214,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
     $this->i++;
   }
 
+  /**
+   * @return bool
+   */
   public function valid() {
     return isset($this->dataset[$this->i]);
   }
+
 }
 // class CRM_Contact_BAO_QueryTestDataProvider
-
-// -- set Emacs parameters --
-// Local variables:
-// mode: php;
-// tab-width: 4
-// c-basic-offset: 4
-// c-hanging-comment-ender-p: nil
-// indent-tabs-mode: nil
-// End:
-

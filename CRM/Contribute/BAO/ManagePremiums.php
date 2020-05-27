@@ -1,148 +1,93 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
+ * @deprecated
  */
-class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_DAO_Product {
+class CRM_Contribute_BAO_ManagePremiums extends CRM_Contribute_BAO_Product {
 
   /**
-   * static holder for the default LT
+   * Class constructor.
    */
-  static $_defaultContributionType = NULL;
-
-  /**
-   * class constructor
-   */
-  function __construct() {
+  public function __construct() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::construct');
     parent::__construct();
   }
 
   /**
-   * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. Typically the valid params are only
-   * contact_id. We'll tweak this function to be more full featured over a period
-   * of time. This is the inverse function of create. It also stores all the retrieved
-   * values in the default array
+   * Fetch object based on array of properties.
    *
-   * @param array $params   (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @deprecated
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return object CRM_Contribute_BAO_ManagePremium object
-   * @access public
-   * @static
+   * @return CRM_Contribute_BAO_Product
    */
-  static function retrieve(&$params, &$defaults) {
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-    if ($premium->find(TRUE)) {
-      $premium->product_name = $premium->name;
-      CRM_Core_DAO::storeValues($premium, $defaults);
-      return $premium;
-    }
-    return NULL;
+  public static function retrieve(&$params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::retrieve');
+    return parent::retrieve($params, $defaults);
   }
 
   /**
-   * update the is_active flag in the db
+   * Update the is_active flag in the db.
    *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
+   * @deprecated
+   * @param int $id
+   *   Id of the database record.
+   * @param bool $is_active
+   *   Value we want to set the is_active field.
    *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
+   * @return bool
    */
-  static function setIsActive($id, $is_active) {
-    if (!$is_active) {
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->product_id = $id;
-      $dao->delete();
-    }
-    return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Product', $id, 'is_active', $is_active);
+  public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::setIsActive');
+    return parent::setIsActive($id, $is_active);
   }
 
   /**
-     * function to add the financial types
+   * Add a premium product to the database, and return it.
    *
-   * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @deprecated
+   * @param array $params
+   *   Reference array contains the values submitted by the form.
+   * @param array $ids (deprecated)
+   *   Reference array contains the id.
    *
-   * @access public
-   * @static
-   *
-   * @return object
+   * @return CRM_Contribute_DAO_Product
    */
-  static function add(&$params, &$ids) {
-
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-
-    // action is taken depending upon the mode
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->copyValues($params);
-
-    $premium->id = CRM_Utils_Array::value('premium', $ids);
-
-    // set currency for CRM-1496
-    if (!isset($premium->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $premium->currency = $config->defaultCurrency;
+  public static function add(&$params, $ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::create');
+    $id = $params['id'] ?? $ids['premium'] ?? NULL;
+    if ($id) {
+      $params['id'] = $id;
     }
-
-    $premium->save();
-    return $premium;
+    return parent::create($params);
   }
 
   /**
-   * Function to delete premium Types
+   * Delete premium Types.
    *
+   * @deprecated
    * @param int $productID
-   * @static
+   *
+   * @throws \CRM_Core_Exception
    */
-
-  static function del($productID) {
-    //check dependencies
-    $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
-    $premiumsProduct->product_id = $productID;
-    if ($premiumsProduct->find(TRUE)) {
-      $session = CRM_Core_Session::singleton();
-      $message .= ts('This Premium is being linked to <a href=\'%1\'>Online Contribution page</a>. Please remove it in order to delete this Premium.', array(1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')), ts('Deletion Error'), 'error');
-      CRM_Core_Session::setStatus($message);
-      return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
-    }
-
-        //delete from financial Type table
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->id = $productID;
-    $premium->delete();
+  public static function del($productID) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Product::del');
+    return parent::del($productID);
   }
-}
 
+}

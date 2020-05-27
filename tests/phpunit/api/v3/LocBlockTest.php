@@ -1,102 +1,108 @@
 <?php
-// $Id$
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
 
-require_once 'CiviTest/CiviUnitTestCase.php';
+/**
+ * Class api_v3_LocBlockTest
+ *
+ * @group headless
+ */
 class api_v3_LocBlockTest extends CiviUnitTestCase {
+
   protected $_apiversion = 3;
+
   protected $_entity = 'loc_block';
-  public $_eNoticeCompliant = TRUE;
+
+  /**
+   * Set up.
+   */
   public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
   }
 
-  function tearDown() {
-  }
-
+  /**
+   * Test creating location block.
+   */
   public function testCreateLocBlock() {
-    $email = civicrm_api('email', 'create', array(
-      'version' => $this->_apiversion,
+    $email = $this->callAPISuccess('email', 'create', [
       'contact_id' => 'null',
-      'location_type_id' => 1,
       'email' => 'test@loc.block',
-    ));
-    $phone = civicrm_api('phone', 'create', array(
-      'version' => $this->_apiversion,
+    ]);
+    $phone = $this->callAPISuccess('phone', 'create', [
       'contact_id' => 'null',
       'location_type_id' => 1,
       'phone' => '1234567',
-    ));
-    $address = civicrm_api('address', 'create', array(
-      'version' => $this->_apiversion,
+    ]);
+    $address = $this->callAPISuccess('address', 'create', [
       'contact_id' => 'null',
       'location_type_id' => 1,
       'street_address' => '1234567',
-    ));
-    $params = array(
-      'version' => $this->_apiversion,
+    ]);
+    $params = [
       'address_id' => $address['id'],
       'phone_id' => $phone['id'],
       'email_id' => $email['id'],
-    );
-    $result = civicrm_api($this->_entity, 'create', $params);
+    ];
+    $description = 'Create locBlock with existing entities';
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description);
     $id = $result['id'];
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$id]['id'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$id]['id']);
     $this->getAndCheck($params, $id, $this->_entity);
   }
 
+  /**
+   * Test creating location block entities.
+   */
   public function testCreateLocBlockEntities() {
-    $params = array(
-      'version' => $this->_apiversion,
-      'email' => array(
+    $params = [
+      'email' => [
         'location_type_id' => 1,
         'email' => 'test2@loc.block',
-      ),
-      'phone' => array(
+      ],
+      'phone' => [
         'location_type_id' => 1,
         'phone' => '987654321',
-      ),
-      'phone_2' => array(
+      ],
+      'phone_2' => [
         'location_type_id' => 1,
         'phone' => '456-7890',
-      ),
-      'address' => array(
+      ],
+      'address' => [
         'location_type_id' => 1,
         'street_address' => '987654321',
-      ),
-    );
-    $result = civicrm_api($this->_entity, 'create', $params);
+      ],
+    ];
+    $description = "Create entities and locBlock in 1 api call.";
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateEntities');
     $id = $result['id'];
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__, 'Create entities and location block in 1 api call', NULL, 'createEntities');
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertEquals(1, $result['count']);
 
-    // Now check our results using the return param 'all'
-    $getParams = array('version' => $this->_apiversion, 'id' => $id, 'return' => 'all');
-    $result = civicrm_api($this->_entity, 'getsingle', $getParams);
-    $this->documentMe($getParams, $result, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call', NULL, 'get');
-    $this->assertNotNull($result['email_id'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['phone_id'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['phone_2_id'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['address_id'], 'In line ' . __LINE__);
-    $this->assertEquals($params['email']['email'], $result['email']['email'],  'In line ' . __LINE__);
-    $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone'],  'In line ' . __LINE__);
-    $this->assertEquals($params['address']['street_address'], $result['address']['street_address'],  'In line ' . __LINE__);
-    // Delete block
-    $result = civicrm_api($this->_entity, 'delete', array(
-      'version' => $this->_apiversion,
+    // Now check our results using the return param 'all'.
+    $getParams = [
       'id' => $id,
-    ));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+      'return' => 'all',
+    ];
+    // Can't use callAPISuccess with getsingle.
+    $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__, 'Get entities and location block in 1 api call');
+    $result = array_pop($result['values']);
+    $this->assertNotNull($result['email_id']);
+    $this->assertNotNull($result['phone_id']);
+    $this->assertNotNull($result['phone_2_id']);
+    $this->assertNotNull($result['address_id']);
+    $this->assertEquals($params['email']['email'], $result['email']['email']);
+    $this->assertEquals($params['phone_2']['phone'], $result['phone_2']['phone']);
+    $this->assertEquals($params['address']['street_address'], $result['address']['street_address']);
+
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $id]);
   }
 
-  public static function setUpBeforeClass() {
-      // put stuff here that should happen before all tests in this unit
-  }
-
-  public static function tearDownAfterClass(){
-  }
 }
-

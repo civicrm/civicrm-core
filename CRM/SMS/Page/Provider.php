@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,29 +20,32 @@
  */
 class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
 
-  /**
-   * The action links that we need to display for the browse screen
-   *
-   * @var array
-   * @static
-   */
-  static $_links = NULL;
+  public $useLivePageJS = TRUE;
 
   /**
-   * Get BAO Name
+   * The action links that we need to display for the browse screen.
    *
-   * @return string Classname of BAO.
+   * @var array
    */
-  function getBAOName() {
+  public static $_links = NULL;
+
+  /**
+   * Get BAO Name.
+   *
+   * @return string
+   *   Classname of BAO.
+   */
+  public function getBAOName() {
     return 'CRM_SMS_BAO_Provider';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(
@@ -77,14 +62,12 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_SMS_BAO_Provider' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Provider'),
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_SMS_BAO_Provider' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Provider'),
         ),
       );
@@ -98,19 +81,18 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    * Finally it calls the parent's run method.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     // set title and breadcrumb
     CRM_Utils_System::setTitle(ts('Settings - SMS Provider'));
-    $breadCrumb = array(array('title' => ts('SMS Provider'),
+    $breadCrumb = array(
+      array(
+        'title' => ts('SMS Provider'),
         'url' => CRM_Utils_System::url('civicrm/admin/sms/provider',
           'reset=1'
         ),
-      ));
+      ),
+    );
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'String',
@@ -126,11 +108,9 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   /**
    * Browse all Providers.
    *
-   * @return void
-   * @access public
-   * @static
+   * @param array $action
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     $providers = CRM_SMS_BAO_Provider::getProviders();
     $rows = array();
     foreach ($providers as $provider) {
@@ -147,7 +127,12 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
       $provider['api_type'] = $apiTypes[$provider['api_type']];
 
       $provider['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $provider['id'])
+        array('id' => $provider['id']),
+        ts('more'),
+        FALSE,
+        'sms.provider.row',
+        'SMSProvider',
+        $provider['id']
       );
       $rows[] = $provider;
     }
@@ -155,30 +140,35 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_SMS_Form_Provider';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'SMS Provider';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/sms/provider';
   }
-}
 
+}

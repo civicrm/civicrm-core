@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this div is being used to apply special css *}
@@ -37,7 +21,7 @@
 {/if}
     {if $rows}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl" location="top" noForm=0}
+            {include file="CRM/common/pager.tpl" location="top"}
         </div>
 
         {* pre-compile section header here, rather than doing it every time under foreach *}
@@ -96,11 +80,11 @@
                                     {assign var=fieldLink value=$field|cat:"_link"}
                                     {assign var=fieldHover value=$field|cat:"_hover"}
                                     <td  class="report-contents crm-report_{$field}">
-                                        {if $row.$fieldLink}<a title="{$row.$fieldHover}" href="{$row.$fieldLink}">{/if}
+                                        {if $row.$fieldLink}<a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}">{/if}
 
                                         {if $row.$field eq 'Subtotal'}
                                             {$row.$field}
-                                        {elseif $header.type eq 12}
+                                        {elseif $header.type eq 12 || $header.type eq 4}
                                             {if $header.group_by eq 'MONTH' or $header.group_by eq 'QUARTER'}
                                                 {$row.$field|crmDate:$config->dateformatPartial}
                                             {elseif $header.group_by eq 'YEAR'}
@@ -142,7 +126,7 @@
                                                 {assign var=fieldHover value=$field|cat:"_hover"}
                               <td class="report-contents crm-report_{$field}">
                                   {if $row.$fieldLink}
-                                <a title="{$row.$fieldHover} "href="{$row.$fieldLink}">
+                                <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}">
                                   {/if}
 
                                   {if $row.$field eq 'Sub Total'}
@@ -173,7 +157,7 @@
         {/foreach}
 
   <div class="report-pager">
-            {include file="CRM/common/pager.tpl" noForm=0}
+            {include file="CRM/common/pager.tpl"}
         </div>
         <br />
         {if $grandStat}
@@ -201,3 +185,10 @@
     {/if}
     {include file="CRM/Report/Form/ErrorMessage.tpl"}
 </div>
+
+
+{if $outputMode == 'print'}
+  <script type="text/javascript">
+    window.print();
+  </script>
+{/if}

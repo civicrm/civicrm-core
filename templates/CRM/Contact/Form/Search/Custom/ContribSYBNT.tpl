@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Default template custom searches. This template is used automatically if templateFile() function not defined in
@@ -42,8 +26,8 @@
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-inclusion_date_one">
                <td><label>Inclusion Date One: Start/End</label></td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date_1}</td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date_1}</td>
+               <td>{$form.start_date_1.html}</td>
+               <td>{$form.end_date_1.html}</td>
                <td>{$form.is_first_amount.html}&nbsp;{ts}First time donor only?{/ts}</td>
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-min_amount_2">
@@ -54,8 +38,8 @@
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-inclusion_date_two">
                <td><label>Inclusion Date Two: Start/End</label></td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=start_date_2}</td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=end_date_2}</td>
+               <td>{$form.start_date_2.html}</td>
+               <td>{$form.end_date_2.html}</td>
                <td>&nbsp;</td>
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-exclude_min_amount">
@@ -66,8 +50,8 @@
            </tr>
            <tr class="crm-contact-custom-search-contribSYBNT-form-block-exclusion_date">
                <td><label>Exclusion Date: Start/End</label></td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=exclude_start_date}</td>
-               <td>{include file="CRM/common/jcalendar.tpl" elementName=exclude_end_date}</td>
+               <td>{$form.exclude_start_date.html}</td>
+               <td>{$form.exclude_end_date.html}</td>
                <td>&nbsp;</td>
            </tr>
         </table>
@@ -104,7 +88,7 @@
         {/if}
 
         {strip}
-        <table class="selector" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
@@ -128,7 +112,7 @@
                     {foreach from=$columnHeaders item=header}
                         {assign var=fName value=$header.sort}
                         {if $fName eq 'sort_name'}
-                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+                            <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`&key=`$qfKey`"}">{$row.sort_name}</a></td>
                         {else}
                             <td>{$row.$fName}</td>
                         {/if}
@@ -138,12 +122,6 @@
             {/foreach}
         </table>
         {/strip}
-
-        <script type="text/javascript">
-        {* this function is called to change the color of selected row(s) *}
-           var fname = "{$form.formName}";
-           on_load_init_checkboxes(fname);
-        </script>
 
         {include file="CRM/common/pager.tpl" location="bottom"}
 
@@ -155,10 +133,3 @@
 
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
- cj(function() {
-    cj().crmAccordions();
- });
-</script>
-{/literal}

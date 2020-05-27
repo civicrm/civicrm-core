@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8 or $action eq 64 or $action eq 16384}
@@ -31,8 +15,8 @@
     {include file="CRM/UF/Form/Preview.tpl"}
 {elseif $action eq 8192}
     {* Display HTML Form Snippet Code *}
-    <div id="help">
-        {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on ANY website where you want to collect contact information.{/ts} {help id='standalone'}
+    <div class="help">
+        {ts}The HTML code below will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts} {help id='standalone'}
     </div>
     <br />
     <form name="html_code" action="{crmURL p='civicrm/admin/uf/group' q="action=profile&gid=$gid"}">
@@ -42,29 +26,30 @@
         <a href="#" onclick="html_code.profile.select(); return false;" class="button"><span>Select HTML Code</span></a>
     </div>
     <div class="action-link">
-        &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}">&raquo;  {ts}Back to Profile Listings{/ts}</a>
+        &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i>  {ts}Back to Profile Listings{/ts}</a>
     </div>
     </form>
 
 {else}
-    <div id="help">
+    <div class="help">
         {ts}CiviCRM Profile(s) allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features. They provide a powerful set of tools for you to collect information from constituents and selectively share contact information.{/ts} {help id='profile_overview'}
     </div>
 
+<div class="crm-content-block crm-block">
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
-        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
     </div>
     {/if}
     {if $rows}
     <div id='mainTabContainer'>
         <ul>
-            <li id='tab_user'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
-            <li id='tab_reserved'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
+            <li id='tab_user-profiles'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
+            <li id='tab_reserved-profiles'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
         </ul>
 
         {* handle enable/disable actions*}
-        {include file="CRM/common/enableDisable.tpl"}
+        {include file="CRM/common/enableDisableApi.tpl"}
         {include file="CRM/common/jsortable.tpl"}
         <div id="user-profiles">
            <div class="crm-content-block">
@@ -72,6 +57,9 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Public Title{/ts}</th>
+                <th>{ts}Created By{/ts}</th>
+                <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
                 <th>{ts}ID{/ts}</th>
                 <th id="nosort">{ts}Used For{/ts}</th>
@@ -81,8 +69,15 @@
             <tbody>
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
-              <tr id="UFGroup-{$row.id}"class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
-                <td><span class="crmf-title crm-editable">{$row.title}</span></td>
+              <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+                <td class="crmf-title crm-editable">{$row.title}</td>
+                <td class="crmf-frontend_title crm-editable">{$row.frontend_title}</td>
+                <td>
+                  {if $row.created_id && $row.created_by}
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
+                  {/if}
+                </td>
+                <td class="crmf-description crm-editable" data-type="textarea">{$row.description}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
@@ -95,7 +90,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -107,6 +102,9 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Public Title{/ts}</th>
+                <th>{ts}Created By{/ts}</th>
+                <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
                 <th>{ts}ID{/ts}</th>
                 <th id="nosort">{ts}Used For{/ts}</th>
@@ -116,8 +114,15 @@
             <tbody>
             {foreach from=$rows item=row}
             {if $row.is_reserved}
-              <tr id="row_{$row.id}"class="{$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.title}</td>
+                <td>{$row.frontend_title}</td>
+                <td>
+                  {if $row.created_id && $row.created_by}
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
+                  {/if}
+                </td>
+                <td>{$row.description}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
@@ -130,23 +135,14 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><div class="icon add-icon"></div>{ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
         </div>{* reserved profile*}
 
-  </div> {* maincontainer*}
-  <script type='text/javascript'>
-    var selectedTab = 'user-profiles';
-    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
-    {literal}
-      cj( function() {
-        var tabIndex = cj('#tab_' + selectedTab).prevAll().length
-        cj("#mainTabContainer").tabs( {selected: tabIndex} );
-      });
-    {/literal}
-  </script>
+  </div>
+{include file="CRM/common/TabHeader.tpl"}
 
     {else}
     {if $action ne 1} {* When we are adding an item, we should not display this message *}
@@ -157,4 +153,4 @@
     {/if}
     {/if}
 {/if}
-{include file="CRM/common/crmeditable.tpl"}
+</div>

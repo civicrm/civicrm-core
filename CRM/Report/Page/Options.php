@@ -1,38 +1,18 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -40,46 +20,40 @@
  */
 class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
 
-  /**
-   * The action links that we need to display for the browse screen
-   *
-   * @var array
-   * @static
-   */
-  static $_links = NULL;
+  public $useLivePageJS = TRUE;
 
   /**
-   * The option group name
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_gName = NULL;
+  public static $_links = NULL;
+
+  /**
+   * The option group name.
+   *
+   * @var array
+   */
+  public static $_gName = NULL;
 
   /**
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
-   * @static
    */
-  static $_GName = NULL;
+  public static $_GName = NULL;
 
   /**
-   * The option group id
+   * The option group id.
    *
    * @var array
-   * @static
    */
-  static $_gId = NULL;
+  public static $_gId = NULL;
 
   /**
    * Obtains the group name from url and sets the title.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
     $this->_id = CRM_Utils_Request::retrieve('id', 'String', $this, FALSE);
 
@@ -103,47 +77,47 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_OptionValue';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links.
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::DISABLE => array(
+          'title' => ts('Edit %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
-          'title' => ts('Disable %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::ENABLE => array(
+          'ref' => 'crm-enable-disable',
+          'title' => ts('Disable %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
-          'title' => ts('Enable %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::DELETE => array(
+          'ref' => 'crm-enable-disable',
+          'title' => ts('Enable %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%&reset=1',
-          'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
-        ),
-      );
+          'title' => ts('Delete %1 Type', [1 => self::$_gName]),
+        ],
+      ];
     }
 
     return self::$_links;
@@ -151,27 +125,20 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
 
   /**
-   * Browse all options
-   *
-   *
-   * @return void
-   * @access public
-   * @static
+   * Browse all options.
    */
-  function browse() {
-    $groupParams = array('name' => self::$_gName);
+  public function browse() {
+    $groupParams = ['name' => self::$_gName];
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'weight');
-    $gName       = self::$_gName;
-    $returnURL   = CRM_Utils_System::url("civicrm/admin/report/options/$gName",
+    $gName = self::$_gName;
+    $returnURL = CRM_Utils_System::url("civicrm/admin/report/options/$gName",
       "reset=1"
     );
     $filter = "option_group_id = " . self::$_gId;
@@ -185,42 +152,47 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Report_Form_Register';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return self::$_GName;
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/report/options/' . self::$_gName;
   }
 
   /**
-   * function to get userContext params
+   * Get userContext params.
    *
-   * @param int $mode mode that we are in
+   * @param int $mode
+   *   Mode that we are in.
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
-}
 
+}

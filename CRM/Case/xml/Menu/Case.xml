@@ -30,7 +30,7 @@
   </item>
   <item>
      <path>civicrm/case/report</path>
-     <title>Case Report</title>
+     <title>Case Activity Audit</title>
      <page_callback>CRM_Case_Form_Report</page_callback>
      <access_arguments>access all cases and activities</access_arguments>
   </item>
@@ -56,7 +56,7 @@
   </item>
   <item>
      <path>civicrm/case/addToCase</path>
-     <title>Build Activity To Case</title>
+     <title>File on Case</title>
      <page_callback>CRM_Case_Form_ActivityToCase</page_callback>
   </item>
   <item>
@@ -65,61 +65,53 @@
      <page_callback>CRM_Case_Page_CaseDetails</page_callback>
   </item>
   <item>
+     <path>civicrm/admin/setting/case</path>
+     <title>CiviCase Settings</title>
+     <page_callback>CRM_Admin_Form_Setting_Case</page_callback>
+     <adminGroup>CiviCase</adminGroup>
+     <weight>380</weight>
+  </item>
+  <item>
      <path>civicrm/admin/options/case_type</path>
      <title>Case Types</title>
-     <desc>List of types which can be assigned to Cases. (Enable the Cases tab from Global Settings - Site Preferences if you want to track cases.)</desc>
-     <path_arguments>group=case_type</path_arguments>
+     <desc>List of types which can be assigned to Cases. (Enable the Cases tab from System Settings - Enable Components if you want to track cases.)</desc>
      <access_arguments>administer CiviCase</access_arguments>
-     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <page_callback>CRM_Core_Page_Redirect</page_callback>
+     <page_arguments>url=civicrm/a/#/caseType</page_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/case_type.png</icon>
      <weight>390</weight>
   </item>
   <item>
      <path>civicrm/admin/options/redaction_rule</path>
      <title>Redaction Rules</title>
      <desc>List of rules which can be applied to user input strings so that the redacted output can be recognized as repeated instances of the same string or can be identified as a "semantic type of the data element" within case data.</desc>
-     <path_arguments>group=redaction_rule</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/redaction_type.png</icon>
      <weight>400</weight>
   </item>
   <item>
      <path>civicrm/admin/options/case_status</path>
      <title>Case Statuses</title>
      <desc>List of statuses that can be assigned to a case.</desc>
-     <path_arguments>group=case_status</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/case_type.png</icon>
      <weight>400</weight>
   </item>
   <item>
      <path>civicrm/admin/options/encounter_medium</path>
      <title>Encounter Mediums</title>
      <desc>List of encounter mediums.</desc>
-     <path_arguments>group=encounter_medium</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCase</access_arguments>
      <adminGroup>CiviCase</adminGroup>
-     <icon>admin/small/case_type.png</icon>
      <weight>400</weight>
   </item>
   <item>
      <path>civicrm/case/report/print</path>
      <page_callback>CRM_Case_XMLProcessor_Report::printCaseReport</page_callback>
      <access_arguments>access all cases and activities</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/case/ajax/unclosed</path>
-     <page_callback>CRM_Case_Page_AJAX::unclosedCases</page_callback>
-  </item>
-  <item>
-     <path>civicrm/case/ajax/relcases</path>
-     <page_callback>CRM_Case_Page_AJAX::getRelatedCases</page_callback>
   </item>
   <item>
      <path>civicrm/case/ajax/addclient</path>
@@ -140,8 +132,7 @@
     <page_callback>CRM_Case_Page_AJAX::deleteCaseRoles</page_callback>
   </item>
   <item>
-    <path>civicrm/case/changeactivitystatus</path>
-    <title>Change Activity Status</title>
-    <page_callback>CRM_Case_Form_ActivityChangeStatus</page_callback>
+    <path>civicrm/ajax/get-cases</path>
+    <page_callback>CRM_Case_Page_AJAX::getCases</page_callback>
   </item>
 </menu>

@@ -1,36 +1,17 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
-{if $cdType }
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-{else}
 <div class="crm-block crm-form-block crm-campaign-survey-main-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action  eq 1}
-    <div id="help">
+    <div class="help">
       {ts}Use this form to Add new Survey. You can create a new Activity type, specific to this Survey or select an existing activity type for this Survey.{/ts}
     </div>
   {/if}
@@ -42,7 +23,7 @@
    </tr>
    <tr class="crm-campaign-survey-main-form-block-campaign_id">
      <td class="label">{$form.campaign_id.label}</td>
-     <td class="view-value">{$form.campaign_id.html} &nbsp; <span class="action-link crm-campaign-survey-new_campaign_link"><a href="{crmURL p='civicrm/campaign/add' q='reset=1'}" target="_blank" title="{ts}Opens New Campaign form in a separate window{/ts}">{ts}new campaign{/ts}</a></span>
+     <td class="view-value">{$form.campaign_id.html}
         <div class="description">{ts}Select the campaign for which survey is created.{/ts}</div>
       </td>
    </tr>
@@ -82,7 +63,7 @@
    </tr>
    <tr class="crm-campaign-form-block-custom_data">
        <td colspan="2">
-           <div id="customData"></div>
+         {include file="CRM/common/customDataBlock.tpl"}
        </td>
    </tr>
   </table>
@@ -95,28 +76,15 @@
 {literal}
 <script type="text/javascript">
     //show edit profile field links
-    cj(function() {
+    CRM.$(function($) {
         // show edit for profile
-        cj('select[id="profile_id"]').change( function( ) {
-            buildLinks( cj(this), cj(this).val());
+        $('select[id="profile_id"]').change( function( ) {
+            buildLinks( $(this), $(this).val());
         });
 
         // show edit links on form loads
-        var profileField =  cj('select[id="profile_id"]');
+        var profileField =  $('select[id="profile_id"]');
         buildLinks( profileField, profileField.val());
     });
 </script>
 {/literal}
-
-{include file="CRM/common/customData.tpl"}
-{literal}
-  <script type="text/javascript">
-    cj(document).ready(function() {
-      {/literal}
-        CRM.buildCustomData( 'Survey' );
-      {literal}
-    });
-  </script>
-{/literal}
-
-{/if}

@@ -1,4 +1,5 @@
-{ts}Dear supporter{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {ts 1="$contribPageTitle"}Thanks for creating a personal campaign page in support of %1.{/ts}
 
 {if $pcpStatus eq 'Approved'}
@@ -33,8 +34,7 @@
 2. {ts}Click or paste this link into your browser to go to your page{/ts}:
 {$pcpInfoURL}
 
-{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit
-your page, tell friends, and update your contact info.{/ts}
+{ts}When you view your campaign page WHILE LOGGED IN, the page includes links to edit your page, tell friends, and update your contact info.{/ts}
 
 
 {elseif $pcpStatus EQ 'Waiting Review'}

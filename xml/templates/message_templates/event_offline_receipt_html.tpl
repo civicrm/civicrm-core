@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,6 +21,7 @@
 
   <tr>
    <td>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
 
     {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
      <p>{$event.confirm_email_text|htmlize}</p>
@@ -29,20 +30,15 @@
     {if $isOnWaitlist}
      <p>{ts}You have been added to the WAIT LIST for this event.{/ts}</p>
      {if $isPrimary}
-       <p>{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}</p>
+       <p>{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}</p>
      {/if}
     {elseif $isRequireApproval}
      <p>{ts}Your registration has been submitted.{/ts}</p>
      {if $isPrimary}
-      <p>{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}</p>
+      <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
      {/if}
     {elseif $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
-    {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
@@ -76,21 +72,7 @@ registration process.{/ts}</p>
      {if $isShowLocation}
       <tr>
        <td colspan="2" {$valueStyle}>
-        {if $location.address.1.name}
-         {$location.address.1.name}<br />
-        {/if}
-        {if $location.address.1.street_address}
-         {$location.address.1.street_address}<br />
-        {/if}
-        {if $location.address.1.supplemental_address_1}
-         {$location.address.1.supplemental_address_1}<br />
-        {/if}
-        {if $location.address.1.supplemental_address_2}
-         {$location.address.1.supplemental_address_2}<br />
-        {/if}
-        {if $location.address.1.city}
-         {$location.address.1.city} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}<br />
-        {/if}
+        {$location.address.1.display|nl2br}
        </td>
       </tr>
      {/if}
@@ -112,7 +94,7 @@ registration process.{/ts}</p>
           {/if}
          </td>
          <td {$valueStyle}>
-          {$phone.phone}
+          {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
          </td>
         </tr>
        {/if}
@@ -130,12 +112,16 @@ registration process.{/ts}</p>
        {/if}
       {/foreach}
      {/if}
-     <tr>
-      <td colspan="2" {$valueStyle}>
-       {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-       <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
-      </td>
-     </tr>
+
+     {if $event.is_public}
+      <tr>
+       <td colspan="2" {$valueStyle}>
+        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
+       </td>
+      </tr>
+     {/if}
+
      {if $email}
       <tr>
        <th {$headerStyle}>
@@ -177,13 +163,18 @@ registration process.{/ts}</p>
              <th>{ts}Item{/ts}</th>
              <th>{ts}Qty{/ts}</th>
              <th>{ts}Each{/ts}</th>
+             {if $dataArray}
+              <th>{ts}SubTotal{/ts}</th>
+              <th>{ts}Tax Rate{/ts}</th>
+              <th>{ts}Tax Amount{/ts}</th>
+             {/if}
              <th>{ts}Total{/ts}</th>
-	     {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
+       {if $pricesetFieldsCount }<th>{ts}Total Participants{/ts}</th>{/if}
             </tr>
             {foreach from=$value item=line}
              <tr>
               <td>
-	      {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}	
+        {if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div>{$line.description|truncate:30:"..."}</div>{/if}
               </td>
               <td>
                {$line.qty}
@@ -191,14 +182,30 @@ registration process.{/ts}</p>
               <td>
                {$line.unit_price|crmMoney}
               </td>
+              {if $dataArray}
+               <td>
+                {$line.unit_price*$line.qty|crmMoney}
+               </td>
+               {if $line.tax_rate != "" || $line.tax_amount != ""}
+                <td>
+                 {$line.tax_rate|string_format:"%.2f"}%
+                </td>
+                <td>
+                 {$line.tax_amount|crmMoney}
+                </td>
+               {else}
+                <td></td>
+                <td></td>
+               {/if}
+              {/if}
               <td>
-               {$line.line_total|crmMoney}
+               {$line.line_total+$line.tax_amount|crmMoney}
               </td>
-	      {if  $pricesetFieldsCount }
-	      <td>
-		{$line.participant_count}
+        {if  $pricesetFieldsCount }
+        <td>
+    {$line.participant_count}
               </td>
-	      {/if}
+        {/if}
              </tr>
             {/foreach}
            </table>
@@ -206,6 +213,27 @@ registration process.{/ts}</p>
          </tr>
         {/if}
        {/foreach}
+       {if $dataArray}
+        <tr>
+         <td {$labelStyle}>
+          {ts}Amount Before Tax:{/ts}
+         </td>
+         <td {$valueStyle}>
+          {$totalAmount-$totalTaxAmount|crmMoney}
+         </td>
+        </tr>
+        {foreach from=$dataArray item=value key=priceset}
+          <tr>
+           {if $priceset || $priceset == 0}
+            <td>&nbsp;{$taxTerm} {$priceset|string_format:"%.2f"}%</td>
+            <td>&nbsp;{$value|crmMoney:$currency}</td>
+           {else}
+            <td>&nbsp;{ts}No{/ts} {$taxTerm}</td>
+            <td>&nbsp;{$value|crmMoney:$currency}</td>
+           {/if}
+          </tr>
+        {/foreach}
+       {/if}
       {/if}
 
       {if $amount && !$lineItem}
@@ -217,21 +245,45 @@ registration process.{/ts}</p>
         </tr>
        {/foreach}
       {/if}
+      {if $totalTaxAmount}
+       <tr>
+        <td {$labelStyle}>
+         {ts}Total Tax Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+         {$totalTaxAmount|crmMoney:$currency}
+        </td>
+       </tr>
+      {/if}
       {if $isPrimary}
        <tr>
         <td {$labelStyle}>
-         {ts}Total Amount{/ts}
+        {if $balanceAmount}
+           {ts}Total Paid{/ts}
+        {else}
+           {ts}Total Amount{/ts}
+         {/if}
         </td>
         <td {$valueStyle}>
          {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
         </td>
        </tr>
+      {if $balanceAmount}
+       <tr>
+        <td {$labelStyle}>
+         {ts}Balance{/ts}
+        </td>
+        <td {$valueStyle}>
+         {$balanceAmount|crmMoney}
+        </td>
+       </tr>
+      {/if}
        {if $pricesetFieldsCount }
      <tr>
-       <td {$labelStyle}> 
-	 {ts}Total Participants{/ts}</td>   
+       <td {$labelStyle}>
+   {ts}Total Participants{/ts}</td>
        <td {$valueStyle}>
-	 {assign var="count" value= 0}
+   {assign var="count" value= 0}
          {foreach from=$lineItem item=pcount}
          {assign var="lineItemCount" value=0}
          {if $pcount neq 'skip'}
@@ -240,11 +292,11 @@ registration process.{/ts}</p>
            {/foreach}
            {if $lineItemCount < 1 }
            assign var="lineItemCount" value=1}
-           {/if}	
+           {/if}
            {assign var="count" value=$count+$lineItemCount}
          {/if}
          {/foreach}
-	 {$count}
+   {$count}
        </td>
      </tr>
      {/if}
@@ -278,13 +330,13 @@ registration process.{/ts}</p>
         </tr>
        {/if}
 
-       {if $contributionTypeName}
+       {if $financialTypeName}
         <tr>
          <td {$labelStyle}>
           {ts}Financial Type{/ts}
          </td>
          <td {$valueStyle}>
-          {$contributionTypeName}
+          {$financialTypeName}
          </td>
         </tr>
        {/if}
@@ -322,7 +374,7 @@ registration process.{/ts}</p>
         </tr>
        {/if}
 
-       {if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+       {if $billingName}
         <tr>
          <th {$headerStyle}>
           {ts}Billing Name and Address{/ts}
@@ -336,7 +388,7 @@ registration process.{/ts}</p>
         </tr>
        {/if}
 
-       {if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+       {if $credit_card_type}
         <tr>
          <th {$headerStyle}>
           {ts}Credit Card Information{/ts}

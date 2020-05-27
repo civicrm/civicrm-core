@@ -1,25 +1,9 @@
 +--------------------------------------------------------------------+
-| CiviCRM version 4.3                                                |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2013                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
+| Copyright CiviCRM LLC. All rights reserved.                        |
 |                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
 +--------------------------------------------------------------------+
 
 This README file documents conventions used in Incremental Upgrade SQL statements.
@@ -41,7 +25,7 @@ VALUES
 Previously, a SELECT INTO @domainID was used. This method is deprecated and should NOT be used:
 
 ----------------------------------------------------
--- get domain id 
+-- get domain id
 SELECT  @domainID := min(id) FROM civicrm_domain;
 ----------------------------------------------------
 
@@ -71,7 +55,7 @@ If a field is NOT localizable, but we just need to make sure it can be translate
 ----------------------------------------------------
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
-VALUES    
+VALUES
     ( {$domainID}, 'civicrm/admin&reset=1', '{ts escape="sql" skip="true"}Administration Console{/ts}', 'Administration Console', 'administer CiviCRM', '', @adminlastID, '1', NULL, 1 );
 ----------------------------------------------------
 
@@ -93,6 +77,7 @@ SELECT @max_wt     := max(weight) from civicrm_option_value where option_group_i
 INSERT INTO civicrm_option_value
   (option_group_id,                {localize field='label'}label{/localize}, {localize field='description'}description{/localize}, value,                           name,               weight,                        filter, component_id)
 VALUES
-    (@option_group_id_activity_type, {localize}'Change Custom Data'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Change Custom Data', (SELECT @max_wt := @max_wt+1), 0, @caseCompId);
+    (@option_group_id_activity_type, {localize}'{ts escape="sql"}Change Custom Data{/ts}'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Change Custom Data', (SELECT @max_wt := @max_wt+1), 0, @caseCompId);
 
 ------------------------------------------------------------------------------
+More details on the wiki: http://wiki.civicrm.org/confluence/display/CRMDOC/Internationalisation+for+Developers#InternationalisationforDevelopers-Localisedfieldsschemachanges

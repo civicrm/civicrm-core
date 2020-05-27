@@ -6,8 +6,8 @@ includeRule can be "include" or "exclude".
 
 includeTime is true or false and says whether to include the time component of date fields.
   It can be overridden at the Field level.
-  
-ifBlank specifies an alternate field to display if the field is blank.
+
+  ifBlank specifies an alternate field to display if the field is blank.
 -->
 
 <regions>
@@ -32,7 +32,7 @@ ifBlank specifies an alternate field to display if the field is blank.
     the fields you specify here. This seems a good compromise
     over explicitly having to define which fields we want for each activity type,
     given that they are custom.
-    
+
     One future tweak is to improve the way the fields get ordered here. Right now
     they'll just come out the same order as in the export, which will likely be semi-random.
   -->
@@ -54,7 +54,7 @@ ifBlank specifies an alternate field to display if the field is blank.
   <sortByLabels>
     <label>Actual Date</label> <!-- Sort by this first -->
     <label>Due Date</label> <!-- Then if equal sort by this -->
-    <label>Date and Time</label> 
+    <label>Date and Time</label>
   </sortByLabels>
 
 </regions>

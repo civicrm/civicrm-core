@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $sms}
@@ -37,7 +21,7 @@
 
 {if $showLinks}
     <div class="action-link">
-    	<a accesskey="N" href="{crmURL p=$newMassUrl q='reset=1'}" class="button"><span><div class="icon email-icon"></div>{ts}{$linkTitle}{/ts}</span></a><br/><br/>
+      {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="envelope"}{ts}{$linkTitle}{/ts}{/crmButton}<br/><br/>
     </div>
 {/if}
 {include file="CRM/Mailing/Form/Search.tpl"}
@@ -47,30 +31,17 @@
     {include file="CRM/common/pagerAToZ.tpl"}
 
     {strip}
-    <table class="selector">
+    <table class="selector row-highlight">
       <thead class="sticky">
       {foreach from=$columnHeaders item=header}
-        {if $unscheduled} {* Hide columnns not relevant for unscheduled mailings. *}
-            {if $header.sort NEQ 'scheduled_by' && $header.sort NEQ 'scheduled_date' && $header.sort NEQ 'start_date' & $header.sort NEQ 'end_date'}
-            <th>
-              {if $header.sort}
-                {assign var='key' value=$header.sort}
-                {$sort->_response.$key.link}
-              {else}
-                {$header.name}
-              {/if}
-            </th>
-            {/if}
-        {elseif $header.sort NEQ 'created_date'}
-            <th>
-              {if $header.sort}
-                {assign var='key' value=$header.sort}
-                {$sort->_response.$key.link}
-              {else}
-                {$header.name}
-              {/if}
-            </th>
-        {/if}
+        <th>
+          {if $header.sort}
+            {assign var='key' value=$header.sort}
+            {$sort->_response.$key.link}
+          {else}
+            {$header.name}
+          {/if}
+        </th>
       {/foreach}
       </thead>
 
@@ -78,17 +49,25 @@
       {foreach from=$rows item=row}
       <tr id="crm-mailing_{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status}">
         <td class="crm-mailing-name">{$row.name}</td>
-        <td class="crm-mailing-status crm-mailing_status-{$row.status}">{$row.status}</td>
-        <td class="crm-mailing-created_by"><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.created_id}>{$row.created_by}</a></td>
-        {if $unscheduled}
-            <td class="crm-mailing-created_date">{$row.created_date}</td>
-        {else}
-            <td class="crm-mailing-scheduled_by"><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.scheduled_id}>{$row.scheduled_by}</a></td>
-            <td class="crm-mailing-scheduled">{$row.scheduled}</td>
-            <td class="crm-mailing-start">{$row.start}</td>
-            <td class="crm-mailing-end">{$row.end}</td>
+        {if $multilingual}
+          <td class="crm-mailing-language">{$row.language}</td>
         {/if}
-      {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
+        <td class="crm-mailing-status crm-mailing_status-{$row.status}">{$row.status}</td>
+        <td class="crm-mailing-created_by">
+          <a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.created_id} title="{$row.created_by|escape}">
+            {$row.created_by|mb_truncate:20:"..."}
+          </a>
+        </td>
+        <td class="crm-mailing-created_date">{$row.created_date}</td>
+        <td class="crm-mailing-scheduled_by">
+          <a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.scheduled_id} title="{$row.scheduled_by|escape}">
+            {$row.scheduled_by|mb_truncate:20:"..."}
+          </a>
+        </td>
+        <td class="crm-mailing-scheduled">{$row.scheduled}</td>
+        <td class="crm-mailing-start">{$row.start}</td>
+        <td class="crm-mailing-end">{$row.end}</td>
+       {if call_user_func(array('CRM_Campaign_BAO_Campaign','isCampaignEnable'))}
           <td class="crm-mailing-campaign">{$row.campaign}</td>
       {/if}
         <td>{$row.action|replace:'xx':$row.id}</td>
@@ -100,7 +79,7 @@
     {include file="CRM/common/pager.tpl" location="bottom"}
     {if $showLinks}
       <div class="action-link">
-            <a accesskey="N" href="{crmURL p=$newMassUrl q='reset=1'}" class="button"><span><div class="icon email-icon"></div>{ts}{$linkTitle}{/ts}</span></a><br/>
+            {crmButton accesskey="N"  p=$newMassUrl q='reset=1' icon="envelope"}{ts}{$linkTitle}{/ts}{/crmButton}<br/>
       </div>
     {/if}
 
@@ -119,7 +98,7 @@
     <div class="status messages">
         <table class="form-layout">
             <tr><div class="icon inform-icon"></div>
-               {ts 1=$componentName}No %1 match your search criteria. Suggestions:{/ts} 
+               {ts 1=$componentName}No %1 match your search criteria. Suggestions:{/ts}
       </tr>
                 <div class="spacer"></div>
                 <ul>
@@ -150,6 +129,6 @@
             {capture assign=crmURL}{crmURL p=$newMassUrl q='reset=1'}{/capture}
             {capture assign=archiveURL}{crmURL p='civicrm/mailing/browse/archived' q='reset=1'}{$qVal}{/capture}
             {ts 1=$componentName}There are no Scheduled or Sent %1.{/ts}
-	    {if $showLinks}{ts 1=$crmURL}You can <a href='%1'>create and send one</a>{/ts}{/if}{if $archiveLinks}{ts 1=$archiveURL 2=$componentName} OR you can search the <a href='%1'>Archived %2</a>{/ts}{/if}.	    
+      {if $showLinks}{ts 1=$crmURL}You can <a href='%1'>create and send one</a>{/ts}{/if}{if $archiveLinks}{ts 1=$archiveURL 2=$componentName} OR you can search the <a href='%1'>Archived %2</a>{/ts}{/if}.
    </div>
 {/if}

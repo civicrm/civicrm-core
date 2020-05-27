@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,16 +20,12 @@
  */
 class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_Form_ContributionPage {
 
-  static $_products;
+  protected $_products;
 
-  static $_pid;
+  protected $_pid;
 
   /**
-   * Function to pre  process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Pre process the form.
    */
   public function preProcess() {
     parent::preProcess();
@@ -69,24 +47,22 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
+   * Set default values for the form.
    *
-   * @access public
-   *
-   * @return void
+   * Note that in edit/view mode the default values are retrieved from the database.
    */
-  function setDefaultValues() {
-    $defaults = array();
+  public function setDefaultValues() {
+    $defaults = [];
 
     if ($this->_pid) {
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->id = $this->_pid;
       $dao->find(TRUE);
       $defaults['product_id'] = $dao->product_id;
-            $defaults['financial_type_id']   = $dao->financial_type_id;
+      $defaults['financial_type_id'] = $dao->financial_type_id;
       $defaults['weight'] = $dao->weight;
-    } else {
+    }
+    else {
       $dao = new CRM_Contribute_DAO_Product();
       $dao->id = key($this->_products);
       $dao->find(TRUE);
@@ -96,26 +72,23 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $pageID = CRM_Utils_Request::retrieve('id', 'Positive',
         $this, FALSE, 0
       );
-      $dao               = new CRM_Contribute_DAO_Premium();
+      $dao = new CRM_Contribute_DAO_Premium();
       $dao->entity_table = 'civicrm_contribution_page';
-      $dao->entity_id    = $pageID;
+      $dao->entity_id = $pageID;
       $dao->find(TRUE);
       $premiumID = $dao->id;
 
-      $sql    = 'SELECT max( weight ) as max_weight FROM civicrm_premiums_product WHERE premiums_id = %1';
-      $params = array(1 => array($premiumID, 'Integer'));
-      $dao    = CRM_Core_DAO::executeQuery($sql, $params);
+      $sql = 'SELECT max( weight ) as max_weight FROM civicrm_premiums_product WHERE premiums_id = %1';
+      $params = [1 => [$premiumID, 'Integer']];
+      $dao = CRM_Core_DAO::executeQuery($sql, $params);
       $dao->fetch();
       $defaults['weight'] = $dao->max_weight + 1;
     }
-    RETURN $defaults;
+    return $defaults;
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return void
-   * @access public
+   * Build the form object.
    */
   public function buildQuickForm() {
     $urlParams = 'civicrm/admin/contribute/premium';
@@ -124,8 +97,9 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
       $session->pushUserContext($url);
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-          CRM_Core_DAO::$_nullObject, '', '', 'GET'
-        )) {
+        CRM_Core_DAO::$_nullObject, '', '', 'GET'
+      )
+      ) {
         $dao = new CRM_Contribute_DAO_PremiumsProduct();
         $dao->id = $this->_pid;
         $dao->delete();
@@ -133,32 +107,30 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
         CRM_Utils_System::redirect($url);
       }
 
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       CRM_Contribute_BAO_Premium::buildPremiumPreviewBlock($this, NULL, $this->_pid);
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Done with Preview'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Done with Preview'),
+          'isDefault' => TRUE,
+        ],
+      ]);
       return;
     }
 
@@ -167,60 +139,62 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     $session->pushUserContext($url);
 
     $this->add('select', 'product_id', ts('Select the Product') . ' ', $this->_products, TRUE);
-    
-    $this->addElement('text', 'weight', ts('Weight'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_PremiumsProduct', 'weight'));
-    
-    $financialType = CRM_Contribute_PseudoConstant::financialType( );
-    $premiumFinancialType = array();
+
+    $this->addElement('text', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_PremiumsProduct', 'weight'));
+
+    $financialType = CRM_Contribute_PseudoConstant::financialType();
+    $premiumFinancialType = [];
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      'account_relationship = 8' 
+      $all = TRUE,
+      $retrieve = 'entity_id',
+      $filter = NULL,
+      'account_relationship = 8'
     );
-            
-    $costFinancialType = array();
+
+    $costFinancialType = [];
     CRM_Core_PseudoConstant::populate(
       $costFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = True, 
-      $retrieve = 'entity_id', 
-      $filter = null, 
-      'account_relationship = 7' 
+      $all = TRUE,
+      $retrieve = 'entity_id',
+      $filter = NULL,
+      'account_relationship = 7'
     );
     $productFinancialType = array_intersect($costFinancialType, $premiumFinancialType);
-    foreach( $financialType as $key => $financialTypeName ){
-      if(!in_array( $key, $productFinancialType))
-        unset( $financialType[$key] );
+    foreach ($financialType as $key => $financialTypeName) {
+      if (!in_array($key, $productFinancialType)) {
+        unset($financialType[$key]);
+      }
     }
-    if( count( $financialType ) ){
-      $this->assign( 'financialType', $financialType );
-    } 
+    // Check permissioned financial types
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialType, CRM_Core_Action::ADD);
+    if (count($financialType)) {
+      $this->assign('financialType', $financialType);
+    }
     $this->add(
-      'select', 
-      'financial_type_id', 
-      ts( 'Financial Type' ), 
-      array(''=>ts('- select -')) + $financialType
+      'select',
+      'financial_type_id',
+      ts('Financial Type'),
+      ['' => ts('- select -')] + $financialType
     );
     $this->addRule('weight', ts('Please enter integer value for weight'), 'integer');
     $session->pushUserContext(CRM_Utils_System::url($urlParams, 'action=update&reset=1&id=' . $this->_id));
 
     if ($this->_single) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Save'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Save'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
     else {
       parent::buildQuickForm();
@@ -228,10 +202,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
   }
 
   /**
-   * Process the form
-   *
-   * @return void
-   * @access public
+   * Process the form.
    */
   public function postProcess() {
     // get the submitted form values.
@@ -239,31 +210,27 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
     $urlParams = 'civicrm/admin/contribute/premium';
     if ($this->_action & CRM_Core_Action::PREVIEW) {
-      $session = CRM_Core_Session::singleton();
-      $url     = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
-      $single  = $session->get('singleForm');
+      $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
       CRM_Utils_System::redirect($url);
       return;
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $session = CRM_Core_Session::singleton();
-      $url     = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
-      $dao     = new CRM_Contribute_DAO_PremiumsProduct();
+      $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
+      $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->id = $this->_pid;
       $dao->delete();
       CRM_Core_Session::setStatus(ts('Selected Premium Product has been removed from this Contribution Page.'), ts('Saved'), 'success');
       CRM_Utils_System::redirect($url);
     }
     else {
-      $session = CRM_Core_Session::singleton();
       $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
       if ($this->_pid) {
         $params['id'] = $this->_pid;
       }
-      $dao               = new CRM_Contribute_DAO_Premium();
+      $dao = new CRM_Contribute_DAO_Premium();
       $dao->entity_table = 'civicrm_contribution_page';
-      $dao->entity_id    = $this->_id;
+      $dao->entity_id = $this->_id;
       $dao->find(TRUE);
       $premiumID = $dao->id;
       $params['premiums_id'] = $premiumID;
@@ -272,9 +239,9 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       if ($this->_pid) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_PremiumsProduct', $this->_pid, 'weight', 'id');
       }
-      
+
       // updateOtherWeights needs to filter on premiums_id
-      $filter = array('premiums_id' => $params['premiums_id']);
+      $filter = ['premiums_id' => $params['premiums_id']];
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Contribute_DAO_PremiumsProduct', $oldWeight, $params['weight'], $filter);
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
@@ -288,10 +255,9 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
-   * @access public
    */
   public function getTitle() {
     return ts('Add Premium to Contribution Page');
   }
-}
 
+}

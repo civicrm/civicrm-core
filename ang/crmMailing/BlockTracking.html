@@ -1,0 +1,14 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing
+-->
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{name: 'subform.url_tracking', title: ts('Track Click-Throughs'), help: hs('url_tracking')}" crm-layout="checkbox">
+      <input crm-ui-id="subform.url_tracking" name="url_tracking" type="checkbox" ng-model="mailing.url_tracking" ng-true-value="'1'" ng-false-value="'0'" />
+    </div>
+    <div crm-ui-field="{name: 'subform.open_tracking', title: ts('Track Opens'), help: hs('open_tracking')}" crm-layout="checkbox">
+      <input crm-ui-id="subform.open_tracking" name="open_tracking" type="checkbox" ng-model="mailing.open_tracking" ng-true-value="'1'" ng-false-value="'0'" />
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,117 +24,138 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * Page for displaying list of Label Formats
+ * Page for displaying list of Label Formats.
  */
 class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
-  /**
-   * The action links that we need to display for the browse screen
-   *
-   * @var array
-   * @static
-   */
-  static $_links = NULL;
+  public $useLivePageJS = TRUE;
 
   /**
-   * Get BAO Name
+   * The action links that we need to display for the browse screen.
    *
-   * @return string Classname of BAO.
+   * @var array
    */
-  function getBAOName() {
+  public static $_links = NULL;
+
+  /**
+   * Get BAO Name.
+   *
+   * @return string
+   *   Classname of BAO.
+   */
+  public function getBAOName() {
     return 'CRM_Core_BAO_LabelFormat';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=update&id=%%id%%&reset=1',
+          'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Edit Label Format'),
-        ),
-        CRM_Core_Action::COPY => array(
+        ],
+        CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=copy&id=%%id%%',
+          'qs' => 'action=copy&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Copy Label Format'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/labelFormats',
-          'qs' => 'action=delete&id=%%id%%',
+          'qs' => 'action=delete&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Delete Label Format'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_LabelFormats';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'Mailing Label Formats';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/labelFormats';
   }
 
   /**
    * Browse all Label Format settings.
    *
-   * @return void
-   * @access public
-   * @static
+   * @param null $action
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
     // Get list of configured Label Formats
     $labelFormatList = CRM_Core_BAO_LabelFormat::getList();
+    $nameFormatList = CRM_Core_BAO_LabelFormat::getList(FALSE, 'name_badge');
 
     // Add action links to each of the Label Formats
     foreach ($labelFormatList as & $format) {
       $action = array_sum(array_keys($this->links()));
-      if (CRM_Utils_Array::value('is_reserved', $format)) {
+      if (!empty($format['is_reserved'])) {
         $action -= CRM_Core_Action::DELETE;
       }
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+
+      $format['groupName'] = ts('Mailing Label');
+      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
+        ['id' => $format['id'], 'group' => 'label_format'],
+        ts('more'),
+        FALSE,
+        'labelFormat.manage.action',
+        'LabelFormat',
+        $format['id']
+      );
     }
+
+    // Add action links to each of the Label Formats
+    foreach ($nameFormatList as & $format) {
+      $format['groupName'] = ts('Name Badge');
+    }
+
+    $labelFormatList = array_merge($labelFormatList, $nameFormatList);
 
     // Order Label Formats by weight
     $returnURL = CRM_Utils_System::url(self::userContext());
@@ -142,5 +163,5 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
     $this->assign('rows', $labelFormatList);
   }
-}
 
+}

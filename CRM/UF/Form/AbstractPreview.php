@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,7 +25,7 @@
 class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
 
   /**
-   * the fields needed to build this form
+   * The fields needed to build this form.
    *
    * @var array
    */
@@ -50,7 +34,8 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   /**
    * Set the profile/field structure for this form
    *
-   * @param array $fields list of fields per CRM_Core_BAO_UFGroup::formatUFFields or CRM_Core_BAO_UFGroup::getFields
+   * @param array $fields
+   *   List of fields per CRM_Core_BAO_UFGroup::formatUFFields or CRM_Core_BAO_UFGroup::getFields.
    * @param bool $isSingleField
    * @param bool $flag
    */
@@ -72,59 +57,50 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
   }
 
   /**
-   * Set the default form values
+   * Set the default form values.
    *
-   * @access protected
    *
-   * @return array the default array reference
+   * @return array
+   *   the default array reference
    */
-  function setDefaultValues() {
-    $defaults = array();
-    $stateCountryMap = array();
+  public function setDefaultValues() {
+    $defaults = [];
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($field['name'])) {
         CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $defaults, NULL, CRM_Profile_Form::MODE_REGISTER);
       }
-
-      //CRM-5403
-      if ((substr($name, 0, 14) === 'state_province') || (substr($name, 0, 7) === 'country') || (substr($name, 0, 6) === 'county')) {
-        list($fieldName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (!array_key_exists($index, $stateCountryMap)) {
-          $stateCountryMap[$index] = array();
-        }
-        $stateCountryMap[$index][$fieldName] = $name;
-      }
-    }
-
-    // also take care of state country widget
-    if (!empty($stateCountryMap)) {
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap, $defaults);
     }
 
     //set default for country.
     CRM_Core_BAO_UFGroup::setRegisterDefaults($this->_fields, $defaults);
 
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
-
     return $defaults;
   }
 
   /**
-   * Function to actually build the form
+   * Build the form object.
    *
    * @return void
-   * @access public
    */
   public function buildQuickForm() {
     foreach ($this->_fields as $name => $field) {
-      if (!CRM_Utils_Array::value('is_view', $field)) {
+      if (empty($field['is_view'])) {
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE);
       }
     }
   }
 
+  /**
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
+   */
+
+  /**
+   * @return string
+   */
   public function getTemplateFileName() {
     return 'CRM/UF/Form/Preview.tpl';
   }
+
 }

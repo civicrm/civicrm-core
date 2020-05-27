@@ -1,32 +1,36 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Extension_Container_BasicTest
+ * @group headless
+ */
 class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
-  function setUp() {
+
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
   }
 
-  function testGetKeysEmpty() {
+  public function testGetKeysEmpty() {
     $basedir = $this->createTempDir('ext-empty-');
     $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', NULL, NULL);
-    $this->assertEquals($c->getKeys(), array());
+    $this->assertEquals($c->getKeys(), []);
   }
 
-  function testGetKeys() {
+  public function testGetKeys() {
     list($basedir, $c) = $this->_createContainer();
-    $this->assertEquals($c->getKeys(), array('test.foo', 'test.foo.bar'));
+    $this->assertEquals($c->getKeys(), ['test.foo', 'test.foo.bar']);
   }
 
-  function testGetPath() {
+  public function testGetPath() {
     list($basedir, $c) = $this->_createContainer();
     try {
       $c->getPath('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -35,11 +39,12 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $this->assertEquals("$basedir/foo/bar", $c->getPath('test.foo.bar'));
   }
 
-  function testGetPath_extraSlashFromConfig() {
+  public function testGetPath_extraSlashFromConfig() {
     list($basedir, $c) = $this->_createContainer(NULL, NULL, '/');
     try {
       $c->getPath('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -48,11 +53,12 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $this->assertEquals("$basedir/foo/bar", $c->getPath('test.foo.bar'));
   }
 
-  function testGetResUrl() {
+  public function testGetResUrl() {
     list($basedir, $c) = $this->_createContainer();
     try {
       $c->getResUrl('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -61,11 +67,12 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $this->assertEquals('http://example/basedir/foo/bar', $c->getResUrl('test.foo.bar'));
   }
 
-  function testGetResUrl_extraSlashFromConfig() {
+  public function testGetResUrl_extraSlashFromConfig() {
     list($basedir, $c) = $this->_createContainer(NULL, NULL, '/');
     try {
       $c->getResUrl('un.kno.wn');
-    } catch (CRM_Extension_Exception $e) {
+    }
+    catch (CRM_Extension_Exception $e) {
       $exc = $e;
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
@@ -74,8 +81,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $this->assertEquals('http://example/basedir/foo/bar', $c->getResUrl('test.foo.bar'));
   }
 
-  function testCaching() {
-    $cache = new CRM_Utils_Cache_Arraycache(array());
+  public function testCaching() {
+    $cache = new CRM_Utils_Cache_Arraycache([]);
     $this->assertTrue(!is_array($cache->get('basic-scan')));
     list($basedir, $c) = $this->_createContainer($cache, 'basic-scan');
     $this->assertEquals('http://example/basedir/foo', $c->getResUrl('test.foo'));
@@ -85,7 +92,14 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     $this->assertEquals('/foo/bar', $cacheData['test.foo.bar']);
   }
 
-  function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
+  /**
+   * @param CRM_Utils_Cache_Interface $cache
+   * @param null $cacheKey
+   * @param string $appendPathGarbage
+   *
+   * @return array
+   */
+  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/foo");
     mkdir("$basedir/foo/bar");
@@ -94,19 +108,20 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     file_put_contents("$basedir/foo/bar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/foo/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
-    return array($basedir, $c);
+    return [$basedir, $c];
   }
 
-  function testConvertPathsToUrls() {
-    $relPaths = array(
+  public function testConvertPathsToUrls() {
+    $relPaths = [
       'foo.bar' => 'foo\bar',
-      'whiz.bang' => 'tests\extensions\whiz\bang'
-    );
-    $expectedRelUrls = array(
+      'whiz.bang' => 'tests\extensions\whiz\bang',
+    ];
+    $expectedRelUrls = [
       'foo.bar' => 'foo/bar',
       'whiz.bang' => 'tests/extensions/whiz/bang',
-    );
+    ];
     $actualRelUrls = CRM_Extension_Container_Basic::convertPathsToUrls('\\', $relPaths);
     $this->assertEquals($expectedRelUrls, $actualRelUrls);
   }
+
 }

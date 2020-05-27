@@ -1,41 +1,24 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/configuring SMS Providers  *}
-<h3>{if $action eq 1}{ts}New Provider{/ts}{elseif $action eq 2}{ts}Edit Provider{/ts}{else}{ts}Delete Provider{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-job-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
 {if $action eq 8}
-  <div class="messages status no-popup">  
-      <div class="icon inform-icon"></div> 
+  <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
         {ts}Do you want to continue?{/ts}
   </div>
 {elseif $action eq 128}
-  <div class="messages status no-popup">  
-      <div class="icon inform-icon"></div> 
+  <div class="messages status no-popup">
+      <div class="icon inform-icon"></div>
         {ts}Are you sure you would like to execute this job?{/ts}
   </div>
 {else}
@@ -68,7 +51,7 @@
         <td></td><td>{$form.is_default.html}&nbsp;{$form.is_default.label}</td>
    </tr>
   </table>
-{/if} 
+{/if}
 </table>
        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </fieldset>
@@ -77,14 +60,13 @@
 {if $action eq 1  or $action eq 2}
 <script type="text/javascript" >
 {literal}
-    function reload(refresh) {
-        var provider = document.getElementById("name");
-        var url = {/literal}"{$refreshURL}"{literal}
-        var post = url + "&key=" + provider.value;
-        if( refresh ) {
-            window.location = post; 
-        }
-    }
+  CRM.$(function($) {
+    var $form = $("form.{/literal}{$form.formClass}{literal}");
+    $('select[name=name]', $form).change(function() {
+      var url = {/literal}"{$refreshURL}"{literal} + "&key=" + this.value;
+      $(this).closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet({url: url}).crmSnippet('refresh');
+    });
+  });
 {/literal}
 </script>
 {/if}

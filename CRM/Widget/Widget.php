@@ -5,36 +5,39 @@
  *
  * Modified and improved upon by CiviCRM LLC (c) 2007
  */
+
+/**
+ * Class CRM_Widget_Widget
+ */
 class CRM_Widget_Widget {
 
-  static $_methodTable;
-  function initialize() {
+  public static $_methodTable;
+
+  public function initialize() {
     if (!self::$_methodTable) {
-      self::$_methodTable = array(
-        'getContributionPageData' =>
-        array(
+      self::$_methodTable = [
+        'getContributionPageData' => [
           'description' => 'Gets all campaign related data and returns it as a std class.',
           'access' => 'remote',
-          'arguments' => array(
+          'arguments' => [
             'contributionPageID',
             'widgetID',
-          ),
-        ),
-        'getEmbedCode' =>
-        array(
-          'description' => 'Gets embed code.  Perhaps overkill, but we can track dropoffs in this case. by # of people reqeusting emebed code / number of unique instances.',
+          ],
+        ],
+        'getEmbedCode' => [
+          'description' => 'Gets embed code.  Perhaps overkill, but we can track dropoffs in this case. by # of people requesting embed code / number of unique instances.',
           'access' => 'remote',
-          'arguments' => array(
+          'arguments' => [
             'contributionPageID',
             'widgetID',
             'format',
-          ),
-        ),
-      );
+          ],
+        ],
+      ];
     }
   }
 
-  function &methodTable() {
+  public function &methodTable() {
     self::initialize();
 
     return self::$_methodTable;
@@ -49,7 +52,7 @@ class CRM_Widget_Widget {
    *
    * @return string
    */
-  function registerRequest($contributionPageID, $widgetID, $action) {
+  public function registerRequest($contributionPageID, $widgetID, $action) {
     return "I registered a request to $action on $contributionPageID from $widgetID";
   }
 
@@ -59,7 +62,7 @@ class CRM_Widget_Widget {
    * @param int $contributionPageID
    * @param string $widgetID
    *
-   * @return stdClass
+   * @return object
    */
   public function getContributionPageData($contributionPageID, $widgetID) {
     $config = CRM_Core_Config::singleton();
@@ -89,11 +92,11 @@ class CRM_Widget_Widget {
       $data->is_active = FALSE;
     }
 
-    $data->is_active    = TRUE;
-    $data->title        = $widget->title;
-    $data->logo         = $widget->url_logo;
+    $data->is_active = TRUE;
+    $data->title = $widget->title;
+    $data->logo = $widget->url_logo;
     $data->button_title = $widget->button_title;
-    $data->button_url   = CRM_Utils_System::url('civicrm/contribute/transact',
+    $data->button_url = CRM_Utils_System::url('civicrm/contribute/transact',
       "reset=1&id=$contributionPageID",
       TRUE, NULL, FALSE, TRUE
     );
@@ -106,7 +109,7 @@ FROM   civicrm_contribution
 WHERE  is_test = 0
 AND    contribution_status_id = 1
 AND    contribution_page_id = %1";
-    $params = array(1 => array($contributionPageID, 'Integer'));
+    $params = [1 => [$contributionPageID, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       $data->num_donors = $dao->count;
@@ -120,7 +123,7 @@ AND    contribution_page_id = %1";
 SELECT goal_amount, start_date, end_date, is_active
 FROM   civicrm_contribution_page
 WHERE  id = %1";
-    $params = array(1 => array($contributionPageID, 'Integer'));
+    $params = [1 => [$contributionPageID, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
       $data->money_target = $dao->goal_amount;
@@ -155,7 +158,7 @@ WHERE  id = %1";
     $data->homepage_link = $widget->url_homepage;
 
     // movie clip colors, must be in '0xRRGGBB' format
-    $data->colors = array();
+    $data->colors = [];
 
     $hexPrefix = '0x';
     $data->colors["title"] = str_replace('#', $hexPrefix, $widget->color_title);
@@ -180,13 +183,15 @@ WHERE  id = %1";
    *
    * @param int $contributionPageID
    * @param string $widgetID
-   * @param string $format - either myspace or normal
+   * @param string $format
+   *   Either myspace or normal.
    *
    * @return string
    */
   public function getEmbedCode($contributionPageID, $widgetID, $format = "normal") {
     self::registerRequest($contributionPageID, $widgetID, __FUNCTION__);
-    return "<embed>.......................</embed>" . print_r(func_get_args(), 1);
+    return "<embed>.......................</embed>" .
+    print_r(func_get_args(), 1);
   }
-}
 
+}

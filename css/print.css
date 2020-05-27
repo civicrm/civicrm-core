@@ -1,7 +1,7 @@
 /* CiviCRM Print Media Stylesheet */
 
 /* Hide any buttons or other form items when printing*/
-#crm-container .buttons, #crm-container .crm-submit-buttons, #crm-container .crm-actions-ribbon, #crm-container .form-submit {
+#crm-container .buttons, #crm-container .crm-submit-buttons, #crm-container .crm-actions-ribbon, #crm-container .crm-form-submit {
      display: none;
 }
 
@@ -14,10 +14,10 @@ table.form-layout td, table.form-layout th {
 .form-item .element-right{
      display: none;
  }
-#crm-container {   
+#crm-container {
     overflow: visible !important;
     font-family      : DejaVu Sans, serif;
-    margin           : 0px 10px 0px 10px;  
+    margin           : 0px 10px 0px 10px;
 }
 
 /* CSS for Print and PDF of Reports */
@@ -62,7 +62,7 @@ table.form-layout td, table.form-layout th {
 }
 
 #crm-container table.report-layout tr {
-    font-size        : 0.9em; 
+    font-size        : 0.9em;
 }
 
 #crm-container table.report-layout tr.group-row {
@@ -72,6 +72,11 @@ table.form-layout td, table.form-layout th {
 #crm-container table.report-layout tr.total-row {
    font-size        : 1em;
    border-top       : 2px groove #DCDCDC;
+}
+
+#crm-container div.page-break {
+  page-break-before: always;
+  height: 0;
 }
 
 #crm-container .report-label {
@@ -87,18 +92,18 @@ table.form-layout td, table.form-layout th {
 }
 
 #crm-container table.report-layout th.report-contents {
-    background-color : #F5F5F5;         
+    background-color : #F5F5F5;
 }
 
 #crm-container table.report-layout th.statistics {
     width            : 5%;
     white-space      : nowrap;
-    text-align       : left; 
+    text-align       : left;
 }
 
 #crm-container table.report-layout th.statistics, #crm-container table.report-layout th.label {
     width            : 20%;
-    text-align       : left; 
+    text-align       : left;
 }
 
 #crm-container h1 {
@@ -118,4 +123,9 @@ table.form-layout td, table.form-layout th {
     font-size        : .8em;
     font-style       : italic;
     float            : right;
+}
+
+/* Fix for CRM-19869 */
+tr {
+    page-break-inside: avoid;
 }

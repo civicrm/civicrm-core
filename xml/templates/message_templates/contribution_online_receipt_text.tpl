@@ -1,3 +1,4 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $receipt_text}
 {$receipt_text}
 {/if}
@@ -6,9 +7,6 @@
 ===========================================================
 {$pay_later_receipt}
 ===========================================================
-{else}
-
-{ts}Please print this receipt for your records.{/ts}
 {/if}
 
 {if $amount}
@@ -22,13 +20,34 @@
 {capture assign=ts_item}{ts}Item{/ts}{/capture}
 {capture assign=ts_qty}{ts}Qty{/ts}{/capture}
 {capture assign=ts_each}{ts}Each{/ts}{/capture}
+{if $dataArray}
+{capture assign=ts_subtotal}{ts}Subtotal{/ts}{/capture}
+{capture assign=ts_taxRate}{ts}Tax Rate{/ts}{/capture}
+{capture assign=ts_taxAmount}{ts}Tax Amount{/ts}{/capture}
+{/if}
 {capture assign=ts_total}{ts}Total{/ts}{/capture}
-{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {$ts_total|string_format:"%10s"}
+{$ts_item|string_format:"%-30s"} {$ts_qty|string_format:"%5s"} {$ts_each|string_format:"%10s"} {if $dataArray} {$ts_subtotal|string_format:"%10s"} {$ts_taxRate} {$ts_taxAmount|string_format:"%10s"} {/if} {$ts_total|string_format:"%10s"}
 ----------------------------------------------------------
 {foreach from=$value item=line}
-{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {$line.line_total|crmMoney:$currency|string_format:"%10s"}
+{capture assign=ts_item}{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description} {$line.description}{/if}{/capture}{$ts_item|truncate:30:"..."|string_format:"%-30s"} {$line.qty|string_format:"%5s"} {$line.unit_price|crmMoney:$currency|string_format:"%10s"} {if $dataArray}{$line.unit_price*$line.qty|crmMoney:$currency|string_format:"%10s"} {if $line.tax_rate != "" || $line.tax_amount != ""}  {$line.tax_rate|string_format:"%.2f"} %  {$line.tax_amount|crmMoney:$currency|string_format:"%10s"} {else}                  {/if}  {/if} {$line.line_total+$line.tax_amount|crmMoney:$currency|string_format:"%10s"}
 {/foreach}
 {/foreach}
+
+{if $dataArray}
+{ts}Amount before Tax{/ts}: {$amount-$totalTaxAmount|crmMoney:$currency}
+
+{foreach from=$dataArray item=value key=priceset}
+{if $priceset || $priceset == 0}
+{$taxTerm} {$priceset|string_format:"%.2f"}%: {$value|crmMoney:$currency}
+{else}
+{ts}No{/ts} {$taxTerm}: {$value|crmMoney:$currency}
+{/if}
+{/foreach}
+{/if}
+
+{if $totalTaxAmount}
+{ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}
+{/if}
 
 {ts}Total Amount{/ts}: {$amount|crmMoney:$currency}
 {else}
@@ -43,10 +62,15 @@
 {ts}Transaction #{/ts}: {$trxn_id}
 {/if}
 
-{if $is_recur and ($contributeMode eq 'notify' or $contributeMode eq 'directIPN')}
-{ts}This is a recurring contribution. You can cancel future contributions at:{/ts}
+{if $is_recur}
+{ts}This is a recurring contribution.{/ts}
+
+{if $cancelSubscriptionUrl}
+{ts}You can cancel future contributions at:{/ts}
 
 {$cancelSubscriptionUrl}
+
+{/if}
 
 {if $updateSubscriptionBillingUrl}
 {ts}You can update billing details for this recurring contribution at:{/ts}
@@ -54,21 +78,31 @@
 {$updateSubscriptionBillingUrl}
 
 {/if}
+
+{if $updateSubscriptionUrl}
 {ts}You can update recurring contribution amount or change the number of installments for this recurring contribution at:{/ts}
 
 {$updateSubscriptionUrl}
 
 {/if}
-
-{if $honor_block_is_active }
-===========================================================
-{$honor_type}
-===========================================================
-{$honor_prefix} {$honor_first_name} {$honor_last_name}
-{if $honor_email}
-{ts}Honoree Email{/ts}: {$honor_email}
 {/if}
 
+{if $honor_block_is_active}
+===========================================================
+{$soft_credit_type}
+===========================================================
+{foreach from=$honoreeProfile item=value key=label}
+{$label}: {$value}
+{/foreach}
+{elseif $softCreditTypes and $softCredits}
+{foreach from=$softCreditTypes item=softCreditType key=n}
+===========================================================
+{$softCreditType}
+===========================================================
+{foreach from=$softCredits.$n item=value key=label}
+{$label}: {$value}
+{/foreach}
+{/foreach}
 {/if}
 {if $pcpBlock}
 ===========================================================
@@ -92,14 +126,7 @@
 {/foreach}
 {/if}
 
-{if !( $contributeMode eq 'notify' OR $contributeMode eq 'directIPN' ) and $is_monetary}
-{if $is_pay_later}
-===========================================================
-{ts}Registered Email{/ts}
-
-===========================================================
-{$email}
-{elseif $amount GT 0}
+{if $billingName}
 ===========================================================
 {ts}Billing Name and Address{/ts}
 
@@ -108,9 +135,14 @@
 {$address}
 
 {$email}
-{/if} {* End ! is_pay_later condition. *}
-{/if}
-{if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
+{elseif $email}
+===========================================================
+{ts}Registered Email{/ts}
+
+===========================================================
+{$email}
+{/if} {* End billingName or Email*}
+{if $credit_card_type}
 
 ===========================================================
 {ts}Credit Card Information{/ts}

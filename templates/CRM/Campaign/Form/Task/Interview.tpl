@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $votingTab and $errorMessages}
@@ -42,7 +26,7 @@
 
     <div id='responseErrors' class = "hiddenElement messages crm-error"></div>
 
-    <div id='help'>
+    <div class='help'>
       {if $votingTab}
         {ts}Click <strong>record response</strong> button to update values for each respondent as needed.{/ts}
       {else}
@@ -59,6 +43,7 @@
           <th></th>
           <th>{ts}Column{/ts}</th>
           <th>{ts}Order{/ts}</th>
+          <th></th>
         </tr>
 
         {section name=rowLoop start=1 loop=5}
@@ -66,7 +51,7 @@
           <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
             <td>
               {if $index GT 1}
-                <a onclick="hideRow({$index}); return false;" name="orderBy_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>
+                <a onclick="hideRow({$index}); return false;" name="orderBy_{$index}" href="#" class="form-link">{icon icon="fa-trash"}{ts}hide field or section{/ts}{/icon}</a>
               {/if}
             </td>
             <td> {$form.order_bys.$index.column.html}</td>
@@ -74,13 +59,13 @@
             <td>
             {if $index eq 1}
               {$form.buttons._qf_Interview_submit_orderBy.html}
-	          {/if}
+            {/if}
             </td>
           </tr>
         {/section}
       </table>
       <div id="optionFieldLink" class="add-remove-link">
-        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another column{/ts}</a>
+        <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another column{/ts}</a>
       </div>
 
       <script type="text/javascript">
@@ -98,27 +83,27 @@
           // hide and display the appropriate blocks as directed by the php code
           on_load_init_blocks( showRows, hideBlocks, '' );
 
-          if (cj("#order_bys_2_column").val()){
-            cj("#optionField_2").show();
+          if (CRM.$("#order_bys_2_column").val()){
+            CRM.$("#optionField_2").show();
           }
-          if (cj("#order_bys_3_column").val()){
-            cj("#optionField_3").show();
+          if (CRM.$("#order_bys_3_column").val()){
+            CRM.$("#optionField_3").show();
           }
-          if (cj("#order_bys_4_column").val()){
-            cj("#optionField_4").show();
+          if (CRM.$("#order_bys_4_column").val()){
+            CRM.$("#optionField_4").show();
           }
 
           function hideRow(i) {
             showHideRow(i);
             // clear values on hidden field, so they're not saved
-            cj('select#order_by_column_'+ i).val('');
-            cj('select#order_by_order_'+ i).val('ASC');
+            CRM.$('select#order_by_column_'+ i).val('');
+            CRM.$('select#order_by_order_'+ i).val('ASC');
           }
           {/literal}
       </script>
     </div>
 
-    <table id="voterRecords" class="display crm-copy-fields">
+    <table id="voterRecords-{$instanceId}" class="display crm-copy-fields">
       <thead>
       <tr class="columnheader">
         {foreach from=$readOnlyFields item=fTitle key=fName}
@@ -131,12 +116,12 @@
             {if $field.skipDisplay}
               {continue}
             {/if}
-            <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</th>
+            <th>{copyIcon name=$field.name title=$field.title}{$field.title}</th>
           {/foreach}
         {/if}
 
-        <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=note}Click to copy %1 from row one to all rows.{/ts}" fname="note" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Note{/ts}</th>
-        <th><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=result}Click to copy %1 from row one to all rows.{/ts}" fname="result" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{ts}Result{/ts}</th>
+        <th>{capture assign="tsNote"}{ts}Note{/ts}{/capture}{copyIcon name=note title=$tsNote}{$tsNote}</th>
+        <th>{capture assign="tsResult"}{ts}Result{/ts}{/capture}{copyIcon name=result title=$tsResult}{$tsResult}</th>
         <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
       </tr>
       </thead>
@@ -155,10 +140,7 @@
                 {continue}
               {/if}
               <td class="compressed {$field.data_type} {$fieldName}">
-                {if ( $field.data_type eq 'Date') or
-                ( $fieldName eq 'thankyou_date' ) or ( $fieldName eq 'cancel_date' ) or ( $fieldName eq 'receipt_date' ) or (  $fieldName eq 'activity_date_time') }
-                {include file="CRM/common/jcalendar.tpl" elementName=$fieldName elementIndex=$voterId batchUpdate=1}
-                {elseif $fieldName|substr:0:5 eq 'phone'}
+                {if $fieldName|substr:0:5 eq 'phone'}
                   {assign var="phone_ext_field" value=$fieldName|replace:'phone':'phone_ext'}
                   {$form.field.$voterId.$fieldName.html}
                   {if $form.field.$voterId.$phone_ext_field.html}
@@ -166,9 +148,6 @@
                   {/if}
                 {else}
                   {$form.field.$voterId.$fieldName.html}
-                {/if}
-                {if $field.html_type eq 'Autocomplete-Select'}
-                  {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = field[`$voterId`][`$fieldName`]}
                 {/if}
               </td>
             {/foreach}
@@ -207,16 +186,15 @@
   </fieldset>
 </div>
 
-
 {literal}
 <script type="text/javascript">
 var updateVote = "{/literal}{ts escape='js'}Update Response{/ts}{literal}";
 var updateVoteforall = "{/literal}{ts escape='js'}Update Responses for All{/ts}{literal}";
-cj( function( ) {
+CRM.$(function($) {
   var count = 0; var columns='';
 
-  cj('#voterRecords th').each( function( ) {
-    if ( cj(this).attr('class') == 'contact_details' ) {
+  CRM.$('#voterRecords-{/literal}{$instanceId}{literal} th').each( function( ) {
+    if ( CRM.$(this).attr('class') == 'contact_details' ) {
       columns += '{"sClass": "contact_details"},';
     }
     else {
@@ -229,7 +207,7 @@ cj( function( ) {
   eval('columns =[' + columns + ']');
 
   //load jQuery data table.
-  cj('#voterRecords').dataTable( {
+  CRM.$('table#voterRecords-{/literal}{$instanceId}{literal}').dataTable( {
     "sPaginationType": "full_numbers",
     "bJQueryUI"  : true,
     "aoColumns"  : columns
@@ -239,7 +217,7 @@ cj( function( ) {
 
 function registerInterview( voterId ) {
   //reset all errors.
-  cj( '#responseErrors' ).hide( ).html( '' );
+  CRM.$( '#responseErrors' ).hide( ).html( '' );
 
   //collect all submitted data.
   var data = new Object;
@@ -247,17 +225,17 @@ function registerInterview( voterId ) {
   //get the values for common elements.
   var fieldName = 'field_' + voterId + '_custom_';
   var specialFieldType = new Array( 'radio', 'checkbox', 'select' );
-  cj( '[id^="'+ fieldName +'"]' ).each( function( ) {
-    fieldType = cj( this ).attr( 'type' );
+  CRM.$( '[id^="'+ fieldName +'"]' ).each( function( ) {
+    fieldType = CRM.$( this ).attr( 'type' );
     if ( specialFieldType.indexOf( fieldType ) == -1 ) {
-      data[cj(this).attr( 'id' )] = cj( this ).val( );
+      data[CRM.$(this).attr( 'id' )] = CRM.$( this ).val( );
     }
   });
 
   //get the values for select.
-  cj('select[id^="'+ fieldName +'"]').each( function( ) {
-    value = cj(this).val( );
-    if (cj(this).attr( 'multiple')) {
+  CRM.$('select[id^="'+ fieldName +'"]').each( function( ) {
+    value = CRM.$(this).val( );
+    if (CRM.$(this).attr( 'multiple')) {
       values = value;
       value = '';
       if ( values ) {
@@ -269,22 +247,22 @@ function registerInterview( voterId ) {
         }
       }
     }
-    data[cj(this).attr('id')] = value;
+    data[CRM.$(this).attr('id')] = value;
   });
 
   var checkBoxField = 'field['+ voterId +'][custom_';
-  cj('input:checkbox[name^="'+ checkBoxField +'"]').each( function( ) {
+  CRM.$('input:checkbox[name^="'+ checkBoxField +'"]').each( function( ) {
     value = '';
-    if (cj(this).is(':checked') == true) value = 1;
-    data[cj(this).attr( 'name' )] = value;
+    if (CRM.$(this).is(':checked') == true) value = 1;
+    data[CRM.$(this).attr( 'name' )] = value;
   });
 
   var allRadios   = new Object;
   var radioField = 'field['+ voterId +'][custom_';
-  cj('input:radio[name^="'+ radioField +'"]').each( function( ) {
-    radioName = cj(this).attr( 'name' );
-    if (cj(this).is(':checked') == true) {
-      data[radioName] = cj(this).val();
+  CRM.$('input:radio[name^="'+ radioField +'"]').each( function( ) {
+    radioName = CRM.$(this).attr( 'name' );
+    if (CRM.$(this).is(':checked') == true) {
+      data[radioName] = CRM.$(this).val();
     }
     allRadios[radioName] = radioName;
   });
@@ -295,12 +273,12 @@ function registerInterview( voterId ) {
   //carry contact related profile field data.
   var fieldName = 'field_' + voterId;
   var checkBoxFieldName = 'field[' + voterId + ']';
-  cj('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) { 
-    fldId = cj(this).attr('id');
+  CRM.$('[id^="'+ fieldName +'"], [id^="'+ checkBoxFieldName +'"]').each(function( ) {
+    fldId = CRM.$(this).attr('id');
     if (fldId.indexOf('_custom_') == -1 &&
       fldId.indexOf('_result') == -1  &&
       fldId.indexOf('_note') == -1 ) {
-      data[fldId] = cj(this).val( );
+      data[fldId] = CRM.$(this).val( );
     }
   });
 
@@ -312,20 +290,20 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
   data['interviewer_id']   = {/literal}{$interviewerId}{literal};
   data['activity_type_id'] = {/literal}{$surveyTypeId}{literal};
   data['activity_id']      = activityId;
-  data['result']           = cj( '#field_' + voterId + '_result' ).val( );
-  data['note']             = cj( '#field_' + voterId + '_note' ).val( );
+  data['result']           = CRM.$( '#field_' + voterId + '_result' ).val( );
+  data['note']             = CRM.$( '#field_' + voterId + '_note' ).val( );
   data['surveyTitle']      = {/literal}'{$surveyValues.title|escape:javascript}'{literal};
   data['survey_id']        = {/literal}'{$surveyValues.id}'{literal};
 
   var dataUrl = {/literal}"{crmURL p='civicrm/campaign/registerInterview' h=0}"{literal}
 
   //post data to create interview.
-  cj.post(dataUrl, data, function(interview) {
+  CRM.$.post(dataUrl, data, function(interview) {
     if ( interview.status == 'success' ) {
-      cj("#row_"+voterId+' td.name').attr('class', 'name disabled' );
-      cj('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
-      cj('#interview_voter_button_' + voterId).html(updateVote);
-      cj('#release_voter_button_' + voterId).hide( );
+      CRM.$("#row_"+voterId+' td.name').attr('class', 'name strikethrough' );
+      CRM.$('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
+      CRM.$('#interview_voter_button_' + voterId).html(updateVote);
+      CRM.$('#release_voter_button_' + voterId).hide( );
     }
     else if (interview.status == 'fail' && interview.errors) {
       var errorList = '';
@@ -333,8 +311,8 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
         if (interview.errors[error]) errorList =  errorList + '<li>' + interview.errors[error] + '</li>';
       }
       if ( errorList ) {
-        var allErrors = '<div class = "icon red-icon alert-icon"></div>Please correct the following errors in the survey fields below:' + '<ul>' + errorList + '</ul>';
-        cj('#responseErrors').show( ).html(allErrors);
+        var allErrors = '<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i> {/literal}{ts}Please correct the following errors in the survey fields below:{/ts}{literal}<ul>' + errorList + '</ul>';
+        CRM.$('#responseErrors').show( ).html(allErrors);
       }
     }
   }, 'json');
@@ -348,7 +326,7 @@ function releaseOrReserveVoter(voterId) {
   if ( !activityId ) return;
 
   var operation  = 'release';
-  var isReleaseOrReserve = cj('#field_' + voterId + '_is_release_or_reserve').val( );
+  var isReleaseOrReserve = CRM.$('#field_' + voterId + '_is_release_or_reserve').val( );
   if (isReleaseOrReserve == 1) {
     operation = 'reserve';
     isReleaseOrReserve = 0;
@@ -367,25 +345,25 @@ function releaseOrReserveVoter(voterId) {
   {literal};
 
     //post data to release / reserve voter.
-    cj.post( actUrl,
+    CRM.$.post( actUrl,
     data,
     function( response ) {
       if (response.status == 'success') {
         if ( operation == 'release' ) {
-          cj( '#interview_voter_button_' + voterId ).hide( );
-          cj( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
-          cj( '#row_' + voterId + ' td.name' ).addClass( 'disabled' );
-          cj( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}reserve{/ts}{literal}"  );
-          cj( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Reserve{/ts}{literal}");
+          CRM.$( '#interview_voter_button_' + voterId ).hide( );
+          CRM.$( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
+          CRM.$( '#row_' + voterId + ' td.name' ).addClass( 'disabled' );
+          CRM.$( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}reserve{/ts}{literal}"  );
+          CRM.$( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Reserve{/ts}{literal}");
         }
         else {
-          cj( '#interview_voter_button_' + voterId ).show( );
-          cj( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
-          cj( '#row_' + voterId + ' td.name' ).removeClass( 'disabled' );
-          cj( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}release{/ts}{literal}"  );
-          cj( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Release{/ts}{literal}");
+          CRM.$( '#interview_voter_button_' + voterId ).show( );
+          CRM.$( '#restmsg_release_or_reserve' + voterId ).fadeIn( 'slow' ).fadeOut( 'slow' );
+          CRM.$( '#row_' + voterId + ' td.name' ).removeClass( 'disabled' );
+          CRM.$( '#release_voter_button_'+ voterId ).html( "{/literal}{ts escape='js'}release{/ts}{literal}"  );
+          CRM.$( '#release_voter_button_' + voterId ).attr('title',"{/literal}{ts escape='js'}Release{/ts}{literal}");
         }
-        cj( '#field_' + voterId + '_is_release_or_reserve' ).val( isReleaseOrReserve );
+        CRM.$( '#field_' + voterId + '_is_release_or_reserve' ).val( isReleaseOrReserve );
       }
     },
   'json');
@@ -394,9 +372,9 @@ function releaseOrReserveVoter(voterId) {
 function registerInterviewforall( ) {
   var Ids = {/literal}{$componentIdsJson}{literal};
   for (var contactid in Ids) {
-    if (cj('#field_'+ Ids[contactid] +'_result').val()) {
+    if (CRM.$('#field_'+ Ids[contactid] +'_result').val()) {
       registerInterview(Ids[contactid]);
-      cj('#interview_voter_button').html(updateVoteforall);
+      CRM.$('#interview_voter_button').html(updateVoteforall);
     }
   }
 }
@@ -406,4 +384,3 @@ function registerInterviewforall( ) {
 {*include batch copy js js file*}
 {include file="CRM/common/batchCopy.tpl"}
 {/if}
-

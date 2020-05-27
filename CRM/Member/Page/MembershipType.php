@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -39,46 +23,46 @@
 class CRM_Member_Page_MembershipType extends CRM_Core_Page {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_links = NULL;
+  public static $_links = NULL;
+
+  public $useLivePageJS = TRUE;
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/member/membershipType/add',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Membership Type'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Member_BAO_MembershipType' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Membership Type'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Member_BAO_MembershipType' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Membership Type'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/member/membershipType/add',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Membership Type'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -91,10 +75,8 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
-  function run() {
+  public function run() {
     $this->browse();
 
     // parent run
@@ -106,21 +88,27 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    *
    * @return void
-   * @access public
-   * @static
    */
-  function browse() {
+  public function browse() {
     // get all membership types sorted by weight
-    $membershipType = array();
+    $membershipType = [];
     $dao = new CRM_Member_DAO_MembershipType();
 
     $dao->orderBy('weight');
     $dao->find();
 
-
     while ($dao->fetch()) {
-      $membershipType[$dao->id] = array();
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
+        && !CRM_Core_Permission::check('view contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))
+      ) {
+        continue;
+      }
+      $links = self::links();
+      $membershipType[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]);
+
+      $membershipType[$dao->id]['period_type'] = CRM_Utils_Array::value($dao->period_type, CRM_Core_SelectValues::periodType(), '');
+      $membershipType[$dao->id]['visibility'] = CRM_Utils_Array::value($dao->visibility, CRM_Core_SelectValues::memberVisibility(), '');
 
       //adding column for relationship type label. CRM-4178.
       if ($dao->relationship_type_id) {
@@ -137,7 +125,13 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
             $value, $relationshipName
           );
         }
-        $membershipType[$dao->id]['maxRelated'] = CRM_Utils_Array::value('max_related', $membershipType[$dao->id]);
+        $membershipType[$dao->id]['maxRelated'] = $membershipType[$dao->id]['max_related'] ?? NULL;
+      }
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+        unset($links[CRM_Core_Action::UPDATE], $links[CRM_Core_Action::ENABLE], $links[CRM_Core_Action::DISABLE]);
+      }
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
+        unset($links[CRM_Core_Action::DELETE]);
       }
       // form all action links
       $action = array_sum(array_keys($this->links()));
@@ -151,8 +145,13 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
         $membershipType[$dao->id]['order'] = $membershipType[$dao->id]['weight'];
-        $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $dao->id)
+        $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
+          ['id' => $dao->id],
+          ts('more'),
+          FALSE,
+          'membershipType.manage.action',
+          'MembershipType',
+          $dao->id
         );
       }
     }
@@ -165,5 +164,5 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
     CRM_Member_BAO_MembershipType::convertDayFormat($membershipType);
     $this->assign('rows', $membershipType);
   }
-}
 
+}

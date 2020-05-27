@@ -1,6 +1,7 @@
 <extension key='test.extension.manager.paymenttest' type='payment'>
   <file>main</file>
   <name>test_extension_manager_paymenttest</name>
+  <description>Sample Payment extension</description>
   <typeInfo>
     <userNameLabel>username</userNameLabel>
     <passwordLabel>password</passwordLabel>
@@ -18,4 +19,7 @@
     <isRecur>0</isRecur>
     <paymentType>1</paymentType>
   </typeInfo>
+  <tags>
+    <tag>mock</tag>
+  </tags>
 </extension>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright U.S. PIRG Education Fund (c) 2007                        |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -24,7 +24,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -34,13 +34,20 @@
  *
  */
 class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMultiSelect {
-  function toHtml() {
+
+  /**
+   * Returns the HTML generated for the advanced multiple select component.
+   *
+   * @return string
+   * @since      version 0.4.0 (2005-06-25)
+   */
+  public function toHtml() {
     if ($this->_flagFrozen) {
       return $this->getFrozenHtml();
     }
 
-    $tabs    = $this->_getTabs();
-    $tab     = $this->_getTab();
+    $tabs = $this->_getTabs();
+    $tab = $this->_getTab();
     $strHtml = '';
 
     if ($this->getComment() != '') {
@@ -59,8 +66,8 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
 
       foreach ($this->_options as $option) {
 
-        $_labelAttributes = array('style', 'class', 'onmouseover', 'onmouseout');
-        $labelAttributes = array();
+        $_labelAttributes = ['style', 'class', 'onmouseover', 'onmouseout'];
+        $labelAttributes = [];
         foreach ($_labelAttributes as $attr) {
           if (isset($option['attr'][$attr])) {
             $labelAttributes[$attr] = $option['attr'][$attr];
@@ -68,7 +75,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
           }
         }
 
-        if (is_array($this->_values) && in_array((string)$option['attr']['value'], $this->_values)) {
+        if (is_array($this->_values) && in_array((string) $option['attr']['value'], $this->_values)) {
           // The items is *selected*
           $checked = ' checked="checked"';
         }
@@ -80,25 +87,25 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       }
       $strHtmlSelected .= $tab . '</div>' . PHP_EOL;
 
-      $strHtmlHidden     = '';
+      $strHtmlHidden = '';
       $strHtmlUnselected = '';
-      $strHtmlAdd        = '';
-      $strHtmlRemove     = '';
+      $strHtmlAdd = '';
+      $strHtmlRemove = '';
 
       // build the select all button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 1);");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 1);"];
       $this->_allButtonAttributes = array_merge($this->_allButtonAttributes, $attributes);
       $attrStrAll = $this->_getAttrString($this->_allButtonAttributes);
       $strHtmlAll = "<input$attrStrAll />" . PHP_EOL;
 
       // build the select none button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 0);");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 0);"];
       $this->_noneButtonAttributes = array_merge($this->_noneButtonAttributes, $attributes);
       $attrStrNone = $this->_getAttrString($this->_noneButtonAttributes);
       $strHtmlNone = "<input$attrStrNone />" . PHP_EOL;
 
       // build the toggle selection button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 2);");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}('" . $this->getName() . "', 2);"];
       $this->_toggleButtonAttributes = array_merge($this->_toggleButtonAttributes, $attributes);
       $attrStrToggle = $this->_getAttrString($this->_toggleButtonAttributes);
       $strHtmlToggle = "<input$attrStrToggle />" . PHP_EOL;
@@ -110,17 +117,26 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       // ... or a dual multi-select
 
       // set name of Select From Box
-      $this->_attributesUnselected = array('name' => '__' . $selectName, 'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add')");
+      $this->_attributesUnselected = [
+        'name' => '__' . $selectName,
+        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add')",
+      ];
       $this->_attributesUnselected = array_merge($this->_attributes, $this->_attributesUnselected);
       $attrUnselected = $this->_getAttrString($this->_attributesUnselected);
 
       // set name of Select To Box
-      $this->_attributesSelected = array('name' => '_' . $selectName, 'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove')");
+      $this->_attributesSelected = [
+        'name' => '_' . $selectName,
+        'ondblclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove')",
+      ];
       $this->_attributesSelected = array_merge($this->_attributes, $this->_attributesSelected);
       $attrSelected = $this->_getAttrString($this->_attributesSelected);
 
       // set name of Select hidden Box
-      $this->_attributesHidden = array('name' => $selectName, 'style' => 'overflow: hidden; visibility: hidden; width: 1px; height: 0;');
+      $this->_attributesHidden = [
+        'name' => $selectName,
+        'style' => 'overflow: hidden; visibility: hidden; width: 1px; height: 0;',
+      ];
       $this->_attributesHidden = array_merge($this->_attributes, $this->_attributesHidden);
       $attrHidden = $this->_getAttrString($this->_attributesHidden);
 
@@ -130,17 +146,17 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
         $arrHtmlSelected = array_fill(0, $append, ' ');
       }
       else {
-        $arrHtmlSelected = array();
+        $arrHtmlSelected = [];
       }
 
       $options = count($this->_options);
-      $arrHtmlUnselected = array();
+      $arrHtmlUnselected = [];
       if ($options > 0) {
         $arrHtmlHidden = array_fill(0, $options, ' ');
 
         foreach ($this->_options as $option) {
           if (is_array($this->_values) &&
-            in_array((string)$option['attr']['value'], $this->_values)
+            in_array((string) $option['attr']['value'], $this->_values)
           ) {
             // Get the post order
             $key = array_search($option['attr']['value'], $this->_values);
@@ -161,7 +177,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
         }
       }
       else {
-        $arrHtmlHidden = array();
+        $arrHtmlHidden = [];
       }
 
       // The 'unselected' multi-select which appears on the left
@@ -192,43 +208,43 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       $strHtmlHidden .= '</select>';
 
       // build the remove button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove'); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'remove'); return false;"];
       $this->_removeButtonAttributes = array_merge($this->_removeButtonAttributes, $attributes);
       $attrStrRemove = $this->_getAttrString($this->_removeButtonAttributes);
       $strHtmlRemove = "<input$attrStrRemove />" . PHP_EOL;
 
       // build the add button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add'); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'add'); return false;"];
       $this->_addButtonAttributes = array_merge($this->_addButtonAttributes, $attributes);
       $attrStrAdd = $this->_getAttrString($this->_addButtonAttributes);
       $strHtmlAdd = "<input$attrStrAdd />" . PHP_EOL;
 
       // build the select all button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'all'); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'all'); return false;"];
       $this->_allButtonAttributes = array_merge($this->_allButtonAttributes, $attributes);
       $attrStrAll = $this->_getAttrString($this->_allButtonAttributes);
       $strHtmlAll = "<input$attrStrAll />" . PHP_EOL;
 
       // build the select none button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'none'); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'none'); return false;"];
       $this->_noneButtonAttributes = array_merge($this->_noneButtonAttributes, $attributes);
       $attrStrNone = $this->_getAttrString($this->_noneButtonAttributes);
       $strHtmlNone = "<input$attrStrNone />" . PHP_EOL;
 
       // build the toggle button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'toggle'); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}{$this->_jsPostfix}(this.form.elements['__" . $selectName . "'], this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "'], 'toggle'); return false;"];
       $this->_toggleButtonAttributes = array_merge($this->_toggleButtonAttributes, $attributes);
       $attrStrToggle = $this->_getAttrString($this->_toggleButtonAttributes);
       $strHtmlToggle = "<input$attrStrToggle />" . PHP_EOL;
 
       // build the move up button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}moveUp(this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "']); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}moveUp(this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "']); return false;"];
       $this->_upButtonAttributes = array_merge($this->_upButtonAttributes, $attributes);
       $attrStrUp = $this->_getAttrString($this->_upButtonAttributes);
       $strHtmlMoveUp = "<input$attrStrUp />" . PHP_EOL;
 
       // build the move down button with all its attributes
-      $attributes = array('onclick' => "{$this->_jsPrefix}moveDown(this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "']); return false;");
+      $attributes = ['onclick' => "{$this->_jsPrefix}moveDown(this.form.elements['_" . $selectName . "'], this.form.elements['" . $selectName . "']); return false;"];
       $this->_downButtonAttributes = array_merge($this->_downButtonAttributes, $attributes);
       $attrStrDown = $this->_getAttrString($this->_downButtonAttributes);
       $strHtmlMoveDown = "<input$attrStrDown />" . PHP_EOL;
@@ -245,7 +261,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
     // render extra labels, if any
     if (is_array($labels)) {
       foreach ($labels as $key => $text) {
-        $key     = is_int($key) ? $key + 2 : $key;
+        $key = is_int($key) ? $key + 2 : $key;
         $strHtml = str_replace("{label_{$key}}", $text, $strHtml);
         $strHtml = str_replace("<!-- BEGIN label_{$key} -->", '', $strHtml);
         $strHtml = str_replace("<!-- END label_{$key} -->", '', $strHtml);
@@ -256,24 +272,38 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
       $strHtml = preg_replace('/\s*<!-- BEGIN label_(\S+) -->.*<!-- END label_\1 -->\s*/i', '', $strHtml);
     }
 
-    $placeHolders = array(
-      '{stylesheet}', '{javascript}', '{class}',
-      '{unselected}', '{selected}',
-      '{add}', '{remove}',
-      '{all}', '{none}', '{toggle}',
-      '{moveup}', '{movedown}',
-    );
-    $htmlElements = array(
-      $this->getElementCss(FALSE), $this->getElementJs(FALSE), $this->_tableAttributes,
-      $strHtmlUnselected, $strHtmlSelected . $strHtmlHidden,
-      $strHtmlAdd, $strHtmlRemove,
-      $strHtmlAll, $strHtmlNone, $strHtmlToggle,
-      $strHtmlMoveUp, $strHtmlMoveDown,
-    );
+    $placeHolders = [
+      '{stylesheet}',
+      '{javascript}',
+      '{class}',
+      '{unselected}',
+      '{selected}',
+      '{add}',
+      '{remove}',
+      '{all}',
+      '{none}',
+      '{toggle}',
+      '{moveup}',
+      '{movedown}',
+    ];
+    $htmlElements = [
+      $this->getElementCss(FALSE),
+      $this->getElementJs(FALSE),
+      $this->_tableAttributes,
+      $strHtmlUnselected,
+      $strHtmlSelected . $strHtmlHidden,
+      $strHtmlAdd,
+      $strHtmlRemove,
+      $strHtmlAll,
+      $strHtmlNone,
+      $strHtmlToggle,
+      $strHtmlMoveUp,
+      $strHtmlMoveDown,
+    ];
 
     $strHtml = str_replace($placeHolders, $htmlElements, $strHtml);
 
     return $strHtml;
   }
-}
 
+}

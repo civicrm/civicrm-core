@@ -9,7 +9,19 @@ require_once 'CRM/Core/Page.php';
 class CRM_Core_Page_QUnit extends CRM_Core_Page {
   protected $tplFile = NULL;
 
-  function run() {
+  /**
+   * Run.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function run() {
+    $qunitJsFile = Civi::paths()->getPath('[civicrm.bower]/qunit/qunit/qunit.js');
+    $qunitJsUrl = Civi::paths()->getUrl('[civicrm.bower]/qunit/qunit/qunit.js');
+    $qunitCssUrl = Civi::paths()->getUrl('[civicrm.bower]/qunit/qunit/qunit.css');
+    if (!file_exists($qunitJsFile)) {
+      throw new \CRM_Core_Exception("QUnit is not available. Please install it in [civicrm.bower]/qunit.");
+    }
+
     list ($ext, $suite) = $this->getRequestExtAndSuite();
     if (empty($ext) || empty($suite)) {
       throw new CRM_Core_Exception("FIXME: Not implemented: QUnit browser");
@@ -35,37 +47,37 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       $this->assign('qunitTpl', "qunit/$suite/test.tpl");
     }
     if (file_exists("$path/tests/qunit/$suite/test.js")) {
-      CRM_Core_Resources::singleton()->addScriptFile($ext, "tests/qunit/$suite/test.js", 1000);
+      CRM_Core_Resources::singleton()->addScriptFile($ext, "tests/qunit/$suite/test.js", 1000, 'html-header');
     }
 
-    CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', array(1 => $ext, 2 => $suite)));
+    CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', [1 => $ext, 2 => $suite]));
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'packages/qunit/qunit.js')
-      ->addStyleFile('civicrm', 'packages/qunit/qunit.css');
+      ->addScriptUrl($qunitJsUrl, 1, 'html-header')
+      ->addStyleUrl($qunitCssUrl, 1, 'html-header');
     parent::run();
   }
 
   /**
-   * Extrac the extension and suite from the request path
+   * Extract the extension and suite from the request path.
    *
    * @return array
    */
-  function getRequestExtAndSuite() {
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+  public function getRequestExtAndSuite() {
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
     if ($arg[1] == 'dev'
       && CRM_Utils_Array::value(2, $arg) == 'qunit'
       && isset($arg[3])
       && isset($arg[4])
     ) {
-      return array(
+      return [
         trim(CRM_Utils_Type::escape($arg[3], 'String'), '/'),
         trim(CRM_Utils_Type::escape($arg[4], 'String'), '/'),
-      );
+      ];
     }
     else {
-      return array(NULL, NULL);
+      return [NULL, NULL];
     }
   }
+
 }

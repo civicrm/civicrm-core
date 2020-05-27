@@ -1,106 +1,74 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class provides the functionality for batch profile update
+ * This class provides the functionality for batch profile update.
  */
 class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
-   * the title of the group
+   * The title of the group.
    *
    * @var string
    */
   protected $_title;
 
   /**
-   * maximum contacts that should be allowed to update
-   *
+   * Maximum contacts that should be allowed to update.
+   * @var int
    */
   protected $_maxContacts = 100;
 
   /**
-   * maximum profile fields that will be displayed
-   *
+   * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
-   * variable to store redirect path
-   *
+   * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
-   * when not to reset sort_name
+   * When not to reset sort_name.
+   * @var bool
    */
   protected $_preserveDefault = TRUE;
-  
-  /**
-   * the internal QF names for the state/country/county fields
-   */
-   
-  protected $_stateCountryCountyFields = array(); 
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
+   * Build all the data structures needed to build the form.
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
       CRM_Core_Error::fatal('ufGroupId is missing');
     }
-    $this->_title = ts('Batch Update') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
+    $this->_title = ts('Update multiple contacts') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
@@ -108,7 +76,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File', 'Autocomplete-Select');
+    $removehtmlTypes = ['File'];
     foreach ($this->_fields as $name => $field) {
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
@@ -121,45 +89,37 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     //FIX ME: phone ext field is added at the end and it gets removed because of below code
     //$this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Update Contact(s)'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
-
+    $this->addButtons([
+      [
+        'type' => 'submit',
+        'name' => ts('Update Contact(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
 
     // if below fields are missing we should not reset sort name / display name
     // CRM-6794
-    $preserveDefaultsArray = array(
-      'first_name', 'last_name', 'middle_name',
+    $preserveDefaultsArray = [
+      'first_name',
+      'last_name',
+      'middle_name',
       'organization_name',
+      'prefix_id',
+      'suffix_id',
       'household_name',
-    );
-    
-    $stateCountryMap = array();
+    ];
 
     foreach ($this->_contactIds as $contactId) {
       $profileFields = $this->_fields;
       CRM_Core_BAO_Address::checkContactSharedAddressFields($profileFields, $contactId);
       foreach ($profileFields as $name => $field) {
-      
-        // Link state to country, county to state per location per contact
-        list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
-          $stateCountryMap["$index-$contactId"][$prefixName] = "field_{$contactId}_{$field['name']}";
-          $this->_stateCountryCountyFields["$index-$contactId"][$prefixName] = "field[{$contactId}][{$field['name']}]";
-        }
-       
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contactId);
 
         if (in_array($field['name'], $preserveDefaultsArray)) {
@@ -167,10 +127,6 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
         }
       }
     }
-    
-    CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    
-
 
     $this->assign('fields', $this->_fields);
 
@@ -178,28 +134,27 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     $buttonName = $this->controller->getButtonName('submit');
 
     if ($suppressFields && $buttonName != '_qf_BatchUpdateProfile_next') {
-      CRM_Core_Session::setStatus(ts("File or Autocomplete Select type field(s) in the selected profile are not supported for Batch Update and have been excluded."), ts('Some Fields Excluded'), 'info');
+      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple contacts."), ts('Some Fields Excluded'), 'info');
     }
 
     $this->addDefaultButtons(ts('Update Contacts'));
-    $this->addFormRule(array('CRM_Contact_Form_Task_Batch', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Task_Batch', 'formRule']);
   }
 
   /**
-   * This function sets the default values for the form.
+   * Set default values for the form.
    *
-   * @access public
    *
-   * @return None
+   * @return array
    */
-  function setDefaultValues() {
+  public function setDefaultValues() {
     if (empty($this->_fields)) {
-      return;
+      return NULL;
     }
 
-    $defaults = $sortName = array();
+    $defaults = $sortName = [];
     foreach ($this->_contactIds as $contactId) {
-      $details[$contactId] = array();
+      $details[$contactId] = [];
 
       //build sortname
       $sortName[$contactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -211,30 +166,27 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     }
 
     $this->assign('sortName', $sortName);
-    
-    // now fix all state country selectors
-    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults, $this->_stateCountryCountyFields); 
 
     return $defaults;
   }
 
   /**
-   * global form rule
+   * Global form rule.
    *
-   * @param array $fields  the input form values
+   * @param array $fields
+   *   The input form values.
    *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
+   * @return bool|array
+   *   true if no errors, else array of errors
    */
-  static function formRule($fields) {
-    $errors = array();
-    $externalIdentifiers = array();
+  public static function formRule($fields) {
+    $errors = [];
+    $externalIdentifiers = [];
     foreach ($fields['field'] as $componentId => $field) {
       foreach ($field as $fieldName => $fieldValue) {
         if ($fieldName == 'external_identifier') {
           if (in_array($fieldValue, $externalIdentifiers)) {
-            $errors["field[$componentId][external_identifier]"] = ts('Duplicate value for External Identifier.');
+            $errors["field[$componentId][external_identifier]"] = ts('Duplicate value for External ID.');
           }
           else {
             $externalIdentifiers[$componentId] = $fieldValue;
@@ -247,17 +199,16 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
   }
 
   /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
     $params = $this->exportValues();
 
-    $ufGroupId         = $this->get('ufGroupId');
-    $notify            = NULL;
+    // @todo extract submit functions &
+    // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
+    // handling of custom data, specifically checkbox fields.
+    $ufGroupId = $this->get('ufGroupId');
+    $notify = NULL;
     $inValidSubtypeCnt = 0;
     //send profile notification email if 'notify' field is set
     $notify = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $ufGroupId, 'notify');
@@ -265,7 +216,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
       //CRM-5521
       //validate subtype before updating
-      if (CRM_Utils_Array::value('contact_sub_type', $value) && !CRM_Contact_BAO_ContactType::isAllowEdit($key)) {
+      if (!empty($value['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isAllowEdit($key)) {
         unset($value['contact_sub_type']);
         $inValidSubtypeCnt++;
       }
@@ -275,7 +226,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       //parse street address, CRM-7768
       self::parseStreetAddress($value, $this);
 
-      CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields, $key, NULL, $ufGroupId);
+      CRM_Contact_BAO_Contact::createProfileContact($value, $this->_fields, $key, NULL, $ufGroupId, NULL, TRUE);
       if ($notify) {
         $values = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($ufGroupId, $key, NULL);
         CRM_Core_BAO_UFGroup::commonSendMail($key, $values);
@@ -284,15 +235,23 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     CRM_Core_Session::setStatus('', ts("Updates Saved"), 'success');
     if ($inValidSubtypeCnt) {
-      CRM_Core_Session::setStatus(ts('Contact SubType field of 1 contact has not been updated.', array('plural' => 'Contact SubType field of %count contacts has not been updated.', 'count' => $inValidSubtypeCnt)), ts('Invalid Subtype'));
+      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', [
+        'plural' => 'Contact Subtype field of %count contacts has not been updated.',
+        'count' => $inValidSubtypeCnt,
+      ]), ts('Invalid Subtype'));
     }
   }
-  //end of function
 
-  function parseStreetAddress(&$contactValues, &$form) {
-    if (!is_array($contactValues) ||
-      !is_array($form->_fields)
-    ) {
+  /**
+   * Parse street address.
+   *
+   * @param array $contactValues
+   *   Contact values.
+   * @param CRM_Core_Form $form
+   *   Form object.
+   */
+  public static function parseStreetAddress(&$contactValues, &$form) {
+    if (!is_array($contactValues) || !is_array($form->_fields)) {
       return;
     }
 
@@ -317,7 +276,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       return;
     }
 
-    $allParseValues = array();
+    $allParseValues = [];
     foreach ($contactValues as $key => $value) {
       if (strpos($key, $addressFldKey) !== FALSE) {
         $locTypeId = substr($key, strlen($addressFldKey) + 1);
@@ -327,9 +286,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
         //street address consider to be parsed properly,
         //If we get street_name and street_number.
-        if (!CRM_Utils_Array::value('street_name', $parsedFields) ||
-          !CRM_Utils_Array::value('street_number', $parsedFields)
-        ) {
+        if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
           $parsedFields = array_fill_keys(array_keys($parsedFields), '');
         }
 
@@ -348,5 +305,5 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       $contactValues += $allParseValues;
     }
   }
-}
 
+}

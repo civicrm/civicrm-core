@@ -1,30 +1,105 @@
 <?php
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
+/**
+ * Class CRM_Core_ManagedEntitiesTest
+ * @group headless
+ */
 class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name'    => 'ManagedEntities',
-      'description' => 'Test automatic creation/deletion of entities',
-      'group'     => 'Core',
-    );
-  }
+  /**
+   * @var \Civi\API\Kernel
+   */
+  protected $apiKernel;
 
-  function setUp() {
+  /**
+   * @var \Civi\API\Provider\AdhocProvider
+   */
+  protected $adhocProvider;
+
+  /**
+   * @var String[]
+   */
+  protected $modules;
+
+  protected $fixtures;
+
+  public function setUp() {
+    $this->useTransaction(TRUE);
     parent::setUp();
-    $this->modules = array(
+    $this->modules = [
       'one' => new CRM_Core_Module('com.example.one', TRUE),
       'two' => new CRM_Core_Module('com.example.two', TRUE),
-    );
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_managed');
-    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name like "CRM_Example_%"');
+    ];
+
+    // Testing on drupal-demo fails because some extensions have mgd ents.
+    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
+
+    $this->fixtures['com.example.one-foo'] = [
+      'module' => 'com.example.one',
+      'name' => 'foo',
+      'entity' => 'CustomSearch',
+      'params' => [
+        'version' => 3,
+        'class_name' => 'CRM_Example_One_Foo',
+        'is_reserved' => 1,
+      ],
+    ];
+    $this->fixtures['com.example.one-bar'] = [
+      'module' => 'com.example.one',
+      'name' => 'bar',
+      'entity' => 'CustomSearch',
+      'params' => [
+        'version' => 3,
+        'class_name' => 'CRM_Example_One_Bar',
+        'is_reserved' => 1,
+      ],
+    ];
+    $this->fixtures['com.example.one-CustomGroup'] = [
+      'module' => 'com.example.one',
+      'name' => 'CustomGroup',
+      'entity' => 'CustomGroup',
+      'params' => [
+        'version' => 3,
+        'name' => 'test_custom_group',
+        'title' => 'Test custom group',
+        'extends' => 'Individual',
+      ],
+    ];
+    $this->fixtures['com.example.one-CustomField'] = [
+      'module' => 'com.example.one',
+      'name' => 'CustomField',
+      'entity' => 'CustomField',
+      'params' => [
+        'version' => 3,
+        'name' => 'test_custom_field',
+        'label' => 'Test custom field',
+        'custom_group_id' => 'test_custom_group',
+        'data_type' => 'String',
+        'html_type' => 'Text',
+      ],
+    ];
+
+    $this->fixtures['com.example.one-Job'] = [
+      'module' => 'com.example.one',
+      'name' => 'Job',
+      'entity' => 'Job',
+      'params' => [
+        'version' => 3,
+        'name' => 'test_job',
+        'run_frequency' => 'Daily',
+        'api_entity' => 'Job',
+        'api_action' => 'Get',
+        'parameters' => '',
+      ],
+    ];
+
+    $this->apiKernel = \Civi::service('civi_api_kernel');
+    $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
+    $this->apiKernel->registerApiProvider($this->adhocProvider);
   }
 
-  function tearDown() {
+  public function tearDown() {
     parent::tearDown();
-    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_managed');
-    CRM_Core_DAO::singleValueQuery('DELETE FROM civicrm_option_value WHERE name like "CRM_Example_%"');
+    \Civi::reset();
   }
 
   /**
@@ -32,20 +107,11 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * to (1) create 'foo' entity, (2) create 'bar' entity', (3) remove 'foo'
    * entity
    */
-  function testAddRemoveEntitiesModule() {
-    $decls = array();
+  public function testAddRemoveEntitiesModule_UpdateAlways_DeleteAlways() {
+    $decls = [];
 
     // create first managed entity ('foo')
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -53,16 +119,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // later on, hook returns an extra managed entity ('bar')
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'bar',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Bar',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-bar'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -99,20 +156,11 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Set up an active module with one managed-entity and, over
    * time, the content of the entity changes
    */
-  function testModifyDeclaration() {
-    $decls = array();
+  public function testModifyDeclaration_UpdateAlways() {
+    $decls = [];
 
     // create first managed entity ('foo')
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -131,77 +179,194 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Set up an active module with one managed-entity and, over
+   * time, the content of the entity changes
    */
-  function testInvalidDeclarationModule() {
+  public function testModifyDeclaration_UpdateNever() {
+    $decls = [];
+
     // create first managed entity ('foo')
-    $decls = array();
-    $decls[] = array(
-      'module' => 'com.example.unknown', // erroneous
+    $decls[] = array_merge($this->fixtures['com.example.one-foo'], [
+      // Policy is to never update after initial creation
+      'update' => 'never',
+    ]);
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // later on, hook specification changes
+    $decls[0]['params']['class_name'] = 'CRM_Example_One_Foobar';
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo2 = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_FooBar"');
+    $this->assertEquals($foo['id'], $foo2['id']);
+  }
+
+  /**
+   * Set up an active module with one managed-entity using the
+   * policy "cleanup=>never". When the managed-entity goes away,
+   * ensure that the policy is followed (ie the entity is not
+   * deleted).
+   */
+  public function testRemoveDeclaration_CleanupNever() {
+    $decls = [];
+
+    // create first managed entity ('foo')
+    $decls[] = array_merge($this->fixtures['com.example.one-foo'], [
+      'cleanup' => 'never',
+    ]);
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // later on, entity definition disappears; but we decide not to do any cleanup (per policy)
+    $decls = [];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo2 = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertEquals($foo['id'], $foo2['id']);
+  }
+
+  /**
+   * Set up an active module with one managed-entity using the
+   * policy "cleanup=>never". When the managed-entity goes away,
+   * ensure that the policy is followed (ie the entity is not
+   * deleted).
+   */
+  public function testRemoveDeclaration_CleanupUnused() {
+    $decls = [];
+
+    // create first managed entity ('foo')
+    $decls[] = array_merge($this->fixtures['com.example.one-foo'], [
+      'cleanup' => 'unused',
+    ]);
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // Override 'getrefcount' ==> The refcount is 1
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function ($apiRequest) {
+      return civicrm_api3_create_success([
+        [
+          'name' => 'mock',
+          'type' => 'mock',
+          'count' => 1,
+        ],
+      ]);
+    });
+
+    // Later on, entity definition disappears; but we decide not to do any cleanup (per policy)
+    $decls = [];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo2 = $me->get('com.example.one', 'foo');
+    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertEquals($foo['id'], $foo2['id']);
+
+    // Override 'getrefcount' ==> The refcount is 0
+    $this->adhocProvider->addAction('getrefcount', 'access CiviCRM', function ($apiRequest) {
+      return civicrm_api3_create_success([]);
+    });
+
+    // The entity definition disappeared and there's no reference; we decide to cleanup (per policy)
+    $decls = [];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $foo3 = $me->get('com.example.one', 'foo');
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+    $this->assertTrue($foo3 === NULL);
+  }
+
+  /**
+   * Setup an active module with a malformed entity declaration.
+   */
+  public function testInvalidDeclarationModule() {
+    // create first managed entity ('foo')
+    $decls = [];
+    $decls[] = [
+      // erroneous
+      'module' => 'com.example.unknown',
       'name' => 'foo',
       'entity' => 'CustomSearch',
-      'params' => array(
+      'params' => [
         'version' => 3,
         'class_name' => 'CRM_Example_One_Foo',
         'is_reserved' => 1,
-      ),
-    );
+      ],
+    ];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
-     // good
+    }
+    catch (Exception $e) {
+      // good
     }
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
-  function testMissingName() {
+  public function testMissingName() {
     // create first managed entity ('foo')
-    $decls = array();
-    $decls[] = array(
+    $decls = [];
+    $decls[] = [
       'module' => 'com.example.unknown',
-      'name' => NULL, // erroneous
+      // erroneous
+      'name' => NULL,
       'entity' => 'CustomSearch',
-      'params' => array(
+      'params' => [
         'version' => 3,
         'class_name' => 'CRM_Example_One_Foo',
         'is_reserved' => 1,
-      ),
-    );
+      ],
+    ];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
-     // good
+    }
+    catch (Exception $e) {
+      // good
     }
   }
 
   /**
-   * Setup an active module with a malformed entity declaration
+   * Setup an active module with a malformed entity declaration.
    */
-  function testMissingEntity() {
+  public function testMissingEntity() {
     // create first managed entity ('foo')
-    $decls = array();
-    $decls[] = array(
+    $decls = [];
+    $decls[] = [
       'module' => 'com.example.unknown',
       'name' => 'foo',
-      'entity' => NULL, // erroneous
-      'params' => array(
+      // erroneous
+      'entity' => NULL,
+      'params' => [
         'version' => 3,
         'class_name' => 'CRM_Example_One_Foo',
         'is_reserved' => 1,
-      ),
-    );
+      ],
+    ];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     try {
       $me->reconcile();
       $this->fail('Expected exception when using invalid declaration');
-    } catch (Exception $e) {
-     // good
+    }
+    catch (Exception $e) {
+      // good
     }
   }
 
@@ -209,19 +374,14 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
    * Setup an active module with an entity -- then disable and re-enable the
    * module
    */
-  function testDeactivateReactivateModule() {
+  public function testDeactivateReactivateModule() {
+    $manager = CRM_Extension_System::singleton()->getManager();
+
     // create first managed entity ('foo')
-    $decls = array();
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls = [];
+    $decls[] = $this->fixtures['com.example.one-foo'];
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::install
+    $manager->setProcessesForTesting(['com.example.one' => ['install']]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
@@ -231,7 +391,9 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // now deactivate module, which has empty decls and which cascades to managed object
     $this->modules['one']->is_active = FALSE;
-    $me = new CRM_Core_ManagedEntities($this->modules, array());
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::disable
+    $manager->setProcessesForTesting(['com.example.one' => ['disable']]);
+    $me = new CRM_Core_ManagedEntities($this->modules, []);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
     $this->assertEquals(0, $foo['is_active']);
@@ -240,43 +402,134 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // and reactivate module, which again provides decls and which cascades to managed object
     $this->modules['one']->is_active = TRUE;
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::enable
+    $manager->setProcessesForTesting(['com.example.one' => ['enable']]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
     $this->assertEquals(1, $foo['is_active']);
     $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
+
+    // Special case: Job entities.
+    //
+    // First we repeat the above steps, but adding the context that
+    // CRM_Extension_Manager adds when installing/enabling extensions.
+    //
+    // The behaviour should be as above.
+    $decls = [$this->fixtures['com.example.one-Job']];
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::install
+    $manager->setProcessesForTesting(['com.example.one' => ['install']]);
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(1, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    // Reset context.
+    $manager->setProcessesForTesting([]);
+
+    // now deactivate module, which has empty decls and which cascades to managed object
+    $this->modules['one']->is_active = FALSE;
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::disable
+    $manager->setProcessesForTesting(['com.example.one' => ['disable']]);
+    $me = new CRM_Core_ManagedEntities($this->modules, []);
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(0, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+
+    // and reactivate module, which again provides decls and which cascades to managed object
+    $this->modules['one']->is_active = TRUE;
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    // Mock the contextual process info that would be added by CRM_Extension_Manager::enable
+    $manager->setProcessesForTesting(['com.example.one' => ['enable']]);
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(1, $job['is_active']);
+    $this->assertEquals('test_job', $job['name']);
+    $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+
+    // Currently: module enabled, job enabled.
+    // Test that if we now manually disable the job, calling reconcile in a
+    // normal flush situation does NOT re-enable it.
+    // ... manually disable job.
+    $this->callAPISuccess('Job', 'create', ['id' => $job['id'], 'is_active' => 0]);
+
+    // ... now call reconcile in the context of a normal flush operation.
+    // Mock the contextual process info - there would not be any
+    $manager->setProcessesForTesting([]);
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+    $job = $me->get('com.example.one', 'Job');
+    $this->assertEquals(0, $job['is_active'], "Job that was manually set inactive should not have been set active again, but it was.");
+    $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+
+    // Now call reconcile again, but in the context of the job's extension being installed/enabled. This should re-enable the job.
+    foreach (['enable', 'install'] as $process) {
+      // Manually disable the job
+      $this->callAPISuccess('Job', 'create', ['id' => $job['id'], 'is_active' => 0]);
+      // Mock the contextual process info that would be added by CRM_Extension_Manager::enable
+      $manager->setProcessesForTesting(['com.example.one' => [$process]]);
+      $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+      $me->reconcile();
+      $job = $me->get('com.example.one', 'Job');
+      $this->assertEquals(1, $job['is_active']);
+      $this->assertEquals('test_job', $job['name']);
+      $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
+    }
+
+    // Reset context.
+    $manager->setProcessesForTesting([]);
   }
 
   /**
    * Setup an active module with an entity -- then entirely uninstall the
    * module
    */
-  function testUninstallModule() {
+  public function testUninstallModule() {
     // create first managed entity ('foo')
-    $decls = array();
-    $decls[] = array(
-      'module' => 'com.example.one',
-      'name' => 'foo',
-      'entity' => 'CustomSearch',
-      'params' => array(
-        'version' => 3,
-        'class_name' => 'CRM_Example_One_Foo',
-        'is_reserved' => 1,
-      ),
-    );
+    $decls = [];
+    $decls[] = $this->fixtures['com.example.one-foo'];
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
     $foo = $me->get('com.example.one', 'foo');
     $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
-    // then destory module; note that decls go away
+    // then destroy module; note that decls go away
     unset($this->modules['one']);
-    $me = new CRM_Core_ManagedEntities($this->modules, array());
+    $me = new CRM_Core_ManagedEntities($this->modules, []);
     $me->reconcile();
     $fooNew = $me->get('com.example.one', 'foo');
     $this->assertTrue(NULL === $fooNew);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
   }
+
+  public function testDependentEntitiesUninstallCleanly() {
+
+    // Install a module with two dependent managed entities
+    $decls = [];
+    $decls[] = $this->fixtures['com.example.one-CustomGroup'];
+    $decls[] = $this->fixtures['com.example.one-CustomField'];
+    $me = new CRM_Core_ManagedEntities($this->modules, $decls);
+    $me->reconcile();
+
+    // Uninstall the module
+    unset($this->modules['one']);
+    $me = new CRM_Core_ManagedEntities($this->modules, []);
+    $me->reconcile();
+
+    // Ensure that no managed entities remain in the civicrm_managed
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_managed');
+
+    // Ensure that com.example.one-CustomGroup is deleted
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_group WHERE name = "test_custom_group"');
+
+    // Ensure that com.example.one-CustomField is deleted
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_custom_field WHERE name = "test_custom_field"');
+
+  }
+
 }

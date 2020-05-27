@@ -1,31 +1,15 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {literal}
 <script type="text/javascript" >
-cj( function( ) {
+CRM.$(function($) {
     {/literal}
     {if $generateAjaxRequest}
         {foreach from=$ajaxRequestBlocks key="blockName" item="instances"}
@@ -56,7 +40,7 @@ function buildAdditionalBlocks( blockName, className ) {
         cj("#" + blockName + '-Primary-html').show( );
     }
 
-    var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&block=' + blockName + '&count=' + currentInstance;;
+    var dataUrl = {/literal}"{crmURL h=0 q='snippet=4'}"{literal} + '&block=' + blockName + '&count=' + currentInstance;
 
     if ( className == 'CRM_Event_Form_ManageEvent_Location' ) {
         dataUrl = ( currentInstance <= 2 ) ? dataUrl + '&subPage=Location' : '';
@@ -80,9 +64,7 @@ function buildAdditionalBlocks( blockName, className ) {
         async   : false,
         success : function(html){
             cj(fname).after(html);
-            if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-              Drupal.attachBehaviors(cj('#' + blockName + '_Block_'+ currentInstance)[0]);
-            }
+            cj(fname).nextAll().trigger('crmLoad');
         }
     });
 
@@ -101,27 +83,27 @@ function singleSelect( object ) {
     var execBlock  = '#' + element['0'] + '-' + block + '-html Input[id*="' + element['2'] + '"]';
 
     //element to check for checkbox
-    var elementChecked =  cj( '#' + object ).attr('checked');
+    var elementChecked =  cj( '#' + object ).prop('checked');
     if ( elementChecked ) {
         cj( execBlock ).each( function() {
             if ( cj(this).attr('id') != object ) {
-                cj(this).attr( 'checked', false );
+                cj(this).prop('checked', false );
             }
         });
     } else {
-        cj( '#' + object ).attr( 'checked', false );
+        cj( '#' + object ).prop('checked', false );
     }
 
   //check if non of elements is set Primary / Allowed to Login.
   if( cj.inArray( element['2'].slice('2'), [ 'Primary', 'Login' ] ) != -1 ) {
     primary = false;
     cj( execBlock ).each( function( ) {
-      if ( cj(this).attr( 'checked' ) ) {
+      if ( cj(this).prop('checked' ) ) {
         primary = true;
       }
     });
     if( ! primary ) {
-      cj('#' + object).attr( 'checked', true );
+      cj('#' + object).prop('checked', true );
     }
   }
 }
@@ -132,7 +114,7 @@ function removeBlock( blockName, blockId ) {
       return clearFirstBlock(blockName , blockId);
     }
 
-    if ( cj( "#"+ blockName + "_" + blockId + "_IsPrimary").attr('checked') ) {
+    if ( cj( "#"+ blockName + "_" + blockId + "_IsPrimary").prop('checked') ) {
          var primaryBlockId = 1;
         // consider next block as a primary,
         // when user delete first block
@@ -148,7 +130,7 @@ function removeBlock( blockName, blockId ) {
         }
 
         // finally sets the primary address
-        cj( '#'+ blockName + '_' + primaryBlockId + '_IsPrimary').attr('checked', true);
+        cj( '#'+ blockName + '_' + primaryBlockId + '_IsPrimary').prop('checked', true);
     }
 
     //remove the spacer for address block only.
@@ -179,7 +161,7 @@ function clearFirstBlock( blockName , blockId ) {
 }
 
 function getAddressBlock( position ) {
-   var addressBlockIds = new Array();
+   var addressBlockIds = [];
    var i = 0;
    switch ( position ) {
         case 'last':

@@ -18,7 +18,7 @@
     <name>id</name>
     <autoincrement>true</autoincrement>
   </primaryKey>
-   <field> 
+   <field>
     <name>activity_id</name>
     <type>int unsigned</type>
     <title>Activity ID</title>
@@ -34,7 +34,7 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
 
-   <field> 
+   <field>
     <name>target_contact_id</name>
     <title>Contact ID (match to contact)</title>
     <import>true</import>
@@ -54,7 +54,7 @@
   <index>
        <name>UI_activity_target_contact_id</name>
        <fieldName>target_contact_id</fieldName>
-       <fieldName>activity_id</fieldName> 
+       <fieldName>activity_id</fieldName>
        <unique>true</unique>
        <add>2.0</add>
   </index>

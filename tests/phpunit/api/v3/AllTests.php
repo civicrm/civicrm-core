@@ -6,12 +6,12 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @version   $Id: AllTests.php 31254 2010-12-15 10:09:29Z eileen $
- *   @package   CiviCRM
+ * @version   $Id: AllTests.php 31254 2010-12-15 10:09:29Z eileen $
+ * @package   CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -31,41 +31,40 @@
  */
 
 /**
- *  Include parent class definition
- */
-require_once 'CiviTest/CiviTestSuite.php';
-
-/**
  *  Class containing all API v3 test suites
  *
- *  @package   CiviCRM
+ * @package   CiviCRM
  */
 class api_v3_AllTests extends CiviTestSuite {
   private static $instance = NULL;
 
   /**
-   * Simple name based constructor
-   */ function __construct($theClass = '', $name = '') {
+   * Simple name based constructor.
+   *
+   * @param string $theClass
+   * @param string $name
+   */
+  public function __construct($theClass = '', $name = '') {
     parent::__construct($theClass, $name);
   }
 
   /**
-   *
    */
   private static function getInstance() {
     if (is_null(self::$instance)) {
-      self::$instance = new self;
+      self::$instance = new self();
     }
     return self::$instance;
   }
 
   /**
-   *  Build test suite dynamically
+   * Build test suite dynamically.
    */
   public static function suite() {
     $inst = self::getInstance();
     return $inst->implSuite(__FILE__);
   }
+
 }
 // class api_v3_AllTests
 
@@ -77,4 +76,3 @@ class api_v3_AllTests extends CiviTestSuite {
 // c-hanging-comment-ender-p: nil
 // indent-tabs-mode: nil
 // End:
-

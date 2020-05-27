@@ -1,37 +1,19 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -40,104 +22,93 @@
 class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen
+   * The action links that we need to display for the browse screen.
    *
    * @var array
-   * @static
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Obtains the group name from url and sets the title.
-   *
-   * @return void
-   * @access public
-   *
    */
-  function preProcess() {
+  public function preProcess() {
+    Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
-        $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
-                                              'reset=1' );
-        
-        $destination = urlencode( $destination );
-        $this->assign( 'destination', $destination );
+    $destination = CRM_Utils_System::url('civicrm/admin/extensions',
+      'reset=1');
+
+    $destination = urlencode($destination);
+    $this->assign('destination', $destination);
   }
 
   /**
-   * Get BAO Name
+   * Get BAO Name.
    *
-   * @return string Classname of BAO.
+   * @return string
+   *   Classname of BAO.
    */
-  function getBAOName() {
+  public function getBAOName() {
     return 'CRM_Core_BAO_Extension';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::ADD => array(
+      self::$_links = [
+        CRM_Core_Action::ADD => [
           'name' => ts('Install'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=add&id=%%id%%&key=%%key%%',
           'title' => ts('Install'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=enable&id=%%id%%&key=%%key%%',
           'ref' => 'enable-action',
           'title' => ts('Enable'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=disable&id=%%id%%&key=%%key%%',
-          'ref' => 'disable-action',
           'title' => ts('Disable'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Uninstall'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=delete&id=%%id%%&key=%%key%%',
           'title' => ts('Uninstall Extension'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Download'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=update&id=%%id%%&key=%%key%%',
           'title' => ts('Download Extension'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
 
   /**
    * Run the basic page (run essentially starts execution for that page).
-   *
-   * @return void
    */
-  function run() {
+  public function run() {
     $this->preProcess();
     return parent::run();
   }
 
   /**
-   * Browse all options
-   *
-   *
-   * @return void
-   * @access public
-   * @static
+   * Browse all options.
    */
-  function browse() {
-    $mapper = CRM_Extension_System::singleton()->getMapper();
-    $manager = CRM_Extension_System::singleton()->getManager();
+  public function browse() {
 
     // build announcements at the top of the page
     $this->assign('extAddNewEnabled', CRM_Extension_System::singleton()->getBrowser()->isEnabled());
@@ -156,108 +127,187 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // TODO: Debate whether to immediately detect changes in underlying source tree
     // $manager->refresh();
 
-    // build list of local extensions
-    $localExtensionRows = array(); // array($pseudo_id => extended_CRM_Extension_Info)
+    $localExtensionRows = $this->formatLocalExtensionRows();
+    $this->assign('localExtensionRows', $localExtensionRows);
+
+    $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
+    $this->assign('remoteExtensionRows', $remoteExtensionRows);
+  }
+
+  /**
+   * Get the list of local extensions and format them as a table with
+   * status and action data.
+   *
+   * @return array
+   */
+  public function formatLocalExtensionRows() {
+    $mapper = CRM_Extension_System::singleton()->getMapper();
+    $manager = CRM_Extension_System::singleton()->getManager();
+
+    // array($pseudo_id => extended_CRM_Extension_Info)
+    $localExtensionRows = [];
     $keys = array_keys($manager->getStatuses());
     sort($keys);
-    foreach($keys as $key) {
+    $hiddenExtensions = $mapper->getKeysByTag('mgmt:hidden');
+    foreach ($keys as $key) {
+      if (in_array($key, $hiddenExtensions)) {
+        continue;
+      }
       try {
         $obj = $mapper->keyToInfo($key);
-      } catch (CRM_Extension_Exception $ex) {
-        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
+      }
+      catch (CRM_Extension_Exception $ex) {
+        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
         continue;
       }
 
+      $mapper = CRM_Extension_System::singleton()->getMapper();
+
       $row = self::createExtendedInfo($obj);
       $row['id'] = $obj->key;
+      $row['action'] = '';
 
       // assign actions
       $action = 0;
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_UNINSTALLED:
-          $action += CRM_Core_Action::ADD;
+          if (!$manager->isIncompatible($row['id'])) {
+            $action += CRM_Core_Action::ADD;
+          }
           break;
+
         case CRM_Extension_Manager::STATUS_DISABLED:
-          $action += CRM_Core_Action::ENABLE;
+          if (!$manager->isIncompatible($row['id'])) {
+            $action += CRM_Core_Action::ENABLE;
+          }
           $action += CRM_Core_Action::DELETE;
           break;
+
         case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
           $action += CRM_Core_Action::DELETE;
           break;
+
         case CRM_Extension_Manager::STATUS_INSTALLED:
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
           $action += CRM_Core_Action::DISABLE;
           break;
+
         default:
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
       // then $action += CRM_Core_Action::UPDATE
-      $row['action'] = CRM_Core_Action::formLink(self::links(),
-        $action,
-        array(
-          'id' => $row['id'],
-          'key' => $obj->key,
-        )
-      );
+      if ($action) {
+        $row['action'] = CRM_Core_Action::formLink(self::links(),
+          $action,
+          ['id' => $row['id'], 'key' => $obj->key],
+          ts('more'),
+          FALSE,
+          'extension.local.action',
+          'Extension',
+          $row['id']
+        );
+      }
+      // Key would be better to send, but it's not an integer.  Moreover, sending the
+      // values to hook_civicrm_links means that you can still get at the key
 
       $localExtensionRows[$row['id']] = $row;
     }
-    $this->assign('localExtensionRows', $localExtensionRows);
+    return $localExtensionRows;
+  }
 
-    // build list of availabe downloads
-    $remoteExtensionRows = array();
-    foreach (CRM_Extension_System::singleton()->getBrowser()->getExtensions() as $info) {
+  /**
+   * Get the list of remote extensions and format them as a table with
+   * status and action data.
+   *
+   * @param array $localExtensionRows
+   * @return array
+   */
+  public function formatRemoteExtensionRows($localExtensionRows) {
+    try {
+      $remoteExtensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
+    }
+    catch (CRM_Extension_Exception $e) {
+      $remoteExtensions = [];
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'error');
+    }
+
+    // build list of available downloads
+    $remoteExtensionRows = [];
+    $compat = CRM_Extension_System::getCompatibilityInfo();
+
+    foreach ($remoteExtensions as $info) {
+      if (!empty($compat[$info->key]['obsolete'])) {
+        continue;
+      }
       $row = (array) $info;
       $row['id'] = $info->key;
       $action = CRM_Core_Action::UPDATE;
       $row['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array(
+        [
           'id' => $row['id'],
           'key' => $row['key'],
-        )
+        ],
+        ts('more'),
+        FALSE,
+        'extension.remote.action',
+        'Extension',
+        $row['id']
       );
+      if (isset($localExtensionRows[$info->key])) {
+        if (array_key_exists('version', $localExtensionRows[$info->key])) {
+          if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
+            $row['is_upgradeable'] = TRUE;
+          }
+        }
+      }
       $remoteExtensionRows[$row['id']] = $row;
     }
-    $this->assign('remoteExtensionRows', $remoteExtensionRows);
+
+    return $remoteExtensionRows;
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_Extensions';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'CRM_Admin_Form_Extensions';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/extensions';
   }
 
   /**
-   * function to get userContext params
+   * Get userContext params.
    *
-   * @param int $mode mode that we are in
+   * @param int $mode
+   *   Mode that we are in.
    *
    * @return string
-   * @access public
    */
-  function userContextParams($mode = NULL) {
+  public function userContextParams($mode = NULL) {
     return 'reset=1&action=browse';
   }
 
@@ -267,40 +317,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * The result format resembles the old CRM_Core_Extensions_Extension.
    *
+   * @param CRM_Extension_Info $obj
+   *
    * @return array
    */
   public static function createExtendedInfo(CRM_Extension_Info $obj) {
-    $mapper = CRM_Extension_System::singleton()->getMapper();
-    $manager = CRM_Extension_System::singleton()->getManager();
-
-    $extensionRow = (array) $obj;
-    try {
-      $extensionRow['path'] = $mapper->keyToBasePath($obj->key);
-    } catch (CRM_Extension_Exception $e) {
-      $extensionRow['path'] = '';
-    }
-    $extensionRow['status'] = $manager->getStatus($obj->key);
-
-    switch ($extensionRow['status']) {
-      case CRM_Extension_Manager::STATUS_UNINSTALLED:
-        $extensionRow['statusLabel'] = ''; // ts('Uninstalled');
-        break;
-      case CRM_Extension_Manager::STATUS_DISABLED:
-        $extensionRow['statusLabel'] = ts('Disabled');
-        break;
-      case CRM_Extension_Manager::STATUS_INSTALLED:
-        $extensionRow['statusLabel'] = ts('Enabled'); // ts('Installed');
-        break;
-      case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
-        $extensionRow['statusLabel'] = ts('Disabled (Missing)');
-        break;
-      case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-        $extensionRow['statusLabel'] = ts('Enabled (Missing)'); // ts('Installed');
-        break;
-      default:
-        $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
-    }
-    return $extensionRow;
+    return CRM_Extension_System::createExtendedInfo($obj);
   }
-}
 
+}

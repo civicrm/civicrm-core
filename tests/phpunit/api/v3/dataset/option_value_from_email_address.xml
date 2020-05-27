@@ -18,21 +18,21 @@
     <column>component_id</column>
     <column>visibility_id</column>
     <row>
-      <value>234</value>        						<!--  id  -->
-      <value>52</value>         						<!--  option_group_id  -->
+      <value>234</value>                    <!--  id  -->
+      <value>52</value>                     <!--  option_group_id  -->
       <value><![CDATA["Test Label - Domain" <test@email.label.net>]]></value>   <!--  label  -->
-      <value>1</value>          						<!--  value  -->
+      <value>1</value>                      <!--  value  -->
       <value><![CDATA["Test Name For Domain" <test@email.name.net>]]></value>   <!--  name  -->
-      <null />                  						<!--  grouping  -->
-      <value>0</value>          						<!--  filter  -->
-      <value>1</value>          						<!--  is_default  -->
-      <value>1</value>          						<!--  weight  -->
-      <value>Default domain email address and from name.</value>		<!--  description  -->
-      <value>0</value>          						<!--  is_optgroup  -->
-      <value>0</value>          						<!--  is_reserved  -->
-      <value>1</value>          						<!--  is_active  -->
-      <null />                  						<!--  component_id  -->
-      <null />                  						<!--  visibility_id  -->
+      <null />                              <!--  grouping  -->
+      <value>0</value>                      <!--  filter  -->
+      <value>1</value>                      <!--  is_default  -->
+      <value>1</value>                      <!--  weight  -->
+      <value>Default domain email address and from name.</value>    <!--  description  -->
+      <value>0</value>                      <!--  is_optgroup  -->
+      <value>0</value>                      <!--  is_reserved  -->
+      <value>1</value>                      <!--  is_active  -->
+      <null />                              <!--  component_id  -->
+      <null />                              <!--  visibility_id  -->
     </row>
   </table>
 </dataset>

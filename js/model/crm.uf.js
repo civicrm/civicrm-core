@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.UF) CRM.UF = {};
 
   var YESNO = [
@@ -9,8 +8,8 @@
 
   var VISIBILITY = [
     {val: 'User and User Admin Only', label: ts('User and User Admin Only'), isInSelectorAllowed: false},
-    {val: 'Public Pages', label: ts('Public Pages'), isInSelectorAllowed: true},
-    {val: 'Public Pages and Listings', label: ts('Public Pages and Listings'), isInSelectorAllowed: true}
+    {val: 'Public Pages', label: ts('Expose Publicly'), isInSelectorAllowed: true},
+    {val: 'Public Pages and Listings', label: ts('Expose Publicly and for Listings'), isInSelectorAllowed: true}
   ];
 
   var LOCATION_TYPES = _.map(CRM.PseudoConstant.locationType, function(value, key) {
@@ -22,13 +21,18 @@
   var PHONE_TYPES = _.map(CRM.PseudoConstant.phoneType, function(value, key) {
     return {val: key, label: value};
   });
+
+  var WEBSITE_TYPES = _.map(CRM.PseudoConstant.websiteType, function(value, key) {
+    return {val: key, label: value};
+  });
   var DEFAULT_PHONE_TYPE_ID = PHONE_TYPES[0].val;
+  var DEFAULT_WEBSITE_TYPE_ID = WEBSITE_TYPES[0].val;
 
   /**
    * Add a help link to a form label
    */
   function addHelp(title, options) {
-    return title + ' <a href="#" onclick=\'CRM.help("' + title + '", ' + JSON.stringify(options) + '); return false;\' title="' + ts('%1 Help', {1: title}) + '" class="helpicon"></a>';
+    return title + ' <a href="#" onclick=\'CRM.help("' + title + '", ' + JSON.stringify(options) + '); return false;\' title="' + ts('%1 Help', {1: title}) + '" aria-label="' + ts('%1 Help', {1: title}) + '" class="helpicon"></a>';
   }
 
   function watchChanges() {
@@ -49,19 +53,33 @@
     var coreTypesExpr = parts[0];
     var subTypesExpr = parts[1];
 
-    if (coreTypesExpr && coreTypesExpr != '') {
+    if (!_.isEmpty(coreTypesExpr)) {
       _.each(coreTypesExpr.split(','), function(coreType){
         typeList.coreTypes[coreType] = true;
       });
     }
 
-    if (subTypesExpr && subTypesExpr != '') {
-      var subTypes = subTypesExpr.split(':');
-      var subTypeKey = subTypes.shift();
-      typeList.subTypes[subTypeKey] = {};
-      _.each(subTypes, function(subTypeId){
-        typeList.subTypes[subTypeKey][subTypeId] = true;
-      });
+    //CRM-15427 Allow Multiple subtype filtering
+    if (!_.isEmpty(subTypesExpr)) {
+      if (subTypesExpr.indexOf(';;') !== -1) {
+        var subTypeparts = subTypesExpr.replace(/;;/g,'\0').split('\0');
+        _.each(subTypeparts, function(subTypepart) {
+          var subTypes = subTypepart.split(':');
+          var subTypeKey = subTypes.shift();
+          typeList.subTypes[subTypeKey] = {};
+          _.each(subTypes, function(subTypeId) {
+            typeList.subTypes[subTypeKey][subTypeId] = true;
+          });
+        });
+      }
+      else {
+        var subTypes = subTypesExpr.split(':');
+        var subTypeKey = subTypes.shift();
+        typeList.subTypes[subTypeKey] = {};
+        _.each(subTypes, function(subTypeId) {
+          typeList.subTypes[subTypeKey][subTypeId] = true;
+        });
+      }
     }
     return typeList;
   };
@@ -78,6 +96,8 @@
       case 'Contact':
       case 'Individual':
       case 'Organization':
+      case 'Household':
+      case 'Formatting':
         return 'contact_1';
       case 'Activity':
         return 'activity_1';
@@ -87,17 +107,24 @@
         return 'membership_1';
       case 'Participant':
         return 'participant_1';
+      case 'Case':
+        return 'case_1';
       default:
-        throw "Cannot guess entity name for field_type=" + field_type;
+        if (CRM.contactSubTypes.length && ($.inArray(field_type,CRM.contactSubTypes) > -1)) {
+          return 'contact_1';
+        }
+        else {
+          throw "Cannot guess entity name for field_type=" + field_type;
+        }
     }
-  }
+  };
 
   /**
    * Represents a field in a customizable form.
    */
   CRM.UF.UFFieldModel = CRM.Backbone.Model.extend({
     /**
-     * Backbone.Form descripton of the field to which this refers
+     * Backbone.Form description of the field to which this refers
      */
     defaults: {
       help_pre: '',
@@ -170,12 +197,18 @@
       },
       'label': {
         title: ts('Field Label'),
-        type: 'Text'
+        type: 'Text',
+        editorAttrs: {maxlength: 255}
       },
       'location_type_id': {
         title: ts('Location Type'),
         type: 'Select',
         options: LOCATION_TYPES
+      },
+      'website_type_id': {
+        title: ts('Website Type'),
+        type: 'Select',
+        options: WEBSITE_TYPES
       },
       'phone_type_id': {
         title: ts('Phone Type'),
@@ -192,6 +225,9 @@
       }
     },
     initialize: function() {
+      if (this.get('field_name').indexOf('formatting') === 0) {
+        this.schema.help_pre.title = ts('Markup');
+      }
       this.set('entity_name', CRM.UF.guessEntityName(this.get('field_type')));
       this.on("rel:ufGroupModel", this.applyDefaults, this);
       this.on('change', watchChanges);
@@ -201,13 +237,21 @@
       if (fieldSchema && fieldSchema.civiIsLocation && !this.get('location_type_id')) {
         this.set('location_type_id', DEFAULT_LOCATION_TYPE_ID);
       }
+      if (fieldSchema && fieldSchema.civiIsWebsite && !this.get('website_type_id')) {
+        this.set('website_type_id', DEFAULT_WEBSITE_TYPE_ID);
+      }
       if (fieldSchema && fieldSchema.civiIsPhone && !this.get('phone_type_id')) {
         this.set('phone_type_id', DEFAULT_PHONE_TYPE_ID);
       }
     },
     isInSelectorAllowed: function() {
       var visibility = _.first(_.where(VISIBILITY, {val: this.get('visibility')}));
-      return visibility.isInSelectorAllowed;
+      if (visibility) {
+        return visibility.isInSelectorAllowed;
+      }
+      else {
+        return false;
+      }
     },
     getFieldSchema: function() {
       return this.getRel('ufGroupModel').getFieldSchema(this.get('entity_name'), this.get('field_name'));
@@ -219,10 +263,10 @@
      * @return {String}
      */
     getSignature: function() {
-      return this.get("entity_name")
-        + '::' + this.get("field_name")
-        + '::' + (this.get("location_type_id") ? this.get("location_type_id") : '')
-        + '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
+      return this.get("entity_name") +
+        '::' + this.get("field_name") +
+        '::' + (this.get("location_type_id") ? this.get("location_type_id") : this.get("website_type_id") ? this.get("website_type_id") : '') +
+        '::' + (this.get("phone_type_id") ? this.get("phone_type_id") : '');
     },
 
     /**
@@ -273,7 +317,9 @@
       var entity_name = ufFieldModel.get('entity_name'),
         field_name = ufFieldModel.get('field_name'),
         fieldSchema = this.getRel('ufGroupModel').getFieldSchema(ufFieldModel.get('entity_name'), ufFieldModel.get('field_name'));
-
+      if (field_name.indexOf('formatting') === 0) {
+        return true;
+      }
       if (! fieldSchema) {
         return false;
       }
@@ -282,6 +328,9 @@
       if (fieldSchema.civiIsLocation) {
         limit *= LOCATION_TYPES.length;
       }
+      if (fieldSchema.civiIsWebsite) {
+        limit *= WEBSITE_TYPES.length;
+      }
       if (fieldSchema.civiIsPhone) {
         limit *= PHONE_TYPES.length;
       }
@@ -289,11 +338,13 @@
     },
     watchDuplicates: function(model, collection, options) {
       model.on('change:location_type_id', this.markDuplicates, this);
+      model.on('change:website_type_id', this.markDuplicates, this);
       model.on('change:phone_type_id', this.markDuplicates, this);
       this.markDuplicates();
     },
     unwatchDuplicates: function(model, collection, options) {
       model.off('change:location_type_id', this.markDuplicates, this);
+      model.off('change:website_type_id', this.markDuplicates, this);
       model.off('change:phone_type_id', this.markDuplicates, this);
       this.markDuplicates();
     },
@@ -372,7 +423,8 @@
       return result;
     },
     isSectionEnabled: function(section) {
-      return (!section || !section.extends_entity_column_value || _.contains(section.extends_entity_column_value, this.get('entity_sub_type')));
+      //CRM-15427
+      return (!section || !section.extends_entity_column_value || _.contains(section.extends_entity_column_value, this.get('entity_sub_type')) || this.get('entity_sub_type') == '*');
     },
     getSections: function() {
       var ufEntityModel = this;
@@ -436,7 +488,15 @@
         title: ts('Profile Name'),
         help: ts(''),
         type: 'Text',
+        editorAttrs: {maxlength: 64},
         validators: ['required']
+      },
+      'frontend_title': {
+        title: ts('Public Title'),
+        help: ts(''),
+        type: 'Text',
+        editorAttrs: {maxlength: 64},
+        validators: []
       },
       'group_type': {
         // For a description of group_type, see CRM_Core_BAO_UFGroup::updateGroupTypes
@@ -459,6 +519,16 @@
         help: ts('If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.'),
         type: 'Text'
       },
+      'cancel_button_text': {
+        title: ts('Cancel Button Text'),
+        help: ts('Text to display on the cancel button when used in create or edit mode'),
+        type: 'Text'
+      },
+      'submit_button_text': {
+        title: ts('Submit Button Text'),
+        help: ts('Text to display on the submit button when used in create or edit mode'),
+        type: 'Text'
+      },
       'created_date': {
         //title: ts(''),
         type: 'Text'// FIXME
@@ -469,14 +539,14 @@
       },
       'help_post': {
         title: ts('Post-form Help'),
-        help: ts('Explanatory text displayed at the end of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        help: ts('Explanatory text displayed at the end of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'help_pre': {
-        title: ts('Pre-form Help '),
-        help: ts('Explanatory text displayed at the beginning of the form.')
-          + ts('Note that this help text is displayed on profile create/edit screens only.'),
+        title: ts('Pre-form Help'),
+        help: ts('Explanatory text displayed at the beginning of the form.') +
+        ts('Note that this help text is displayed on profile create/edit screens only.'),
         type: 'TextArea'
       },
       'is_active': {
@@ -503,7 +573,7 @@
         options: YESNO
       },
       'is_proximity_search': {
-        title: ts('Proximity search'),
+        title: ts('Proximity Search'),
         help: ts('FIXME'),
         type: 'Select',
         options: YESNO // FIXME
@@ -571,7 +641,7 @@
           ufGroupModel: this
         });
         paletteFieldCollection.sync = function(method, model, options) {
-          options || (options = {});
+          if (!options) options = {};
           // console.log(method, model, options);
           switch (method) {
             case 'read':
@@ -586,6 +656,8 @@
             case 'create':
             case 'update':
             case 'delete':
+              throw 'Unsupported method: ' + method;
+
             default:
               throw 'Unsupported method: ' + method;
           }
@@ -615,9 +687,17 @@
           return _.omit(ufFieldModel.toStrictJSON(), ['id', 'uf_group_id']);
         })
       );
-      copy.set('title', ts('%1 (Copy)', {
-        1: copy.get('title')
-      }));
+      var new_id = 1;
+      CRM.api3('UFGroup', 'getsingle', {
+        "return": ["id"],
+        "options": {"limit": 1, "sort": "id DESC"}
+      }).done(function(result) {
+        new_id = Number(result.id) + 1;
+        var copyLabel = ' ' + ts('(Copy)');
+        var nameSuffix = '_' + new_id;
+        copy.set('title', copy.get('title').slice(0, 64 - copyLabel.length) + copyLabel);
+        copy.set('name', copy.get('name').slice(0, 64 - nameSuffix.length) + nameSuffix);
+      });
       return copy;
     },
     getModelClass: function(entity_name) {
@@ -626,12 +706,13 @@
       return ufEntity.getModelClass();
     },
     getFieldSchema: function(entity_name, field_name) {
+      if (field_name.indexOf('formatting') === 0) {
+        field_name = 'formatting';
+      }
       var modelClass = this.getModelClass(entity_name);
       var fieldSchema = modelClass.prototype.schema[field_name];
       if (!fieldSchema) {
-        if (console.log) {
-          console.log('Failed to locate field: ' + entity_name + "." + field_name);
-        }
+        CRM.console('warn', 'Failed to locate field: ' + entity_name + "." + field_name);
         return null;
       }
       return fieldSchema;
@@ -640,12 +721,19 @@
      * Check that the group_type contains *only* the types listed in validTypes
      *
      * @param string validTypesExpr
+     * @param bool allowAllSubtypes
      * @return {Boolean}
      */
-    checkGroupType: function(validTypesExpr) {
+    //CRM-15427
+    checkGroupType: function(validTypesExpr, allowAllSubtypes, usedByFilter) {
       var allMatched = true;
-      if (! this.get('group_type') || this.get('group_type') == '') {
+      allowAllSubtypes = allowAllSubtypes || false;
+      usedByFilter = usedByFilter || null;
+      if (_.isEmpty(this.get('group_type'))) {
         return true;
+      }
+      if (usedByFilter && _.isEmpty(this.get('module'))) {
+        return false;
       }
 
       var actualTypes = CRM.UF.parseTypeList(this.get('group_type'));
@@ -658,35 +746,87 @@
         }
       });
 
-      // Every actual.subType is a valid.subType
-      _.each(actualTypes.subTypes, function(actualSubTypeIds, actualSubTypeKey) {
-        if (!validTypes.subTypes[actualSubTypeKey]) {
-          allMatched = false;
-          return;
-        }
-        // actualSubTypeIds is a list of all subtypes which can be used by group,
-        // so it's sufficient to match any one of them
-        var subTypeMatched = false;
-        _.each(actualSubTypeIds, function(ignore, actualSubTypeId) {
-          if (validTypes.subTypes[actualSubTypeKey][actualSubTypeId]) {
-            subTypeMatched = true;
+      // CRM-16915 - filter with usedBy module if specified.
+      if (usedByFilter && this.get('module') != usedByFilter) {
+        allMatched = false;
+      }
+      //CRM-15427 allow all subtypes
+      if (!$.isEmptyObject(validTypes.subTypes) && !allowAllSubtypes) {
+        // Every actual.subType is a valid.subType
+        _.each(actualTypes.subTypes, function(actualSubTypeIds, actualSubTypeKey) {
+          if (!validTypes.subTypes[actualSubTypeKey]) {
+            allMatched = false;
+            return;
           }
+          // actualSubTypeIds is a list of all subtypes which can be used by group,
+          // so it's sufficient to match any one of them
+          var subTypeMatched = false;
+          _.each(actualSubTypeIds, function(ignore, actualSubTypeId) {
+            if (validTypes.subTypes[actualSubTypeKey][actualSubTypeId]) {
+              subTypeMatched = true;
+            }
+          });
+          allMatched = allMatched && subTypeMatched;
         });
-        allMatched = allMatched && subTypeMatched;
-      });
+      }
       return allMatched;
+    },
+    calculateContactEntityType: function() {
+      var ufGroupModel = this;
+
+      // set proper entity model based on selected profile
+      var contactTypes = ['Individual', 'Household', 'Organization'];
+      var profileType = ufGroupModel.get('group_type') || '';
+
+      // check if selected profile have subtype defined eg: ["Individual,Contact,Case", "caseType:7"]
+      if (_.isArray(profileType) && profileType[0]) {
+        profileType = profileType[0];
+      }
+      profileType = profileType.split(',');
+
+      var ufEntityModel;
+      _.each(profileType, function (ptype) {
+        if ($.inArray(ptype, contactTypes) > -1) {
+          ufEntityModel = ptype + 'Model';
+          return true;
+        }
+      });
+
+      return ufEntityModel;
+    },
+    setUFGroupModel: function(entityType, allEntityModels) {
+      var ufGroupModel = this;
+
+      var newUfEntityModels = [];
+      _.each(allEntityModels, function (values) {
+        if (entityType && values.entity_name == 'contact_1') {
+          values.entity_type = entityType;
+        }
+        newUfEntityModels.push(new CRM.UF.UFEntityModel(values));
+      });
+
+      ufGroupModel.getRel('ufEntityCollection').reset(newUfEntityModels);
     },
     resetEntities: function() {
       var ufGroupModel = this;
+      var deleteFieldList = [];
       ufGroupModel.getRel('ufFieldCollection').each(function(ufFieldModel){
         if (!ufFieldModel.getFieldSchema()) {
-          CRM.alert(ts('The data model no longer includes field "%1"! All references to the field have been removed.', {
-            1: ufFieldModel.get('entity_name') + "." + ufFieldModel.get('field_name')
+          CRM.alert(ts('This profile no longer includes field "%1"! All references to the field have been removed.', {
+            1: ufFieldModel.get('label')
           }), '', 'alert', {expires: false});
-          ufFieldModel.destroyLocal();
+          deleteFieldList.push(ufFieldModel);
         }
       });
+
+      _.each(deleteFieldList, function(ufFieldModel) {
+        ufFieldModel.destroyLocal();
+      });
+
       this.getRel('paletteFieldCollection').reset(this.buildPaletteFields());
+
+      // reset to redraw the cancel after entity type is updated.
+      ufGroupModel.getRel('ufFieldCollection').reset(ufGroupModel.getRel('ufFieldCollection').toJSON());
     },
     /**
      *
@@ -731,4 +871,4 @@
   CRM.UF.UFGroupCollection = CRM.Backbone.Collection.extend({
     model: CRM.UF.UFGroupModel
   });
-})(cj);
+})(CRM.$, CRM._);

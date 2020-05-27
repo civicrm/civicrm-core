@@ -1,56 +1,38 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  *  Test APIv3 civicrm_membership_payment* functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_Member
+ * @package CiviCRM_APIv3
+ * @subpackage API_Member
+ * @group headless
  */
-
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_contactID;
   protected $_contributionTypeID;
   protected $_membershipTypeID;
   protected $_membershipStatusID;
-  protected $_contribution = array();
-  function setUp() {
+  protected $_contribution = [];
+
+  public function setUp() {
     parent::setUp();
+    $this->useTransaction(TRUE);
 
     $this->_contactID = $this->organizationCreate(NULL);
-    $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactID, 1);
+    $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
-    $params = array(
+    $params = [
       'contact_id' => $this->_contactID,
       'currency' => 'USD',
       'financial_type_id' => 1,
@@ -64,25 +46,9 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'trxn_id' => '22ereerwww322323',
       'invoice_id' => '22ed39c9e9ee6ef6031621ce0eafe6da70',
       'thankyou_date' => '20080522',
-      'version' => 3,
-    );
+    ];
 
-    $this->_contribution = civicrm_api('contribution','create', $params);
-  }
-
-  function tearDown() {
-    $this->quickCleanup(
-      array(
-        'civicrm_contact',
-        'civicrm_contribution',
-        'civicrm_membership',
-        'civicrm_membership_payment',
-        'civicrm_membership_status',
-        'civicrm_membership_type',
-        'civicrm_line_item',
-      )
-    );
-    $this->contributionTypeDelete();
+    $this->_contribution = $this->callAPISuccess('contribution', 'create', $params);
   }
 
   ///////////////// civicrm_membership_payment_create methods
@@ -91,20 +57,16 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
    * Test civicrm_membership_payment_create with empty params.
    */
   public function testCreateEmptyParams() {
-    $params = array('version' => $this->_apiversion);
-    $CreateEmptyParams = civicrm_api('membership_payment', 'create', $params);
-    $this->assertEquals($CreateEmptyParams['error_message'], 'Mandatory key(s) missing from params array: membership_id, contribution_id');
+    $this->callAPIFailure('membership_payment', 'create', [], 'Mandatory key(s) missing from params array: membership_id, contribution_id');
   }
 
   /**
    * Test civicrm_membership_payment_create - success expected.
    */
   public function testCreate() {
-    $contactId = $this->individualCreate(NULL);
+    $contactId = $this->individualCreate();
 
-
-
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => '2006-01-21',
@@ -113,73 +75,46 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-      'version' => API_LATEST_VERSION,
-    );
+    ];
 
-    $membership = civicrm_api('membership', 'create', $params);
-    $this->assertAPISuccess($membership, "membership created in line " . __LINE__);
+    $membership = $this->callAPISuccess('membership', 'create', $params);
 
-    $params = array(
+    $params = [
       'contribution_id' => $this->_contribution['id'],
       'membership_id' => $membership['id'],
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('membership_payment', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
+    ];
+    $result = $this->callAPIAndDocument('membership_payment', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $membership['id'], 'Check Membership Id in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $this->_contribution['id'], 'Check Contribution Id in line ' . __LINE__);
 
   }
 
-
   ///////////////// civicrm_membershipPayment_get methods
-
-  /**
-   * Test civicrm_membershipPayment_get with wrong params type.
-   */
-  public function testGetWrongParamsType() {
-    $params = 'eeee';
-    $GetWrongParamsType = civicrm_api('membership_payment', 'get', $params);
-    $this->assertEquals($GetWrongParamsType['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
-   * Test civicrm_membershipPayment_get with empty params.
-   */
-  public function testGetEmptyParams() {
-    $params = array();
-    $GetEmptyParams = civicrm_api('membership_payment', 'get', $params);
-    $this->assertEquals($GetEmptyParams['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
 
   /**
    * Test civicrm_membershipPayment_get - success expected.
    */
   public function testGet() {
-    $contactId = $this->individualCreate(NULL);
-    $params = array(
+    $contactId = $this->individualCreate();
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-      'version' => $this->_apiversion,
-    );
-    $ids = array();
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+    ];
 
-    $params = array(
+    $membership = $this->callAPISuccess('membership', 'create', $params);
+
+    $params = [
       'contribution_id' => $this->_contribution['id'],
-      'membership_id' => $membership->id,
-      'version' => $this->_apiversion,
-    );
-    civicrm_api('membership_payment', 'create', $params);
+      'membership_id' => $membership['id'],
+    ];
+    $this->callAPISuccess('membership_payment', 'create', $params);
 
-    $result = civicrm_api('membership_payment', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals($result['values'][$result['id']]['membership_id'], $membership->id, 'Check Membership Id');
-    $this->assertEquals($result['values'][$result['id']]['contribution_id'], $this->_contribution['id'], 'Check Contribution Id');
-
+    $result = $this->callAPIAndDocument('membership_payment', 'get', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals($result['values'][$result['id']]['membership_id'], $params['membership_id'], 'Check Membership Id');
+    $this->assertEquals($result['values'][$result['id']]['contribution_id'], $params['contribution_id'], 'Check Contribution Id');
   }
-}
 
+}

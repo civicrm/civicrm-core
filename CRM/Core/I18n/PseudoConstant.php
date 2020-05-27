@@ -1,70 +1,47 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_I18n_PseudoConstant {
-  static function &languages() {
-    static $languages = NULL;
-    if ($languages === NULL) {
-      $rows = array();
-      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows, 'weight', TRUE);
 
-      $languages = array();
-      foreach ($rows as $row) {
-        $languages[$row['name']] = $row['label'];
-      }
-    }
-    return $languages;
-  }
-
-  static function longForShort($short) {
+  /**
+   * @param $short
+   *
+   * @return mixed
+   */
+  public static function longForShort($short) {
     $longForShortMapping = self::longForShortMapping();
     return $longForShortMapping[$short];
   }
 
-  static function &longForShortMapping() {
+  /**
+   * @return array
+   */
+  public static function &longForShortMapping() {
     static $longForShortMapping = NULL;
     if ($longForShortMapping === NULL) {
-      $rows = array();
-      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows);
+      $rows = [];
+      CRM_Core_OptionValue::getValues(['name' => 'languages'], $rows);
 
-      $longForShortMapping = array();
+      $longForShortMapping = [];
       foreach ($rows as $row) {
         $longForShortMapping[$row['value']] = $row['name'];
       }
       // hand-crafted enforced overrides for language variants
-      // NB: when adding support for a regional override for a new language below, update 
-      // relevant comments in templates/CRM/common/civicrm.settings.php.tpl as well
+      // NB: when adding support for a regional override for a new language below, update
+      // relevant comments in templates/CRM/common/civicrm.settings.php.template as well
       $longForShortMapping['zh'] = defined("CIVICRM_LANGUAGE_MAPPING_ZH") ? CIVICRM_LANGUAGE_MAPPING_ZH : 'zh_CN';
       $longForShortMapping['en'] = defined("CIVICRM_LANGUAGE_MAPPING_EN") ? CIVICRM_LANGUAGE_MAPPING_EN : 'en_US';
       $longForShortMapping['fr'] = defined("CIVICRM_LANGUAGE_MAPPING_FR") ? CIVICRM_LANGUAGE_MAPPING_FR : 'fr_FR';
@@ -74,8 +51,29 @@ class CRM_Core_I18n_PseudoConstant {
     return $longForShortMapping;
   }
 
-  static function shortForLong($long) {
+  /**
+   * @param $long
+   *
+   * @return string
+   */
+  public static function shortForLong($long) {
     return substr($long, 0, 2);
   }
-}
 
+  /**
+   * Returns a list of ISO 639-1 "right-to-left" language codes.
+   *
+   * @return array
+   */
+  public static function getRTLlanguages() {
+    $rtl = [
+      'ar',
+      'fa',
+      'he',
+      'ur',
+    ];
+
+    return $rtl;
+  }
+
+}

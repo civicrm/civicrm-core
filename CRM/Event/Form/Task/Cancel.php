@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -39,21 +23,18 @@
 class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
 
   /**
-   * variable to store redirect path
-   *
+   * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
-   * build all the data structures needed to build the form
+   * Build all the data structures needed to build the form.
    *
    * @return void
-   * @access public
    */
-  function preProcess() {
-    /*
-     * initialize the task and row fields
-     */
+  public function preProcess() {
+    // initialize the task and row fields
     parent::preProcess();
 
     $session = CRM_Core_Session::singleton();
@@ -61,28 +42,26 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form
+   * Build the form object.
    *
-   * @access public
    *
    * @return void
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Cancel Registration for Event Participation'));
     $session = CRM_Core_Session::singleton();
-    $this->addDefaultButtons(ts('Continue'), 'done');
+    $this->addDefaultButtons(ts('Cancel Registrations'), 'done');
   }
 
   /**
-   * process the form after the input has been submitted and validated
+   * Process the form after the input has been submitted and validated.
    *
-   * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
-    $value = array();
+    $value = [];
 
     foreach ($this->_participantIds as $participantId) {
       $value['id'] = $participantId;
@@ -92,6 +71,5 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
       CRM_Event_BAO_Participant::create($value);
     }
   }
-  //end of function
-}
 
+}

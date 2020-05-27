@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CustomData>
+  <CustomGroups>
+    <CustomGroup>
+      <name>example</name>
+      <title>example</title>
+      <extends>Contact</extends>
+      <style>Inline</style>
+      <collapse_display>0</collapse_display>
+      <help_pre></help_pre>
+      <help_post></help_post>
+      <weight>1</weight>
+      <is_active>1</is_active>
+      <table_name>civicrm_value_example_1</table_name>
+      <is_multiple>0</is_multiple>
+      <collapse_adv_display>0</collapse_adv_display>
+      <is_reserved>0</is_reserved>
+      <is_public>1</is_public>
+    </CustomGroup>
+  </CustomGroups>
+  <CustomFields>
+    <CustomField>
+      <name>Our_select_field</name>
+      <label>Our select field</label>
+      <data_type>String</data_type>
+      <html_type>Select</html_type>
+      <is_required>1</is_required>
+      <is_searchable>0</is_searchable>
+      <is_search_range>0</is_search_range>
+      <weight>4</weight>
+      <is_active>1</is_active>
+      <is_view>0</is_view>
+      <column_name>our_select_field_1</column_name>
+      <in_selector>0</in_selector>
+      <option_group_name>our_select_field_20130818044104</option_group_name>
+      <custom_group_name>example</custom_group_name>
+    </CustomField>
+  </CustomFields>
+  <OptionGroups>
+    <OptionGroup>
+      <name>our_select_field_20130818044104</name>
+      <title>Our select field</title>
+      <is_reserved>1</is_reserved>
+      <is_active>1</is_active>
+    </OptionGroup>
+  </OptionGroups>
+  <OptionValues>
+    <OptionValue>
+      <label>Label1</label>
+      <value>1</value>
+      <name>Label1</name>
+      <is_default>0</is_default>
+      <weight>1</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>our_select_field_20130818044104</option_group_name>
+    </OptionValue>
+    <OptionValue>
+      <label>Label2</label>
+      <value>2</value>
+      <name>Label2</name>
+      <is_default>0</is_default>
+      <weight>2</weight>
+      <is_optgroup>0</is_optgroup>
+      <is_reserved>0</is_reserved>
+      <is_active>1</is_active>
+      <option_group_name>our_select_field_20130818044104</option_group_name>
+    </OptionValue>
+  </OptionValues>
+</CustomData>

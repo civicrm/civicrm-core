@@ -1,41 +1,33 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_SearchCustom {
 
-  static function details($csID, $ssID = NULL, $gID = NULL) {
-    $error = array(NULL, NULL, NULL);
+  /**
+   * Get details.
+   *
+   * @param int $csID
+   * @param int $ssID
+   * @param int $gID
+   *
+   * @return array
+   * @throws Exception
+   */
+  public static function details($csID, $ssID = NULL, $gID = NULL) {
+    $error = [NULL, NULL, NULL];
 
     if (!$csID &&
       !$ssID &&
@@ -45,7 +37,7 @@ class CRM_Contact_BAO_SearchCustom {
     }
 
     $customSearchID = $csID;
-    $formValues = array();
+    $formValues = [];
     if ($ssID || $gID) {
       if ($gID) {
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $gID, 'saved_search_id');
@@ -63,35 +55,41 @@ class CRM_Contact_BAO_SearchCustom {
 
     // check that the csid exists in the db along with the right file
     // and implements the right interface
-    $customSearchClass = CRM_Core_OptionGroup::getLabel('custom_search',
-      $customSearchID
-    );
-    if (!$customSearchClass) {
-      return $error;
-    }
+    $customSearchClass = civicrm_api3('OptionValue', 'getvalue', [
+      'option_group_id' => 'custom_search',
+      'return' => 'name',
+      'value' => $customSearchID,
+    ]);
 
     $ext = CRM_Extension_System::singleton()->getMapper();
 
     if (!$ext->isExtensionKey($customSearchClass)) {
       $customSearchFile = str_replace('_',
-        DIRECTORY_SEPARATOR,
-        $customSearchClass
-      ) . '.php';
+          DIRECTORY_SEPARATOR,
+          $customSearchClass
+        ) . '.php';
     }
     else {
       $customSearchFile = $ext->keyToPath($customSearchClass);
       $customSearchClass = $ext->keyToClass($customSearchClass);
     }
 
-    $error = include_once ($customSearchFile);
+    $error = include_once $customSearchFile;
     if ($error == FALSE) {
       CRM_Core_Error::fatal('Custom search file: ' . $customSearchFile . ' does not exist. Please verify your custom search settings in CiviCRM administrative panel.');
     }
 
-    return array($customSearchID, $customSearchClass, $formValues);
+    return [$customSearchID, $customSearchClass, $formValues];
   }
 
-  static function customClass($csID, $ssID) {
+  /**
+   * @param int $csID
+   * @param int $ssID
+   *
+   * @return CRM_Contact_Form_Search_Custom_Base
+   * @throws Exception
+   */
+  public static function customClass($csID, $ssID) {
     list($customSearchID, $customSearchClass, $formValues) = self::details($csID, $ssID);
 
     if (!$customSearchID) {
@@ -99,21 +97,32 @@ class CRM_Contact_BAO_SearchCustom {
     }
 
     // instantiate the new class
-    eval('$customClass = new ' . $customSearchClass . '( $formValues );');
+    $customClass = new $customSearchClass($formValues);
 
     return $customClass;
   }
 
-  static function contactIDSQL($csID, $ssID) {
+  /**
+   * @param int $csID
+   * @param int $ssID
+   *
+   * @return mixed
+   */
+  public static function contactIDSQL($csID, $ssID) {
     $customClass = self::customClass($csID, $ssID);
     return $customClass->contactIDs();
   }
 
-  static function &buildFormValues($args) {
+  /**
+   * @param $args
+   *
+   * @return array
+   */
+  public static function &buildFormValues($args) {
     $args = trim($args);
 
     $values = explode("\n", $args);
-    $formValues = array();
+    $formValues = [];
     foreach ($values as $value) {
       list($n, $v) = CRM_Utils_System::explode('=', $value, 2);
       if (!empty($v)) {
@@ -123,14 +132,19 @@ class CRM_Contact_BAO_SearchCustom {
     return $formValues;
   }
 
-  static function fromWhereEmail($csID, $ssID) {
+  /**
+   * @param int $csID
+   * @param int $ssID
+   *
+   * @return array
+   */
+  public static function fromWhereEmail($csID, $ssID) {
     $customClass = self::customClass($csID, $ssID);
 
     $from = $customClass->from();
     $where = $customClass->where();
 
-
-    return array($from, $where);
+    return [$from, $where];
   }
-}
 
+}

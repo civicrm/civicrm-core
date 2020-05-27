@@ -13,7 +13,7 @@ WHERE cog.name = 'account_type';
     SET label_{$locale} = 'Financial Type'
     WHERE field_name = 'financial_type' AND label_{$locale} = 'Contribution Type';
   {/foreach}
-  
+
 {else}
   UPDATE civicrm_uf_field
   SET  field_name = 'financial_type',

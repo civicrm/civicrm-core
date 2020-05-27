@@ -14,8 +14,7 @@ Thank you for your participation.  This letter is a confirmation that your regis
 {ts}You have been added to the WAIT LIST for this event.{/ts}
 
 {if $isPrimary}
-{ts}If space becomes available you will receive an email with
-a link to a web page where you can complete your registration.{/ts}
+{ts}If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
@@ -25,9 +24,7 @@ a link to a web page where you can complete your registration.{/ts}
 {ts}Your registration has been submitted.{/ts}
 
 {if $isPrimary}
-{ts}Once your registration has been reviewed, you will receive
-an email with a link to a web page where you can complete the
-registration process.{/ts}
+{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}
 
 {/if}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
@@ -162,14 +159,14 @@ You were registered by: {$payer.name}
         {/foreach}
       {if $lineItemCount < 1 }
         {assign var="lineItemCount" value=1}
-      {/if}	
+      {/if}
       {assign var="count" value=$count+$lineItemCount}
       {/if}
       {/foreach}
 
 {ts}Total Participants{/ts}: {$count}
 {/if}
-  
+
 {if $register_date}
 {ts}Registration Date{/ts}: {$register_date|crmDate}
 {/if}
@@ -233,7 +230,7 @@ You were registered by: {$payer.name}
 {foreach from=$customPost item=customPos key=j}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
-{$customPost_grouptitle.$j} 
+{$customPost_grouptitle.$j}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
 {foreach from=$customPos item=customValue key=customName}

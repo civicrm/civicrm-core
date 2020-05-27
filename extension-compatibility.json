@@ -1,0 +1,36 @@
+{
+  "com.civibridge.quickmenu": {
+    "obsolete": "5.24",
+    "disable": true,
+    "uninstall": true
+  },
+  "org.civicrm.exportui": {
+    "obsolete": "5.23",
+    "disable": true,
+    "uninstall": true
+  },
+  "org.civicrm.api4": {
+    "obsolete": "5.19",
+    "force-uninstall": true
+  },
+  "uk.squiffle.kam": {
+    "obsolete": "5.12",
+    "disable": true,
+    "uninstall": true
+  },
+  "com.aghstrategies.slicknav": {
+    "obsolete": "5.12",
+    "disable": true,
+    "uninstall": true
+  },
+  "de.systopia.recentitems": {
+    "obsolete": "5.12",
+    "disable": true,
+    "uninstall": true
+  },
+  "com.ixiam.modules.quicksearch": {
+    "obsolete": "5.8",
+    "disable": true,
+    "uninstall": true
+  }
+}

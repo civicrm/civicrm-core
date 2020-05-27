@@ -1,33 +1,16 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Advanced Search Criteria Fieldset *}
 {literal}
 <script type="text/javascript">
-cj(function($) {
-  $().crmAccordions();
+CRM.$(function($) {
   // Bind first click of accordion header to load crm-accordion-body with snippet
   // everything else is taken care of by crmAccordions()
   $('.crm-search_criteria_basic-accordion .crm-accordion-header').addClass('active');
@@ -57,13 +40,7 @@ cj(function($) {
     return false;
   });
   // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-  var modes = {
-    '2': 'CiviContribute',
-    '3': 'CiviEvent',
-    '4': 'activity',
-    '5': 'CiviMember',
-    '6': 'CiviCase',
-  };
+  var modes = {/literal}{$component_mappings}{literal};
   // Handle change of results mode
   $('#component_mode').change(function() {
     // Reset task dropdown
@@ -73,7 +50,7 @@ cj(function($) {
       $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
       loadPanes(mode);
     }
-    if ($('#component_mode').val() == '7') {
+    if ('related_contact' === modes[$('#component_mode').val()]) {
       $('#crm-display_relationship_type').show();
     }
     else {
@@ -85,61 +62,75 @@ cj(function($) {
   * Loads snippet based on id of crm-accordion-header
   */
   function loadPanes(id) {
-    var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="snippet=1&qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
+    var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
     var header = $('#' + id);
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('{/literal}<a href="#" class="crm-close-accordion" title="{ts escape='js'}Remove from search criteria{/ts}"><span>{ts escape='js'}Reset{/ts}</span> &nbsp;<img src="{$config->resourceBase}i/close.png" /></a>{literal}');
+      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{literal}');
       header.addClass('active');
-      $.ajax({
-        url : url,
-        success: function(data) {
-          body.html(data);
-        },
-        error: function() {
-          CRM.alert({/literal}'{ts escape="js"}Sorry, could not load the requested information from the server.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal});
-          $('.crm-close-accordion', header).click();
-        }
-      });
+      CRM.loadPage(url, {target: body, block: false});
     }
   }
 });
 </script>
 {/literal}
 
-    {if $context EQ 'smog' || $context EQ 'amtg' || $savedSearch}
-          <h3>
-          {if $context EQ 'smog'}{ts}Find Contacts within this Group{/ts}
-          {elseif $context EQ 'amtg'}{ts}Find Contacts to Add to this Group{/ts}
-          {elseif $savedSearch}{ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts} &nbsp; {help id='id-advanced-smart'}
-          {/if}
-          </h3>
-        {/if}
+{if $context EQ 'smog' || $context EQ 'amtg' || $savedSearch}
+  <h3>
+    {if $context EQ 'smog'}{ts}Find Contacts within this Group{/ts}
+    {elseif $context EQ 'amtg'}{ts}Find Contacts to Add to this Group{/ts}
+    {elseif $savedSearch}{ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts} &nbsp; {help id='id-advanced-smart'}
+    {/if}
+  </h3>
+{/if}
 
 {strip}
-<div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
-  <div class="crm-accordion-header">
-    {ts}Basic Criteria{/ts}
-  </div><!-- /.crm-accordion-header -->
- <div class="crm-accordion-body">
+  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+    <div class="crm-accordion-header">
+      {ts}Display Settings For Results{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      {include file="CRM/Contact/Form/Search/Criteria/DisplaySettings.tpl"}
+    </div>
+  </div>
+  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+    <div class="crm-accordion-header">
+      {ts}Search Settings{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      {include file="CRM/Contact/Form/Search/Criteria/SearchSettings.tpl"}
+    </div>
+  </div>
+  <div class="crm-accordion-wrapper crm-search_criteria_basic-accordion ">
+    <div class="crm-accordion-header">
+      {ts}Basic Criteria{/ts}
+    </div>
+    <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/Criteria/Basic.tpl"}
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </div>
+  {foreach from=$allPanes key=paneName item=paneValue}
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || $openedPanes.$paneName} {else}collapsed{/if}">
+      <div class="crm-accordion-header" id="{$paneValue.id}">
+        {$paneName}
+      </div>
+    <div class="crm-accordion-body {$paneValue.id}"></div>
+    </div><!-- Surplus /div is required (not sure why but breakage is obvious when you remove it) -->
+  {/foreach}
+  <div class="spacer"></div>
 
-    {foreach from=$allPanes key=paneName item=paneValue}
-      <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' and $openedPanes.$paneName} {else}collapsed{/if}">
-       <div class="crm-accordion-header" id="{$paneValue.id}">
-         {$paneName}
-       </div>
-       <div class="crm-accordion-body {$paneValue.id}"></div>
-       </div>
-    {/foreach}
-    <div class="spacer"></div>
-
-    <table class="form-layout">
-        <tr>
-            <td>{$form.buttons.html}</td>
-        </tr>
-    </table>
+  <table class="form-layout">
+    <tr>
+      <td>
+        {include file="CRM/common/formButtons.tpl" location="bottom"}
+        <div class="crm-submit-buttons reset-advanced-search">
+          <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+            <i class="crm-i fa-undo" aria-hidden="true"></i>
+            &nbsp;{ts}Reset Form{/ts}
+          </a>
+        </div>
+      </td>
+    </tr>
+  </table>
 {/strip}

@@ -1,74 +1,53 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
  * Ensure that the extended interface for SQL-backed queues
  * work. For example, the createItem() interface supports
  * priority-queueing.
+ * @group headless
  */
 class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
-  function get_info() {
-    return array(
-      'name' => 'SQL Queue',
-      'description' => 'Test SQL-backed queue items',
-      'group' => 'Queue',
-    );
-  }
 
   /* ----------------------- Queue providers ----------------------- */
 
   /* Define a list of queue providers which should be tested */
 
   /**
-   * Return a list of persistent and transient queue providers
+   * Return a list of persistent and transient queue providers.
    */
-  function getQueueSpecs() {
-    $queueSpecs = array();
-    $queueSpecs[] = array(
-      array(
+  public function getQueueSpecs() {
+    $queueSpecs = [];
+    $queueSpecs[] = [
+      [
         'type' => 'Sql',
         'name' => 'test-queue',
-      ));
+      ],
+    ];
     return $queueSpecs;
   }
 
-  /* ----------------------- Per-provider tests ----------------------- */
-  function setUp() {
+  /**
+   * Per-provider tests
+   *
+   */
+  public function setUp() {
     parent::setUp();
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
   }
 
-  function tearDown() {
+  public function tearDown() {
     CRM_Utils_Time::resetTime();
 
-    $tablesToTruncate = array('civicrm_queue_item');
+    $tablesToTruncate = ['civicrm_queue_item'];
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -76,20 +55,21 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
    * Create a few queue items; alternately enqueue and dequeue various
    *
    * @dataProvider getQueueSpecs
+   * @param $queueSpec
    */
-  function testPriorities($queueSpec) {
+  public function testPriorities($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
-    $this->queue->createItem(array(
-        'test-key' => 'a',
-      ));
-    $this->queue->createItem(array(
-        'test-key' => 'b',
-      ));
-    $this->queue->createItem(array(
-        'test-key' => 'c',
-      ));
+    $this->queue->createItem([
+      'test-key' => 'a',
+    ]);
+    $this->queue->createItem([
+      'test-key' => 'b',
+    ]);
+    $this->queue->createItem([
+      'test-key' => 'c',
+    ]);
 
     $this->assertEquals(3, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -102,24 +82,24 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $this->queue->deleteItem($item);
 
     $this->queue->createItem(
-      array(
+      [
         'test-key' => 'start',
-      ), 
-      array(
+      ],
+      [
         'weight' => -1,
-      )
+      ]
     );
     $this->queue->createItem(
-      array(
+      [
         'test-key' => 'end',
-      ), 
-      array(
+      ],
+      [
         'weight' => 1,
-      )
+      ]
     );
-    $this->queue->createItem(array(
-        'test-key' => 'd',
-      ));
+    $this->queue->createItem([
+      'test-key' => 'd',
+    ]);
 
     $this->assertEquals(4, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -145,4 +125,3 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
   }
 
 }
-

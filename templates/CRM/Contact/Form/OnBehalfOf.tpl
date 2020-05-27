@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This file provides the HTML for the on-behalf-of form. Can also be used for related contact edit form. *}
@@ -69,15 +53,6 @@
    <fieldset><legend></legend>
  {/if}
   <div class="crm-section organizationName-section">
-      {if $relatedOrganizationFound}
-      <div class="section crm-section">
-    <div class="content">{$form.org_option.html}</div>
-      </div>
-      <div id="select_org" class="crm-section select_org-section">
-        <div class="label">{$form.organization_name.label}</div>
-        <div class="content">{$form.organization_id.html|crmAddClass:big}</div>
-      </div>
-      {/if}
       <div id="create_org" class="crm-section create_org-section">
     <div class="label">{$form.organization_name.label}</div>
         <div class="content">{$form.organization_name.html|crmAddClass:big}</div>
@@ -149,6 +124,13 @@
             <div class="clear"></div>
         </div>
         {/if}
+        {if $addressSequence.supplemental_address_3}
+    <div class="crm-section {$form.address.$index.supplemental_address_3.id}-section">
+            <div class="label">{$form.address.$index.supplemental_address_3.label}</div>
+            <div class="content">{$form.address.$index.supplemental_address_3.html}</div>
+            <div class="clear"></div>
+        </div>
+        {/if}
         {if $addressSequence.city}
     <div class="crm-section {$form.address.$index.city.id}<-section">
             <div class="label">{$form.address.$index.city.label}</div>
@@ -189,7 +171,7 @@
             <div class="content">{$form.address.$index.geo_code_1.html}, {$form.address.$index.geo_code_2.html}
                 <br class="spacer"/>
                 <span class="description">
-                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-setup" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
+                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
             </div>
             <div class="clear"></div>
         </div>
@@ -229,52 +211,3 @@
          invert              = "false"
     }
 {/if}
-
-{literal}
-<script type="text/javascript">
-{/literal}
-{* If mid present in the url, take the required action (poping up related existing contact ..etc) *}
-{if $membershipContactID}
-    {literal}
-    cj( function( ) {
-        cj( '#organization_id' ).val("{/literal}{$membershipContactName}{literal}");
-        cj( '#organization_name' ).val("{/literal}{$membershipContactName}{literal}");
-        cj( '#onbehalfof_id' ).val("{/literal}{$membershipContactID}{literal}");
-        setLocationDetails( "{/literal}{$membershipContactID}{literal}" );
-    });
-    {/literal}
-{/if}
-{* Javascript method to populate the location fields when a different existing related contact is selected *}
-{literal}
-    var dataUrl   = "{/literal}{$employerDataURL}{literal}";
-    cj('#organization_id').autocomplete( dataUrl, { width : 180, selectFirst : false, matchContains: true, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-    }).result( function(event, data, formatted) {
-        cj('#organization_name').val( data[0] );
-        cj('#onbehalfof_id').val( data[1] );
-        setLocationDetails( data[1] );
-    });
-
-    var orgId = {/literal}"{$orgId}"{literal};
-    if ( orgId ) {
-        setLocationDetails( orgId );
-    }
-
-    function setLocationDetails( contactID ) {
-        var locationUrl = {/literal}"{$locDataURL}"{literal}+ contactID + "&relContact=1";
-
-        cj.ajax({
-            url         : locationUrl,
-            dataType    : "json",
-            timeout     : 5000, //Time in milliseconds
-            success     : function( data, status ) {
-                for (var ele in data) {
-                    cj( "#"+ele ).val( data[ele] );
-                }
-            },
-            error       : function( XMLHttpRequest, textStatus, errorThrown ) {
-                console.error("HTTP error status: ", textStatus);
-            }
-        });
-    }
-</script>
-{/literal}

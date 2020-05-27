@@ -1,60 +1,41 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class provides the functionality to add contacts for
- * voter reservation.
+ * This class provides the functionality to add contacts for voter reservation.
  */
 class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
 
   /**
-   * survet id
+   * Survet id
    *
    * @var int
    */
   protected $_surveyId;
 
   /**
-   * number of voters
+   * Number of voters
    *
    * @var int
    */
   protected $_interviewerId;
 
   /**
-   * survey details
+   * Survey details
    *
    * @var object
    */
@@ -63,16 +44,17 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   protected $_surveyActivities;
 
   /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */ function preProcess() {
+   * Build all the data structures needed to build the form.
+   */
+  public function preProcess() {
     $this->_interviewToRelease = $this->get('interviewToRelease');
     if ($this->_interviewToRelease) {
       //user came from interview form.
-      foreach (array(
-        'surveyId', 'contactIds', 'interviewerId') as $fld) {
+      foreach ([
+        'surveyId',
+        'contactIds',
+        'interviewerId',
+      ] as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
 
@@ -97,14 +79,13 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       CRM_Core_Error::statusBounce(ts('Could not find respondents to release.'));
     }
 
-    $surveyDetails = array();
-    $params = array('id' => $this->_surveyId);
+    $surveyDetails = [];
+    $params = ['id' => $this->_surveyId];
     $this->_surveyDetails = CRM_Campaign_BAO_Survey::retrieve($params, $surveyDetails);
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-    $statusIds = array();
-    foreach (array(
-      'Scheduled') as $name) {
+    $statusIds = [];
+    foreach (['Scheduled'] as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }
@@ -124,7 +105,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     //append breadcrumb to survey dashboard.
     if (CRM_Campaign_BAO_Campaign::accessCampaign()) {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
-      CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Survey(s)'), 'url' => $url)));
+      CRM_Utils_System::appendBreadCrumb([['title' => ts('Survey(s)'), 'url' => $url]]);
     }
 
     //set the title.
@@ -132,38 +113,44 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   }
 
   /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
+   * Build the form object.
    */
-  function buildQuickForm() {
+  public function buildQuickForm() {
 
     $this->addDefaultButtons(ts('Release Respondents'), 'done');
   }
 
-  function postProcess() {
-    $deleteActivityIds = array();
+  public function postProcess() {
+    $deleteActivityIds = [];
     foreach ($this->_contactIds as $cid) {
       if (array_key_exists($cid, $this->_surveyActivities)) {
         $deleteActivityIds[] = $this->_surveyActivities[$cid]['activity_id'];
       }
     }
 
-    //set survey activites as deleted = true.
+    //set survey activities as deleted = true.
     if (!empty($deleteActivityIds)) {
       $query = 'UPDATE civicrm_activity SET is_deleted = 1 WHERE id IN ( ' . implode(', ', $deleteActivityIds) . ' )';
       CRM_Core_DAO::executeQuery($query);
 
-      $status = array(ts("%1 respondent(s) have been released.", array(1 => count($deleteActivityIds))));
-      if (count($this->_contactIds) > count($deleteActivityIds)) {
-        $status[] = ts("%1 respondents did not release.",
-          array(1 => (count($this->_contactIds) - count($deleteActivityIds)))
-        );
+      if ($deleteActivityIds) {
+        $status = ts("Respondent has been released.", [
+          'count' => count($deleteActivityIds),
+          'plural' => '%count respondents have been released.',
+        ]);
+        CRM_Core_Session::setStatus($status, ts('Released'), 'success');
       }
-      CRM_Core_Session::setStatus(implode('&nbsp;', $status), '', 'info');
+
+      if (count($this->_contactIds) > count($deleteActivityIds)) {
+        $status = ts('1 respondent did not release.',
+          [
+            'count' => (count($this->_contactIds) - count($deleteActivityIds)),
+            'plural' => '%count respondents did not release.',
+          ]
+        );
+        CRM_Core_Session::setStatus($status, ts('Notice'), 'alert');
+      }
     }
   }
-}
 
+}

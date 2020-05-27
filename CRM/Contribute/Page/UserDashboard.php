@@ -1,63 +1,72 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
   /**
-   * This function is called when action is browse
-   *
-   * return null
-   * @access public
+   * called when action is browse.
    */
-  function listContribution() {
-    $controller = new CRM_Core_Controller_Simple(
-      'CRM_Contribute_Form_Search',
-      ts('Contributions'),
-      NULL,
-      FALSE, FALSE, TRUE, FALSE
-    );
-    $controller->setEmbedded(TRUE);
-    $controller->reset();
-    $controller->set('limit', 12);
-    $controller->set('cid', $this->_contactId);
-    $controller->set('context', 'user');
-    $controller->set('force', 1);
-    $controller->process();
-    $controller->run();
+  public function listContribution() {
+    $rows = civicrm_api3('Contribution', 'get', [
+      'options' => [
+        'limit' => 12,
+        'sort' => 'receive_date DESC',
+      ],
+      'sequential' => 1,
+      'contact_id' => $this->_contactId,
+      'return' => [
+        'total_amount',
+        'contribution_recur_id',
+        'financial_type',
+        'receive_date',
+        'receipt_date',
+        'contribution_status',
+        'currency',
+        'amount_level',
+        'contact_id,',
+        'contribution_source',
+      ],
+    ])['values'];
+
+    // We want oldest first, just among the most recent contributions
+    $rows = array_reverse($rows);
+
+    foreach ($rows as $index => &$row) {
+      // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
+      // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
+      // and allow extensions to assign new ones through the pageRun hook
+      if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id'])) {
+        $row['buttons']['pay'] = [
+          'class' => 'button',
+          'label' => ts('Pay Now'),
+          'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
+            'reset' => 1,
+            'id' => Civi::settings()->get('default_invoice_page'),
+            'ccid' => $row['contribution_id'],
+            'cs' => $this->getUserChecksum(),
+            'cid' => $row['contact_id'],
+          ]),
+        ];
+      }
+    }
+
+    $this->assign('contribute_rows', $rows);
+    $this->assign('contributionSummary', ['total_amount' => civicrm_api3('Contribution', 'getcount', ['contact_id' => $this->_contactId])]);
 
     //add honor block
-    $params = array();
     $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
 
     if (!empty($params)) {
@@ -66,29 +75,21 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       $this->assign('honor', TRUE);
     }
 
-
-    $recur             = new CRM_Contribute_DAO_ContributionRecur();
+    $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->contact_id = $this->_contactId;
-    $recur->is_test    = 0;
+    $recur->is_test = 0;
     $recur->find();
 
-    $config = CRM_Core_Config::singleton();
+    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
 
-    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-
-    $recurRow = array();
-    $recurIDs = array();
+    $recurRow = [];
+    $recurIDs = [];
     while ($recur->fetch()) {
-      $mode = $recur->is_test ? 'test' : 'live';
-      $paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($recur->id,
-        $mode
-      );
-      if (!$paymentProcessor) {
+      if (empty($recur->payment_processor_id)) {
+        // it's not clear why we continue here as any without a processor id would likely
+        // be imported from another system & still seem valid.
         continue;
       }
-
-      // note that we are passing a CRM_Core_Page object ($this) as if it were a form here:
-      $paymentObject = CRM_Core_Payment::singleton($mode, $paymentProcessor, $this);
 
       require_once 'api/v3/utils.php';
       //@todo calling api functions directly is not supported
@@ -107,18 +108,19 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       }
 
       $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
-        $action, array(
+        $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],
           'cxt' => 'contribution',
-        )
+        ],
+        ts('more'),
+        FALSE,
+        'contribution.dashboard.recurring',
+        'Contribution',
+        $values['id']
       );
 
       $recurIDs[] = $values['id'];
-
-      //reset $paymentObject for checking other paymenet processor
-      //recurring url
-      $paymentObject = NULL;
     }
     if (is_array($recurIDs) && !empty($recurIDs)) {
       $getCount = CRM_Contribute_BAO_ContributionRecur::getCount($recurIDs);
@@ -140,15 +142,29 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
   }
 
   /**
-   * This function is the main function that is called when the page
-   * loads, it decides the which action has to be taken for the page.
+   * Should invoice links be displayed on the template.
    *
-   * return null
-   * @access public
+   * @todo This should be moved to a hook-like structure on the invoicing class
+   * (currently CRM_Utils_Invoicing) with a view to possible removal from core.
    */
-  function run() {
+  public function isIncludeInvoiceLinks() {
+    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      return FALSE;
+    }
+    $dashboardOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'user_dashboard_options'
+    );
+    return $dashboardOptions['Invoices / Credit Notes'];
+  }
+
+  /**
+   * the main function that is called when the page
+   * loads, it decides the which action has to be taken for the page.
+   */
+  public function run() {
+    $this->assign('isIncludeInvoiceLinks', $this->isIncludeInvoiceLinks());
     parent::preProcess();
     $this->listContribution();
   }
-}
 
+}

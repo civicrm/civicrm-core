@@ -1,67 +1,49 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * This class generates form components for case report
- *
+ * This class generates form components for case report.
  */
 class CRM_Case_Form_Report extends CRM_Core_Form {
 
   /**
    * Case Id
+   * @var int
    */
   public $_caseID = NULL;
 
   /**
    * Client Id
+   * @var int
    */
   public $_clientID = NULL;
 
   /**
-   * activity set name
+   * Activity set name
+   * @var string
    */
   public $_activitySetName = NULL;
 
   public $_report = NULL;
 
   /**
-   * Function to build the form
-   *
-   * @return None
-   * @access public
-   */ function preProcess() {
+   * Build the form object.
+   */
+  public function preProcess() {
     $this->_caseID = CRM_Utils_Request::retrieve('caseid', 'Integer', $this, TRUE);
     $this->_clientID = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
     $this->_activitySetName = CRM_Utils_Request::retrieve('asn', 'String', $this, TRUE);
@@ -84,9 +66,10 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       return;
     }
 
-    $includeActivites = array(1 => ts('Include All Activities'),
-      2 => ts('Include Missing Activities Only'),
-    );
+    $includeActivites = [
+      1 => ts('All Activities'),
+      2 => ts('Exclude Completed Activities'),
+    ];
     $includeActivitesGroup = $this->addRadio('include_activities',
       NULL,
       $includeActivites,
@@ -101,39 +84,42 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       ts('Redact (hide) Client and Service Provider Data')
     );
 
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Generate Report'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'refresh',
+        'name' => ts('Generate Report'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
+    // We want this form to redirect to a full page
+    $this->preventAjaxSubmit();
   }
 
   /**
-   * Function to process the form
-   *
-   * @access public
-   *
-   * @return None
+   * Process the form submission.
    */
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $xmlProcessor = new CRM_Case_XMLProcessor_Report();
-    $contents = $xmlProcessor->run($this->_clientID,
-      $this->_caseID,
-      $this->_activitySetName,
-      $params
-    );
-    $this->set('report', $contents);
-  }
-}
+    // this is either a 1 or a 2, but the url expects a 1 or 0
+    $all = ($params['include_activities'] == 1) ? 1 : 0;
 
+    // similar but comes from a checkbox that's either 1 or not present
+    $is_redact = empty($params['is_redact']) ? 0 : 1;
+
+    $asn = rawurlencode($this->_activitySetName);
+
+    CRM_Utils_System::redirect(
+      CRM_Utils_System::url(
+        'civicrm/case/report/print',
+        "caseID={$this->_caseID}&cid={$this->_clientID}&asn={$asn}&redact={$is_redact}&all={$all}"
+      )
+    );
+  }
+
+}

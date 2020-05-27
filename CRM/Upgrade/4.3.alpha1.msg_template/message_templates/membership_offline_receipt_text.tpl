@@ -2,7 +2,7 @@
 {$formValues.receipt_text_signup}
 {elseif $formValues.receipt_text_renewal}
 {$formValues.receipt_text_renewal}
-{else}{ts}Thanks for your support.{/ts}{/if}
+{else}{ts}Thank you for your support.{/ts}{/if}
 
 {if ! $cancelled}{ts}Please print this receipt for your records.{/ts}
 
@@ -51,7 +51,7 @@
 {if $formValues.paidBy}
 {ts}Paid By{/ts}: {$formValues.paidBy}
 {if $formValues.check_number}
-{ts}Check Number{/ts}: {$formValues.check_number} 
+{ts}Check Number{/ts}: {$formValues.check_number}
 {/if}
 {/if}
 {/if}

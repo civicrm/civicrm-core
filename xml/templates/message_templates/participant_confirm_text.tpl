@@ -1,4 +1,7 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
+{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}
+
 {if !$isAdditional and $participant.id}
 
 ===========================================================
@@ -9,7 +12,11 @@
 Click this link to go to a web page where you can confirm your registration online:
 {$confirmUrl}
 {/if}
-
+{if $event.allow_selfcancelxfer }
+{ts 1=$event.selfcancelxfer_time}You may transfer your registration to another participant or cancel your registration up to %1 hours before the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}
+   {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participant.id`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+{ts}Transfer or cancel your registration:{/ts} {$selfService}
+{/if}
 ===========================================================
 {ts}Event Information and Location{/ts}
 
@@ -38,19 +45,7 @@ Click this link to go to a web page where you can confirm your registration onli
 {ts}Participant Role{/ts}: {$participant.role}
 
 {if $isShowLocation}
-{if $event.location.address.1.name}
-
-{$event.location.address.1.name}
-{/if}
-{if $event.location.address.1.street_address}{$event.location.address.1.street_address}
-{/if}
-{if $event.location.address.1.supplemental_address_1}{$event.location.address.1.supplemental_address_1}
-{/if}
-{if $event.location.address.1.supplemental_address_2}{$event.location.address.1.supplemental_address_2}
-{/if}
-{if $event.location.address.1.city}{$event.location.address.1.city} {$event.location.address.1.postal_code}{if $event.location.address.1.postal_code_suffix} - {$event.location.address.1.postal_code_suffix}{/if}
-{/if}
-
+{$event.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
 {if $event.location.phone.1.phone || $event.location.email.1.email}
@@ -67,8 +62,11 @@ Click this link to go to a web page where you can confirm your registration onli
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
+{if $event.is_public}
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-{ts}Download iCalendar File{/ts}: {$icalFeed}
+{ts}Download iCalendar File:{/ts} {$icalFeed}
+{/if}
+
 {if $contact.email}
 
 ===========================================================

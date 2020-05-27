@@ -1,5 +1,5 @@
 <table class="crm-info-panel">
-    {if $action EQ 1}
+    {if $extension.name}
     <tr>
         <td class="label">{ts}Name (key){/ts}</td><td>{$extension.name} ({$extension.key})</td>
     </tr>
@@ -30,6 +30,21 @@
     </tr>
     <tr>
         <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage}</td>
+    </tr>
+    <tr>
+        <td class="label">{ts}Requires{/ts}</td>
+        <td>
+            {foreach from=$extension.requires item=ext}
+                {if array_key_exists($ext, $localExtensionRows)}
+                    {$localExtensionRows.$ext.name} (already downloaded - {$ext})
+                {elseif array_key_exists($ext, $remoteExtensionRows)}
+                    {$remoteExtensionRows.$ext.name} (not downloaded - {$ext})
+                {else}
+                    {$ext} {ts}(not available){/ts}
+                {/if}
+                <br/>
+            {/foreach}
+        </td>
     </tr>
     <tr>
         <td class="label">{ts}Compatible with{/ts}</td>

@@ -1,135 +1,128 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright (C) 2011 Marty Wright                                    |
- | Licensed to CiviCRM under the Academic Free License version 3.0.   |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * Page for displaying list of Reminders
+ * Page for displaying list of Reminders.
  */
 class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
 
-  /**
-   * The action links that we need to display for the browse screen
-   *
-   * @var array
-   * @static
-   */
-  static $_links = NULL;
+  public $useLivePageJS = TRUE;
 
   /**
-   * Get BAO Name
+   * The action links that we need to display for the browse screen.
    *
-   * @return string Classname of BAO.
+   * @var array
    */
-  function getBAOName() {
+  public static $_links = NULL;
+
+  /**
+   * Get BAO Name.
+   *
+   * @return string
+   *   Classname of BAO.
+   */
+  public function getBAOName() {
     return 'CRM_Core_BAO_ActionSchedule';
   }
 
   /**
-   * Get action Links
+   * Get action Links.
    *
-   * @return array (reference) of action links
+   * @return array
+   *   (reference) of action links
    */
-  function &links() {
+  public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Schedule Reminders'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_ActionSchedule' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Label Format'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_ActionSchedule' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Label Format'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Schedule Reminders'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
   }
 
   /**
-   * Get name of edit form
+   * Get name of edit form.
    *
-   * @return string Classname of edit form.
+   * @return string
+   *   Classname of edit form.
    */
-  function editForm() {
+  public function editForm() {
     return 'CRM_Admin_Form_ScheduleReminders';
   }
 
   /**
-   * Get edit form name
+   * Get edit form name.
    *
-   * @return string name of this page.
+   * @return string
+   *   name of this page.
    */
-  function editName() {
+  public function editName() {
     return 'ScheduleReminders';
   }
 
   /**
    * Get user context.
    *
-   * @return string user context.
+   * @param null $mode
+   *
+   * @return string
+   *   user context.
    */
-  function userContext($mode = NULL) {
+  public function userContext($mode = NULL) {
     return 'civicrm/admin/scheduleReminders';
   }
 
   /**
    * Browse all Scheduled Reminders settings.
    *
-   * @return void
-   * @access public
-   * @static
+   * @param null $action
+   *
+   * @throws \CRM_Core_Exception
    */
-  function browse($action = NULL) {
+  public function browse($action = NULL) {
+    //CRM-16777: Do not permit access to user, for page 'Administer->Communication->Schedule Reminder',
+    //when do not have 'administer CiviCRM' permission.
+    if (!CRM_Core_Permission::check('administer CiviCRM')) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+
     // Get list of configured reminders
     $reminderList = CRM_Core_BAO_ActionSchedule::getList();
 
@@ -143,11 +136,20 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         else {
           $action -= CRM_Core_Action::DISABLE;
         }
-        $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+        $format['action'] = CRM_Core_Action::formLink(
+          self::links(),
+          $action,
+          ['id' => $format['id']],
+          ts('more'),
+          FALSE,
+          'actionSchedule.manage.action',
+          'ActionSchedule',
+          $format['id']
+        );
       }
     }
 
     $this->assign('rows', $reminderList);
   }
-}
 
+}

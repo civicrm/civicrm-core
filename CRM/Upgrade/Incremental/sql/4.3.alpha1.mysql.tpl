@@ -1,7 +1,7 @@
 {include file='../CRM/Upgrade/4.3.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 -- CRM-10999
-ALTER TABLE `civicrm_premiums` 
+ALTER TABLE `civicrm_premiums`
 ADD COLUMN `premiums_nothankyou_position` int(10) unsigned DEFAULT '1';
 
 -- CRM-11514 if contribution type name is null, assign it a name
@@ -31,14 +31,14 @@ ALTER TABLE civicrm_contact
 
 -- CRM-10296
 DELETE FROM civicrm_job WHERE `api_action` = 'process_membership_reminder_date';
-ALTER TABLE civicrm_membership 			DROP COLUMN reminder_date;
-ALTER TABLE civicrm_membership_log 	DROP COLUMN renewal_reminder_date;
+ALTER TABLE civicrm_membership       DROP COLUMN reminder_date;
+ALTER TABLE civicrm_membership_log   DROP COLUMN renewal_reminder_date;
 ALTER TABLE civicrm_membership_type
-	DROP COLUMN renewal_reminder_day,
-	DROP FOREIGN KEY FK_civicrm_membership_type_renewal_msg_id,
-	DROP INDEX FK_civicrm_membership_type_renewal_msg_id,
-	DROP COLUMN renewal_msg_id,
-	DROP COLUMN autorenewal_msg_id;
+  DROP COLUMN renewal_reminder_day,
+  DROP FOREIGN KEY FK_civicrm_membership_type_renewal_msg_id,
+  DROP INDEX FK_civicrm_membership_type_renewal_msg_id,
+  DROP COLUMN renewal_msg_id,
+  DROP COLUMN autorenewal_msg_id;
 
 -- CRM-10738
 ALTER TABLE civicrm_msg_template
@@ -58,7 +58,7 @@ INSERT IGNORE INTO `civicrm_state_province`(`country_id`, `abbreviation`, `name`
 {if $multilingual}
   {foreach from=$locales item=locale}
     UPDATE civicrm_option_group SET title_{$locale} = '{ts escape="sql"}Currencies Enabled{/ts}' WHERE name = "currencies_enabled";
-    ALTER TABLE `civicrm_premiums` 
+    ALTER TABLE `civicrm_premiums`
       ADD COLUMN premiums_nothankyou_label_{$locale} varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Label displayed for No Thank-you option in premiums block (e.g. No thank you)';
   {/foreach}
 {else}
@@ -125,13 +125,13 @@ ALTER TABLE civicrm_uf_field
 -- CRM-1115
 -- note that country names are not translated in the DB
 SELECT @region_id   := max(id) from civicrm_worldregion where name = "Europe and Central Asia";
-INSERT INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VALUES("Kosovo", "XK", @region_id, 0);
+INSERT IGNORE INTO civicrm_country (name,iso_code,region_id,is_province_abbreviated) VALUES("Kosovo", "XK", @region_id, 0);
 
 UPDATE civicrm_country SET name = 'Libya' WHERE name LIKE 'Libyan%';
 UPDATE civicrm_country SET name = 'Congo, Republic of the' WHERE name = 'Congo';
 
 -- CRM-10621 Add component report links to reports menu for upgrade
-SELECT @reportlastID       := MAX(id) FROM civicrm_navigation where name = 'Reports';
+SELECT @reportlastID       := MAX(id) FROM civicrm_navigation where name = 'Reports' AND domain_id = {$domainID};
 SELECT @max_weight     := MAX(ROUND(weight)) from civicrm_navigation WHERE parent_id = @reportlastID;
 
 INSERT INTO civicrm_navigation
@@ -261,23 +261,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_financial_item` (
   KEY `IX_entity` (`entity_table`,`entity_id`),
   KEY `FK_civicrm_financial_item_contact_id` (`contact_id`),
   KEY `FK_civicrm_financial_item_financial_account_id` (`financial_account_id`)
-)ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS `civicrm_payment` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Id',
-  `payment_batch_number` int(10) unsigned NOT NULL COMMENT 'Payment Batch Nnumber',
-  `payment_number` int(10) unsigned NOT NULL COMMENT 'Payment Number',
-  `financial_type_id` int(10) unsigned NOT NULL COMMENT 'Financial Type ID',
-  `contact_id` int(10) unsigned NOT NULL COMMENT 'Contact ID',
-  `payment_created_date` date DEFAULT NULL COMMENT 'Payment Created Date.',
-  `payment_date` date DEFAULT NULL COMMENT 'Payment Date.',
-  `payable_to_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Payable To Name.',
-  `payable_to_address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Payable To Address.',
-  `amount` decimal(20,2) NOT NULL COMMENT 'Requested grant amount, in default currency.',
-  `currency` varchar(3) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
-  `payment_reason` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Payment Reason.',
-  `replaces_payment_id` varchar(8) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Replaces Payment Id.',
-  PRIMARY KEY (`id`)
 )ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 ALTER TABLE `civicrm_batch`
@@ -461,7 +444,7 @@ UPDATE civicrm_navigation SET  `label` = 'Financial Types', `name` = 'Financial 
 -- CRM-9199
 -- Insert menu item at Administer > CiviContribute, below the section break below Premiums (Thank-you Gifts), just below Financial Account.
 
-SELECT @parent_id := id from `civicrm_navigation` where name = 'CiviContribute';
+SELECT @parent_id := id from `civicrm_navigation` where name = 'CiviContribute' AND domain_id = {$domainID};
 SELECT @add_weight_id := weight from `civicrm_navigation` where `name` = 'Financial Types' and `parent_id` = @parent_id;
 
 UPDATE `civicrm_navigation`
@@ -472,10 +455,10 @@ AND `weight` > @add_weight_id;
 INSERT INTO `civicrm_navigation`
         ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-	( {$domainID}, 'civicrm/admin/financial/financialAccount&reset=1',      '{ts escape="sql" skip="true"}Financial Account{/ts}', 'Financial Account', 'access CiviContribute,administer CiviCRM', 'AND', @parent_id, '1', NULL, @add_weight_id + 1 );
+  ( {$domainID}, 'civicrm/admin/financial/financialAccount&reset=1',      '{ts escape="sql" skip="true"}Financial Account{/ts}', 'Financial Account', 'access CiviContribute,administer CiviCRM', 'AND', @parent_id, '1', NULL, @add_weight_id + 1 );
 
 -- CRM-10944
-SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions';
+SELECT @contributionlastID := max(id) from civicrm_navigation where name = 'Contributions' AND domain_id = {$domainID};
 
 SELECT @pledgeWeight := weight from civicrm_navigation where name = 'Pledges' and parent_id = @contributionlastID;
 
@@ -560,22 +543,22 @@ ALTER TABLE civicrm_financial_type DROP accounting_code;
 INSERT INTO
    `civicrm_financial_account` (`name`, `contact_id`, `financial_account_type_id`, `description`, `accounting_code`, `account_type_code`, `is_reserved`, `is_active`, `is_deductible`, `is_default`)
 VALUES
-  ('{ts escape="sql"}Banking Fees{/ts}'         , @domainContactId, @opexp, 'Payment processor fees and manually recorded banking fees', '5200', 'EXP', 0, 1, 0, 0),
-  ('{ts escape="sql"}Deposit Bank Account{/ts}' , @domainContactId, @opAsset, 'All manually recorded cash and cheques go to this account', '1100', 'BANK', 0, 1, 0, 1),
-  ('{ts escape="sql"}Accounts Receivable{/ts}'  , @domainContactId, @opAsset, 'Amounts to be received later (eg pay later event revenues)', '1200', 'AR', 0, 1, 0, 0),
-  ('{ts escape="sql"}Accounts Payable{/ts}'     , @domainContactId, @opLiability, 'Amounts to be paid out such as grants and refunds', '2200', 'AP', 0, 1, 0, 0),
-  ('{ts escape="sql"}Premiums{/ts}'             , @domainContactId, @opCost, 'Account to record cost of premiums provided to payors', '5100', 'COGS', 0, 1, 0, 0),
-  ('{ts escape="sql"}Premiums Inventory{/ts}'   , @domainContactId, @opAsset, 'Account representing value of premiums inventory', '1375', 'OCASSET', 0, 1, 0, 0),
-  ('{ts escape="sql"}Discounts{/ts}'            , @domainContactId, @opval, 'Contra-revenue account for amounts discounted from sales', '4900', 'INC', 0, 1, 0, 0),
-  ('{ts escape="sql"}Payment Processor Account{/ts}', @domainContactId, @opAsset, 'Account to record payments into a payment processor merchant account', '1150', 'BANK', 0, 1, 0, 0);
+  ('Banking Fees'         , @domainContactId, @opexp, 'Payment processor fees and manually recorded banking fees', '5200', 'EXP', 0, 1, 0, 0),
+  ('Deposit Bank Account' , @domainContactId, @opAsset, 'All manually recorded cash and cheques go to this account', '1100', 'BANK', 0, 1, 0, 1),
+  ('Accounts Receivable'  , @domainContactId, @opAsset, 'Amounts to be received later (eg pay later event revenues)', '1200', 'AR', 0, 1, 0, 0),
+  ('Accounts Payable'     , @domainContactId, @opLiability, 'Amounts to be paid out such as grants and refunds', '2200', 'AP', 0, 1, 0, 0),
+  ('Premiums'             , @domainContactId, @opCost, 'Account to record cost of premiums provided to payors', '5100', 'COGS', 0, 1, 0, 0),
+  ('Premiums Inventory'   , @domainContactId, @opAsset, 'Account representing value of premiums inventory', '1375', 'OCASSET', 0, 1, 0, 0),
+  ('Discounts'            , @domainContactId, @opval, 'Contra-revenue account for amounts discounted from sales', '4900', 'INC', 0, 1, 0, 0),
+  ('Payment Processor Account', @domainContactId, @opAsset, 'Account to record payments into a payment processor merchant account', '1150', 'BANK', 0, 1, 0, 0);
 
 -- CRM-10926
 SELECT @option_value_rel_id_exp  := value FROM `civicrm_option_value` WHERE `option_group_id` = @option_group_id_arel AND `name` = 'Expense Account is';
 SELECT @option_value_rel_id_ar  := value FROM `civicrm_option_value` WHERE `option_group_id` = @option_group_id_arel AND `name` = 'Accounts Receivable Account is';
 SELECT @option_value_rel_id_as  := value FROM `civicrm_option_value` WHERE `option_group_id` = @option_group_id_arel AND `name` = 'Asset Account is';
 
-SELECT @financial_account_id_bf	       := max(id) FROM `civicrm_financial_account` WHERE `name` = 'Banking Fees';
-SELECT @financial_account_id_ap	       := max(id) FROM `civicrm_financial_account` WHERE `name` = 'Accounts Receivable';
+SELECT @financial_account_id_bf         := max(id) FROM `civicrm_financial_account` WHERE `name` = 'Banking Fees';
+SELECT @financial_account_id_ap         := max(id) FROM `civicrm_financial_account` WHERE `name` = 'Accounts Receivable';
 
 INSERT INTO `civicrm_entity_financial_account`
      ( entity_table, entity_id, account_relationship, financial_account_id )
@@ -618,24 +601,23 @@ SELECT 'civicrm_payment_processor', id, @option_value_rel_id_as, @financial_acco
 -- CRM-9923 and CRM-11037
 SELECT @option_group_id_batch_status   := max(id) from civicrm_option_group where name = 'batch_status';
 
-SELECT @weight                 := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
+SELECT @weight                 := MAX(ROUND(value)) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
 
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`)
 VALUES
-   (@option_group_id_batch_status, {localize}'Data Entry'{/localize}, @weight = @weight + 1, 'Data Entry', NULL, 0, 0, @weight = @weight + 1),
-   (@option_group_id_batch_status, {localize}'Reopened'{/localize}, @weight = @weight + 1, 'Reopened', NULL, 0, 0, @weight = @weight + 1),
-   (@option_group_id_batch_status, {localize}'Exported'{/localize}, @weight = @weight + 1, 'Exported' , NULL, 0, 0, @weight = @weight + 1);
+   (@option_group_id_batch_status, {localize}'Data Entry'{/localize}, @weight + 1, 'Data Entry', NULL, 0, 0, @weight + 1),
+   (@option_group_id_batch_status, {localize}'Reopened'{/localize}, @weight + 2, 'Reopened', NULL, 0, 0, @weight + 2),
+   (@option_group_id_batch_status, {localize}'Exported'{/localize}, @weight + 3, 'Exported' , NULL, 0, 0, @weight + 3);
 
 -- Insert Batch Modes.
+SELECT @option_group_id_batch_modes := max(id) from civicrm_option_group where name = 'batch_mode';
 
-SELECT @option_group_id_batch_modes   := max(id) from civicrm_option_group where name = 'batch_mode';
-SELECT @weight := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`)
 VALUES
-   (@option_group_id_batch_modes, {localize}'Manual Batch'{/localize}, @weight = @weight + 1, 'Manual Batch', NULL, 0, 0, @weight = @weight + 1),
-   (@option_group_id_batch_modes, {localize}'Automatic Batch'{/localize}, @weight = @weight + 1, 'Automatic Batch' , NULL, 0, 0, @weight = @weight + 1);
+   (@option_group_id_batch_modes, {localize}'Manual Batch'{/localize}, 1, 'Manual Batch', NULL, 0, 0, 1),
+   (@option_group_id_batch_modes, {localize}'Automatic Batch'{/localize}, 2, 'Automatic Batch' , NULL, 0, 0, 2);
 
 -- End of civiaccounts upgrade
 
@@ -653,6 +635,7 @@ ALTER TABLE `civicrm_membership_log`
 ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships.' AFTER `membership_type_id`;
 
 -- CRM-11358
+DELETE FROM civicrm_dashboard_contact WHERE contact_id NOT IN (SELECT id FROM civicrm_contact);
 INSERT INTO `civicrm_dashboard`
 (`domain_id`, {localize field='label'}`label`{/localize}, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `fullscreen_url`, `is_fullscreen`, `is_reserved`)
 SELECT id, {localize}'{ts escape="sql"}CiviCRM News{/ts}'{/localize}, 'civicrm/dashlet/blog&reset=1&snippet=5', 'access CiviCRM', NULL, 0, 0, 1, 0, 'civicrm/dashlet/blog&reset=1&snippet=5&context=dashletFullscreen', 1, 1
@@ -714,99 +697,99 @@ DELETE FROM civicrm_state_province WHERE name IN ('Ventspils Apripkis', 'Aizkrau
 INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUES
 (@country_id, '002', 'Aizkraukles novads'),
 (@country_id, '038', 'Jaunjelgavas novads'),
-(@country_id, '072', 'Pļaviņu novads'),
+(@country_id, '072', 'PÄ¼aviÅ†u novads'),
 (@country_id, '046', 'Kokneses novads'),
 (@country_id, '065', 'Neretas novads'),
-(@country_id, '092', 'Skrīveru novads'),
-(@country_id, '007', 'Alūksnes novads'),
+(@country_id, '092', 'SkrÄ«veru novads'),
+(@country_id, '007', 'AlÅ«ksnes novads'),
 (@country_id, '009', 'Apes novads'),
 (@country_id, '015', 'Balvu novads'),
-(@country_id, '108', 'Viļakas novads'),
+(@country_id, '108', 'ViÄ¼akas novads'),
 (@country_id, '014', 'Baltinavas novads'),
-(@country_id, '082', 'Rugāju novads'),
+(@country_id, '082', 'RugÄ�ju novads'),
 (@country_id, '016', 'Bauskas novads'),
 (@country_id, '034', 'Iecavas novads'),
-(@country_id, '083', 'Rundāles novads'),
+(@country_id, '083', 'RundÄ�les novads'),
 (@country_id, '105', 'Vecumnieku novads'),
-(@country_id, '022', 'Cēsu novads'),
-(@country_id, '055', 'Līgatnes novads'),
+(@country_id, '022', 'CÄ“su novads'),
+(@country_id, '055', 'LÄ«gatnes novads'),
 (@country_id, '008', 'Amatas novads'),
 (@country_id, '039', 'Jaunpiebalgas novads'),
-(@country_id, '075', 'Priekuļu novads'),
-(@country_id, '070', 'Pārgaujas novads'),
+(@country_id, '075', 'PriekuÄ¼u novads'),
+(@country_id, '070', 'PÄ�rgaujas novads'),
 (@country_id, '076', 'Raunas novads'),
 (@country_id, '104', 'Vecpiebalgas novads'),
 (@country_id, '025', 'Daugavpils novads'),
-(@country_id, '036', 'Ilūkstes novads'),
+(@country_id, '036', 'IlÅ«kstes novads'),
 (@country_id, '026', 'Dobeles novads'),
 (@country_id, '010', 'Auces novads'),
-(@country_id, '098', 'Tērvetes novads'),
+(@country_id, '098', 'TÄ“rvetes novads'),
 (@country_id, '033', 'Gulbenes novads'),
 (@country_id, '041', 'Jelgavas novads'),
 (@country_id, '069', 'Ozolnieku novads'),
-(@country_id, '042', 'Jēkabpils novads'),
-(@country_id, '004', 'Aknīstes novads'),
-(@country_id, '107', 'Viesītes novads'),
+(@country_id, '042', 'JÄ“kabpils novads'),
+(@country_id, '004', 'AknÄ«stes novads'),
+(@country_id, '107', 'ViesÄ«tes novads'),
 (@country_id, '049', 'Krustpils novads'),
 (@country_id, '085', 'Salas novads'),
-(@country_id, '047', 'Krāslavas novads'),
+(@country_id, '047', 'KrÄ�slavas novads'),
 (@country_id, '024', 'Dagdas novads'),
 (@country_id, '001', 'Aglonas novads'),
-(@country_id, '050', 'Kuldīgas novads'),
+(@country_id, '050', 'KuldÄ«gas novads'),
 (@country_id, '093', 'Skrundas novads'),
 (@country_id, '006', 'Alsungas novads'),
 (@country_id, '003', 'Aizputes novads'),
 (@country_id, '028', 'Durbes novads'),
-(@country_id, '032', 'Grobiņas novads'),
-(@country_id, '071', 'Pāvilostas novads'),
+(@country_id, '032', 'GrobiÅ†as novads'),
+(@country_id, '071', 'PÄ�vilostas novads'),
 (@country_id, '074', 'Priekules novads'),
-(@country_id, '066', 'Nīcas novads'),
+(@country_id, '066', 'NÄ«cas novads'),
 (@country_id, '081', 'Rucavas novads'),
-(@country_id, '100', 'Vaiņodes novads'),
-(@country_id, '054', 'Limbažu novads'),
+(@country_id, '100', 'VaiÅ†odes novads'),
+(@country_id, '054', 'LimbaÅ¾u novads'),
 (@country_id, '005', 'Alojas novads'),
-(@country_id, '086', 'Salacgrīvas novads'),
+(@country_id, '086', 'SalacgrÄ«vas novads'),
 (@country_id, '058', 'Ludzas novads'),
-(@country_id, '044', 'Kārsavas novads'),
+(@country_id, '044', 'KÄ�rsavas novads'),
 (@country_id, '110', 'Zilupes novads'),
 (@country_id, '023', 'Ciblas novads'),
 (@country_id, '059', 'Madonas novads'),
 (@country_id, '021', 'Cesvaines novads'),
-(@country_id, '057', 'Lubānas novads'),
-(@country_id, '102', 'Varakļānu novads'),
-(@country_id, '030', 'Ērgļu novads'),
+(@country_id, '057', 'LubÄ�nas novads'),
+(@country_id, '102', 'VarakÄ¼Ä�nu novads'),
+(@country_id, '030', 'Ä’rgÄ¼u novads'),
 (@country_id, '067', 'Ogres novads'),
-(@country_id, '035', 'Ikšķiles novads'),
-(@country_id, '051', 'Ķeguma novads'),
-(@country_id, '053', 'Lielvārdes novads'),
-(@country_id, '073', 'Preiļu novads'),
-(@country_id, '056', 'Līvānu novads'),
-(@country_id, '078', 'Riebiņu novads'),
-(@country_id, '103', 'Vārkavas novads'),
-(@country_id, '077', 'Rēzeknes novads'),
-(@country_id, '109', 'Viļānu novads'),
+(@country_id, '035', 'IkÅ¡Ä·iles novads'),
+(@country_id, '051', 'Ä¶eguma novads'),
+(@country_id, '053', 'LielvÄ�rdes novads'),
+(@country_id, '073', 'PreiÄ¼u novads'),
+(@country_id, '056', 'LÄ«vÄ�nu novads'),
+(@country_id, '078', 'RiebiÅ†u novads'),
+(@country_id, '103', 'VÄ�rkavas novads'),
+(@country_id, '077', 'RÄ“zeknes novads'),
+(@country_id, '109', 'ViÄ¼Ä�nu novads'),
 (@country_id, '013', 'Baldones novads'),
-(@country_id, '052', 'Ķekavas novads'),
+(@country_id, '052', 'Ä¶ekavas novads'),
 (@country_id, '068', 'Olaines novads'),
 (@country_id, '087', 'Salaspils novads'),
 (@country_id, '089', 'Saulkrastu novads'),
 (@country_id, '091', 'Siguldas novads'),
-(@country_id, '037', 'Inčukalna novads'),
-(@country_id, '011', 'Ādažu novads'),
-(@country_id, '012', 'Babītes novads'),
+(@country_id, '037', 'InÄ�ukalna novads'),
+(@country_id, '011', 'Ä€daÅ¾u novads'),
+(@country_id, '012', 'BabÄ«tes novads'),
 (@country_id, '020', 'Carnikavas novads'),
 (@country_id, '031', 'Garkalnes novads'),
 (@country_id, '048', 'Krimuldas novads'),
-(@country_id, '061', 'Mālpils novads'),
-(@country_id, '062', 'Mārupes novads'),
-(@country_id, '080', 'Ropažu novads'),
-(@country_id, '090', 'Sējas novads'),
-(@country_id, '095', 'Stopiņu novads'),
+(@country_id, '061', 'MÄ�lpils novads'),
+(@country_id, '062', 'MÄ�rupes novads'),
+(@country_id, '080', 'RopaÅ¾u novads'),
+(@country_id, '090', 'SÄ“jas novads'),
+(@country_id, '095', 'StopiÅ†u novads'),
 (@country_id, '088', 'Saldus novads'),
-(@country_id, '018', 'Brocēnu novads'),
+(@country_id, '018', 'BrocÄ“nu novads'),
 (@country_id, '097', 'Talsu novads'),
 (@country_id, '027', 'Dundagas novads'),
-(@country_id, '063', 'Mērsraga novads'),
+(@country_id, '063', 'MÄ“rsraga novads'),
 (@country_id, '079', 'Rojas novads'),
 (@country_id, '099', 'Tukuma novads'),
 (@country_id, '043', 'Kandavas novads'),
@@ -814,15 +797,15 @@ INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUE
 (@country_id, '040', 'Jaunpils novads'),
 (@country_id, '101', 'Valkas novads'),
 (@country_id, '094', 'Smiltenes novads'),
-(@country_id, '096', 'Strenču novads'),
-(@country_id, '045', 'Kocēnu novads'),
+(@country_id, '096', 'StrenÄ�u novads'),
+(@country_id, '045', 'KocÄ“nu novads'),
 (@country_id, '060', 'Mazsalacas novads'),
-(@country_id, '084', 'Rūjienas novads'),
-(@country_id, '017', 'Beverīnas novads'),
+(@country_id, '084', 'RÅ«jienas novads'),
+(@country_id, '017', 'BeverÄ«nas novads'),
 (@country_id, '019', 'Burtnieku novads'),
-(@country_id, '064', 'Naukšēnu novads'),
+(@country_id, '064', 'NaukÅ¡Ä“nu novads'),
 (@country_id, '106', 'Ventspils novads'),
-(@country_id, 'JKB', 'Jēkabpils'),
+(@country_id, 'JKB', 'JÄ“kabpils'),
 (@country_id, 'VMR', 'Valmiera');
 
 -- CRM-11507

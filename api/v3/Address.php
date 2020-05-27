@@ -1,57 +1,35 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
- * File for the CiviCRM APIv3 address functions
+ * This api exposes CiviCRM Address records.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_Address
- *
- * @copyright CiviCRM LLC (c) 2004-2013
- * @version $Id: Address.php 2011-02-16 ErikHommel $
  */
-
-require_once 'CRM/Core/BAO/Address.php';
 
 /**
- *  Add an Address for a contact
+ * Add an Address for a contact.
  *
- * Allowed @params array keys are:
- * {@getfields address_create}
- * {@example AddressCreate.php}
+ * FIXME: Should be using basic_create util
  *
- * @return array of newly created tag property values.
- * @access public
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
  */
-function civicrm_api3_address_create(&$params) {
+function civicrm_api3_address_create($params) {
+  _civicrm_api3_check_edit_permissions('CRM_Core_BAO_Address', $params);
   /**
-   * if street_parsing, street_address has to be parsed into
+   * If street_parsing, street_address has to be parsed into
    * separate parts
    */
   if (array_key_exists('street_parsing', $params)) {
@@ -78,62 +56,101 @@ function civicrm_api3_address_create(&$params) {
     }
   }
 
+  if (!isset($params['check_permissions'])) {
+    $params['check_permissions'] = 0;
+  }
+
+  if (!isset($params['fix_address'])) {
+    $params['fix_address'] = TRUE;
+  }
+
   /**
-    * create array for BAO (expects address params in as an
-    * element in array 'address'
-    */
-  $addressBAO = CRM_Core_BAO_Address::add($params, TRUE);
+   * Create array for BAO (expects address params in as an
+   * element in array 'address'
+   */
+  $addressBAO = CRM_Core_BAO_Address::add($params, $params['fix_address']);
   if (empty($addressBAO)) {
     return civicrm_api3_create_error("Address is not created or updated ");
   }
   else {
-    $values = array();
     $values = _civicrm_api3_dao_to_array($addressBAO, $params);
-    return civicrm_api3_create_success($values, $params, 'address', $addressBAO);
+    return civicrm_api3_create_success($values, $params, 'Address', $addressBAO);
   }
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * @param array $params array or parameters determined by getfields
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_address_create_spec(&$params) {
   $params['location_type_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
-  $params['country'] = array('title' => 'Name or 2-letter abbreviation of country. Looked up in civicrm_country table');
-  $params['street_parsing'] = array('title' => 'optional param to indicate you want the street_address field parsed into individual params');
+  $params['street_parsing'] = [
+    'title' => 'Street Address Parsing',
+    'description' => 'Optional param to indicate you want the street_address field parsed into individual params',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
+  $params['skip_geocode'] = [
+    'title' => 'Skip geocode',
+    'description' => 'Optional param to indicate you want to skip geocoding (useful when importing a lot of addresses
+      at once, the job \'Geocode and Parse Addresses\' can execute this task after the import)',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
+  $params['fix_address'] = [
+    'title' => ts('Fix address'),
+    'description' => ts('When true, apply various fixes to the address before insert. Default true.'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => TRUE,
+  ];
+  $params['world_region'] = [
+    'title' => ts('World Region'),
+    'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
+  ];
+  $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+  if ($defaultLocation) {
+    $params['location_type_id']['api.default'] = $defaultLocation->id;
+  }
 }
 
 /**
- * Deletes an existing Address
+ * Adjust Metadata for Get action.
  *
- * @param  array  $params
- *
- * {@getfields address_delete}
- * {@example AddressDelete.php 0}
- *
- * @return boolean | error  true if successfull, error otherwise
- * @access public
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
-function civicrm_api3_address_delete(&$params) {
+function _civicrm_api3_address_get_spec(&$params) {
+  $params['world_region'] = [
+    'title' => ts('World Region'),
+    'name' => 'world_region',
+    'type' => CRM_Utils_Type::T_TEXT,
+  ];
+}
+
+/**
+ * Delete an existing Address.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *   API result array
+ */
+function civicrm_api3_address_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Retrieve one or more addresses on address_id, contact_id, street_name, city
- * or a combination of those
+ * Retrieve one or more addresses.
  *
- * @param  mixed[]  (reference ) input parameters
+ * @param array $params
+ *   Array per getfields metadata.
  *
- * {@example AddressGet.php 0}
- * @param  array $params  an associative array of name/value pairs.
- *
- * @return  array details of found addresses else error
- * {@getfields address_get}
- * @access public
+ * @return array
+ *   API result array
  */
-function civicrm_api3_address_get(&$params) {
+function civicrm_api3_address_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Address');
 }
-

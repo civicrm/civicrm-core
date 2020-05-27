@@ -4,11 +4,11 @@
  *
  *  (PHP 5)
  *
- *   @author Walt Haas <walt@dharmatech.org> (801) 534-1262
- *   @copyright Copyright CiviCRM LLC (C) 2009
- *   @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
+ * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
+ * @copyright Copyright CiviCRM LLC (C) 2009
+ * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html
  *              GNU Affero General Public License version 3
- *   @package CiviCRM
+ * @package CiviCRM
  *
  *   This file is part of CiviCRM
  *
@@ -30,7 +30,7 @@
 /**
  *  Include parent class definition
  */
-require_once 'CiviTest/CiviUnitTestCase.php';
+
 
 /**
  *  Include class under test
@@ -51,10 +51,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test contact custom search functions
  *
- *  @package CiviCRM
+ * @package CiviCRM
+ * @group headless
  */
 class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
-  static $_tablesToTruncate = array(
+  protected $_tablesToTruncate = [
     'civicrm_group_contact',
     'civicrm_group',
     'civicrm_saved_search',
@@ -63,114 +64,106 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     'civicrm_contact',
     'civicrm_option_value',
     'civicrm_option_group',
-  );
-  function get_info() {
-    return array(
-      'name' => 'Contact Custom Search Group',
-      'description' => 'Test all CRM_Contact_Form_Search_Custom_Group methods.',
-      'group' => 'CiviCRM Custom Search Tests',
-    );
-  }
+  ];
 
+  /**
+   * @return CRM_Contact_Form_Search_Custom_GroupTestDataProvider
+   */
   public function dataProvider() {
-    return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider;
+    return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider();
   }
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
   }
 
-  function tearDown() {}
+  public function tearDown() {
+  }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::count()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
+   * @throws \Exception
    */
   public function testCount($fv, $count, $ids, $full) {
-    $this->foreignKeyChecksOff();
+    $this->quickCleanup($this->_tablesToTruncate);
 
-    $this->quickCleanup(self::$_tablesToTruncate);
-
-    // echo "testCount\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
+
     $sql = $obj->all();
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     /**
-     echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
-     while ( $dao->fetch( ) ) {
-     echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
-     }
+     * echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
+     * while ( $dao->fetch( ) ) {
+     * echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
+     * }
      **/
-    $this->assertEquals($count, $obj->count(),
-      'In line ' . __LINE__
-    );
+    $this->assertEquals($count, $obj->count());
   }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::all()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
+   * @throws \Exception
    */
   public function testAll($fv, $count, $ids, $full) {
     // Truncate affected tables
-    $this->quickCleanup(self::$_tablesToTruncate);
+    $this->quickCleanup($this->_tablesToTruncate);
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
 
-    // echo "testAll\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
-      )
-    );
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->all();
-    $this->assertTrue(is_string($sql), 'In line ' . __LINE__);
+    $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $all = array();
+    $all = [];
     while ($dao->fetch()) {
-      $all[] = array(
+      $all[] = [
         'contact_id' => $dao->contact_id,
         'contact_type' => $dao->contact_type,
         'sort_name' => $dao->sort_name,
-      );
+      ];
     }
     asort($all);
-    $this->assertEquals($full, $all, 'In line ' . __LINE__);
+    $this->assertEquals($full, $all);
   }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::contactIDs()
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
+   * @param $fv
+   * @param $count
+   * @param $ids
+   * @param $full
+   * @throws \Exception
    */
   public function testContactIDs($fv, $count, $ids, $full) {
     // Truncate affected tables
-    $this->quickCleanup(self::$_tablesToTruncate);
+    $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testContactIDs\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_FlatXMLDataSet(
-        dirname(__FILE__) . '/dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
+
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->contactIDs();
-    $this->assertTrue(is_string($sql), 'In line ' . __LINE__);
+    $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $contacts = array();
+    $contacts = [];
     while ($dao->fetch()) {
       $contacts[$dao->contact_id] = 1;
     }
     $contacts = array_keys($contacts);
     sort($contacts, SORT_NUMERIC);
-    $this->assertEquals($ids, $contacts, 'In line ' . __LINE__);
+    $this->assertEquals($ids, $contacts);
   }
 
   /**
@@ -178,30 +171,31 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  It returns an array of translated name => keys
    */
   public function testColumns() {
-    $formValues = array();
-    $obj        = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $columns    = $obj->columns();
-    $this->assertTrue(is_array($columns), 'In line ' . __LINE__);
+    $formValues = [];
+    $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
+    $columns = $obj->columns();
+    $this->assertTrue(is_array($columns));
     foreach ($columns as $key => $value) {
-      $this->assertTrue(is_string($key), 'In line ' . __LINE__);
-      $this->assertTrue(is_string($value), 'In line ' . __LINE__);
+      $this->assertTrue(is_string($key));
+      $this->assertTrue(is_string($value));
     }
   }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::from()
-   *  @todo write this test
+   * @todo write this test
    */
-  public function SKIPPED_testFrom() {}
+  public function SKIPPED_testFrom() {
+  }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::summary()
    *  It returns NULL
    */
   public function testSummary() {
-    $formValues = array();
+    $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertNull($obj->summary(), 'In line ' . __LINE__);
+    $this->assertNull($obj->summary());
   }
 
   /**
@@ -209,12 +203,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  Returns the path to the file as a string
    */
   public function testTemplateFile() {
-    $formValues = array();
-    $obj        = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $fileName   = $obj->templateFile();
-    $this->assertTrue(is_string($fileName), 'In line ' . __LINE__);
+    $formValues = [];
+    $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
+    $fileName = $obj->templateFile();
+    $this->assertTrue(is_string($fileName));
     //FIXME: we would need to search the include path to do the following
-    //$this->assertTrue( file_exists( $fileName ), 'In line ' . __LINE__ );
+    //$this->assertTrue( file_exists( $fileName ) );
   }
 
   /**
@@ -222,12 +216,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  With no arguments it returns '(1)'
    */
   public function testWhereNoArgs() {
-    $formValues = array(
+    $formValues = [
       CRM_Core_Form::CB_PREFIX . '17' => TRUE,
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
-    );
+    ];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1) ', $obj->where(), 'In line ' . __LINE__);
+    $this->assertEquals(' (1) ', $obj->where());
   }
 
   /**
@@ -235,10 +229,10 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  With false argument it returns '(1)'
    */
   public function testWhereFalse() {
-    $formValues = array(
+    $formValues = [
       CRM_Core_Form::CB_PREFIX . '17' => TRUE,
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
-    );
+    ];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $this->assertEquals(' (1) ', $obj->where(FALSE),
       'In line ' . __LINE__
@@ -250,13 +244,14 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  With true argument it returns list of contact IDs
    */
   public function testWhereTrue() {
-    $formValues = array(
+    $formValues = [
       CRM_Core_Form::CB_PREFIX . '17' => TRUE,
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
-    );
+    ];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $this->assertEquals(' (1)  AND contact_a.id IN ( 17, 23 )', $obj->where(TRUE),
       'In line ' . __LINE__
     );
   }
+
 }

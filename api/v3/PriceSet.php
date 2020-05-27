@@ -1,53 +1,35 @@
 <?php
 /*
-/*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
+ */
 
 
 /**
- * File for the CiviCRM APIv3 group functions
+ * This api exposes CiviCRM Price Sets.
+ *
+ * PriceSets contain PriceFields (which have their own api).
+ * Use chaining to create a PriceSet and associated PriceFields in one api call.
  *
  * @package CiviCRM_APIv3
- * @subpackage API_PriceSet
- * @copyright CiviCRM LLC (c) 20042012
  */
 
 /**
- * Create or update a price_set
+ * Create or update a PriceSet.
  *
- * @param array $params  Associative array of property
- *                       name/value pairs to insert in new 'price_set'
- * @example PriceSetCreate.php Std Create example
+ * @param array $params
+ *   name/value pairs to insert in new 'PriceSet'
  *
- * @return array api result array
- * {@getfields price_set_create}
- * @access public
+ * @return array
+ *   api result array
  */
 function civicrm_api3_price_set_create($params) {
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'PriceSet');
   // Handle price_set_entity
   if (!empty($result['id']) && !empty($params['entity_table']) && !empty($params['entity_id'])) {
     $entityId = $params['entity_id'];
@@ -57,7 +39,7 @@ function civicrm_api3_price_set_create($params) {
     foreach ($entityId as $eid) {
       $eid = (int) trim($eid);
       if ($eid) {
-        CRM_Price_BAO_Set::addTo($params['entity_table'], $eid, $result['id']);
+        CRM_Price_BAO_PriceSet::addTo($params['entity_table'], $eid, $result['id']);
       }
     }
   }
@@ -65,45 +47,53 @@ function civicrm_api3_price_set_create($params) {
 }
 
 /**
- * Adjust Metadata for Create action
+ * Adjust Metadata for Create action.
  *
- * The metadata is used for setting defaults, documentation & validation
- * @param array $params array or parameters determined by getfields
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_price_set_create_spec(&$params) {
+  $params['title']['api.required'] = TRUE;
 }
 
 /**
- * Returns array of price_sets  matching a set of one or more group properties
+ * Returns array of price_sets matching a set of one or more group properties.
  *
- * @param array $params Array of one or more valid property_name=>value pairs. If $params is set
- *  as null, all price_sets will be returned (default limit is 25)
+ * @param array $params
+ *   Array of one or more valid property_name=>value pairs. If $params is set.
+ *   as null, all price_sets will be returned (default limit is 25)
  *
- * @return array  Array of matching price_sets
- * {@getfields price_set_get}
- * @access public
+ * @return array
+ *   Array of matching price_sets
  */
 function civicrm_api3_price_set_get($params) {
+  // hack to make getcount work. - not sure the best approach here
+  // as creating an alternate getcount function also feels a bit hacky
+  if (isset($params['options'])  && isset($params['options']['is_count'])) {
+    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  }
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
-  // Fetch associated entities
-  foreach ($result as &$item) {
-    $item['entity'] = CRM_Price_BAO_Set::getUsedBy($item['id'], 'entity');
+  // Fetch associated entities if the return has not been previously limited.
+  if (!isset($params['return'])) {
+    foreach ($result as &$item) {
+      $item['entity'] = CRM_Price_BAO_PriceSet::getUsedBy($item['id'], 'entity');
+    }
   }
   return civicrm_api3_create_success($result, $params);
 }
 
 /**
- * delete an existing price_set
+ * Delete an existing PriceSet.
  *
- * This method is used to delete any existing price_set. id of the group
- * to be deleted is required field in $params array
+ * This method is used to delete any existing PriceSet given its id.
  *
- * @param array $params array containing id of the group
- *  to be deleted
+ * @param array $params
+ *   Array containing id of the group to be deleted.
  *
- * @return array  returns flag true if successfull, error message otherwise
- * {@getfields price_set_delete}
- * @access public
+ * @return array
+ *   API result array
  */
 function civicrm_api3_price_set_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

@@ -1,67 +1,27 @@
 <?php
-// $Id$
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
-*/
-
-
-require_once 'CiviTest/CiviUnitTestCase.php';
+ */
 
 /**
- * Test class for API functions
+ * Test class for API functions.
  *
- *  @package CiviCRM_APIv3
+ * @package CiviCRM_APIv3
+ * @group headless
  */
 class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
-  public $_eNoticeCompliant = TRUE;
 
-  protected $_apiversion;
+  protected $_apiversion = 3;
 
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   *
-   * @access protected
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->_apiversion = 3;
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   *
-   * @access protected
-   */
-  protected function tearDown() {}
-
-  function testAPIReplaceVariables() {
-    $result = array();
+  public function testAPIReplaceVariables() {
+    $result = [];
     $result['testfield'] = 6;
     $result['api.tag.get'] = 999;
     $result['api.tag.create']['id'] = 8;
@@ -70,7 +30,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     $result['api.tag.create']['values']['0']['display'] = 'batman';
     $result['api.tag.create.api.tag.create']['values']['0']['display'] = 'krypton';
     $result['api.tag.create']['values']['0']['api_tag_get'] = 'darth vader';
-    $params = array(
+    $params = [
       'activity_type_id' => '$value.testfield',
       'tag_id' => '$value.api.tag.create.id',
       'tag1_id' => '$value.api.entity.create.0.id',
@@ -79,8 +39,8 @@ class api_v3_APITest extends CiviUnitTestCase {
       'number' => '$value.api.tag.get',
       'big_rock' => '$value.api.tag.create.api.tag.create.values.0.display',
       'villain' => '$value.api.tag.create.values.0.api_tag_get.display',
-    );
-    _civicrm_api_replace_variables('Activity', 'Get', $params, $result);
+    ];
+    _civicrm_api_replace_variables($params, $result);
     $this->assertEquals(999, $params['number']);
     $this->assertEquals(8, $params['tag_id']);
     $this->assertEquals(6, $params['activity_type_id']);
@@ -90,53 +50,45 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->assertEquals('krypton', $params['big_rock']);
   }
 
-  /*
-    * test that error doesn't occur for non-existant file
-    */
-  function testAPIWrapperIncludeNoFile() {
-
-
-    $result = civicrm_api('RandomFile', 'get', array('version' => 3));
-    $this->assertEquals($result['is_error'], 1);
-    $this->assertEquals($result['error_message'], 'API (RandomFile,get) does not exist (join the API team and implement it!)');
+  /**
+   * Test that error doesn't occur for non-existent file.
+   */
+  public function testAPIWrapperIncludeNoFile() {
+    $this->callAPIFailure(
+      'RandomFile',
+      'get',
+      [],
+      'API (RandomFile, get) does not exist (join the API team and implement it!)'
+    );
   }
 
-  function testAPIWrapperCamelCaseFunction() {
-    $result = civicrm_api('OptionGroup', 'Get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $result['is_error']);
+  public function testAPIWrapperCamelCaseFunction() {
+    $this->callAPISuccess('OptionGroup', 'Get', []);
   }
 
-  function testAPIWrapperLcaseFunction() {
-    $result = civicrm_api('OptionGroup', 'get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $result['is_error']);
+  public function testAPIWrapperLcaseFunction() {
+    $this->callAPISuccess('OptionGroup', 'get', []);
   }
 
-  function testAPIResolver() {
-    $oldpath = get_include_path();
-    set_include_path($oldpath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
+  /**
+   * Test resolver.
+   */
+  public function testAPIResolver() {
+    $oldPath = get_include_path();
+    set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
-    $result = civicrm_api('contact', 'example_action1', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('contact', 'example_action1', []);
     $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
-    $result = civicrm_api('contact', 'example_action2', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('contact', 'example_action2', []);
     $this->assertEquals($result['values'][0], 'civicrm_api3_contact_example_action2 is ok');
-    $result = civicrm_api('test_entity', 'example_action3', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('test_entity', 'example_action3', []);
     $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
 
-    set_include_path($oldpath);
+    set_include_path($oldPath);
   }
 
-  function testFromCamel() {
-    $cases = array(
+  public function testFromCamel() {
+    $cases = [
       'Contribution' => 'contribution',
       'contribution' => 'contribution',
       'OptionValue' => 'option_value',
@@ -145,28 +97,94 @@ class api_v3_APITest extends CiviUnitTestCase {
       'UFJoin' => 'uf_join',
       'ufJoin' => 'uf_join',
       'uf_join' => 'uf_join',
-    );
+    ];
     foreach ($cases as $input => $expected) {
       $actual = _civicrm_api_get_entity_name_from_camel($input);
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
 
-  function testToCamel() {
-    $cases = array(
+  public function testToCamel() {
+    $cases = [
       'Contribution' => 'Contribution',
       'contribution' => 'Contribution',
       'OptionValue' => 'OptionValue',
       'optionValue' => 'OptionValue',
       'option_value' => 'OptionValue',
       'UFJoin' => 'UFJoin',
-      // dommage 'ufJoin' => 'UFJoin',
       'uf_join' => 'UFJoin',
-    );
+    ];
     foreach ($cases as $input => $expected) {
       $actual = _civicrm_api_get_camel_name($input);
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
-}
 
+  /**
+   * Test that calling via wrapper works.
+   */
+  public function testv3Wrapper() {
+    try {
+      $result = civicrm_api3('contact', 'get', []);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail("This should have been a success test");
+    }
+    $this->assertTrue(is_array($result));
+    $this->assertAPISuccess($result);
+  }
+
+  /**
+   * Test exception is thrown.
+   */
+  public function testV3WrapperException() {
+    try {
+      civicrm_api3('contact', 'create', ['debug' => 1]);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $this->assertEquals('mandatory_missing', $e->getErrorCode());
+      $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
+      $extra = $e->getExtraParams();
+      $this->assertArrayHasKey('trace', $extra);
+      return;
+    }
+    $this->fail('Exception was expected');
+  }
+
+  /**
+   * Test result parsing for null.
+   */
+  public function testCreateNoStringNullResult() {
+    // create an example contact
+    // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
+    $result = $this->callAPISuccess('ContributionPage', 'create', [
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'USD',
+      'goal_amount' => 100,
+    ]);
+    $contact = array_shift($result['values']);
+
+    $this->assertTrue(is_numeric($contact['id']));
+    $this->assertNotEmpty($contact['title']);
+    // preferred_mail_format preferred_communication_method preferred_language gender_id
+    // currency
+    $this->assertNotEmpty($contact['currency']);
+
+    // update the contact
+    $result = $this->callAPISuccess('ContributionPage', 'create', [
+      'id' => $contact['id'],
+      'title' => 'New title',
+      'currency' => '',
+    ]);
+
+    // Check return format.
+    $this->assertEquals(1, $result['count']);
+    foreach ($result['values'] as $resultValue) {
+      $this->assertEquals('New title', $resultValue['title']);
+      // BUG: $resultValue['location'] === 'null'.
+      $this->assertEquals('', $resultValue['currency']);
+    }
+  }
+
+}

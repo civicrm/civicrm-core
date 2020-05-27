@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Search form and results for voters *}
@@ -30,9 +14,8 @@
 {if $searchVoterFor}
   {assign var='searchForm' value="search_form_$searchVoterFor"}
 {/if}
-
   <div id="{$searchForm}" class="crm-accordion-wrapper crm-contribution_search_form-accordion {if $rows}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+    <div class="crm-accordion-header {if !$votingTab} crm-master-accordion-header{/if}">
     {ts}Edit Search Criteria{/ts}
     </div><!-- /.crm-accordion-header -->
 
@@ -49,10 +32,10 @@
 
           {if $showInterviewer}
             <td class="font-size12pt">
-              {$form.survey_interviewer_name.label}
+              {$form.survey_interviewer_id.label}
             </td>
             <td class="font-size12pt ">
-              {$form.survey_interviewer_name.html}
+              {$form.survey_interviewer_id.html}
             </td>
           {/if}
 
@@ -61,39 +44,25 @@
           <td class="font-size12pt">
             {$form.sort_name.label}
           </td>
-          <td>
+          <td colspan="3">
             {$form.sort_name.html|crmAddClass:'twenty'}
           </td>
-          <td><label>{ts}Contact Type(s){/ts}</label><br />
-            {$form.contact_type.html}
-            {literal}
-              <script type="text/javascript">
-                cj("select#contact_type").crmasmSelect({
-                  addItemTarget: 'bottom',
-                  animate: false,
-                  highlight: true,
-                  sortable: true,
-                  respectParents: true
-                });
-              </script>
-            {/literal}
+        </tr>
+        <tr>
+          <td>
+            <label>{ts}Contact Type(s){/ts}</label>
           </td>
-          <td><label>{ts}Group(s){/ts}</label>
+          <td>
+            {$form.contact_type.html}
+          </td>
+          <td>
+            <label>{ts}Group(s){/ts}</label>
+          </td>
+          <td >
             {$form.group.html}
-            {literal}
-              <script type="text/javascript">
-                cj("select#group").crmasmSelect({
-                  addItemTarget: 'bottom',
-                  animate: false,
-                  highlight: true,
-                  sortable: true,
-                  respectParents: true,
-                  selectClass:'campaignGroupsSelect'
-                });
-              </script>
-            {/literal}
           </td>
         </tr>
+
         <tr>
           <td class="font-size12pt">
             {$form.street_address.label}
@@ -179,32 +148,13 @@
 {literal}
 <script type="text/javascript">
 
-  cj(function() {
-    cj().crmAccordions();
-
+  CRM.$(function($) {
     {/literal}
     {if !$isFormSubmitted}
       buildCampaignGroups( );
     {/if}
     {literal}
   });
-
-//load interviewer autocomplete.
-var interviewerDataUrl = "{/literal}{$dataUrl}{literal}";
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-cj( "#survey_interviewer_name" ).autocomplete( interviewerDataUrl,
-  { width : 256,
-    selectFirst : false,
-    hintText: hintText,
-    matchContains: true,
-    minChars: 1
-  }
-).result( function( event, data, formatted ) {
-    cj( "#survey_interviewer_id" ).val( data[1] );
-  }).bind( 'click', function( ) {
-    cj( "#survey_interviewer_id" ).val('');
-  });
-
 
 function buildCampaignGroups( surveyId ) {
   if ( !surveyId ) surveyId = cj("#campaign_survey_id").val( );
@@ -220,34 +170,24 @@ function buildCampaignGroups( surveyId ) {
     function( data ) {
       if ( data.status != 'success' ) return;
 
-      var selectName         = 'campaignGroupsSelect';
-      var groupSelect        = cj("select[id^=" + selectName + "]");
-      var groupSelectCountId  = cj( groupSelect ).attr( 'id' ).replace( selectName, '' );
-
       //first remove all groups for given survey.
-      cj( "#group" ).find('option').remove( );
-      cj( groupSelect ).find('option').remove( );
-      cj( '#crmasmContainer' + groupSelectCountId ).find( 'span' ).remove( );
-      cj( '#crmasmList' + groupSelectCountId ).find( 'li' ).remove( );
+      cj("#group").find('option').remove();
 
       var groups = data.groups;
 
       //build the new group options.
       var optCount = 0;
       for ( group in groups ) {
-        title = groups[group].title;
-        value = groups[group].value;
-        if ( !title ) continue;
-        var crmOptCount = 'asm' + groupSelectCountId + 'option' + optCount;
+        var title = groups[group].title;
+        var value = groups[group].value;
+        if ( !value ) continue;
 
         //add options to main group select.
-        cj( "#group" ).append( cj('<option></option>').val( value ).html( title ).attr( 'id', crmOptCount ) );
-
-        //add option to crm multi select ul.
-        cj( groupSelect ).append( cj('<option></option>').val(value).html(title).attr( 'rel', crmOptCount ) );
+        cj( "#group" ).append( cj('<option></option>').val( value ).html(title));
 
         optCount++;
       }
+      cj("#group").trigger('change');
     },
     'json');
 }

@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This file builds html for address block inline edit *}
@@ -28,7 +12,7 @@
   <table class="form-layout crm-edit-address-form crm-inline-edit-form">
     <tr>
       <td>
-        <div class="crm-submit-buttons"> 
+        <div class="crm-submit-buttons">
           {include file="CRM/common/formButtons.tpl"}
           {if $addressId}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -50,10 +34,10 @@
            <span class="crm-address-element is_billing-address-element">{$form.address.$blockId.is_billing.html}</span>
         </td>
      </tr>
-     
+
      {* include shared address template *}
      {include file="CRM/Contact/Form/ShareAddress.tpl"}
- 
+
      <tr>
       <td>
         <table id="address_table_{$blockId}" class="form-layout-compressed">
@@ -66,10 +50,10 @@
       </td>
      </tr>
   </table>
-  
-  <div class="crm-edit-address-custom_data crm-inline-edit-form crm-address-custom-set-block-{$blockId}"> 
+
+  <div class="crm-edit-address-custom_data crm-inline-edit-form crm-address-custom-set-block-{$blockId}">
     {include file="CRM/Contact/Form/Edit/Address/CustomData.tpl"}
-  </div> 
+  </div>
 {literal}
 <script type="text/javascript">
   {/literal}{* // Enforce unique location_type_id fields *}{literal}
@@ -83,7 +67,7 @@
       cj('.crm-inline-edit.address').each(function() {
         if (ok && cj(this).data('location-type-id') == lt) {
           var label = cj('option:selected', ele).text();
-          ele.val('');
+          ele.select2('val', '');
           ele.crmError(label + "{/literal} {ts escape='js'}has already been assigned to another address. Please select another location for this address.{/ts}"{literal});
           ok = false;
         }
@@ -94,14 +78,14 @@
     }
   });
   {/literal}{* // Enforce unique is_primary fields *}{literal}
-  cj(':checkbox[id*="[is_primary"]', 'form#Address_{/literal}{$blockId}{literal}').change(function() {
+  cj(':checkbox[id*="[is_primary"]', 'form[name=Address_{/literal}{$blockId}{literal}]').change(function() {
     if (this.defaultChecked) {
       cj(this).crmError("{/literal} {ts escape='js'}Please choose another address to be primary before changing this one.{/ts}{literal}");
       cj(this).prop('checked', true);
     }
   });
   {/literal}{* // Reset location_type_id when cancel button pressed *}{literal}
-  cj(':submit[name$=cancel]', 'form#Address_{/literal}{$blockId}{literal}').click(function() {
+  cj(':submit[name$=cancel]', 'form[name=Address_{/literal}{$blockId}{literal}]').click(function() {
     var container = cj(this).closest('div.crm-inline-edit.address');
     var origValue = container.attr('data-location-type-id') || '';
     container.data('location-type-id', origValue);
