@@ -1079,10 +1079,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @throws \CiviCRM_API3_Exception
    */
   public static function sendEmail(
-    &$contactDetails,
-    &$subject,
-    &$text,
-    &$html,
+    $contactDetails,
+    $subject,
+    $text,
+    $html,
     $emailAddress,
     $userID = NULL,
     $from = NULL,
