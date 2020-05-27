@@ -202,7 +202,7 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'FKApiName' => 'Case',
   ];
 
-  $params['activity_date_time']['api.default'] = date('YmdHis');
+  $params['activity_date_time']['api.default'] = 'now';
 
 }
 
