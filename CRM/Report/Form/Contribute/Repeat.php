@@ -667,8 +667,19 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    * @return array
    */
   public function statistics(&$rows) {
+    $this->_statiscticsSelect = "
+SELECT COUNT({$this->_aliases['civicrm_contribution']}1.total_amount_count )       as count,
+       SUM({$this->_aliases['civicrm_contribution']}1.total_amount_sum )           as amount,
+       ROUND(AVG({$this->_aliases['civicrm_contribution']}1.total_amount_sum), 2)  as avg,
+       COUNT({$this->_aliases['civicrm_contribution']}2.total_amount_count )       as count2,
+       SUM({$this->_aliases['civicrm_contribution']}2.total_amount_sum )           as amount2,
+       ROUND(AVG({$this->_aliases['civicrm_contribution']}2.total_amount_sum), 2)  as avg2,
+       currency";
+    $this->_statiscticsGroupBy = "GROUP BY    currency";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
     $statistics = parent::statistics($rows);
     $sql = "{$this->_select} {$this->_from} {$this->_where}";
+    $this->addToDeveloperTab($sql);
     $dao = $this->executeReportQuery($sql);
     //store contributions in array 'contact_sums' for comparison
     $contact_sums = array();
@@ -740,17 +751,8 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       'title' => ts('% Maintained Donors'),
     );
 
-    $select = "
-SELECT COUNT({$this->_aliases['civicrm_contribution']}1.total_amount_count )       as count,
-       SUM({$this->_aliases['civicrm_contribution']}1.total_amount_sum )           as amount,
-       ROUND(AVG({$this->_aliases['civicrm_contribution']}1.total_amount_sum), 2)  as avg,
-       COUNT({$this->_aliases['civicrm_contribution']}2.total_amount_count )       as count2,
-       SUM({$this->_aliases['civicrm_contribution']}2.total_amount_sum )           as amount2,
-       ROUND(AVG({$this->_aliases['civicrm_contribution']}2.total_amount_sum), 2)  as avg2,
-       currency";
-    $sql = "{$select} {$this->_from} {$this->_where}
-GROUP BY    currency
-";
+    $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where} {$this->_statiscticsGroupBy}";
+    $this->addtoDeveloperTab($sql);
     $dao = $this->executeReportQuery($sql);
 
     $amount = $average = $amount2 = $average2 = array();

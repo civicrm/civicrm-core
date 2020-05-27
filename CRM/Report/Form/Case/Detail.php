@@ -477,8 +477,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select = "select COUNT( DISTINCT( {$this->_aliases['civicrm_address']}.country_id))";
-    $sql = "{$select} {$this->_from} {$this->_where}";
+    $this->_statiscticsSelect = "select COUNT( DISTINCT( {$this->_aliases['civicrm_address']}.country_id))";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+    $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where}";
+    $this->addToDeveloperTab($sql);
     $countryCount = CRM_Core_DAO::singleValueQuery($sql);
 
     $statistics['counts']['case'] = [

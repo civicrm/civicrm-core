@@ -582,13 +582,15 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select = "SELECT DISTINCT {$this->_aliases['civicrm_contribution']}.id";
+    $this->_statiscticsSelect = "SELECT DISTINCT {$this->_aliases['civicrm_contribution']}.id";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
 
     $sql = "SELECT COUNT(cc.id) as count, SUM(cc.total_amount) as amount, ROUND(AVG(cc.total_amount), 2) as avg, cc.currency as currency
             FROM civicrm_contribution cc
-            WHERE cc.id IN ({$select} {$this->_from} {$this->_where})
+            WHERE cc.id IN ({$this->_statiscticsSelect} {$this->_from} {$this->_where})
             GROUP BY cc.currency";
 
+    $this->addToDeveloperTab($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
     $totalAmount = $average = [];
     while ($dao->fetch()) {

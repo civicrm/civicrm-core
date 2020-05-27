@@ -600,7 +600,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
     FROM {$this->_tempTableName} INNER JOIN {$this->_tempDurationSumTableName}
       ON ({$this->_tempTableName}.id = {$this->_tempDurationSumTableName}.id)";
-
+    $this->addToDeveloperTab($query);
     $actDAO = CRM_Core_DAO::executeQuery($query);
 
     $activityTypesCount = [];

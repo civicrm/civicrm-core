@@ -597,16 +597,17 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
       "{$this->_aliases['civicrm_contribution']}.currency",
       $financialSelect,
     ];
-    $select = "SELECT " . implode(', ', $this->_selectClauses);
+    $this->_statiscticsSelect = "SELECT " . implode(', ', $this->_selectClauses);
 
     $this->groupBy();
-
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
     $tempTableName = $this->createTemporaryTable('tempTable', "
-                  {$select} {$this->_from} {$this->_where} {$this->_groupBy} ");
+                  {$this->_statiscticsSelect} {$this->_from} {$this->_where} {$this->_groupBy} ");
 
     $sql = "SELECT COUNT(trxnID) as count, SUM(amount) as amount, currency
             FROM {$tempTableName}
             GROUP BY currency";
+    $this->addToDeveloperTab($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
     $amount = $avg = [];
     while ($dao->fetch()) {

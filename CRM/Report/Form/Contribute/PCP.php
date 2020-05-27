@@ -306,11 +306,13 @@ LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
     $statistics = parent::statistics($rows);
 
     // Calculate totals from the civicrm_contribution_soft table.
-    $select = "SELECT SUM({$this->_aliases['civicrm_contribution_soft']}.amount) "
+    $this->_statiscticsSelect = "SELECT SUM({$this->_aliases['civicrm_contribution_soft']}.amount) "
       . "as committed_total, COUNT({$this->_aliases['civicrm_contribution_soft']}.id) "
       . "as donors_total, SUM(IF( contribution_civireport.contribution_status_id > 1, 0, "
       . "contribution_soft_civireport.amount)) AS received_total ";
+    CRM_Utils_Hook:alterReportVar('statssql', $this, $this);
     $sql = "{$select} {$this->_from} {$this->_where}";
+    $this->addToDeveloperTab($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
     $dao->fetch();
     $committed_total = $dao->committed_total;

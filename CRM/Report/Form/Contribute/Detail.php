@@ -417,7 +417,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
     $totalAmount = $average = $fees = $net = [];
     $count = 0;
-    $select = "
+    $this->_statiscticsSelect = "
         SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,
                SUM( {$this->_aliases['civicrm_contribution']}.total_amount ) as amount,
                ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2) as avg,
@@ -426,8 +426,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                SUM( {$this->_aliases['civicrm_contribution']}.net_amount ) as net
         ";
 
-    $group = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
-    $sql = "{$select} {$this->_from} {$this->_where} {$group}";
+    $this->_statiscticsGroupBy = "\nGROUP BY {$this->_aliases['civicrm_contribution']}.currency";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+    $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where} {$this->_statiscticsGroupBy}";
     $dao = CRM_Core_DAO::executeQuery($sql);
     $this->addToDeveloperTab($sql);
 

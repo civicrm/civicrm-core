@@ -476,17 +476,16 @@ GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentn
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select = "
+    $this->_statiscticsSelect = "
         SELECT COUNT({$this->_aliases['civicrm_contribution_soft']}.amount ) as count,
                SUM({$this->_aliases['civicrm_contribution_soft']}.amount ) as amount,
                ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as avg,
                {$this->_aliases['civicrm_contribution']}.currency as currency
         ";
-
-    $sql = "{$select} {$this->_from} {$this->_where}
-GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
-";
-
+    $this->_statiscticsGroupBy = "GROUP BY   {$this->_aliases['civicrm_contribution']}.currency";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+    $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where} {$this->_statiscticsGroupBy}";
+    $this->addToDeveloperTab($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
     $count = 0;
     $totalAmount = $average = [];

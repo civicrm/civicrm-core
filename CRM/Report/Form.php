@@ -520,6 +520,18 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $optimisedForOnlyFullGroupBy = TRUE;
 
   /**
+   * Replacement Select query for Statistics
+   * @var string
+   */
+  protected $_statiscticsSelect;
+
+  /**
+   * Replacement group by for Statistics
+   * @var string
+   */
+  protected $_statiscticsGroupBy;
+
+  /**
    * Class constructor.
    */
   public function __construct() {

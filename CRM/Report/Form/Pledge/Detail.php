@@ -270,15 +270,16 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     if (!$this->_having) {
       $totalAmount = $average = [];
       $count = 0;
-      $select = "
+      $this->_statiscticsSelect = "
         SELECT COUNT({$this->_aliases['civicrm_pledge']}.amount )       as count,
           SUM({$this->_aliases['civicrm_pledge']}.amount )         as amount,
           ROUND(AVG({$this->_aliases['civicrm_pledge']}.amount), 2) as avg,
           {$this->_aliases['civicrm_pledge']}.currency as currency
         ";
 
-      $group = "GROUP BY {$this->_aliases['civicrm_pledge']}.currency";
-      $sql = "{$select} {$this->_from} {$this->_where} {$group}";
+      $this->_statiscticsGroupBy = "GROUP BY {$this->_aliases['civicrm_pledge']}.currency";
+      CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+      $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where} {$this->_statiscticsGroupBy}";
       $dao = CRM_Core_DAO::executeQuery($sql);
       $count = $index = $totalCount = 0;
       // this will run once per currency

@@ -272,13 +272,13 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
     $statistics = parent::statistics($rows);
 
     if (!$this->_having) {
-      $select = "
+      $this->_statiscticsSelect = "
             SELECT COUNT({$this->_aliases['civicrm_pledge']}.amount )       as count,
                    SUM({$this->_aliases['civicrm_pledge']}.amount )         as amount,
                    ROUND(AVG({$this->_aliases['civicrm_pledge']}.amount), 2) as avg
             ";
-
-      $sql = "{$select} {$this->_from} {$this->_where}";
+      CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+      $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where}";
 
       $dao = CRM_Core_DAO::executeQuery($sql);
 

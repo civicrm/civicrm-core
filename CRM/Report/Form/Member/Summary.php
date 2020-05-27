@@ -367,18 +367,17 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
    */
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-    $select = "
+    $this->_statiscticsSelect = "
         SELECT COUNT({$this->_aliases['civicrm_contribution']}.total_amount ) as count,
                IFNULL(SUM({$this->_aliases['civicrm_contribution']}.total_amount ), 0) as amount,
                IFNULL(ROUND(AVG({$this->_aliases['civicrm_contribution']}.total_amount), 2),0) as avg,
                COUNT( DISTINCT {$this->_aliases['civicrm_membership']}.id ) as memberCount,
                {$this->_aliases['civicrm_contribution']}.currency as currency
         ";
-
-    $sql = "{$select} {$this->_from} {$this->_where}
-GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
-";
-
+    $this->_statiscticsGroupBy = "GROUP BY    {$this->_aliases['civicrm_contribution']}.currency";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+    $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where} {$this->_statiscticsGroupBy}";
+    $this->addToDeveloperTab($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     $totalAmount = $average = [];

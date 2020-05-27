@@ -345,10 +345,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
 
     $statistics = parent::statistics($rows);
     $avg = NULL;
-    $select = " SELECT SUM( {$this->_aliases['civicrm_line_item']}.participant_count ) as count,
+    $this->_statiscticsSelect = " SELECT SUM( {$this->_aliases['civicrm_line_item']}.participant_count ) as count,
                   SUM( {$this->_aliases['civicrm_line_item']}.line_total )   as amount
             ";
-    $sql = "{$select} {$this->_from} {$this->_where}";
+    CRM_Utils_Hook::alterReportVar('statssql', $this, $this);
+    $sql = "{$this->_statiscticsSelect} {$this->_from} {$this->_where}";
+    $this->addToDeveloperTab($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
     if ($dao->fetch()) {
 
