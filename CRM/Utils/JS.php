@@ -125,26 +125,51 @@ class CRM_Utils_JS {
    * ]
    *
    * @param string $js
+   * @param bool $throwException
    * @return mixed
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
-  public static function decode($js) {
+  public static function decode($js, $throwException = FALSE) {
     $js = trim($js);
     $first = substr($js, 0, 1);
     $last = substr($js, -1);
-    if ($last === $first && ($first === "'" || $first === '"')) {
-      // Use a temp placeholder for escaped backslashes
-      $backslash = chr(0) . 'backslash' . chr(0);
-      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', $backslash], [$backslash, "'", '"', '&', '/', '\\'], substr($js, 1, -1));
+    if ($first === "'" && $last === "'") {
+      $js = self::convertSingleQuoteString($js, $throwException);
     }
-    if (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
+    elseif (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
       $obj = self::getRawProps($js);
       foreach ($obj as $idx => $item) {
-        $obj[$idx] = self::decode($item);
+        $obj[$idx] = self::decode($item, $throwException);
       }
       return $obj;
     }
-    return json_decode($js);
+    $result = json_decode($js);
+    if ($throwException && $result === NULL && $js !== 'null') {
+      throw new CRM_Core_Exception(json_last_error_msg());
+    }
+    return $result;
+  }
+
+  /**
+   * @param string $str
+   * @return string|null
+   * @throws CRM_Core_Exception
+   */
+  public static function convertSingleQuoteString(string $str, $throwException) {
+    // json_decode can only handle double quotes around strings, so convert single-quoted strings
+    $backslash = chr(0) . 'backslash' . chr(0);
+    $str = str_replace(['\\\\', '\\"', '"', '\\&', '\\/', $backslash], [$backslash, '"', '\\"', '&', '/', '\\'], substr($str, 1, -1));
+    // Ensure the string doesn't terminate early by checking that all single quotes are escaped
+    $pos = -1;
+    while (($pos = strpos($str, "'", $pos + 1)) !== FALSE) {
+      if (($pos - strlen(rtrim(substr($str, 0, $pos)))) % 2) {
+        if ($throwException) {
+          throw new CRM_Core_Exception('Invalid string passed to CRM_Utils_JS::decode');
+        }
+        return NULL;
+      }
+    }
+    return '"' . $str . '"';
   }
 
   /**
