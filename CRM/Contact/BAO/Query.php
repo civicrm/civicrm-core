@@ -517,6 +517,7 @@ class CRM_Contact_BAO_Query {
 
       // add activity fields
       $this->_fields = array_merge($this->_fields, CRM_Activity_BAO_Activity::exportableFields());
+      $this->_fields = array_merge($this->_fields, CRM_Activity_BAO_Activity::exportableFields('Case'));
       // Add hack as no unique name is defined for the field but the search form is in denial.
       $this->_fields['activity_priority_id'] = $this->_fields['priority_id'];
 

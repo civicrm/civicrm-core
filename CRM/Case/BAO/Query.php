@@ -121,6 +121,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
+    // @todo switch to a more standard case_source_contact as the key where we want the name not the id.
     if (!empty($query->_returnProperties['case_source_contact_id'])) {
       $query->_select['case_source_contact_id'] = "civicrm_case_reporter.sort_name as case_source_contact_id";
       $query->_element['case_source_contact_id'] = 1;
@@ -320,6 +321,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         $query->handleWhereFromMetadata($fieldSpec, $name, $value, $op);
         return;
 
+      // @todo switch to a more standard case_source_contact as the key where we want the name not the id.
       case 'case_source_contact_id':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case_reporter.sort_name", $op, $value, 'String');
         $query->_qill[$grouping][] = ts("Activity Reporter %1 '%2'", [1 => $op, 2 => $value]);
@@ -643,6 +645,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
         'case_start_date' => 1,
         'case_end_date' => 1,
         'case_subject' => 1,
+        // @todo switch to a more standard case_source_contact as the key where we want the name not the id.
         'case_source_contact_id' => 1,
         'case_activity_status' => 1,
         'case_activity_duration' => 1,
