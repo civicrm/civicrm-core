@@ -86,8 +86,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     }
 
     // check if we're in shopping cart mode for events
-    $enableCart = Civi::settings()->get('enable_cart');
-    if (!$enableCart) {
+    if (!(bool) Civi::settings()->get('enable_cart')) {
       unset($tabs['conference']);
     }
 
@@ -107,7 +106,7 @@ LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_ta
 WHERE      e.id = %1
 ";
       //Check if repeat is configured
-      $eventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
+      CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
       $params = [
         1 => [$eventID, 'Integer'],
         2 => [$eventNameMapping->getId(), 'Integer'],
