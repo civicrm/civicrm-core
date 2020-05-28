@@ -65,15 +65,7 @@
   }
 
   function validateJson() {
-    var val = $(this).val();
-    $(this).parent().removeClass('crm-error');
-    if (val[0] === '[' || val[0] === '{') {
-      try {
-        JSON.parse(val);
-      } catch (e) {
-        $(this).parent().addClass('crm-error');
-      }
-    }
+    // TODO: strict json isn't required so we can't use JSON.parse for error checking. Need something like angular.eval.
   }
 
   function addOption() {
