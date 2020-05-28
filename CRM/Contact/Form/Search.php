@@ -197,6 +197,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => NULL,
         'taskClassName' => 'CRM_Contact_Task',
         'component' => '',
+        'entity' => 'Contact',
       ],
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE => [
         'selectorName' => 'CRM_Contribute_Selector_Search',
@@ -207,6 +208,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Contribute_Task',
         'component' => 'CiviContribute',
+        'entity' => 'Contribution',
       ],
       CRM_Contact_BAO_Query::MODE_EVENT => [
         'selectorName' => 'CRM_Event_Selector_Search',
@@ -217,6 +219,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Event_Task',
         'component' => 'CiviEvent',
+        'entity' => 'Participant',
       ],
       CRM_Contact_BAO_Query::MODE_ACTIVITY => [
         'selectorName' => 'CRM_Activity_Selector_Search',
@@ -227,6 +230,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Activity_Task',
         'component' => 'activity',
+        'entity' => 'Activity',
       ],
       CRM_Contact_BAO_Query::MODE_MEMBER => [
         'selectorName' => 'CRM_Member_Selector_Search',
@@ -237,6 +241,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Member_Task',
         'component' => 'CiviMember',
+        'entity' => 'Member',
       ],
       CRM_Contact_BAO_Query::MODE_CASE => [
         'selectorName' => 'CRM_Case_Selector_Search',
@@ -247,6 +252,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Case_Task',
         'component' => 'CiviCase',
+        'entity' => 'Case',
       ],
       CRM_Contact_BAO_Query::MODE_CONTACTSRELATED => [
         'selectorName' => self::$_selectorName,
@@ -257,6 +263,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => NULL,
         'taskClassName' => 'CRM_Contact_Task',
         'component' => 'related_contact',
+        'entity' => 'Contact',
       ],
       CRM_Contact_BAO_Query::MODE_MAILING => [
         'selectorName' => 'CRM_Mailing_Selector_Search',
@@ -267,6 +274,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'resultContext' => 'Search',
         'taskClassName' => 'CRM_Mailing_Task',
         'component' => 'CiviMail',
+        'entity' => 'Mailing',
       ],
     ];
   }
