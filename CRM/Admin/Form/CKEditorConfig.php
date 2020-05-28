@@ -33,6 +33,7 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
     'extraPlugins',
     'toolbarGroups',
     'removeButtons',
+    'customConfig',
     'filebrowserBrowseUrl',
     'filebrowserImageBrowseUrl',
     'filebrowserFlashBrowseUrl',
@@ -105,23 +106,31 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
       // Standardize line-endings
       . preg_replace('~\R~u', "\n", $params['config']);
 
-    // Use all params starting with config_
+    // Generate a whitelist of allowed config params
+    $allOptions = json_decode(file_get_contents(\Civi::paths()->getPath('[civicrm.root]/js/wysiwyg/ck-options.json')), TRUE);
+    // These two aren't really blacklisted they're just in a different part of the form
+    $blackList = array_diff($this->blackList, ['skin', 'extraPlugins']);
+    // All options minus blacklist = whitelist
+    $whiteList = array_diff(array_column($allOptions, 'id'), $blackList);
+
+    // Save whitelisted params starting with config_
     foreach ($params as $key => $val) {
       $val = trim($val);
-      if (strpos($key, 'config_') === 0 && strlen($val)) {
+      if (strpos($key, 'config_') === 0 && strlen($val) && in_array(substr($key, 7), $whiteList)) {
         if ($val != 'true' && $val != 'false' && $val != 'null' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
-          $val = json_encode($val, JSON_UNESCAPED_SLASHES);
+          $val = '"' . $val . '"';
         }
-        elseif ($val[0] == '{' || $val[0] == '[') {
-          if (!is_array(json_decode($val, TRUE))) {
-            // Invalid JSON. Do not save.
-            continue;
+        try {
+          $val = CRM_Utils_JS::encode(CRM_Utils_JS::decode($val, TRUE));
+          $pos = strrpos($config, '};');
+          $key = preg_replace('/^config_/', 'config.', $key);
+          $setting = "\n\t{$key} = {$val};\n";
+          $config = substr_replace($config, $setting, $pos, 0);
+        } catch (CRM_Core_Exception $e) {
+          if (!empty($params['save'])) {
+            CRM_Core_Session::setStatus(ts("Error saving %1.", [1 => $key]), ts('Invalid Value'), 'error');
           }
         }
-        $pos = strrpos($config, '};');
-        $key = preg_replace('/^config_/', 'config.', $key);
-        $setting = "\n\t{$key} = {$val};\n";
-        $config = substr_replace($config, $setting, $pos, 0);
       }
     }
     self::saveConfigFile($this->preset, $config);
