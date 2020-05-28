@@ -1700,6 +1700,26 @@ if (!CRM.vars) CRM.vars = {};
 
   // CVE-2020-11022 and CVE-2020-11023  Passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code.
   $.htmlPrefilter = function(html) {
+    // This is how jQuery determines the first tag in the HTML.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5521
+    var tag = ( rtagName.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase();
+
+    // It is not valid HTML for <option> or <optgroup> to have <select> as
+    // either a descendant or sibling, and attempts to inject one can cause
+    // XSS on jQuery versions before 3.5. Since this is invalid HTML and a
+    // possible XSS attack, reject the entire string.
+    // @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11023
+    if ((tag === 'option' || tag === 'optgroup') && html.match(/<\/?select/i)) {
+      html = '';
+    }
+
+    // Retain jQuery's prior to 3.5 conversion of pseudo-XHTML, but for only
+    // the tags in the `selfClosingTagsToReplace` list defined above.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5518
+    // @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11022
+    html = html.replace(rxhtmlTagWithoutSpaceOrAttributes, "<$1></$1>");
+    html = html.replace(rxhtmlTagWithSpaceAndMaybeAttributes, "<$1$2></$1>");
+
     return html;
   };
 
