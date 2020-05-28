@@ -215,6 +215,9 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         ' [{a: {aa: true}, b: [false, null, {x: 1, y: 2, z: 3}] , "c": -1}, ["fee", "fie", \'foe\']]',
         [['a' => ['aa' => TRUE], 'b' => [FALSE, NULL, ['x' => 1, 'y' => 2, 'z' => 3]], "c" => -1], ["fee", "fie", "foe"]],
       ],
+      ["'Hi\&'", 'Hi&'],
+      ['"Hello " + alert("XSS") + " sucker"', NULL],
+      ["'Hello ' + alert('XSS') + ' sucker'", NULL],
     ];
   }
 
@@ -234,8 +237,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
       ],
       [
-        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\\\'oo", '"bar"'], 'b' => []]]],
-        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\\\\\'oo', '\"bar\"'], b: {}}}}",
+        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\'oo", '"bar"'], 'b' => []]]],
+        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\'oo', '\"bar\"'], b: {}}}}",
       ],
       [TRUE, 'true'],
       [' ', "' '"],
@@ -299,7 +302,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', "foo&": getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
       ],
       [
-        '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\\\&\\/" : 0}',
+        '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\&\\/" : 0}',
         ['some"key' => 'typeof foo === \'number\' ? true : false', "O'Really?" => '",((,"', 'A"quote"' => '1 + 1', '\\&/' => '0'],
         '{\'some"key\': typeof foo === \'number\' ? true : false, "O\'Really?": ",((,", \'A"quote"\': 1 + 1, "\\\\&/": 0}',
       ],
