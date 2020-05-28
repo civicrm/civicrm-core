@@ -1,5 +1,4 @@
 <?php
-use CRM_Event_Cart_ExtensionUtil as E;
 
 /**
  * Collection of upgrade steps.

@@ -1,7 +1,6 @@
 <?php
 
 require_once 'eventcart.civix.php';
-use CRM_Event_Cart_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
