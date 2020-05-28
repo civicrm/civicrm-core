@@ -1659,4 +1659,9 @@ if (!CRM.vars) CRM.vars = {};
     }
   });
 
+  // CVE-2020-11022 and CVE-2020-11023  Passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code.
+  $.htmlPrefilter = function(html) {
+    return html;
+  };
+
 })(jQuery, _);
