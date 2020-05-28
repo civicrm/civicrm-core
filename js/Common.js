@@ -1700,6 +1700,69 @@ if (!CRM.vars) CRM.vars = {};
 
   // CVE-2020-11022 and CVE-2020-11023  Passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code.
   $.htmlPrefilter = function(html) {
+    // Prior to jQuery 3.5, jQuery converted XHTML-style self-closing tags to
+    // their XML equivalent: e.g., "<div />" to "<div></div>". This is
+    // problematic for several reasons, including that it's vulnerable to XSS
+    // attacks. However, since this was jQuery's behavior for many years, many
+    // Drupal modules and jQuery plugins may be relying on it. Therefore, we
+    // preserve that behavior, but for a limited set of tags only, that we believe
+    // to not be vulnerable. This is the set of HTML tags that satisfy all of the
+    // following conditions:
+    // - In DOMPurify's list of HTML tags. If an HTML tag isn't safe enough to
+    //   appear in that list, then we don't want to mess with it here either.
+    //   @see https://github.com/cure53/DOMPurify/blob/2.0.11/dist/purify.js#L128
+    // - A normal element (not a void, template, text, or foreign element).
+    //   @see https://html.spec.whatwg.org/multipage/syntax.html#elements-2
+    // - An element that is still defined by the current HTML specification
+    //   (not a deprecated element), because we do not want to rely on how
+    //   browsers parse deprecated elements.
+    //   @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+    // - Not 'html', 'head', or 'body', because this pseudo-XHTML expansion is
+    //   designed for fragments, not entire documents.
+    // - Not 'colgroup', because due to an idiosyncrasy of jQuery's original
+    //   regular expression, it didn't match on colgroup, and we don't want to
+    //   introduce a behavior change for that.
+    var selfClosingTagsToReplace = [
+      'a', 'abbr', 'address', 'article', 'aside', 'audio', 'b', 'bdi', 'bdo',
+      'blockquote', 'button', 'canvas', 'caption', 'cite', 'code', 'data',
+      'datalist', 'dd', 'del', 'details', 'dfn', 'div', 'dl', 'dt', 'em',
+      'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3',
+      'h4', 'h5', 'h6', 'header', 'hgroup', 'i', 'ins', 'kbd', 'label', 'legend',
+      'li', 'main', 'map', 'mark', 'menu', 'meter', 'nav', 'ol', 'optgroup',
+      'option', 'output', 'p', 'picture', 'pre', 'progress', 'q', 'rp', 'rt',
+      'ruby', 's', 'samp', 'section', 'select', 'small', 'source', 'span',
+      'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th',
+      'thead', 'time', 'tr', 'u', 'ul', 'var', 'video'
+    ];
+
+    // Define regular expressions for <TAG/> and <TAG ATTRIBUTES/>. Doing this as
+    // two expressions makes it easier to target <a/> without also targeting
+    // every tag that starts with "a".
+    var xhtmlRegExpGroup = '(' + selfClosingTagsToReplace.join('|') + ')';
+    var whitespace = '[\\x20\\t\\r\\n\\f]';
+    var rxhtmlTagWithoutSpaceOrAttributes = new RegExp('<' + xhtmlRegExpGroup + '\\/>', 'gi');
+    var rxhtmlTagWithSpaceAndMaybeAttributes = new RegExp('<' + xhtmlRegExpGroup + '(' + whitespace + '[^>]*)\\/>', 'gi');
+
+    // jQuery 3.5 also fixed a vulnerability for when </select> appears within
+    // an <option> or <optgroup>, but it did that in local code that we can't
+    // backport directly. Instead, we filter such cases out. To do so, we need to
+    // determine when jQuery would otherwise invoke the vulnerable code, which it
+    // uses this regular expression to determine. The regular expression changed
+    // for version 3.0.0 and changed again for 3.4.0.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L4958
+    // @see https://github.com/jquery/jquery/blob/3.0.0/dist/jquery.js#L4584
+    // @see https://github.com/jquery/jquery/blob/3.4.0/dist/jquery.js#L4712
+    var rtagName = /<([\w:]+)/;
+
+    // The regular expression that jQuery uses to determine which self-closing
+    // tags to expand to open and close tags. This is vulnerable, because it
+    // matches all tag names except the few excluded ones. We only use this
+    // expression for determining vulnerability. The expression changed for
+    // version 3, but we only need to check for vulnerability in versions 1 and 2,
+    // so we use the expression from those versions.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L4957
+    var rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi;
+
     // This is how jQuery determines the first tag in the HTML.
     // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5521
     var tag = ( rtagName.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase();
