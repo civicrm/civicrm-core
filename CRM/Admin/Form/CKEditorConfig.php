@@ -42,23 +42,11 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
     'filebrowserFlashUploadUrl',
   ];
 
-  public $preset;
-
   /**
-   * Run page.
-   *
-   * @return string
+   * Prepare form
    */
   public function preProcess() {
-    $this->preset = CRM_Utils_Array::value('preset', $_REQUEST, 'default');
-    // If the form was submitted, take appropriate action.
-    if (!empty($_POST['revert'])) {
-      self::deleteConfigFile($this->preset);
-      self::setConfigDefault();
-    }
-    elseif (!empty($_POST['config'])) {
-      $this->save($_POST);
-    }
+    CRM_Utils_Request::retrieve('preset', 'String', $this, FALSE, 'default', 'GET');
 
     $settings = $this->getConfigSettings();
 
@@ -76,15 +64,14 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
         'settings' => $settings,
       ]);
 
-    $configUrl = self::getConfigUrl($this->preset) ?: self::getConfigUrl('default');
+    $configUrl = self::getConfigUrl($this->get('preset')) ?: self::getConfigUrl('default');
 
-    $this->assign('preset', $this->preset);
+    $this->assign('preset', $this->get('preset'));
     $this->assign('presets', CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name'));
     $this->assign('skins', $this->getCKSkins());
     $this->assign('skin', CRM_Utils_Array::value('skin', $settings));
     $this->assign('extraPlugins', CRM_Utils_Array::value('extraPlugins', $settings));
     $this->assign('configUrl', $configUrl);
-    $this->assign('revertConfirm', htmlspecialchars(ts('Are you sure you want to revert all changes?', ['escape' => 'js'])));
 
     CRM_Utils_System::appendBreadCrumb([
       [
@@ -92,8 +79,45 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
         'title' => ts('Display Preferences'),
       ],
     ]);
+  }
 
-    return parent::preProcess();
+  /**
+   * Build form
+   */
+  public function buildQuickForm() {
+    $revertConfirm = json_encode(ts('Are you sure you want to revert all changes?'));
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+      [
+        'type' => 'refresh',
+        'name' => ts('Revert to Default'),
+        'icon' => 'fa-undo',
+        'js' => ['onclick' => "return confirm($revertConfirm);"],
+      ],
+    ]);
+  }
+
+  /**
+   * Handle form submission
+   */
+  public function postProcess() {
+    if (!empty($_POST[$this->getButtonName('refresh')])) {
+      self::deleteConfigFile($this->get('preset'));
+      self::setConfigDefault();
+    }
+    else {
+      if (!empty($_POST[$this->getButtonName('next')])) {
+        $this->save($_POST);
+      }
+      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/setting/preferences/display', ['reset' => 1]));
+    }
   }
 
   /**
@@ -126,17 +150,14 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
           $key = preg_replace('/^config_/', 'config.', $key);
           $setting = "\n\t{$key} = {$val};\n";
           $config = substr_replace($config, $setting, $pos, 0);
-        } catch (CRM_Core_Exception $e) {
-          if (!empty($params['save'])) {
-            CRM_Core_Session::setStatus(ts("Error saving %1.", [1 => $key]), ts('Invalid Value'), 'error');
-          }
+        }
+        catch (CRM_Core_Exception $e) {
+          CRM_Core_Session::setStatus(ts("Error saving %1.", [1 => $key]), ts('Invalid Value'), 'error');
         }
       }
     }
-    self::saveConfigFile($this->preset, $config);
-    if (!empty($params['save'])) {
-      CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
-    }
+    self::saveConfigFile($this->get('preset'), $config);
+    CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
   }
 
   /**
@@ -194,7 +215,7 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
    */
   private function getConfigSettings() {
     $matches = $result = [];
-    $file = self::getConfigFile($this->preset) ?: self::getConfigFile('default');
+    $file = self::getConfigFile($this->get('preset')) ?: self::getConfigFile('default');
     $result['skin'] = 'moono';
     if ($file) {
       $contents = file_get_contents($file);

@@ -44,10 +44,6 @@
     border-bottom: 0 none;
     padding: 3px 10px 1px !important;
   }
-  .crm-config-option-row span.crm-error:after {
-    font-family: FontAwesome;
-    content: " \f071 Invalid JSON"
-  }
 {/literal}</style>
 {* Force the custom config file to reload by appending a new query string *}
 <script type="text/javascript">
@@ -64,7 +60,7 @@
     {/foreach}
   </ul>
 </div>
-<form method="post" action="{crmURL}" id="toolbarModifierForm">
+<div id="toolbarModifierForm">
   <fieldset>
     <div class="crm-block crm-form-block">
       <label for="skin">{ts}Skin{/ts}</label>
@@ -89,7 +85,6 @@
       </div>
     </div>
 
-
     <div class="crm-block crm-form-block">
       <fieldset>
         <legend>{ts}Advanced Options{/ts}</legend>
@@ -98,17 +93,9 @@
       </fieldset>
     </div>
 
-    <div class="crm-submit-buttons">
-      <span class="crm-button crm-i-button">
-        <i class="crm-i fa-wrench" aria-hidden="true"></i> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
-      </span>
-      <span class="crm-button crm-i-button">
-        <i class="crm-i fa-times" aria-hidden="true"></i> <input type="submit" value="{ts}Revert to Default{/ts}" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');"/>
-      </span>
-    </div>
-    <input type="hidden" value="{$preset}" name="preset" />
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   </fieldset>
-</form>
+</div>
 <script type="text/template" id="config-row-tpl">
   <div class="crm-config-option-row">
     <input class="huge crm-config-option-name" placeholder="{ts}Option{/ts}"/>
