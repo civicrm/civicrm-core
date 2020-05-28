@@ -44,10 +44,9 @@ class CRM_Event_Cart_Upgrader_Base {
    */
   static public function instance() {
     if (!self::$instance) {
-      // FIXME auto-generate
       self::$instance = new CRM_Event_Cart_Upgrader(
         'eventcart',
-        realpath(__DIR__ . '/../../../')
+        E::path()
       );
     }
     return self::$instance;
