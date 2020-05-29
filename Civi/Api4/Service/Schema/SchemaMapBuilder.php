@@ -111,7 +111,7 @@ class SchemaMapBuilder {
         $target = $map->getTableByName($link->getTargetTable());
         $tableName = $link->getBaseTable();
         // Exclude custom field tables
-        if (strpos($link->getTargetTable(), 'civicrm_value_') !== 0) {
+        if (strpos($link->getTargetTable(), 'civicrm_value_') !== 0 && strpos($link->getBaseTable(), 'civicrm_value_') !== 0) {
           $plural = str_replace('civicrm_', '', $this->getPlural($tableName));
           $joinable = new Joinable($tableName, $link->getBaseColumn(), $plural);
           $joinable->setJoinType($joinable::JOIN_TYPE_ONE_TO_MANY);
@@ -190,7 +190,7 @@ class SchemaMapBuilder {
     }
 
     foreach ($links as $alias => $link) {
-      $joinable = new CustomGroupJoinable($link['tableName'], $alias, $link['isMultiple'], $entity, $link['columns']);
+      $joinable = new CustomGroupJoinable($link['tableName'], $alias, $link['isMultiple'], $link['columns']);
       $baseTable->addTableLink('id', $joinable);
     }
   }

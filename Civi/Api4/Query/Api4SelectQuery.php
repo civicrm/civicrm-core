@@ -518,9 +518,8 @@ class Api4SelectQuery extends SelectQuery {
     }
     $prefix = $pathArray ? implode('.', $pathArray) . '.' : '';
     // Cache field info for retrieval by $this->getField()
-    $joinEntity = $lastLink->getEntity();
     foreach ($lastLink->getEntityFields() as $fieldObject) {
-      $fieldArray = ['entity' => $joinEntity] + $fieldObject->toArray();
+      $fieldArray = $fieldObject->toArray();
       $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
       $fieldArray['is_custom'] = $isCustom;
       $fieldArray['is_join'] = TRUE;

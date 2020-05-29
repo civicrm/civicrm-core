@@ -40,9 +40,7 @@ class GetLinks extends \Civi\Api4\Generic\BasicGetAction {
           'links' => [],
         ];
         foreach ($table->getTableLinks() as $link) {
-          $link = $link->toArray();
-          $link['entity'] = CoreUtil::getApiNameFromTableName($link['targetTable']);
-          $item['links'][] = $link;
+          $item['links'][] = $link->toArray();
         }
         $result[] = $item;
       }
