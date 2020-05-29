@@ -680,7 +680,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $hash = self::generateLogFileHash($config) . '.';
       }
       else {
-        $hash = '';
+        // If Config And Log Directory is under the webroot still generate the hash file.
+        if (stripos($config->configAndLogDir, $config->userSystem->getCiviSourceStorage()['path'])) {
+          $hash = self::generateLogFileHash($config) . '.';
+        }
+        else {
+          $hash = '';
+        }
       }
       $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . 'log';
 
