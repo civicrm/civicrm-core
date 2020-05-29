@@ -44,7 +44,7 @@ class CRM_Mailing_Form_Task_AdhocMailing extends CRM_Contact_Form_Task {
       ],
     ]);
 
-    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $mailing['id']));
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a', NULL, TRUE, '/mailing/' . $mailing['id']));
   }
 
 }
