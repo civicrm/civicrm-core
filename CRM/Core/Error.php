@@ -676,22 +676,30 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $prefixString = $prefix ? ($prefix . '.') : '';
 
-      $hash = self::generateLogFileHash($config);
-      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
+      if (CRM_Utils_Constant::value('CIVICRM_LOG_HASH', TRUE)) {
+        $hash = self::generateLogFileHash($config) . '.';
+      }
+      else {
+        $hash = '';
+      }
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . 'log';
 
-      // Roll log file monthly or if greater than 256M.
+      // Roll log file monthly or if greater than our threshold.
       // Size-based rotation introduced in response to filesize limits on
       // certain OS/PHP combos.
-      if (file_exists($fileName)) {
-        $fileTime = date("Ym", filemtime($fileName));
-        $fileSize = filesize($fileName);
-        if (($fileTime < date('Ym')) ||
-          ($fileSize > 256 * 1024 * 1024) ||
-          ($fileSize < 0)
-        ) {
-          rename($fileName,
-            $fileName . '.' . date('YmdHi')
-          );
+      $maxBytes = CRM_Utils_Constant::value('CIVICRM_LOG_ROTATESIZE', 256 * 1024 * 1024);
+      if ($maxBytes) {
+        if (file_exists($fileName)) {
+          $fileTime = date("Ym", filemtime($fileName));
+          $fileSize = filesize($fileName);
+          if (($fileTime < date('Ym')) ||
+            ($fileSize > $maxBytes) ||
+            ($fileSize < 0)
+          ) {
+            rename($fileName,
+              $fileName . '.' . date('YmdHi')
+            );
+          }
         }
       }
       \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
