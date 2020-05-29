@@ -130,7 +130,8 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return array
    *   (reference) of tab links
    */
-  public static function &tabs($enableCart) {
+  public static function &tabs() {
+    $enableCart = Civi::settings()->get('enable_cart');
     $cacheKey = $enableCart ? 1 : 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = [];

@@ -38,7 +38,7 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
     $a = (array) $participant;
     $this->copyValues($a);
 
-    $this->email = $participant['email'] ?? NULL;
+    $this->email = $a['email'] ?? NULL;
   }
 
   /**
