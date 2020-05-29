@@ -120,11 +120,11 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if (isset($params['is_recur']) && $params['is_recur'] == TRUE) {
-      CRM_Core_Error::fatal(ts('Elavon - recurring payments not implemented'));
+      throw new CRM_Core_Exception(ts('Elavon - recurring payments not implemented'));
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('Elavon / Nova Virtual Merchant Gateway requires curl with SSL support'));
+      throw new CRM_Core_Exception(ts('Elavon / Nova Virtual Merchant Gateway requires curl with SSL support'));
     }
 
     //Create the array of variables to be sent to the processor from the $params array

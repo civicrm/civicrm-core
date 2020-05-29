@@ -53,10 +53,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::RESTORE);
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
     }
     elseif (!CRM_Core_Permission::check('delete contacts')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to delete this contact.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact.'));
     }
 
     $this->assign('trash', Civi::settings()->get('contact_undelete') and !$this->_skipUndelete);
@@ -68,10 +68,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     if ($cid) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
       }
       elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
-        CRM_Core_Error::fatal(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
+        CRM_Core_Error::statusBounce(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
 
       $this->_contactIds = [$cid];
