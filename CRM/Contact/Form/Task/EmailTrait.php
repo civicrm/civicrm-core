@@ -413,12 +413,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $subject = "[case #$hash] $subject";
     }
 
-    $attachments = [];
-    CRM_Core_BAO_File::formatAttachment($formValues,
-      $attachments,
-      NULL, NULL
-    );
-
     // format contact details array to handle multiple emails from same contact
     $formattedContactDetails = [];
     foreach ($this->_contactIds as $key => $contactId) {
@@ -450,7 +444,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       NULL,
       NULL,
       $from,
-      $attachments,
+      $this->getAttachments($formValues),
       $cc,
       $bcc,
       array_keys($this->_toContactDetails),
@@ -631,6 +625,22 @@ trait CRM_Contact_Form_Task_EmailTrait {
   protected function setSuppressedEmail($contactID, $values) {
     $contactViewUrl = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $contactID);
     $this->suppressedEmails[$contactID] = "<a href='$contactViewUrl' title='{$values['email']}'>{$values['display_name']}</a>" . ($values['on_hold'] ? '(' . ts('on hold') . ')' : '');
+  }
+
+  /**
+   * Get any attachments.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  protected function getAttachments(array $formValues): array {
+    $attachments = [];
+    CRM_Core_BAO_File::formatAttachment($formValues,
+      $attachments,
+      NULL, NULL
+    );
+    return $attachments;
   }
 
 }
