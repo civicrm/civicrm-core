@@ -68,19 +68,17 @@ class CRM_Utils_Address_USPS {
 
     $XMLQuery = '<AddressValidateRequest USERID="' . $userID . '"><Address ID="0"><Address1>' . CRM_Utils_Array::value('supplemental_address_1', $values, '') . '</Address1><Address2>' . $address2 . '</Address2><City>' . $values['city'] . '</City><State>' . $values['state_province'] . '</State><Zip5>' . $values['postal_code'] . '</Zip5><Zip4>' . CRM_Utils_Array::value('postal_code_suffix', $values, '') . '</Zip4></Address></AddressValidateRequest>';
 
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request();
-
-    $request->setURL($url);
-
-    $request->addQueryString('API', 'Verify');
-    $request->addQueryString('XML', $XMLQuery);
-
-    $response = $request->sendRequest();
+    $client = new GuzzleHttp\Client();
+    $request = $client->request('GET', $url, [
+      'query' => [
+        'API' => 'Verify',
+        'XML' => $XMLQuery,
+      ],
+    ]);
 
     $session = CRM_Core_Session::singleton();
 
-    $code = $request->getResponseCode();
+    $code = $request->getStatusCode();
     if ($code != 200) {
       $session->setStatus(ts('USPS Address Lookup Failed with HTTP status code: %1',
         [1 => $code]
@@ -88,7 +86,7 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-    $responseBody = $request->getResponseBody();
+    $responseBody = $request->getBody();
 
     $xml = simplexml_load_string($responseBody);
 

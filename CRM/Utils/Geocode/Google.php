@@ -105,10 +105,9 @@ class CRM_Utils_Geocode_Google {
 
     $query = 'https://' . self::$_server . self::$_uri . $add;
 
-    require_once 'HTTP/Request.php';
-    $request = new HTTP_Request($query);
-    $request->sendRequest();
-    $string = $request->getResponseBody();
+    $client = new GuzzleHttp\Client();
+    $request = $client->request('GET', $query);
+    $string = $request->getBody();
 
     libxml_use_internal_errors(TRUE);
     $xml = @simplexml_load_string($string);
