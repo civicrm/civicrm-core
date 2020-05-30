@@ -42,7 +42,7 @@ class CRM_Financial_BAO_Payment {
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
     $lineItems = self::getPayableLineItems($params);
 
-    $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date'];
+    $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
     $paymentTrxnParams['is_payment'] = 1;
     // Really we should have a DB default.
