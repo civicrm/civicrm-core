@@ -2592,13 +2592,23 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
           $contributionParams['financial_type_id'] = $recurringContribution['financial_type_id'];
         }
       }
-      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
-        $contributionParams['contribution_recur_id'],
-        array_intersect_key($contributionParams, [
-          'total_amount' => TRUE,
-          'financial_type_id' => TRUE,
-        ])
-      );
+      if (empty($contributionParams['contribution_recur_id'])) {
+        $templateContribution = [
+          'financial_type_id' => $contribution->financial_type_id,
+          'contact_id' => $contribution->contact_id,
+          'source' => $contribution->source,
+        ];
+      }
+      else {
+        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
+          $contributionParams['contribution_recur_id'],
+          array_intersect_key($contributionParams, [
+            'total_amount' => TRUE,
+            'financial_type_id' => TRUE,
+          ])
+        );
+      }
+      // @fixme What is this line trying to do?
       $input['line_item'] = $contributionParams['line_item'] = $templateContribution['line_item'];
 
       $contributionParams['status_id'] = 'Pending';
@@ -2607,6 +2617,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $contribution->financial_type_id = $contributionParams['financial_type_id'];
       }
       else {
+        // If we have a recurring contribution we should have a templateContribution
+        // Otherwise use the contribution object that we have been passed
         $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       }
       $contributionParams['contact_id'] = $templateContribution['contact_id'];
@@ -2788,10 +2800,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $this->find(TRUE);
     }
 
-    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
-      'paymentProcessor',
-      $ids
-    ));
+    $paymentProcessorID = $input['payment_processor_id'] ?? $ids['paymentProcessor'] ?? NULL;
 
     if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
       $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',

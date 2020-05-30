@@ -595,10 +595,13 @@ function civicrm_api3_contribution_repeattransaction($params) {
       'A valid original contribution ID is required', 'invalid_data');
   }
   $original_contribution = clone $contribution;
-  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
-    'return' => 'payment_processor_id',
-    'id' => $contribution->contribution_recur_id,
-  ]);
+  if (!empty($contribution->contribution_recur_id)) {
+    // If $contribution->contribution_recur_id is empty this returns 1 as the result which is wrong!
+    $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+      'return' => 'payment_processor_id',
+      'id' => $contribution->contribution_recur_id,
+    ]);
+  }
   try {
     if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');
