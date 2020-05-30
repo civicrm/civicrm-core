@@ -1391,6 +1391,11 @@ abstract class CRM_Core_Payment {
    * proceed. Note the form layer will only call this after calling
    * $processor->supports('cancelRecurring');
    *
+   * A payment processor can control whether to notify the actual payment provider or just
+   * cancel in CiviCRM by setting the `isNotifyProcessorOnCancelRecur` property on PropertyBag.
+   * If supportsCancelRecurringNotifyOptional() is TRUE this will be automatically set based on
+   * the user selection on the form. If FALSE you need to set it yourself.
+   *
    * @param \Civi\Payment\PropertyBag $propertyBag
    *
    * @return array
@@ -1399,7 +1404,7 @@ abstract class CRM_Core_Payment {
    */
   public function doCancelRecurring(PropertyBag $propertyBag) {
     if (method_exists($this, 'cancelSubscription')
-    && $propertyBag->getIsNotifyProcessorOnCancelRecur()) {
+    && ($propertyBag->has('isNotifyProcessorOnCancelRecur') && $propertyBag->getIsNotifyProcessorOnCancelRecur())) {
       $message = NULL;
       if ($this->cancelSubscription($message, $propertyBag)) {
         return ['message' => $message];

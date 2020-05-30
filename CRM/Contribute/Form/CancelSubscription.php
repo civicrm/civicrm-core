@@ -214,7 +214,9 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
     try {
       $propertyBag = new PropertyBag();
-      $propertyBag->setIsNotifyProcessorOnCancelRecur(!empty($params['send_cancel_request']));
+      if (isset($params['send_cancel_request'])) {
+        $propertyBag->setIsNotifyProcessorOnCancelRecur(!empty($params['send_cancel_request']));
+      }
       $propertyBag->setContributionRecurID($this->getSubscriptionDetails()->recur_id);
       $propertyBag->setRecurProcessorID($this->getSubscriptionDetails()->subscription_id);
       $message = $this->_paymentProcessorObj->doCancelRecurring($propertyBag)['message'];
