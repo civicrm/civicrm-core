@@ -835,6 +835,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution', FALSE, FALSE, FALSE, $checkPermission)
       );
 
+      $fields['financial_type_id']['title'] = ts('Financial Type ID');
+
       self::$_exportableFields = $fields;
     }
 
