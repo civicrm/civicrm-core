@@ -609,6 +609,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
 
     $passThroughParams = [
       'trxn_id',
+      'order_reference',
       'total_amount',
       'campaign_id',
       'fee_amount',

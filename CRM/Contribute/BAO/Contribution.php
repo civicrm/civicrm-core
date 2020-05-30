@@ -4417,6 +4417,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'fee_amount',
       'net_amount',
       'trxn_id',
+      'order_reference',
       'check_number',
       'payment_instrument_id',
       'is_test',
