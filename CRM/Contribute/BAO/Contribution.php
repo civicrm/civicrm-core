@@ -3609,7 +3609,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'fee_amount' => $params['fee_amount'] ?? NULL,
         'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
         'currency' => $params['contribution']->currency,
-        'trxn_id' => $params['contribution']->trxn_id,
+        'trxn_id' => $params['trxn_id'],
+        'order_reference' => $params['order_reference'],
+
         // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
         // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
         // this should really default to completed (after discussion).
