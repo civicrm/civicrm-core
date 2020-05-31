@@ -383,19 +383,6 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     return $dao->N;
   }
 
-  public function __destruct() {
-    //drop the temp. tables if they exist
-    if ($this->_igTable && !empty($this->_includeGroups)) {
-      $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_igTable}";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-
-    if ($this->_xgTable && !empty($this->_excludeGroups)) {
-      $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_xgTable}";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-  }
-
   /**
    * @param string $tableAlias
    */
