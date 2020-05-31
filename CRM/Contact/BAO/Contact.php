@@ -101,7 +101,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @return CRM_Contact_DAO_Contact|CRM_Core_Error|NULL
    *   Created or updated contact object or error object.
    *   (error objects are being phased out in favour of exceptions)
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public static function add(&$params) {
     $contact = new CRM_Contact_DAO_Contact();
@@ -1320,7 +1320,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       return $contactTypes;
     }
     else {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception();
     }
   }
 
@@ -2017,7 +2017,7 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     if (empty($contactID)) {
-      CRM_Core_Error::fatal('Cannot proceed without a valid contact id');
+      throw new CRM_Core_Exception('Cannot proceed without a valid contact id');
     }
 
     // Process group and tag

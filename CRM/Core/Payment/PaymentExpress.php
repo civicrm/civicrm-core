@@ -103,7 +103,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *   Assoc array of input parameters for this transaction.
    */
   public function doDirectPayment(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
+    throw new CRM_Core_Exception(ts('This function is not implemented'));
   }
 
   /**
@@ -118,7 +118,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     $component = strtolower($component);
     $config = CRM_Core_Config::singleton();
     if ($component != 'contribute' && $component != 'event') {
-      CRM_Core_Error::fatal(ts('Component is invalid'));
+      throw new CRM_Core_Exception(ts('Component is invalid'));
     }
 
     $url = CRM_Utils_System::externUrl('extern/pxIPN');
@@ -211,7 +211,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       }
       else {
         // calling DPS failed
-        CRM_Core_Error::fatal(ts('Unable to establish connection to the payment gateway.'));
+        throw new CRM_Core_Exception(ts('Unable to establish connection to the payment gateway.'));
       }
     }
     else {

@@ -139,11 +139,11 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
-      CRM_Core_Error::fatal(ts('eWAY - recurring payments not implemented'));
+      throw new CRM_Core_Exception(ts('eWAY - recurring payments not implemented'));
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('eWAY - Gateway requires curl with SSL support'));
+      throw new CRM_Core_Exception(ts('eWAY - Gateway requires curl with SSL support'));
     }
 
     // eWAY Client ID

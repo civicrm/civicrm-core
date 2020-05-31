@@ -185,7 +185,7 @@ AND    p.entity_id    = e.id
     }
 
     if (empty($event)) {
-      CRM_Core_Error::fatal(ts('There are no events with Price Sets'));
+      CRM_Core_Error::statusBounce(ts('There are no events with Price Sets'));
     }
 
     $form->add('select',

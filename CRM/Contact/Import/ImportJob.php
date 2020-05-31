@@ -52,7 +52,7 @@ class CRM_Contact_Import_ImportJob {
    * @param null $createSql
    * @param bool $createTable
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public function __construct($tableName = NULL, $createSql = NULL, $createTable = FALSE) {
     $dao = new CRM_Core_DAO();
@@ -60,7 +60,7 @@ class CRM_Contact_Import_ImportJob {
 
     if ($createTable) {
       if (!$createSql) {
-        CRM_Core_Error::fatal('Either an existing table name or an SQL query to build one are required');
+        throw new CRM_Core_Exception(ts('Either an existing table name or an SQL query to build one are required'));
       }
 
       // FIXME: we should regen this table's name if it exists rather than drop it
@@ -72,7 +72,7 @@ class CRM_Contact_Import_ImportJob {
     }
 
     if (!$tableName) {
-      CRM_Core_Error::fatal('Import Table is required.');
+      throw new CRM_Core_Exception(ts('Import Table is required.'));
     }
 
     $this->_tableName = $tableName;

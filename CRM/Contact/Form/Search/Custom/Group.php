@@ -329,7 +329,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
             $ssGroup = new CRM_Contact_DAO_Group();
             $ssGroup->id = $values;
             if (!$ssGroup->find(TRUE)) {
-              CRM_Core_Error::fatal();
+              CRM_Core_Error::statusBounce(ts('Smart group sepecifed in exclude groups is not found in the database'));
             }
             CRM_Contact_BAO_GroupContactCache::load($ssGroup);
 
@@ -389,7 +389,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
           $ssGroup = new CRM_Contact_DAO_Group();
           $ssGroup->id = $values;
           if (!$ssGroup->find(TRUE)) {
-            CRM_Core_Error::fatal();
+            CRM_Core_Error::statusBounce(ts('Smart group sepecifed in include groups is not found in the database'));
           }
           CRM_Contact_BAO_GroupContactCache::load($ssGroup);
 

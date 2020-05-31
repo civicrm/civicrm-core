@@ -156,11 +156,11 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if ($params['is_recur'] == TRUE) {
-      CRM_Core_Error::fatal(ts('First Data - recurring payments not implemented'));
+      throw new CRM_Core_Exception(ts('First Data - recurring payments not implemented'));
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('%1 - Gateway requires curl with SSL support', [1 => $paymentProcessor]));
+      throw new CRM_Core_Exception(ts('%1 - Gateway requires curl with SSL support', [1 => $paymentProcessor]));
     }
 
     /**********************************************************

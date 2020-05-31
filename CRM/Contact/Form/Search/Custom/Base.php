@@ -193,7 +193,7 @@ class CRM_Contact_Form_Search_Custom_Base {
 
     foreach ($includeStrings as $string) {
       if (stripos($sql, $string) === FALSE) {
-        CRM_Core_Error::fatal(ts('Could not find \'%1\' string in SQL clause.',
+        CRM_Core_Error::statusBounce(ts('Could not find \'%1\' string in SQL clause.',
           [1 => $string]
         ));
       }
@@ -201,7 +201,7 @@ class CRM_Contact_Form_Search_Custom_Base {
 
     foreach ($excludeStrings as $string) {
       if (preg_match('/(\s' . $string . ')|(' . $string . '\s)/i', $sql)) {
-        CRM_Core_Error::fatal(ts('Found illegal \'%1\' string in SQL clause.',
+        CRM_Core_Error::statusBounce(ts('Found illegal \'%1\' string in SQL clause.',
           [1 => $string]
         ));
       }
