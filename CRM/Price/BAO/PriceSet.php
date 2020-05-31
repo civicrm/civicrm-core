@@ -114,26 +114,22 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    */
   public static function getDefaultPriceSet($entity = 'contribution') {
-    if (!empty(self::$_defaultPriceSet[$entity])) {
-      return self::$_defaultPriceSet[$entity];
+    if (isset(\Civi::$statics[__CLASS__][$entity])) {
+      return \Civi::$statics[__CLASS__][$entity];
     }
-    $entityName = 'default_contribution_amount';
-    if ($entity == 'membership') {
-      $entityName = 'default_membership_type_amount';
-    }
+    $priceSetName = ($entity === 'membership') ? 'default_membership_type_amount' : 'default_contribution_amount';
 
     $sql = "
 SELECT      ps.id AS setID, pfv.price_field_id AS priceFieldID, pfv.id AS priceFieldValueID, pfv.name, pfv.label, pfv.membership_type_id, pfv.amount, pfv.financial_type_id
 FROM        civicrm_price_set ps
 LEFT JOIN   civicrm_price_field pf ON pf.`price_set_id` = ps.id
 LEFT JOIN   civicrm_price_field_value pfv ON pfv.price_field_id = pf.id
-WHERE       ps.name = '{$entityName}'
+WHERE       ps.name = '{$priceSetName}'
 ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    self::$_defaultPriceSet[$entity] = [];
     while ($dao->fetch()) {
-      self::$_defaultPriceSet[$entity][$dao->priceFieldValueID] = [
+      \Civi::$statics[__CLASS__][$entity][$dao->priceFieldValueID] = [
         'setID' => $dao->setID,
         'priceFieldID' => $dao->priceFieldID,
         'name' => $dao->name,
@@ -145,7 +141,7 @@ WHERE       ps.name = '{$entityName}'
       ];
     }
 
-    return self::$_defaultPriceSet[$entity];
+    return \Civi::$statics[__CLASS__][$entity];
   }
 
   /**
