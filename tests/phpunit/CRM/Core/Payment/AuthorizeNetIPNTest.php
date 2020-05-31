@@ -180,6 +180,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurSuccessSuppliedReceiveDate() {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -242,6 +244,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response mails don't leak.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentMembershipRecurSuccessNoLeakage() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -377,9 +381,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    */
   public function getRecurTransaction($params = []) {
     return array_merge([
-      "x_amount" => "200.00",
+      'x_amount' => '200.00',
       "x_country" => 'US',
-      "x_phone" => "",
+      'x_phone' => "",
       "x_fax" => "",
       "x_email" => "me@gmail.com",
       "x_description" => "lots of money",

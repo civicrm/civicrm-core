@@ -28,7 +28,7 @@ trait CRMTraits_Financial_OrderTrait {
     $this->ids['contact'][0] = $this->individualCreate();
     $this->ids['membership_type'][0] = $this->membershipTypeCreate();
 
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', array_merge([
       'contact_id' => $this->_contactID,
       'amount' => 1000,
       'sequential' => 1,
@@ -97,7 +97,7 @@ trait CRMTraits_Financial_OrderTrait {
    */
   protected function createExtraneousContribution() {
     $this->contributionCreate([
-      'contact_id' => $this->_contactID,
+      'contact_id' => $this->individualCreate(),
       'is_test' => 1,
       'financial_type_id' => 1,
       'invoice_id' => 'abcd',
