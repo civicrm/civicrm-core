@@ -316,4 +316,20 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['count'], 1);
   }
 
+  public function testMembersipTypeACLFinancialTypeACL() {
+    $contactID = $this->individualCreate();
+    $this->contactMembershipCreate(['contact_id' => $contactID]);
+    $this->enableFinancialACLs();
+    $this->setPermissions([
+      'access CiviCRM',
+      'access CiviContribute',
+      'view all contacts',
+      'add contributions of type Donation',
+      'view contributions of type Donation',
+    ]);
+    $this->assertEquals(0, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
+    $this->addFinancialAclPermissions([['view', 'Member Dues']]);
+    $this->assertEquals(1, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
+  }
+
 }
