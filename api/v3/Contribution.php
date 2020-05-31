@@ -709,6 +709,7 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
       'optionGroupName' => 'contribution_status',
     ],
     'api.required' => TRUE,
+    'api.default' => 'Pending',
   ];
   $params['receive_date'] = [
     'title' => 'Contribution Receive Date',
