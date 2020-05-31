@@ -430,6 +430,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     //complete the contribution.
     // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
     // as this method is not preferred / supported.
+    // We need to pass $input['trxn_date'] to completeOrder. Previously we *may* have used receive_date
+    $input['trxn_date'] = $input['trxn_date'] ?? $input['receive_date'] ?? date('YmdHis');
     CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
 
     // reset template values before processing next transactions

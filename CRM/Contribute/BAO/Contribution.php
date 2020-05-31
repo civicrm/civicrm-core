@@ -4451,6 +4451,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
+    $contributionParams['receive_date'] = $input['trxn_date'];
 
     // CRM-20678 Ensure that the currency is correct in subseqent transcations.
     if (empty($contributionParams['currency']) && isset($objects['first_contribution']->currency)) {
@@ -4467,11 +4468,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
-    }
-    $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
-
-    if (empty($contributionParams['receive_date']) && $changeDate) {
-      $contributionParams['receive_date'] = $changeDate;
     }
 
     self::repeatTransaction($contribution, $input, $contributionParams, $paymentProcessorId);
@@ -4512,7 +4508,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         self::updateMembershipBasedOnCompletionOfContribution(
           $contribution,
           $primaryContributionID,
-          $changeDate
+          $input['trxn_date']
         );
       }
     }
@@ -4520,7 +4516,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
         if ($event->is_email_confirm) {
           // @todo this should be set by the function that sends the mail after sending.
-          $contributionParams['receipt_date'] = $changeDate;
+          $contributionParams['receipt_date'] = $input['trxn_date'];
         }
         $participantParams['id'] = $participant->id;
         $participantParams['status_id'] = 'Registered';

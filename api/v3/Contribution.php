@@ -605,10 +605,11 @@ function civicrm_api3_contribution_repeattransaction($params) {
     }
 
     unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
-    $contribution->receive_date = $params['receive_date'];
+    $contribution->receive_date = $params['trxn_date'];
 
     $passThroughParams = [
       'trxn_id',
+      'trxn_date',
       'total_amount',
       'campaign_id',
       'fee_amount',
@@ -657,12 +658,6 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   if (isset($params['is_email_receipt'])) {
     $input['is_email_receipt'] = $params['is_email_receipt'];
   }
-  if (!empty($params['trxn_date'])) {
-    $input['trxn_date'] = $params['trxn_date'];
-  }
-  if (!empty($params['receive_date'])) {
-    $input['receive_date'] = $params['receive_date'];
-  }
   if (empty($contribution->contribution_page_id)) {
     static $domainFromName;
     static $domainFromEmail;
@@ -710,10 +705,11 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     ],
     'api.required' => TRUE,
   ];
-  $params['receive_date'] = [
-    'title' => 'Contribution Receive Date',
-    'name' => 'receive_date',
+  $params['trxn_date'] = [
+    'title' => 'Transaction Date',
+    'description' => 'Date this transaction occurred',
     'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    'api.aliases' => ['receive_date'],
     'api.default' => 'now',
   ];
   $params['trxn_id'] = [

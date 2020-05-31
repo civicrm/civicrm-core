@@ -181,7 +181,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
         $contribution->trxn_id = $ids['membership'];
       }
     }
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
+    $this->completeTransaction($input, $ids, $objects);
     return TRUE;
   }
 

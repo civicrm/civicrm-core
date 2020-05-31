@@ -477,6 +477,8 @@ class CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction(&$input, &$ids, &$objects, $transaction = NULL) {
+    // We need to pass $input['trxn_date'] to completeOrder. Previously we *may* have used receive_date
+    $input['trxn_date'] = $input['trxn_date'] ?? $input['receive_date'] ?? date('YmdHis');
     CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction);
   }
 
