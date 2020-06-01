@@ -1649,7 +1649,7 @@ abstract class CRM_Core_Payment {
    *
    * @return string
    */
-  public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
+  public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel', $recurId = NULL) {
     // Set URL
     switch ($action) {
       case 'cancel':
@@ -1715,6 +1715,9 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
       // Add checksum argument
       if ($contactID != 0 && $userId != $contactID) {
         $checksumValue = '&cs=' . CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
+      }
+      if ($entity != 'recur' && !empty($recurId)) {
+        return CRM_Utils_System::url($url, "reset=1&{$entityArg}={$entityID}&crid={$recurId}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
       }
       return CRM_Utils_System::url($url, "reset=1&{$entityArg}={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
     }
