@@ -1646,6 +1646,7 @@ abstract class CRM_Core_Payment {
    * @param int $entityID
    * @param null $entity
    * @param string $action
+   * @param int $recurId
    *
    * @return string
    */
