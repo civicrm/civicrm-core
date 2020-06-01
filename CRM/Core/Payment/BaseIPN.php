@@ -206,6 +206,7 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Set contribution to failed.
+   * @deprecated
    *
    * @param array $objects
    * @param object $transaction
@@ -272,6 +273,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * @deprecated - use the api
    * Handled pending contribution status.
    *
    * @param array $objects
@@ -287,6 +289,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * @deprecated - use the api
    * Process cancelled payment outcome.
    *
    * @param array $objects
@@ -356,6 +359,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * @deprecated - use the api
    * Rollback unhandled outcomes.
    *
    * @param array $objects
@@ -477,10 +481,12 @@ class CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction(&$input, &$ids, &$objects, $transaction = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Contribution.repeattransaction and Payment.create API');
     CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction);
   }
 
   /**
+   * @deprecated use CRM_Core_BAO_LocationType::getBilling()
    * Get site billing ID.
    *
    * @param array $ids
@@ -488,6 +494,7 @@ class CRM_Core_Payment_BaseIPN {
    * @return bool
    */
   public function getBillingID(&$ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_LocationType::getBilling()');
     $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     if (!$ids['billing']) {
       CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', [1 => 'Billing']));
