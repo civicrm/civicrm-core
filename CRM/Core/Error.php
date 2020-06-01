@@ -1035,12 +1035,17 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param $newMethod
    *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
+   * @param $oldMethod
+   *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning($newMethod) {
-    $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-    $callerFunction = $dbt[1]['function'] ?? NULL;
-    $callerClass = $dbt[1]['class'] ?? NULL;
-    Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", ['civi.tag' => 'deprecated']);
+  public static function deprecatedFunctionWarning($newMethod, $oldMethod = NULL) {
+    if (!$oldMethod) {
+      $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+      $callerFunction = $dbt[1]['function'] ?? NULL;
+      $callerClass = $dbt[1]['class'] ?? NULL;
+      $oldMethod = "{$callerClass}::{$callerFunction}";
+    }
+    Civi::log()->warning("Deprecated function $oldMethod, use $newMethod.", ['civi.tag' => 'deprecated']);
   }
 
 }

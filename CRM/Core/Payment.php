@@ -1357,12 +1357,14 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_paymentProcessor['billing_mode'] == 4) {
+      CRM_Core_Error::deprecatedFunctionWarning('doPayment', 'CRM_Core_Payment::doTransferCheckout');
       $result = $this->doTransferCheckout($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         $result['payment_status_id'] = array_search('Pending', $statuses);
       }
     }
     else {
+      CRM_Core_Error::deprecatedFunctionWarning('doPayment', 'CRM_Core_Payment::doDirectPayment');
       $result = $this->doDirectPayment($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
