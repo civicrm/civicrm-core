@@ -423,11 +423,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $formattedContactDetails["{$contactId}::{$email}"] = $details;
     }
 
-    $contributionIds = [];
-    if ($this->getVar('_contributionIds')) {
-      $contributionIds = $this->getVar('_contributionIds');
-    }
-
     // send the mail
     list($sent, $activityId) = CRM_Activity_BAO_Activity::sendEmail(
       $formattedContactDetails,
@@ -442,7 +437,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $bcc,
       array_keys($this->_toContactDetails),
       $additionalDetails,
-      $contributionIds,
+      $this->getVar('_contributionIds') ?? [],
       CRM_Utils_Array::value('campaign_id', $formValues),
       $this->getVar('_caseId')
     );
