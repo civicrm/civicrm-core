@@ -31,7 +31,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
     }
     elseif ($rev == '5.26.alpha1') {
       $preUpgradeMessage .= '<br/>' . ts("WARNING: CiviCRM 5.26 and later changes how front-end CiviCRM URLs are formed in WordPress.  Please <a href='%1' target='_blank'>read this blog post before upgrading</a> . You may need to update settings at your payment Processor for recurring payments. If you have an external service that sends callback messages to CiviCRM, you may need to update the settings at the external service to use the new URL format.", [
-        1 => 'https://lab.civicrm.org/dev/wordpress/-/issues/49',
+        1 => 'https://civicrm.org/blog/kcristiano/civicrm-526-and-wordpress-important-notice',
       ]);
     }
   }
@@ -50,7 +50,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
     }
     elseif ($rev == '5.26.alpha1') {
       $postUpgradeMessage .= '<br/>' . ts("WARNING: CiviCRM 5.26 and later changes how front-end CiviCRM URLs are formed in WordPress.  Please <a href='%1' target='_blank'>read this blog post before upgrading</a> . You may need to update settings at your payment Processor for recurring payments. If you have an external service that sends callback messages to CiviCRM, you may need to update the settings at the external service to use the new URL format.", [
-        1 => 'https://lab.civicrm.org/dev/wordpress/-/issues/49',
+        1 => 'https://civicrm.org/blog/kcristiano/civicrm-526-and-wordpress-important-notice',
       ]);
     }
   }
