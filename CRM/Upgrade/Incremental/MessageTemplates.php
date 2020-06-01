@@ -215,13 +215,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ],
       ],
-      [
-        'version' => '5.27.alpha1',
-        'upgrade_descriptor' => ts('Addition of subscription URLs to backoffice contribution receipts'),
-        'templates' => [
-          ['name' => 'contribution_offline_receipt', 'type' => 'html'],
-        ],
-      ],
+
     ];
   }
 

@@ -1196,15 +1196,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
       $this->_params['trxn_id'] = $result['trxn_id'] ?? NULL;
       $this->_params['contact_id'] = $contactID;
-      $this->_params['contribution_id'] = $entityID = $contribution->id;
-      // Add subscription links to the message template if contribution is a recurring one.
-      if (!empty($this->_params['is_recur'])) {
-        $entity = 'contribution';
-        $this->assign('is_recur', $this->_params['is_recur']);
-        $this->assign('cancelSubscriptionUrl', $this->_paymentObject->subscriptionURL($entityID, $entity, 'cancel'));
-        $this->assign('updateSubscriptionBillingUrl', $this->_paymentObject->subscriptionURL($entityID, $entity, 'billing'));
-        $this->assign('updateSubscriptionUrl', $this->_paymentObject->subscriptionURL($entityID, $entity, 'update'));
-      }
+      $this->_params['contribution_id'] = $contribution->id;
       if (CRM_Contribute_Form_AdditionalInfo::emailReceipt($this, $this->_params, TRUE)) {
         $this->statusMessage[] = ts('A receipt has been emailed to the contributor.');
       }
