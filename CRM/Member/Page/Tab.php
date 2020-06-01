@@ -33,9 +33,17 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * called when action is browse.
    */
   public function browse() {
+    $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
+    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
+    $addWhere = "membership_type_id IN (0)";
+    if (!empty($membershipTypes)) {
+      $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
+    }
+
     $membership = [];
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
+    $dao->whereAdd($addWhere);
     $dao->find();
 
     //CRM--4418, check for view, edit, delete
