@@ -781,7 +781,8 @@ class CRM_Export_BAO_ExportProcessor {
 
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $this->getQueryMode(),
-      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
+      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator(),
+      NULL, TRUE
     );
 
     //sort by state
