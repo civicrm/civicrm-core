@@ -549,14 +549,14 @@ function adjustPayment( ) {
 }
 
 {/literal}{if $processorSupportsFutureStartDate}{literal}
-cj ('input:radio[name="is_recur"]').click( function( ) {
+cj ('#is_recur').click( function( ) {
   showStartDate( );
 });
 
 showStartDate( );
 
 function showStartDate( ) {
-  if (cj( 'input:radio[name="is_recur"]:checked').val( ) == 0 ) {
+  if (cj('#is_recur').is(':checked')) {
     cj('#start_date').hide( );
   }
   else {
