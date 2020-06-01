@@ -603,7 +603,7 @@ WHERE name = %1';
 
     if (!empty($params['id'])) {
       $newParams = [
-        'label' => "New $contact",
+        'label' => ts("New %1", [1 => $contact]),
         'is_active' => $active,
       ];
       CRM_Core_BAO_Navigation::processUpdate(['name' => "New $contactName"], $newParams);
@@ -616,7 +616,7 @@ WHERE name = %1';
       $value = ['name' => "New $name"];
       CRM_Core_BAO_Navigation::retrieve($value, $navinfo);
       $navigation = [
-        'label' => "New $contact",
+        'label' => ts("New %1", [1 => $contact]),
         'name' => "New $contactName",
         'url' => "civicrm/contact/add?ct=$name&cst=$contactName&reset=1",
         'permission' => 'add contacts',
