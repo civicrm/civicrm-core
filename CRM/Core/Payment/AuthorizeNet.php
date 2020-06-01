@@ -33,6 +33,25 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   protected $_params = [];
 
   /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
+  }
+
+  /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
@@ -98,6 +117,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *
    * @return array
    *   the result in a nice formatted array (or an error object)
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
@@ -316,30 +337,22 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $template->assign('billingCountry', $this->_getParam('country'));
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
-    // submit to authorize.net
 
-    $submit = curl_init($this->_paymentProcessor['url_recur']);
-    if (!$submit) {
-      return self::error(9002, 'Could not initiate connection to payment gateway');
-    }
-    curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($submit, CURLOPT_HTTPHEADER, ["Content-Type: text/xml"]);
-    curl_setopt($submit, CURLOPT_HEADER, 1);
-    curl_setopt($submit, CURLOPT_POSTFIELDS, $arbXML);
-    curl_setopt($submit, CURLOPT_POST, 1);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
+    // Submit to authorize.net
+    $response = $this->getGuzzleClient()->post($this->_paymentProcessor['url_recur'], [
+      'headers' => [
+        'Content-Type' => 'text/xml; charset=UTF8',
+      ],
+      'body' => $arbXML,
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ]);
+    $responseFields = $this->_ParseArbReturn((string) $response->getBody());
 
-    $response = curl_exec($submit);
-
-    if (!$response) {
-      return self::error(curl_errno($submit), curl_error($submit));
-    }
-
-    curl_close($submit);
-    $responseFields = $this->_ParseArbReturn($response);
-
-    if ($responseFields['resultCode'] == 'Error') {
-      return self::error($responseFields['code'], $responseFields['text']);
+    if ($responseFields['resultCode'] === 'Error') {
+      throw new PaymentProcessorException($responseFields['code'], $responseFields['text']);
     }
 
     // update recur processor_id with subscriptionId

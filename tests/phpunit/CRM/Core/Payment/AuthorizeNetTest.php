@@ -15,6 +15,13 @@
  */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
+  use \Civi\Test\GuzzleTestTrait;
+
+  /**
+   * @var \CRM_Core_Payment_AuthorizeNet
+   */
+  protected $processor;
+
   public function setUp() {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
@@ -37,12 +44,15 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
   public function testCreateSingleNowDated() {
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7) . uniqid();
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7) . uniqid();
-    $nameParams = ['first_name' => $firstName, 'last_name' => $lastName];
+    $this->createMockHandler([$this->getExpectedResponse()]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+    $firstName = 'John';
+    $lastName = 'Smith';
+    $nameParams = ['first_name' => 'John', 'last_name' => $lastName];
     $contactId = $this->individualCreate($nameParams);
 
-    $invoiceID = sha1(rand());
+    $invoiceID = 123456;
     $amount = rand(100, 1000) . '.00';
 
     $recur = $this->callAPISuccess('ContributionRecur', 'create', [
@@ -76,7 +86,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
       'hidden_CreditCard' => 1,
       'billing_first_name' => $firstName,
-      'billing_middle_name' => "",
+      'billing_middle_name' => '',
       'billing_last_name' => $lastName,
       'billing_street_address-5' => '8 Hobbitton Road',
       'billing_city-5' => 'The Shire',
@@ -96,14 +106,14 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'installments' => 12,
       'financial_type_id' => $this->_financialTypeId,
       'is_email_receipt' => 1,
-      'from_email_address' => "{$firstName}.{$lastName}@example.com",
+      'from_email_address' => 'john.smith@example.com',
       'receive_date' => date('Ymd'),
       'receipt_date_time' => '',
       'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
-      'source' => "Mordor",
+      'source' => 'Mordor',
       'soft_credit_to' => '',
       'soft_contact_id' => '',
       'billing_state_province-5' => 'IL',
@@ -116,20 +126,20 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'amount' => 7,
       'amount_level' => 0,
       'currencyID' => 'USD',
-      'pcp_display_in_roll' => "",
-      'pcp_roll_nickname' => "",
-      'pcp_personal_note' => "",
-      'non_deductible_amount' => "",
-      'fee_amount' => "",
-      'net_amount' => "",
+      'pcp_display_in_roll' => '',
+      'pcp_roll_nickname' => '',
+      'pcp_personal_note' => '',
+      'non_deductible_amount' => '',
+      'fee_amount' => '',
+      'net_amount' => '',
       'invoiceID' => $invoiceID,
-      'contribution_page_id' => "",
+      'contribution_page_id' => '',
       'thankyou_date' => NULL,
       'honor_contact_id' => NULL,
       'first_name' => $firstName,
       'middle_name' => '',
       'last_name' => $lastName,
-      'street_address' => '8 Hobbiton Road' . uniqid(),
+      'street_address' => '8 Hobbiton Road',
       'city' => 'The Shire',
       'state_province' => 'IL',
       'postal_code' => 5010,
@@ -160,6 +170,17 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $message = '';
     $result = $this->processor->cancelSubscription($message, ['subscriptionId' => $subscriptionID]);
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
+
+    $requests = $this->getRequestBodies();
+    $this->assertEquals($this->getExpectedRequest(date('Y-m-d')), $requests[0]);
+    $header = $this->getRequestHeaders()[0];
+    $this->assertEquals(['apitest.authorize.net'], $header['Host']);
+    $this->assertEquals(['text/xml; charset=UTF8'], $header['Content-Type']);
+
+    $this->assertEquals([
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+    ], $this->container[0]['options']['curl']);
   }
 
   /**
@@ -318,6 +339,67 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
         'AuthorizeNet failed for unknown reason.' . $e->getMessage());
       $this->markTestSkipped('AuthorizeNet test server is not in a good mood so we can\'t test this right now');
     }
+  }
+
+  /**
+   * Get the content that we expect to see sent out.
+   *
+   * @param string $startDate
+   *
+   * @return string
+   */
+  public function getExpectedRequest($startDate) {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBCreateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+  <refId>123456</refId>
+  <subscription>
+        <paymentSchedule>
+      <interval>
+        <length>1</length>
+        <unit>months</unit>
+      </interval>
+      <startDate>' . $startDate . '</startDate>
+      <totalOccurrences>12</totalOccurrences>
+    </paymentSchedule>
+    <amount>7</amount>
+    <payment>
+      <creditCard>
+        <cardNumber>4444333322221111</cardNumber>
+        <expirationDate>2025-09</expirationDate>
+      </creditCard>
+    </payment>
+      <order>
+     <invoiceNumber>1</invoiceNumber>
+        </order>
+       <customer>
+      <id>3</id>
+      <email>John.Smith@example.com</email>
+    </customer>
+    <billTo>
+      <firstName>John</firstName>
+      <lastName>Smith</lastName>
+      <address>8 Hobbiton Road</address>
+      <city>The Shire</city>
+      <state>IL</state>
+      <zip>5010</zip>
+      <country>US</country>
+    </billTo>
+  </subscription>
+</ARBCreateSubscriptionRequest>
+';
+  }
+
+  /**
+   * Get a successful response to setting up a recurring.
+   *
+   * @return string
+   */
+  public function getExpectedResponse() {
+    return '﻿<?xml version="1.0" encoding="utf-8"?><ARBCreateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><refId>8d468ca1b1dd5c2b56c7</refId><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><subscriptionId>6632052</subscriptionId><profile><customerProfileId>1512023280</customerProfileId><customerPaymentProfileId>1512027350</customerPaymentProfileId></profile></ARBCreateSubscriptionResponse>';
   }
 
 }
