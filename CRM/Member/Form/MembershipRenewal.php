@@ -598,7 +598,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
     $membership = $this->processMembership(
       $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
-      $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
+      $renewalDate, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
       $pending,
       $contributionRecurID, $membershipSource, $this->_params['is_pay_later'], CRM_Utils_Array::value('campaign_id',
       $this->_params)
@@ -744,7 +744,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param int $membershipTypeID
    * @param bool $is_test
    * @param string $changeToday
-   * @param int $modifiedID
    * @param $customFieldsFormatted
    * @param $numRenewTerms
    * @param int $membershipID
@@ -758,7 +757,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId) {
+  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId) {
     $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -897,12 +896,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     //make status override false.
     $memParams['is_override'] = FALSE;
 
-    //CRM-4027, create log w/ individual contact.
-    if ($modifiedID) {
-      // @todo this param is likely unused now.
-      $memParams['is_for_organization'] = TRUE;
-    }
-    $params['modified_id'] = $modifiedID ?? $contactID;
+    $params['modified_id'] = $contactID;
 
     //inherit campaign from contrib page.
     if (isset($campaignId)) {
