@@ -594,6 +594,14 @@ function civicrm_api3_contribution_repeattransaction($params) {
     throw new API_Exception(
       'A valid original contribution ID is required', 'invalid_data');
   }
+  // We don't support repeattransaction without a related recurring contribution.
+  if (empty($contribution->contribution_recur_id)) {
+    throw new API_Exception(
+      'Repeattransaction API can only be used in the context of contributions that have a contribution_recur_id.',
+      'invalid_data'
+    );
+  }
+
   $original_contribution = clone $contribution;
   $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
