@@ -556,7 +556,7 @@ cj ('#is_recur').click( function( ) {
 showStartDate( );
 
 function showStartDate( ) {
-  if (cj('#is_recur').is(':checked')) {
+  if (!cj('#is_recur').is(':checked')) {
     cj('#start_date').hide( );
   }
   else {
