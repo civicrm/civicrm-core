@@ -63,7 +63,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
 
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('DPS Payment Express');
   }
 
   /**

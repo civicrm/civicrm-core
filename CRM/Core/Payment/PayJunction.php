@@ -43,7 +43,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('PayJunction');
   }
 
   /**
