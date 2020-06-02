@@ -596,7 +596,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
-    list($membership) = $this->processMembership(
+    $membership = $this->processMembership(
       $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
       $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
       $pending,
@@ -757,17 +757,15 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param null|CRM_Contribute_BAO_Contribution $contribution
    * @param array $lineItems
    *
-   * @return array
+   * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId, $formDates = [], $contribution = NULL, $lineItems = []) {
-    $renewalMode = $updateStatusId = FALSE;
+    $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
-    $statusFormat = '%Y-%m-%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
-    $dates = [];
     $ids = [];
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
@@ -775,8 +773,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
       $is_test, $membershipID, TRUE
     );
-
-    $renewalMode = TRUE;
 
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
@@ -803,8 +799,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $memParams['contribution_recur_id'] = $contributionRecurID;
       }
       // @todo stop passing $ids - it is empty
-      $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
-      return [$membership, $renewalMode, $dates];
+      return CRM_Member_BAO_Membership::create($memParams, $ids);
     }
 
     // Check and fix the membership if it is STALE
@@ -937,7 +932,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
     $membership->find(TRUE);
 
-    return [$membership, $renewalMode, $dates];
+    return $membership;
   }
 
 }
