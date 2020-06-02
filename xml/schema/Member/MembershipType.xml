@@ -43,6 +43,7 @@
     <uniqueName>membership_type</uniqueName>
     <title>Membership Type</title>
     <type>varchar</type>
+    <required>true</required>
     <import>true</import>
     <length>128</length>
     <localizable>true</localizable>

@@ -118,7 +118,7 @@ class CRM_Core_I18n_SchemaStructure {
           'title' => "varchar(127) COMMENT 'Payment Processor Descriptive Name.'",
         ],
         'civicrm_membership_type' => [
-          'name' => "varchar(128) COMMENT 'Name of Membership Type'",
+          'name' => "varchar(128) NOT NULL COMMENT 'Name of Membership Type'",
           'description' => "varchar(255) COMMENT 'Description of Membership Type'",
         ],
         'civicrm_membership_block' => [
@@ -486,6 +486,7 @@ class CRM_Core_I18n_SchemaStructure {
           'name' => [
             'type' => "Text",
             'label' => "Name",
+            'required' => "true",
           ],
           'description' => [
             'type' => "TextArea",
