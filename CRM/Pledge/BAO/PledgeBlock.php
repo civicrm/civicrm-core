@@ -119,7 +119,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @return array
    */
   public static function getPledgeBlock($pageID) {
-    $pledgeBlock = array();
+    $pledgeBlock = [];
 
     $dao = new CRM_Pledge_DAO_PledgeBlock();
     $dao->entity_table = 'civicrm_contribution_page';
@@ -140,7 +140,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     //build pledge payment fields.
     if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.
-      $allPayments = array();
+      $allPayments = [];
       $returnProperties = array(
         'status_id',
         'scheduled_date',
@@ -153,9 +153,9 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       // get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
-      $nextPayment = array();
+      $nextPayment = [];
       $isNextPayment = FALSE;
-      $overduePayments = array();
+      $overduePayments = [];
       foreach ($allPayments as $payID => $value) {
         if ($allStatus[$value['status_id']] == 'Overdue') {
           $overduePayments[$payID] = array(
@@ -184,7 +184,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
 
       // build check box array for payments.
-      $payments = array();
+      $payments = [];
       if (!empty($overduePayments)) {
         foreach ($overduePayments as $id => $payment) {
           $label = ts("%1 - due on %2 (overdue)", array(
@@ -236,7 +236,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
       // Frequency unit drop-down label suffixes switch from *ly to *(s)
       $freqUnitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $pledgeBlock['pledge_frequency_unit']);
-      $freqUnits = array();
+      $freqUnits = [];
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
       foreach ($freqUnitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
@@ -247,7 +247,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       // CRM-18854
       if (!empty($pledgeBlock['is_pledge_start_date_visible'])) {
         if (!empty($pledgeBlock['pledge_start_date'])) {
-          $defaults = array();
+          $defaults = [];
           $date = (array) json_decode($pledgeBlock['pledge_start_date']);
           foreach ($date as $field => $value) {
             switch ($field) {

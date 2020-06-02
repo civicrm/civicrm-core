@@ -23,7 +23,7 @@ class Civi {
    * `Civi::$statics[__CLASS__]['foo'] = 'bar';
    * ```
    */
-  public static $statics = array();
+  public static $statics = [];
 
   /**
    * Retrieve a named cache instance.
@@ -106,7 +106,7 @@ class Civi {
    * singletons, containers.
    */
   public static function reset() {
-    self::$statics = array();
+    self::$statics = [];
     Civi\Core\Container::singleton();
   }
 

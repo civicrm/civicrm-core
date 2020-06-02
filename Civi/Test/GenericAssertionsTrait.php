@@ -35,8 +35,8 @@ trait GenericAssertionsTrait {
    * @param array $actual
    */
   public function assertTreeEquals($expected, $actual) {
-    $e = array();
-    $a = array();
+    $e = [];
+    $a = [];
     \CRM_Utils_Array::flatten($expected, $e, '', ':::');
     \CRM_Utils_Array::flatten($actual, $a, '', ':::');
     ksort($e);

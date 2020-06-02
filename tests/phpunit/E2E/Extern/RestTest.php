@@ -43,7 +43,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       $this->markTestSkipped('Missing siteKey');
     }
 
-    $this->old_api_keys = array();
+    $this->old_api_keys = [];
   }
 
   protected function getRestUrl() {
@@ -78,7 +78,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
    * @return array; each item is a list of parameters for testAPICalls
    */
   public function apiTestCases() {
-    $cases = array();
+    $cases = [];
 
     // entity,action: omit apiKey, valid entity+action
     $cases[] = array(

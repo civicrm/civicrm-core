@@ -46,7 +46,7 @@ class CRM_Admin_Page_ConfigTaskList extends CRM_Core_Page {
       'sequential' => 1,
       'return' => ["enable_components"],
     ]);
-    $enabled = array();
+    $enabled = [];
     foreach ($result['values'][0]['enable_components'] as $component) {
       $enabled[$component] = 1;
     }

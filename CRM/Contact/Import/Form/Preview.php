@@ -169,7 +169,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     $invalidTagName = $invalidGroupName = FALSE;
 
     if (!empty($fields['newTagName'])) {
@@ -263,7 +263,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     // check if there is any error occurred
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
-    $errorMessage = array();
+    $errorMessage = [];
 
     if (is_array($errors)) {
       foreach ($errors as $key => $value) {
@@ -317,14 +317,14 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
 
-    $mapperKeys = array();
-    $mapperLocTypes = array();
-    $mapperPhoneTypes = array();
-    $mapperRelated = array();
-    $mapperRelatedContactType = array();
-    $mapperRelatedContactDetails = array();
-    $mapperRelatedContactLocType = array();
-    $mapperRelatedContactPhoneType = array();
+    $mapperKeys = [];
+    $mapperLocTypes = [];
+    $mapperPhoneTypes = [];
+    $mapperRelated = [];
+    $mapperRelatedContactType = [];
+    $mapperRelatedContactDetails = [];
+    $mapperRelatedContactLocType = [];
+    $mapperRelatedContactPhoneType = [];
 
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
@@ -375,7 +375,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
 
     foreach ($mapper as $key => $value) {
-      $header = array();
+      $header = [];
       list($id, $first, $second) = explode('_', $mapper[$key][0]);
       if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
         $relationType = new CRM_Contact_DAO_RelationshipType();
@@ -447,7 +447,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     if (is_array($groups)) {
-      $groupAdditions = array();
+      $groupAdditions = [];
       foreach ($groups as $groupId) {
         $addCount = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $groupId);
         if (!empty($relatedContactIds)) {
@@ -492,7 +492,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     if (is_array($tag)) {
 
-      $tagAdditions = array();
+      $tagAdditions = [];
       foreach ($tag as $tagId => $val) {
         $addTagCount = CRM_Core_BAO_EntityTag::addContactsToTag($contactIds, $tagId);
         if (!empty($relatedContactIds)) {
@@ -527,7 +527,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
-    $errorMessage = array();
+    $errorMessage = [];
 
     if (is_array($errors)) {
       foreach ($errors as $key => $value) {

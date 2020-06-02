@@ -262,12 +262,12 @@ class CRM_Contact_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (!isset($params['deletedContacts'])) {
       $params['deletedContacts'] = FALSE;
     }
     self::tasks();
-    $tasks = array();
+    $tasks = [];
     if ($params['deletedContacts']) {
       if (CRM_Core_Permission::check('access deleted contacts')) {
         $tasks[self::RESTORE] = self::$_tasks[self::RESTORE]['title'];

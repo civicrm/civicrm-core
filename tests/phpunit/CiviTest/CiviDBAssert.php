@@ -150,7 +150,7 @@ class CiviDBAssert {
    */
   public function assertDBCompareValues(&$testCase, $daoName, $searchParams, $expectedValues) {
     //get the values from db
-    $dbValues = array();
+    $dbValues = [];
     CRM_Core_DAO::commonRetrieve($daoName, $searchParams, $dbValues);
 
     // compare db values with expected values

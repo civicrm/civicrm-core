@@ -131,11 +131,11 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    * @return string, sql fragment with conditional expressions
    */
   public function where($includeContactIDs = FALSE) {
-    $params = array();
+    $params = [];
     $where = "contact_a.contact_type   = 'Household'";
 
     $count  = 1;
-    $clause = array();
+    $clause = [];
     $name   = CRM_Utils_Array::value('household_name',
       $this->_formValues
     );

@@ -5,7 +5,7 @@
  */
 class test_extension_manager_paymenttest extends CRM_Core_Payment {
 
-  public static $counts = array();
+  public static $counts = [];
 
   public function install() {
     self::$counts['install'] = self::$counts['install'] ?? 0;

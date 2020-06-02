@@ -69,7 +69,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
    * @return array
    */
   public function getExamples() {
-    $examples = array();
+    $examples = [];
 
     $examples[] = array(
       0 => 'square.txt',

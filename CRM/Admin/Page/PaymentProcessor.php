@@ -108,7 +108,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    */
   public function browse($action = NULL) {
     // get all custom groups sorted by weight
-    $paymentProcessor = array();
+    $paymentProcessor = [];
     $dao = new CRM_Financial_DAO_PaymentProcessor();
     $dao->is_test = 0;
     $dao->domain_id = CRM_Core_Config::domainID();
@@ -116,7 +116,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     $dao->find();
 
     while ($dao->fetch()) {
-      $paymentProcessor[$dao->id] = array();
+      $paymentProcessor[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $paymentProcessor[$dao->id]);
       $paymentProcessor[$dao->id]['payment_processor_type'] = CRM_Core_PseudoConstant::getLabel(
         'CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', $dao->payment_processor_type_id

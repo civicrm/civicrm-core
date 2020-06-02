@@ -312,7 +312,7 @@ class CRM_Core_Action {
 
     // make links indexed sequentially instead of by bitmask
     // otherwise it's next to impossible to reliably add new ones
-    $seqLinks = array();
+    $seqLinks = [];
     foreach ($links as $bit => $link) {
       $link['bit'] = $bit;
       $seqLinks[] = $link;

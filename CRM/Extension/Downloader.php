@@ -49,7 +49,7 @@ class CRM_Extension_Downloader {
    *   list of error messages; empty if OK
    */
   public function checkRequirements($extensionInfo = NULL) {
-    $errors = array();
+    $errors = [];
 
     if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));

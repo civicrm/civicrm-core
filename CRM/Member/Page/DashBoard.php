@@ -40,7 +40,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     }
     $this->assign('membershipSummary', TRUE);
     CRM_Utils_System::setTitle(ts('CiviMember'));
-    $membershipSummary = array();
+    $membershipSummary = [];
     $preMonth = date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
     $preMonthEnd = date("Y-m-t", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
 
