@@ -330,6 +330,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
 SELECT rec.id                   as recur_id,
        rec.processor_id         as subscription_id,
        rec.frequency_interval,
+       rec.payment_token_id as token_id,
        rec.installments,
        rec.frequency_unit,
        rec.amount,

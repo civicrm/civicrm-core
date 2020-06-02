@@ -195,6 +195,17 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
     return $sub->contact_id ?? FALSE;
   }
 
+  protected function getSubscriptionID() {
+    $sub = $this->getSubscriptionDetails();
+    if (empty($sub->subscription_id) && !empty($sub->token_id)) {
+      $tokenDetails = civicrm_api3('PaymentToken', 'get', ['id' => $sub->token_id]);
+      if (!empty($tokenDetails['values'])) {
+        return $tokenDetails['values'][$tokenDetails['id']]['token'];
+      }
+    }
+    return $sub->subscription_id;
+  }
+
   /**
    * Is this being used by a front end user to update their own recurring.
    *
