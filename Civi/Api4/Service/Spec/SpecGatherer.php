@@ -109,15 +109,24 @@ class SpecGatherer {
   }
 
   /**
+   * Get custom fields that extend this entity
+   *
+   * @see \CRM_Core_SelectValues::customGroupExtends
+   *
    * @param string $entity
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
    * @param array $values
    * @throws \API_Exception
    */
   private function addCustomFields($entity, RequestSpec $specification, $values = []) {
+    // Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs (Contact, Participant).
     $extends = [$entity];
     if ($entity === 'Contact') {
-      $extends = !empty($values['contact_type']) ? [$values['contact_type'], 'Contact'] : ['Contact', 'Individual', 'Organization', 'Household'];
+      $contactType = !empty($values['contact_type']) ? [$values['contact_type']] : \CRM_Contact_BAO_ContactType::basicTypes();
+      $extends = array_merge(['Contact'], $contactType);
+    }
+    if ($entity === 'Participant') {
+      $extends = ['Participant', 'ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'];
     }
     $customFields = CustomField::get()
       ->setCheckPermissions(FALSE)

@@ -61,7 +61,7 @@ class CustomGroupJoinable extends Joinable {
     if (!$this->entityFields) {
       $fields = CustomField::get()
         ->setCheckPermissions(FALSE)
-        ->setSelect(['custom_group.name', 'custom_group.extends', '*'])
+        ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', '*'])
         ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {
