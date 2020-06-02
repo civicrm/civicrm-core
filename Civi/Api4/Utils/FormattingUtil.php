@@ -83,10 +83,14 @@ class FormattingUtil {
    * @param string $fieldName
    * @param array $fieldSpec
    * @param string $action
+   * @param string|NULL $operator
+   *   For WHERE clauses, the formatting of an input value depends on the operator.
+   *   For other kinds of clauses, it does not.
+   *   Ex: '=', 'BETWEEN', 'IS'
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatInputValue(&$value, $fieldName, $fieldSpec, $action = 'get') {
+  public static function formatInputValue(&$value, $fieldName, $fieldSpec, $action = 'get', $operator = NULL) {
     // Evaluate pseudoconstant suffix
     $suffix = strpos($fieldName, ':');
     if ($suffix) {
@@ -96,7 +100,7 @@ class FormattingUtil {
     }
     elseif (is_array($value)) {
       foreach ($value as &$val) {
-        self::formatInputValue($val, $fieldName, $fieldSpec, $action);
+        self::formatInputValue($val, $fieldName, $fieldSpec, $action, $operator);
       }
       return;
     }
@@ -115,11 +119,11 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $value = date('Y-m-d H:i:s', strtotime($value));
+        $value = ($operator === 'IS') ? (string) $value : date('Y-m-d H:i:s', strtotime($value));
         break;
 
       case 'Date':
-        $value = date('Ymd', strtotime($value));
+        $value = ($operator === 'IS') ? (string) $value : date('Ymd', strtotime($value));
         break;
     }
 

@@ -304,7 +304,7 @@ class Api4SelectQuery extends SelectQuery {
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE') {
       $field = $this->getField($expr, TRUE);
-      FormattingUtil::formatInputValue($value, $expr, $field);
+      FormattingUtil::formatInputValue($value, $expr, $field, 'get', $operator);
       $fieldAlias = $field['sql_name'];
     }
     // For HAVING, expr must be an item in the SELECT clause

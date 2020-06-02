@@ -2734,6 +2734,27 @@ SELECT contact_id
             }
             return $escapedCriteria;
 
+          // Special purpose "IS" operator
+          case 'IS':
+            $recurse = function ($newFilter) use ($fieldName, $type, $alias, $returnSanitisedArray) {
+              return self::createSQLFilter($fieldName, $newFilter, $type, $alias, $returnSanitisedArray);
+            };
+
+            if ($criteria === 'null' || $criteria === 'NULL') {
+              return $recurse(['IS NULL' => '']);
+            }
+            elseif ($criteria === 'not null' || $criteria === 'NOT NULL') {
+              return $recurse(['IS NOT NULL' => '']);
+            }
+
+            $relDateFilters = \CRM_Core_OptionGroup::values('relative_date_filters');
+            if (isset($relDateFilters[$criteria])) {
+              list ($dateFrom, $dateTo) = \CRM_Utils_Date::getFromTo($criteria, NULL, NULL);
+              return $recurse(['BETWEEN' => [$dateFrom, $dateTo]]);
+            }
+
+            break;
+
           // binary operators
 
           default:
@@ -2769,6 +2790,7 @@ SELECT contact_id
       'NOT IN',
       'BETWEEN',
       'NOT BETWEEN',
+      'IS',
       'IS NOT NULL',
       'IS NULL',
     ];
