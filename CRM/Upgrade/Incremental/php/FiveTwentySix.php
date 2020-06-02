@@ -26,9 +26,14 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if (!function_exists('civi_wp')) {
+      //exit
+    }
+    elseif ($rev == '5.26.alpha1') {
+      $preUpgradeMessage .= '<br/>' . ts("WARNING: CiviCRM 5.26 and later changes how front-end CiviCRM URLs are formed in WordPress.  Please <a href='%1' target='_blank'>read this blog post before upgrading</a> . You may need to update settings at your payment Processor for recurring payments. If you have an external service that sends callback messages to CiviCRM, you may need to update the settings at the external service to use the new URL format.", [
+        1 => 'https://civicrm.org/blog/kcristiano/civicrm-526-and-wordpress-important-notice',
+      ]);
+    }
   }
 
   /**
@@ -40,10 +45,14 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    if (!function_exists('civi_wp')) {
+      //exit
+    }
+    elseif ($rev == '5.26.alpha1') {
+      $postUpgradeMessage .= '<br/>' . ts("WARNING: CiviCRM 5.26 and later changes how front-end CiviCRM URLs are formed in WordPress.  Please <a href='%1' target='_blank'>read this blog post before upgrading</a> . You may need to update settings at your payment Processor for recurring payments. If you have an external service that sends callback messages to CiviCRM, you may need to update the settings at the external service to use the new URL format.", [
+        1 => 'https://civicrm.org/blog/kcristiano/civicrm-526-and-wordpress-important-notice',
+      ]);
+    }
   }
 
   /*
