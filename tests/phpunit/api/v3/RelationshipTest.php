@@ -1183,8 +1183,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relType3 = 6;
     $relType1 = 1;
     $memberType = $this->membershipTypeCreate([
-      'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
-      'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
+      'relationship_type_id' => [$relType1, $relType3],
+      'relationship_direction' => ['a_b', 'b_a'],
     ]);
 
     // Relationship 2.
@@ -1242,8 +1242,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relType3 = 6;
     $relType1 = 1;
     $memberType = $this->membershipTypeCreate([
-      'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
-      'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
+      'relationship_type_id' => [$relType1, $relType3],
+      'relationship_direction' => ['a_b', 'b_a'],
     ]);
 
     // Relationship 2.
