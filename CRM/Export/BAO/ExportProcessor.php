@@ -498,7 +498,7 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setRelationshipValue($relationshipType, $contactID, $field, $value) {
     $this->relatedContactValues[$relationshipType][$contactID][$field] = $value;
-    if ($field === 'id') {
+    if ($field === 'id' && $this->isHouseholdMergeRelationshipTypeKey($relationshipType)) {
       $this->householdsToSkip[] = $value;
     }
   }
