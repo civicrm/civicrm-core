@@ -62,7 +62,40 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     $this->addTask('Add serialize column to civicrm_custom_field', 'addColumn',
       'civicrm_custom_field', 'serialize', "int unsigned DEFAULT NULL COMMENT 'Serialization method - a non-null value indicates a multi-valued field.'"
     );
+    $this->addTask('Make the label field required on price field value', 'priceFieldValueLabelRequired');
+    $this->addTask('Make the name field required on civicrm_membership_type', 'nameMembershipTypeRequired');
+    $this->addTask('Rebuild Multilingal Schema', 'rebuildMultilingalSchema', '5.27.alpha1');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  public function priceFieldValueLabelRequired($ctx) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      foreach ($locales as $locale) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label_{$locale}` `label_{$locale}` varchar(255) NOT NULL   COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    else {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label` `label` varchar(255) NOT NULL   COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
+  public function nameMembershipTypeRequired($ctx) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      foreach ($locales as $locale) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_membership_type CHANGE `name_{$locale}` `name_{$locale}` varchar(128) NOT NULL   COMMENT 'Name of Membership Type'", [], TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    else {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_membership_type CHANGE `name` `name` varchar(128) NOT NULL   COMMENT 'Name of Membership Type'", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
   }
 
 }
