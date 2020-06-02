@@ -326,9 +326,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @return null|Object
    */
   public static function getSubscriptionDetails($entityID, $entity = 'recur') {
+    // Note: processor_id used to be aliased as subscription_id so we include it here
+    // both as processor_id and subscription_id for legacy compatibility.
     $sql = "
 SELECT rec.id                   as recur_id,
        rec.processor_id         as subscription_id,
+       rec.processor_id,
        rec.frequency_interval,
        rec.installments,
        rec.frequency_unit,
