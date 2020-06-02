@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c878584eb2dc9da8a1b13e2db07361f",
+    "content-hash": "f547e4d1ac65fa8044d302f46a7e7267",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -890,20 +890,20 @@
         },
         {
             "name": "pear/log",
-            "version": "1.13.1",
+            "version": "1.13.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Log.git",
-                "reference": "c4be9ded2353c7c231d4c35cc3da75b209453803"
+                "reference": "d8cde3dba893a36ec561bf6188fdc39f4221c4d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Log/zipball/c4be9ded2353c7c231d4c35cc3da75b209453803",
-                "reference": "c4be9ded2353c7c231d4c35cc3da75b209453803",
+                "url": "https://api.github.com/repos/pear/Log/zipball/d8cde3dba893a36ec561bf6188fdc39f4221c4d3",
+                "reference": "d8cde3dba893a36ec561bf6188fdc39f4221c4d3",
                 "shasum": ""
             },
             "require": {
-                "pear/pear_exception": "1.0.0",
+                "pear/pear_exception": "1.0.1",
                 "php": ">5.2"
             },
             "require-dev": {
@@ -939,7 +939,7 @@
                 "log",
                 "logging"
             ],
-            "time": "2016-04-16T00:49:33+00:00"
+            "time": "2020-06-02T00:04:03+00:00"
         },
         {
             "name": "pear/mail",
@@ -1168,16 +1168,16 @@
         },
         {
             "name": "pear/pear_exception",
-            "version": "v1.0.0",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/PEAR_Exception.git",
-                "reference": "8c18719fdae000b690e3912be401c76e406dd13b"
+                "reference": "dbb42a5a0e45f3adcf99babfb2a1ba77b8ac36a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/PEAR_Exception/zipball/8c18719fdae000b690e3912be401c76e406dd13b",
-                "reference": "8c18719fdae000b690e3912be401c76e406dd13b",
+                "url": "https://api.github.com/repos/pear/PEAR_Exception/zipball/dbb42a5a0e45f3adcf99babfb2a1ba77b8ac36a7",
+                "reference": "dbb42a5a0e45f3adcf99babfb2a1ba77b8ac36a7",
                 "shasum": ""
             },
             "require": {
@@ -1193,9 +1193,9 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "PEAR": ""
-                }
+                "classmap": [
+                    "PEAR/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "include-path": [
@@ -1219,7 +1219,7 @@
             "keywords": [
                 "exception"
             ],
-            "time": "2015-02-10T20:07:52+00:00"
+            "time": "2019-12-10T10:24:42+00:00"
         },
         {
             "name": "pear/validate_finance_creditcard",
@@ -2498,9 +2498,7 @@
             "version": "3.0.0+php53",
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/tplaner/When/archive/c1ec099f421bff354cc5c929f83b94031423fc80.zip"
             },
             "require": {
                 "php": ">=5.3.0"
@@ -2838,5 +2836,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.1"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }
