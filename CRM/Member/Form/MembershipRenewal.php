@@ -740,7 +740,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param int $membershipID
    * @param $pending
    * @param int $contributionRecurID
-   * @param $membershipSource
    * @param $isPayLater
    *
    * @return CRM_Member_BAO_Membership
@@ -749,7 +748,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $isPayLater) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $format = '%Y%m%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
     $ids = [];
 
@@ -787,54 +785,30 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // Check and fix the membership if it is STALE
     CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
 
+    $isMembershipCurrent = $currentMembership['is_current_member'];
+
+    // CRM-7297 Membership Upsell - calculate dates based on new membership type
+    $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
+      $changeToday,
+      $membershipTypeID,
+      $numRenewTerms
+    );
+    $memParams = [
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => $dates['end_date'] ?? NULL,
+      'join_date' => $currentMembership['join_date'],
+      'start_date' => $isMembershipCurrent ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
+      'id' => $currentMembership['id'],
+      'is_test' => $is_test,
+      // Since we are renewing, make status override false.
+      'is_override' => FALSE,
+      'modified_id' => $contactID,
+      'log_start_date' => $dates['log_start_date'],
+    ];
+
     // Now Renew the membership
-    if (!$currentMembership['is_current_member']) {
-      // membership is not CURRENT
-
-      // CRM-7297 Membership Upsell - calculate dates based on new membership type
-      $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
-        $changeToday,
-        $membershipTypeID,
-        $numRenewTerms
-      );
-
-      foreach (['start_date', 'end_date'] as $dateType) {
-        $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
-      }
-      $currentMembership['is_test'] = $is_test;
-      $memParams = $currentMembership;
-      $memParams['membership_type_id'] = $membershipTypeID;
-    }
-    else {
-
+    if ($isMembershipCurrent) {
       // CURRENT Membership
-      $membership = new CRM_Member_DAO_Membership();
-      $membership->id = $currentMembership['id'];
-      $membership->find(TRUE);
-      // CRM-7297 Membership Upsell - calculate dates based on new membership type
-      $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
-        $changeToday,
-        $membershipTypeID,
-        $numRenewTerms
-      );
-
-      // Insert renewed dates for CURRENT membership
-      $memParams = [];
-      $memParams['join_date'] = $membership->join_date;
-      $memParams['start_date'] = $membership->start_date;
-      $memParams['end_date'] = $dates['end_date'] ?? NULL;
-      $memParams['membership_type_id'] = $membershipTypeID;
-
-      //set the log start date.
-      $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
-
-      if (empty($membership->source)) {
-        $memParams['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-          $currentMembership['id'],
-          'source'
-        );
-      }
-
       if (!empty($currentMembership['id'])) {
         $ids['membership'] = $currentMembership['id'];
       }
@@ -846,12 +820,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($contributionRecurID) {
       $memParams['contribution_recur_id'] = $contributionRecurID;
     }
-
-    //since we are renewing,
-    //make status override false.
-    $memParams['is_override'] = FALSE;
-
-    $params['modified_id'] = $contactID;
 
     $memParams['custom'] = $customFieldsFormatted;
     // @todo stop passing $ids (membership and userId may be set by this point)
