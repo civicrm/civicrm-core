@@ -150,6 +150,53 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test deleting an activity that has an attachment.
+   */
+  public function testActivityDeleteWithAttachment() {
+    $loggedInUser = $this->createLoggedInUser();
+    // Create an activity
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUser,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'test with attachment',
+      'status_id' => 'Completed',
+      'target_id' => $this->target,
+    ]);
+    $this->assertNotEmpty($activity['id']);
+
+    // Add an attachment - this will also create it in the filesystem.
+    $attachment = $this->callAPISuccess('Attachment', 'create', [
+      'name' => 'abc.txt',
+      'mime_type' => 'text/plain',
+      'entity_id' => $activity['id'],
+      'entity_table' => 'civicrm_activity',
+      'content' => 'delete me',
+    ]);
+    $this->assertNotEmpty($attachment['id']);
+
+    // Check the file is actually there
+    $file_path = $attachment['values'][$attachment['id']]['path'];
+    $this->assertTrue(file_exists($file_path));
+
+    // Call our local helper function to use the form to delete
+    $this->deleteActivity($activity['id']);
+
+    // File should be gone from the filesystem
+    $this->assertFalse(file_exists($file_path), "File is still in filesystem $file_path");
+
+    // Shouldn't be an entry in civicrm_entity_file
+    $query_params = [1 => [$activity['id'], 'Integer']];
+    $entity_file_id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_entity_file WHERE entity_table='civicrm_activity' AND entity_id = %1", $query_params);
+    $this->assertEmpty($entity_file_id, 'Entry is still in civicrm_entity_file table.');
+
+    // In this situation there also shouldn't be an entry in civicrm_file since
+    // there's no other references to it.
+    $query_params = [1 => [$attachment['id'], 'Integer']];
+    $file_id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_file WHERE id = %1", $query_params);
+    $this->assertEmpty($file_id, 'Entry is still in civicrm_file table.');
+  }
+
+  /**
    * Asserts that the target contact has the expected activity IDs
    *
    * @param array $expectedActivityIds
