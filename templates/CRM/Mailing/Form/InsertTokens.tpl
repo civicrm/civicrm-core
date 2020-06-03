@@ -54,8 +54,26 @@ var isMailing    = false;
 {/if}
 {literal}
 
+/**
+ * Checks if both the Save Template and Update Template fields exist.
+ * These fields will not exist if user does not have the edit message
+ * templates permission.
+ *
+ * @param {String} prefix
+ */
+function manageTemplateFieldsExists(prefix) {
+  var saveTemplate = document.getElementsByName(prefix + "saveTemplate");
+  var updateTemplate = document.getElementsByName(prefix + "updateTemplate");
+
+  return saveTemplate.length > 0 && updateTemplate.length > 0;
+}
+
 function showSaveUpdateChkBox(prefix) {
   prefix = prefix || '';
+  if (!manageTemplateFieldsExists(prefix)) {
+    document.getElementById(prefix + "saveDetails").style.display = "none";
+    return;
+  }
   if (document.getElementById(prefix + "template") == null) {
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked){
       document.getElementById(prefix + "saveDetails").style.display = "block";
@@ -89,9 +107,11 @@ function showSaveUpdateChkBox(prefix) {
 }
 
 function selectValue( val, prefix) {
-  document.getElementsByName(prefix + "saveTemplate")[0].checked = false;
-  document.getElementsByName(prefix + "updateTemplate")[0].checked = false;
-  showSaveUpdateChkBox(prefix);
+  if (manageTemplateFieldsExists(prefix)) {
+    document.getElementsByName(prefix + "saveTemplate")[0].checked = false;
+    document.getElementsByName(prefix + "updateTemplate")[0].checked = false;
+    showSaveUpdateChkBox(prefix);
+  }
   if ( !val ) {
     if (document.getElementById("subject").length) {
       document.getElementById("subject").value ="";
@@ -180,6 +200,9 @@ if ( isMailing ) {
 
   function verify(select, prefix) {
     prefix = prefix || '';
+    if (!manageTemplateFieldsExists(prefix)) {
+      return;
+    }
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked  == false) {
       document.getElementById(prefix + "saveDetails").style.display = "none";
     }
