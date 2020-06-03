@@ -1116,8 +1116,8 @@ class CRM_Export_BAO_ExportProcessor {
           preg_match('/<a[^>]+href=([\'"])(?<href>.+?)\1[^>]*>/i', $displayValue, $matches);
           if (!empty($matches)) {
             $displayValue = $matches['2'];
-            if ((strpos($file,  "http ")) === false) {
-              return CIVICRM_UF_BASEURL. html_entity_decode($displayValue);
+            if ((strpos($file, "http ")) === FALSE) {
+              return CIVICRM_UF_BASEURL . html_entity_decode($displayValue);
             }
           }
         }
