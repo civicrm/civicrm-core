@@ -206,26 +206,15 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     // check if we need to setdefaults and check for valid contact emails / communication preferences
     if (is_array($this->_allContactIds) && $setDefaults) {
-      $returnProperties = [
-        'sort_name' => 1,
-        'email' => 1,
-        'do_not_email' => 1,
-        'is_deceased' => 1,
-        'on_hold' => 1,
-        'display_name' => 1,
-        'preferred_mail_format' => 1,
-      ];
-
       // get the details for all selected contacts ( to, cc and bcc contacts )
-      list($this->_allContactDetails) = CRM_Utils_Token::getTokenDetails($this->_allContactIds,
-        $returnProperties,
-        FALSE,
-        FALSE
-      );
+      $allContactDetails = civicrm_api3('Contact', 'get', [
+        'id' => ['IN' => $this->_allContactIds],
+        'return' => ['sort_name', 'email', 'do_not_email', 'is_deceased', 'on_hold', 'display_name', 'preferred_mail_format'],
+        'options' => ['limit' => 0],
+      ])['values'];
 
       // perform all validations on unique contact Ids
-      foreach (array_unique($this->_allContactIds) as $key => $contactId) {
-        $value = $this->_allContactDetails[$contactId];
+      foreach ($allContactDetails as $contactId => $value) {
         if ($value['do_not_email'] || empty($value['email']) || !empty($value['is_deceased']) || $value['on_hold']) {
           $this->setSuppressedEmail($contactId, $value);
         }
@@ -234,7 +223,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
           // build array's which are used to setdefaults
           if (in_array($contactId, $this->_toContactIds)) {
-            $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $this->_allContactDetails[$contactId];
+            $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $value;
             // If a particular address has been specified as the default, use that instead of contact's primary email
             if (!empty($this->_toEmail) && $this->_toEmail['contact_id'] == $contactId) {
               $email = $this->_toEmail['email'];
