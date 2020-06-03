@@ -34,6 +34,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field3' => NULL,
         'field4' => [1, 2, 3],
         'field5' => 'apple',
+        'field7' => date('Y-m-d H:i:s', strtotime('now')),
       ],
       [
         'field1' => 2,
@@ -42,6 +43,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field4' => [2, 3, 4],
         'field5' => 'banana',
         'field6' => '',
+        'field7' => date('Y-m-d H:i:s', strtotime('now')),
       ],
       [
         'field1' => 3,
@@ -49,6 +51,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field4' => [3, 4, 5],
         'field5' => 'banana',
         'field6' => 0,
+        'field7' => date('Y-m-d H:i:s', strtotime('-1 week')),
       ],
       [
         'field1' => 4,
@@ -57,6 +60,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field4' => [4, 5, 6],
         'field5' => 'apple',
         'field6' => '0',
+        'field7' => date('Y-m-d H:i:s', strtotime('-2 week')),
       ],
       [
         'field1' => 5,
@@ -65,6 +69,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'field4' => [4, 5, 6],
         'field5' => 'apple',
         'field6' => 0,
+        'field7' => date('Y-m-d H:i:s', strtotime('+1 week')),
       ],
     ];
   }

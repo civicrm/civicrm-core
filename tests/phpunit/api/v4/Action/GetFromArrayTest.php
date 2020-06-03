@@ -116,6 +116,11 @@ class GetFromArrayTest extends UnitTestCase {
     $this->assertEquals([1, 3], array_column((array) $result, 'field1'));
 
     $result = MockArrayEntity::get()
+      ->addWhere('field3', 'IS', 'null')
+      ->execute();
+    $this->assertEquals([1, 3], array_column((array) $result, 'field1'));
+
+    $result = MockArrayEntity::get()
       ->addWhere('field3', '=', '0')
       ->execute();
     $this->assertEquals([2], array_column((array) $result, 'field1'));
@@ -154,6 +159,15 @@ class GetFromArrayTest extends UnitTestCase {
       ->addWhere('field1', 'NOT BETWEEN', [3, 4])
       ->execute();
     $this->assertEquals([1, 2, 5], array_column((array) $result, 'field1'));
+  }
+
+  public function testArrayGetWithIsDateRange() {
+    $result = MockArrayEntity::get()
+      ->addWhere('field7', 'IS', 'previous.week')
+      ->execute();
+    $resultIds = array_column((array) $result, 'field1');
+    $this->assertTrue(in_array(3, $resultIds));
+    $this->assertFalse(in_array(1, $resultIds));
   }
 
   public function testArrayGetWithNestedWhereClauses() {
