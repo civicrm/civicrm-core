@@ -2736,23 +2736,10 @@ SELECT contact_id
 
           // Special purpose "IS" operator
           case 'IS':
-            $recurse = function ($newFilter) use ($fieldName, $type, $alias, $returnSanitisedArray) {
+            $newFilter = \Civi\Api4\Utils\CoreUtil::rewriteIsCriteria($fieldName, $criteria);
+            if ($newFilter !== NULL) {
               return self::createSQLFilter($fieldName, $newFilter, $type, $alias, $returnSanitisedArray);
-            };
-
-            if ($criteria === 'null' || $criteria === 'NULL') {
-              return $recurse(['IS NULL' => '']);
             }
-            elseif ($criteria === 'not null' || $criteria === 'NOT NULL') {
-              return $recurse(['IS NOT NULL' => '']);
-            }
-
-            $relDateFilters = \CRM_Core_OptionGroup::values('relative_date_filters');
-            if (isset($relDateFilters[$criteria])) {
-              list ($dateFrom, $dateTo) = \CRM_Utils_Date::getFromTo($criteria, NULL, NULL);
-              return $recurse(['BETWEEN' => [$dateFrom, $dateTo]]);
-            }
-
             break;
 
           // binary operators

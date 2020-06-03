@@ -22,6 +22,7 @@
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Helper functions for performing api queries on arrays of data.
@@ -141,6 +142,12 @@ trait ArrayQueryActionTrait {
 
       case '<=':
         return $value <= $expected;
+
+      case 'IS':
+        foreach ((array) CoreUtil::rewriteIsCriteria($condition[0], $expected) as $newOperator => $newCriteria) {
+          return $this->walkFilters($row, [$condition[0], $newOperator, $newCriteria]);
+        }
+        return FALSE;
 
       case 'BETWEEN':
       case 'NOT BETWEEN':

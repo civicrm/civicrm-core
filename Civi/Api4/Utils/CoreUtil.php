@@ -73,4 +73,33 @@ class CoreUtil {
     return $entityName;
   }
 
+  /**
+   * Given an expression like "activity_date_time IS previous.month", rewrite to
+   * an equivalent expression "activity_date_time BETWEEN {start-of-previous-month} AND {end-of-previous-month}.
+   *
+   * @param string $fieldName
+   *   Ex: 'activity_date_time'
+   * @param string $criteria
+   *   Ex: ['IS' => 'previous.month']
+   * @return array|NULL
+   *   Array(string $newOperator, mixed $newCriteria).
+   *   Ex: ['BETWEEN' => ['2020-05-01', '2020-06-01']]
+   */
+  public static function rewriteIsCriteria($fieldName, $criteria) {
+    if ($criteria === 'null' || $criteria === 'NULL') {
+      return ['IS NULL' => ''];
+    }
+    elseif ($criteria === 'not null' || $criteria === 'NOT NULL') {
+      return ['IS NOT NULL' => ''];
+    }
+
+    $relDateFilters = \CRM_Core_OptionGroup::values('relative_date_filters');
+    if (isset($relDateFilters[$criteria])) {
+      list ($dateFrom, $dateTo) = \CRM_Utils_Date::getFromTo($criteria, NULL, NULL);
+      return ['BETWEEN' => [\CRM_Utils_Date::mysqlToIso($dateFrom), \CRM_Utils_Date::mysqlToIso($dateTo)]];
+    }
+
+    return NULL;
+  }
+
 }
