@@ -2734,7 +2734,7 @@ SELECT contact_id
             }
             return $escapedCriteria;
 
-          // Special purpose "IS" operator
+          // The "IS" operator is like an alias; it can be rewritten into other criteria.
           case 'IS':
             $newFilter = \Civi\Api4\Utils\CoreUtil::rewriteIsCriteria($fieldName, $criteria);
             if ($newFilter !== NULL) {
