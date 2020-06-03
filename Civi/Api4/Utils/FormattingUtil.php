@@ -119,11 +119,11 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $value = ($operator === 'IS') ? (string) $value : date('Y-m-d H:i:s', strtotime($value));
+        $value = in_array($operator, ['IS', 'IS NOT']) ? (string) $value : date('Y-m-d H:i:s', strtotime($value));
         break;
 
       case 'Date':
-        $value = ($operator === 'IS') ? (string) $value : date('Ymd', strtotime($value));
+        $value = in_array($operator, ['IS', 'IS NOT']) ? (string) $value : date('Ymd', strtotime($value));
         break;
     }
 

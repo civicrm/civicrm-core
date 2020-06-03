@@ -2736,11 +2736,12 @@ SELECT contact_id
 
           // The "IS" operator is like an alias; it can be rewritten into other criteria.
           case 'IS':
-            $newFilter = \Civi\Api4\Utils\CoreUtil::rewriteIsCriteria($fieldName, $criteria);
+          case 'IS NOT':
+            $newFilter = \Civi\Api4\Utils\CoreUtil::rewriteIsCriteria($fieldName, $operator, $criteria);
             if ($newFilter !== NULL) {
               return self::createSQLFilter($fieldName, $newFilter, $type, $alias, $returnSanitisedArray);
             }
-            break;
+            return NULL;
 
           // binary operators
 
@@ -2778,6 +2779,7 @@ SELECT contact_id
       'BETWEEN',
       'NOT BETWEEN',
       'IS',
+      'IS NOT',
       'IS NOT NULL',
       'IS NULL',
     ];

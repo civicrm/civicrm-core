@@ -144,7 +144,8 @@ trait ArrayQueryActionTrait {
         return $value <= $expected;
 
       case 'IS':
-        foreach ((array) CoreUtil::rewriteIsCriteria($condition[0], $expected) as $newOperator => $newCriteria) {
+      case 'IS NOT':
+        foreach ((array) CoreUtil::rewriteIsCriteria($condition[0], $operator, $expected) as $newOperator => $newCriteria) {
           return $this->walkFilters($row, [$condition[0], $newOperator, $newCriteria]);
         }
         return FALSE;
