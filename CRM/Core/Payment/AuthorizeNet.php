@@ -64,7 +64,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Authorize.net');
 
     $this->_setParam('apiLogin', $paymentProcessor['user_name']);
     $this->_setParam('paymentKey', $paymentProcessor['password']);

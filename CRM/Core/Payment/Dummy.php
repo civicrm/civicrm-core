@@ -56,7 +56,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Dummy Processor');
   }
 
   /**

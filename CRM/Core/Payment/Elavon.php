@@ -42,7 +42,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Elavon');
   }
 
   /**

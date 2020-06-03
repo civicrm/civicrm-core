@@ -94,7 +94,7 @@ abstract class CRM_Core_Payment {
   /**
    * Processor type label.
    *
-   * (Deprecated parameter but used in some messages).
+   * (Deprecated unused parameter).
    *
    * @var string
    * @deprecated
