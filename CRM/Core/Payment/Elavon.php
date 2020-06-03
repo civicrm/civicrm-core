@@ -29,14 +29,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     CHARSET = 'UFT-8';
 
   /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var CRM_Core_Payment_Elavon
-   */
-  static private $_singleton = NULL;
-
-  /**
    * Constructor.
    *
    * @param string $mode
