@@ -75,6 +75,9 @@
   organization: AGH Strategies
   jira        : alifrumin
 
+- github      : andyburnsco
+  name        : Andy Burns
+
 - github      : amsharma9
   name        : Amal Sharma
   organization: Abhikalak Consultants
@@ -574,6 +577,10 @@
   organization: CompuCorp
   jira        : guanhuan
 
+- github      : GuillaumeSorel
+  name        : Guillaume Sorel
+  organization: All In Appli.com
+
 - github      : guyiac
   name        : Guy Iaccarino
   organization: Greenleaf Advancement
@@ -649,6 +656,10 @@
 - github      : irritatie
   name        : Matthijs Keijser
   organization: CiviCoop
+
+- github      : ivan-compucorp
+  name        : Ivan
+  organization: CompuCorp
 
 - github      : jaapjansma
   name        : Jaap Jansma
