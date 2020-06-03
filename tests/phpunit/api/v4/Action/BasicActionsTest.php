@@ -266,6 +266,7 @@ class BasicActionsTest extends UnitTestCase {
 
     $results = MockBasicEntity::get()
       ->addSelect('*', 'group:label', 'group:name', 'fruit:name', 'fruit:color', 'fruit:label')
+      ->addOrderBy('fruit:color', "DESC")
       ->execute();
 
     $this->assertEquals('round', $results[0]['shape']);
@@ -276,6 +277,12 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertEquals('Banana', $results[0]['fruit:label']);
     $this->assertEquals('banana', $results[0]['fruit:name']);
     $this->assertEquals('yellow', $results[0]['fruit:color']);
+
+    // Reverse order
+    $results = MockBasicEntity::get()
+      ->addOrderBy('fruit:color')
+      ->execute();
+    $this->assertEquals('two', $results[0]['group']);
 
     // Cannot match to a non-unique option property like :color on create
     try {

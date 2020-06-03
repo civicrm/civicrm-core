@@ -196,6 +196,33 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $this->assertEquals('blü', $result['myPseudoconstantTest.Color:label']);
     $this->assertEquals('bl_', $result['myPseudoconstantTest.Color:name']);
     $this->assertEquals('b', $result['myPseudoconstantTest.Color']);
+
+    $cid1 = Contact::create()
+      ->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'two')
+      ->addValue('myPseudoconstantTest.Technicolor:label', 'RED')
+      ->execute()->first()['id'];
+    $cid2 = Contact::create()
+      ->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'two')
+      ->addValue('myPseudoconstantTest.Technicolor:label', 'GREEN')
+      ->execute()->first()['id'];
+
+    // Test ordering by label
+    $result = Contact::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('id', 'IN', [$cid1, $cid2])
+      ->addSelect('id')
+      ->addOrderBy('myPseudoconstantTest.Technicolor:label')
+      ->execute()->first()['id'];
+    $this->assertEquals($cid2, $result);
+    $result = Contact::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('id', 'IN', [$cid1, $cid2])
+      ->addSelect('id')
+      ->addOrderBy('myPseudoconstantTest.Technicolor:label', 'DESC')
+      ->execute()->first()['id'];
+    $this->assertEquals($cid1, $result);
   }
 
   public function testJoinOptions() {

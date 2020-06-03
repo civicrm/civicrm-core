@@ -222,7 +222,20 @@ class Api4SelectQuery extends SelectQuery {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
         throw new \API_Exception("Invalid sort direction. Cannot order by $item $dir");
       }
-      $this->query->orderBy($this->renderExpression($item) . " $dir");
+      $expr = $this->getExpression($item);
+      $column = $expr->render($this->apiFieldSpec);
+
+      // Use FIELD() function to sort on pseudoconstant values
+      $suffix = strstr($item, ':');
+      if ($suffix && $expr->getType() === 'SqlField') {
+        $field = $this->getField($item);
+        $options = FormattingUtil::getPseudoconstantList($field['entity'], $field['name'], substr($suffix, 1));
+        if ($options) {
+          asort($options);
+          $column = "FIELD($column,'" . implode("','", array_keys($options)) . "')";
+        }
+      }
+      $this->query->orderBy("$column $dir");
     }
   }
 
@@ -241,7 +254,7 @@ class Api4SelectQuery extends SelectQuery {
    */
   protected function buildGroupBy() {
     foreach ($this->groupBy as $item) {
-      $this->query->groupBy($this->renderExpression($item));
+      $this->query->groupBy($this->getExpression($item)->render($this->apiFieldSpec));
     }
   }
 
@@ -372,16 +385,6 @@ class Api4SelectQuery extends SelectQuery {
       $this->getField($fieldName, TRUE);
     }
     return $sqlExpr;
-  }
-
-  /**
-   * @param string $expr
-   * @return string
-   * @throws \API_Exception
-   */
-  protected function renderExpression(string $expr) {
-    $sqlExpr = $this->getExpression($expr);
-    return $sqlExpr->render($this->apiFieldSpec);
   }
 
   /**

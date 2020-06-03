@@ -28,6 +28,7 @@
     $scope.havingOptions = [];
     $scope.fieldsAndJoins = [];
     $scope.fieldsAndJoinsAndFunctions = [];
+    $scope.fieldsAndJoinsAndFunctionsWithSuffixes = [];
     $scope.fieldsAndJoinsAndFunctionsAndWildcards = [];
     $scope.availableParams = {};
     $scope.params = {};
@@ -357,6 +358,7 @@
       $scope.action = $routeParams.api4action;
       $scope.fieldsAndJoins.length = 0;
       $scope.fieldsAndJoinsAndFunctions.length = 0;
+      $scope.fieldsAndJoinsAndFunctionsWithSuffixes.length = 0;
       $scope.fieldsAndJoinsAndFunctionsAndWildcards.length = 0;
       if (!actions.length) {
         formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params']);
@@ -382,10 +384,12 @@
             });
           }
           $scope.fieldsAndJoinsAndFunctions = addJoins($scope.fields.concat(functions), true);
+          $scope.fieldsAndJoinsAndFunctionsWithSuffixes = addJoins(getFieldList($scope.action, ['name', 'label']).concat(functions), false, ['name', 'label']);
           $scope.fieldsAndJoinsAndFunctionsAndWildcards = addJoins(getFieldList($scope.action, ['name', 'label']).concat(functions), true, ['name', 'label']);
         } else {
           $scope.fieldsAndJoins = getFieldList($scope.action, ['name']);
           $scope.fieldsAndJoinsAndFunctions = $scope.fields;
+          $scope.fieldsAndJoinsAndFunctionsWithSuffixes = getFieldList($scope.action, ['name', 'label']);
           $scope.fieldsAndJoinsAndFunctionsAndWildcards = getFieldList($scope.action, ['name', 'label']);
         }
         $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
