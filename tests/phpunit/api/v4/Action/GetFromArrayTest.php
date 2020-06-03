@@ -168,6 +168,13 @@ class GetFromArrayTest extends UnitTestCase {
     $resultIds = array_column((array) $result, 'field1');
     $this->assertTrue(in_array(3, $resultIds));
     $this->assertFalse(in_array(1, $resultIds));
+
+    $result = MockArrayEntity::get()
+      ->addWhere('field7', 'IS NOT', 'previous.week')
+      ->execute();
+    $resultIds = array_column((array) $result, 'field1');
+    $this->assertTrue(in_array(1, $resultIds));
+    $this->assertFalse(in_array(3, $resultIds));
   }
 
   public function testArrayGetWithNestedWhereClauses() {
