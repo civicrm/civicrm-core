@@ -84,7 +84,7 @@ class CRM_Utils_Hook_DrupalBase extends CRM_Utils_Hook {
         $this->drupalModules = $this->getDrupalModules();
       }
 
-      if ($this->civiModules === NULL) {
+      if (empty($this->civiModules)) {
         $this->civiModules = [];
         $this->requireCiviModules($this->civiModules);
       }
