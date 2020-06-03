@@ -233,7 +233,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    *
    * @return \ezcMail|string
    */
-  public function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
+  public function checkMailLog($strings, $absentStrings = [], $prefix = '') {
     $mail = $this->getMostRecentEmail('raw');
     return $this->checkMailForStrings($strings, $absentStrings, $prefix, $mail);
   }
@@ -249,7 +249,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    *
    * @return \ezcMail|string
    */
-  public function checkAllMailLog($strings, $absentStrings = array(), $prefix = '') {
+  public function checkAllMailLog($strings, $absentStrings = [], $prefix = '') {
     $mails = $this->getAllMessages('raw');
     $mail = implode(',', $mails);
     return $this->checkMailForStrings($strings, $absentStrings, $prefix, $mail);
@@ -271,7 +271,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    *   Array($msgPos => array($recipPos => $emailAddr)).
    */
   public function assertRecipients($expectedRecipients) {
-    $recipients = array();
+    $recipients = [];
     foreach ($this->getAllMessages('ezc') as $message) {
       $recipients[] = CRM_Utils_Array::collect('email', $message->to);
     }
@@ -297,7 +297,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
    *   Array(string $subj).
    */
   public function assertSubjects($expectedSubjects) {
-    $subjects = array();
+    $subjects = [];
     foreach ($this->getAllMessages('ezc') as $message) {
       /** @var ezcMail $message */
       $subjects[] = $message->subject;

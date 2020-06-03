@@ -63,10 +63,10 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     $clientID,
     $caseID
   ) {
-    $case = $this->_redactionRegexRules = array();
+    $case = $this->_redactionRegexRules = [];
 
     if (empty($this->_redactionStringRules)) {
-      $this->_redactionStringRules = array();
+      $this->_redactionStringRules = [];
     }
 
     if ($this->_isRedact == 1) {
@@ -111,7 +111,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ((string ) $activitySetXML->name == $activitySetName) {
-          $activityTypes = array();
+          $activityTypes = [];
           $allActivityTypes = CRM_Case_PseudoConstant::caseActivityType(TRUE, TRUE);
           foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
             foreach ($activityTypesXML as $activityTypeXML) {
@@ -192,7 +192,7 @@ AND    ac.case_id = %1
    * @return mixed
    */
   public function &getActivityInfo($clientID, $activityID, $anyActivity = FALSE, $redact = 0) {
-    static $activityInfos = array();
+    static $activityInfos = [];
     if ($redact) {
       $this->_isRedact = 1;
       $this->getRedactionRules();
@@ -205,7 +205,7 @@ AND    ac.case_id = %1
     }
 
     if (!array_key_exists($index, $activityInfos)) {
-      $activityInfos[$index] = array();
+      $activityInfos[$index] = [];
       $selectCaseActivity = "";
       $joinCaseActivity = "";
 
@@ -259,11 +259,11 @@ WHERE      a.id = %1
    */
   public function &getActivity($clientID, $activityDAO, &$activityTypeInfo) {
     if (empty($this->_redactionStringRules)) {
-      $this->_redactionStringRules = array();
+      $this->_redactionStringRules = [];
     }
 
-    $activity = array();
-    $activity['fields'] = array();
+    $activity = [];
+    $activity['fields'] = [];
     if ($clientID) {
       $clientID = CRM_Utils_Type::escape($clientID, 'Integer');
       if (!in_array($activityTypeInfo['name'], array(
@@ -326,7 +326,7 @@ WHERE      a.id = %1
       }
 
       if ($processTarget) {
-        $targetRedacted = array();
+        $targetRedacted = [];
         foreach ($targetNames as $targetID => $target) {
           // add Recipient SortName as well as Display to the strings to be redacted across the case session
           // suffixed with a randomly generated 4-digit number
@@ -513,11 +513,11 @@ WHERE      a.id = %1
 
     $params = array(1 => array($activityDAO->id, 'Integer'));
 
-    $customGroups = array();
+    $customGroups = [];
     foreach ($sql as $tableName => $sqlClause) {
       $dao = CRM_Core_DAO::executeQuery($sqlClause, $params);
       if ($dao->fetch()) {
-        $customGroup = array();
+        $customGroup = [];
         foreach ($typeValues[$tableName] as $columnName => $typeValue) {
 
           if (CRM_Utils_Array::value('type', $typeValue) == 'Date') {
@@ -565,7 +565,7 @@ WHERE      a.id = %1
    * @return mixed
    */
   public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL, $onlyActive = TRUE) {
-    static $cache = array();
+    static $cache = [];
 
     if (is_null($activityTypeID)) {
       $activityTypeID = 0;
@@ -606,11 +606,11 @@ AND " . CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, 'cg.')
       );
       $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-      $result = $options = $sql = $groupTitle = array();
+      $result = $options = $sql = $groupTitle = [];
       while ($dao->fetch()) {
         if (!array_key_exists($dao->tableName, $result)) {
-          $result[$dao->tableName] = array();
-          $sql[$dao->tableName] = array();
+          $result[$dao->tableName] = [];
+          $sql[$dao->tableName] = [];
         }
         $result[$dao->tableName][$dao->columnName] = array(
           'label' => $dao->label,
@@ -618,7 +618,7 @@ AND " . CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, 'cg.')
           'fieldID' => $dao->fieldID,
         );
 
-        $options[$dao->fieldID] = array();
+        $options[$dao->fieldID] = [];
         $options[$dao->fieldID]['attributes'] = array(
           'label' => $dao->label,
           'data_type' => $dao->dataType,
@@ -695,7 +695,7 @@ LIMIT  1
    *
    * @return mixed
    */
-  private function redact($string, $printReport = FALSE, $replaceString = array()) {
+  private function redact($string, $printReport = FALSE, $replaceString = []) {
     if ($printReport) {
       return CRM_Utils_String::redaction($string, $replaceString);
     }
@@ -787,7 +787,7 @@ LIMIT  1
     $template->assign_by_ref('activitySet', $activitySet);
 
     //now collect all the information about activities
-    $activities = array();
+    $activities = [];
     $form->getActivities($clientID, $caseID, $activityTypes, $activities);
     $template->assign_by_ref('activities', $activities);
 
@@ -800,7 +800,7 @@ LIMIT  1
     $activitySetName = CRM_Utils_Request::retrieve('asn', 'String');
     $isRedact = CRM_Utils_Request::retrieve('redact', 'Boolean');
     $includeActivities = CRM_Utils_Request::retrieve('all', 'Positive');
-    $params = $otherRelationships = $globalGroupInfo = array();
+    $params = $otherRelationships = $globalGroupInfo = [];
     $report = new CRM_Case_XMLProcessor_Report($isRedact);
     if ($includeActivities) {
       $params['include_activities'] = 1;
@@ -808,7 +808,7 @@ LIMIT  1
 
     if ($isRedact) {
       $params['is_redact'] = 1;
-      $report->_redactionStringRules = array();
+      $report->_redactionStringRules = [];
     }
     $template = CRM_Core_Smarty::singleton();
 
@@ -960,7 +960,7 @@ LIMIT  1
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($caseID, 'Case');
     $extends = array('case');
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
-    $caseCustomFields = array();
+    $caseCustomFields = [];
     foreach ($groupTree as $gid => $group_values) {
       foreach ($group_values['fields'] as $id => $field_values) {
         if (array_key_exists($id, $customValues)) {

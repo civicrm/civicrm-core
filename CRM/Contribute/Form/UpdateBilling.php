@@ -84,10 +84,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    *   Default values
    */
   public function setDefaultValues() {
-    $this->_defaults = array();
+    $this->_defaults = [];
 
     if ($this->_subscriptionDetails->contact_id) {
-      $fields = array();
+      $fields = [];
       $names = array(
         'first_name',
         'middle_name',
@@ -170,7 +170,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // validate the payment instrument values (e.g. credit card number)
@@ -192,7 +192,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     }
     $fields["email-{$this->_bltID}"] = 1;
 
-    $processorParams = array();
+    $processorParams = [];
     foreach ($params as $key => $val) {
       $key = str_replace('billing_', '', $key);
       list($key) = explode('-', $key);

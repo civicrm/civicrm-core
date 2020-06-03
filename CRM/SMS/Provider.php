@@ -22,7 +22,7 @@ abstract class CRM_SMS_Provider {
    *
    * @var object
    */
-  static private $_singleton = array();
+  static private $_singleton = [];
   const MAX_SMS_CHAR = 460;
 
   /**
@@ -34,7 +34,7 @@ abstract class CRM_SMS_Provider {
    * @return object
    * @throws CRM_Core_Exception
    */
-  public static function &singleton($providerParams = array(), $force = FALSE) {
+  public static function &singleton($providerParams = [], $force = FALSE) {
     $mailingID = $providerParams['mailing_id'] ?? NULL;
     $providerID = $providerParams['provider_id'] ?? NULL;
     $providerName = $providerParams['provider'] ?? NULL;
@@ -125,7 +125,7 @@ abstract class CRM_SMS_Provider {
    * @return self|null|object
    * @throws CRM_Core_Exception
    */
-  public function createActivity($apiMsgID, $message, $headers = array(), $jobID = NULL, $userID = NULL) {
+  public function createActivity($apiMsgID, $message, $headers = [], $jobID = NULL, $userID = NULL) {
     if ($jobID) {
       $sql = "
 SELECT scheduled_id FROM civicrm_mailing m

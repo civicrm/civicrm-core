@@ -411,14 +411,14 @@ AND         cp.page_type = 'contribute'
 
     $this->search();
 
-    $params = array();
+    $params = [];
 
     $whereClause = $this->whereClause($params, FALSE);
     $config = CRM_Core_Config::singleton();
     if ($config->includeAlphabeticalPager) {
       $this->pagerAToZ($whereClause, $params);
     }
-    $params = array();
+    $params = [];
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);
 
@@ -434,7 +434,7 @@ AND         cp.page_type = 'contribute'
    ORDER BY is_active desc, title asc
    LIMIT  $offset, $rowCount";
     $contribPage = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Contribute_DAO_ContributionPage');
-    $contribPageIds = array();
+    $contribPageIds = [];
     while ($contribPage->fetch()) {
       $contribPageIds[$contribPage->id] = $contribPage->id;
     }
@@ -457,7 +457,7 @@ ORDER BY is_active desc, title asc
     $configureActionLinks = self::configureActionLinks();
 
     while ($dao->fetch()) {
-      $contribution[$dao->id] = array();
+      $contribution[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $contribution[$dao->id]);
 
       // form all action links
@@ -485,7 +485,7 @@ ORDER BY is_active desc, title asc
       }
 
       //build the configure links.
-      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, array());
+      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
       $contribution[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
         array('id' => $dao->id),
@@ -565,7 +565,7 @@ ORDER BY is_active desc, title asc
    */
   public function whereClause(&$params, $sortBy = TRUE) {
     // @todo Unused local variable can be safely removed.
-    $values = $clauses = array();
+    $values = $clauses = [];
     $title = $this->get('title');
     $createdId = $this->get('cid');
 
@@ -584,7 +584,7 @@ ORDER BY is_active desc, title asc
     }
 
     $value = $this->get('financial_type_id');
-    $val = array();
+    $val = [];
     if ($value) {
       if (is_array($value)) {
         foreach ($value as $k => $v) {
@@ -627,7 +627,7 @@ ORDER BY is_active desc, title asc
   public function getCampaignIds() {
     // The unfiltered value from the session cannot be trusted, it needs to be
     // processed to get a clean array of positive integers.
-    $ids = array();
+    $ids = [];
     foreach ((array) $this->get('campaign_id') as $id) {
       if ((string) (int) $id === (string) $id && $id > 0) {
         $ids[] = $id;
@@ -695,7 +695,7 @@ ORDER BY UPPER(LEFT(title, 1))
       }
 
       if (empty($sectionsInfo[$sectionName])) {
-        $classes = array();
+        $classes = [];
         if (isset($link['class'])) {
           $classes = $link['class'];
         }

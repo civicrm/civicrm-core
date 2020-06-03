@@ -244,7 +244,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
    * Override parent select for reasons someone will someday make sense of & document.
    */
   public function select() {
-    $select = array();
+    $select = [];
     $append = NULL;
     // since contact fields not related to financial type
     if (array_key_exists('financial_type', $this->_params['group_bys']) ||
@@ -409,7 +409,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     }
 
     if (!$this->_amountClauseWithAND) {
-      $amountClauseWithAND = array();
+      $amountClauseWithAND = [];
       if (!empty($clauses['total_amount1'])) {
         $amountClauseWithAND[] = str_replace("{$this->_aliases['civicrm_contribution']}.total_amount",
           "{$this->_aliases['civicrm_contribution']}1.total_amount_sum", $clauses['total_amount1']);
@@ -478,7 +478,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    */
   public static function formRule($fields, $files, $self) {
 
-    $errors = $checkDate = $errorCount = array();
+    $errors = $checkDate = $errorCount = [];
 
     $rules = array(
       'id' => array(
@@ -558,7 +558,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       foreach ($fields['fields'] as $fld_id => $value) {
         if (!($fld_id == 'total_amount1') && !($fld_id == 'total_amount2') && !(substr($fld_id, 0, 7) === "custom_")) {
           $found = FALSE;
-          $invlidGroups = array();
+          $invlidGroups = [];
           foreach ($fields['group_bys'] as $grp_id => $val) {
             $validFields = $rules[$grp_id];
             if (in_array($fld_id, $validFields)) {
@@ -671,7 +671,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     $sql = "{$this->_select} {$this->_from} {$this->_where}";
     $dao = $this->executeReportQuery($sql);
     //store contributions in array 'contact_sums' for comparison
-    $contact_sums = array();
+    $contact_sums = [];
     while ($dao->fetch()) {
       $contact_sums[$dao->contact_civireport_id] = array(
         'contribution1_total_amount_sum' => $dao->contribution1_total_amount_sum,
@@ -753,7 +753,7 @@ GROUP BY    currency
 ";
     $dao = $this->executeReportQuery($sql);
 
-    $amount = $average = $amount2 = $average2 = array();
+    $amount = $average = $amount2 = $average2 = [];
     $count = $count2 = 0;
     while ($dao->fetch()) {
       if ($dao->amount) {
@@ -824,7 +824,7 @@ GROUP BY    currency
     $count = 0;
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_orderBy} {$this->_limit}";
     $dao = $this->executeReportQuery($sql);
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
       foreach ($this->_columnHeaders as $key => $value) {
         $rows[$count][$key] = $dao->$key;

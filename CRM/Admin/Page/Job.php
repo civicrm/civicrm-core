@@ -144,7 +144,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     }
 
     $sj = new CRM_Core_JobManager();
-    $rows = $temp = array();
+    $rows = $temp = [];
     foreach ($sj->jobs as $job) {
       $action = array_sum(array_keys($this->links()));
 

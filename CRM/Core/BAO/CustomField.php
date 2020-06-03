@@ -888,7 +888,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Autocomplete-Select':
         static $customUrls = [];
         // Fixme: why is this a string in the first place??
-        $attributes = array();
+        $attributes = [];
         if ($field->attributes) {
           foreach (explode(' ', $field->attributes) as $at) {
             if (strpos($at, '=')) {

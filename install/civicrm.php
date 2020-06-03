@@ -200,7 +200,7 @@ function civicrm_config(&$config) {
   global $tplPath, $installType;
 
   // Ex: $extraSettings[] = '$civicrm_settings["domain"]["foo"] = "bar";';
-  $extraSettings = array();
+  $extraSettings = [];
 
   $params = array(
     'crmRoot' => $crmPath,

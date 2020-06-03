@@ -42,7 +42,7 @@ class CRM_Contact_Import_ImportJob {
   protected $_allTags;
 
   protected $_mapper;
-  protected $_mapperKeys = array();
+  protected $_mapperKeys = [];
   protected $_mapFields;
 
   protected $_parser;
@@ -124,7 +124,7 @@ class CRM_Contact_Import_ImportJob {
    */
   public function runImport(&$form, $timeout = 55) {
     $mapper = $this->_mapper;
-    $mapperFields = array();
+    $mapperFields = [];
     $parserParameters = CRM_Contact_Import_Parser_Contact::getParameterForParser(count($mapper));
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -294,7 +294,7 @@ class CRM_Contact_Import_ImportJob {
 
     if ($newGroupName) {
       /* Create a new group */
-      $newGroupType = $newGroupType ?? array();
+      $newGroupType = $newGroupType ?? [];
       $gParams = array(
         'title' => $newGroupName,
         'description' => $newGroupDesc,
@@ -306,7 +306,7 @@ class CRM_Contact_Import_ImportJob {
     }
 
     if (is_array($this->_groups)) {
-      $groupAdditions = array();
+      $groupAdditions = [];
       foreach ($this->_groups as $groupId) {
         $addCount = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $groupId);
         $totalCount = $addCount[1];
@@ -361,7 +361,7 @@ class CRM_Contact_Import_ImportJob {
     //add Tag to Import
 
     if (is_array($this->_tag)) {
-      $tagAdditions = array();
+      $tagAdditions = [];
       foreach ($this->_tag as $tagId => $val) {
         $addTagCount = CRM_Core_BAO_EntityTag::addEntitiesToTag($contactIds, $tagId, 'civicrm_contact', FALSE);
         $totalTagCount = $addTagCount[1];

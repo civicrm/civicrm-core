@@ -120,7 +120,7 @@ class CRM_Core_Block {
           'template' => 'LangSwitch.tpl',
           'info' => ts('CiviCRM Language Switcher'),
           'subject' => '',
-          'templateValues' => array(),
+          'templateValues' => [],
           'active' => TRUE,
           'cache' => BLOCK_NO_CACHE,
           'visibility' => 1,
@@ -133,7 +133,7 @@ class CRM_Core_Block {
           'template' => 'Event.tpl',
           'info' => ts('CiviCRM Upcoming Events'),
           'subject' => ts('Upcoming Events'),
-          'templateValues' => array(),
+          'templateValues' => [],
           'active' => TRUE,
           'cache' => BLOCK_NO_CACHE,
           'visibility' => 1,
@@ -215,7 +215,7 @@ class CRM_Core_Block {
    */
   public static function getInfo() {
 
-    $block = array();
+    $block = [];
     foreach (self::properties() as $id => $value) {
       if ($value['active']) {
         if (in_array($id, array(
@@ -328,7 +328,7 @@ class CRM_Core_Block {
   private static function setTemplateShortcutValues() {
     $config = CRM_Core_Config::singleton();
 
-    static $shortCuts = array();
+    static $shortCuts = [];
 
     if (!($shortCuts)) {
       if (CRM_Core_Permission::check('add contacts')) {
@@ -397,7 +397,7 @@ class CRM_Core_Block {
       }
     }
 
-    $values = array();
+    $values = [];
     foreach ($shortCuts as $key => $short) {
       $values[$key] = self::setShortCutValues($short);
     }
@@ -431,7 +431,7 @@ class CRM_Core_Block {
    * @return array
    */
   private static function setShortcutValues($short) {
-    $value = array();
+    $value = [];
     if (isset($short['url'])) {
       $value['url'] = $short['url'];
     }
@@ -452,7 +452,7 @@ class CRM_Core_Block {
    * Create the list of dashboard links.
    */
   private static function setTemplateDashboardValues() {
-    static $dashboardLinks = array();
+    static $dashboardLinks = [];
     if (CRM_Core_Permission::check('access Contact Dashboard')) {
       $dashboardLinks = array(
         array(
@@ -467,9 +467,9 @@ class CRM_Core_Block {
       return NULL;
     }
 
-    $values = array();
+    $values = [];
     foreach ($dashboardLinks as $dash) {
-      $value = array();
+      $value = [];
       if (isset($dash['url'])) {
         $value['url'] = $dash['url'];
       }
@@ -504,9 +504,9 @@ class CRM_Core_Block {
       );
     }
 
-    $values = array();
+    $values = [];
     foreach ($shortCuts as $short) {
-      $value = array();
+      $value = [];
       $value['url'] = CRM_Utils_System::url($short['path'], $short['query']);
       $value['title'] = $short['title'];
       $values[] = $value;
@@ -601,7 +601,7 @@ class CRM_Core_Block {
       return NULL;
     }
 
-    $block = array();
+    $block = [];
     $block['name'] = 'block-civicrm';
     $block['id'] = $block['name'] . '_' . $id;
     $block['subject'] = self::fetch($id, 'Subject.tpl',

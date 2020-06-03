@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_Save
       $types = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         substr($defaults['group_type'], 1, -1)
       );
-      $defaults['group_type'] = array();
+      $defaults['group_type'] = [];
       foreach ($types as $type) {
         $defaults['group_type'][$type] = 1;
       }
