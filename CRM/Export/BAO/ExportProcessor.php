@@ -1109,7 +1109,20 @@ class CRM_Export_BAO_ExportProcessor {
     ) {
       //check for custom data
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
-        return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+        $html_type = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
+        $displayValue = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+        //need to calculate the link to the file for file custom data
+        if ($html_type === 'File') {
+          preg_match('/<a[^>]+href=([\'"])(?<href>.+?)\1[^>]*>/i', $displayValue, $matches);
+          if (!empty($matches)) {
+            $displayValue = $matches['2'];
+            if ((strpos($file,  "http ")) === false) {
+              return CIVICRM_UF_BASEURL. html_entity_decode($displayValue);
+            }
+          }
+        }
+
+        return $displayValue;
       }
 
       elseif (in_array($field, [
