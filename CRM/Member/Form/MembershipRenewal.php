@@ -753,15 +753,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param $membershipSource
    * @param $isPayLater
    * @param int $campaignId
-   * @param array $formDates
-   * @param null|CRM_Contribute_BAO_Contribution $contribution
-   * @param array $lineItems
    *
    * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId, $formDates = [], $contribution = NULL, $lineItems = []) {
+  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId) {
     $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -785,11 +782,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $memParams = [
         'id' => $currentMembership['id'],
-        'contribution' => $contribution,
         'status_id' => $currentMembership['status_id'],
         'start_date' => $currentMembership['start_date'],
         'end_date' => $currentMembership['end_date'],
-        'line_item' => $lineItems,
         'join_date' => $currentMembership['join_date'],
         'membership_type_id' => $membershipTypeID,
         'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
@@ -818,10 +813,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $currentMembership['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
       foreach (['start_date', 'end_date'] as $dateType) {
-        $currentMembership[$dateType] = $formDates[$dateType] ?? NULL;
-        if (empty($currentMembership[$dateType])) {
-          $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
-        }
+        $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
       }
       $currentMembership['is_test'] = $is_test;
 
@@ -859,12 +851,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       // Insert renewed dates for CURRENT membership
       $memParams = [];
-      $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
-      $memParams['start_date'] = CRM_Utils_Array::value('start_date', $formDates, CRM_Utils_Date::isoToMysql($membership->start_date));
-      $memParams['end_date'] = $formDates['end_date'] ?? NULL;
-      if (empty($memParams['end_date'])) {
-        $memParams['end_date'] = $dates['end_date'] ?? NULL;
-      }
+      $memParams['join_date'] = $membership->join_date;
+      $memParams['start_date'] = $membership->start_date;
+      $memParams['end_date'] = $dates['end_date'] ?? NULL;
       $memParams['membership_type_id'] = $membershipTypeID;
 
       //set the log start date.
@@ -920,11 +909,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $memParams['campaign_id'] = $campaignId;
     }
 
-    $memParams['contribution'] = $contribution;
     $memParams['custom'] = $customFieldsFormatted;
-    // Load all line items & process all in membership. Don't do in contribution.
-    // Relevant tests in api_v3_ContributionPageTest.
-    $memParams['line_item'] = $lineItems;
     // @todo stop passing $ids (membership and userId may be set by this point)
     $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
