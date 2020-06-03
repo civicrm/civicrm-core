@@ -52,14 +52,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
-
-  /**
    * Constructor.
    *
    * @param string $mode
