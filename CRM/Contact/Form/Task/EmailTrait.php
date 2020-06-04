@@ -431,35 +431,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $this->getVar('_caseId')
     );
 
-    $followupStatus = '';
     if ($sent) {
-      $followupActivity = NULL;
-      if (!empty($formValues['followup_activity_type_id'])) {
-        $params['followup_activity_type_id'] = $formValues['followup_activity_type_id'];
-        $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
-        $params['followup_date'] = $formValues['followup_date'];
-        $params['target_contact_id'] = $this->_contactIds;
-        $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
-        $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
-        $followupStatus = ts('A followup activity has been scheduled.');
-
-        if (Civi::settings()->get('activity_assignee_notification')) {
-          if ($followupActivity) {
-            $mailToFollowupContacts = [];
-            $assignee = [$followupActivity->id];
-            $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($assignee, TRUE, FALSE);
-            foreach ($assigneeContacts as $values) {
-              $mailToFollowupContacts[$values['email']] = $values;
-            }
-
-            $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
-            if ($sentFollowup) {
-              $followupStatus .= '<br />' . ts('A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).');
-            }
-          }
-        }
-      }
-
+      $followupStatus = $this->createFollowUpActivities($formValues, $activityId);
       $count_success = count($this->_toContactDetails);
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', [
         'plural' => '%count messages were sent successfully. ',
@@ -636,6 +609,48 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $subject = "[case #$hash] $subject";
     }
     return $subject;
+  }
+
+  /**
+   * Create any follow up activities.
+   *
+   * @param array $formValues
+   * @param int $activityId
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createFollowUpActivities($formValues, $activityId): string {
+    $params = [];
+    $followupStatus = '';
+    $followupActivity = NULL;
+    if (!empty($formValues['followup_activity_type_id'])) {
+      $params['followup_activity_type_id'] = $formValues['followup_activity_type_id'];
+      $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
+      $params['followup_date'] = $formValues['followup_date'];
+      $params['target_contact_id'] = $this->_contactIds;
+      $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
+      $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
+      $followupStatus = ts('A followup activity has been scheduled.');
+
+      if (Civi::settings()->get('activity_assignee_notification')) {
+        if ($followupActivity) {
+          $mailToFollowupContacts = [];
+          $assignee = [$followupActivity->id];
+          $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($assignee, TRUE, FALSE);
+          foreach ($assigneeContacts as $values) {
+            $mailToFollowupContacts[$values['email']] = $values;
+          }
+
+          $sentFollowup = CRM_Activity_BAO_Activity::sendToAssignee($followupActivity, $mailToFollowupContacts);
+          if ($sentFollowup) {
+            $followupStatus .= '<br />' . ts('A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).');
+          }
+        }
+      }
+    }
+    return $followupStatus;
   }
 
 }
