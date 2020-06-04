@@ -52,6 +52,8 @@ class CRM_Core_Form_Date {
   /**
    * Retrieve the date range - relative or absolute and assign it to the form.
    *
+   * @deprecated
+   *
    * @param CRM_Core_Form $form
    *   The form the dates should be added to.
    * @param string $fieldName
@@ -73,6 +75,7 @@ class CRM_Core_Form_Date {
     $dateFormat = 'searchDate', $displayTime = FALSE,
     $attributes = ['class' => 'crm-select2']
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
     $selector
       = CRM_Core_Form_Date::returnDateRangeSelector(
         $form, $fieldName, $count,
@@ -90,6 +93,8 @@ class CRM_Core_Form_Date {
 
   /**
    * Build the date range array that will provide the form option values.
+   *
+   * @deprecated
    *
    * It can be - relative or absolute.
    *
@@ -115,6 +120,7 @@ class CRM_Core_Form_Date {
     $required = FALSE, $operators = [],
     $dateFormat = 'searchDate', $displayTime = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
     $selector = [
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
@@ -138,6 +144,8 @@ class CRM_Core_Form_Date {
 
   /**
    * Build the date range - relative or absolute.
+   *
+   * @deprecated
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -165,6 +173,7 @@ class CRM_Core_Form_Date {
     $displayTime = FALSE,
     $attributes
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
