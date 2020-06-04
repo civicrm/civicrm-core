@@ -361,15 +361,18 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Rollback unhandled outcomes.
    *
+   * @deprecated
+   *
    * @param array $objects
    * @param CRM_Core_Transaction $transaction
    *
    * @return bool
    */
   public function unhandled(&$objects, &$transaction) {
+    CRM_Core_Error::deprecatedFunctionWarning('This function will be removed at some point');
     $transaction->rollback();
-    Civi::log()->debug("Returning since contribution status is not handled");
-    echo "Failure: contribution status is not handled<p>";
+    Civi::log()->debug('Returning since contribution status is not handled');
+    echo 'Failure: contribution status is not handled<p>';
     return FALSE;
   }
 
