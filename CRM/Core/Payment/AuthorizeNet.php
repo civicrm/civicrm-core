@@ -245,7 +245,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $intervalLength *= 12;
       $intervalUnit = 'months';
     }
-    elseif ($intervalUnit == 'day') {
+    elseif ($intervalUnit === 'day') {
       $intervalUnit = 'days';
     }
     elseif ($intervalUnit == 'month') {

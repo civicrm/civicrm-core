@@ -53,7 +53,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate($nameParams);
 
     $invoiceID = 123456;
-    $amount = rand(100, 1000) . '.00';
+    $amount = 7;
 
     $recur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $contactId,
@@ -72,7 +72,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $contactId,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 'Donation',
       'receive_date' => date('Ymd'),
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
@@ -156,7 +156,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     Civi::settings()->set('verifySSL', '0');
-    $this->doPayment($params);
+    $this->processor->doPayment($params);
     // turn verifySSL on
     Civi::settings()->set('verifySSL', '0');
 
@@ -172,7 +172,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
 
     $requests = $this->getRequestBodies();
-    $this->assertEquals($this->getExpectedRequest(date('Y-m-d')), $requests[0]);
+    $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d')), $requests[0]);
     $header = $this->getRequestHeaders()[0];
     $this->assertEquals(['apitest.authorize.net'], $header['Host']);
     $this->assertEquals(['text/xml; charset=UTF8'], $header['Content-Type']);
@@ -187,16 +187,18 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Create a single post dated payment as a recurring transaction.
    */
   public function testCreateSinglePostDated() {
-    $start_date = date('Ymd', strtotime("+ 1 week"));
+    $this->createMockHandler([$this->getExpectedResponse()]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+    $start_date = date('Ymd', strtotime('+ 1 week'));
 
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'John';
+    $lastName = 'Smith';
     $nameParams = ['first_name' => $firstName, 'last_name' => $lastName];
     $contactId = $this->individualCreate($nameParams);
 
-    $ids = ['contribution' => NULL];
-    $invoiceID = sha1(rand());
-    $amount = rand(100, 1000) . '.00';
+    $invoiceID = 123456;
+    $amount = 70.23;
 
     $contributionRecurParams = [
       'contact_id' => $contactId,
@@ -208,11 +210,11 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'start_date' => $start_date,
       'create_date' => date('Ymd'),
       'invoice_id' => $invoiceID,
-      'contribution_status_id' => 2,
+      'contribution_status_id' => '',
       'is_test' => 1,
       'payment_processor_id' => $this->_paymentProcessorID,
     ];
-    $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
+    $recur = $this->callAPISuccess('ContributionRecur', 'create', $contributionRecurParams);
 
     $contributionParams = [
       'contact_id' => $contactId,
@@ -221,18 +223,18 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
       'currency' => 'USD',
-      'contribution_recur_id' => $recur->id,
+      'contribution_recur_id' => $recur['id'],
       'is_test' => 1,
       'contribution_status_id' => 2,
     ];
 
-    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
     $params = [
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
       'hidden_CreditCard' => 1,
       'billing_first_name' => $firstName,
-      'billing_middle_name' => "",
+      'billing_middle_name' => '',
       'billing_last_name' => $lastName,
       'billing_street_address-5' => '8 Hobbitton Road',
       'billing_city-5' => 'The Shire',
@@ -259,7 +261,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
-      'source' => "Mordor",
+      'source' => 'Mordor',
       'soft_credit_to' => '',
       'soft_contact_id' => '',
       'billing_state_province-5' => 'IL',
@@ -269,24 +271,24 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'year' => 2022,
       'month' => 10,
       'ip_address' => '127.0.0.1',
-      'amount' => 70,
+      'amount' => 70.23,
       'amount_level' => 0,
       'currencyID' => 'USD',
-      'pcp_display_in_roll' => "",
-      'pcp_roll_nickname' => "",
-      'pcp_personal_note' => "",
-      'non_deductible_amount' => "",
-      'fee_amount' => "",
-      'net_amount' => "",
-      'invoice_id' => "",
-      'contribution_page_id' => "",
+      'pcp_display_in_roll' => '',
+      'pcp_roll_nickname' => '',
+      'pcp_personal_note' => '',
+      'non_deductible_amount' => '',
+      'fee_amount' => '',
+      'net_amount' => '',
+      'invoice_id' => '',
+      'contribution_page_id' => '',
       'thankyou_date' => NULL,
       'honor_contact_id' => NULL,
       'invoiceID' => $invoiceID,
       'first_name' => $firstName,
       'middle_name' => 'bob',
       'last_name' => $lastName,
-      'street_address' => '8 Hobbiton Road' . uniqid(),
+      'street_address' => '8 Hobbiton Road',
       'city' => 'The Shire',
       'state_province' => 'IL',
       'postal_code' => 5010,
@@ -295,7 +297,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'email' => "{$firstName}.{$lastName}@example.com",
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
-      'contributionRecurID' => $recur->id,
+      'contributionRecurID' => $recur['id'],
     ];
 
     // if cancel-subscription has been called earlier 'subscriptionType' would be set to cancel.
@@ -303,52 +305,39 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('subscriptionType', 'create');
 
-    // turn verifySSL off
-    Civi::settings()->set('verifySSL', '0');
-    $this->doPayment($params);
-    // turn verifySSL on
-    Civi::settings()->set('verifySSL', '0');
+    $this->processor->doPayment($params);
 
     // if subscription was successful, processor_id / subscription-id must not be null
-    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id',
+    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id',
       'id', 'Failed to create subscription with Authorize.'
     );
 
     // cancel it or the transaction will be rejected by A.net if the test is re-run
-    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
+    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id');
     $message = '';
     $result = $this->processor->cancelSubscription($message, ['subscriptionId' => $subscriptionID]);
     $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-  }
 
-  /**
-   * Process payment against the Authorize.net test server.
-   *
-   * Skip the test if the server is unresponsive.
-   *
-   * @param array $params
-   *
-   * @throws PHPUnit\Framework\SkippedTestError
-   */
-  public function doPayment($params) {
-    try {
-      $this->processor->doPayment($params);
-    }
-    catch (Exception $e) {
-      $this->assertTrue((strpos($e->getMessage(), 'E00001: Internal Error Occurred.') !== FALSE),
-        'AuthorizeNet failed for unknown reason.' . $e->getMessage());
-      $this->markTestSkipped('AuthorizeNet test server is not in a good mood so we can\'t test this right now');
-    }
+    $response = $this->getResponseBodies();
+    $this->assertEquals($this->getExpectedResponse(), $response[0], 3);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d', strtotime($start_date)), 70.23, 3, 4007000000027, '2022-10'), $requests[0]);
   }
 
   /**
    * Get the content that we expect to see sent out.
    *
+   * @param int $contactID
    * @param string $startDate
+   *
+   * @param int $amount
+   * @param int $occurrences
+   * @param int $cardNumber
+   * @param string $cardExpiry
    *
    * @return string
    */
-  public function getExpectedRequest($startDate) {
+  public function getExpectedRequest($contactID, $startDate, $amount = 7, $occurrences = 12, $cardNumber = 4444333322221111, $cardExpiry = '2025-09') {
     return '<?xml version="1.0" encoding="utf-8"?>
 <ARBCreateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
@@ -363,20 +352,20 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
         <unit>months</unit>
       </interval>
       <startDate>' . $startDate . '</startDate>
-      <totalOccurrences>12</totalOccurrences>
+      <totalOccurrences>' . $occurrences . '</totalOccurrences>
     </paymentSchedule>
-    <amount>7</amount>
+    <amount>' . $amount . '</amount>
     <payment>
       <creditCard>
-        <cardNumber>4444333322221111</cardNumber>
-        <expirationDate>2025-09</expirationDate>
+        <cardNumber>' . $cardNumber . '</cardNumber>
+        <expirationDate>' . $cardExpiry . '</expirationDate>
       </creditCard>
     </payment>
       <order>
      <invoiceNumber>1</invoiceNumber>
         </order>
        <customer>
-      <id>3</id>
+      <id>' . $contactID . '</id>
       <email>John.Smith@example.com</email>
     </customer>
     <billTo>
