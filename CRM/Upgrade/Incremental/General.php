@@ -59,6 +59,13 @@ class CRM_Upgrade_Incremental_General {
   const MIN_INSTALL_MYSQL_VER = '5.5';
 
   /**
+   * The minimum MySQL/MariaDB version required to install Civi.
+   *
+   * @see install/index.php
+   */
+  const NEW_MIN_INSTALL_MYSQL_VER = '5.6.5';
+
+  /**
    * Compute any messages which should be displayed before upgrade.
    *
    * @param string $preUpgradeMessage
@@ -74,6 +81,25 @@ class CRM_Upgrade_Incremental_General {
         1 => $latestVer,
         2 => self::MIN_RECOMMENDED_PHP_VER,
         3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', self::RECOMMENDED_PHP_VER),
+      ]);
+      $preUpgradeMessage .= '</p>';
+    }
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::MIN_RECOMMENDED_MYSQL_VER) < 0 && version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::NEW_MIN_INSTALL_MYSQL_VER) >= 0) {
+      $preUpgradeMessage .= '<p>';
+      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require MySQL version %2 or above or MariaDB version %3 or above.', [
+        1 => $latestVer,
+        2 => self::MIN_RECOMMENDED_MYSQL_VER,
+        3 => '10.1',
+      ]);
+      $preUpgradeMessage .= '</p>';
+    }
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::NEW_MIN_INSTALL_MYSQL_VER) < 0) {
+      $preUpgradeMessage .= '<p>';
+      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but CiviCRM versions from 5.28 onwards will require at least MySQL version %1. It is recommended to use MySQL version %3 or above or MariaDB version %4 or above.', [
+        1 => $latestVer,
+        2 => self::NEW_MIN_INSTALL_MYSQL_VER,
+        3 => self::MIN_RECOMMENDED_MYSQL_VER,
+        4 => '10.1',
       ]);
       $preUpgradeMessage .= '</p>';
     }
