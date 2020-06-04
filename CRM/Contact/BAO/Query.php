@@ -685,12 +685,12 @@ class CRM_Contact_BAO_Query {
   public function addSpecialFields($apiEntity) {
     static $special = ['contact_type', 'contact_sub_type', 'sort_name', 'display_name'];
     // if get called via Contact.get API having address_id as return parameter
-    if ($apiEntity == 'Contact') {
+    if ($apiEntity === 'Contact') {
       $special[] = 'address_id';
     }
     foreach ($special as $name) {
       if (!empty($this->_returnProperties[$name])) {
-        if ($name == 'address_id') {
+        if ($name === 'address_id') {
           $this->_tables['civicrm_address'] = 1;
           $this->_select['address_id'] = 'civicrm_address.id as address_id';
           $this->_element['address_id'] = 1;
@@ -953,14 +953,14 @@ class CRM_Contact_BAO_Query {
           $this->_tables['civicrm_group_contact_cache'] = 1;
           $this->_pseudoConstantsSelect["{$name}"] = [
             'pseudoField' => "groups",
-            'idCol' => "groups",
+            'idCol' => 'groups',
           ];
         }
         elseif ($name === 'notes') {
           //@todo move this handling outside the big IF & ditch $makeException
           // if note field is subject then return subject else body of the note
           $noteColumn = 'note';
-          if (isset($noteField) && $noteField == 'note_subject') {
+          if (isset($noteField) && $noteField === 'note_subject') {
             $noteColumn = 'subject';
           }
 
@@ -1623,7 +1623,7 @@ class CRM_Contact_BAO_Query {
           }
         }
       }
-      elseif ($id == 'email_on_hold') {
+      elseif ($id === 'email_on_hold') {
         if ($onHoldValue = CRM_Utils_Array::value('email_on_hold', $formValues)) {
           // onHoldValue should be 0 or 1 or an array. Some legacy groups may hold ''
           // so in 5.11 we have an extra if that should become redundant over time.
@@ -1636,10 +1636,10 @@ class CRM_Contact_BAO_Query {
           }
         }
       }
-      elseif (substr($id, 0, 7) == 'custom_'
+      elseif (substr($id, 0, 7) === 'custom_'
         &&  (
-          substr($id, -5, 5) == '_from'
-          || substr($id, -3, 3) == '_to'
+          substr($id, -5, 5) === '_from'
+          || substr($id, -3, 3) === '_to'
         )
       ) {
         self::convertCustomRelativeFields($formValues, $params, $values, $id);
@@ -2982,7 +2982,7 @@ class CRM_Contact_BAO_Query {
       $value = CRM_Utils_Array::value($op, $value, $value);
     }
 
-    if ($name == 'group_type') {
+    if ($name === 'group_type') {
       $value = array_keys($this->getGroupsFromTypeCriteria($value));
     }
 
@@ -2997,7 +2997,7 @@ class CRM_Contact_BAO_Query {
     }
     $hasNonSmartGroups = count($regularGroupIDs);
 
-    $isNotOp = ($op == 'NOT IN' || $op == '!=');
+    $isNotOp = ($op === 'NOT IN' || $op === '!=');
 
     $statusJoinClause = $this->getGroupStatusClause($grouping);
     // If we are searching for 'Removed' contacts then despite it being a smart group we only care about the group_contact table.
@@ -3026,11 +3026,11 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
+      $gcTable = '`civicrm_group_contact-' . uniqid() . "`";
       $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
 
       // @todo consider just casting != to NOT IN & handling both together.
-      if ($op == '!=') {
+      if ($op === '!=') {
         $groupIds = '';
         if (!empty($regularGroupIDs)) {
           $groupIds = CRM_Utils_Type::validate(
@@ -6201,7 +6201,7 @@ AND   displayRelType.is_active = 1
         // @todo - this is a bit specific (one operator).
         // However it is covered by a unit test so can be altered later with
         // some confidence.
-        if ($op == 'BETWEEN') {
+        if ($op === 'BETWEEN') {
           $separator = ' AND ';
         }
         $fieldValue = implode($separator, $fieldValue);
@@ -6250,7 +6250,7 @@ AND   displayRelType.is_active = 1
    * @return string
    */
   public static function getWildCardedValue($wildcard, $op, $value) {
-    if ($wildcard && $op == 'LIKE') {
+    if ($wildcard && $op === 'LIKE') {
       if (CRM_Core_Config::singleton()->includeWildCardInName && (substr($value, 0, 1) != '%')) {
         return "%$value%";
       }
@@ -6698,7 +6698,10 @@ AND   displayRelType.is_active = 1
    *   Should be clause with proper joins, effective to reduce where clause load.
    *
    * @param bool $skipOrderAndLimit
+   *
    * @return string
+   *
+   * @throws \CRM_Core_Exception
    */
   public function getSearchSQL(
     $offset = 0, $rowCount = 0, $sort = NULL,
@@ -6773,7 +6776,7 @@ AND   displayRelType.is_active = 1
       $name = $values[0] ?? NULL;
       $op = $values[1] ?? NULL;
       $value = $values[2] ?? NULL;
-      if ($name == 'contact_id' and $op == '=') {
+      if ($name === 'contact_id' and $op === '=') {
         if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'is_deleted')) {
           $onlyDeleted = TRUE;
         }
