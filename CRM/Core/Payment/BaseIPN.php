@@ -274,15 +274,18 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Handled pending contribution status.
    *
+   * @deprecated
+   *
    * @param array $objects
    * @param object $transaction
    *
    * @return bool
    */
   public function pending(&$objects, &$transaction) {
+    CRM_Core_Error::deprecatedFunctionWarning('This function will be removed at some point');
     $transaction->commit();
-    Civi::log()->debug("Returning since contribution status is Pending");
-    echo "Success: Returning since contribution status is pending<p>";
+    Civi::log()->debug('Returning since contribution status is Pending');
+    echo 'Success: Returning since contribution status is pending<p>';
     return TRUE;
   }
 
