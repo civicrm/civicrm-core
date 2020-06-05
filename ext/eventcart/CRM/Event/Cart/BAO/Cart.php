@@ -343,4 +343,28 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
+  /**
+   * Get payment processors.
+   *
+   * This differs from the option value in that we append description for disambiguation.
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getPaymentProcessors(): array {
+    $results = civicrm_api3('PaymentProcessor', 'get', [
+      'is_test' => 0,
+      'return' => ['id', 'name', 'description', 'domain_id'],
+    ]);
+
+    $processors = [];
+    foreach ($results['values'] as $processorID => $details) {
+      $processors[$processorID] = $details['name'];
+      if (!empty($details['description'])) {
+        $processors[$processorID] .= ' : ' . $details['description'];
+      }
+    }
+    return $processors;
+  }
+
 }

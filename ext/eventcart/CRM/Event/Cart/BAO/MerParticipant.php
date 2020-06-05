@@ -154,25 +154,6 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param $contact
-   *
-   * @return null
-   */
-  public static function billing_address_from_contact($contact) {
-    foreach ($contact->address as $loc) {
-      if ($loc['is_billing']) {
-        return $loc;
-      }
-    }
-    foreach ($contact->address as $loc) {
-      if ($loc['is_primary']) {
-        return $loc;
-      }
-    }
-    return NULL;
-  }
-
-  /**
    * @return CRM_Event_Cart_Form_MerParticipant
    */
   public function get_form() {

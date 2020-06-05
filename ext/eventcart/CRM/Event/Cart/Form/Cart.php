@@ -10,15 +10,12 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
    */
   public $cart;
 
-  public $_action;
   public $contact;
   public $event_cart_id = NULL;
-  public $_mode;
   public $participants;
 
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieveValue('action', 'String');
-    $this->_mode = 'live';
     $this->loadCart();
 
     $this->checkWaitingList();
@@ -94,28 +91,6 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     else {
       return NULL;
     }
-  }
-
-  /**
-   * @return int
-   * @throws \CRM_Core_Exception
-   */
-  public function getContactID() {
-    $tempID = CRM_Utils_Request::retrieveValue('cid', 'Positive');
-
-    //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieveValue('cs', 'String');
-    if ($userChecksum) {
-      //check for anonymous user.
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
-      if ($validUser) {
-        return $tempID;
-      }
-    }
-
-    // check if the user is registered and we have a contact ID
-    $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
   }
 
   /**
