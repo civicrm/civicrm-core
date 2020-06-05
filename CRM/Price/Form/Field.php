@@ -667,7 +667,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
     if (!is_a($priceField, 'CRM_Core_Error')) {
       CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
+
+      // Useful for postProcess hooks
+      if (!$this->_fid) {
+        $this->_fid = $priceField->id;
+      }
     }
+
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
