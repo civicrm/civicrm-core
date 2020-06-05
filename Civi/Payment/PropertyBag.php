@@ -388,7 +388,7 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("setAmount requires a numeric amount value");
     }
 
-    return $this->set('amount', CRM_Utils_Money::format($value, NULL, NULL, TRUE), $label);
+    return $this->set('amount', $label, \CRM_Utils_Money::format($value, NULL, NULL, TRUE));
   }
 
   /**
