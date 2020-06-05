@@ -1157,7 +1157,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (
-      ($form->_mode == 'test' || $form->_allowConfirmation)
+      ($form->getPaymentMode() === 'test' || $form->_allowConfirmation)
     ) {
       return FALSE;
     }

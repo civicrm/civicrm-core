@@ -21,11 +21,70 @@
 trait CRM_Financial_Form_FrontEndPaymentFormTrait {
 
   /**
+   * Is pay later enabled on this form?
+   *
+   * @var bool
+   */
+  protected $isPayLater = FALSE;
+
+  /**
    * The label for the pay later pseudoprocessor option.
    *
    * @var string
    */
   protected $payLaterLabel;
+
+  /**
+   * Is this a back office form
+   *
+   * @var bool
+   */
+  public $isBackOffice = FALSE;
+
+  /**
+   * The payment mode that we are in ("live" or "test")
+   * This should be protected and retrieved via getPaymentMode() but it's accessed all over the place so we have to leave it public for now.
+   *
+   * @var string
+   */
+  public $_mode;
+
+  /**
+   * @return bool
+   */
+  public function isPayLater() {
+    return $this->isPayLater;
+  }
+
+  /**
+   * @param bool $isPayLater
+   */
+  public function setIsPayLater($isPayLater) {
+    $this->isPayLater = $isPayLater;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getIsBackOffice() {
+    return $this->isBackOffice;
+  }
+
+  /**
+   * Get the payment mode ('live' or 'test')
+   *
+   * @return string
+   */
+  public function getPaymentMode() {
+    return $this->_mode;
+  }
+
+  /**
+   * Set the payment mode ('live' or 'test')
+   */
+  public function setPaymentMode() {
+    $this->_mode = ($this->_action === CRM_Core_Action::PREVIEW) ? 'test' : 'live';
+  }
 
   /**
    * @return string
