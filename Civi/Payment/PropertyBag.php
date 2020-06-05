@@ -95,6 +95,22 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
+   * Get the property bag as an array
+   *
+   * Transition function.
+   * This allows you to convert a processor to use property bag but handle existing code that doesn't (yet)
+   * support propertybag. This is particularly important because many widely used functions stop working
+   * with propertybag such as empty(), array_*.
+   *
+   * @param string $label
+   *
+   * @return array
+   */
+  public function getPropsAsArray($label = 'default') {
+    return $this->props[$label];
+  }
+
+  /**
    * Just for unit testing.
    *
    * @var string
