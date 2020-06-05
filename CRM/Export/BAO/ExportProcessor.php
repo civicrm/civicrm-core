@@ -1115,7 +1115,7 @@ class CRM_Export_BAO_ExportProcessor {
         if ($html_type === 'File' && $fieldValue) {
           $result = civicrm_api3('attachment', 'get', ['return' => ['url'], 'id' => $fieldValue]);
           return $result['values'][$result['id']]['url'];
-	}
+        }
 
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
