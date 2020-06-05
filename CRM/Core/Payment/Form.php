@@ -290,6 +290,15 @@ class CRM_Core_Payment_Form {
       $form->_defaults["billing_state_province_id-{$form->_bltID}"] = CRM_Core_Config::singleton()
         ->defaultContactStateProvince;
     }
+
+    // Set default payment processor
+    if (!empty($form->_paymentProcessors)) {
+      foreach ($form->_paymentProcessors as $pid => $value) {
+        if (!empty($value['is_default'])) {
+          $form->_defaults['payment_processor_id'] = $pid;
+        }
+      }
+    }
   }
 
   /**
