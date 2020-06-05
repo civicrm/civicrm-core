@@ -16,7 +16,7 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Flush CMS metadata', basename(__FILE__)));
 
-    system_rebuild_module_data();
+    \Drupal::service('extension.list.module')->reset();
     \Drupal::service('module_installer')->install(['civicrm', 'civicrmtheme']);
     drupal_flush_all_caches();
     civicrm_install_set_drupal8_perms();

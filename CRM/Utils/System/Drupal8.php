@@ -537,7 +537,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   public function getModules() {
     $modules = [];
 
-    $module_data = system_rebuild_module_data();
+    $module_data = \Drupal::service('extension.list.module')->reset()->getList();
     foreach ($module_data as $module_name => $extension) {
       if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
         $extension->schema_version = drupal_get_installed_schema_version($module_name);
