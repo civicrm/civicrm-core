@@ -133,10 +133,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
-      $result = $this->doRecurPayment();
-      if (is_a($result, 'CRM_Core_Error')) {
-        return $result;
-      }
+      $this->doRecurPayment();
       return $params;
     }
 
@@ -237,36 +234,31 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $intervalLength = $this->_getParam('frequency_interval');
     $intervalUnit = $this->_getParam('frequency_unit');
-    if ($intervalUnit == 'week') {
+    if ($intervalUnit === 'week') {
       $intervalLength *= 7;
       $intervalUnit = 'days';
     }
-    elseif ($intervalUnit == 'year') {
+    elseif ($intervalUnit === 'year') {
       $intervalLength *= 12;
       $intervalUnit = 'months';
     }
     elseif ($intervalUnit === 'day') {
       $intervalUnit = 'days';
-    }
-    elseif ($intervalUnit == 'month') {
-      $intervalUnit = 'months';
-    }
-
-    // interval cannot be less than 7 days or more than 1 year
-    if ($intervalUnit == 'days') {
+      // interval cannot be less than 7 days or more than 1 year
       if ($intervalLength < 7) {
-        return self::error(9001, 'Payment interval must be at least one week');
+        throw new PaymentProcessorException('Payment interval must be at least one week', 9001);
       }
-      elseif ($intervalLength > 365) {
-        return self::error(9001, 'Payment interval may not be longer than one year');
+      if ($intervalLength > 365) {
+        throw new PaymentProcessorException('Payment interval may not be longer than one year', 9001);
       }
     }
-    elseif ($intervalUnit == 'months') {
+    elseif ($intervalUnit === 'month') {
+      $intervalUnit = 'months';
       if ($intervalLength < 1) {
-        return self::error(9001, 'Payment interval must be at least one week');
+        throw new PaymentProcessorException('Payment interval must be at least one week', 9001);
       }
-      elseif ($intervalLength > 12) {
-        return self::error(9001, 'Payment interval may not be longer than one year');
+      if ($intervalLength > 12) {
+        throw new PaymentProcessorException('Payment interval may not be longer than one year', 9001);
       }
     }
 
