@@ -103,7 +103,6 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'contactID' => 123,
       'contributionRecurID' => 456,
     ]);
-    $this->assertEquals('We have merged input params into the property bag for now but please rewrite code to not use this.', $propertyBag->lastWarning);
     $this->assertEquals(123, $propertyBag->getContactID());
     $this->assertEquals(456, $propertyBag->getContributionRecurID());
   }
