@@ -549,7 +549,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'amount' => $this->_params['total_amount'],
           'contribution_status_id' => 'Pending',
           'payment_processor_id' => $this->_params['payment_processor_id'],
-          'campaign_id' => $this->_params['campaign_id'],
           'financial_type_id' => $this->_params['financial_type_id'],
           'is_email_receipt' => !empty($this->_params['send_receipt']),
           'payment_instrument_id' => $this->_params['payment_instrument_id'],
@@ -588,21 +587,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['is_pay_later'] = 1;
     }
 
-    // These variable sets prior to membership may not be required for this form. They were in
-    // a function this form shared with other forms.
-    $membershipSource = NULL;
-    if (!empty($this->_params['membership_source'])) {
-      $membershipSource = $this->_params['membership_source'];
-    }
-
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
+
     $membership = $this->processMembership(
       $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
       $renewalDate, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
       $pending,
-      $contributionRecurID, $membershipSource, $this->_params['is_pay_later'], CRM_Utils_Array::value('campaign_id',
-      $this->_params)
-    );
+      $contributionRecurID, $this->_params['is_pay_later']);
 
     $this->endDate = CRM_Utils_Date::processDate($membership->end_date);
 
@@ -751,13 +742,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param int $contributionRecurID
    * @param $membershipSource
    * @param $isPayLater
-   * @param int $campaignId
    *
    * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId) {
+  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $isPayLater) {
     $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
@@ -816,15 +806,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
       $currentMembership['is_test'] = $is_test;
 
-      if (!empty($membershipSource)) {
-        $currentMembership['source'] = $membershipSource;
-      }
-      else {
-        $currentMembership['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-          $currentMembership['id'],
-          'source'
-        );
-      }
+      $currentMembership['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
+        $currentMembership['id'],
+        'source'
+      );
 
       if (!empty($currentMembership['id'])) {
         $ids['membership'] = $currentMembership['id'];
@@ -858,11 +843,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       //set the log start date.
       $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
 
-      //CRM-18067
-      if (!empty($membershipSource)) {
-        $memParams['source'] = $membershipSource;
-      }
-      elseif (empty($membership->source)) {
+      if (empty($membership->source)) {
         $memParams['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
           $currentMembership['id'],
           'source'
@@ -897,11 +878,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $memParams['is_override'] = FALSE;
 
     $params['modified_id'] = $contactID;
-
-    //inherit campaign from contrib page.
-    if (isset($campaignId)) {
-      $memParams['campaign_id'] = $campaignId;
-    }
 
     $memParams['custom'] = $customFieldsFormatted;
     // @todo stop passing $ids (membership and userId may be set by this point)
