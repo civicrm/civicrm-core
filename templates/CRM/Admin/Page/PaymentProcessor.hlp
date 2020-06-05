@@ -239,22 +239,3 @@
 {htxt id='Elavon-test-url-site'}
 <p>{ts}Use 'https://www.myvirtualmerchant.com/VirtualMerchant/processxml.do' unless otherwise advised by Elavon.{/ts}</p>
 {/htxt}
-
-{htxt id='FirstData-live-user-name'}
-<p>{ts}This is the LIVE <strong>First Data Store Name</strong> associated with your First Data account (This is Certificate file number without the extension).{/ts}</p>
-{/htxt}
-{htxt id='FirstData-live-password'}
-<p>{ts}This is the LIVE <strong>Certificate Path</strong> associated with your First Data account.{/ts}</p>
-{/htxt}
-{htxt id='FirstData-live-url-site'}
-<p>{ts}The URL for First Data's Live Payment server. Use the default value (unless otherwise advised by First Data):{/ts}<br />https://secure.linkpt.net</p>
-{/htxt}
-{htxt id='FirstData-test-user-name'}
-<p>{ts}This is the TEST <strong>First Data Store Name</strong> associated with your First Data account (This is Certificate file number without the extension).{/ts}</p>
-{/htxt}
-{htxt id='FirstData-test-password'}
-<p>{ts}This is the TEST <strong>Certificate Path</strong> associated with your First Data account.{/ts}</p>
-{/htxt}
-{htxt id='FirstData-test-url-site'}
-<p>{ts}The URL for First Data's TEST Payment server. Use the default value (unless otherwise advised by First Data):{/ts}<br />https://staging.linkpt.net</p>
-{/htxt}
