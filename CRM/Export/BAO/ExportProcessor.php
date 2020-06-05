@@ -1110,21 +1110,15 @@ class CRM_Export_BAO_ExportProcessor {
       //check for custom data
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
         $html_type = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
-        $displayValue = CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
+
         //need to calculate the link to the file for file custom data
-        if ($html_type === 'File') {
-          preg_match('/<a[^>]+href=([\'"])(?<href>.+?)\1[^>]*>/i', $displayValue, $matches);
-          if (!empty($matches)) {
-            $displayValue = $matches['2'];
-            if ((strpos($file, "http ")) === FALSE) {
-              return CIVICRM_UF_BASEURL . html_entity_decode($displayValue);
-            }
-          }
-        }
+        if ($html_type === 'File' && $fieldValue) {
+          $result = civicrm_api3('attachment', 'get', ['return' => ['url'], 'id' => $fieldValue]);
+          return $result['values'][$result['id']]['url'];
+	}
 
-        return $displayValue;
+        return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
-
       elseif (in_array($field, [
         'email_greeting',
         'postal_greeting',
