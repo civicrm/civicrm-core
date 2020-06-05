@@ -79,7 +79,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var array
    *   An array of payment processor details with objects loaded in the 'object' field.
    */
-  protected $_paymentProcessors;
+  public $_paymentProcessors;
 
   /**
    * Available payment processors (IDS).
@@ -791,6 +791,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (empty($this->_paymentProcessor) && $paymentProcessorDetail['is_default'] == 1 || (count($this->_paymentProcessors) == 1)
         ) {
           $this->_paymentProcessor = $paymentProcessorDetail;
+          $this->_paymentProcessorID = $paymentProcessorID;
           $this->assign('paymentProcessor', $this->_paymentProcessor);
           // Setting this is a bit of a legacy overhang.
           $this->_paymentObject = $paymentProcessorDetail['object'];
