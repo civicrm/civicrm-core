@@ -799,25 +799,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $numRenewTerms
       );
 
-      $currentMembership['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
       foreach (['start_date', 'end_date'] as $dateType) {
         $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
       }
       $currentMembership['is_test'] = $is_test;
-
-      $currentMembership['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-        $currentMembership['id'],
-        'source'
-      );
-
-      if (!empty($currentMembership['id'])) {
-        $ids['membership'] = $currentMembership['id'];
-      }
       $memParams = $currentMembership;
       $memParams['membership_type_id'] = $membershipTypeID;
-
-      //set the log start date.
-      $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
     }
     else {
 
