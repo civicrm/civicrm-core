@@ -20,6 +20,31 @@
  */
 class CRM_Price_Form_Field extends CRM_Core_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'PriceField';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_fid;
+  }
+
   /**
    * Constants for number of options for data types of multiple option.
    */
@@ -57,8 +82,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    */
   public function preProcess() {
 
-    $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive', $this, FALSE, NULL, 'REQUEST');
-    $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE, NULL, 'REQUEST');
+    $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
+    $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this);
     $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
     $breadCrumb = [['title' => ts('Price Set Fields'), 'url' => $url]];
 
@@ -78,20 +103,21 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    *
    * @return array
    *   array of default values
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
     // is it an edit operation ?
-    if (isset($this->_fid)) {
-      $params = ['id' => $this->_fid];
-      $this->assign('fid', $this->_fid);
+    if ($this->getEntityId()) {
+      $params = ['id' => $this->getEntityId()];
+      $this->assign('fid', $this->getEntityId());
       CRM_Price_BAO_PriceField::retrieve($params, $defaults);
       $this->_sid = $defaults['price_set_id'];
 
       // if text, retrieve price
       if ($defaults['html_type'] == 'Text') {
         $isActive = $defaults['is_active'];
-        $valueParams = ['price_field_id' => $this->_fid];
+        $valueParams = ['price_field_id' => $this->getEntityId()];
 
         CRM_Price_BAO_PriceFieldValue::retrieve($valueParams, $defaults);
 
@@ -142,7 +168,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // add a hidden field to remember the price set id
     // this get around the browser tab issue
     $this->add('hidden', 'sid', $this->_sid);
-    $this->add('hidden', 'fid', $this->_fid);
+    $this->add('hidden', 'fid', $this->getEntityId());
 
     // label
     $this->add('text', 'label', ts('Field Label'), CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'label'), TRUE);
@@ -364,8 +390,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
-   * @param CRM_Core_Form $form
+   * @param array $files
+   * @param self $form
    *
    * @return array
    *   if errors then list of errors to be posted back to the form,
@@ -381,7 +407,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
      *  Incomplete row checking is also required.
      */
     if (($form->_action & CRM_Core_Action::ADD || $form->_action & CRM_Core_Action::UPDATE) &&
-      $fields['html_type'] == 'Text'
+      $fields['html_type'] === 'Text'
     ) {
       if ($fields['price'] == NULL) {
         $errors['price'] = ts('Price is a required field');
@@ -397,7 +423,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $priceFieldLabel->price_set_id = $form->_sid;
 
     $dupeLabel = FALSE;
-    if ($priceFieldLabel->find(TRUE) && $form->_fid != $priceFieldLabel->id) {
+    if ($priceFieldLabel->find(TRUE) && $form->getEntityId() != $priceFieldLabel->id) {
       $dupeLabel = TRUE;
     }
 
@@ -630,8 +656,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       $fieldValues = ['price_set_id' => $this->_sid];
       $oldWeight = NULL;
-      if ($this->_fid) {
-        $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'weight', 'id');
+      if ($this->getEntityId()) {
+        $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->getEntityId(), 'weight', 'id');
       }
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceField', $oldWeight, $params['weight'], $fieldValues);
     }
@@ -657,9 +683,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_visibility_id'] = [1 => CRM_Utils_Array::value('visibility_id', $params)];
     }
 
-    if ($this->_fid) {
-      $params['id'] = $this->_fid;
-    }
+    $params['id'] = $this->getEntityId();
 
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
 
