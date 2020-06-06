@@ -205,7 +205,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $input
    * @param array $ids
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    */
   public function getInput(&$input, &$ids) {
@@ -230,10 +229,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $input['trxn_id'] = md5(uniqid(rand(), TRUE));
     }
 
-    if (!$this->getBillingID($ids)) {
-      return FALSE;
-    }
-    $billingID = $ids['billing'];
+    $billingID = $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     $params = [
       'first_name' => 'x_first_name',
       'last_name' => 'x_last_name',

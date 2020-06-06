@@ -381,17 +381,13 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    */
   public function getInput(&$input, &$ids) {
-    if (!$this->getBillingID($ids)) {
-      return;
-    }
-
+    $billingID = $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     $input['txnType'] = $this->retrieve('txn_type', 'String', FALSE);
     $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
     $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);
     $input['amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
     $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
-    $billingID = $ids['billing'];
     $lookup = [
       "first_name" => 'first_name',
       "last_name" => 'last_name',
