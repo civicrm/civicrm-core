@@ -333,15 +333,27 @@
       var isRecur = cj('input[id="is_recur"]:checked');
       var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
       var quickConfig = {/literal}{$quickConfig}{literal};
-      if ( allowAutoRenew && cj("#auto_renew") && quickConfig) {
+      if (allowAutoRenew && cj("#auto_renew") && quickConfig) {
         showHideAutoRenew(null);
       }
+
+      var frequencyUnit = cj('#frequency_unit');
+      var frequencyInerval = cj('#frequency_interval');
+      var installments = cj('#installments');
+      isDisabled = false;
+
       if (isRecur.val() > 0) {
         cj('#recurHelp').show();
+        frequencyUnit.prop('disabled', false).addClass('required');
+        frequencyInerval.prop('disabled', false).addClass('required');
+        installments.prop('disabled', false);
         cj('#amount_sum_label').text('{/literal}{ts escape='js'}Regular amount{/ts}{literal}');
       }
       else {
         cj('#recurHelp').hide();
+        frequencyUnit.prop('disabled', true).removeClass('required');
+        frequencyInerval.prop('disabled', true).removeClass('required');
+        installments.prop('disabled', true);
         cj('#amount_sum_label').text('{/literal}{ts escape='js'}Total Amount{/ts}{literal}');
       }
     }
