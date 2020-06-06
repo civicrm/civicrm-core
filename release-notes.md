@@ -20,9 +20,7 @@ Other resources for identifying changes are:
 Released June 6, 2020
 
 - **[Synopsis](release-notes/5.26.1.md#synopsis)**
-- **[Features](release-notes/5.26.1.md#features)**
 - **[Bugs resolved](release-notes/5.26.1.md#bugs)**
-- **[Miscellany](release-notes/5.26.1.md#misc)**
 - **[Credits](release-notes/5.26.1.md#credits)**
 - **[Feedback](release-notes/5.26.1.md#feedback)**
 
