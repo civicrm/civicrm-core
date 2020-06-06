@@ -940,16 +940,46 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $version = CRM_Utils_SQL::getDatabaseVersion();
     $minInstallVersion = CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER;
     $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
+    $mariaDbRecommendedVersion = '10.1';
+    $upcomingCiviChangeVersion = '5.28';
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minInstallVersion, '<')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses MySQL/MariaDB version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least MySQL version %2 or MariaDB version %3 is recommended', [
+        ts('This system uses MySQL/MariaDB v%1. To ensure the continued operation of CiviCRM, upgrade MySQL now. The recommended version is MySQL v%2 or MariaDB v%3.', [
           1 => $version,
-          2 => $minRecommendedVersion,
-          3 => '10.1',
+          2 => $minRecommendedVersion . '+',
+          3 => '10.1' . '+',
         ]),
-        ts('MySQL Out of date'),
+        ts('MySQL Out-of-Date'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-server'
+      );
+    }
+    elseif (version_compare(CRM_Utils_SQL::getDatabaseVersion(), CRM_Upgrade_Incremental_General::NEW_MIN_INSTALL_MYSQL_VER, '<')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses MySQL/MariaDB v%1. To prepare for CiviCRM v%5, please upgrade MySQL. The recommended version will be MySQL v%3 or MariaDB v%4. The minimum requirement will be MySQL v%2. ', [
+          1 => $version,
+          2 => CRM_Upgrade_Incremental_General::NEW_MIN_INSTALL_MYSQL_VER . '+',
+          3 => $minRecommendedVersion . '+',
+          4 => $mariaDbRecommendedVersion . '+',
+          5 => $upcomingCiviChangeVersion . '+',
+        ]),
+        ts('MySQL Out-of-Date'),
         \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    elseif (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedVersion, '<')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system uses MySQL/MariaDB v%1. You can continue to use this version of MySQL. However, support may be removed in a future release. The recommended version is MySQL v%2 or MariaDB v%3.', [
+          1 => $version,
+          2 => $minRecommendedVersion . '+',
+          3 => $mariaDbRecommendedVersion . '+',
+        ]),
+        ts('MySQL Out-of-Date'),
+        \Psr\Log\LogLevel::NOTICE,
         'fa-server'
       );
     }
