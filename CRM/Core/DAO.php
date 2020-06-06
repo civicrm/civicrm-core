@@ -44,6 +44,14 @@ class CRM_Core_DAO extends DB_DataObject {
    * @deprecated
    */
   public static $_nullObject = NULL;
+
+  /**
+   * Icon associated with this entity.
+   *
+   * @var string
+   */
+  public static $_icon = NULL;
+
   /**
    * @var array
    * @deprecated
@@ -109,6 +117,16 @@ class CRM_Core_DAO extends DB_DataObject {
   public function __construct() {
     $this->initialize();
     $this->__table = $this->getTableName();
+  }
+
+  /**
+   * Returns localized title of this entity.
+   * @return string
+   */
+  public static function getEntityTitle() {
+    $className = static::class;
+    Civi::log()->warning("$className needs to be regeneraged. Missing getEntityTitle method.", ['civi.tag' => 'deprecated']);
+    return CRM_Core_DAO_AllCoreTables::getBriefName($className);
   }
 
   public function __clone() {

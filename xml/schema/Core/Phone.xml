@@ -7,6 +7,7 @@
   <comment>Phone information for a specific location.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-phone</icon>
   <field>
     <name>id</name>
     <title>Phone ID</title>

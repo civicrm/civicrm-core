@@ -19,6 +19,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\ReflectionUtils;
 
 /**
  * Base class for all api entities.
@@ -81,6 +82,15 @@ abstract class AbstractEntity {
   }
 
   /**
+   * Overridable function to return a localized title for this entity.
+   *
+   * @return string
+   */
+  protected static function getEntityTitle() {
+    return static::getEntityName();
+  }
+
+  /**
    * Magic method to return the action object for an api.
    *
    * @param string $action
@@ -99,6 +109,23 @@ abstract class AbstractEntity {
       throw new NotImplementedException("Api $entity $action version 4 does not exist.");
     }
     return $actionObject;
+  }
+
+  /**
+   * Reflection function called by Entity::get()
+   *
+   * @see \Civi\Api4\Action\Entity\Get
+   * @return array
+   */
+  public static function getInfo() {
+    $info = [
+      'name' => static::getEntityName(),
+      'title' => static::getEntityTitle(),
+    ];
+    $reflection = new \ReflectionClass(static::class);
+    $info += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
+    unset($info['package'], $info['method']);
+    return $info;
   }
 
 }

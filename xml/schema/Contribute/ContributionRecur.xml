@@ -5,6 +5,7 @@
   <name>civicrm_contribution_recur</name>
   <add>1.6</add>
   <log>true</log>
+  <title>Recurring Contributions</title>
   <field>
     <name>id</name>
     <uniqueName>contribution_recur_id</uniqueName>

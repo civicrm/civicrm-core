@@ -6,6 +6,7 @@
   <comment>Other Activity details stored here include contact, location, details.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-tasks</icon>
   <field>
     <name>id</name>
     <uniqueName>activity_id</uniqueName>

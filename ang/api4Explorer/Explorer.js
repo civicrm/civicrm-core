@@ -73,7 +73,7 @@
     };
 
     if (!entities.length) {
-      formatForSelect2(schema, entities, 'name', ['description']);
+      formatForSelect2(schema, entities, 'name', ['description', 'icon']);
     }
 
     $scope.$bindToRoute({

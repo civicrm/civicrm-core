@@ -7,6 +7,7 @@
   <comment>Email information for a specific location.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-envelope-o</icon>
   <field>
     <name>id</name>
     <title>Email ID</title>

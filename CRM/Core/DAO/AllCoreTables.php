@@ -298,7 +298,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $daoName
    *   Ex: 'Contact'.
-   * @return string|NULL
+   * @return CRM_Core_DAO|NULL
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getFullName($daoName) {

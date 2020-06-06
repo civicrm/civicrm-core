@@ -7,6 +7,7 @@
   <comment>Stores the physical street / mailing address. This format should be capable of storing ALL international addresses.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-map-marker</icon>
   <field>
     <name>id</name>
     <uniqueName>address_id</uniqueName>
