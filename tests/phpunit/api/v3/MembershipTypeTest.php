@@ -16,7 +16,6 @@
 class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_contactID;
   protected $_contributionTypeID;
-  protected $_apiversion;
   protected $_entity = 'MembershipType';
 
   /**
@@ -25,7 +24,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $this->_apiversion = 3;
     $this->_contactID = $this->organizationCreate();
   }
 
@@ -33,8 +31,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    * Get the membership without providing an ID.
    *
    * This should return an empty array but not an error.
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetWithoutId() {
+  public function testGetWithoutId($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -51,8 +51,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test get works.
+   * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet($version) {
+    $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
 
     $params = [
@@ -70,8 +72,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test create with missing mandatory field.
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateWithoutMemberOfContactId() {
+  public function testCreateWithoutMemberOfContactId($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -84,13 +88,16 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     ];
 
-    $this->callAPIFailure('membership_type', 'create', $params, 'Mandatory key(s) missing from params array: member_of_contact_id');
+    $msg = $version === 4 ? 'Mandatory values missing from Api4 MembershipType::create: member_of_contact_id' : 'Mandatory key(s) missing from params array: member_of_contact_id';
+    $this->callAPIFailure('membership_type', 'create', $params, $msg);
   }
 
   /**
    * Test successful create.
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreate() {
+  public function testCreate($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '40+ Membership',
       'description' => 'people above 40 are given health instructions',
@@ -112,8 +119,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Domain ID can be intuited..
    * DomainID is now optional on API, check that it gets set correctly and that the domain_id is not overwritten when not specified in create.
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateWithoutDomainId() {
+  public function testCreateWithoutDomainId($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -142,8 +151,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    *  CRM-20010 Tests period_type is required for MemberType create
+   * @dataProvider versionThreeAndFour
    */
-  public function testMemberTypePeriodiTypeRequired() {
+  public function testMemberTypePeriodiTypeRequired($version) {
+    $this->_apiversion = $version;
     $this->callAPIFailure('MembershipType', 'create', [
       'domain_id' => "Default Domain Name",
       'member_of_contact_id' => 1,
@@ -157,8 +168,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test update.
+   * @dataProvider versionThreeAndFour
    */
-  public function testUpdate() {
+  public function testUpdate($version) {
+    $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'financial_type_id' => 2]);
     $newMemberOrgParams = [
       'organization_name' => 'New membership organisation',
@@ -183,8 +196,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test successful delete.
+   * @dataProvider versionThreeAndFour
    */
-  public function testDelete() {
+  public function testDelete($version) {
+    $this->_apiversion = $version;
     $membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->organizationCreate()]);
     $params = [
       'id' => $membershipTypeID,
