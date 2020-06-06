@@ -780,9 +780,12 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param string $label
    *
-   * @return bool|null
+   * @return bool
    */
   public function getIsRecur($label = 'default'):bool {
+    if (!$this->has('isRecur')) {
+      return FALSE;
+    }
     return $this->get('isRecur', $label);
   }
 

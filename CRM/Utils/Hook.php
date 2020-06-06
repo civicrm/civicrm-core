@@ -1162,7 +1162,7 @@ abstract class CRM_Utils_Hook {
    *   See discussion in CRM-16224 as to whether $paymentObj should be passed by reference.
    * @param array &$rawParams
    *    array of params as passed to to the processor
-   * @param array &$cookedParams
+   * @param array|\Civi\Payment\PropertyBag &$cookedParams
    *     params after the processor code has translated them into its own key/value pairs
    *
    * @return mixed
