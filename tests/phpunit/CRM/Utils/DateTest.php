@@ -304,4 +304,16 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
   }
 
+  /**
+   * Test Earlier Day Relative term to absolute
+   */
+  public function testRelativeEarlierDay() {
+    $date=CRM_Utils_Date::relativeToAbsolute('earlier', 'day');
+
+    $this->assertEquals([
+      'from' => null,
+      'to' =>  date('Ymd000000', strtotime('-1 day')),
+    ], $date);
+  }
+
 }
