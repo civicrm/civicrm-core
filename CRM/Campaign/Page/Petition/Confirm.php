@@ -36,7 +36,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
       !$subscribe_id ||
       !$hash
     ) {
-      CRM_Core_Error::fatal(ts("Missing input parameters"));
+      CRM_Core_Error::statusBounce(ts("Missing input parameters"));
     }
 
     $result = $this->confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id);
