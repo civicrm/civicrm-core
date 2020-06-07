@@ -95,15 +95,16 @@ class CRM_Core_CommunityMessages {
       $isChanged = TRUE;
     }
 
-    if ($document['expires'] <= CRM_Utils_Time::getTimeRaw()) {
+    $refTime = CRM_Utils_Time::getTimeRaw();
+    if ($document['expires'] <= $refTime) {
       $newDocument = $this->fetchDocument();
       if ($newDocument && $this->validateDocument($newDocument)) {
         $document = $newDocument;
-        $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['ttl'];
+        $document['expires'] = $refTime + $document['ttl'];
       }
       else {
         // keep the old messages for now, try again later
-        $document['expires'] = CRM_Utils_Time::getTimeRaw() + $document['retry'];
+        $document['expires'] = $refTime + $document['retry'];
       }
       $isChanged = TRUE;
     }
