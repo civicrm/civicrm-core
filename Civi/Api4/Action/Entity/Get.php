@@ -86,7 +86,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $customEntities = CustomGroup::get()
       ->addWhere('is_multiple', '=', 1)
       ->addWhere('is_active', '=', 1)
-      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends'])
+      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'icon'])
       ->setCheckPermissions(FALSE)
       ->execute();
     foreach ($customEntities as $customEntity) {
@@ -99,6 +99,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
           'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
           '\\Civi\\Api4\\CustomGroup',
         ],
+        'icon' => $customEntity['icon'],
       ];
       if (!empty($customEntity['help_pre'])) {
         $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);

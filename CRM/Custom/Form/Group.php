@@ -50,6 +50,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
+
     // current set id
     $this->_id = $this->get('id');
 
@@ -296,6 +298,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
     // display style
     $this->add('select', 'style', ts('Display Style'), CRM_Core_SelectValues::customGroupStyle());
+
+    $this->add('text', 'icon', ts('Tab icon'), ['class' => 'crm-icon-picker', 'allowClear' => TRUE]);
 
     // is this set collapsed or expanded ?
     $this->addElement('advcheckbox', 'collapse_display', ts('Collapse this set on initial display'));

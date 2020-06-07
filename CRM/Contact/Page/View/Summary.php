@@ -420,7 +420,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
         'hideCount' => !$group['is_multiple'],
         'class' => 'livePage',
-        'icon' => 'crm-i fa-gear',
+        'icon' => 'crm-i ' . ($group['icon'] ?: 'fa-gear'),
       ];
       $weight += 10;
     }

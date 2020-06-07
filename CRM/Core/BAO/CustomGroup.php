@@ -106,6 +106,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'help_post',
       'is_active',
       'is_multiple',
+      'icon',
     ];
     $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
     $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
@@ -1096,6 +1097,7 @@ ORDER BY civicrm_custom_group.weight,
       $group['extra'] = ['gid' => $customGroupDAO->id];
       $group['table_name'] = $customGroupDAO->table_name;
       $group['is_multiple'] = $customGroupDAO->is_multiple;
+      $group['icon'] = $customGroupDAO->icon;
       $groups[] = $group;
     }
 
