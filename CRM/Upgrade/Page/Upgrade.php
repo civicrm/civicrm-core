@@ -66,7 +66,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
         break;
 
       default:
-        CRM_Core_Error::fatal(ts('Unrecognized upgrade action'));
+        throw new CRM_Core_Exception(ts('Unrecognized upgrade action'));
     }
   }
 
@@ -79,7 +79,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
     if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
-      CRM_Core_Error::fatal($error);
+      throw new CRM_Core_Exception($error);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -119,7 +119,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
     if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
-      CRM_Core_Error::fatal($error);
+      throw new CRM_Core_Exception($error);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -145,7 +145,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       'buttons' => ['retry' => $config->debug, 'skip' => $config->debug],
     ]);
     $queueRunner->runAllViaWeb();
-    CRM_Core_Error::fatal(ts('Upgrade failed to redirect'));
+    throw new CRM_Core_Exception(ts('Upgrade failed to redirect'));
   }
 
   /**
@@ -172,7 +172,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     // do a version check - after doFinish() sets the final version
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
     if ($error = $upgrade->checkCurrentVersion($currentVer, $latestVer)) {
-      CRM_Core_Error::fatal($error);
+      throw new CRM_Core_Exception($error);
     }
 
     $template->assign('message', $postUpgradeMessage);
