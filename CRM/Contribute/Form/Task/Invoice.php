@@ -229,7 +229,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $ids['event'] = $detail['event'] ?? NULL;
 
       if (!$invoiceElements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
-        CRM_Core_Error::fatal();
+        CRM_Core_Error::statusBounce('Supplied data was not able to be validated');
       }
 
       $contribution = &$objects['contribution'];

@@ -93,7 +93,7 @@ class CRM_Contact_Import_ImportJob {
    */
   public function isComplete($dropIfComplete = TRUE) {
     if (!$this->_statusFieldName) {
-      CRM_Core_Error::fatal("Could not get name of the import status field");
+      throw new CRM_Core_Exception("Could not get name of the import status field");
     }
     $query = "SELECT * FROM $this->_tableName
                   WHERE  $this->_statusFieldName = 'NEW' LIMIT 1";

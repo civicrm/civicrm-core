@@ -414,7 +414,7 @@ WHERE  contribution_id = {$id}
       //get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (!($paymentStatusID == array_search('Pending', $allStatus) || $paymentStatusID == array_search('Overdue', $allStatus))) {
-        CRM_Core_Error::fatal(ts("Pledge payment status should be 'Pending' or  'Overdue'."));
+        CRM_Core_Error::statusBounce(ts("Pledge payment status should be 'Pending' or  'Overdue'."));
       }
 
       //get the pledge values associated with given pledge payment.
