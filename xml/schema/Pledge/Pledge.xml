@@ -5,6 +5,7 @@
   <name>civicrm_pledge</name>
   <add>2.1</add>
   <log>true</log>
+  <icon>fa-paper-plane</icon>
   <field>
     <name>id</name>
     <uniqueName>pledge_id</uniqueName>

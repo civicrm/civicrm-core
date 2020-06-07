@@ -209,6 +209,8 @@ class CRM_Core_CodeGen_Specification {
       'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
+      'title' => $tableXML->title ?? self::nameToTitle($klass),
+      'icon' => $tableXML->icon ?? NULL,
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
       'bao' => (file_exists($baoPath . $klass . '.php') ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
@@ -739,6 +741,17 @@ class CRM_Core_CodeGen_Specification {
       }
     }
     return 'CRM_Utils_Type::HUGE';
+  }
+
+  /**
+   * Converts an entity name to a user friendly string.
+   *
+   * @param string $name
+   * return string
+   */
+  public static function nameToTitle(string $name) {
+    $name = preg_replace('/([a-z])([A-Z])/', '$1 $2', $name);
+    return CRM_Utils_String::pluralize($name);
   }
 
 }

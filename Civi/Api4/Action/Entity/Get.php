@@ -20,7 +20,6 @@
 namespace Civi\Api4\Action\Entity;
 
 use Civi\Api4\CustomGroup;
-use Civi\Api4\Utils\ReflectionUtils;
 
 /**
  * Get the names & docblocks of all APIv4 entities.
@@ -47,7 +46,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   protected function getRecords() {
     $entities = [];
     $toGet = $this->_itemsToGet('name');
-    $getDocs = $this->_isFieldSelected('description', 'comment', 'see');
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
@@ -57,15 +55,13 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];
           preg_match('/(\w*)\.php$/', $file, $matches);
+          $entity = '\Civi\Api4\\' . $matches[1];
           if (
             (!$toGet || in_array($matches[1], $toGet))
-            && is_a('\Civi\Api4\\' . $matches[1], '\Civi\Api4\Generic\AbstractEntity', TRUE)
+            && is_a($entity, '\Civi\Api4\Generic\AbstractEntity', TRUE)
           ) {
-            $entity = ['name' => $matches[1]];
-            if ($getDocs) {
-              $this->addDocs($entity);
-            }
-            $entities[$matches[1]] = $entity;
+            $info = $entity::getInfo();
+            $entities[$info['name']] = $info;
           }
         }
       }
@@ -97,7 +93,8 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       $fieldName = 'Custom_' . $customEntity['name'];
       $entities[$fieldName] = [
         'name' => $fieldName,
-        'description' => $customEntity['title'] . ' custom group - extends ' . $customEntity['extends'],
+        'title' => $customEntity['title'],
+        'description' => 'Custom group - extends ' . $customEntity['extends'],
         'see' => [
           'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
           '\\Civi\\Api4\\CustomGroup',
@@ -121,17 +118,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   private function plainTextify($input) {
     return html_entity_decode(strip_tags($input), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-  }
-
-  /**
-   * Add info from code docblock.
-   *
-   * @param $entity
-   */
-  private function addDocs(&$entity) {
-    $reflection = new \ReflectionClass("\\Civi\\Api4\\" . $entity['name']);
-    $entity += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $entity['name']]);
-    unset($entity['package'], $entity['method']);
   }
 
 }

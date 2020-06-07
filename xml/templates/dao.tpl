@@ -20,6 +20,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       */
       public static $_tableName = '{$table.name}';
 
+   {if $table.icon}
+     /**
+      * Icon associated with this entity.
+      *
+      * @var string
+      */
+      public static $_icon = '{$table.icon}';
+   {/if}
       /**
        * Should CiviCRM log any modifications to this table in the civicrm_log table.
        *
@@ -47,6 +55,15 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
         parent::__construct( );
     {rdelim}
+
+    /**
+     * Returns localized title of this entity.
+     */
+    public static function getEntityTitle() {ldelim}
+        return ts('{$table.title}');
+    {rdelim}
+
+
 
 {if $table.foreignKey || $table.dynamicForeignKey}
     /**

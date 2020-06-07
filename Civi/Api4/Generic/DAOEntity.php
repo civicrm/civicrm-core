@@ -70,4 +70,26 @@ abstract class DAOEntity extends AbstractEntity {
     return new BasicReplaceAction(static::class, __FUNCTION__);
   }
 
+  /**
+   * @return string
+   */
+  protected static function getEntityTitle() {
+    $name = static::getEntityName();
+    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($name);
+    return $dao ? $dao::getEntityTitle() : $name;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
+    if ($dao) {
+      $info['icon'] = $dao::$_icon;
+      $info['dao'] = $dao;
+    }
+    return $info;
+  }
+
 }

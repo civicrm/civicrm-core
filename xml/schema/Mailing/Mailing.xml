@@ -6,6 +6,7 @@
   <name>civicrm_mailing</name>
   <comment>Stores information about a mailing.</comment>
   <archive>true</archive>
+  <icon>fa-envelope-o</icon>
   <field>
     <name>id</name>
     <title>Mailing ID</title>

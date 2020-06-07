@@ -33,7 +33,7 @@ class GetActions extends BasicGetAction {
     $entityReflection = new \ReflectionClass('\Civi\Api4\\' . $this->_entityName);
     foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC) as $method) {
       $actionName = $method->getName();
-      if ($actionName != 'permissions' && $actionName[0] != '_') {
+      if ($actionName != 'permissions' && $actionName != 'getInfo' && $actionName[0] != '_') {
         $this->loadAction($actionName, $method);
       }
     }

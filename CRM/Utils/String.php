@@ -939,16 +939,15 @@ class CRM_Utils_String {
    * @return string
    */
   public static function pluralize($str) {
-    switch (substr($str, -1)) {
-      case 's':
-        return $str . 'es';
-
-      case 'y':
-        return substr($str, 0, -1) . 'ies';
-
-      default:
-        return $str . 's';
+    $lastLetter = substr($str, -1);
+    $lastTwo = substr($str, -2);
+    if ($lastLetter == 's' || $lastTwo == 'ch') {
+      return $str . 'es';
     }
+    if ($lastLetter == 'y' && $lastTwo != 'ey') {
+      return substr($str, 0, -1) . 'ies';
+    }
+    return $str . 's';
   }
 
   /**

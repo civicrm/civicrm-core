@@ -5,7 +5,7 @@
   <name>civicrm_survey</name>
   <comment>Campaign Survey Details.</comment>
   <add>3.2</add>
-
+  <icon>fa-clipboard</icon>
   <field>
     <name>id</name>
     <title>Survey ID</title>
