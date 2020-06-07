@@ -107,7 +107,7 @@ class CRM_Cxn_CiviCxnHttp extends \Civi\Cxn\Rpc\Http\PhpHttp {
       $result['ssl'] = $caConfig->toStreamOptions();
     }
     if (!$caConfig->isEnableSSL() && preg_match('/^https:/', $url)) {
-      CRM_Core_Error::fatal('Cannot fetch document - system does not support SSL');
+      throw new CRM_Core_Exception('Cannot fetch document - system does not support SSL');
     }
 
     return $result;

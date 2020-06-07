@@ -266,8 +266,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
       return TRUE;
     }
     else {
-      CRM_Core_Error::fatal(ts('Petition Id and/or Activity Id is not of the type Positive.'));
-      return FALSE;
+      throw new CRM_Core_Exception(ts('Petition Id and/or Activity Id is not of the type Positive.'));
     }
   }
 
@@ -561,7 +560,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $petitionInfo = [];
     CRM_Campaign_BAO_Survey::retrieve($petitionParams, $petitionInfo);
     if (empty($petitionInfo)) {
-      CRM_Core_Error::fatal('Petition doesn\'t exist.');
+      throw new CRM_Core_Exception('Petition doesn\'t exist.');
     }
 
     //get the default domain email address.

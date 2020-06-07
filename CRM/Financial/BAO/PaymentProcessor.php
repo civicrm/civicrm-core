@@ -49,7 +49,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       $ppTypeDAO = new CRM_Financial_DAO_PaymentProcessorType();
       $ppTypeDAO->id = $params['payment_processor_type_id'];
       if (!$ppTypeDAO->find(TRUE)) {
-        CRM_Core_Error::fatal(ts('Could not find payment processor meta information'));
+        throw new CRM_Core_Exception(ts('Could not find payment processor meta information'));
       }
 
       // also copy meta fields from the info DAO
@@ -194,7 +194,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    */
   public static function del($paymentProcessorID) {
     if (!$paymentProcessorID) {
-      CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+      throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessor();
