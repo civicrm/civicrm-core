@@ -2206,7 +2206,7 @@ AND cl.modified_id  = c.id
         ],
         'case_activity_details' => [
           'title' => ts('Activity Details'),
-          'type' => CRM_Utils_Type::T_TEXT,
+          'type' => CRM_Utils_Type::T_LONGTEXT,
         ],
         'case_activity_is_auto' => [
           'title' => ts('Activity Auto-generated?'),
