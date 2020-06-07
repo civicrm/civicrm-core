@@ -56,12 +56,11 @@ class CRM_Bridge_OG_Utils {
 
   /**
    * @param int $groupID
-   * @param bool $abort
    *
    * @return int|null|string
    * @throws Exception
    */
-  public static function ogID($groupID, $abort = TRUE) {
+  public static function ogID($groupID) {
     $source = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
       $groupID,
       'source'
@@ -72,9 +71,6 @@ class CRM_Bridge_OG_Utils {
       if (is_numeric($matches[1])) {
         return $matches[1];
       }
-    }
-    if ($abort) {
-      CRM_Core_Error::fatal();
     }
     return NULL;
   }
@@ -97,7 +93,7 @@ class CRM_Bridge_OG_Utils {
     CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $ufID, $account->mail, 'Drupal');
     $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
     if (!$contactID) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('no contact found');
     }
     return $contactID;
   }
@@ -108,7 +104,7 @@ class CRM_Bridge_OG_Utils {
    * @param bool $abort
    *
    * @return null|string
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public static function groupID($source, $title = NULL, $abort = FALSE) {
     $query = "
@@ -126,7 +122,7 @@ SELECT id
     if ($abort &&
       !$groupID
     ) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('no group found');
     }
 
     return $groupID;

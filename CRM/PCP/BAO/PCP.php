@@ -936,7 +936,7 @@ INNER JOIN civicrm_uf_group ufgroup
          WHERE pb.entity_id = %1 AND pb.entity_table = %2";
     $params = [1 => [$component_id, 'Integer'], 2 => [$entity_table, 'String']];
     if (!$ownerNotificationId = CRM_Core_DAO::singleValueQuery($query, $params)) {
-      CRM_Core_Error::fatal(ts('Owner Notification is not set for this Personal Campaign Page. Please contact the site administrator if you need assistance.'));
+      throw new CRM_Core_Exception(ts('Owner Notification is not set for this Personal Campaign Page. Please contact the site administrator if you need assistance.'));
     }
     else {
       return $ownerNotificationId;
