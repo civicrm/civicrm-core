@@ -39,7 +39,7 @@ class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base
           1 => $count,
           2 => '<em>SELECT ct.* FROM civicrm_contribution ct LEFT JOIN civicrm_contact c ON ct.contact_id = c.id WHERE c.id IS NULL;</em>',
         ]);
-        CRM_Core_Error::fatal($error);
+        throw new CRM_Core_Exception($error);
         return FALSE;
       }
     }
@@ -51,7 +51,7 @@ class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base
         theme('item_list', []);
         $theme_registry = theme_get_registry();
         if (!isset($theme_registry['page']['preprocess functions']) || FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])) {
-          CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+          throw new CRM_Core_Exception('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
         }
       }
     }
@@ -79,7 +79,7 @@ WHERE {$key}.id IS NULL";
         $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
         if ($dao->N) {
           $invalidDataMessage = '<strong>Oops, it looks like you have orphaned recurring contribution records in your database. Before this upgrade can complete they will need to be fixed or deleted. <a href="http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Orphaned+Contribution+Recur+Records" target="_blank">You can review steps to correct this situation on the documentation wiki.</a></strong>';
-          CRM_Core_Error::fatal($invalidDataMessage);
+          throw new CRM_Core_Exception($invalidDataMessage);
           return FALSE;
         }
       }
