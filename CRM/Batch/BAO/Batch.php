@@ -579,12 +579,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    */
   public static function exportFinancialBatch($batchIds, $exportFormat, $downloadFile) {
     if (empty($batchIds)) {
-      CRM_Core_Error::fatal(ts('No batches were selected.'));
-      return;
+      throw new CRM_Core_Exception(ts('No batches were selected.'));
     }
     if (empty($exportFormat)) {
-      CRM_Core_Error::fatal(ts('No export format selected.'));
-      return;
+      throw new CRM_Core_Exception(ts('No export format selected.'));
     }
     self::$_exportFormat = $exportFormat;
 
@@ -594,7 +592,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $exporter = new $exporterClass();
     }
     else {
-      CRM_Core_Error::fatal("Could not locate exporter: $exporterClass");
+      throw new CRM_Core_Exception("Could not locate exporter: $exporterClass");
     }
     $export = [];
     $exporter->_isDownloadFile = $downloadFile;
