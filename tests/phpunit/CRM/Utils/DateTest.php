@@ -312,7 +312,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
     $this->assertEquals([
       'from' => NULL,
-      'to' =>  date('Ymd000000', strtotime('-1 day'))
+      'to' => date('Ymd000000', strtotime('-1 day')),
     ], $date);
   }
 
