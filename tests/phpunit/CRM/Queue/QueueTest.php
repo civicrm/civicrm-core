@@ -155,7 +155,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertEquals(FALSE, $item2);
 
     // pass expiration mark
-    CRM_Utils_Time::setTime('2012-04-01 2:00:01');
+    CRM_Utils_Time::setTime('2012-04-01 2:00:03');
     $item3 = $this->queue->claimItem();
     $this->assertEquals('a', $item3->data['test-key']);
     $this->assertEquals(1, $this->queue->numberOfItems());
