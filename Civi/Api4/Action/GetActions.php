@@ -75,7 +75,7 @@ class GetActions extends BasicGetAction {
     try {
       if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array($actionName, $this->_actionsToGet))) {
         $action = \Civi\API\Request::create($this->getEntityName(), $actionName, ['version' => 4]);
-        if (is_object($action)) {
+        if (is_object($action) && (!$this->checkPermissions || $action->isAuthorized())) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
             $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];
