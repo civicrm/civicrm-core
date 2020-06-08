@@ -56,7 +56,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_MYSQL_VER = '5.5';
+  const MIN_INSTALL_MYSQL_VER = '5.6.5';
 
   /**
    * The minimum MySQL/MariaDB version required to install Civi.

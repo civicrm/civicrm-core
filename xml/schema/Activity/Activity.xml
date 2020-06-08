@@ -122,6 +122,9 @@
   <field>
     <name>activity_date_time</name>
     <import>true</import>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP</default>
     <title>Activity Date</title>
     <type>datetime</type>
     <headerPattern>/(activity.)?date(.time$)?/i</headerPattern>
@@ -467,7 +470,7 @@
     <comment>When was the activity was created.</comment>
     <required>false</required>
     <export>true</export>
-    <default>NULL</default>
+    <default>CURRENT_TIMESTAMP</default>
     <add>4.7</add>
   </field>
   <field>
