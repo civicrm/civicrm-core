@@ -537,13 +537,12 @@ WHERE  contribution_id = {$id}
         $this->_params['payment_processor_id'],
         ($this->_mode == 'test')
       );
-      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
-      $this->assign('credit_card_number', CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number']));
-      $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
 
-    self::formatCreditCardDetails($this->_params);
+    $valuesForForm = self::formatCreditCardDetails($this->_params);
+    $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+
     foreach ($this->submittableMoneyFields as $moneyField) {
       if (isset($this->_params[$moneyField])) {
         $this->_params[$moneyField] = CRM_Utils_Rule::cleanMoney($this->_params[$moneyField]);
@@ -563,9 +562,13 @@ WHERE  contribution_id = {$id}
    *
    * @param array $params
    *
-   * @return void
+   * @return array An array of params suitable for assigning to the form/tpl
    */
   public static function formatCreditCardDetails(&$params) {
+    if (!empty($params['credit_card_exp_date'])) {
+      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
+      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
+    }
     if (!empty($params['credit_card_type'])) {
       $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
     }
@@ -576,6 +579,11 @@ WHERE  contribution_id = {$id}
       $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
       $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
     }
+
+    $tplParams['credit_card_exp_date'] = isset($params['credit_card_exp_date']) ? CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($params['credit_card_exp_date'])) : NULL;
+    $tplParams['credit_card_type'] = CRM_Utils_Array::value('credit_card_type', $params);
+    $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $params));
+    return $tplParams;
   }
 
   /**

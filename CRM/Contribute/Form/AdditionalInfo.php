@@ -291,7 +291,7 @@ class CRM_Contribute_Form_AdditionalInfo {
   /**
    * Send email receipt.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form $form
    *   instance of Contribution form.
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
@@ -359,13 +359,8 @@ class CRM_Contribute_Form_AdditionalInfo {
         $form->_bltID
       ));
 
-      $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
-      $date = CRM_Utils_Date::mysqlToIso($date);
-      $form->assign('credit_card_type', $params['credit_card_type'] ?? NULL);
-      $form->assign('credit_card_exp_date', $date);
-      $form->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
-      );
+      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+      $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
     }
     else {
       //offline contribution

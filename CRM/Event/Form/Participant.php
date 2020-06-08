@@ -1477,13 +1477,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $this->_bltID
         ));
 
-        $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
-        $date = CRM_Utils_Date::mysqlToIso($date);
-        $this->assign('credit_card_exp_date', $date);
-        $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
-        );
-        $this->assign('credit_card_type', $params['credit_card_type']);
+        $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+        $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+
         // The concept of contributeMode is deprecated.
         $this->assign('contributeMode', 'direct');
         $this->assign('isAmountzero', 0);

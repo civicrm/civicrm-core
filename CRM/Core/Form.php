@@ -802,7 +802,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     else {
       throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
     }
+  }
 
+  /**
+   * Assign an array of variables to the form/tpl
+   *
+   * @param array $values Array of [key => value] to assign to the form
+   * @param array $keys Array of keys to assign from the values array
+   */
+  public function assignVariables($values, $keys) {
+    foreach ($keys as $key) {
+      $this->assign($key, $values[$key] ?? NULL);
+    }
   }
 
   /**
@@ -858,10 +869,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     // For legacy reasons we set these creditcard expiry fields if present
-    if (isset($params['credit_card_exp_date'])) {
-      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
-      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
-    }
+    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
 
     // Assign IP address parameter
     $params['ip_address'] = CRM_Utils_System::ipAddress();
