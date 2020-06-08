@@ -1517,10 +1517,12 @@ LIKE %1
       $dao = new CRM_Core_DAO();
     }
     else {
+      CRM_Core_Error::deprecatedFunctionWarning('passing in DAOName is deprecated');
       $dao = new $daoName();
     }
 
     if ($trapException) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     }
 
@@ -1624,6 +1626,9 @@ LIKE %1
    * @throws CRM_Core_Exception
    */
   public static function composeQuery($query, $params = [], $abort = TRUE) {
+    if (!$abort) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling functions should not bypass error handling');
+    }
     $tr = [];
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
