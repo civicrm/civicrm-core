@@ -113,7 +113,9 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
-      return self::error(9001, 'Authorize.Net requires curl with SSL support');
+      // Note that guzzle doesn't necessarily require CURL, although it prefers it. But we should leave this error
+      // here unless someone suggests it is not required since it's likely helpful.
+      throw new PaymentProcessorException('Authorize.Net requires curl with SSL support', 9001);
     }
 
     /*
@@ -158,24 +160,13 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       return self::error(9004, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
     }
 
-    $submit = curl_init($this->_paymentProcessor['url_site']);
-
-    if (!$submit) {
-      return self::error(9002, 'Could not initiate connection to payment gateway');
-    }
-
-    curl_setopt($submit, CURLOPT_POST, TRUE);
-    curl_setopt($submit, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($submit, CURLOPT_POSTFIELDS, implode('&', $postFields));
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-
-    $response = curl_exec($submit);
-
-    if (!$response) {
-      return self::error(curl_errno($submit), curl_error($submit));
-    }
-
-    curl_close($submit);
+    $response = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_site'], [
+      'body' => implode('&', $postFields),
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ])->getBody();
 
     $response_fields = $this->explode_csv($response);
 

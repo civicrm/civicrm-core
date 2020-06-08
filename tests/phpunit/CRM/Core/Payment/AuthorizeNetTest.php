@@ -39,6 +39,39 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test doing a one-off payment.
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testSinglePayment() {
+    $this->createMockHandler([$this->getExpectedSinglePaymentResponse()]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+    $params = $this->getBillingParams();
+    $params['amount'] = 5.24;
+    $this->processor->doPayment($params);
+    $this->assertEquals($this->getExpectedSinglePaymentRequest(), $this->getRequestBodies()[0]);
+  }
+
+  /**
+   * Get the expected response from Authorize.net.
+   *
+   * @return string
+   */
+  public function getExpectedSinglePaymentResponse() {
+    return '"1","1","1","(TESTMODE) This transaction has been approved.","000000","P","0","","","5.24","CC","auth_capture","","John","O&#39;Connor","","","","","","","","","","","","","","","","","","","","","","","",""';
+  }
+
+  /**
+   *  Get the expected request from Authorize.net.
+   *
+   * @return string
+   */
+  public function getExpectedSinglePaymentRequest() {
+    return 'x_login=4y5BfuW7jm&x_tran_key=4cAmW927n8uLf5J8&x_email_customer=&x_first_name=John&x_last_name=O%27Connor&x_address=&x_city=&x_state=&x_zip=&x_country=&x_customer_ip=&x_email=&x_invoice_num=&x_amount=5.24&x_currency_code=&x_description=&x_cust_id=&x_relay_response=FALSE&x_delim_data=TRUE&x_delim_char=%2C&x_encap_char=%22&x_card_num=4444333322221111&x_card_code=123&x_exp_date=10%2F2022&x_test_request=TRUE';
+  }
+
+  /**
    * Create a single post dated payment as a recurring transaction.
    *
    * Test works but not both due to some form of caching going on in the SmartySingleton
@@ -48,7 +81,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $this->setUpClientWithHistoryContainer();
     $this->processor->setGuzzleClient($this->getGuzzleClient());
     $firstName = 'John';
-    $lastName = 'Smith';
+    $lastName = "O\'Connor";
     $nameParams = ['first_name' => 'John', 'last_name' => $lastName];
     $contactId = $this->individualCreate($nameParams);
 
@@ -82,24 +115,11 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
     ]);
 
-    $params = [
+    $billingParams = $this->getBillingParams();
+
+    $params = array_merge($billingParams, [
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
       'hidden_CreditCard' => 1,
-      'billing_first_name' => $firstName,
-      'billing_middle_name' => '',
-      'billing_last_name' => $lastName,
-      'billing_street_address-5' => '8 Hobbitton Road',
-      'billing_city-5' => 'The Shire',
-      'billing_state_province_id-5' => 1012,
-      'billing_postal_code-5' => 5010,
-      'billing_country_id-5' => 1228,
-      'credit_card_number' => '4444333322221111',
-      'cvv2' => 123,
-      'credit_card_exp_date' => [
-        'M' => 9,
-        'Y' => 2025,
-      ],
-      'credit_card_type' => 'Visa',
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
@@ -147,12 +167,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contributionType_name' => 'My precious',
       'contributionType_accounting_code' => '',
       'contributionPageID' => '',
-      'email' => "{$firstName}.{$lastName}@example.com",
+      'email' => 'john.smith@example.com',
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
       'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur['id'],
-    ];
+    ]);
 
     // turn verifySSL off
     Civi::settings()->set('verifySSL', '0');
@@ -193,7 +213,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $start_date = date('Ymd', strtotime('+ 1 week'));
 
     $firstName = 'John';
-    $lastName = 'Smith';
+    $lastName = "O'Connor";
     $nameParams = ['first_name' => $firstName, 'last_name' => $lastName];
     $contactId = $this->individualCreate($nameParams);
 
@@ -294,7 +314,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'postal_code' => 5010,
       'country' => 'US',
       'contributionPageID' => '',
-      'email' => "{$firstName}.{$lastName}@example.com",
+      'email' => 'john.smith@example.com',
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
       'contributionRecurID' => $recur['id'],
@@ -366,11 +386,11 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
         </order>
        <customer>
       <id>' . $contactID . '</id>
-      <email>John.Smith@example.com</email>
+      <email>john.smith@example.com</email>
     </customer>
     <billTo>
       <firstName>John</firstName>
-      <lastName>Smith</lastName>
+      <lastName>O\'Connor</lastName>
       <address>8 Hobbiton Road</address>
       <city>The Shire</city>
       <state>IL</state>
@@ -389,6 +409,33 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    */
   public function getExpectedResponse() {
     return '﻿<?xml version="1.0" encoding="utf-8"?><ARBCreateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><refId>8d468ca1b1dd5c2b56c7</refId><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><subscriptionId>6632052</subscriptionId><profile><customerProfileId>1512023280</customerProfileId><customerPaymentProfileId>1512027350</customerPaymentProfileId></profile></ARBCreateSubscriptionResponse>';
+  }
+
+  /**
+   * Get some basic billing parameters.
+   *
+   * @return array
+   */
+  protected function getBillingParams(): array {
+    return [
+      'billing_first_name' => 'John',
+      'billing_middle_name' => '',
+      'billing_last_name' => "O'Connor",
+      'billing_street_address-5' => '8 Hobbitton Road',
+      'billing_city-5' => 'The Shire',
+      'billing_state_province_id-5' => 1012,
+      'billing_postal_code-5' => 5010,
+      'billing_country_id-5' => 1228,
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => 123,
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => 2025,
+      ],
+      'credit_card_type' => 'Visa',
+      'year' => 2022,
+      'month' => 10,
+    ];
   }
 
 }
