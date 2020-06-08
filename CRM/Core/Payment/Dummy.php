@@ -94,22 +94,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
       return $result;
     }
-    if ($this->_mode === 'test') {
-      $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
-      $p = [];
-      $trxn_id = (string) CRM_Core_DAO::singleValueQuery($query, $p);
-      $trxn_id = str_replace('test_', '', $trxn_id);
-      $trxn_id = (int) $trxn_id + 1;
-      $params['trxn_id'] = 'test_' . $trxn_id . '_' . uniqid();
-    }
-    else {
-      $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
-      $p = [];
-      $trxn_id = (string) CRM_Core_DAO::singleValueQuery($query, $p);
-      $trxn_id = str_replace('live_', '', $trxn_id);
-      $trxn_id = (int) $trxn_id + 1;
-      $params['trxn_id'] = 'live_' . $trxn_id . '_' . uniqid();
-    }
+
+    $params['trxn_id'] = $this->getTrxnID();;
+
     $params['gross_amount'] = $propertyBag->getAmount();
     // Add a fee_amount so we can make sure fees are handled properly in underlying classes.
     $params['fee_amount'] = 1.50;
@@ -217,6 +204,23 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    */
   public function doCancelRecurring(PropertyBag $propertyBag) {
     return ['message' => ts('Recurring contribution cancelled')];
+  }
+
+  /**
+   * Get a value for the transaction ID.
+   *
+   * Value is made up of the max existing value + a random string.
+   *
+   * Note the random string is likely a historical workaround.
+   *
+   * @return string
+   */
+  protected function getTrxnID() {
+    $string = $this->_mode;
+    $trxn_id = CRM_Core_DAO::singleValueQuery("SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE '{$string}_%'");
+    $trxn_id = str_replace($string, '', $trxn_id);
+    $trxn_id = (int) $trxn_id + 1;
+    return $string . '_' . $trxn_id . '_' . uniqid();
   }
 
 }
