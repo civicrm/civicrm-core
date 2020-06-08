@@ -33,9 +33,9 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
         if (count($values) > 0) {
           foreach ($values as $value) {
             try {
-              CRM_Utils_Type::validate($value['value'], $optionGroup['data_type'], FALSE, '', TRUE);
+              CRM_Utils_Type::validate($value['value'], $optionGroup['data_type']);
             }
-            catch (Exception $e) {
+            catch (CRM_Core_Exception $e) {
               $problemValues[] = [
                 'group_name' => $optionGroup['title'],
                 'value_name' => $value['label'],

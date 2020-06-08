@@ -358,15 +358,13 @@ class CRM_Utils_Type {
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    * @param string $name
    *   The name of the attribute
-   * @param bool $isThrowException
-   *   Should an exception be thrown rather than a using a deprecated fatal error.
    *
    * @return mixed
    *   The data, escaped if necessary
    *
    * @throws \CRM_Core_Exception
    */
-  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = TRUE) {
+  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
 
     $possibleTypes = [
       'Integer',
@@ -392,10 +390,7 @@ class CRM_Utils_Type {
       'Color',
     ];
     if (!in_array($type, $possibleTypes)) {
-      if ($isThrowException) {
-        throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
-      }
-      CRM_Core_Error::fatal(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+      throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
     }
     switch ($type) {
       case 'Integer':
@@ -472,10 +467,7 @@ class CRM_Utils_Type {
 
     if ($abort) {
       $data = htmlentities($data);
-      if ($isThrowException) {
-        throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
-      }
-      CRM_Core_Error::fatal("$name (value: $data) is not of the type $type");
+      throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
     }
 
     return NULL;

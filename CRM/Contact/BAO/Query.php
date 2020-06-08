@@ -3033,10 +3033,7 @@ class CRM_Contact_BAO_Query {
       if ($op === '!=') {
         $groupIds = '';
         if (!empty($regularGroupIDs)) {
-          $groupIds = CRM_Utils_Type::validate(
-            implode(',', (array) $regularGroupIDs),
-            'CommaSeparatedIntegers'
-          );
+          $groupIds = CRM_Utils_Type::validate(implode(',', (array) $regularGroupIDs), 'CommaSeparatedIntegers');
         }
         $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
       }
@@ -3283,10 +3280,7 @@ WHERE  $smartGroupClause
     // implode array, then remove all spaces
     $value = str_replace(' ', '', implode(',', (array) $value));
     if (!empty($value)) {
-      $value = CRM_Utils_Type::validate(
-        $value,
-        'CommaSeparatedIntegers'
-      );
+      $value = CRM_Utils_Type::validate($value, 'CommaSeparatedIntegers');
     }
 
     $useAllTagTypes = $this->getWhereValues('all_tag_types', $grouping);
