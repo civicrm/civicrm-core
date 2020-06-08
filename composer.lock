@@ -165,21 +165,21 @@
         },
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "v0.19.01.08",
+            "version": "v0.19.01.09",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-                "reference": "5a142bc4d24b7f8c830f59768b405ec74d582f22"
+                "reference": "3ea668bc651adb4d61e96276f55e76ae22baea7a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/5a142bc4d24b7f8c830f59768b405ec74d582f22",
-                "reference": "5a142bc4d24b7f8c830f59768b405ec74d582f22",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/3ea668bc651adb4d61e96276f55e76ae22baea7a",
+                "reference": "3ea668bc651adb4d61e96276f55e76ae22baea7a",
                 "shasum": ""
             },
             "require": {
                 "phpseclib/phpseclib": "1.0.*",
-                "psr/log": "~1.1"
+                "psr/log": "~1.0"
             },
             "type": "library",
             "autoload": {
@@ -198,7 +198,7 @@
                 }
             ],
             "description": "RPC library for CiviConnect",
-            "time": "2019-01-08T19:20:09+00:00"
+            "time": "2020-02-05T03:24:26+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
@@ -1760,16 +1760,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
+                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
-                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
                 "shasum": ""
             },
             "require": {
@@ -1803,7 +1803,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2019-11-01T11:05:21+00:00"
+            "time": "2020-03-23T09:12:05+00:00"
         },
         {
             "name": "psr/simple-cache",
@@ -2836,6 +2836,5 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.1"
-    },
-    "plugin-api-version": "1.1.0"
+    }
 }
