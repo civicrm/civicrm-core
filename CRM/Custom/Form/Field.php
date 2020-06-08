@@ -121,7 +121,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     }
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
+      CRM_Core_Error::statusBounce("You cannot add or edit fields in a reserved custom field-set.");
     }
 
     if ($this->_gid) {

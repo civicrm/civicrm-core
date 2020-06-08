@@ -61,7 +61,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     );
 
     if (empty($this->_values) || empty($this->_htmlTypeTransitions)) {
-      CRM_Core_Error::fatal(ts("Invalid custom field or can't change input type of this custom field."));
+      CRM_Core_Error::statusBounce(ts("Invalid custom field or can't change input type of this custom field."));
     }
 
     $url = CRM_Utils_System::url('civicrm/admin/custom/group/field/update',

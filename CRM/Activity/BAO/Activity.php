@@ -1770,8 +1770,7 @@ WHERE      activity.id IN ($activityIds)";
     // @todo - use api - remove lots of wrangling above. Remove deprecated fatal & let form layer
     // deal with any exceptions.
     if (is_a(self::create($activityParams), 'CRM_Core_Error')) {
-      CRM_Core_Error::fatal("Failed creating Activity for $component of id {$activity->id}");
-      return FALSE;
+      throw new CRM_Core_Exception("Failed creating Activity for $component of id {$activity->id}");
     }
   }
 

@@ -70,7 +70,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
 
     if (is_a($cart, 'CRM_Core_Error')) {
       $transaction->rollback();
-      CRM_Core_Error::fatal(ts('There was an error creating an event cart'));
+      throw new CRM_Core_Exception(ts('There was an error creating an event cart'));
     }
 
     $transaction->commit();
@@ -324,7 +324,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public static function retrieve(&$params, &$values) {
     $cart = self::find_by_params($params);
     if ($cart === FALSE) {
-      CRM_Core_Error::fatal(ts('Could not find cart matching %1', [1 => var_export($params, TRUE)]));
+      throw new CRM_Core_Exception(ts('Could not find cart matching %1', [1 => var_export($params, TRUE)]));
     }
     CRM_Core_DAO::storeValues($cart, $values);
     return $values;

@@ -74,7 +74,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $ufGroupId = $this->get('ufGroupId');
 
     if (!$ufGroupId) {
-      CRM_Core_Error::fatal('ufGroupId is missing');
+      CRM_Core_Error::statusBounce('ufGroupId is missing');
     }
     $this->_title = ts('Update multiple memberships') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);
     CRM_Utils_System::setTitle($this->_title);

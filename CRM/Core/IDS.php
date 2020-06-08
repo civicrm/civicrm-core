@@ -292,7 +292,7 @@ class CRM_Core_IDS {
       );
       CRM_Utils_JSON::output($error);
     }
-    CRM_Core_Error::fatal($msg);
+    throw new CRM_Core_Exception($msg);
   }
 
 }

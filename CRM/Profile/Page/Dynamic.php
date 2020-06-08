@@ -237,7 +237,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($this->_isContactActivityProfile && $this->_gid) {
         $errors = CRM_Profile_Form::validateContactActivityProfile($this->_activityId, $this->_id, $this->_gid);
         if (!empty($errors)) {
-          CRM_Core_Error::fatal(array_pop($errors));
+          CRM_Core_Error::statusBounce(array_pop($errors));
         }
       }
 

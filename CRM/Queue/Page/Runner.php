@@ -36,7 +36,7 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
     $qrid = CRM_Utils_Request::retrieve('qrid', 'String', $this, TRUE);
     $runner = CRM_Queue_Runner::instance($qrid);
     if (!is_object($runner)) {
-      CRM_Core_Error::fatal('Queue runner must be configured before execution.');
+      CRM_Core_Error::statusBounce('Queue runner must be configured before execution.');
     }
 
     CRM_Utils_System::setTitle($runner->title);

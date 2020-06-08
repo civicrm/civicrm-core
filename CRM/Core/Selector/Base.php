@@ -123,9 +123,6 @@ class CRM_Core_Selector_Base {
           unset($header);
         }
       }
-      if ($firstElementNotFound) {
-        // CRM_Core_Error::fatal( "Could not find a valid sort directional element" );
-      }
     }
     return $this->_order;
   }

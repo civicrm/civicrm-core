@@ -14,7 +14,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * @throws \Exception
    */
   public function run() {
-    CRM_Core_Error::fatal('This is not a real page!');
+    throw new CRM_Core_Exception('This is not a real page!');
   }
 
   /**

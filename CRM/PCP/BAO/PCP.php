@@ -665,7 +665,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
       $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
-      CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+      throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     $receiptFrom = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
@@ -913,7 +913,7 @@ INNER JOIN civicrm_uf_group ufgroup
 
     $params = [1 => [$component_id, 'Integer'], 2 => [$entity_table, 'String']];
     if (!$supporterProfileId = CRM_Core_DAO::singleValueQuery($query, $params)) {
-      CRM_Core_Error::fatal(ts('Supporter profile is not set for this Personal Campaign Page or the profile is disabled. Please contact the site administrator if you need assistance.'));
+      throw new CRM_Core_Exception(ts('Supporter profile is not set for this Personal Campaign Page or the profile is disabled. Please contact the site administrator if you need assistance.'));
     }
     else {
       return $supporterProfileId;

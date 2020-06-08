@@ -104,7 +104,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
     }
 
     if (!$valid) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Cannot delete participant payment');
     }
 
     if ($participantPayment->find(TRUE)) {
