@@ -206,7 +206,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
       // give error if empty or build form for payment.
       if (empty($payments)) {
-        CRM_Core_Error::fatal(ts("Oops. It looks like there is no valid payment status for online payment."));
+        throw new CRM_Core_Exception(ts('Oops. It looks like there is no valid payment status for online payment.'));
       }
       else {
         $form->assign('is_pledge_payment', TRUE);

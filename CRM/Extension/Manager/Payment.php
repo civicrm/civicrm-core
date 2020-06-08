@@ -109,7 +109,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   public function onPreUninstall(CRM_Extension_Info $info) {
     $paymentProcessorTypes = $this->_getAllPaymentProcessorTypes('class_name');
     if (!array_key_exists($info->key, $paymentProcessorTypes)) {
-      CRM_Core_Error::fatal(ts('This payment processor type is not registered.'));
+      throw new CRM_Core_Exception(ts('This payment processor type is not registered.'));
     }
 
     $dao = new CRM_Financial_DAO_PaymentProcessor();
@@ -229,7 +229,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
     }
 
     if (empty($class_name)) {
-      CRM_Core_Error::fatal("Unable to find payment processor in " . __CLASS__ . '::' . __METHOD__);
+      throw new CRM_Core_Exception('Unable to find payment processor in ' . __CLASS__ . '::' . __METHOD__);
     }
 
     // In the case of uninstall, check for instances of PP first.

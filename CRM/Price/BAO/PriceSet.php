@@ -1670,8 +1670,8 @@ WHERE     ct.id = cp.financial_type_id AND
           break;
 
         default:
-          CRM_Core_Error::fatal("$table is not supported in PriceSet::usedBy()");
-          break;
+          throw new CRM_Core_Exception("$table is not supported in PriceSet::usedBy()");
+
       }
     }
     return $usedBy;

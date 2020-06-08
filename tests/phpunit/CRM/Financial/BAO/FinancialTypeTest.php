@@ -320,8 +320,8 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributions->id, 'view');
       $this->fail('Missed expected exception');
     }
-    catch (Exception $e) {
-      $this->assertEquals('A fatal error was triggered: You do not have permission to access this page.', $e->getMessage());
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('You do not have permission to access this page.', $e->getMessage());
     }
 
     $this->setPermissions([

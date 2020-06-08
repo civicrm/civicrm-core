@@ -204,7 +204,7 @@ SELECT v.id
 
     $contactID = CRM_Bridge_OG_Utils::contactID($params['uf_id']);
     if (!$contactID) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(' no contact found');
     }
 
     // get the group id of this OG
