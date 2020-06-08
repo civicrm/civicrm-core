@@ -643,6 +643,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $creditCardTypes = CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id');
     foreach ($rows as $rowNum => $row) {
+      $entryFound = FALSE;
       // convert display name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
         !empty($rows[$rowNum]['civicrm_contact_sort_name']) &&
