@@ -40,7 +40,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
 
     if (is_a($event_in_cart, 'CRM_Core_Error')) {
       $transaction->rollback();
-      CRM_Core_Error::fatal(ts('There was an error creating an event_in_cart'));
+      throw new CRM_Core_Exception(ts('There was an error creating an event_in_cart'));
     }
 
     $transaction->commit();

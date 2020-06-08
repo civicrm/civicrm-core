@@ -49,7 +49,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
       $session = CRM_Core_Session::singleton();
       $this->_id = $session->get('userID');
       if (!$this->_id) {
-        CRM_Core_Error::fatal(ts('Could not find the required contact id parameter (id=) for viewing a contact record with a Profile.'));
+        CRM_Core_Error::statusBounce(ts('Could not find the required contact id parameter (id=) for viewing a contact record with a Profile.'));
       }
     }
     $this->assign('cid', $this->_id);
@@ -66,7 +66,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
 
       // check if we are rendering mixed profiles
       if (CRM_Core_BAO_UFGroup::checkForMixProfiles($profileIds)) {
-        CRM_Core_Error::fatal(ts('You cannot combine profiles of multiple types.'));
+        CRM_Core_Error::statusBounce(ts('You cannot combine profiles of multiple types.'));
       }
 
       $this->_gid = $profileIds[0];

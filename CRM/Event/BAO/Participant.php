@@ -1496,7 +1496,7 @@ UPDATE  civicrm_participant
         ];
 
         if (is_a(CRM_Activity_BAO_Activity::create($activityParams), 'CRM_Core_Error')) {
-          CRM_Core_Error::fatal('Failed creating Activity for expiration mail');
+          throw new CRM_Core_Exception('Failed creating Activity for expiration mail');
         }
       }
     }

@@ -58,7 +58,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
         !checkdate(substr($ym, 4, 2), 1, substr($ym, 0, 4)) ||
         substr($ym, 0, 1) == 0
       ) {
-        CRM_Core_Error::fatal(ts('Invalid date query "%1" in URL (valid syntax is yyyymm).', array(1 => $ym)));
+        CRM_Core_Error::statusBounce(ts('Invalid date query "%1" in URL (valid syntax is yyyymm).', array(1 => $ym)));
       }
 
       $isPreviousMonth = 0;

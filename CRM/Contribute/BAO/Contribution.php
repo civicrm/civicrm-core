@@ -2115,7 +2115,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $ids['contributionPage'] = NULL;
 
     if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Unable to validate supplied data');
     }
 
     $memberships = &$objects['membership'];

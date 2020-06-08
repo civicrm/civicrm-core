@@ -508,7 +508,7 @@ class CRM_Core_Permission {
   public static function checkMenuItem(&$item) {
     if (!array_key_exists('access_callback', $item)) {
       CRM_Core_Error::backtrace();
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Missing Access Callback key in menu item');
     }
 
     // if component_id is present, ensure it is enabled

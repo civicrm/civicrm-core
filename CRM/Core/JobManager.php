@@ -181,7 +181,7 @@ class CRM_Core_JobManager {
    */
   private function _getJob($id = NULL, $entity = NULL, $action = NULL) {
     if (is_null($id) && is_null($action)) {
-      CRM_Core_Error::fatal('You need to provide either id or name to use this method');
+      throw new CRM_Core_Exception('You need to provide either id or name to use this method');
     }
     $dao = new CRM_Core_DAO_Job();
     $dao->id = $id;

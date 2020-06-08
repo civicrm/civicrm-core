@@ -130,7 +130,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if (is_a($dao, 'DB_Error')) {
       // FIXME - Adding code to allow tests to pass
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Unable to claim queue item');
     }
 
     if ($dao->fetch()) {

@@ -155,7 +155,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
       CRM_Utils_System::redirect(CRM_Utils_System::url($url, $urlParams));
     }
     else {
-      CRM_Core_Error::fatal("Could not find Event ID");
+      CRM_Core_Error::statusBounce("Could not find Event ID");
     }
     parent::endPostProcess();
   }

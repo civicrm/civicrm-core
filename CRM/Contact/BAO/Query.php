@@ -2323,7 +2323,7 @@ class CRM_Contact_BAO_Query {
             }
             // we don't know when this might happen
             else {
-              CRM_Core_Error::fatal(ts("%1 is not a valid operator", [1 => $operator]));
+              throw new CRM_Core_Exception(ts("%1 is not a valid operator", [1 => $operator]));
             }
           }
         }
@@ -2417,7 +2417,7 @@ class CRM_Contact_BAO_Query {
       $tName = str_replace(' ', '_', $tName);
       return [$tName, $fldName];
     }
-    CRM_Core_Error::fatal();
+    throw new CRM_Core_Exception('Cannot determine location table information');
   }
 
   /**
@@ -2973,7 +2973,7 @@ class CRM_Contact_BAO_Query {
 
     if (is_array($value) && count($value) > 1) {
       if (strpos($op, 'IN') === FALSE && strpos($op, 'NULL') === FALSE) {
-        CRM_Core_Error::fatal(ts("%1 is not a valid operator", [1 => $op]));
+        throw new CRM_Core_Exception(ts("%1 is not a valid operator", [1 => $op]));
       }
       $this->_useDistinct = TRUE;
     }

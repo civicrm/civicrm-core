@@ -223,8 +223,8 @@ class CRM_Core_Region {
           break;
 
         default:
-          require_once 'CRM/Core/Error.php';
-          CRM_Core_Error::fatal(ts('Snippet type %1 is unrecognized',
+          require_once 'CRM/Core/Exception.php';
+          throw new CRM_Core_Exception(ts('Snippet type %1 is unrecognized',
             [1 => $snippet['type']]));
       }
     }
