@@ -1377,6 +1377,10 @@
   name        : Sean Madsen
   organization: Left Join Labs
   jira        : seanmadsen
+  
+- github      : semseysandor
+  name        : Sandor Semsey
+  organization: ES-Progress
 
 - name        : Shailesh Lende
   jira        : shailesh
