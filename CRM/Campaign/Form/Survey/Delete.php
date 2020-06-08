@@ -77,7 +77,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
     }
     else {
-      CRM_Core_Error::fatal(ts('Delete action is missing expected survey ID.'));
+      CRM_Core_Error::statusBounce(ts('Delete action is missing expected survey ID.'));
     }
   }
 
