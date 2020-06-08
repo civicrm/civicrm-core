@@ -3696,7 +3696,7 @@ WHERE  $smartGroupClause
     }
     CRM_Utils_Type::validateAll($contactIds, 'Positive');
     if (!empty($contactIds)) {
-      $this->_where[0][] = " ( contact_a.id IN (" . implode(',', $contactIds) . " ) ) ";
+      $this->_where[0][] = ' ( contact_a.id IN (' . implode(',', $contactIds) . " ) ) ";
     }
   }
 
