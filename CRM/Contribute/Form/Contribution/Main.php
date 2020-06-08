@@ -454,7 +454,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     if (empty($this->_values['fee']) && empty($this->_ccid)) {
-      CRM_Core_Error::fatal(ts('This page does not have any price fields configured or you may not have permission for them. Please contact the site administrator for more details.'));
+      throw new CRM_Core_Exception(ts('This page does not have any price fields configured or you may not have permission for them. Please contact the site administrator for more details.'));
     }
 
     //we have to load confirm contribution button in template

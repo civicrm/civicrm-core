@@ -234,7 +234,7 @@ AND    co.id IN ( $contribIDs )";
       $ids['event'] = $details[$row['contribution_id']]['event'] ?? NULL;
 
       if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-        CRM_Core_Error::fatal();
+        CRM_Core_Error::statusBounce('Supplied data was not able to be validated');
       }
 
       $contribution = &$objects['contribution'];

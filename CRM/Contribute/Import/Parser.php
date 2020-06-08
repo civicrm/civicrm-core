@@ -128,7 +128,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
     $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Unable to determine import file');
     }
     $fileName = $fileName['name'];
 
