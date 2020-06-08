@@ -213,26 +213,26 @@ trait CRM_Contact_Form_Task_EmailTrait {
         'options' => ['limit' => 0],
       ])['values'];
 
+      // The contact task supports passing in email_id in a url. It supports a single email
+      // and is marked as having been related to CiviHR.
+      // The array will look like $this->_toEmail = ['email' => 'x', 'contact_id' => 2])
+      // If it exists we want to use the specified email which might be different to the primary email
+      // that we have.
+      if (!empty($this->_toEmail['contact_id']) && !empty($allContactDetails[$this->_toEmail['contact_id']])) {
+        $allContactDetails[$this->_toEmail['contact_id']]['email'] = $this->_toEmail['email'];
+      }
+
       // perform all validations on unique contact Ids
       foreach ($allContactDetails as $contactId => $value) {
         if ($value['do_not_email'] || empty($value['email']) || !empty($value['is_deceased']) || $value['on_hold']) {
           $this->setSuppressedEmail($contactId, $value);
         }
-        else {
-          $email = $value['email'];
-
-          // build array's which are used to setdefaults
-          if (in_array($contactId, $this->_toContactIds)) {
-            $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $value;
-            // If a particular address has been specified as the default, use that instead of contact's primary email
-            if (!empty($this->_toEmail) && $this->_toEmail['contact_id'] == $contactId) {
-              $email = $this->_toEmail['email'];
-            }
-            $toArray[] = [
-              'text' => '"' . $value['sort_name'] . '" <' . $email . '>',
-              'id' => "$contactId::{$email}",
-            ];
-          }
+        elseif (in_array($contactId, $this->_toContactIds)) {
+          $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $value;
+          $toArray[] = [
+            'text' => '"' . $value['sort_name'] . '" <' . $value['email'] . '>',
+            'id' => "$contactId::{$value['email']}",
+          ];
         }
       }
 
