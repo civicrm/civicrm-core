@@ -301,6 +301,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws Exception
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('throw new CRM_Core_Exception or use CRM_Core_Error::statusBounce', 'CRM_Core_Error::fatal');
     $vars = [
       'message' => $message,
       'code' => $code,
