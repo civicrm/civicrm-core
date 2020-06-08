@@ -196,11 +196,18 @@ class CRM_Utils_Type {
   /**
    * Helper function to call validate on arrays
    *
+   * @param mixed $data
+   * @param string $type
+   *
+   * @return mixed
+   *
+   * @throws \CRM_Core_Exception
+   *
    * @see validate
    */
-  public static function validateAll($data, $type, $abort = TRUE) {
+  public static function validateAll($data, $type) {
     foreach ($data as $key => $value) {
-      $data[$key] = CRM_Utils_Type::validate($value, $type, $abort);
+      $data[$key] = CRM_Utils_Type::validate($value, $type);
     }
     return $data;
   }
