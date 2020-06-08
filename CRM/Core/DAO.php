@@ -1481,6 +1481,7 @@ FROM   civicrm_domain
     }
 
     if ($trapException) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     }
 
@@ -1584,6 +1585,9 @@ FROM   civicrm_domain
    * @throws CRM_Core_Exception
    */
   public static function composeQuery($query, $params = [], $abort = TRUE) {
+    if (!$abort) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling functions should not bypass error handling');
+    }
     $tr = [];
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
