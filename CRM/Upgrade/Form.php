@@ -453,6 +453,16 @@ SET    version = '$version'
         ]);
     }
 
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER) < 0) {
+      $error = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2 ',
+        [
+          1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
+          2 => CRM_Utils_SQL::getDatabaseVersion(),
+          3 => '10.1',
+          4 => $latestVer,
+        ]);
+    }
+
     // check for mysql trigger privileges
     if (!\Civi::settings()->get('logging_no_trigger_permission') && !CRM_Core_DAO::checkTriggerViewPermission(FALSE, TRUE)) {
       $error = ts('CiviCRM %1 requires MySQL trigger privileges.',

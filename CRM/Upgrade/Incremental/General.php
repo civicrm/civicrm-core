@@ -59,13 +59,6 @@ class CRM_Upgrade_Incremental_General {
   const MIN_INSTALL_MYSQL_VER = '5.6.5';
 
   /**
-   * The minimum MySQL/MariaDB version required to install Civi.
-   *
-   * @see install/index.php
-   */
-  const NEW_MIN_INSTALL_MYSQL_VER = '5.6.5';
-
-  /**
    * Compute any messages which should be displayed before upgrade.
    *
    * @param string $preUpgradeMessage
@@ -86,25 +79,14 @@ class CRM_Upgrade_Incremental_General {
       ]);
       $preUpgradeMessage .= '</p>';
     }
-    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::MIN_RECOMMENDED_MYSQL_VER) < 0 && version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::NEW_MIN_INSTALL_MYSQL_VER) >= 0) {
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::MIN_RECOMMENDED_MYSQL_VER) < 0) {
       $preUpgradeMessage .= '<p>';
-      $preUpgradeMessage .= ts('This system uses MySQL/MariaDB v%4. You may proceed with the upgrade, and CiviCRM v%1 will continue working normally. However, future releases will require MySQL v%2 or MariaDB v%3.', [
+      $preUpgradeMessage .= ts('This system uses MySQL/MariaDB v%5. You may proceed with the upgrade, and CiviCRM v%1 will continue working normally. However, CiviCRM v%4 will require MySQL v%2 or MariaDB v%3.', [
         1 => $latestVer,
         2 => self::MIN_RECOMMENDED_MYSQL_VER . '+',
         3 => '10.1' . '+',
-        4 => CRM_Utils_SQL::getDatabaseVersion(),
-      ]);
-      $preUpgradeMessage .= '</p>';
-    }
-    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::NEW_MIN_INSTALL_MYSQL_VER) < 0) {
-      $preUpgradeMessage .= '<p>';
-      $preUpgradeMessage .= ts('This system uses MySQL/MariaDB v%6. You may proceed with the upgrade, and CiviCRM v%1 will continue working normally. However, CiviCRM v%5 will require MySQL v%2. We recommend MySQL v%3 or MariaDB v%4.', [
-        1 => $latestVer,
-        2 => self::NEW_MIN_INSTALL_MYSQL_VER . '+',
-        3 => self::MIN_RECOMMENDED_MYSQL_VER . '+',
-        4 => '10.1' . '+',
-        5 => '5.28' . '+',
-        6 => CRM_Utils_SQL::getDatabaseVersion(),
+        4 => '5.34' . '+',
+        5 => CRM_Utils_SQL::getDatabaseVersion(),
       ]);
       $preUpgradeMessage .= '</p>';
     }
