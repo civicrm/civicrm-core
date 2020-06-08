@@ -1822,6 +1822,7 @@ class CRM_Utils_Date {
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
+            $to = self::intervalAdd('day', -1, $to);
             unset($from);
             break;
 
