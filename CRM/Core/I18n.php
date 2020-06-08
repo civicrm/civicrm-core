@@ -612,6 +612,17 @@ class CRM_Core_I18n {
   }
 
   /**
+   * If you switch back/forth between locales/drivers, it may be necessary
+   * to reset some options.
+   */
+  protected function reactivate() {
+    if ($this->_nativegettext) {
+      $this->setNativeGettextLocale($this->locale);
+    }
+
+  }
+
+  /**
    * Change the processing language without changing the current user language
    *
    * @param $locale
@@ -623,15 +634,6 @@ class CRM_Core_I18n {
     // Change the language of the CMS as well, for URLs.
     CRM_Utils_System::setUFLocale($locale);
 
-    // change the gettext ressources
-    if ($this->_nativegettext) {
-      $this->setNativeGettextLocale($locale);
-    }
-    else {
-      // phpgettext
-      $this->setPhpGettextLocale($locale);
-    }
-
     // For sql queries, if running in DB multi-lingual mode.
     global $dbLocale;
 
@@ -642,6 +644,8 @@ class CRM_Core_I18n {
     // For self::getLocale()
     global $tsLocale;
     $tsLocale = $locale;
+
+    CRM_Core_I18n::singleton()->reactivate();
   }
 
   /**
