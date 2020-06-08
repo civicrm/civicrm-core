@@ -270,8 +270,9 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     elseif ($status == 'Refunded' || $status == 'Reversed') {
       return $this->cancelled($objects, $transaction);
     }
-    elseif ($status != 'Completed') {
-      return $this->unhandled($objects, $transaction);
+    elseif ($status !== 'Completed') {
+      Civi::log()->debug('Returning since contribution status is not handled');
+      return;
     }
 
     // check if contribution is already completed, if so we ignore this ipn
@@ -279,7 +280,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     if ($contribution->contribution_status_id == $completedStatusId) {
       $transaction->commit();
       Civi::log()->debug('PayPalIPN: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
-      echo "Success: Contribution has already been handled<p>";
+      echo 'Success: Contribution has already been handled<p>';
       return;
     }
 
