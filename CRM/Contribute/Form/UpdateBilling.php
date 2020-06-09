@@ -202,7 +202,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
     $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
     $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
-    $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
+    $processorParams['subscriptionId'] = $processorParams['recurProcessorID'] = $this->getSubscriptionDetails()->processor_id;
+    $processorParams['contributionRecurID'] = $this->getSubscriptionDetails()->recur_id;
     $processorParams['amount'] = $this->_subscriptionDetails->amount;
     $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo('', $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
