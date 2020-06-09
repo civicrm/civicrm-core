@@ -2326,6 +2326,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           }
           elseif (CRM_Core_BAO_CustomField::getKeyID($name)) {
             $defaults[$fldName] = self::formatCustomValue($field, $details[$name]);
+            if (!$singleProfile && $field['html_type'] === 'CheckBox') {
+              // For batch update profile there needs to be a key lik
+              // $defaults['field[166]['custom_8'][2]'] => 1 where
+              // 166 is the conntact id, 8 is the field id and 2 is the checkbox option.
+              foreach ($defaults[$fldName] as $itemKey => $itemValue) {
+                $defaults[$fldName . '[' . $itemKey . ']'] = $itemValue;
+              }
+            }
           }
           else {
             $defaults[$fldName] = $details[$name];
@@ -3585,6 +3593,7 @@ SELECT  group_id
     if (CRM_Core_BAO_CustomField::isSerialized($field)) {
       $value = CRM_Utils_Array::explodePadded($value);
 
+      // This may not be required now.
       if ($field['html_type'] === 'CheckBox') {
         $checkboxes = [];
         foreach (array_filter($value) as $item) {
