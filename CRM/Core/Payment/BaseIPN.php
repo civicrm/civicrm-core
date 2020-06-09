@@ -487,6 +487,7 @@ class CRM_Core_Payment_BaseIPN {
   }
 
   /**
+   * @deprecated
    * Get site billing ID.
    *
    * @param array $ids
@@ -494,6 +495,7 @@ class CRM_Core_Payment_BaseIPN {
    * @return bool
    */
   public function getBillingID(&$ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_LocationType::getBilling()');
     $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
     if (!$ids['billing']) {
       CRM_Core_Error::debug_log_message(ts('Please set a location type of %1', [1 => 'Billing']));
