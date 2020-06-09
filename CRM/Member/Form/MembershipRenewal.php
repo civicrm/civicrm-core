@@ -748,7 +748,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @throws \CiviCRM_API3_Exception
    */
   public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $isPayLater) {
-    $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
@@ -855,22 +854,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
       $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
     }
-    //CRM-4555
-    if ($pending) {
-      $updateStatusId = array_search('Pending', $allStatus);
-    }
 
     // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
     // perhaps shouldn't be?
     if ($contributionRecurID) {
       $memParams['contribution_recur_id'] = $contributionRecurID;
-    }
-    //CRM-4555
-    //if we decided status here and want to skip status
-    //calculation in create( ); then need to pass 'skipStatusCal'.
-    if ($updateStatusId) {
-      $memParams['status_id'] = $updateStatusId;
-      $memParams['skipStatusCal'] = TRUE;
     }
 
     //since we are renewing,
