@@ -782,8 +782,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       if ($contributionRecurID) {
         $memParams['contribution_recur_id'] = $contributionRecurID;
       }
-      // @todo stop passing $ids - it is empty
-      return CRM_Member_BAO_Membership::create($memParams, $ids);
+      return CRM_Member_BAO_Membership::create($memParams);
     }
 
     // Check and fix the membership if it is STALE
