@@ -2339,7 +2339,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $defaults[$fldName] = $details['worldregion_id'];
           }
           elseif (CRM_Core_BAO_CustomField::getKeyID($name)) {
-            $defaults[$fldName] = self::formatCustomValue($field, $details[$name]);
+            self::formatCustomValue($field, $details[$name], $fldName, $defaults);
           }
           else {
             $defaults[$fldName] = $details[$name];
@@ -2419,12 +2419,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                       }
                     }
                     elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
-                      $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
+                      self::formatCustomValue($field, $details[$name], $fldName, $defaults);
                     }
                   }
                 }
                 elseif (strpos($fieldName, 'address_custom') === 0 && !empty($value[substr($fieldName, 8)])) {
-                  $defaults[$fldName] = self::formatCustomValue($field, $value[substr($fieldName, 8)]);
+                  self::formatCustomValue($field, $details[$name], $fldName, $defaults);
                 }
               }
             }
@@ -3591,25 +3591,31 @@ SELECT  group_id
    *   Field metadata.
    * @param string $value
    *   Raw value
+   * @param string $fldName
+   *   Index to be used in $defaults array
+   * @param array $defaults
+   *   Array of default values passed by reference
    *
    * @return mixed
    *   String or array, depending on the html type
    */
-  private static function formatCustomValue($field, $value) {
+  private static function formatCustomValue($field, $value, $fldName, &$defaults) {
     if (CRM_Core_BAO_CustomField::isSerialized($field)) {
       $value = CRM_Utils_Array::explodePadded($value);
-
       if ($field['html_type'] === 'CheckBox') {
-        $checkboxes = [];
-        foreach (array_filter($value) as $item) {
-          $checkboxes[$item] = 1;
-          // CRM-2969 seems like we need this for QF style checkboxes in profile where its multiindexed
-          $checkboxes["[{$item}]"] = 1;
+        foreach ($value as $item) {
+          if ($item) {
+            $defaults[$fldName . "[$item]"] = 1;
+          }
         }
-        return $checkboxes;
+      }
+      else {
+        $defaults[$fldName] = $value;
       }
     }
-    return $value;
+    else {
+      $defaults[$fldName] = $value;
+    }
   }
 
 }
