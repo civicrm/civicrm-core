@@ -124,6 +124,13 @@ class CRM_Dedupe_MergeHandler {
     if (!isset(\Civi::$statics[__CLASS__]['dynamic'])) {
       \Civi::$statics[__CLASS__]['dynamic'] = [];
       foreach (CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact') as $tableName => $field) {
+        if ($tableName === 'civicrm_financial_item') {
+          // It turns out that civicrm_financial_item does not have an index on entity_table (only as the latter
+          // part of a entity_id/entity_table index which probably is not adding any value over & above entity_id
+          // only. This means this is a slow query. The correct fix is probably to add a whitelist to
+          // values for entity_table in the schema.
+          continue;
+        }
         $sql[] = "(SELECT '$tableName' as civicrm_table, '{$field[0]}' as field_name FROM $tableName WHERE entity_table = 'civicrm_contact' LIMIT 1)";
       }
       $sqlString = implode(' UNION ', $sql);
