@@ -28,7 +28,9 @@
         <thead class="sticky">
             <th>{ts}Status{/ts}</th>
             <th>{ts}Start Event{/ts}</th>
+            <th>{ts}Start Adjustment{/ts}</th>
             <th>{ts}End Event{/ts}</th>
+            <th>{ts}End Adjustment{/ts}</th>
             <th>{ts}Member{/ts}</th>
             <th>{ts}Admin{/ts}</th>
             <th>{ts}Order{/ts}</th>
@@ -38,8 +40,10 @@
         {foreach from=$rows item=row}
         <tr id="membership_status-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} {if NOT $row.is_active} disabled{/if} crmf">
           <td class="crmf-label crm-editable" >{$row.label}</td>
-          <td class="crmf-start_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.start_event}</td>
-          <td class="crmf-end_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.end_event}</td>
+          <td class="nowrap crmf-start_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.start_event}</td>
+          <td class="nowrap crmf-start_event_adjust_unit_interval">{$row.start_event_adjust_unit_interval}</td>
+          <td class="nowrap crmf-end_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.end_event}</td>
+          <td class="nowrap crmf-end_event_adjust_interval">{$row.end_event_adjust_interval}</td>
           <td class="crmf-is_current_member crm-editable" data-type="boolean">{if $row.is_current_member eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crmf-is_admin crm-editable" data-type="boolean">{if $row.is_admin eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="nowrap crmf-weight">{$row.weight}</td>
