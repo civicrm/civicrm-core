@@ -240,9 +240,8 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
         $sql = '
 SELECT type.*, parent.name as parent, parent.label as parent_label
 FROM      civicrm_contact_type type
-LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id
-WHERE  type.name IS NOT NULL
-';
+LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id';
+
         if ($all === FALSE) {
           $sql .= ' AND type.is_active = 1';
         }
@@ -581,7 +580,11 @@ WHERE name = %1';
 
     // label or name
     if (empty($params['id']) && empty($params['label'])) {
+      // @todo consider throwing exception instead.
       return NULL;
+    }
+    if (empty($params['id']) && empty($params['name'])) {
+      $params['name'] = ucfirst(CRM_Utils_String::munge($params['label']));
     }
     if (!empty($params['parent_id']) &&
       !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $params['parent_id'])
@@ -592,7 +595,6 @@ WHERE name = %1';
     $contactType = new CRM_Contact_DAO_ContactType();
     $contactType->copyValues($params);
     $contactType->id = $params['id'] ?? NULL;
-    $contactType->is_active = CRM_Utils_Array::value('is_active', $params, 0);
 
     $contactType->save();
     if ($contactType->find(TRUE)) {
@@ -604,7 +606,7 @@ WHERE name = %1';
     if (!empty($params['id'])) {
       $newParams = [
         'label' => ts("New %1", [1 => $contact]),
-        'is_active' => $active,
+        'is_active' => $contactType->is_active,
       ];
       CRM_Core_BAO_Navigation::processUpdate(['name' => "New $contactName"], $newParams);
     }

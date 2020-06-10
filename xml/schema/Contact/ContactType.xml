@@ -24,6 +24,7 @@
     <length>64</length>
     <comment>Internal name of Contact Type (or Subtype).</comment>
     <add>3.1</add>
+    <required>true</required>
   </field>
   <index>
     <name>contact_type</name>
@@ -84,6 +85,7 @@
     <name>is_active</name>
     <title>Contact Type Is Active?</title>
     <type>boolean</type>
+    <default>1</default>
     <comment>Is this entry active?</comment>
     <add>3.1</add>
   </field>
@@ -91,6 +93,7 @@
     <name>is_reserved</name>
     <title>Contact Type is Reserved?</title>
     <type>boolean</type>
+    <default>0</default>
     <comment>Is this contact type a predefined system type</comment>
     <add>3.1</add>
   </field>
