@@ -69,4 +69,30 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
   //   return TRUE;
   // }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_28_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Populate missing Contact Type name fields', 'populateMissingContactTypeName');
+  }
+
+  public static function populateMissingContactTypeName() {
+    $contactTypes = \Civi\Api4\ContactType::get()
+      ->setCheckPermissions(FALSE)
+      ->execute();
+    foreach ($contactTypes as $contactType) {
+      if (empty($contactType['name'])) {
+        \Civi\Api4\ContactType::update()
+          ->addWhere('id', '=', $contactType['id'])
+          ->addValue('name', ucfirst(CRM_Utils_String::munge($contactType['label'])))
+          ->setCheckPermissions(FALSE)
+          ->execute();
+      }
+    }
+    return TRUE;
+  }
+
 }
