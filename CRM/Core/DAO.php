@@ -2407,7 +2407,6 @@ SELECT contact_id
     $refsFound = [];
     foreach (CRM_Core_DAO_AllCoreTables::getClasses() as $daoClassName) {
       $links = $daoClassName::getReferenceColumns();
-      $daoTableName = $daoClassName::getTableName();
 
       foreach ($links as $refSpec) {
         /** @var $refSpec CRM_Core_Reference_Interface */
