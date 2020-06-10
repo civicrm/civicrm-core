@@ -308,9 +308,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     // @todo - stop changing formValues - respect submitted form values, change a working array.
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
-
-    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
     $this->set('queryParams', $this->_queryParams);

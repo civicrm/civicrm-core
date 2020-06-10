@@ -285,8 +285,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["participant_test"] = 0;
     }
 
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
-
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
     $this->set('queryParams', $this->_queryParams);

@@ -1587,6 +1587,7 @@ class CRM_Contact_BAO_Query {
     }
 
     self::filterCountryFromValuesIfStateExists($formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($formValues);
 
     foreach ($formValues as $id => $values) {
       if (self::isAlreadyProcessedForQueryFormat($values)) {
