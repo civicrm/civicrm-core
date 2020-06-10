@@ -1469,7 +1469,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options = $info['values'];
     }
     if (!array_key_exists('placeholder', $props)) {
-      $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
+      $props['placeholder'] = $required ? ts('- select -') : (CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -'));
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {

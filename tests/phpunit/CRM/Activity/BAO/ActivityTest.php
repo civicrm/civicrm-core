@@ -1613,6 +1613,7 @@ $text
   protected function setShowCaseActivitiesInCore(bool $val) {
     Civi::settings()->set('civicaseShowCaseActivities', $val ? 1 : 0);
     CRM_Core_Component::getEnabledComponents();
+    Civi::$statics['CRM_Core_Component']['info']['CiviCase'] = new CRM_Case_Info('CiviCase', 'CRM_Case', 7);
     Civi::$statics['CRM_Core_Component']['info']['CiviCase']->info['showActivitiesInCore'] = $val;
   }
 
