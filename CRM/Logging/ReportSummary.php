@@ -10,10 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
+ * Class CRM_Logging_ReportSummary
  */
 class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $cid;
