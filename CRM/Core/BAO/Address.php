@@ -157,9 +157,22 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       self::fixSharedAddress($params);
     }
 
-    $address->copyValues($params);
-
-    $address->save();
+    if (empty($params['id']) && isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+      // copy from master to ensure we have custom fields
+      // but keep all params data that might have been updated above
+      $fieldsFix = [
+        'replace' => $params,
+      ];
+      $address = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Address', [
+        'id' => $params['master_id']],
+        NULL,
+        $fieldsFix
+      );
+    }
+    else {
+      $address->copyValues($params);
+      $address->save();
+    }
 
     if ($address->id) {
       if (isset($params['custom'])) {
@@ -1067,6 +1080,7 @@ SELECT is_primary,
       $addressDAO->copyValues($params);
       $addressDAO->id = $dao->id;
       $addressDAO->save();
+      $addressDAO->copyCustomFields($addressId, $addressDAO->id);
     }
   }
 
