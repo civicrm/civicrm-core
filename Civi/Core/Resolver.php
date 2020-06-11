@@ -95,7 +95,7 @@ class Resolver {
       // Callback: Constant value.
       return new ResolverConstantCallback((int) $id);
     }
-    elseif ($id{0} >= 'A' && $id{0} <= 'Z') {
+    elseif ($id[0] >= 'A' && $id[0] <= 'Z') {
       // Object: New/default instance.
       return new $id();
     }

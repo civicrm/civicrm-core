@@ -67,7 +67,7 @@ class CRM_Utils_SQL_Insert {
         $value = NULL;
       }
       // Skip '_foobar' and '{\u00}*_options' and 'N'.
-      if (preg_match('/[a-zA-Z]/', $key{0}) && $key !== 'N') {
+      if (preg_match('/[a-zA-Z]/', $key[0]) && $key !== 'N') {
         $row[$key] = $value;
       }
     }
