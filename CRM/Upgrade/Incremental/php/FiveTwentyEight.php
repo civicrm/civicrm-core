@@ -59,18 +59,9 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
    */
   public function upgrade_5_28_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Populate missing Contact Type name fields', 'populateMissingContactTypeName');
     $this->addTask('Add icon column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'icon', "varchar(255) COMMENT 'crm-i icon class' DEFAULT NULL");
-  }
-
-  /**
-   * Upgrade function.
-   *
-   * @param string $rev
-   */
-  public function upgrade_5_28_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addTask('Populate missing Contact Type name fields', 'populateMissingContactTypeName');
   }
 
   public static function populateMissingContactTypeName() {
