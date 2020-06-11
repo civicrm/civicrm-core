@@ -231,4 +231,13 @@
     <comment>Is this property public?</comment>
     <add>4.7</add>
   </field>
+  <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>crm-i icon class</comment>
+    <add>5.28</add>
+  </field>
 </table>
