@@ -199,7 +199,10 @@ class Api4SelectQuery extends SelectQuery {
    */
   protected function buildWhereClause() {
     foreach ($this->where as $clause) {
-      $this->query->where($this->treeWalkClauses($clause, 'WHERE'));
+      $sql = $this->treeWalkClauses($clause, 'WHERE');
+      if ($sql) {
+        $this->query->where($sql);
+      }
     }
   }
 
@@ -270,6 +273,10 @@ class Api4SelectQuery extends SelectQuery {
    * @uses composeClause() to generate the SQL etc.
    */
   protected function treeWalkClauses($clause, $type) {
+    // Skip empty leaf.
+    if (in_array($clause[0], ['AND', 'OR', 'NOT']) && empty($clause[1])) {
+      return '';
+    }
     switch ($clause[0]) {
       case 'OR':
       case 'AND':
