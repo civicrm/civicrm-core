@@ -748,10 +748,6 @@ SELECT count(*)
                 $errors['option_value[' . $nextIndex . ']'] = ts('Duplicate Option values');
                 $_flagOption = 1;
               }
-              if (strpos($fields['option_value'][$start], ',') != FALSE) {
-                $errors['option_value[' . $start . ']'] = ts('You cannot use comma in Option value');
-                $_flagOption = 1;
-              }
               $nextIndex++;
             }
             $start++;
