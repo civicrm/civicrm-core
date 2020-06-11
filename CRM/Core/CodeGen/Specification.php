@@ -341,7 +341,7 @@ class CRM_Core_CodeGen_Specification {
       default:
         $field['phpType'] = $this->value('phpType', $fieldXML, $type);
         $field['sqlType'] = $type;
-        if ($type == 'int unsigned') {
+        if ($type == 'int unsigned' || $type == 'tinyint') {
           $field['phpType'] = 'int';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
