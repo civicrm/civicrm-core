@@ -100,7 +100,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   public function testFixCustomFieldValue() {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $params = [
-      'email' => 'abc@webaccess.co.in',
+      'email' => 'abc@example.com',
     ];
 
     foreach ([
