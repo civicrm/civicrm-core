@@ -1551,7 +1551,7 @@ WHERE  id = %1
     $output = [];
     $query = "$select $from";
     if ($wheres) {
-      $query .= " WHERE " . implode($wheres, ' AND ');
+      $query .= " WHERE " . implode(' AND ', $wheres);
     }
     $query .= ' ' . $order;
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);

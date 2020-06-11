@@ -175,7 +175,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     // Since hash was required, make sure we have a 0 value for it (CRM-1063).
     // @todo - does this mean we can remove this block?
     // Fixed in 1.5 by making hash optional, only do this in create mode, not update.
-    if ((!array_key_exists('hash', $contact) || !$contact->hash) && !$contact->id) {
+    if ((!isset($contact->hash) || !$contact->hash) && !$contact->id) {
       $allNull = FALSE;
       $contact->hash = md5(uniqid(rand(), TRUE));
     }
