@@ -1132,12 +1132,13 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $tempTableName . ' (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a temp table.');
       $this->error($testDetails);
     }
-    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
   }
 
   /**
@@ -1201,18 +1202,19 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $tempTableName . ' (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a table in the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysqli_query($conn, 'LOCK TABLES civicrm_install_temp_table_test WRITE');
+    $result = mysqli_query($conn, 'LOCK TABLES ' . $tempTableName . ' WRITE');
     if (!$result) {
       $testDetails[2] = ts('Could not obtain a write lock for the database table.');
       $this->error($testDetails);
-      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
       return;
     }
 
@@ -1220,11 +1222,11 @@ class InstallRequirements {
     if (!$result) {
       $testDetails[2] = ts('Could not release the lock for the database table.');
       $this->error($testDetails);
-      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
       return;
     }
 
-    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
   }
 
   /**

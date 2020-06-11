@@ -58,6 +58,9 @@ class Requirements {
    *   An array of check summaries. Each array contains the keys 'title', 'severity', and 'details'.
    */
   public function checkAll(array $config) {
+    if (!class_exists('\CRM_Utils_SQL_TempTable')) {
+      require_once dirname(__FILE__) . '/../../CRM/Utils/SQL/TempTable.php';
+    }
     return array_merge($this->checkSystem($config['file_paths']), $this->checkDatabase($config['db_config']));
   }
 
@@ -373,15 +376,15 @@ class Requirements {
       $results['details'] = "Could not select the database";
       return $results;
     }
-
-    $r = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
+    $temporaryTableName = \CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $r = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $temporaryTableName . ' (test text)');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "Database does not support creation of temporary tables";
       return $results;
     }
 
-    mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $temporaryTableName);
     return $results;
   }
 
