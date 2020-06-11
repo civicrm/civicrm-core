@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\PropertyBag;
+
 /**
  * Class CRM_Core_Payment_AuthorizeNetTest
  * @group headless
@@ -185,12 +187,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'id', 'Failed to create subscription with Authorize.'
     );
 
-    // cancel it or the transaction will be rejected by A.net if the test is re-run
-    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id');
-    $message = '';
-    $result = $this->processor->cancelSubscription($message, ['subscriptionId' => $subscriptionID]);
-    $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-
     $requests = $this->getRequestBodies();
     $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d')), $requests[0]);
     $header = $this->getRequestHeaders()[0];
@@ -332,12 +328,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'id', 'Failed to create subscription with Authorize.'
     );
 
-    // cancel it or the transaction will be rejected by A.net if the test is re-run
-    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id');
-    $message = '';
-    $result = $this->processor->cancelSubscription($message, ['subscriptionId' => $subscriptionID]);
-    $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
-
     $response = $this->getResponseBodies();
     $this->assertEquals($this->getExpectedResponse(), $response[0], 3);
     $requests = $this->getRequestBodies();
@@ -436,6 +426,240 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'year' => 2022,
       'month' => 10,
     ];
+  }
+
+  /**
+   * Test the update billing function.
+   */
+  public function testUpdateBilling() {
+    $this->setUpClient($this->getExpectedUpdateResponse());
+    $params = [
+      'qfKey' => '52e3078a34158a80b18d0e3c690c5b9f_2369',
+      'entryURL' => 'http://dmaster.local/civicrm/contribute/updatebilling?reset=1&amp;crid=2&amp;cid=202&amp;context=contribution',
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => ['M' => '3', 'Y' => '2022'],
+      'credit_card_type' => 'Visa',
+      'first_name' => 'q',
+      'middle_name' => '',
+      'last_name' => 't',
+      'street_address' => 'y',
+      'city' => 'xyz',
+      'state_province_id' => '1587',
+      'postal_code' => '777',
+      'country_id' => '1006',
+      'state_province' => 'Bengo',
+      'country' => 'Angola',
+      'month' => '3',
+      'year' => '2022',
+      'subscriptionId' => 6656444,
+      'amount' => '6.00',
+    ];
+    $message = '';
+    $result = $this->processor->updateSubscriptionBillingInfo($message, $params);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals('I00001: Successful.', $message);
+    $this->assertTrue($result);
+    $this->assertEquals($this->getExpectedUpdateRequest(), $requests[0]);
+  }
+
+  /**
+   * Test change subscription function.
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testChangeSubscription() {
+    $this->setUpClient($this->getExpectedUpdateResponse());
+    $params = [
+      'hidden_custom' => '1',
+      'hidden_custom_group_count' => ['' => 1],
+      'qfKey' => '38588554ecd5c01d5ecdedf3870d9100_7980',
+      'entryURL' => 'http://dmaster.local/civicrm/contribute/updaterecur?reset=1&amp;action=update&amp;crid=2&amp;cid=202&amp;context=contribution',
+      'amount' => '9.67',
+      'currency' => 'USD',
+      'installments' => '8',
+      'is_notify' => '1',
+      'financial_type_id' => '3',
+      '_qf_default' => 'UpdateSubscription:next',
+      '_qf_UpdateSubscription_next' => 'Save',
+      'id' => '2',
+      'subscriptionId' => 1234,
+    ];
+    $message = '';
+    $result = $this->processor->changeSubscriptionAmount($message, $params);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals('I00001: Successful.', $message);
+    $this->assertTrue($result);
+    $this->assertEquals($this->getExpectedChangeSubscriptionRequest(), $requests[0]);
+  }
+
+  /**
+   * Get the expected request string for updateBilling.
+   *
+   * @return string
+   */
+  public function getExpectedUpdateRequest() {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+  <subscriptionId>6656444</subscriptionId>
+  <subscription>
+    <payment>
+      <creditCard>
+        <cardNumber>4444333322221111</cardNumber>
+        <expirationDate>2022-03</expirationDate>
+      </creditCard>
+    </payment>
+    <billTo>
+      <firstName>q</firstName>
+      <lastName>t</lastName>
+      <address>y</address>
+      <city>xyz</city>
+      <state>Bengo</state>
+      <zip>777</zip>
+      <country>Angola</country>
+    </billTo>
+  </subscription>
+</ARBUpdateSubscriptionRequest>
+';
+  }
+
+  /**
+   * Get the expected response string for update billing.
+   *
+   * @return string
+   */
+  public function getExpectedUpdateResponse() {
+    return 'HTTP/1.1 200 OK
+Cache-Control: no-store
+Pragma: no-cache
+Content-Type: application/xml; charset=utf-8
+X-OPNET-Transaction-Trace: a2_4345e2c4-e273-46be-8517-8e6c8c408f5c-11416-3580701
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: x-requested-with,cache-control,content-type,origin,method,SOAPAction
+Access-Control-Allow-Methods: PUT,OPTIONS,POST,GET
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000
+X-Cnection: close
+Date: Thu, 11 Jun 2020 23:19:48 GMT
+Content-Length: 557
+
+﻿<?xml version="1.0" encoding="utf-8"?><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text>';
+  }
+
+  /**
+   * Get the expected outgoing request for changeSubscription.
+   *
+   * @return string
+   */
+  protected function getExpectedChangeSubscriptionRequest() {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+<subscriptionId>1234</subscriptionId>
+  <subscription>
+    <paymentSchedule>
+    <totalOccurrences>8</totalOccurrences>
+    </paymentSchedule>
+    <amount>9.67</amount>
+   </subscription>
+</ARBUpdateSubscriptionRequest>
+';
+  }
+
+  /**
+   * Get the expected incoming response for changeSubscription.
+   *
+   * @return string
+   */
+  protected function getExpectedChangeSubscriptionResponse() {
+    return 'HTTP/1.1 200 OK
+Cache-Control: no-store
+Pragma: no-cache
+Content-Type: application/xml; charset=utf-8
+X-OPNET-Transaction-Trace: a2_e77aa7be-8f98-4f54-ba8a-e8a7f3d9e5ab-8400-7232961
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: x-requested-with,cache-control,content-type,origin,method,SOAPAction
+Access-Control-Allow-Methods: PUT,OPTIONS,POST,GET
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000
+X-Cnection: close
+Date: Fri, 12 Jun 2020 00:18:11 GMT
+Content-Length: 492
+
+﻿<?xml version="1.0" encoding="utf-8"?><ARBUpdateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><profile><customerProfileId>1512214263</customerProfileId><customerPaymentProfileId>1512250079</customerPaymentProfileId></profile></ARBUpdateSubscriptionResponse>';
+  }
+
+  /**
+   * Setup the guzzle client, helper.
+   *
+   * @param string $response
+   */
+  protected function setUpClient($response) {
+    $this->createMockHandler([$response]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+  }
+
+  /**
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testCancelRecurring() {
+    $this->setUpClient($this->getExpectedCancelResponse());
+    $propertyBag = new PropertyBag();
+    $propertyBag->setContributionRecurID(9);
+    $propertyBag->setIsNotifyProcessorOnCancelRecur(TRUE);
+    $propertyBag->setRecurProcessorID(6656333);
+    $this->processor->doCancelRecurring($propertyBag);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals($this->getExpectedCancelRequest(), $requests[0]);
+  }
+
+  /**
+   * Get expected incoming cancel response.
+   *
+   * @return string
+   */
+  protected function getExpectedCancelResponse() {
+    return 'HTTP/1.1 200 OK
+Cache-Control: no-store
+Pragma: no-cache
+Content-Type: application/xml; charset=utf-8
+X-OPNET-Transaction-Trace: a2_e77aa7be-8f98-4f54-ba8a-e8a7f3d9e5ab-8400-7311552
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: x-requested-with,cache-control,content-type,origin,method,SOAPAction
+Access-Control-Allow-Methods: PUT,OPTIONS,POST,GET
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000
+X-Cnection: close
+Date: Fri, 12 Jun 2020 00:52:00 GMT
+Content-Length: 361
+
+﻿<?xml version="1.0" encoding="utf-8"?><ARBCancelSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages></ARBCancelSubscriptionResponse>';
+  }
+
+  /**
+   * Get the expected outgoing cancel request.
+   *
+   * @return string
+   */
+  protected function getExpectedCancelRequest() {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBCancelSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+  <subscriptionId>6656333</subscriptionId>
+</ARBCancelSubscriptionRequest>
+';
+
   }
 
 }
