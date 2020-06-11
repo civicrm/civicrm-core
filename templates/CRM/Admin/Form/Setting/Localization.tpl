@@ -71,7 +71,7 @@
             </tr>
             <tr class="crm-localization-form-block-moneyvalueformat">
                 <td class="label">{$form.moneyvalueformat.label} {help id='moneyvalueformat' title=$form.moneyvalueformat.label}</td>
-                <td>{$form.moneyvalueformat.html}</td>
+                <td>{$form.moneyvalueformat.html}<br> Note that this setting is proposed to be deprecated as per this <a href="https://lab.civicrm.org/dev/core/-/issues/1494">Gitlab Issue</a></td>
             </tr>
             <tr class="crm-localization-form-block-customTranslateFunction">
                 <td class="label">{$form.customTranslateFunction.label} {help id='customTranslateFunction' title=$form.customTranslateFunction.label}</td>
