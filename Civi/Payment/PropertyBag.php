@@ -38,12 +38,14 @@ class PropertyBag implements \ArrayAccess {
     'billingPostalCode'           => TRUE,
     'billingCounty'               => TRUE,
     'billingCountry'              => TRUE,
+    'cardNumber'                  => TRUE,
     'contactID'                   => TRUE,
     'contact_id'                  => 'contactID',
     'contributionID'              => TRUE,
     'contribution_id'             => 'contributionID',
     'contributionRecurID'         => TRUE,
     'contribution_recur_id'       => 'contributionRecurID',
+    'credit_card_number'          => 'cardNumber',
     'currency'                    => TRUE,
     'currencyID'                  => 'currency',
     'description'                 => TRUE,
@@ -555,6 +557,29 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
+   * Get the (generally credit) card number.
+   *
+   * @param string $label
+   *
+   * @return string
+   */
+  public function getCardNumber($label = 'default'): string {
+    return $this->get('cardNumber', $label);
+  }
+
+  /**
+   * @param string $cardNumber
+   * @param string $label
+   *
+   * @return \Civi\Payment\PropertyBag
+   */
+  public function setCardNumber($cardNumber, $label = 'default'): PropertyBag {
+    return $this->set('cardNumber', $label, (string) $cardNumber);
+  }
+
+  /**
+   * @param string $label
+   *
    * @return int
    */
   public function getContactID($label = 'default'): int {
@@ -564,6 +589,8 @@ class PropertyBag implements \ArrayAccess {
   /**
    * @param int $contactID
    * @param string $label
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setContactID($contactID, $label = 'default') {
     // We don't use this because it counts zero as positive: CRM_Utils_Type::validate($contactID, 'Positive');
