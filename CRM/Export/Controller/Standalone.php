@@ -15,6 +15,25 @@
 class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
 
   /**
+   * Yet another hardcoded list :(
+   *
+   * Very similar to the switch statement in CRM_Export_Form_Select::preProcess
+   * TODO: Make this extensible for extension export pages.
+   *
+   * @var string[]
+   */
+  public static $components = [
+    'Contact' => 'Contact',
+    'Contribution' => 'Contribute',
+    'Membership' => 'Member',
+    'Participant' => 'Event',
+    'Pledge' => 'Pledge',
+    'Case' => 'Case',
+    'Grant' => 'Grant',
+    'Activity' => 'Activity',
+  ];
+
+  /**
    * Class constructor.
    *
    * @param string $title
@@ -42,6 +61,10 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       $this->set('cids', implode(',', array_keys($perm['values'])));
     }
 
+    // For the benefit of CRM_Export_Form_Select::getQueryMode()
+    $queryComponent = $entity === 'Contact' ? 'CONTACTS' : strtoupper(self::$components[$entity]);
+    $this->set('component_mode', constant('CRM_Contact_BAO_Query::MODE_' . $queryComponent));
+
     $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action);
 
     // create and instantiate the pages
@@ -49,6 +72,9 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
 
     // add all the actions
     $this->addActions();
+
+    $dao = CRM_Core_DAO_AllCoreTables::getFullName($entity);
+    CRM_Utils_System::setTitle(ts('Export %1', [1 => $dao::getEntityTitle()]));
   }
 
   /**
@@ -67,7 +93,7 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       }
     }
     // Set the "task" selector value to Export
-    $className = 'CRM_' . $this->get('entity') . '_Task';
+    $className = 'CRM_' . self::$components[$this->get('entity')] . '_Task';
     foreach ($className::tasks() as $taskId => $task) {
       $taskForm = (array) $task['class'];
       if ($taskForm[0] == 'CRM_Export_Form_Select') {
