@@ -326,7 +326,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $responseFields = $this->_ParseArbReturn((string) $response->getBody());
 
     if ($responseFields['resultCode'] === 'Error') {
-      throw new PaymentProcessorException($responseFields['code'], $responseFields['text']);
+      throw new PaymentProcessorException($responseFields['text'], $responseFields['code']);
     }
 
     // update recur processor_id with subscriptionId
@@ -615,6 +615,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @param array $params
    *
    * @return bool|object
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function cancelSubscription(&$message = '', $params = []) {
     $template = CRM_Core_Smarty::singleton();
@@ -623,45 +624,39 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $template->assign('apiLogin', $this->_getParam('apiLogin'));
     $template->assign('paymentKey', $this->_getParam('paymentKey'));
-    $template->assign('subscriptionId', CRM_Utils_Array::value('subscriptionId', $params));
+    $template->assign('subscriptionId', $params['subscriptionId']);
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
-    // submit to authorize.net
-    $submit = curl_init($this->_paymentProcessor['url_recur']);
-    if (!$submit) {
-      return self::error(9002, 'Could not initiate connection to payment gateway');
-    }
-
-    curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($submit, CURLOPT_HTTPHEADER, ["Content-Type: text/xml"]);
-    curl_setopt($submit, CURLOPT_HEADER, 1);
-    curl_setopt($submit, CURLOPT_POSTFIELDS, $arbXML);
-    curl_setopt($submit, CURLOPT_POST, 1);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-
-    $response = curl_exec($submit);
-
-    if (!$response) {
-      return self::error(curl_errno($submit), curl_error($submit));
-    }
-
-    curl_close($submit);
+    $response = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_recur'], [
+      'headers' => [
+        'Content-Type' => 'text/xml; charset=UTF8',
+      ],
+      'body' => $arbXML,
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ])->getBody();
 
     $responseFields = $this->_ParseArbReturn($response);
     $message = "{$responseFields['code']}: {$responseFields['text']}";
 
-    if ($responseFields['resultCode'] == 'Error') {
-      return self::error($responseFields['code'], $responseFields['text']);
+    if ($responseFields['resultCode'] === 'Error') {
+      throw new PaymentProcessorException($responseFields['text'], $responseFields['code']);
     }
     return TRUE;
   }
 
   /**
+   * Update payment details at Authorize.net.
+   *
    * @param string $message
    * @param array $params
    *
    * @return bool|object
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function updateSubscriptionBillingInfo(&$message = '', $params = []) {
     $template = CRM_Core_Smarty::singleton();
@@ -686,32 +681,23 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
+    $response = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_recur'], [
+      'headers' => [
+        'Content-Type' => 'text/xml; charset=UTF8',
+      ],
+      'body' => $arbXML,
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ])->getBody();
+
     // submit to authorize.net
-    $submit = curl_init($this->_paymentProcessor['url_recur']);
-    if (!$submit) {
-      return self::error(9002, 'Could not initiate connection to payment gateway');
-    }
-
-    curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($submit, CURLOPT_HTTPHEADER, ["Content-Type: text/xml"]);
-    curl_setopt($submit, CURLOPT_HEADER, 1);
-    curl_setopt($submit, CURLOPT_POSTFIELDS, $arbXML);
-    curl_setopt($submit, CURLOPT_POST, 1);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-
-    $response = curl_exec($submit);
-
-    if (!$response) {
-      return self::error(curl_errno($submit), curl_error($submit));
-    }
-
-    curl_close($submit);
-
     $responseFields = $this->_ParseArbReturn($response);
     $message = "{$responseFields['code']}: {$responseFields['text']}";
 
-    if ($responseFields['resultCode'] == 'Error') {
-      return self::error($responseFields['code'], $responseFields['text']);
+    if ($responseFields['resultCode'] === 'Error') {
+      throw new PaymentProcessorException($responseFields['text'], $responseFields['code']);
     }
     return TRUE;
   }
@@ -725,10 +711,14 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+   * Change the amount of the recurring payment.
+   *
    * @param string $message
    * @param array $params
    *
    * @return bool|object
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function changeSubscriptionAmount(&$message = '', $params = []) {
     $template = CRM_Core_Smarty::singleton();
@@ -748,31 +738,21 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
-    // submit to authorize.net
-    $submit = curl_init($this->_paymentProcessor['url_recur']);
-    if (!$submit) {
-      throw new PaymentProcessorException('Could not initiate connection to payment gateway', 9002);
-    }
-
-    curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($submit, CURLOPT_HTTPHEADER, ["Content-Type: text/xml"]);
-    curl_setopt($submit, CURLOPT_HEADER, 1);
-    curl_setopt($submit, CURLOPT_POSTFIELDS, $arbXML);
-    curl_setopt($submit, CURLOPT_POST, 1);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-
-    $response = curl_exec($submit);
-
-    if (!$response) {
-      return self::error(curl_errno($submit), curl_error($submit));
-    }
-
-    curl_close($submit);
+    $response = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_recur'], [
+      'headers' => [
+        'Content-Type' => 'text/xml; charset=UTF8',
+      ],
+      'body' => $arbXML,
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ])->getBody();
 
     $responseFields = $this->_parseArbReturn($response);
     $message = "{$responseFields['code']}: {$responseFields['text']}";
 
-    if ($responseFields['resultCode'] == 'Error') {
+    if ($responseFields['resultCode'] === 'Error') {
       throw new PaymentProcessorException($responseFields['text'], $responseFields['code']);
     }
     return TRUE;
