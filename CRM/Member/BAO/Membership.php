@@ -1821,8 +1821,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
         if ($contributionRecurID) {
           $memParams['contribution_recur_id'] = $contributionRecurID;
         }
-        // @todo stop passing $ids - it is empty
-        $membership = self::create($memParams, $ids);
+
+        $membership = self::create($memParams);
         return [$membership, $renewalMode, $dates];
       }
 
@@ -1851,12 +1851,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
 
         if (!empty($membershipSource)) {
           $currentMembership['source'] = $membershipSource;
-        }
-        else {
-          $currentMembership['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $currentMembership['id'],
-            'source'
-          );
         }
 
         if (!empty($currentMembership['id'])) {
@@ -1909,10 +1903,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           $ids['membership'] = $currentMembership['id'];
         }
         $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
-      }
-      //CRM-4555
-      if ($pending) {
-        $updateStatusId = array_search('Pending', $allStatus);
       }
     }
     else {
