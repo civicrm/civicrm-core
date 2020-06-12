@@ -61,6 +61,10 @@ class CRM_Utils_Money {
       $valueFormat = $config->moneyvalueformat;
     }
 
+    if (!empty($valueFormat) && $valueFormat !== '%!i') {
+      CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than !%i is deprecated, please report this on the GitLab Issue https://lab.civicrm.org/dev/core/-/issues/1494 with the relevant moneyValueFormat you use.');
+    }
+
     if ($onlyNumber) {
       // money_format() exists only in certain PHP install (CRM-650)
       if (is_numeric($amount) and function_exists('money_format')) {
@@ -170,6 +174,9 @@ class CRM_Utils_Money {
    * @return string
    */
   protected static function formatLocaleNumeric($amount) {
+    if (CRM_Core_Config::singleton()->moneyvalueformat !== '%!i') {
+      CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than !%i is deprecated, please report this on GitLab with the relevant moneyValueFormat you use.');
+    }
     return self::formatNumericByFormat($amount, CRM_Core_Config::singleton()->moneyvalueformat);
   }
 

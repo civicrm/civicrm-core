@@ -178,4 +178,19 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  public function checkMoneyValueFormatConfig() {
+    $messages = [];
+    if (CRM_Core_Config::singleton()->moneyvalueformat !== '%!i') {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('<p>The Money Value format stored is deprecated please report your configuration on <a href="https://lab.civicrm.org/dev/core/-/issues/1494">Gitlab Issue</a>'),
+        ts('Deprectad money value format configuration'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $messages[] = $msg;
+    }
+    return $messages;
+  }
+
 }
