@@ -284,11 +284,23 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       return NULL;
     }
 
-    $key = $_REQUEST['qfKey'] ?? NULL;
-    if (!$key && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    // We need a form key. Check _POST first, then _GET.
+    // @todo Note: we currently have to check $_REQUEST, too, since that
+    // is currently overwritten by civicrm_api3_contribution_page_validate.
+    // It's bad form to use $_REQUEST because it's ambiguous; and it's bad form
+    // to change superglobals anyway. If PR
+    // https://github.com/civicrm/civicrm-core/pull/17324
+    // and/or related get merged, then we should remove the REQUEST reference here.
+    $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+    if (!$key && in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'])) {
+      // Generate a key if this is an initial request without one.
+      // We allow HEAD here because it is used by bots to validate URLs, so if
+      // we issue a 500 server error to them they may think the site is broken.
       $key = CRM_Core_Key::get($name, $addSequence);
     }
     else {
+      // Other requests that usually change data (POST, but feasibly DELETE,
+      // PUT, PATCH...) always require a valid key.
       $key = CRM_Core_Key::validate($key, $name, $addSequence);
     }
 
