@@ -1172,6 +1172,9 @@ class CRM_Core_SelectValues {
     return $ret;
   }
 
+  /**
+   * @return string[]
+   */
   public static function fieldSerialization() {
     return [
       CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND => 'separator_bookend',
@@ -1179,6 +1182,17 @@ class CRM_Core_SelectValues {
       CRM_Core_DAO::SERIALIZE_JSON => 'json',
       CRM_Core_DAO::SERIALIZE_PHP => 'php',
       CRM_Core_DAO::SERIALIZE_COMMA => 'comma',
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public static function navigationMenuSeparator() {
+    return [
+      ts('None'),
+      ts('After menu element'),
+      ts('Before menu element'),
     ];
   }
 
