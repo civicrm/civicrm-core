@@ -204,7 +204,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
     $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
     $processorParams['amount'] = $this->_subscriptionDetails->amount;
-    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo('', $processorParams);
+    $message = '';
+    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
     }
