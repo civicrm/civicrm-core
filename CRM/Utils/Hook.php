@@ -532,6 +532,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called before a db write on a custom table.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $groupID
+   *   The custom group ID.
+   * @param object $entityID
+   *   The entityID of the row in the custom table.
+   * @param array $params
+   *   The parameters that were sent into the calling function.
+   *
+   * @return null
+   *   the return value is ignored
+   */
+  public static function customPre($op, $groupID, $entityID, &$params) {
+    return self::singleton()
+      ->invoke(['op', 'groupID', 'entityID', 'params'], $op, $groupID, $entityID, $params, self::$_nullObject, self::$_nullObject, 'civicrm_customPre');
+  }
+
+  /**
    * This hook is called when composing the ACL where clause to restrict
    * visibility of contacts to the logged in user
    *
