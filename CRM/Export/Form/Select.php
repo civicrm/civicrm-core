@@ -78,6 +78,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this->_componentIds = [];
     $this->_componentClause = NULL;
 
+    $formName = NULL;
+
     // we need to determine component export
     $components = ['Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity'];
 
@@ -193,7 +195,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $taskName = $componentTasks[$this->_task];
     $this->assign('taskName', $taskName);
 
-    if ($this->_componentTable) {
+    if ($this->_componentTable && $formName !== 'CRM_Export_StateMachine_Standalone') {
       $query = "
 SELECT count(*)
 FROM   {$this->_componentTable}
