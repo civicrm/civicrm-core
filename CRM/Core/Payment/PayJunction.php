@@ -46,6 +46,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    *
    * @return array
    *   the result in an nice formatted array (or an error object)
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doDirectPayment(&$params) {
     $logon = $this->_paymentProcessor['user_name'];
@@ -96,7 +97,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     $pjpgTxn->setCustInfo($pjpgCustInfo);
 
     // empty installments convert to 999 because PayJunction do not allow open end donation
-    if ($params['installments'] == '') {
+    if ($params['installments'] === '') {
       $params['installments'] = '999';
     }
 
@@ -167,12 +168,11 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   public function isError(&$response) {
     $responseCode = $response['dc_response_code'];
 
-    if ($responseCode == "00" || $responseCode == "85") {
+    if ($responseCode === "00" || $responseCode === "85") {
       return FALSE;
     }
-    else {
-      return TRUE;
-    }
+    return TRUE;
+
   }
 
   /**
@@ -189,9 +189,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     if (isset($this->_params[$field])) {
       return $this->_params[$field];
     }
-    else {
-      return '';
-    }
+    return '';
   }
 
   /**
