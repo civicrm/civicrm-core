@@ -307,7 +307,8 @@ class Requirements {
       return $results;
     }
 
-    if (version_compare($info, $min) == -1) {
+    $versionDetails = mysqli_query($conn, 'SELECT version() as version')->fetch_assoc();
+    if (version_compare($versionDetails['version'], $min) == -1) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = "MySQL version is {$info}; minimum required is {$min}";
       return $results;
