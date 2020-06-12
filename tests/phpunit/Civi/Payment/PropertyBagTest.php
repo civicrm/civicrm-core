@@ -13,7 +13,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    * @return \Civi\Test\CiviEnvBuilder
    */
   public function setUpHeadless() {
-    return \Civi\Test::headless()->apply();
+    static $reset = FALSE;
+    $return = \Civi\Test::headless()->apply($reset);
+    $reset = FALSE;
+    return $return;
   }
 
   /**
@@ -120,6 +123,8 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag = new PropertyBag();
     $propertyBag['customThingForMyProcessor'] = 'fidget';
     $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
+    // Test array access, too.
+    $this->assertEquals('fidget', $propertyBag['customThingForMyProcessor']);
     $this->assertEquals("Unknown property 'customThingForMyProcessor'. We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties", $propertyBag->lastWarning);
   }
 
@@ -132,6 +137,17 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   public function testSetCustomPropFails() {
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('contactID', 123);
+  }
+
+  /**
+   * Test we can't get a custom prop that was not set.
+   *
+   * @expectedException \BadMethodCallException
+   * @expectedExceptionMessage Property 'aCustomProp' has not been set.
+   */
+  public function testGetCustomPropFails() {
+    $propertyBag = new PropertyBag();
+    $v = $propertyBag['aCustomProp'];
   }
 
   /**
@@ -215,6 +231,51 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Test that using utils array value to get a nonexistent property returns the default.
     $this->assertEquals(456, \CRM_Utils_Array::value('ISawAManWhoWasntThere', $propertyBag, 456));
+  }
+
+  /**
+   */
+  public function testEmpty() {
+    $propertyBag = new PropertyBag();
+    $propertyBag->setContactID(123);
+    $propertyBag->setRecurProcessorID('');
+    $propertyBag->setBillingPostalCode(NULL);
+    $propertyBag->setFeeAmount(0);
+    $propertyBag->setCustomProperty('custom_issue', 'black lives matter');
+    $propertyBag->setCustomProperty('custom_null', NULL);
+    $propertyBag->setCustomProperty('custom_false', FALSE);
+    $propertyBag->setCustomProperty('custom_zls', '');
+    $propertyBag->setCustomProperty('custom_0', 0);
+
+    // Tests on known properties.
+    $v = empty($propertyBag->getContactID());
+    $this->assertFalse($v, "empty on a set, known property should return False");
+    $v = empty($propertyBag['contactID']);
+    $this->assertFalse($v, "empty on a set, known property accessed by ArrayAccess with correct name should return False");
+    $v = empty($propertyBag['contact_id']);
+    $this->assertFalse($v, "empty on a set, known property accessed by ArrayAccess with legacy name should return False");
+    $v = empty($propertyBag['recurProcessorID']);
+    $this->assertTrue($v, "empty on an unset, known property accessed by ArrayAccess should return True");
+    $v = empty($propertyBag->getRecurProcessorID());
+    $this->assertTrue($v, "empty on a set, but '' value should return True");
+    $v = empty($propertyBag->getFeeAmount());
+    $this->assertTrue($v, "empty on a set, but 0 value should return True");
+    $v = empty($propertyBag->getBillingPostalCode());
+    $this->assertTrue($v, "empty on a set, but NULL value should return True");
+
+    // Test custom properties.
+    $v = empty($propertyBag->getCustomProperty('custom_issue'));
+    $this->assertFalse($v, "empty on a set custom property with non-empty value should return False");
+    foreach (['null', 'false', 'zls', '0'] as $_) {
+      $v = empty($propertyBag["custom_$_"]);
+      $this->assertTrue($v, "empty on a set custom property with $_ value should return TRUE");
+    }
+    $v = empty($propertyBag['nonexistent_custom_field']);
+    $this->assertTrue($v, "empty on a non-existent custom property should return True");
+
+    $v = empty($propertyBag['custom_issue']);
+    $this->assertFalse($v, "empty on a set custom property accessed by ArrayAccess should return False");
+
   }
 
   /**

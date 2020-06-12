@@ -109,7 +109,9 @@ class PropertyBag implements \ArrayAccess {
    */
   public function offsetExists ($offset): bool {
     $prop = $this->handleLegacyPropNames($offset, TRUE);
-    return $prop && isset($this->props['default'][$prop]);
+    // If there's no prop, assume it's a custom property.
+    $prop = $prop ?? $offset;
+    return array_key_exists($prop, $this->props['default']);
   }
 
   /**
@@ -118,8 +120,11 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @return mixed
    */
-  public function offsetGet ($offset) {
-    $prop = $this->handleLegacyPropNames($offset);
+  public function offsetGet($offset) {
+    $prop = $this->handleLegacyPropNames($offset, TRUE);
+    // Allow transparent access to custom properties.
+    // We could issue a deprecation notice here, but we've probably got enough in this code already!
+    $prop = $prop ?? $offset;
     return $this->get($prop, 'default');
   }
 
