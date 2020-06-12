@@ -186,16 +186,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $isBackOffice = FALSE;
 
   /**
-   * Payment instrument if for the transaction.
-   *
-   * This will generally be drawn from the payment processor and is ignored for
-   * front end forms.
-   *
-   * @var int
-   */
-  public $paymentInstrumentID;
-
-  /**
    * Is the price set quick config.
    * @return bool
    */

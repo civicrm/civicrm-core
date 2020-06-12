@@ -1746,7 +1746,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         return FALSE;
       }
 
-      CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
+      CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE);
       if (!$form->_mode) {
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           ['onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);"]
@@ -1766,11 +1766,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
         $form->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
 
-        $form->add('select', 'payment_instrument_id',
-          ts('Payment Method'),
-          ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
-          FALSE, ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
-        );
         // don't show transaction id in batch update mode
         $path = CRM_Utils_System::currentPath();
         $form->assign('showTransactionId', FALSE);

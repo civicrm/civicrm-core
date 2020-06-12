@@ -182,13 +182,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $_formType;
 
   /**
-   * Payment instrument id for the transaction.
-   *
-   * @var int
-   */
-  public $paymentInstrumentID;
-
-  /**
    * Component - event, membership or contribution.
    *
    * @var string

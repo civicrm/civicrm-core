@@ -49,9 +49,6 @@ class CRM_Core_Payment_ProcessorForm {
     }
     $form->set('paymentProcessor', $form->_paymentProcessor);
     $form->_paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
-    if ($form->paymentInstrumentID) {
-      $form->_paymentObject->setPaymentInstrumentID($form->paymentInstrumentID);
-    }
     $form->_paymentObject->setBackOffice($form->isBackOffice);
     $form->assign('isBackOffice', $form->isBackOffice);
 
@@ -87,8 +84,7 @@ class CRM_Core_Payment_ProcessorForm {
       $form,
       $form->_paymentProcessor,
       CRM_Utils_Request::retrieve('billing_profile_id', 'String'),
-      $form->isBackOffice,
-      $form->paymentInstrumentID
+      $form->isBackOffice
     );
 
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
@@ -139,7 +135,7 @@ class CRM_Core_Payment_ProcessorForm {
     if (!empty($processorId)) {
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, $form->isBackOffice, $form->paymentInstrumentID ?? NULL);
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, $form->isBackOffice);
   }
 
 }
