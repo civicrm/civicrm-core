@@ -101,22 +101,19 @@
   <div class="crm-section event_date_time-section">
       <div class="label">{ts}When{/ts}</div>
       <div class="content">
-            <abbr class="dtstart" title="{$event.event_start_date|crmDate}">
-            {$event.event_start_date|crmDate}</abbr>
+        {strip}
+            {$event.event_start_date|crmDate}
             {if $event.event_end_date}
-                &nbsp; {ts}through{/ts} &nbsp;
+                &nbsp;{ts}through{/ts}&nbsp;
                 {* Only show end time if end date = start date *}
                 {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
-                    <abbr class="dtend" title="{$event.event_end_date|crmDate:0:1}">
                     {$event.event_end_date|crmDate:0:1}
-                    </abbr>
                 {else}
-                    <abbr class="dtend" title="{$event.event_end_date|crmDate}">
                     {$event.event_end_date|crmDate}
-                    </abbr>
                 {/if}
             {/if}
-        </div>
+        {/strip}
+      </div>
     <div class="clear"></div>
   </div>
 
@@ -137,7 +134,7 @@
               <div class="content">
                     {assign var=showDirectly value="1"}
                     {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly}
-                    <br /><a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
+                    <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>
           </div>
@@ -150,17 +147,20 @@
       <div class="crm-section event_contact-section">
           <div class="label">{ts}Contact{/ts}</div>
           <div class="content">
-              {* loop on any phones and emails for this event *}
               {foreach from=$location.phone item=phone}
                   {if $phone.phone}
-                      {if $phone.phone_type_id}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}:
-                          <span class="tel">{$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if} </span> <br />
-                      {/if}
+                    <div class="crm-eventinfo-contact-phone">
+                      {* @todo This should use "{ts 1=$phone.phone_type_display 2=$phone}%1: %2{/ts}" because some language have nbsp before column *}
+                      {if $phone.phone_type_id}{$phone.phone_type_display}:{else}{ts}Phone:{/ts}{/if}
+                      <span class="tel">{$phone.phone}{if $phone.phone_ext}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
+                    </div>
+                  {/if}
               {/foreach}
-
               {foreach from=$location.email item=email}
                   {if $email.email}
+                    <div class="crm-eventinfo-contact-email">
                       {ts}Email:{/ts} <span class="email"><a href="mailto:{$email.email}">{$email.email}</a></span>
+                    </div>
                   {/if}
               {/foreach}
           </div>
@@ -217,7 +217,6 @@
       {/crmRegion}
     </div>
     {if $event.is_public }
-        <br />
         <div class="action-link section iCal_links-section">
           {include file="CRM/Event/Page/iCalLinks.tpl"}
         </div>
