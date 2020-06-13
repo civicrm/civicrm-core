@@ -54,7 +54,7 @@
     "symfony/process": "~3.0 || ~4.4",
     "psr/log": "~1.0",
     "symfony/finder": "~3.0 || ~4.4",
-    "tecnickcom/tcpdf" : "6.2.*",
+    "tecnickcom/tcpdf" : "6.3.*",
     "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "1.9.*",
