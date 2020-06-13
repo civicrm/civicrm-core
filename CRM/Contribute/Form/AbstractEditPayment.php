@@ -361,7 +361,7 @@ WHERE  contribution_id = {$id}
       if (!empty($processor['description'])) {
         $this->_processors[$id] .= ' : ' . $processor['description'];
       }
-      if ($processor['is_recur']) {
+      if ($this->_paymentProcessors[$id]['object']->supportsRecurring()) {
         $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
       }
     }
