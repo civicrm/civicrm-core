@@ -157,7 +157,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     // Authorize.Net will not refuse duplicates, so we should check if the user already submitted this transaction
     if ($this->checkDupe($authorizeNetFields['x_invoice_num'], CRM_Utils_Array::value('contributionID', $params))) {
-      return self::error(9004, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
+      throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9004);
     }
 
     $response = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_site'], [
@@ -184,11 +184,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       case self::AUTH_ERROR:
         $params['payment_status_id'] = array_search('Failed', $contributionStatus);
         $errormsg = $response_fields[2] . ' ' . $response_fields[3];
-        return self::error($response_fields[1], $errormsg);
+        throw new PaymentProcessorException($errormsg, $response_fields[1]);
 
       case self::AUTH_DECLINED:
         $errormsg = $response_fields[2] . ' ' . $response_fields[3];
-        return self::error($response_fields[1], $errormsg);
+        throw new PaymentProcessorException($errormsg, $response_fields[1]);
 
       default:
         // Success
@@ -541,23 +541,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $value = str_replace(['&', '"', "'", '<', '>'], '', $value);
     }
     return $value;
-  }
-
-  /**
-   * @param null $errorCode
-   * @param null $errorMessage
-   *
-   * @return object
-   */
-  public function &error($errorCode = NULL, $errorMessage = NULL) {
-    $e = CRM_Core_Error::singleton();
-    if ($errorCode) {
-      $e->push($errorCode, 0, [], $errorMessage);
-    }
-    else {
-      $e->push(9001, 0, [], 'Unknown System Error.');
-    }
-    return $e;
   }
 
   /**
