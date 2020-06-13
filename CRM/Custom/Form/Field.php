@@ -618,7 +618,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     //checks the given custom field name doesnot start with digit
     if (!empty($title)) {
       // gives the ascii value
-      $asciiValue = ord($title{0});
+      $asciiValue = ord($title[0]);
       if ($asciiValue >= 48 && $asciiValue <= 57) {
         $errors['label'] = ts("Name cannot not start with a digit");
       }

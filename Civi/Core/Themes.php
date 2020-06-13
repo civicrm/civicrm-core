@@ -135,7 +135,7 @@ class Themes {
   public function getAvailable() {
     $result = [];
     foreach ($this->getAll() as $key => $theme) {
-      if ($key{0} !== '_') {
+      if ($key[0] !== '_') {
         $result[$key] = $theme['title'];
       }
     }
