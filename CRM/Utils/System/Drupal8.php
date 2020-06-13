@@ -408,7 +408,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $request = new \Symfony\Component\HttpFoundation\Request([], [], [], [], [], $_SERVER);
 
     // Create a kernel and boot it.
-    \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod')->prepareLegacyRequest($request);
+    $kernel = \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod');
+    $kernel->boot();
+    $kernel->preHandle($request);
+    $container = $kernel->rebuildContainer();
+    // Add our request to the stack and route context.
+    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
+    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
+    $container->get('request_stack')->push($request);
+    $container->get('router.request_context')->fromRequest($request);
 
     // Initialize Civicrm
     \Drupal::service('civicrm')->initialize();
@@ -706,7 +714,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $timezone = drupal_get_user_timezone();
+    $timezone = date_default_timezone_get();
     return $timezone;
   }
 
