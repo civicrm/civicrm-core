@@ -770,7 +770,7 @@ LIMIT {$offset}, {$rowCount}
   public static function getSearchOptionsFromRequest() {
     $searchParams = [];
     $searchData = $_REQUEST['search'] ?? NULL;
-    $searchData['value'] = CRM_Utils_Type::escape($searchData['value'], 'String');
+    $searchData['value'] = CRM_Utils_Type::escape($searchData['value'] ?? NULL, 'String');
     $selectorElements = [
       'is_selected',
       'is_selected_input',

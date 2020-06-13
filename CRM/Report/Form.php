@@ -681,7 +681,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     // Do not display Report Settings section if administer Reports permission is absent OR
     // if report instance is reserved and administer reserved reports absent
     if (!CRM_Core_Permission::check('administer Reports') ||
-      ($this->_instanceValues['is_reserved'] &&
+      (!empty($this->_instanceValues['is_reserved']) &&
         !CRM_Core_Permission::check('administer reserved reports'))
     ) {
       $this->_instanceForm = FALSE;
@@ -692,7 +692,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (CRM_Core_Permission::check('administer Reports') ||
       CRM_Core_Permission::check('access Report Criteria')
     ) {
-      if (!$this->_instanceValues['is_reserved'] ||
+      if (empty($this->_instanceValues['is_reserved']) ||
         CRM_Core_Permission::check('administer reserved reports')
       ) {
         $this->assign('criteriaForm', TRUE);

@@ -3288,7 +3288,7 @@ WHERE  $smartGroupClause
 
     $etTable = "`civicrm_entity_tag-" . uniqid() . "`";
 
-    if ($useAllTagTypes[2]) {
+    if (!empty($useAllTagTypes[2])) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND {$etTable}.entity_table = 'civicrm_contact') ";
 
@@ -4237,7 +4237,7 @@ WHERE  $smartGroupClause
     // Note we do not currently set mySql to handle timezones, so doing this the old-fashioned way
     $today = date('Ymd');
     //check for active, inactive and all relation status
-    if ($relStatus[2] == 0) {
+    if (empty($relStatus[2])) {
       $where[$grouping][] = "(
 civicrm_relationship.is_active = 1 AND
 ( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
