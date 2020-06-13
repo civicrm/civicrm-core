@@ -306,7 +306,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $object_type = get_class($object);
 
     if (!$forceAction) {
-      if (array_key_exists('is_reserved', $object) && $object->is_reserved) {
+      if (property_exists($object, 'is_reserved') && $object->is_reserved) {
         $values['class'] = 'reserved';
         // check if object is relationship type
 
@@ -326,7 +326,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         }
       }
       else {
-        if (array_key_exists('is_active', $object)) {
+        if (property_exists($object, 'is_active')) {
           if ($object->is_active) {
             if ($hasDisable) {
               $newAction += CRM_Core_Action::DISABLE;
