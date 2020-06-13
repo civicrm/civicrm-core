@@ -1375,6 +1375,7 @@ abstract class CRM_Core_Payment {
       }
     }
     if (is_a($result, 'CRM_Core_Error')) {
+      CRM_Core_Error::deprecatedFunctionWarning('payment processors should throw exceptions rather than return errors');
       throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
     return $result;
