@@ -650,7 +650,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->controller = new CRM_Core_Controller();
     $form->_bltID = 5;
     $form->_mode = $mode;
-    $form->_id = $this->_membershipID;
+    $form->setEntityId($this->_membershipID);
     $form->preProcess();
     return $form;
   }
@@ -698,6 +698,52 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
     ];
+  }
+
+  /**
+   * Test renewing an expired membership.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitRenewExpired() {
+    $form = $this->getForm(NULL);
+    $this->createLoggedInUser();
+    $originalMembership = $this->callAPISuccessGetSingle('membership', []);
+    $this->callAPISuccess('Membership', 'create', [
+      'status_id' => 'Expired',
+      'id' => $originalMembership['id'],
+      'start_date' => '2019-03-01',
+      'join_date' => '2019-03-01',
+      'end_date' => '2020-03-24',
+      'source' => 'sauce',
+    ]);
+
+    $params = [
+      'contact_id' => $this->_individualId,
+      'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
+      'renewal_date' => '2020-06-10',
+      'financial_type_id' => '2',
+      'num_terms' => '1',
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'record_contribution' => '1',
+      'total_amount' => '100.00',
+      'receive_date' => '2020-06-05 06:05:00',
+      'payment_instrument_id' => '4',
+      'contribution_status_id' => '1',
+      'send_receipt' => '1',
+    ];
+    $form->testSubmit($params);
+    $renewedMembership = $this->callAPISuccessGetSingle('Membership', ['id' => $originalMembership['id']]);
+    $this->assertEquals('sauce', $renewedMembership['source']);
+    $this->assertEquals(date('Y-01-01'), $renewedMembership['start_date']);
+    $this->assertEquals(date('2019-03-01'), $renewedMembership['join_date']);
+    $this->assertEquals(date('Y-12-31'), $renewedMembership['end_date']);
+    $log = $this->callAPISuccessGetSingle('MembershipLog', ['membership_id' => $renewedMembership['id'], 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
+    $this->assertEquals(date('Y-01-01'), $log['start_date']);
+    $this->assertEquals(date('Y-12-31'), $log['end_date']);
+    $this->assertEquals(date('Y-m-d'), $log['modified_date']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Current'), $log['status_id']);
   }
 
 }
