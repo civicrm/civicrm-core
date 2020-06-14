@@ -67,7 +67,10 @@
       <td class="right">{$line.line_total|crmMoney:$currency}</td>
       {if $line.tax_rate != "" || $line.tax_amount != ""}
         <td class="right">{$taxTerm} ({$line.tax_rate}%)</td>
-        <td class="right">{$line.tax_amount|crmMoney:$currency}</td>
+        <td class="right">
+          {math equation="(x * y) / 100" x=$line.line_total y=$line.tax_rate assign=tax_value}
+          {$tax_value|crmMoney:$currency}
+        </td>
       {else}
         <td></td>
         <td></td>

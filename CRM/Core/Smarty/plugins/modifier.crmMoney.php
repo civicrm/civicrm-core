@@ -9,13 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
+use Brick\Money\Money;
+use Brick\Money\Context\DefaultContext;
+use Brick\Math\RoundingMode;
 
 /**
  * Format the given monetary amount (and currency) for display
@@ -25,12 +21,15 @@
  * @param string $currency
  *   The (optional) currency.
  *
- * @param null $format
- * @param bool $onlyNumber
- *
  * @return string
  *   formatted monetary amount
  */
-function smarty_modifier_crmMoney($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE) {
-  return CRM_Utils_Money::format($amount, $currency, $format, $onlyNumber);
+function smarty_modifier_crmMoney($amount, $currency = NULL) {
+  if (!$amount) {
+    return $amount;
+  }
+  $currency = $currency ?? CRM_Core_Config::singleton()->defaultCurrency;
+  $money = Money::of($amount, $currency, new DefaultContext(), RoundingMode::CEILING);
+  $formatter = new \NumberFormatter(CRM_Core_I18n::singleton()->getLocale(), \NumberFormatter::CURRENCY);
+  return $money->formatWith($formatter);
 }
