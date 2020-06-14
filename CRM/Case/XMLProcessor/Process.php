@@ -253,7 +253,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @return array
    */
   public function activityTypes($activityTypesXML, $maxInst = FALSE, $isLabel = FALSE, $maskAction = FALSE) {
-    $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
+    $activityTypes = CRM_Case_PseudoConstant::caseActivityType(TRUE, TRUE);
     $result = [];
     foreach ($activityTypesXML as $activityTypeXML) {
       foreach ($activityTypeXML as $recordXML) {

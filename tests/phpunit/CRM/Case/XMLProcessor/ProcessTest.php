@@ -427,4 +427,78 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     ];
   }
 
+  /**
+   * Test XMLProcessor activityTypes()
+   */
+  public function testXmlProcessorActivityTypes() {
+    // First change an activity's label since we also test getting the labels.
+    // @todo Having a brain freeze or something - can't do this in one step?
+    $activity_type_id = $this->callApiSuccess('OptionValue', 'get', [
+      'option_group_id' => 'activity_type',
+      'name' => 'Medical evaluation',
+    ])['id'];
+    $this->callApiSuccess('OptionValue', 'create', [
+      'id' => $activity_type_id,
+      'label' => 'Medical evaluation changed',
+    ]);
+
+    $p = new CRM_Case_XMLProcessor_Process();
+    $xml = $p->retrieve('housing_support');
+
+    // Test getting the `name`s
+    $activityTypes = $p->activityTypes($xml->ActivityTypes, FALSE, FALSE, FALSE);
+    $this->assertEquals(
+      [
+        13 => 'Open Case',
+        55 => 'Medical evaluation',
+        56 => 'Mental health evaluation',
+        57 => 'Secure temporary housing',
+        60 => 'Income and benefits stabilization',
+        58 => 'Long-term housing plan',
+        14 => 'Follow up',
+        15 => 'Change Case Type',
+        16 => 'Change Case Status',
+        18 => 'Change Case Start Date',
+        25 => 'Link Cases',
+      ],
+      $activityTypes
+    );
+
+    // While we're here and have the `name`s check the editable types in
+    // Settings.xml which is something that gets called reasonably often
+    // thru CRM_Case_XMLProcessor_Process::activityTypes().
+    $activityTypeValues = array_flip($activityTypes);
+    $xml = $p->retrieve('Settings');
+    $settings = $p->activityTypes($xml->ActivityTypes, FALSE, FALSE, 'edit');
+    $this->assertEquals(
+      [
+        'edit' => [
+          0 => $activityTypeValues['Change Case Status'],
+          1 => $activityTypeValues['Change Case Start Date'],
+        ],
+      ],
+      $settings
+    );
+
+    // Now get `label`s
+    $xml = $p->retrieve('housing_support');
+    $activityTypes = $p->activityTypes($xml->ActivityTypes, FALSE, TRUE, FALSE);
+    $this->assertEquals(
+      [
+        13 => 'Open Case',
+        55 => 'Medical evaluation changed',
+        56 => 'Mental health evaluation',
+        57 => 'Secure temporary housing',
+        60 => 'Income and benefits stabilization',
+        58 => 'Long-term housing plan',
+        14 => 'Follow up',
+        15 => 'Change Case Type',
+        16 => 'Change Case Status',
+        18 => 'Change Case Start Date',
+        25 => 'Link Cases',
+      ],
+      $activityTypes
+    );
+  }
+
 }
