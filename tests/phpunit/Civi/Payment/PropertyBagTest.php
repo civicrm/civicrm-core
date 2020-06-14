@@ -122,10 +122,11 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // Test we can do this with array, although we should get a warning.
     $propertyBag = new PropertyBag();
     $propertyBag['customThingForMyProcessor'] = 'fidget';
+    $this->assertEquals("Unknown property 'customThingForMyProcessor'. We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties", $propertyBag->lastWarning);
     $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
     // Test array access, too.
     $this->assertEquals('fidget', $propertyBag['customThingForMyProcessor']);
-    $this->assertEquals("Unknown property 'customThingForMyProcessor'. We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties", $propertyBag->lastWarning);
+    $this->assertEquals("Unknown property 'customThingForMyProcessor'. ArrayAccess used to access non-standard property. Please rewrite your code to use PropertyBag->getCustomProperty if it is a genuinely custom property, or a standardised getter like PropertyBag->getContactID() for standard properties", $propertyBag->lastWarning);
   }
 
   /**
@@ -140,7 +141,9 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
-   * Test we can't get a custom prop that was not set.
+   * Test we get NULL for custom prop that was not set.
+   *
+   * This is only for backward compatibility/ease of transition. One day it would be nice to throw an exception instead.
    *
    * @expectedException \BadMethodCallException
    * @expectedExceptionMessage Property 'aCustomProp' has not been set.
@@ -352,9 +355,16 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $this->assertEquals("Attempted to get 'contribution_recur_id' via getCustomProperty - must use using its getter.", $e->getMessage());
     }
 
-    // Nb. hmmm. the custom property getter does not throw an exception if the property is unset, it just returns NULL.
-    $result = $propertyBag->getter('something_custom');
-    $this->assertNull($result, "Failed testing the getter on an unset custom property when not providing a default");
+    // Nb. up to 5.26, the custom property getter did not throw an exception if the property is unset, it just returned NULL.
+    // Now, we return NULL for array access (legacy) but for modern access
+    // (getter, getPropX(), getCustomProperty())  then we throw an exception if
+    // it is not set.
+    try {
+      $result = $propertyBag->getter('something_custom');
+      $this->fail("Expected a BadMethodCallException when getting 'something_custom' which has not been set.");
+    }
+    catch (\BadMethodCallException $e) {
+    }
 
     try {
       $propertyBag->setter('some_custom_thing', 'foo');

@@ -121,10 +121,19 @@ class PropertyBag implements \ArrayAccess {
    * @return mixed
    */
   public function offsetGet($offset) {
-    $prop = $this->handleLegacyPropNames($offset, TRUE);
-    // Allow transparent access to custom properties.
-    // We could issue a deprecation notice here, but we've probably got enough in this code already!
-    $prop = $prop ?? $offset;
+    try {
+      $prop = $this->handleLegacyPropNames($offset);
+    }
+    catch (InvalidArgumentException $e) {
+      $this->legacyWarning($e->getMessage() . " ArrayAccess used to access non-standard property. Please rewrite your code to use PropertyBag->getCustomProperty if it is a genuinely custom property, or a standardised getter like PropertyBag->getContactID() for standard properties");
+      try {
+        return $this->getCustomProperty($offset, 'default');
+      }
+      catch (BadMethodCallException $e) {
+        $this->legacyWarning($e->getMessage() . " calling getCustomProperty on a non-set property will result in a BadMethodCallException exception, but for your legacy use we have returned NULL. Please update your code.");
+        return NULL;
+      }
+    }
     return $this->get($prop, 'default');
   }
 
@@ -244,7 +253,7 @@ class PropertyBag implements \ArrayAccess {
    * @return mixed
    */
   protected function get($prop, $label) {
-    if (array_key_exists($prop, $this->props['default'])) {
+    if (array_key_exists($prop, $this->props[$label] ?? [])) {
       return $this->props[$label][$prop];
     }
     throw new \BadMethodCallException("Property '$prop' has not been set.");
@@ -1059,6 +1068,10 @@ class PropertyBag implements \ArrayAccess {
   public function getCustomProperty($prop, $label = 'default') {
     if (isset(static::$propMap[$prop])) {
       throw new \InvalidArgumentException("Attempted to get '$prop' via getCustomProperty - must use using its getter.");
+    }
+
+    if (!array_key_exists($prop, $this->props[$label] ?? [])) {
+      throw new \BadMethodCallException("Property '$prop' has not been set.");
     }
     return $this->props[$label][$prop] ?? NULL;
   }
