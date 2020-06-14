@@ -127,7 +127,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       }
     }
     else {
-      if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
+      if ($this->_id && $this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
         CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to change settings for this reserved group."));
       }
       if (isset($this->_id)) {

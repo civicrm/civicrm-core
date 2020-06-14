@@ -129,7 +129,7 @@ class ParticipantTest extends UnitTestCase {
       ->addWhere('event_id', 'IN', [$firstEventId, $secondEventId])
       ->execute();
 
-    $firstResult = $result->first();
+    $firstResult = $firstTwo->first();
 
     // verify counts
     // count should either twice the first event count or one less
