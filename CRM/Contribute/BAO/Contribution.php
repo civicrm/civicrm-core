@@ -4204,7 +4204,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ) {
       $taxRateParams = $taxRates[$params['financial_type_id']];
       $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams);
-      $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
+      $params['tax_amount'] = $taxAmount['tax_amount'];
 
       // Get Line Item on update of contribution
       if (isset($params['id'])) {
@@ -4227,7 +4227,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if (isset($value['financial_type_id']) && array_key_exists($value['financial_type_id'], $taxRates)) {
           $taxRate = $taxRates[$value['financial_type_id']];
           $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($value['line_total'], $taxRate);
-          $taxAmountArray[] = round($taxAmount['tax_amount'], 2);
+          $taxAmountArray[] = $taxAmount['tax_amount'];
         }
       }
       $params['tax_amount'] = array_sum($taxAmountArray);
@@ -4238,7 +4238,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) && $isLineItem) {
         $taxRate = $taxRates[$params['financial_type_id']];
         $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['line_total'], $taxRate);
-        $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
+        $params['tax_amount'] = $taxAmount['tax_amount'];
       }
     }
     return $params;

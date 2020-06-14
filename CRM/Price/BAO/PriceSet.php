@@ -1485,10 +1485,10 @@ WHERE       ps.id = %1
   public static function setLineItem($field, $lineItem, $optionValueId, &$totalTax) {
     // Here we round - i.e. after multiplying by quantity
     if ($field['html_type'] == 'Text') {
-      $taxAmount = round($field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'], 2);
+      $taxAmount = $field['options'][$optionValueId]['tax_amount'] * $lineItem[$optionValueId]['qty'];
     }
     else {
-      $taxAmount = round($field['options'][$optionValueId]['tax_amount'], 2);
+      $taxAmount = $field['options'][$optionValueId]['tax_amount'];
     }
     $taxRate = $field['options'][$optionValueId]['tax_rate'];
     $lineItem[$optionValueId]['tax_amount'] = $taxAmount;
@@ -1705,7 +1705,7 @@ WHERE     ct.id = cp.financial_type_id AND
           if (array_key_exists($params['financial_type_id'], $taxRates)) {
             $field['options'][key($field['options'])]['tax_rate'] = $taxRates[$params['financial_type_id']];
             $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($field['options'][$optionValueId]['amount'], $field['options'][$optionValueId]['tax_rate']);
-            $field['options'][$optionValueId]['tax_amount'] = round($taxAmount['tax_amount'], 2);
+            $field['options'][$optionValueId]['tax_amount'] = $taxAmount['tax_amount'];
           }
         }
         if (!empty($field['options'][$optionValueId]['tax_rate'])) {
