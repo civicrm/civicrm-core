@@ -912,7 +912,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $action = array_sum(array_keys($newLinks));
 
       // CRM-9936
-      if (array_key_exists('is_reserved', $object)) {
+      if (property_exists($object, 'is_reserved')) {
         //if group is reserved and I don't have reserved permission, suppress delete/edit
         if ($object->is_reserved && !$reservedPermission) {
           $action -= CRM_Core_Action::DELETE;
@@ -921,7 +921,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
       }
 
-      if (array_key_exists('is_active', $object)) {
+      if (property_exists($object, 'is_active')) {
         if ($object->is_active) {
           $action -= CRM_Core_Action::ENABLE;
         }
