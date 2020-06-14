@@ -369,8 +369,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * @return CRM_Utils_HttpClient|PHPUnit\Framework\MockObject\MockObject
    */
   protected function expectNoHttpRequest() {
-    $mockFunction = $this->mockMethod;
-    $client = $this->$mockFunction('CRM_Utils_HttpClient');
+    $client = $this->getMockBuilder('CRM_Utils_HttpClient')->getMock();
     $client->expects($this->never())
       ->method('get');
     return $client;
@@ -384,8 +383,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * @return CRM_Utils_HttpClient|PHPUnit\Framework\MockObject\MockObject
    */
   protected function expectOneHttpRequest($response) {
-    $mockFunction = $this->mockMethod;
-    $client = $this->$mockFunction('CRM_Utils_HttpClient');
+    $client = $this->getMockBuilder('CRM_Utils_HttpClient')->getMock();
     $client->expects($this->once())
       ->method('get')
       ->will($this->returnValue($response));
