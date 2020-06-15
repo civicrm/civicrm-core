@@ -873,14 +873,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
   public static function getVisibilityOptionID($visibilityName) {
 
     if (!isset(self::$visibilityOptionsKeys)) {
-      self::$visibilityOptionsKeys = CRM_Price_BAO_PriceField::buildOptions(
-        'visibility_id',
-        NULL,
-        [
-          'labelColumn' => 'name',
-          'flip' => TRUE,
-        ]
-      );
+      self::$visibilityOptionsKeys = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceField', 'visibility_id', [
+        'labelColumn' => 'name',
+        'flip' => TRUE,
+      ]);
     }
 
     if (isset(self::$visibilityOptionsKeys[$visibilityName])) {
