@@ -7,6 +7,9 @@ if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Ve
   // Using an early return instead of a else does not work when using the PHPUnit phar due to some weird PHP behavior (the class
   // gets defined without executing the code before it and so the definition is not properly conditional)
 }
+elseif (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '>=')) {
+  class_alias('Civi\Test\CiviTestListenerPHPUnit7', 'Civi\Test\CiviTestListener');
+}
 else {
 
   /**
