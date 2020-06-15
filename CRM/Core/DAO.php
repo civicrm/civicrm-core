@@ -2609,7 +2609,7 @@ SELECT contact_id
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
     // If a given bao does not override this function
     $baoName = get_called_class();
-    return CRM_Core_PseudoConstant::get($baoName, $fieldName, [], $context);
+    return CRM_Core_PseudoConstant::get($baoName, $fieldName, $props, $context);
   }
 
   /**
