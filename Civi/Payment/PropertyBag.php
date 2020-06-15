@@ -130,6 +130,10 @@ class PropertyBag implements \ArrayAccess {
         return $this->getCustomProperty($offset, 'default');
       }
       catch (BadMethodCallException $e) {
+        \CRM_Core_Error::deprecatedFunctionWarning(
+          "Use \$propertyBag->setCustomProperty('$offset', \$value) and then \$propertyBag->getCustomProperty('$offset') instead.",
+          "Accessing a not-set custom property via array access is deprecated. We're returning NULL for now but you should update your code."
+        );
         $this->legacyWarning($e->getMessage() . " calling getCustomProperty on a non-set property will result in a BadMethodCallException exception, but for your legacy use we have returned NULL. Please update your code.");
         return NULL;
       }
