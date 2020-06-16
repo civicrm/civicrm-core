@@ -690,6 +690,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $priceField = CRM_Price_BAO_PriceField::create($params);
 
     if (!is_a($priceField, 'CRM_Core_Error')) {
+      // Required by extensions implementing the postProcess hook (to get the ID of new entities)
+      $this->setEntityId($priceField->id);
       CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
     }
     $buttonName = $this->controller->getButtonName();
