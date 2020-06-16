@@ -550,7 +550,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $createdMembership = CRM_Member_BAO_Membership::create($params);
 
-    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+    civicrm_api3('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
@@ -578,7 +578,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $createdMembership = CRM_Member_BAO_Membership::create($params);
 
-    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+    civicrm_api3('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
@@ -605,7 +605,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $createdMembership = CRM_Member_BAO_Membership::create($params);
 
-    CRM_Member_BAO_Membership::updateAllMembershipStatus();
+    civicrm_api3('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
