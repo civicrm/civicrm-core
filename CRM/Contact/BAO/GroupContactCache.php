@@ -489,7 +489,9 @@ WHERE  id IN ( $groupIDs )
     $tempTable = $groupContactsTempTable->getName();
     $groupContactsTempTable->createWithColumns('contact_id int, group_id int, UNIQUE UI_contact_group (contact_id,group_id)');
 
-    $contactQueries[] = $sql;
+    if (!empty($sql)) {
+      $contactQueries[] = $sql;
+    }
     // lets also store the records that are explicitly added to the group
     // this allows us to skip the group contact LEFT JOIN
     $contactQueries[] =
