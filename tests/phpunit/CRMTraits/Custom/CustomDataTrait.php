@@ -91,7 +91,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL) {
-    $supported = ['text', 'select', 'date', 'int', 'contact_reference'];
+    $supported = ['text', 'select', 'date', 'int', 'contact_reference', 'radio'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -120,6 +120,11 @@ trait CRMTraits_Custom_CustomDataTrait {
       case 'contact_reference':
         $reference = $this->createContactReferenceCustomField($fieldParams)['id'];
         return;
+
+      case 'radio':
+        $reference = $this->createIntegerRadioCustomField($fieldParams)['id'];
+        return;
+
     }
   }
 
@@ -330,6 +335,18 @@ trait CRMTraits_Custom_CustomDataTrait {
   }
 
   /**
+   * Create a custom field of  type radio with integer values.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createIntegerRadioCustomField($params): array {
+    $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
    * Get default field values for the type of field.
    *
    * @param $dataType
@@ -424,7 +441,7 @@ trait CRMTraits_Custom_CustomDataTrait {
         ],
         'CheckBox' => [
           'label' => 'Pick Color',
-          'html_type' => 'Checkbox',
+          'html_type' => 'CheckBox',
           'data_type' => 'String',
           'text_length' => '',
           'default_value' => '',
@@ -544,6 +561,12 @@ trait CRMTraits_Custom_CustomDataTrait {
               'label' => '100',
               'value' => 4,
               'weight' => 2,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Red Testing',
+              'value' => 5,
+              'weight' => 3,
               'is_active' => 1,
             ],
           ],
