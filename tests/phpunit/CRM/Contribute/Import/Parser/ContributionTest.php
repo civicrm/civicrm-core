@@ -177,6 +177,25 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // on one hand the custom fields have a date format & on the other there is an input format &
     // it seems to ignore the latter in favour of the former - which seems wrong.
     $this->assertEquals('20191020000000', $formatted[$this->getCustomFieldName('date')]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['date']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
+  }
+
+  public function testParsedCustomOption() {
+    $contactID = $this->individualCreate();
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
+    // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
+    $this->createCustomGroupWithFieldOfType([], 'radio');
+    $values['contribution_id'] = $contribution['id'];
+    $values[$this->getCustomFieldName('radio')] = 'Red Testing';
+    unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
+    $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['radio']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
   }
 
   /**
