@@ -2575,7 +2575,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return bool
    */
-  protected function isFormInViewOrEditMode() {
+  public function isFormInViewOrEditMode() {
     return in_array($this->_action, [
       CRM_Core_Action::UPDATE,
       CRM_Core_Action::ADD,
