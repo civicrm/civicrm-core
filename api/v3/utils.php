@@ -2342,6 +2342,16 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
       // CiviMagic syntax for Nulling out the field - let it through.
       return;
     }
+    // Legacy support for custom fields: If matching failed by name, fallback to label
+    // @see https://lab.civicrm.org/dev/core/-/issues/1816
+    if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($fieldName)) {
+      $field = new CRM_Core_BAO_CustomField();
+      $field->id = $customFieldId;
+      $options = array_map("strtolower", $field->getOptions());
+      $newValue = array_search(strtolower($value), $options);
+    }
+  }
+  if ($newValue === FALSE) {
     throw new API_Exception("'$value' is not a valid option for field $fieldName", 2001, ['error_field' => $fieldName]);
   }
   $value = $newValue;

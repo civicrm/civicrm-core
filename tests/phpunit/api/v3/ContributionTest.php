@@ -4515,6 +4515,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(5, $getContribution['values'][$contribution['id']][$this->getCustomFieldName('int')]);
     $this->assertEquals('Some Text', $getContribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['text']]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['text']]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['int']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
   }
 
   /**
@@ -4534,6 +4537,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'custom_' . $this->ids['CustomField']['int'] => 5,
       ]);
     }
+  }
+
+  /**
+   * Test that passing in label for an option value linked to a custom field works
+   * @see dev/core#1816
+   */
+  public function testCustomValueOptionLabelTest() {
+    $this->createCustomGroupWithFieldOfType([], 'radio');
+    $params = $this->_params;
+    $params['custom_' . $this->ids['CustomField']['radio']] = 'Red Testing';
+    $contribution = $this->callAPISuccess('Contribution', 'Create', $params);
   }
 
 }
