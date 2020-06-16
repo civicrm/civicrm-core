@@ -653,5 +653,4 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   }
 
-
 }

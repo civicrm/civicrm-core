@@ -163,8 +163,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       $fieldsFix = [
         'replace' => $params,
       ];
-      $address = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Address', [
-        'id' => $params['master_id']],
+      $address = CRM_Core_DAO::copyGeneric(
+        'CRM_Core_DAO_Address',
+        ['id' => $params['master_id']],
         NULL,
         $fieldsFix
       );
