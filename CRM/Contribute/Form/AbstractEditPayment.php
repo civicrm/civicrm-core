@@ -661,14 +661,15 @@ WHERE  contribution_id = {$id}
   /**
    * Get the default payment instrument id.
    *
+   * This priortises the submitted value, if any and falls back on the processor.
+   *
    * @return int
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getDefaultPaymentInstrumentId() {
     $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
-    if ($paymentInstrumentID) {
-      return $paymentInstrumentID;
-    }
-    return key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+    return (int) ($paymentInstrumentID ?? $this->_paymentProcessor['payment_instrument_id']);
   }
 
   /**
