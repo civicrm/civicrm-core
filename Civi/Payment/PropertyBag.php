@@ -175,6 +175,12 @@ class PropertyBag implements \ArrayAccess {
    */
   protected function legacyWarning($message) {
     if (empty(static::$legacyWarnings)) {
+      if (CIVICRM_UF === 'UnitTests') {
+        // This idea of logging lots of warnings to the log file is an ad hoc pattern.
+        // Our standard pattern is to use CRM_Core_Error::deprecatedFunctionWarning
+        // This is just to flush out why we are hitting these in our unit tests.
+        \CRM_Core_Error::deprecatedFunctionWarning($message);
+      }
       // First time we have been called.
       register_shutdown_function([PropertyBag::class, 'writeLegacyWarnings']);
     }
