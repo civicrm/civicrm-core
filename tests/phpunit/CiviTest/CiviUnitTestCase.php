@@ -3550,6 +3550,22 @@ VALUES
   }
 
   /**
+   * @return array|int
+   * @throws \CRM_Core_Exception
+   */
+  protected function createRuleGroup() {
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 8,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ]);
+    return $ruleGroup;
+  }
+
+  /**
    * Generic create test.
    *
    * @param int $version
