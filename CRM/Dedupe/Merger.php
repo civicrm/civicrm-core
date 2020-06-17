@@ -495,6 +495,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $otherId = $mergeHandler->getToRemoveID();
     $cidRefs = self::cidRefs();
     $eidRefs = $mergeHandler->getTablesDynamicallyRelatedToContactTable();
+    $dynamicRefs = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact');
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
     self::filterRowBasedCustomDataFromCustomTables($cidRefs);
@@ -551,8 +552,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
 
       if (isset($eidRefs[$table])) {
-        $sqls[] = "UPDATE IGNORE $table SET {$eidRefs[$table]}= $mainId WHERE {$eidRefs[$table]} = $otherId AND entity_table = 'civicrm_contact'";
-        $sqls[] = "DELETE FROM $table WHERE {$eidRefs[$table]} = $otherId AND entity_table = 'civicrm_contact'";
+        foreach ($dynamicRefs[$table] as $dynamicRef) {
+          $sqls[] = "UPDATE IGNORE $table SET {$dynamicRef[0]}= $mainId WHERE {$dynamicRef[0]} = $otherId AND {$dynamicRef[1]} = 'civicrm_contact'";
+          $sqls[] = "DELETE FROM $table WHERE {$dynamicRef[0]} = $otherId AND {$dynamicRef[1]} = 'civicrm_contact'";
+        }
       }
     }
 
