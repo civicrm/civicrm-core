@@ -2576,15 +2576,38 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return bool
    */
   protected function isFormInViewOrEditMode() {
+    return $this->isFormInViewMode() || $this->isFormInEditMode();
+  }
+
+  /**
+   * Is the form in edit mode.
+   *
+   * Helper function, notably for extensions implementing the buildForm hook,
+   * so that they can return early.
+   *
+   * @return bool
+   */
+  public function isFormInEditMode() {
     return in_array($this->_action, [
       CRM_Core_Action::UPDATE,
       CRM_Core_Action::ADD,
-      CRM_Core_Action::VIEW,
       CRM_Core_Action::BROWSE,
       CRM_Core_Action::BASIC,
       CRM_Core_Action::ADVANCED,
       CRM_Core_Action::PREVIEW,
     ]);
+  }
+
+  /**
+   * Is the form in view mode.
+   *
+   * Helper function, notably for extensions implementing the buildForm hook,
+   * so that they can return early.
+   *
+   * @return bool
+   */
+  public function isFormInViewMode() {
+    return $this->_action == CRM_Core_Action::VIEW;
   }
 
   /**
