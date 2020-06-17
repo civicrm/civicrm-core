@@ -120,15 +120,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
         break;
 
       default:
-        // FIXME: Code cleanup, we may not need to do this $componentName code here.
-        $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
-        $componentName = explode('_', $formName);
-        if ($formName == 'CRM_Export_StateMachine_Standalone') {
-          $componentName = ['CRM', $this->controller->get('entity')];
-        }
-        // Contact
-        $entityShortname = $componentName[1];
-        $entityDAOName = $entityShortname;
+        $entityShortname = $entityDAOName = $this->getComponentName();
         break;
     }
 
@@ -496,6 +488,21 @@ FROM   {$this->_componentTable}
    */
   public function getQueryMode() {
     return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
+  }
+
+  /**
+   * Get the name of the component.
+   *
+   * @return array
+   */
+  protected function getComponentName(): string {
+    if (method_exists($this->controller, 'getComponent')) {
+      return $this->controller->getComponent();
+    }
+    // This code is thought to be unreachable.
+    $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
+    $componentName = explode('_', $formName);
+    return $componentName[1];
   }
 
 }
