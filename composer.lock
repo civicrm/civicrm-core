@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3c6d377d0dfd5ce11b0a96af56344181",
+    "content-hash": "96209031150a0c16ca42aeb4422abe56",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -431,6 +431,11 @@
                 "shasum": ""
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "PHP7.4 Fix for array access using {} instead of []": "https://raw.githubusercontent.com/civicrm/civicrm-core/fe45bdfc4f3e3d3deb27e3d853cdbc7f616620a9/tools/scripts/composer/patches/php74_array_access_fix_phpquery.patch"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "phpQuery/"
@@ -3061,5 +3066,6 @@
     "platform-dev": [],
     "platform-overrides": {
         "php": "7.1"
-    }
+    },
+    "plugin-api-version": "1.1.0"
 }
