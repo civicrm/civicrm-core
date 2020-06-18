@@ -333,10 +333,10 @@ class CRM_Activity_BAO_Query {
 
         $names = [];
         foreach ($value as $k => $v) {
-          $names[] = $activityTags[$v];
+          $names[] = $activityTags[$k];
         }
 
-        $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
+        $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", array_keys($value)) . ")";
         $query->_qill[$grouping][] = ts('Activity Tag %1', [1 => $op]) . ' ' . implode(' ' . ts('OR') . ' ', $names);
         $query->_tables['civicrm_activity_tag'] = $query->_whereTables['civicrm_activity_tag'] = 1;
         break;
