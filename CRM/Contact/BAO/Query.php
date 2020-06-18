@@ -2049,7 +2049,7 @@ class CRM_Contact_BAO_Query {
             $this->_params[$id][1]
           );
           $this->_qill[0][] = ts("%1 %2 %3", [
-            1 => $field['title'],
+            1 => $field['title'] ?? '',
             2 => $qillop,
             3 => $qillVal,
           ]);
