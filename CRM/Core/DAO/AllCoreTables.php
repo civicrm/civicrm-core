@@ -117,10 +117,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   index definitions after localization
    */
   public static function multilingualize($class, $originalIndices) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-    if (CRM_Utils_System::isNull($locales)) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return $originalIndices;
     }
     $classFields = $class::fields();

@@ -842,8 +842,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     $tsLocale = CRM_Core_I18n::getLocale();
     $config = CRM_Core_Config::singleton();
     $json = $jsonDecode = NULL;
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
+    $multilingual = CRM_Core_I18n::isMultilingual();
 
     $moduleDataFormat = [
       'soft_credit' => [
@@ -866,7 +865,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     if ($setDefault) {
       $jsonDecode = json_decode($params);
       $jsonDecode = (array) $jsonDecode->$module;
-      if (!$domain->locales && !empty($jsonDecode['default'])) {
+      if (!$multilingual && !empty($jsonDecode['default'])) {
         //monolingual state
         $jsonDecode += (array) $jsonDecode['default'];
         unset($jsonDecode['default']);
@@ -882,7 +881,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     }
 
     //check and handle multilingual honoree params
-    if (!$domain->locales) {
+    if (!$multilingual) {
       //if in singlelingual state simply return the array format
       $json = [$module => NULL];
       foreach ($moduleDataFormat[$module] as $key => $attribute) {

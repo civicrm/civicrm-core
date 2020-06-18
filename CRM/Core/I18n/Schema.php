@@ -20,13 +20,11 @@ class CRM_Core_I18n_Schema {
    * Drop all views (for use by CRM_Core_DAO::dropAllTables() mostly).
    */
   public static function dropAllViews() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if (!$domain->locales) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return;
     }
 
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
     $tables = CRM_Core_I18n_SchemaStructure::tables();
 
     foreach ($locales as $locale) {
@@ -81,6 +79,7 @@ class CRM_Core_I18n_Schema {
    */
   public static function makeSinglelingual($retain) {
     $domain = new CRM_Core_DAO_Domain();
+    $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -130,6 +129,7 @@ class CRM_Core_I18n_Schema {
     $triggers = []
   ) {
     $domain = new CRM_Core_DAO_Domain();
+    $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -207,6 +207,7 @@ class CRM_Core_I18n_Schema {
   public static function addLocale($locale, $source) {
     // get the current supported locales
     $domain = new CRM_Core_DAO_Domain();
+    $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -485,13 +486,11 @@ class CRM_Core_I18n_Schema {
    */
   public static function triggerInfo(&$info, $tableName = NULL) {
     // get the current supported locales
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if (empty($domain->locales)) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return;
     }
 
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
     $locale = array_pop($locales);
 
     // CRM-10027

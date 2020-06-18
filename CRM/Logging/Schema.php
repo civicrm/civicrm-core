@@ -72,8 +72,6 @@ class CRM_Logging_Schema {
    * @throws API_Exception
    */
   public static function checkLoggingSupport(&$value, $fieldSpec) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
       throw new API_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
     }

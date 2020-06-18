@@ -335,10 +335,8 @@ ALTER TABLE {$tableName}
       else {
         CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
       }
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if ($domain->locales) {
-        $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      $locales = CRM_Core_I18n::getMultilingual();
+      if ($locales) {
         CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, $isUpgradeMode);
       }
     }
@@ -385,9 +383,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    */
   public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLengths = []) {
     $queries = [];
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
 
     // if we're multilingual, cache the information on internationalised fields
     static $columns = NULL;

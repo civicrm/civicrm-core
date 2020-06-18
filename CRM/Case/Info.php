@@ -255,12 +255,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     $dao = new CRM_Core_DAO();
     $db = $dao->getDatabaseConnection();
 
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $multiLingual = (bool) $domain->locales;
+    $locales = CRM_Core_I18n::getMultilingual();
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('multilingual', $multiLingual);
-    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
+    $smarty->assign('multilingual', (bool) $locales);
+    $smarty->assign('locales', $locales);
 
     if (!$lineMode) {
 
