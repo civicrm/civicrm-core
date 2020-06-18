@@ -15,25 +15,6 @@
 class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
 
   /**
-   * Yet another hardcoded list :(
-   *
-   * Very similar to the switch statement in CRM_Export_Form_Select::preProcess
-   * TODO: Make this extensible for extension export pages.
-   *
-   * @var string[]
-   */
-  public $components = [
-    'Contact' => 'Contact',
-    'Contribution' => 'Contribute',
-    'Membership' => 'Member',
-    'Participant' => 'Event',
-    'Pledge' => 'Pledge',
-    'Case' => 'Case',
-    'Grant' => 'Grant',
-    'Activity' => 'Activity',
-  ];
-
-  /**
    * Class constructor.
    *
    * @param string $title
@@ -104,7 +85,8 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
    * @return string
    */
   public function getComponent() {
-    return $this->components[$this->getEntity()];
+    $components = CRM_Export_BAO_Export::getComponents();
+    return $components[$this->getEntity()];
   }
 
   /**
