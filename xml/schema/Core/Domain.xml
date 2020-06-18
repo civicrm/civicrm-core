@@ -128,6 +128,7 @@
     <type>text</type>
     <title>Supported Languages</title>
     <comment>list of locales supported by the current db state (NULL for single-lang install)</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>2.1</add>
   </field>
   <field>
