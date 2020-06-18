@@ -5,7 +5,7 @@
     {ts}This is your receipt of payment made for the following event registration.{/ts}
   </p>
   <p>
-    {ts 1=$transaction_id 2=$transaction_date|date_format:"%D %I:%M %p %Z"}Your order number is <strong>#%1</strong>. Please print this confirmation for your records. You will receieve a confirmation email with the information below.  Information about the workshops will be sent separately to each participant. Here's a summary of your transaction placed on %2:{/ts}
+    {ts 1=$transaction_id 2=$transaction_date|date_format:"%D %I:%M %p %Z"}Your order number is <strong>#%1</strong>. Please print this confirmation for your records. You will receive a confirmation email with the information below.  Information about the workshops will be sent separately to each participant. Here's a summary of your transaction placed on %2:{/ts}
   </p>
   {if $pay_later_receipt && $is_pay_later}
   <p>
