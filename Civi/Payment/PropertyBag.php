@@ -3,6 +3,7 @@ namespace Civi\Payment;
 
 use InvalidArgumentException;
 use Civi;
+use CRM_Core_Error;
 use CRM_Core_PseudoConstant;
 
 /**
@@ -21,11 +22,6 @@ use CRM_Core_PseudoConstant;
  *
  */
 class PropertyBag implements \ArrayAccess {
-  /**
-   * @var array
-   * - see legacyWarning
-   */
-  public static $legacyWarnings = [];
 
   protected $props = ['default' => []];
 
@@ -74,6 +70,14 @@ class PropertyBag implements \ArrayAccess {
     'trxnResultCode'              => TRUE,
     'isNotifyProcessorOnCancelRecur' => TRUE,
   ];
+
+
+  /**
+   * @var bool
+   * Temporary, internal variable to help ease transition to PropertyBag.
+   * Used by cast() to suppress legacy warnings.
+   */
+  protected $suppressLegacyWarnings = FALSE;
 
   /**
    * Get the property bag.
@@ -125,19 +129,30 @@ class PropertyBag implements \ArrayAccess {
       $prop = $this->handleLegacyPropNames($offset);
     }
     catch (InvalidArgumentException $e) {
-      $this->legacyWarning($e->getMessage() . " ArrayAccess used to access non-standard property. Please rewrite your code to use PropertyBag->getCustomProperty if it is a genuinely custom property, or a standardised getter like PropertyBag->getContactID() for standard properties");
+
+      CRM_Core_Error::deprecatedFunctionWarning(
+        "proper getCustomProperty('$offset') for non-core properties. "
+        . $e->getMessage(),
+        "PropertyBag array access to get '$offset'"
+      );
+
       try {
         return $this->getCustomProperty($offset, 'default');
       }
       catch (BadMethodCallException $e) {
-        \CRM_Core_Error::deprecatedFunctionWarning(
-          "Use \$propertyBag->setCustomProperty('$offset', \$value) and then \$propertyBag->getCustomProperty('$offset') instead.",
-          "Accessing a not-set custom property via array access is deprecated. We're returning NULL for now but you should update your code."
+        CRM_Core_Error::deprecatedFunctionWarning(
+          "proper setCustomProperty('$offset', \$value) to store the value (since it is not a core value), then access it with getCustomProperty('$offset'). NULL is returned but in future an exception will be thrown."
+          . $e->getMessage(),
+          "PropertyBag array access to get unset property '$offset'"
         );
-        $this->legacyWarning($e->getMessage() . " calling getCustomProperty on a non-set property will result in a BadMethodCallException exception, but for your legacy use we have returned NULL. Please update your code.");
         return NULL;
       }
     }
+
+    CRM_Core_Error::deprecatedFunctionWarning(
+      "get" . ucfirst($offset) . "()",
+      "PropertyBag array access for core property '$offset'"
+    );
     return $this->get($prop, 'default');
   }
 
@@ -157,7 +172,15 @@ class PropertyBag implements \ArrayAccess {
       // This is fine if it's something particular to a payment processor
       // (which should be using setCustomProperty) however it could also lead to
       // things like 'my_weirly_named_contact_id'.
-      $this->legacyWarning($e->getMessage() . " We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties");
+      //
+      // From 5.28 we suppress this when using PropertyBag::cast() to ease transition.
+      if (!$this->suppressLegacyWarnings) {
+        CRM_Core_Error::deprecatedFunctionWarning(
+          "proper setCustomProperty('$offset', \$value) for non-core properties. "
+          . $e->getMessage(),
+          "PropertyBag array access to set '$offset'"
+        );
+      }
       $this->setCustomProperty($offset, $value, 'default');
       return;
     }
@@ -173,6 +196,12 @@ class PropertyBag implements \ArrayAccess {
     // These lines are here (and not in try block) because the catch must only
     // catch the case when the prop is custom.
     $setter = 'set' . ucfirst($prop);
+    if (!$this->suppressLegacyWarnings) {
+      CRM_Core_Error::deprecatedFunctionWarning(
+        "$setter()",
+        "PropertyBag array access to set core property '$offset'"
+      );
+    }
     $this->$setter($value, 'default');
   }
 
@@ -184,24 +213,6 @@ class PropertyBag implements \ArrayAccess {
   public function offsetUnset ($offset) {
     $prop = $this->handleLegacyPropNames($offset);
     unset($this->props['default'][$prop]);
-  }
-
-  /**
-   * Log legacy warnings info.
-   *
-   * @param string $message
-   */
-  protected function legacyWarning($message) {
-    if (empty(static::$legacyWarnings)) {
-      // First time we have been called.
-      register_shutdown_function([PropertyBag::class, 'writeLegacyWarnings']);
-    }
-    // Store warnings instead of logging immediately, as calls to Civi::log()
-    // can take over half a second to work in some hosting environments.
-    static::$legacyWarnings[$message] = TRUE;
-
-    // For unit tests:
-    $this->lastWarning = $message;
   }
 
   /**
@@ -244,7 +255,10 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
     // Remaining case is legacy name that's been translated.
-    $this->legacyWarning("We have translated '$prop' to '$newName' for you, but please update your code to use the propper setters and getters.");
+    if (!$this->suppressLegacyWarnings) {
+      CRM_Core_Error::deprecatedFunctionWarning("Canonical property name '$newName'", "Legacy property name '$prop'");
+    }
+
     return $newName;
   }
 
@@ -309,16 +323,21 @@ class PropertyBag implements \ArrayAccess {
 
   /**
    * This is used to merge values from an array.
-   * It's a transitional function and should not be used!
+   * It's a transitional, internal function and should not be used!
    *
    * @param array $data
    */
   public function mergeLegacyInputParams($data) {
+    // Suppress legacy warnings for merging an array of data as this
+    // suits our migration plan at this moment. Future behaviour may differ.
+    // @see https://github.com/civicrm/civicrm-core/pull/17643
+    $this->suppressLegacyWarnings = TRUE;
     foreach ($data as $key => $value) {
       if ($value !== NULL && $value !== '') {
         $this->offsetSet($key, $value);
       }
     }
+    $this->suppressLegacyWarnings = FALSE;
   }
 
   /**
