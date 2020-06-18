@@ -354,7 +354,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $fy = $config->fiscalYearStart;
                 $fiscal = self::fiscalYearOffset($field['dbAlias']);
 
-                $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy{'M'}})-1 MONTH) AS {$tableName}_{$fieldName}_start";
+                $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy['M']})-1 MONTH) AS {$tableName}_{$fieldName}_start";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_interval";
                 $field['title'] = ts('Fiscal Year Beginning');
