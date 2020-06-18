@@ -216,13 +216,13 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     ];
     $createdField = $this->callAPISuccess('customField', 'create', $params);
     $contact1 = $this->individualCreate();
-    $contact2 = $this->individualCreate(['custom_' . $createdField['id'] => $contact1['id']]);
-
-    $this->assertEquals($contact1['display_name'], CRM_Core_BAO_CustomField::displayValue($contact2['id'], $createdField['id']));
+    $contact2 = $this->individualCreate(['custom_' . $createdField['id'] => $contact1]);
+    $contact1Details = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contact1]);
+    $this->assertEquals($contact1Details['display_name'], CRM_Core_BAO_CustomField::displayValue($contact2, $createdField['id']));
     $this->assertEquals("Bob", CRM_Core_BAO_CustomField::displayValue("Bob", $createdField['id']));
 
-    $this->contactDelete($contact2['id']);
-    $this->contactDelete($contact1['id']);
+    $this->contactDelete($contact2);
+    $this->contactDelete($contact1);
     $this->customGroupDelete($customGroup['id']);
   }
 
