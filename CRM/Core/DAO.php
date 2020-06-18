@@ -2471,7 +2471,7 @@ SELECT contact_id
       $coreReferences = CRM_Core_DAO::getReferencesToTable($tableName);
       foreach ($coreReferences as $coreReference) {
         if ($coreReference instanceof \CRM_Core_Reference_Dynamic) {
-          \Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName][$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
+          \Civi::$statics[__CLASS__]['contact_references_dynamic'][$tableName][$coreReference->getReferenceTable()][] = [$coreReference->getReferenceKey(), $coreReference->getTypeColumn()];
         }
       }
     }
