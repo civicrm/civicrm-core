@@ -139,4 +139,10 @@ interface MappingInterface {
    */
   public function resetOnTriggerDateChange($schedule);
 
+  /**
+   * Determine whether a schedule based on this mapping should
+   * send to additional contacts.
+   */
+  public function sendToAdditional($entityId): bool;
+
 }
