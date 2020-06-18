@@ -584,15 +584,14 @@ class CRM_Core_I18n {
   }
 
   /**
-   * Is the CiviCRM in multilingual mode.
+   * Is the current CiviCRM domain in multilingual mode.
    *
    * @return Bool
    *   True if CiviCRM is in multilingual mode.
    */
   public static function isMultilingual() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    return (bool) $domain->locales;
+    $domainId = CRM_Core_Config::domainID();
+    return (bool) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'locales');
   }
 
   /**
