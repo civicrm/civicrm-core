@@ -413,7 +413,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50.00', $contribution['total_amount']);
+    $this->assertEquals('50', $contribution['total_amount']);
     $this->assertEquals(.08, $contribution['fee_amount']);
     $this->assertEquals(49.92, $contribution['net_amount']);
     $this->assertEquals('tx', $contribution['trxn_id']);
@@ -464,7 +464,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50.00', $contribution['total_amount']);
+    $this->assertEquals('50', $contribution['total_amount']);
     $this->assertEquals(0, $contribution['non_deductible_amount']);
   }
 
