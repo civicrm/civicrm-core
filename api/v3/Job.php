@@ -179,6 +179,10 @@ function _civicrm_api3_job_geocode_spec(&$params) {
     'description' => 'If enabled, geo-codes at a slow rate',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
+  $params['ct'] = [
+    'title' => 'Contact Type',
+    'type' => CRM_Utils_Type::T_STRING,
+  ];
 }
 
 /**

@@ -28,6 +28,7 @@ class CRM_Utils_Address_BatchUpdate {
   public $geocoding = 1;
   public $parse = 1;
   public $throttle = 0;
+  public $ct = NULL;
 
   public $returnMessages = [];
   public $returnError = 0;
@@ -126,6 +127,11 @@ class CRM_Utils_Address_BatchUpdate {
     if ($this->end) {
       $clause[] = "( c.id <= %2 )";
       $params[2] = [$this->end, 'Integer'];
+    }
+    // contact type filter
+    if ($this->ct && in_array($this->ct, ['Individual', 'Household', 'Organization'])) {
+      $clause[] = "( c.contact_type = %3 )";
+      $params[3] = [$this->ct, 'String'];
     }
 
     if ($processGeocode) {

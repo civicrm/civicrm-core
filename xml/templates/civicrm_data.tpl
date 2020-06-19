@@ -1662,6 +1662,7 @@ VALUES
 parse=[1 or 0] required
 start=[contact ID] optional-begin with this contact ID
 end=[contact ID] optional-process contacts with IDs less than this
+ct=[Individual or Household or Organization] optional-process contacts with these type
 throttle=[1 or 0] optional-1 adds five second sleep{/ts}', 0),
     ( @domainID, 'Daily' ,  NULL, '{ts escape="sql" skip="true"}Update Greetings and Addressees{/ts}','{ts escape="sql" skip="true"}Goes through contact records and updates email and postal greetings, or addressee value{/ts}', 'job', 'update_greeting','{ts escape="sql" skip="true"}ct=[Individual or Household or Organization] required
 gt=[email_greeting or postal_greeting or addressee] required
