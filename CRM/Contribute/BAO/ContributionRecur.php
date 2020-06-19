@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *
  * @package CRM
@@ -267,6 +269,23 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recur->cancel_reason = $params['cancel_reason'] ?? NULL;
       $recur->cancel_date = date('YmdHis');
       $recur->save();
+
+      // Cancel any pending transactions that are linked to the recurring entity
+      $contributions = Contribution::get()
+        ->addWhere('contribution_recur_id', '=', $recurId)
+        ->addWhere('contribution_status_id:name', '=', 'Pending')
+        ->setCheckPermissions(FALSE)
+        ->execute();
+      foreach ($contributions as $contribution) {
+        Contribution::update()
+          ->setCheckPermissions(FALSE)
+          ->addValue('cancel_reason', $params['cancel_reason'] ?? NULL)
+          ->addValue('cancel_date', date('YmdHis'))
+          ->addValue('contribution_status_id:name', 'Cancelled')
+          ->addWhere('id', '=', $contribution['id'])
+          ->setCheckPermissions(FALSE)
+          ->execute();
+      }
 
       // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
       $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);

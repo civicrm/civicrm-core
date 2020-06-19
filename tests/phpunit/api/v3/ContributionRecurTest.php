@@ -119,7 +119,17 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testContributionRecurCancel() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->ids['contact'][0],
+      'contribution_recur_id' => $result['id'],
+      'total_amount' => 500,
+      'financial_type_id' => 1,
+      'receive_date' => '2020-07-20 13:00:00',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+    ]);
     $this->callAPISuccess('ContributionRecur', 'cancel', ['id' => $result['id'], 'cancel_reason' => 'just cos', 'processor_message' => 'big fail']);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $contribution['id']]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'), $contribution['contribution_status_id']);
     $cancelled = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals('just cos', $cancelled['cancel_reason']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled'), $cancelled['contribution_status_id']);
