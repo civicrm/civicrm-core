@@ -1317,7 +1317,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
-    $floatFields = [];
     $baoString = _civicrm_api3_get_BAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
@@ -1439,7 +1438,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_MONEY:
-          $floatFields[] = $field;
           $entity[$field] = '22.75';
           break;
 
@@ -1507,9 +1505,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity[$field] = CRM_Core_DAO::serializeField($checkEntity[$field], $specs['serialize']);
       }
 
-      foreach ($floatFields as $floatField) {
-        $checkEntity[$floatField] = rtrim($checkEntity[$floatField], "0");
-      }
       $this->assertAPIArrayComparison($entity, $checkEntity, [], "checking if $fieldName was correctly updated\n" . print_r([
         'update-params' => $updateParams,
         'update-result' => $update,
