@@ -31,7 +31,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['contact'][0],
       'application_received_date' => 'now',
       'decision_date' => 'next Monday',
-      'amount_total' => '500',
+      'amount_total' => '500.00',
       'status_id' => 1,
       'rationale' => 'Just Because',
       'currency' => 'USD',

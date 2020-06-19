@@ -33,7 +33,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['contact'][0],
       'installments' => '12',
       'frequency_interval' => '1',
-      'amount' => '500',
+      'amount' => '500.00',
       'contribution_status_id' => 1,
       'start_date' => '2012-01-01 00:00:00',
       'currency' => 'USD',

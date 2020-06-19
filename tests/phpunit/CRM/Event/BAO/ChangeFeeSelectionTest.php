@@ -9,11 +9,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
   protected $_priceSetID;
 
-  protected $_cheapFee = 80;
+  protected $_cheapFee = '80.00';
 
-  protected $_expensiveFee = 100;
+  protected $_expensiveFee = '100.00';
 
-  protected $_veryExpensive = 120;
+  protected $_veryExpensive = '120.00';
 
   protected $_noFee = 0;
 
