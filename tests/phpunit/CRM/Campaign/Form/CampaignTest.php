@@ -40,7 +40,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
       'campaign_type_id' => 1,
     ], $form);
     $campaign = $this->callAPISuccess('campaign', 'get', ['id' => $result['id']]);
-    $this->assertEquals('10000', $campaign['values'][$campaign['id']]['goal_revenue']);
+    $this->assertEquals('10000.00', $campaign['values'][$campaign['id']]['goal_revenue']);
   }
 
 }
