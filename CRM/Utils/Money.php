@@ -15,6 +15,10 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Brick\Money\Money;
+use Brick\Money\Context\DefaultContext;
+use Brick\Math\RoundingMode;
+
 /**
  * Money utilties
  */
@@ -135,8 +139,8 @@ class CRM_Utils_Money {
    */
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
-      $precision = pow(10, self::getCurrencyPrecision($currency));
-      return (($leftOp * $precision) - ($rightOp * $precision)) / $precision;
+      $money = Money::of($leftOp, $currency, new DefaultContext(), RoundingMode::CEILING);
+      return $money->minus($rightOp)->getAmount()->toFloat();
     }
   }
 
