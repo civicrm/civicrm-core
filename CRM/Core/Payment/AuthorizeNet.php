@@ -595,19 +595,19 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
   /**
    * @param string $message
-   * @param array $params
+   * @param \Civi\Payment\PropertyBag $params
    *
    * @return bool|object
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function cancelSubscription(&$message = '', $params = []) {
+  public function cancelSubscription(&$message = '', $params) {
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('subscriptionType', 'cancel');
 
     $template->assign('apiLogin', $this->_getParam('apiLogin'));
     $template->assign('paymentKey', $this->_getParam('paymentKey'));
-    $template->assign('subscriptionId', $params['subscriptionId']);
+    $template->assign('subscriptionId', $params->getRecurProcessorID());
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
