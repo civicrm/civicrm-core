@@ -206,7 +206,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $softcontribution = $this->callAPIAndDocument('contribution_soft', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['contact_id'], $this->_softIndividual1Id);
-    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['amount'], '10.00');
+    $this->assertEquals($softcontribution['values'][$softcontribution['id']]['amount'], '10');
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['currency'], 'USD');
     $this->assertEquals($softcontribution['values'][$softcontribution['id']]['soft_credit_type_id'], 5);
   }

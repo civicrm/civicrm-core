@@ -2223,7 +2223,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $contribution['id'], 'sequential' => 1]);
     $this->assertEquals('Completed', $contribution['contribution_status']);
     $this->assertEquals('7778888', $contribution['trxn_id']);
-    $this->assertEquals('.56', $contribution['fee_amount']);
+    $this->assertEquals('0.56', $contribution['fee_amount']);
     $this->assertEquals('99.44', $contribution['net_amount']);
   }
 

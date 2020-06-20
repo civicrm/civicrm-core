@@ -355,8 +355,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     // To protect against the modified date not changing due to the updates being too close together.
     sleep(1);
     $loggings = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);
-    $this->assertEquals('civicrm_address', $loggings['values'][0]['table'], CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray());
-    $this->assertEquals(1, $loggings['count'], CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray());
+    $this->assertEquals('civicrm_address', $loggings['values'][0]['table'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
+    $this->assertEquals(1, $loggings['count'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
     $this->assertEquals('27 Cool way', $loggings['values'][0]['from']);
     $this->assertEquals('25 Dorky way', $loggings['values'][0]['to']);
     $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);

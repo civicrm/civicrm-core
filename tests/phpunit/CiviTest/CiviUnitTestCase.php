@@ -2859,7 +2859,7 @@ VALUES
     if ($context != 'online' && $context != 'payLater') {
       $compareParams = [
         'to_financial_account_id' => 6,
-        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 1,
       ];
     }
@@ -2869,7 +2869,7 @@ VALUES
     elseif ($context == 'online') {
       $compareParams = [
         'to_financial_account_id' => 12,
-        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 1,
         'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, 1),
       ];
@@ -2877,7 +2877,7 @@ VALUES
     elseif ($context == 'payLater') {
       $compareParams = [
         'to_financial_account_id' => 7,
-        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 2,
       ];
     }
@@ -2891,13 +2891,13 @@ VALUES
       'id' => $entityTrxn['entity_id'],
     ];
     $compareParams = [
-      'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+      'amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
       'status_id' => 1,
       'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
     ];
     if ($context == 'payLater') {
       $compareParams = [
-        'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
         'status_id' => 3,
         'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
       ];
@@ -2925,7 +2925,7 @@ VALUES
         'entity_table' => 'civicrm_financial_trxn',
       ];
       $compareParams = [
-        'amount' => 50,
+        'amount' => 50.00,
         'status_id' => 1,
         'financial_account_id' => 5,
       ];
