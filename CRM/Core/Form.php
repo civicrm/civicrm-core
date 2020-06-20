@@ -420,7 +420,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       if (!empty($attributes['aria-label']) || $label) {
-        $attributes['aria-label'] = CRM_Utils_Array::value('aria-label', $attributes, $label);
+        $attributes['aria-label'] = $attributes['aria-label'] ?? $label;
       }
       $type = "text";
     }
@@ -1211,12 +1211,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $optAttributes = $attributes;
       if (!empty($optionAttributes[$key])) {
         foreach ($optionAttributes[$key] as $optAttr => $optVal) {
-          if (!empty($optAttributes[$optAttr])) {
-            $optAttributes[$optAttr] .= ' ' . $optVal;
-          }
-          else {
-            $optAttributes[$optAttr] = $optVal;
-          }
+          $optAttributes[$optAttr] = ltrim(($optAttributes[$optAttr] ?? '') . ' ' . $optVal);
         }
       }
       // We use a class here to avoid html5 issues with collapsed cutsomfield sets.
@@ -2067,7 +2062,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, []);
     $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
-    $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-entityref');
 
     if (array_key_exists('create', $props) && empty($props['create'])) {
       unset($props['create']);
