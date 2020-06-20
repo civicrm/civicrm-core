@@ -26,7 +26,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contact_BAO_ContactType|null
+   * @return CRM_Contact_DAO_ContactType|null
    *   object on success, null otherwise
    */
   public static function retrieve(&$params, &$defaults) {
@@ -48,8 +48,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    */
   public static function isActive($contactType) {
     $contact = self::contactTypeInfo(FALSE);
-    $active = array_key_exists($contactType, $contact);
-    return $active;
+    return array_key_exists($contactType, $contact);
   }
 
   /**
@@ -224,11 +223,11 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    *   Array of basic types + all subtypes.
    */
   public static function contactTypeInfo($all = FALSE) {
-    static $_cache = NULL;
 
-    if ($_cache === NULL) {
-      $_cache = [];
+    if (!isset(Civi::$statics[__CLASS__]['contactTypeInfo'])) {
+      Civi::$statics[__CLASS__]['contactTypeInfo'] = [];
     }
+    $_cache = &Civi::$statics[__CLASS__]['contactTypeInfo'];
 
     $argString = $all ? 'CRM_CT_CTI_1' : 'CRM_CT_CTI_0';
     if (!array_key_exists($argString, $_cache)) {
@@ -243,7 +242,7 @@ FROM      civicrm_contact_type type
 LEFT JOIN civicrm_contact_type parent ON type.parent_id = parent.id';
 
         if ($all === FALSE) {
-          $sql .= ' AND type.is_active = 1';
+          $sql .= ' WHERE type.is_active = 1';
         }
 
         $dao = CRM_Core_DAO::executeQuery($sql,
@@ -576,7 +575,7 @@ WHERE name = %1';
    * @return object|void
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params) {
+  public static function add($params) {
 
     // label or name
     if (empty($params['id']) && empty($params['label'])) {
