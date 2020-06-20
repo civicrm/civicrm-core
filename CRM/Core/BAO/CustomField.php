@@ -796,6 +796,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         else {
           parse_str($field->attributes, $radioAttributes);
           $radioAttributes = array_merge($radioAttributes, $customFieldAttributes);
+          if ($search || empty($useRequired)) {
+            $radioAttributes['allowClear'] = TRUE;
+          }
           $qf->addRadio($elementName, $label, $options, $radioAttributes, NULL, $useRequired);
         }
         break;
