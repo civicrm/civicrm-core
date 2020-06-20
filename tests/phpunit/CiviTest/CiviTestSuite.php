@@ -56,20 +56,6 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
   }
 
   /**
-   *  Test suite setup.
-   */
-  protected function setUp() {
-    //print __METHOD__ . "\n";
-  }
-
-  /**
-   *  Test suite teardown.
-   */
-  protected function tearDown() {
-    //print __METHOD__ . "\n";
-  }
-
-  /**
    *  suppress failed test error issued by phpunit when it finds.
    *  a test suite with no tests
    */
