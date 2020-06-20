@@ -794,25 +794,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->add('text', $elementName . '_to', ts('To'), $field->attributes);
         }
         else {
-          $choice = [];
           parse_str($field->attributes, $radioAttributes);
           $radioAttributes = array_merge($radioAttributes, $customFieldAttributes);
-
-          foreach ($options as $v => $l) {
-            $choice[] = $qf->createElement('radio', NULL, '', $l, (string) $v, $radioAttributes);
-          }
-          $element = $qf->addGroup($choice, $elementName, $label);
-          $optionEditKey = 'data-option-edit-path';
-          if (isset($selectAttributes[$optionEditKey])) {
-            $element->setAttribute($optionEditKey, $selectAttributes[$optionEditKey]);
-          }
-
-          if ($useRequired && !$search) {
-            $qf->addRule($elementName, ts('%1 is a required field.', [1 => $label]), 'required');
-          }
-          else {
-            $element->setAttribute('allowClear', TRUE);
-          }
+          $qf->addRadio($elementName, $label, $options, $radioAttributes, NULL, $useRequired);
         }
         break;
 

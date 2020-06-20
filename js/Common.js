@@ -879,9 +879,9 @@ if (!CRM.vars) CRM.vars = {};
    */
   $.fn.crmValidate = function(params) {
     return $(this).each(function () {
-      var that = this,
-        settings = $.extend({}, CRM.validate._defaults, CRM.validate.params);
-      $(this).validate(settings);
+      var validator = $(this).validate();
+      var that = this;
+      validator.settings = $.extend({}, validator.settings, CRM.validate._defaults, CRM.validate.params);
       // Call any post-initialization callbacks
       if (CRM.validate.functions && CRM.validate.functions.length) {
         $.each(CRM.validate.functions, function(i, func) {

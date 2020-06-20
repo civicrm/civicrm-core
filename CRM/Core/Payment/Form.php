@@ -109,7 +109,7 @@ class CRM_Core_Payment_Form {
           $field['name'],
           $field['title'],
           $field['attributes'],
-          FALSE,
+          $field['is_required'],
           $field['extra']
         );
       }
