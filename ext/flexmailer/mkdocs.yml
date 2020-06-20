@@ -1,0 +1,28 @@
+site_name: FlexMailer
+repo_url: https://github.com/civicrm/org.civicrm.flexmailer
+theme: 
+  name: material
+
+nav:
+- Introduction: index.md
+- Installation: install.md
+- Development:
+  - Overview: develop/index.md
+  - CheckSendableEvent: develop/CheckSendableEvent.md
+  - RunEvent: develop/RunEvent.md
+  - WalkBatchesEvent: develop/WalkBatchesEvent.md
+  - ComposeBatchEvent: develop/ComposeBatchEvent.md
+  - SendBatchEvent: develop/SendBatchEvent.md
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - def_list
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tilde
+  - pymdownx.betterem
+  - pymdownx.mark
