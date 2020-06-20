@@ -68,7 +68,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $this->_setParam('apiLogin', $paymentProcessor['user_name']);
     $this->_setParam('paymentKey', $paymentProcessor['password']);
     $this->_setParam('paymentType', 'AIM');
-    $this->_setParam('md5Hash', CRM_Utils_Array::value('signature', $paymentProcessor));
+    $this->_setParam('md5Hash', $paymentProcessor['signature'] ?? NULL);
 
     $this->_setParam('timestamp', time());
     srand(time());
@@ -192,26 +192,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
       default:
         // Success
-
-        // test mode always returns trxn_id = 0
-        // also live mode in CiviCRM with test mode set in
-        // Authorize.Net return $response_fields[6] = 0
-        // hence treat that also as test mode transaction
-        // fix for CRM-2566
-        if (($this->_mode == 'test') || $response_fields[6] == 0) {
-          $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
-          $p = [];
-          $trxn_id = strval(CRM_Core_DAO::singleValueQuery($query, $p));
-          $trxn_id = str_replace('test', '', $trxn_id);
-          $trxn_id = intval($trxn_id) + 1;
-          $params['trxn_id'] = sprintf('test%08d', $trxn_id);
-        }
-        else {
-          $params['trxn_id'] = $response_fields[6];
-        }
+        $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
         $params['gross_amount'] = $response_fields[9];
         break;
     }
+
     // TODO: include authorization code?
 
     return $params;
@@ -739,6 +724,24 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       throw new PaymentProcessorException($responseFields['text'], $responseFields['code']);
     }
     return TRUE;
+  }
+
+  /**
+   * Get an appropriate test trannsaction id.
+   *
+   * @return string
+   */
+  protected function getTestTrxnID() {
+    // test mode always returns trxn_id = 0
+    // also live mode in CiviCRM with test mode set in
+    // Authorize.Net return $response_fields[6] = 0
+    // hence treat that also as test mode transaction
+    // fix for CRM-2566
+    $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id RLIKE 'test[0-9]+'";
+    $trxn_id = (string) (CRM_Core_DAO::singleValueQuery($query));
+    $trxn_id = str_replace('test', '', $trxn_id);
+    $trxn_id = (int) ($trxn_id) + 1;
+    return sprintf('test%08d', $trxn_id);
   }
 
 }
