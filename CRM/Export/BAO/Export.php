@@ -26,6 +26,30 @@ class CRM_Export_BAO_Export {
   const EXPORT_ROW_COUNT = 100000;
 
   /**
+   * Returns a list of exportable entities and their associated component.
+   *
+   * Note: Some entities like Contact & Activity are not in components, so
+   * the export form seems to fudge things and accept the entity name instead of
+   * component name in those cases.
+   *
+   * TODO: Hardcoded list bad. Needs to support extension export pages.
+   *
+   * @var string[]
+   */
+  public static function getComponents() {
+    return [
+      'Contact' => 'Contact',
+      'Contribution' => 'Contribute',
+      'Membership' => 'Member',
+      'Participant' => 'Event',
+      'Pledge' => 'Pledge',
+      'Case' => 'Case',
+      'Grant' => 'Grant',
+      'Activity' => 'Activity',
+    ];
+  }
+
+  /**
    * Get the list the export fields.
    *
    * @param int $selectAll

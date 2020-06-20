@@ -79,7 +79,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this->_componentClause = NULL;
 
     // we need to determine component export
-    $components = ['Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity'];
+    $components = CRM_Export_BAO_Export::getComponents();
 
     // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
     // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
@@ -120,16 +120,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
         break;
 
       default:
-        // FIXME: Code cleanup, we may not need to do this $componentName code here.
-        $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
-        $componentName = explode('_', $formName);
-        if ($formName == 'CRM_Export_StateMachine_Standalone') {
-          $componentName = ['CRM', $this->controller->get('entity')];
-        }
-        // Contact
-        $entityShortname = $componentName[1];
-        $entityDAOName = $entityShortname;
-        break;
+        $entityShortname = $this->getComponentName();
+        $entityDAOName = $this->controller->get('entity') ?? $entityShortname;
     }
 
     if (in_array($entityShortname, $components)) {
@@ -496,6 +488,22 @@ FROM   {$this->_componentTable}
    */
   public function getQueryMode() {
     return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
+  }
+
+  /**
+   * Get the name of the component.
+   *
+   * @return array
+   */
+  protected function getComponentName(): string {
+    // CRM_Export_Controller_Standalone has this method
+    if (method_exists($this->controller, 'getComponent')) {
+      return $this->controller->getComponent();
+    }
+    // For others, just guess based on the name of the controller
+    $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
+    $componentName = explode('_', $formName);
+    return $componentName[1];
   }
 
 }
