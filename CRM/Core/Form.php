@@ -350,7 +350,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $type
    * @param string $name
    * @param string $label
-   * @param string|array $attributes (options for select elements)
+   * @param array $attributes (options for select elements)
    * @param bool $required
    * @param array $extra
    *   (attributes for select elements).
@@ -364,10 +364,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function &add(
     $type, $name, $label = '',
-    $attributes = '', $required = FALSE, $extra = NULL
+    $attributes = NULL, $required = FALSE, $extra = NULL
   ) {
     if ($type === 'radio') {
       CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::addRadio');
+    }
+
+    if ($attributes && !is_array($attributes)) {
+      // The $attributes param used to allow for strings and would default to an
+      // empty string.  However, now that the variable is heavily manipulated,
+      // we should expect it to always be an array.
+      Civi::log()->warning('Attributes passed to CRM_Core_Form::add() are not an array.', ['civi.tag' => 'deprecated']);
     }
     // Fudge some extra types that quickform doesn't support
     $inputType = $type;

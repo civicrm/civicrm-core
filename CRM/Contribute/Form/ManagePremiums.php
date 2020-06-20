@@ -81,7 +81,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     ]);
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
-    $this->add('textarea', 'description', ts('Description'), 'rows=3, cols=60');
+    $this->add('textarea', 'description', ts('Description'), ['cols' => 60, 'rows' => 3]);
 
     $image['image'] = $this->createElement('radio', NULL, NULL, ts('Upload from my computer'), 'image', 'onclick="add_upload_file_block(\'image\');');
     $image['thumbnail'] = $this->createElement('radio', NULL, NULL, ts('Display image and thumbnail from these locations on the web:'), 'thumbnail', 'onclick="add_upload_file_block(\'thumbnail\');');
@@ -94,7 +94,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addElement('text', 'imageUrl', ts('Image URL'));
     $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
 
-    $this->add('file', 'uploadFile', ts('Image File Name'), 'onChange="select_option();"');
+    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'select_option();']);
 
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
@@ -105,7 +105,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'min_contribution', ts('Minimum Contribution Amount'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'min_contribution'), TRUE);
     $this->addRule('min_contribution', ts('Please enter a monetary value for the Minimum Contribution Amount.'), 'money');
 
-    $this->add('textarea', 'options', ts('Options'), 'rows=3, cols=60');
+    $this->add('textarea', 'options', ts('Options'), ['cols' => 60, 'rows' => 3]);
 
     $this->add('select', 'period_type', ts('Period Type'), [
       '' => '- select -',

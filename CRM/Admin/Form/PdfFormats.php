@@ -67,7 +67,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
       ['onChange' => "selectPaper( this.value );"]
     );
 
-    $this->add('static', 'paper_dimensions', NULL, ts('Width x Height'));
+    $this->add('static', 'paper_dimensions', ts('Width x Height'));
     $this->add('select', 'orientation', ts('Orientation'), CRM_Core_BAO_PdfFormat::getPageOrientations(), FALSE,
       ['onChange' => "updatePaperDimensions();"]
     );

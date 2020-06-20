@@ -101,7 +101,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, ['minDate' => date('Y-m-d')]);
 
     $this->add('textarea', 'parameters', ts('Command parameters'),
-      "cols=50 rows=6"
+      ['cols' => 50, 'rows' => 6]
     );
 
     // is this job active ?

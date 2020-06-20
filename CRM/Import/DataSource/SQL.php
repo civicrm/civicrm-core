@@ -49,7 +49,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_SQL');
-    $form->add('textarea', 'sqlQuery', ts('Specify SQL Query'), 'rows=10 cols=45', TRUE);
+    $form->add('textarea', 'sqlQuery', ts('Specify SQL Query'), ['rows' => 10, 'cols' => 45], TRUE);
     $form->addFormRule(['CRM_Import_DataSource_SQL', 'formRule'], $form);
   }
 
