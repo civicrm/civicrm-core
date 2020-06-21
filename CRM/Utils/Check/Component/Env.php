@@ -986,4 +986,18 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  public function checkPHPIntlExists() {
+    $messages = [];
+    if (!extension_loaded('intl')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system currently does not have the PHP-INTL extension enabled please contact your system administrator about getting the extension enabled'),
+        ts('Missing PHP Extension: INTL'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
+    return $messages;
+  }
+
 }
