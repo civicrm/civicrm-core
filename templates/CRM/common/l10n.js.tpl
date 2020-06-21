@@ -105,6 +105,7 @@
     // but there will be no overall message. Currently the container is only available on backoffice pages.
     if ($('#crm-notification-container').length) {
       $.each(validator.errorList, function(k, error) {
+        $(error.element).parents('.crm-custom-accordion.collapsed').crmAccordionToggle();
         $(error.element).crmError(error.message);
       });
     }

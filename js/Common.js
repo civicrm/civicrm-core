@@ -882,6 +882,8 @@ if (!CRM.vars) CRM.vars = {};
       var validator = $(this).validate();
       var that = this;
       validator.settings = $.extend({}, validator.settings, CRM.validate._defaults, CRM.validate.params);
+      // Call our custom validation handler.
+      $(validator.currentForm).on("invalid-form.validate", validator.settings.invalidHandler );
       // Call any post-initialization callbacks
       if (CRM.validate.functions && CRM.validate.functions.length) {
         $.each(CRM.validate.functions, function(i, func) {
