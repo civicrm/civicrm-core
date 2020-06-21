@@ -77,7 +77,8 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
     // check for all contact types
     $result = CRM_Contact_BAO_ContactType::subTypes();
-    $this->assertEquals(array_keys($this->getExpectedAllSubtypes()), $result);
+    $subtypes = array_keys($this->getExpectedAllSubtypes());
+    $this->assertEquals(sort($subtypes), sort($result));
   }
 
   /**
