@@ -95,7 +95,7 @@
   var params = {
     errorClass: 'crm-inline-error',
     messages: {},
-    ignore: '.select2-offscreen, [readonly], :hidden:not(.crm-select2), .crm-no-validate'
+    ignore: '.select2-offscreen, [readonly], :hidden:not(.crm-select2), .crm-no-validate',
     ignoreTitle: true
   };
 
