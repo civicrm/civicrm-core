@@ -48,21 +48,25 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'title' => ts('Group - add contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToGroup',
           'url' => 'civicrm/task/add-to-group',
+          'icon' => 'fa-user-plus',
         ),
         self::GROUP_REMOVE => array(
           'title' => ts('Group - remove contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromGroup',
           'url' => 'civicrm/task/remove-from-group',
+          'icon' => 'fa-user-plus',
         ),
         self::TAG_ADD => array(
           'title' => ts('Tag - add to contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToTag',
           'url' => 'civicrm/task/add-to-tag',
+          'icon' => 'fa-tags',
         ),
         self::TAG_REMOVE => array(
           'title' => ts('Tag - remove from contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromTag',
           'url' => 'civicrm/task/remove-from-tag',
+          'icon' => 'fa-tag',
         ),
         self::TASK_EXPORT => array(
           'title' => ts('Export contacts'),
@@ -80,12 +84,14 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
           'url' => 'civicrm/task/send-email',
+          'icon' => 'fa-paper-plane-o',
         ),
         self::TASK_DELETE => array(
           'title' => ts('Delete contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
           'result' => FALSE,
           'url' => 'civicrm/task/delete-contact',
+          'icon' => 'fa-trash',
         ),
         self::RECORD_CONTACTS => array(
           'title' => ts('Add activity'),
@@ -111,6 +117,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'class' => 'CRM_Contact_Form_Task_Label',
           'result' => TRUE,
           'url' => 'civicrm/task/make-mailing-label',
+          'icon' => 'fa-print',
         ),
         self::BATCH_UPDATE => array(
           'title' => ts('Update multiple contacts'),
@@ -120,22 +127,26 @@ class CRM_Contact_Task extends CRM_Core_Task {
           ),
           'result' => TRUE,
           'url' => 'civicrm/task/pick-profile',
+          'icon' => 'fa-pencil',
         ),
         self::PDF_LETTER => array(
           'title' => ts('Print/merge document'),
           'class' => 'CRM_Contact_Form_Task_PDF',
           'result' => TRUE,
           'url' => 'civicrm/task/print-document',
+          'icon' => 'fa-file-pdf-o',
         ),
         self::EMAIL_UNHOLD => array(
           'title' => ts('Email - unhold addresses'),
           'class' => 'CRM_Contact_Form_Task_Unhold',
           'url' => 'civicrm/task/unhold-email',
+          'icon' => 'fa-unlock',
         ),
         self::COMMUNICATION_PREFS => array(
           'title' => ts('Communication preferences - alter'),
           'class' => 'CRM_Contact_Form_Task_AlterPreferences',
           'url' => 'civicrm/task/alter-contact-preference',
+          'icon' => 'fa-check-square-o',
         ),
         self::RESTORE => array(
           'title' => ts('Restore contacts from trash'),
