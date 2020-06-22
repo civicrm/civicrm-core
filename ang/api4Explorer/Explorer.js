@@ -465,7 +465,7 @@
               $timeout(function() {
                 if (field) {
                   if (name === 'join') {
-                    $scope.params[name].push([field + ' AS ' + _.snakeCase(field), false, '[]']);
+                    $scope.params[name].push([field + ' AS ' + _.snakeCase(field), false]);
                   }
                   else if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
@@ -905,59 +905,70 @@
     };
   });
 
-  angular.module('api4Explorer').directive('crmApi4Clause', function($timeout) {
+  angular.module('api4Explorer').directive('crmApi4Clause', function() {
     return {
       scope: {
-        data: '=crmApi4Clause'
+        data: '<crmApi4Clause'
       },
       templateUrl: '~/api4Explorer/Clause.html',
-      link: function (scope, element, attrs) {
-        var ts = scope.ts = CRM.ts();
-        scope.newClause = '';
-        scope.conjunctions = ['AND', 'OR', 'NOT'];
-        scope.operators = CRM.vars.api4.operators;
-
-        scope.addGroup = function(op) {
-          scope.data.clauses.push([op, []]);
+      controller: function ($scope, $element, $timeout) {
+        var ts = $scope.ts = CRM.ts();
+        var ctrl = $scope.$ctrl = this;
+        this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
+        this.operators = CRM.vars.api4.operators;
+        this.sortOptions = {
+          axis: 'y',
+          connectWith: '.api4-clause-group-sortable',
+          containment: $element.closest('.api4-clause-fieldset'),
+          over: onSortOver,
+          start: onSort,
+          stop: onSort
         };
 
-        scope.removeGroup = function() {
-          scope.data.groupParent.splice(scope.data.groupIndex, 1);
+        this.addGroup = function(op) {
+          $scope.data.clauses.push([op, []]);
         };
 
-        scope.onSort = function(event, ui) {
-          $(element).closest('.api4-clause-fieldset').toggleClass('api4-sorting', event.type === 'sortstart');
+        this.removeGroup = function() {
+          $scope.data.groupParent.splice($scope.data.groupIndex, 1);
+        };
+
+        function onSort(event, ui) {
+          $($element).closest('.api4-clause-fieldset').toggleClass('api4-sorting', event.type === 'sortstart');
           $('.api4-input.form-inline').css('margin-left', '');
-        };
+        }
 
         // Indent clause while dragging between nested groups
-        scope.onSortOver = function(event, ui) {
+        function onSortOver(event, ui) {
           var offset = 0;
           if (ui.sender) {
             offset = $(ui.placeholder).offset().left - $(ui.sender).offset().left;
           }
           $('.api4-input.form-inline.ui-sortable-helper').css('margin-left', '' + offset + 'px');
-        };
+        }
 
-        scope.$watch('newClause', function(value) {
-          var field = value;
+        this.addClause = function() {
           $timeout(function() {
-            if (field) {
-              scope.data.clauses.push([field, '=', '']);
-              scope.newClause = null;
+            if (ctrl.newClause) {
+              $scope.data.clauses.push([ctrl.newClause, '=', '']);
+              ctrl.newClause = null;
             }
           });
-        });
-        scope.$watch('data.clauses', function(values) {
-          // Remove empty values
-          _.each(values, function(clause, index) {
-            if (typeof clause !== 'undefined' && !clause[0]) {
-              values.splice(index, 1);
-            }
-            if (typeof clause[1] === 'string' && _.contains(clause[1], 'NULL')) {
-              clause.length = 2;
-            } else if (typeof clause[1] === 'string' && clause.length == 2) {
-              clause.push('');
+        };
+        $scope.$watch('data.clauses', function(values) {
+          // Iterate in reverse order so index doesn't get out-of-sync during splice
+          _.forEachRight(values, function(clause, index) {
+            // Remove empty values
+            if (index >= ($scope.data.skip  || 0)) {
+              if (typeof clause !== 'undefined' && !clause[0]) {
+                values.splice(index, 1);
+              }
+              // Add/remove value if operator allows for one
+              else if (typeof clause[1] === 'string' && _.contains(clause[1], 'NULL')) {
+                clause.length = 2;
+              } else if (typeof clause[1] === 'string' && clause.length === 2) {
+                clause.push('');
+              }
             }
           });
         }, true);
@@ -1073,7 +1084,7 @@
         scope.$watchCollection('data', function(data) {
           destroyWidget();
           var field = getField(data.field, entity, action);
-          if (field) {
+          if (field && data.format !== 'plain') {
             makeWidget(field, data.op);
           }
         });
