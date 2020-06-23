@@ -223,6 +223,26 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         ],
         'grouping' => 'contri-fields',
       ],
+      'civicrm_contribution_recur' => [
+        'dao' => 'CRM_Contribute_DAO_ContributionRecur',
+        'fields' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status'),
+          ],
+        ],
+        'filters' => [
+          'autorenew_status_id' => [
+            'name' => 'contribution_status_id',
+            'title' => ts('Auto-Renew Subscription Status?'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => [0 => ts('None'), -1 => ts('Ended')] + CRM_Contribute_BAO_ContributionRecur::buildOptions('contribution_status_id', 'search'),
+            'type' => CRM_Utils_Type::T_INT,
+            'pseudofield' => TRUE,
+          ],
+        ],
+        'grouping' => 'member-fields',
+      ],
     ] + $this->getAddressColumns([
       // These options are only excluded because they were not previously present.
       'order_by' => FALSE,
@@ -241,6 +261,23 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   public function preProcess() {
     $this->assign('reportTitle', ts('Membership Detail Report'));
     parent::preProcess();
+  }
+
+  public function select() {
+    parent::select();
+    if (in_array('civicrm_contribution_recur_autorenew_status_id', $this->_selectAliases)) {
+      // If we're getting auto-renew status we'll want to know if auto-renew has
+      // ended.
+      $this->_selectClauses[] = "{$this->_aliases['civicrm_contribution_recur']}.end_date as civicrm_contribution_recur_end_date";
+      $this->_selectAliases[] = 'civicrm_contribution_recur_end_date';
+      // Regenerate SELECT part of query
+      $this->_select = "SELECT " . implode(', ', $this->_selectClauses) . " ";
+      $this->_columnHeaders["civicrm_contribution_recur_end_date"] = [
+        'title' => NULL,
+        'type' => NULL,
+        'no_display' => TRUE,
+      ];
+    }
   }
 
   public function from() {
@@ -265,6 +302,80 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
                  ON {$this->_aliases['civicrm_membership']}.id = cmp.membership_id
              LEFT JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                  ON cmp.contribution_id={$this->_aliases['civicrm_contribution']}.id\n";
+    }
+    if ($this->isTableSelected('civicrm_contribution_recur')) {
+      $this->_from .= <<<HERESQL
+            LEFT JOIN civicrm_contribution_recur {$this->_aliases['civicrm_contribution_recur']}
+                ON {$this->_aliases['civicrm_membership']}.contribution_recur_id = {$this->_aliases['civicrm_contribution_recur']}.id
+HERESQL;
+    }
+  }
+
+  /**
+   * Override to add handling for autorenew status.
+   */
+  public function storeWhereHavingClauseArray() {
+    parent::storeWhereHavingClauseArray();
+
+    // Handle autorenew status
+    $op = $this->_params['autorenew_status_id_op'] ?? NULL;
+    $value = $this->_params['autorenew_status_id_value'] ?? NULL;
+    $clauseParts = [];
+    switch ($op) {
+      case 'in':
+        if ($value !== NULL && is_array($value) && count($value) > 0) {
+          $regularOptions = implode(', ', array_diff($value, [0, -1]));
+          // None: is null
+          if (in_array(0, $value)) {
+            $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
+          }
+          // Ended: not null, end_date in past
+          if (in_array(-1, $value)) {
+            $clauseParts[] = <<<HERESQL
+              {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL
+                AND {$this->_aliases['civicrm_contribution_recur']}.end_date < NOW()
+HERESQL;
+          }
+          // Normal statuses: IN()
+          if (!empty($regularOptions)) {
+            $clauseParts[] = "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id IN ($regularOptions)";
+          }
+          $this->_whereClauses[] = '(' . implode(') OR (', $clauseParts) . ')';
+        }
+        break;
+
+      case 'notin':
+        if ($value !== NULL && is_array($value) && count($value) > 0) {
+          $regularOptions = implode(', ', array_diff($value, [0, -1]));
+          // None: is not null
+          if (in_array(0, $value)) {
+            $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
+          }
+          // Ended: null or end_date in future
+          if (in_array(-1, $value)) {
+            $clauseParts[] = <<<HERESQL
+              {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
+                OR {$this->_aliases['civicrm_contribution_recur']}.end_date >= NOW()
+                OR {$this->_aliases['civicrm_contribution_recur']}.end_date IS NULL
+HERESQL;
+          }
+          // Normal statuses: null or NOT IN()
+          if (!empty($regularOptions)) {
+            $clauseParts[] = <<<HERESQL
+              {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
+                OR {$this->_aliases['civicrm_contribution_recur']}.contribution_status_id NOT IN ($regularOptions)
+HERESQL;
+          }
+          $this->_whereClauses[] = '(' . implode(') AND (', $clauseParts) . ')';
+        }
+        break;
+
+      case 'nll':
+        $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
+        break;
+
+      case 'nnll':
+        $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
     }
   }
 
@@ -367,6 +478,15 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
       }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_payment_instrument_id'] = $paymentInstruments[$value];
+        $entryFound = TRUE;
+      }
+      if ($value = $row['civicrm_contribution_recur_autorenew_status_id'] ?? NULL) {
+        $rows[$rowNum]['civicrm_contribution_recur_autorenew_status_id'] = $contributionStatus[$value];
+        if (!empty($row['civicrm_contribution_recur_end_date'])
+          && strtotime($row['civicrm_contribution_recur_end_date']) < time()) {
+          $ended = ts('ended');
+          $rows[$rowNum]['civicrm_contribution_recur_autorenew_status_id'] .= " ($ended)";
+        }
         $entryFound = TRUE;
       }
 
