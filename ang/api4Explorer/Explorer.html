@@ -63,16 +63,19 @@
               <input class="collapsible-optgroups form-control huge" ng-model="controls.select" crm-ui-select="{data: fieldsAndJoinsAndFunctionsAndWildcards}" placeholder="Add select" />
             </div>
           </fieldset>
-          <fieldset class="api4-input form-inline" ng-mouseenter="help('join', availableParams.join)" ng-mouseleave="help()" ng-if="::availableParams.join">
+          <fieldset id="api4-join-fieldset" class="api4-input form-inline" ng-mouseenter="help('join', availableParams.join)" ng-mouseleave="help()" ng-if="::availableParams.join">
             <legend>join<span class="crm-marker" ng-if="::availableParams.join.required"> *</span></legend>
-            <div ng-model="params.join" ui-sortable="{axis: 'y'}">
-              <div class="api4-input form-inline" ng-repeat="item in params.join track by $index">
-                <i class="crm-i fa-arrows"></i>
-                <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" />
-                <select class="form-control" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
-                <input class="form-control twenty" type="text" ng-model="params.join[$index][2]" />
-                <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
-              </div>
+            <div ng-model="params.join" ui-sortable="{axis: 'y', containment: '#api4-join-fieldset'}">
+              <fieldset ng-repeat="item in params.join track by $index">
+                <div class="api4-input form-inline">
+                  <i class="crm-i fa-arrows"></i>
+                  <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.buildFieldList()"/>
+                  <select class="form-control" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+                  <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
+                </div>
+                <fieldset class="api4-clause-fieldset" crm-api4-clause="{skip: 2, clauses: params.join[$index], op: 'AND', label: 'On', fields: fieldsAndJoins, format: 'plain'}">
+                </fieldset>
+              </fieldset>
             </div>
             <div class="api4-input form-inline">
               <input class="collapsible-optgroups form-control huge" ng-model="controls.join" crm-ui-select="{data: entities}" placeholder="Add join" />
@@ -97,7 +100,7 @@
             <textarea class="form-control" type="{{:: param.type[0] === 'int' && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]">
             </textarea>
           </div>
-          <fieldset ng-if="::availableParams.where" class="api4-clause-fieldset" ng-mouseenter="help('where', availableParams.where)" ng-mouseleave="help()" crm-api4-clause="{type: 'where', clauses: params.where, required: availableParams.where.required, op: 'AND', label: 'where', fields: fieldsAndJoins}">
+          <fieldset ng-if="::availableParams.where" class="api4-clause-fieldset" ng-mouseenter="help('where', availableParams.where)" ng-mouseleave="help()" crm-api4-clause="{type: 'where', clauses: params.where, required: availableParams.where.required, op: 'AND', label: 'Where', fields: fieldsAndJoins}">
           </fieldset>
           <fieldset ng-repeat="name in ['values', 'defaults']" ng-if="::availableParams[name]" ng-mouseenter="help(name, availableParams[name])" ng-mouseleave="help()">
             <legend>{{:: name }}<span class="crm-marker" ng-if="::availableParams[name].required"> *</span></legend>
@@ -122,7 +125,7 @@
               <input class="collapsible-optgroups form-control huge" ng-model="controls.groupBy" crm-ui-select="{data: fieldsAndJoinsAndFunctions}" placeholder="Add groupBy" />
             </div>
           </fieldset>
-          <fieldset ng-if="::availableParams.having" class="api4-clause-fieldset" ng-mouseenter="help('having', availableParams.having)" ng-mouseleave="help()" crm-api4-clause="{type: 'having', clauses: params.having, required: availableParams.having.required, op: 'AND', label: 'having', fields: havingOptions}">
+          <fieldset ng-if="::availableParams.having" class="api4-clause-fieldset" ng-mouseenter="help('having', availableParams.having)" ng-mouseleave="help()" crm-api4-clause="{clauses: params.having, required: availableParams.having.required, op: 'AND', label: 'Having', fields: havingOptions}">
           </fieldset>
           <fieldset ng-if="::availableParams.orderBy" ng-mouseenter="help('orderBy', availableParams.orderBy)" ng-mouseleave="help()">
             <legend>orderBy<span class="crm-marker" ng-if="::availableParams.orderBy.required"> *</span></legend>
