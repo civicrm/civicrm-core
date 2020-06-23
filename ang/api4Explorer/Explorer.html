@@ -69,7 +69,7 @@
               <fieldset ng-repeat="item in params.join track by $index">
                 <div class="api4-input form-inline">
                   <i class="crm-i fa-arrows"></i>
-                  <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" />
+                  <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.buildFieldList()"/>
                   <select class="form-control" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
                   <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
                 </div>

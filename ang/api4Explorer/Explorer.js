@@ -10,6 +10,8 @@
   var actions = [];
   // Field options
   var fieldOptions = {};
+  // Api params
+  var params;
 
 
   angular.module('api4Explorer').config(function($routeProvider) {
@@ -21,7 +23,8 @@
   });
 
   angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4, dialogService) {
-    var ts = $scope.ts = CRM.ts();
+    var ts = $scope.ts = CRM.ts(),
+      ctrl = $scope.$ctrl = this;
     $scope.entities = entities;
     $scope.actions = actions;
     $scope.fields = [];
@@ -31,7 +34,7 @@
     $scope.fieldsAndJoinsAndFunctionsWithSuffixes = [];
     $scope.fieldsAndJoinsAndFunctionsAndWildcards = [];
     $scope.availableParams = {};
-    $scope.params = {};
+    params = $scope.params = {};
     $scope.index = '';
     $scope.selectedTab = {result: 'result', code: 'php'};
     $scope.perm = {
@@ -114,21 +117,34 @@
       return container;
     }
 
-    // Returns field list formatted for select2
-    function getFieldList(action, addPseudoconstant) {
-      var fields = [],
-        fieldInfo = _.findWhere(getEntity().actions, {name: action}).fields;
+    // Replaces contents of fieldList array with current fields formatted for select2
+    function getFieldList(fieldList, action, addPseudoconstant) {
+      var fieldInfo = _.cloneDeep(_.findWhere(getEntity().actions, {name: action}).fields);
+      fieldList.length = 0;
       if (addPseudoconstant) {
-        fieldInfo = _.cloneDeep(fieldInfo);
         addPseudoconstants(fieldInfo, addPseudoconstant);
       }
-      formatForSelect2(fieldInfo, fields, 'name', ['description', 'required', 'default_value']);
-      return fields;
+      formatForSelect2(fieldInfo, fieldList, 'name', ['description', 'required', 'default_value']);
     }
 
     // Note: this function expects fieldList to be select2-formatted already
     function addJoins(fieldList, addWildcard, addPseudoconstant) {
-      var fields = _.cloneDeep(fieldList);
+      // Add entities specified by the join param
+      _.each(getExplicitJoins(), function(joinEntity, joinAlias) {
+        var wildCard = addWildcard ? [{id: joinAlias + '.*', text: joinAlias + '.*', 'description': 'All core ' + joinEntity + ' fields'}] : [],
+          joinFields = _.cloneDeep(entityFields(joinEntity));
+        if (joinFields) {
+          if (addPseudoconstant) {
+            addPseudoconstants(joinFields, addPseudoconstant);
+          }
+          fieldList.push({
+            text: joinEntity + ' AS ' + joinAlias,
+            description: 'Explicit join to ' + joinEntity,
+            children: wildCard.concat(formatForSelect2(joinFields, [], 'name', ['description'], joinAlias + '.'))
+          });
+        }
+      });
+      // Add implicit joins based on schema links
       _.each(links[$scope.entity], function(link) {
         var linkFields = _.cloneDeep(entityFields(link.entity)),
           wildCard = addWildcard ? [{id: link.alias + '.*', text: link.alias + '.*', 'description': 'All core ' + link.entity + ' fields'}] : [];
@@ -136,14 +152,13 @@
           if (addPseudoconstant) {
             addPseudoconstants(linkFields, addPseudoconstant);
           }
-          fields.push({
+          fieldList.push({
             text: link.alias,
             description: 'Implicit join to ' + link.entity,
             children: wildCard.concat(formatForSelect2(linkFields, [], 'name', ['description'], link.alias + '.'))
           });
         }
       });
-      return fields;
     }
 
     // Note: this function transforms a raw list a-la getFields; not a select2-formatted list
@@ -223,7 +238,8 @@
     // Returns field list for write params (values, defaults)
     $scope.fieldList = function(param) {
       return function() {
-        var fields = _.cloneDeep(getFieldList($scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, ['name']));
+        var fields = [];
+        getFieldList(fields, $scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, ['name']);
         // Disable fields that are already in use
         _.each($scope.params[param] || [], function(val) {
           var usedField = val[0].replace(':name', '');
@@ -333,11 +349,12 @@
     }
 
     function parseYaml(input) {
-      if (typeof input === 'undefined') {
-        return undefined;
+      if (typeof input === 'undefined' || input === '') {
+        return input;
       }
-      if (input === '') {
-        return '';
+      // Return literal quoted string without removing quotes - for the sake of JOIN ON clauses
+      if (_.isString(input) && input[0] === input[input.length - 1] && _.includes(["'", '"'], input[0])) {
+        return input;
       }
       if (_.isObject(input) || _.isArray(input)) {
         _.each(input, function(item, index) {
@@ -354,45 +371,46 @@
       }
     }
 
+    this.buildFieldList = function() {
+      var actionInfo = _.findWhere(actions, {id: $scope.action});
+      getFieldList($scope.fields, $scope.action);
+      getFieldList($scope.fieldsAndJoins, $scope.action, ['name']);
+      getFieldList($scope.fieldsAndJoinsAndFunctions, $scope.action);
+      getFieldList($scope.fieldsAndJoinsAndFunctionsWithSuffixes, $scope.action, ['name', 'label']);
+      getFieldList($scope.fieldsAndJoinsAndFunctionsAndWildcards, $scope.action, ['name', 'label']);
+      if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
+        addJoins($scope.fieldsAndJoins);
+        // SQL functions are supported if HAVING is
+        if (actionInfo.params.having) {
+          var functions = {
+            text: ts('FUNCTION'),
+            description: ts('Calculate result of a SQL function'),
+            children: _.transform(CRM.vars.api4.functions, function(result, fn) {
+              result.push({
+                id: fn.name + '() AS ' + fn.name.toLowerCase(),
+                text: fn.name + '()',
+                description: fn.name + '(' + describeSqlFn(fn.params) + ')'
+              });
+            })
+          };
+          $scope.fieldsAndJoinsAndFunctions.push(functions);
+          $scope.fieldsAndJoinsAndFunctionsWithSuffixes.push(functions);
+          $scope.fieldsAndJoinsAndFunctionsAndWildcards.push(functions);
+        }
+        addJoins($scope.fieldsAndJoinsAndFunctions, true);
+        addJoins($scope.fieldsAndJoinsAndFunctionsWithSuffixes, false, ['name', 'label']);
+        addJoins($scope.fieldsAndJoinsAndFunctionsAndWildcards, true, ['name', 'label']);
+      }
+      $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
+    };
+
     function selectAction() {
       $scope.action = $routeParams.api4action;
-      $scope.fieldsAndJoins.length = 0;
-      $scope.fieldsAndJoinsAndFunctions.length = 0;
-      $scope.fieldsAndJoinsAndFunctionsWithSuffixes.length = 0;
-      $scope.fieldsAndJoinsAndFunctionsAndWildcards.length = 0;
       if (!actions.length) {
         formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params']);
       }
       if ($scope.action) {
         var actionInfo = _.findWhere(actions, {id: $scope.action});
-        $scope.fields = getFieldList($scope.action);
-        if (_.contains(['get', 'update', 'delete', 'replace'], $scope.action)) {
-          $scope.fieldsAndJoins = addJoins(getFieldList($scope.action, ['name']));
-          var functions = [];
-          // SQL functions are supported if HAVING is
-          if (actionInfo.params.having) {
-            functions.push({
-              text: ts('FUNCTION'),
-              description: ts('Calculate result of a SQL function'),
-              children: _.transform(CRM.vars.api4.functions, function(result, fn) {
-                result.push({
-                  id: fn.name + '() AS ' + fn.name.toLowerCase(),
-                  text: fn.name + '()',
-                  description: fn.name + '(' + describeSqlFn(fn.params) + ')'
-                });
-              })
-            });
-          }
-          $scope.fieldsAndJoinsAndFunctions = addJoins($scope.fields.concat(functions), true);
-          $scope.fieldsAndJoinsAndFunctionsWithSuffixes = addJoins(getFieldList($scope.action, ['name', 'label']).concat(functions), false, ['name', 'label']);
-          $scope.fieldsAndJoinsAndFunctionsAndWildcards = addJoins(getFieldList($scope.action, ['name', 'label']).concat(functions), true, ['name', 'label']);
-        } else {
-          $scope.fieldsAndJoins = getFieldList($scope.action, ['name']);
-          $scope.fieldsAndJoinsAndFunctions = $scope.fields;
-          $scope.fieldsAndJoinsAndFunctionsWithSuffixes = getFieldList($scope.action, ['name', 'label']);
-          $scope.fieldsAndJoinsAndFunctionsAndWildcards = getFieldList($scope.action, ['name', 'label']);
-        }
-        $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
         _.each(actionInfo.params, function (param, name) {
           var format,
             defaultVal = _.cloneDeep(param.default);
@@ -466,6 +484,7 @@
                 if (field) {
                   if (name === 'join') {
                     $scope.params[name].push([field + ' AS ' + _.snakeCase(field), false]);
+                    ctrl.buildFieldList();
                   }
                   else if (typeof objectParams[name] === 'undefined') {
                     $scope.params[name].push(field);
@@ -484,6 +503,7 @@
             });
           }
         });
+        ctrl.buildFieldList();
         $scope.availableParams = actionInfo.params;
       }
       writeCode();
@@ -912,8 +932,8 @@
       },
       templateUrl: '~/api4Explorer/Clause.html',
       controller: function ($scope, $element, $timeout) {
-        var ts = $scope.ts = CRM.ts();
-        var ctrl = $scope.$ctrl = this;
+        var ts = $scope.ts = CRM.ts(),
+          ctrl = $scope.$ctrl = this;
         this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
         this.operators = CRM.vars.api4.operators;
         this.sortOptions = {
@@ -1186,6 +1206,15 @@
     return _.result(entity, 'fields');
   }
 
+  function getExplicitJoins() {
+    return _.transform(params.join, function(joins, join) {
+      var j = join[0].split(' AS '),
+        joinEntity = _.trim(j[0]),
+        joinAlias = _.trim(j[1]) || joinEntity.toLowerCase();
+      joins[joinAlias] = joinEntity;
+    }, {});
+  }
+
   function getField(fieldName, entity, action) {
     var suffix = fieldName.split(':')[1];
     fieldName = fieldName.split(':')[0];
@@ -1205,7 +1234,7 @@
         return comboName;
       }
       var linkName = fieldNames.shift(),
-        newEntity = _.findWhere(links[entity], {alias: linkName}).entity;
+        newEntity = getExplicitJoins()[linkName] || _.findWhere(links[entity], {alias: linkName}).entity;
       return get(newEntity, fieldNames);
     }
   }
