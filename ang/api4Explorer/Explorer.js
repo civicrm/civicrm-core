@@ -94,14 +94,15 @@
     }
 
     function pluralize(str) {
-      switch (str[str.length-1]) {
-        case 's':
-          return str + 'es';
-        case 'y':
-          return str.slice(0, -1) + 'ies';
-        default:
-          return str + 's';
+      var lastLetter = str[str.length - 1],
+        lastTwo = str[str.length - 2] + lastLetter;
+      if (lastLetter === 's' || lastTwo === 'ch') {
+        return str + 'es';
       }
+      if (lastLetter === 'y' && lastTwo !== 'ey') {
+        return str.slice(0, -1) + 'ies';
+      }
+      return str + 's';
     }
 
     // Reformat an existing array of objects for compatibility with select2
