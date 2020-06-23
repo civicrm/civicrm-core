@@ -387,17 +387,19 @@ SELECT count(*)
     // set values for custom field properties and save
     $customOption = new CRM_Core_DAO_OptionValue();
     $customOption->label = $params['label'];
-    $customOption->name = CRM_Utils_String::titleToVar($params['label']);
     $customOption->weight = $params['weight'];
     $customOption->description = $params['description'];
     $customOption->value = $params['value'];
-    $customOption->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $customOption->is_active = $params['is_active'] ?? FALSE;
 
     $oldWeight = NULL;
     if ($this->_id) {
       $customOption->id = $this->_id;
       CRM_Core_BAO_CustomOption::updateCustomValues($params);
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'weight', 'id');
+    }
+    else {
+      $customOption->name = CRM_Utils_String::titleToVar($params['label']);
     }
 
     $fieldValues = ['option_group_id' => $this->_optionGroupID];
