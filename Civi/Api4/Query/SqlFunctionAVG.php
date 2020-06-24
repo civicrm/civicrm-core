@@ -26,4 +26,11 @@ class SqlFunctionAVG extends SqlFunction {
     ],
   ];
 
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Average');
+  }
+
 }

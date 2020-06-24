@@ -26,4 +26,11 @@ class SqlFunctionLOWER extends SqlFunction {
     ],
   ];
 
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Lowercase');
+  }
+
 }

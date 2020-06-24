@@ -26,4 +26,11 @@ class SqlFunctionSUM extends SqlFunction {
     ],
   ];
 
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Sum');
+  }
+
 }

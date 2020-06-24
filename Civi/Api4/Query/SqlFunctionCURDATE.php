@@ -18,4 +18,11 @@ class SqlFunctionCURDATE extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Now');
+  }
+
 }

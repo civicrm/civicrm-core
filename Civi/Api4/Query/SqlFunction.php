@@ -206,4 +206,9 @@ abstract class SqlFunction extends SqlExpression {
     return static::$category;
   }
 
+  /**
+   * @return string
+   */
+  abstract public static function getTitle(): string;
+
 }
