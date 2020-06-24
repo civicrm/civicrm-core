@@ -49,6 +49,8 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'source_record_id' => '1',
         'activity_type_id' => '6',
         'activity_type' => 'Contribution',
+        // This line breaks tests with https://github.com/civicrm/civicrm-core/pull/17274
+        'activity_is_test' => '0',
         'target_contact_name' => [],
         'assignee_contact_name' => [],
         'source_contact_id' => '3',
