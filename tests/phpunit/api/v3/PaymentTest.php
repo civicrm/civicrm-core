@@ -1074,4 +1074,64 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->validateAllPayments();
   }
 
+  /**
+   * This test was introduced in
+   * https://github.com/civicrm/civicrm-core/pull/17688 to ensure that a
+   * contribution's date is not set to today's date when a payment is received,
+   * and that the contribution's trxn_id is set to that of the payment.
+   *
+   * This tests the current behaviour, but there are questions about whether
+   * that's right.
+   *
+   * The current behaviour is that when a payment is received that completes a
+   * contribution: the contribution's receive_date is set to that of the
+   * payment (passed to Payment.create as trxn_date).
+   *
+   * But why *should* we update the receive_date at all?
+   *
+   * If we decide that receive_date should not be touched, just change
+   * $trxnDate for $trxnID as detailed in the code comment below, which will
+   * still make sure we're not setting today's date, as well as confirming
+   * that the original date is not changed.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/17688
+   * @see https://lab.civicrm.org/dev/financial/-/issues/139
+   *
+   */
+  public function testPaymentCreateTrxnIdAndDates() {
+
+    $trxnDate = '2010-01-01 09:00:00';
+    $trxnID = 'aabbccddeeffggh';
+    $originalReceiveDate = '2010-02-02 22:22:22';
+
+    $contributionID = $this->contributionCreate([
+      'contact_id'             => $this->individualCreate(),
+      'total_amount'           => 100,
+      'contribution_status_id' => 'Pending',
+      'receive_date'           => $originalReceiveDate,
+    ]);
+
+    $payment = $this->callAPISuccess('Payment', 'create', [
+      'total_amount' => 100,
+      'order_id'     => $contributionID,
+      'trxn_date'    => $trxnDate,
+      'trxn_id'      => $trxnID,
+    ]);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    $this->assertEquals($trxnID, $contribution['trxn_id'],
+      "Contribution trxn_id should have been set to that of the payment.");
+
+    // change $trxnDate for $receiveDate if we agree that transactions should NOT
+    // update contributions.
+    $this->assertEquals($trxnDate, $contribution['receive_date'],
+      "Contribution receive date was changed, but should not have been.");
+
+    $this->validateAllPayments();
+    $this->validateAllContributions();
+
+  }
+
 }
