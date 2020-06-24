@@ -32,7 +32,7 @@
       "Civi\\": ["tests/phpunit/"]
     },
     "psr-4": {
-      "Civi\\": [".", "setup/src/"]
+      "Civi\\": [".", "Civi/", "setup/src/"]
     }
   },
   "include-path": ["vendor/tecnickcom"],
