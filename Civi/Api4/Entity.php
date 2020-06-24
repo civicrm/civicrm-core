@@ -48,12 +48,24 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Entity name',
         ],
         [
+          'name' => 'title',
+          'description' => 'Localized title',
+        ],
+        [
           'name' => 'description',
           'description' => 'Description from docblock',
         ],
         [
           'name' => 'comment',
           'description' => 'Comments from docblock',
+        ],
+        [
+          'name' => 'icon',
+          'description' => 'crm-i icon class associated with this entity',
+        ],
+        [
+          'name' => 'dao',
+          'description' => 'Class name for dao-based entities',
         ],
         [
           'name' => 'see',
