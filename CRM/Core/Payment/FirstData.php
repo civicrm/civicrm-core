@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | FirstData Core Payment Module for CiviCRM version 4.7              |
+ | FirstData Core Payment Module for CiviCRM version 5                |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -13,6 +13,8 @@
  |                                                                    |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * Note that in order to use FirstData / LinkPoint you need a certificate (.pem) file issued by them
@@ -52,16 +54,6 @@
  * **************************
  */
 class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
-  # (not used, implicit in the API, might need to convert?)
-  const CHARSET = 'UFT-8';
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
 
   /**
    * Constructor.
@@ -69,12 +61,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_FirstData *******************************************************
+   * @param array $paymentProcessor
    */
   public function __construct($mode, &$paymentProcessor) {
-    // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
   }
@@ -95,9 +84,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     /*concatenate full customer name first  - code from EWAY gateway
      */
 
-    $credit_card_name = $params['first_name'] . " ";
+    $credit_card_name = $params['first_name'] . ' ';
     if (strlen($params['middle_name']) > 0) {
-      $credit_card_name .= $params['middle_name'] . " ";
+      $credit_card_name .= $params['middle_name'] . ' ';
     }
     $credit_card_name .= $params['last_name'];
 
@@ -122,7 +111,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $requestFields['email'] = $params['email'];
     $requestFields['ip'] = $params['ip_address'];
     $requestFields['transactionorigin'] = "Eci";
-    #32 character string
+    // 32 character string
     $requestFields['invoice_number'] = $params['invoiceID'];
     $requestFields['ordertype'] = 'Sale';
     $requestFields['comments'] = $params['description'];
@@ -156,11 +145,11 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if ($params['is_recur'] == TRUE) {
-      CRM_Core_Error::fatal(ts('First Data - recurring payments not implemented'));
+      throw new CRM_Core_Exception(ts('First Data - recurring payments not implemented'));
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('%1 - Gateway requires curl with SSL support', array(1 => $paymentProcessor)));
+      throw new CRM_Core_Exception(ts('%1 - Gateway requires curl with SSL support', [1 => $paymentProcessor]));
     }
 
     /**********************************************************
@@ -179,9 +168,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
      * define variables for connecting with the gateway
      **********************************************************/
 
-    # Name and location of certificate file
+    // Name and location of certificate file
     $key = $this->_paymentProcessor['password'];
-    # Your store number
+    // Your store number
     $requestFields["configfile"] = $this->_paymentProcessor['user_name'];
     $port = "1129";
     $host = $this->_paymentProcessor['url_site'] . ":" . $port . "/LSGSXML";
@@ -190,7 +179,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     // Check to see if we have a duplicate before we send
     //----------------------------------------------------------------------------------------------------
     if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
-      return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
+      throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from eWAY.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9003);
     }
     //----------------------------------------------------------------------------------------------------
     // Convert to XML using function provided by payment processor
@@ -204,7 +193,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
 
     $ch = curl_init($host);
     if (!$ch) {
-      return self::errorExit(9004, 'Could not initiate connection to payment gateway');
+      throw new PaymentProcessorException('Could not initiate connection to payment gateway', 9004);
     }
 
     curl_setopt($ch, CURLOPT_POST, 1);
@@ -244,10 +233,10 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
         $errorDesc = "Connection to payment gateway failed";
       }
       if ($errorNum == 60) {
-        return self::errorExit($errorNum, "Curl error - " . $errorDesc . " Try this link for more information http://curl.haxx.se/docs/sslcerts.html");
+        throw new PaymentProcessorException("Curl error - " . $errorDesc . ' Try this link for more information http://curl.haxx.se/docs/sslcerts.html', $errorNum);
       }
 
-      return self::errorExit($errorNum, "Curl error - " . $errorDesc . " your key is located at " . $key . " the url is " . $host . " xml is " . $requestxml . " processor response = " . $processorResponse);
+      throw new PaymentProcessorException('Curl error - ' . $errorDesc . ' your key is located at ' . $key . ' the url is ' . $host . ' xml is ' . $requestxml . ' processor response = ' . $processorResponse, $errorNum);
     }
 
     //----------------------------------------------------------------------------------------------------
@@ -257,14 +246,14 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     //       any reason, the return value will be the boolean false.
     //----------------------------------------------------------------------------------------------------
     if (($responseData === FALSE) || (strlen($responseData) == 0)) {
-      return self::errorExit(9006, "Error: Connection to payment gateway failed - no data returned.");
+      throw new PaymentProcessorException('Error: Connection to payment gateway failed - no data returned.', 9006);
     }
 
     //----------------------------------------------------------------------------------------------------
     // If gateway returned no data - tell 'em and bail out
     //----------------------------------------------------------------------------------------------------
     if (empty($responseData)) {
-      return self::errorExit(9007, "Error: No data returned from payment gateway.");
+      throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
 
     //----------------------------------------------------------------------------------------------------
@@ -279,8 +268,8 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     $processorResponse = lphp::decodeXML($responseData);
 
     // transaction failed, print the reason
-    if ($processorResponse["r_approved"] != "APPROVED") {
-      return self::errorExit(9009, "Error: [" . $processorResponse['r_error'] . "] - from payment processor");
+    if ($processorResponse['r_approved'] !== "APPROVED") {
+      throw new PaymentProcessorException('Error: [' . $processorResponse['r_error'] . '] - from payment processor', 9009);
     }
     else {
 
@@ -309,27 +298,6 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       return $params;
     }
   }
-  // end function doDirectPayment
-
-  /**
-   * Produces error message and returns from class.
-   *
-   * @param int $errorCode
-   * @param string $errorMessage
-   *
-   * @return object
-   */
-  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
-    $e = CRM_Core_Error::singleton();
-
-    if ($errorCode) {
-      $e->push($errorCode, 0, NULL, $errorMessage);
-    }
-    else {
-      $e->push(9000, 0, NULL, 'Unknown System Error.');
-    }
-    return $e;
-  }
 
   /**
    * This public function checks to see if we have the right processor config values set.
@@ -346,7 +314,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    * CiviCRM V2.0 Declaration
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ts(' Store Name is not set for this payment processor');
@@ -359,9 +327,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     if (!empty($errorMsg)) {
       return implode('<p>', $errorMsg);
     }
-    else {
-      return NULL;
-    }
+    return NULL;
   }
 
 }

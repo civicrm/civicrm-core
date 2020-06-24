@@ -19,18 +19,15 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
    * and redirect stdin to a temporary file
    */
   public function setUp() {
-    //  Connect to the database
     parent::setUp();
 
-    require_once 'CiviTest/Contact.php';
-
-    // lets create one contact of each type
-    Contact::createIndividual();
-    Contact::createHousehold();
-    Contact::createOrganisation();
+    $this->individualCreate();
+    $this->householdCreate();
+    $this->organizationCreate();
   }
 
   public function tearDown() {
+    parent::tearDown();
   }
 
   /**
@@ -58,9 +55,9 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     $result = $this->callAPISuccess(
       'contact',
       'get',
-      array(
+      [
         'contact_type' => $contactType,
-      )
+      ]
     );
 
     foreach ($result['values'] as $idx => $contact) {

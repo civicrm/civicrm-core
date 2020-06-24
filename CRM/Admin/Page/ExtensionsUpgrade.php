@@ -10,18 +10,22 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
   const END_URL = 'civicrm/admin/extensions';
   const END_PARAMS = 'reset=1';
 
+  /**
+   * Run Page.
+   */
   public function run() {
     $queue = CRM_Extension_Upgrades::createQueue();
-    $runner = new CRM_Queue_Runner(array(
+    $runner = new CRM_Queue_Runner([
       'title' => ts('Database Upgrades'),
       'queue' => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-      'onEnd' => array('CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'),
-      'onEndUrl' => CRM_Utils_System::url(self::END_URL, self::END_PARAMS),
-    ));
+      'onEnd' => ['CRM_Admin_Page_ExtensionsUpgrade', 'onEnd'],
+      'onEndUrl' => !empty($_GET['destination']) ? $_GET['destination'] : CRM_Utils_System::url(self::END_URL, self::END_PARAMS),
+    ]);
 
     CRM_Core_Error::debug_log_message('CRM_Admin_Page_ExtensionsUpgrade: Start upgrades');
-    $runner->runAllViaWeb(); // does not return
+    // does not return
+    $runner->runAllViaWeb();
   }
 
   /**

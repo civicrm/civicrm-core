@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -37,7 +21,7 @@
  *   - "match-mandatory" will generate an error
  *   - "match" will allow action to proceed -- thus inserting a new record
  *
- * @code
+ * ```
  * $result = civicrm_api('contact', 'create', array(
  *   'options' => array(
  *     'match' => array('last_name', 'first_name')
@@ -46,10 +30,10 @@
  *   'last_name' => 'Lebowski',
  *   'nick_name' => 'The Dude',
  * ));
- * @endcode
+ * ```
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'api/Wrapper.php';
@@ -93,7 +77,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
         $keys = $apiRequest['params']['options']['match'];
       }
       if (is_string($keys)) {
-        $keys = array($keys);
+        $keys = [$keys];
       }
     }
 
@@ -153,7 +137,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
       if ($isMandatory) {
         throw new API_Exception("Failed to match existing record");
       }
-      return $createParams; // OK, don't care
+      // OK, don't care
+      return $createParams;
     }
     elseif ($getResult['count'] == 1) {
       $item = array_shift($getResult['values']);
@@ -184,7 +169,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    *   APIv3 $params
    */
   public function createGetParams($origParams, $keys) {
-    $params = array('version' => 3);
+    $params = ['version' => 3];
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $origParams, '');
     }

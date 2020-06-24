@@ -1,30 +1,13 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-path-form-block">
-  <div class="help">
+<div class="help">
     <p>
       {ts}You may configure these upload directories using absolute paths or path variables.{/ts}
       {help id='id-path_vars'}
@@ -32,8 +15,8 @@
     <p>
       {ts}If you modify the defaults, make sure that your web server has write access to the directories.{/ts}
     </p>
-
-  </div>
+</div>
+<div class="crm-block crm-form-block crm-path-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
            <table class="form-layout">
             <tr class="crm-path-form-block-uploadDir">
@@ -58,7 +41,7 @@
                 <td class="label">{$form.customTemplateDir.label}</td>
                 <td>{$form.customTemplateDir.html|crmAddClass:'huge40'}<br />
                     <span class="description">{ts}Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named <em>templateFile.extra.tpl</em>.{/ts} {docURL page="Customize Built-in Screens" resource="wiki"}</span><br />
-                    <span class="description">{ts}CiviCase configuration files can also be stored in this custom path.{/ts} {docURL page="user/case-management/setup"}</span>
+                    <span class="description">{ts}CiviCase configuration files can also be stored in this custom path.{/ts} {docURL page="user/case-management/set-up"}</span>
                 </td>
             </tr>
             <tr class="crm-path-form-block-customPHPPathDir">

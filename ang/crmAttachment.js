@@ -1,7 +1,7 @@
 /// crmFile: Manage file attachments
 (function (angular, $, _) {
 
-  angular.module('crmAttachment', ['angularFileUpload']);
+  angular.module('crmAttachment', CRM.angRequires('crmAttachment'));
 
   // crmAttachment manages the list of files which are attached to a given entity
   angular.module('crmAttachment').factory('CrmAttachments', function (crmApi, crmStatus, FileUploader, $q) {
@@ -156,6 +156,11 @@
         var model = $parse(attr.crmAttachments);
         scope.att = model(scope.$parent);
         scope.ts = CRM.ts(null);
+        CRM.api4('Setting', 'get', {
+          select: ["maxFileSize"]
+        }).then(function(settings) {
+          scope.max_size = settings[0].value;
+        });
         scope.inclUrl = '~/crmAttachment/attachments.html';
 
         // delay rendering of child tree until after model has been populated

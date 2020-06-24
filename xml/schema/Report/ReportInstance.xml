@@ -6,6 +6,8 @@
   <name>civicrm_report_instance</name>
   <comment>Users can save their report instance and put in a cron tab etc.</comment>
   <add>2.2</add>
+  <title>Reports</title>
+  <icon>fa-bar-chart</icon>
   <field>
     <name>id</name>
     <title>Report Instance ID</title>
@@ -52,7 +54,7 @@
     <name>report_id</name>
     <title>Report template ID</title>
     <type>varchar</type>
-    <length>64</length>
+    <length>512</length>
     <required>true</required>
     <comment>FK to civicrm_option_value for the report template</comment>
     <html>
@@ -118,9 +120,10 @@
   <field>
     <name>form_values</name>
     <title>Submitted Form Values</title>
-    <type>text</type>
+    <type>longtext</type>
     <import>true</import>
     <comment>Submitted form values for this report</comment>
+    <serialize>PHP</serialize>
     <add>2.2</add>
   </field>
   <field>

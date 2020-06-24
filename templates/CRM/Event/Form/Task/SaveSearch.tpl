@@ -1,31 +1,15 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-event-savesearch-form-block">
-<fieldset>
-    <legend>{ts}Smart Group{/ts}</legend>
+
+  <h3>{ts}Smart Group{/ts}</h3>
 
   <div class="help">
     <p>{ts}This smart group will stay up-to-date with all contacts who meet the search criteria.{/ts}</p>
@@ -41,7 +25,7 @@
         </ul>
       </div>
     {/if}
-    <p>{docURL page='user/current/organising-your-data/smart-groups/'}</p>
+    <p>{docURL page='user/organising-your-data/smart-groups/'}</p>
   </div>
 
  <table class="form-layout-compressed">
@@ -56,11 +40,9 @@
    <tr>
       <td colspan="2" class="label">{include file="CRM/Event/Form/Task.tpl"}</td>
    </tr>
-   <tr>
-      <td colspan="2">{include file="CRM/common/formButtons.tpl" location="bottom"}</td>
-   </tr>
 </table>
-
-</fieldset>
+<div class="crm-submit-buttons">
+{include file="CRM/common/formButtons.tpl" location="bottom"}
+</div>
 </div>
 

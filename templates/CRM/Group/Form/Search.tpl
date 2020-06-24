@@ -1,80 +1,79 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-group-search-form-block">
-
-<h3>{ts}Find Groups{/ts}</h3>
-<table class="form-layout">
-  <tr>
-    <td>
-      {$form.title.label}<br />
-      {$form.title.html}<br />
-      <span class="description font-italic">
+  <div class="crm-accordion-wrapper crm-search_builder-accordion {if $rows and !$showSearchForm}collapsed{/if}">
+    <div class="crm-accordion-header crm-master-accordion-header">
+      {ts}Find Groups{/ts}
+    </div>
+    <div class="crm-accordion-body">
+      <div id="searchForm">
+        <table class="form-layout">
+          <tr>
+            <td>
+              {$form.title.label}<br />
+              {$form.title.html}<br />
+              <span class="description font-italic">
           {ts}Complete OR partial group name.{/ts}
       </span>
-    </td>
-    <td>
-      {$form.created_by.label}<br />
-      {$form.created_by.html}<br />
-      <span class="description font-italic">
+            </td>
+            <td>
+              {$form.created_by.label}<br />
+              {$form.created_by.html}<br />
+              <span class="description font-italic">
           {ts}Complete OR partial creator name.{/ts}
       </span>
-    </td>
-    <td id="group_type-block">
-      {$form.group_type_search.label}<br />
-      {$form.group_type_search.html}<br />
-      <span class="description font-italic">
-          {ts}Filter search by group type(s).{/ts}
-      </span>
-    </td>
-    <td>
-      {$form.visibility.label}<br />
-      {$form.visibility.html}<br />
-      <span class="description font-italic">
+            </td>
+            <td>
+              {$form.visibility.label}<br />
+              {$form.visibility.html}<br />
+              <span class="description font-italic">
           {ts}Filter search by visibility.{/ts}
       </span>
-    </td>
-    <td>
-      {$form.group_status.label}<br />
-      {$form.group_status.html}
-    </td>
-  </tr>
-</table>
-</div>
+            </td>
+          </tr>
+          <tr>
+            <td id="group_type-block">
+              {$form.group_type_search.label}<br />
+              {$form.group_type_search.html}<br />
+              <span class="description font-italic">
+          {ts}Filter search by group type(s).{/ts}
+      </span>
+            </td>
+            <td>
+              {$form.group_status.label}<br />
+              {$form.group_status.html}
+            </td>
+            <td>
+              {$form.component_mode.label}<br />
+              {$form.component_mode.html}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
 <div class="css_right">
   <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
 </div>
+{if call_user_func(array('CRM_Core_Permission','check'), 'edit groups')}
+  {assign var='editableClass' value='crm-editable'}
+{/if}
 <table class="crm-group-selector crm-ajax-table" data-order='[[0,"asc"]]'>
   <thead>
     <tr>
-      <th data-data="title" cell-class="crm-group-name crm-editable crmf-title" class='crm-group-name'>{ts}Name{/ts}</th>
+      <th data-data="title" cell-class="crm-group-name {$editableClass} crmf-title" class='crm-group-name'>{ts}Name{/ts}</th>
       <th data-data="count" cell-class="crm-group-count right" class='crm-group-count'>{ts}Count{/ts}</th>
       <th data-data="created_by" cell-class="crm-group-created_by" class='crm-group-created_by'>{ts}Created By{/ts}</th>
-      <th data-data="description" data-orderable="false" cell-class="crm-group-description crmf-description crm-editable" class='crm-group-description'>{ts}Description{/ts}</th>
+      <th data-data="description" data-orderable="false" cell-class="crm-group-description crmf-description {$editableClass}" class='crm-group-description'>{ts}Description{/ts}</th>
       <th data-data="group_type" cell-class="crm-group-group_type" class='crm-group-group_type'>{ts}Group Type{/ts}</th>
-      <th data-data="visibility" cell-class="crm-group-visibility crmf-visibility crm-editable" cell-data-type="select" class='crm-group-visibility'>{ts}Visibility{/ts}</th>
+      <th data-data="visibility" cell-class="crm-group-visibility crmf-visibility {$editableClass}" cell-data-type="select" class='crm-group-visibility'>{ts}Visibility{/ts}</th>
       {if $showOrgInfo}
         <th data-data="org_info" data-orderable="false" cell-class="crm-group-org_info" class='crm-group-org_info'>{ts}Organization{/ts}</th>
       {/if}
@@ -94,18 +93,16 @@
     // on initial load of manage group page and
     // also to handle search filtering for initial load of same page.
     var parentsOnly = 1
-    var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">No Groups have been created for this site.{/ts}</div>'{literal};
+    var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">None found.{/ts}</div>'{literal};
     $('table.crm-group-selector').data({
       "ajax": {
         "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
         "data": function (d) {
 
-          var groupTypes = ($('.crm-group-search-form-block #group_type_search_1').prop('checked')) ? '1' : '';
-          if (groupTypes) {
-            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? groupTypes + ',2' : groupTypes;
-          } else {
-            groupTypes = ($('.crm-group-search-form-block #group_type_search_2').prop('checked')) ? '2' : '';
-          }
+          var groupTypes = '';
+          $('input[id*="group_type_search_"]:checked').each(function(e) {
+            groupTypes += $(this).attr('id').replace(/group_type_search_/, groupTypes == '' ? '' : ',');
+          });
 
           var groupStatus = ($('.crm-group-search-form-block #group_status_1').prop('checked')) ? 1 : '';
           if (groupStatus) {
@@ -119,12 +116,13 @@
           d.group_type = groupTypes,
           d.visibility = $(".crm-group-search-form-block select#visibility").val(),
           d.status = groupStatus,
+          d.component_mode = $(".crm-group-search-form-block select#component_mode").val(),
           d.showOrgInfo = {/literal}"{$showOrgInfo}"{literal},
           d.parentsOnly = parentsOnly
         }
       },
       "language": {
-        "zeroRecords": ZeroRecordText 
+        "zeroRecords": ZeroRecordText
       },
       "drawCallback": function(settings) {
         //Add data attributes to cells
@@ -142,8 +140,12 @@
         //Reload table after draw
         $(settings.nTable).trigger('crmLoad');
         if (parentsOnly) {
-          $('tbody tr.crm-group-parent', settings.nTable).each( function() {
-            $(this).find('td:first').prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}');
+          CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmEditable.js').done(function () {
+            $('tbody tr.crm-group-parent', settings.nTable).each(function () {
+              $(this).find('td:first')
+                .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
+                .find('div').css({'display': 'inline'});
+            });
           });
         }
       }
@@ -187,7 +189,7 @@
         $('.parent_is_' + parent_id).hide();
         $('.parent_is_' + parent_id).each(function(i, obj) {
           // also hide children of children
-          var gID = $(this).find('td:nth-child(2)').text();
+          var gID = $(this).data('id');
           $('.parent_is_' + gID).hide();
         });
       }
@@ -201,7 +203,7 @@
         // child rows for this parent have already been retrieved so just show them
         $('.parent_is_' + parent_id ).show();
       } else {
-        //FIXME Is it possible to replace all this with a datatables call? 
+        //FIXME Is it possible to replace all this with a datatables call?
         $.ajax( {
             "dataType": 'json',
             "url": {/literal}'{crmURL p="civicrm/ajax/grouplist" h=0 q="snippet=4"}'{literal},
@@ -209,18 +211,26 @@
             "success": function(response){
               var appendHTML = '';
               $.each( response.data, function( i, val ) {
-                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="crm-entity parent_is_'+parent_id+' crm-row-child">';
+                val.row_classes = [
+                  'crm-entity',
+                  'parent_is_' + parent_id,
+                  'crm-row-child'
+                ];
+                if ('DT_RowClass' in val) {
+                  val.row_classes = val.row_classes.concat(val.DT_RowClass.split(' ').filter((item) => val.row_classes.indexOf(item) < 0));
+                }
+                appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="' + val.row_classes.join(' ') + '">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title crm-editable ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.title + '</td>';
+                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div></td>';
                 }
                 else {
-                  appendHTML += '<td class="' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><span class="crm-group-name crmf-title crm-editable">{literal}' + val.title + '</span></td>';
+                  appendHTML += '<td class="crm-group-name  crmf-title {/literal}{$editableClass}{literal} ' + levelClass + '"><span class="crm-no-children"></span>' + val.title + '</td>';
                 }
                 appendHTML += '<td class="right">' + val.count + "</td>";
                 appendHTML += "<td>" + val.created_by + "</td>";
-                appendHTML += '<td class="crm-editable crmf-description">' + (val.description || '') + "</td>";
+                appendHTML += '<td class="{/literal}{$editableClass}{literal} crmf-description">' + (val.description || '') + "</td>";
                 appendHTML += "<td>" + val.group_type + "</td>";
-                appendHTML += '<td class="crm-editable crmf-visibility" data-type="select">' + val.visibility + "</td>";
+                appendHTML += '<td class="{/literal}{$editableClass}{literal} crmf-visibility" data-type="select">' + val.visibility + "</td>";
                 if (showOrgInfo) {
                   appendHTML += "<td>" + val.org_info + "</td>";
                 }

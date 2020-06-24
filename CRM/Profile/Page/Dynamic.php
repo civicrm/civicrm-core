@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -67,15 +49,16 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Should we bypass permissions.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_skipPermission;
 
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
+   * @var array
    */
-  protected $_profileIds = array();
+  protected $_profileIds = [];
 
   /**
    * Contact profile having activity fields?
@@ -95,8 +78,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
   protected $_recordId = NULL;
 
-  /*
+  /**
+   *
    * fetch multirecord as well as non-multirecord fields
+   * @var int
    */
   protected $_allFields = NULL;
 
@@ -149,7 +134,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $this->_profileIds = $profileIds;
     }
     else {
-      $this->_profileIds = array($gid);
+      $this->_profileIds = [$gid];
     }
 
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
@@ -177,7 +162,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * This method is called after the page is created. It checks for the
    * type of action and executes that action.
    *
-   * @return void
    */
   public function run() {
     $template = CRM_Core_Smarty::singleton();
@@ -239,7 +223,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $admin = TRUE;
       }
 
-      $values = array();
+      $values = [];
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileIds, FALSE, CRM_Core_Action::VIEW,
         NULL, NULL, FALSE, $this->_restrict,
         $this->_skipPermission, NULL,
@@ -253,7 +237,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($this->_isContactActivityProfile && $this->_gid) {
         $errors = CRM_Profile_Form::validateContactActivityProfile($this->_activityId, $this->_id, $this->_gid);
         if (!empty($errors)) {
-          CRM_Core_Error::fatal(array_pop($errors));
+          CRM_Core_Error::statusBounce(array_pop($errors));
         }
       }
 
@@ -271,7 +255,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       if ($this->_isContactActivityProfile) {
-        $contactFields = $activityFields = array();
+        $contactFields = $activityFields = [];
 
         foreach ($fields as $fieldName => $field) {
           if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
@@ -289,7 +273,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
             $activityFields,
             $values,
             TRUE,
-            array(array('activity_id', '=', $this->_activityId, 0, 0))
+            [['activity_id', '=', $this->_activityId, 0, 0]]
           );
         }
       }
@@ -314,8 +298,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       // $profileFields array can be used for customized display of field labels and values in Profile/View.tpl
-      $profileFields = array();
-      $labels = array();
+      $profileFields = [];
+      $labels = [];
 
       foreach ($fields as $name => $field) {
         //CRM-14338
@@ -332,10 +316,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       foreach ($values as $title => $value) {
-        $profileFields[$labels[$title]] = array(
+        $profileFields[$labels[$title]] = [
           'label' => $title,
           'value' => $value,
-        );
+        ];
       }
 
       $template->assign_by_ref('row', $values);
@@ -353,7 +337,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     if (($this->_multiRecord & CRM_Core_Action::VIEW) && $this->_recordId && !$this->_allFields) {
       $fieldDetail = reset($fields);
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
-      $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
+      $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles([$fieldId]);
       $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
     }
     else {
@@ -377,7 +361,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $title .= ' - ' . $displayName;
     }
 
-    $title = isset($multiRecTitle) ? ts('View %1 Record', array(1 => $multiRecTitle)) : $title;
+    $title = isset($multiRecTitle) ? ts('View %1 Record', [1 => $multiRecTitle]) : $title;
     CRM_Utils_System::setTitle($title);
 
     // invoke the pagRun hook, CRM-3906
@@ -416,9 +400,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    *
    * @return string
    */
-  /**
-   * @return string
-   */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
@@ -428,9 +409,6 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * Default extra tpl file basically just replaces .tpl with .extra.tpl
    * i.e. we dont override
    *
-   * @return string
-   */
-  /**
    * @return string
    */
   public function overrideExtraTemplateFileName() {

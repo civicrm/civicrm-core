@@ -47,6 +47,11 @@
     <required>true</required>
     <comment>price set being used</comment>
     <add>1.8</add>
+    <pseudoconstant>
+      <table>civicrm_price_set</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>price_set_id</name>
@@ -61,4 +66,3 @@
     <add>1.8</add>
   </index>
 </table>
-

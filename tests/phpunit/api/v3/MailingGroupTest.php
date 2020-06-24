@@ -1,28 +1,12 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2015                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -44,19 +28,17 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $this->_email = 'test@test.test';
   }
 
-  //---------- civicrm_mailing_event_subscribe methods ---------
-
   /**
    * Test civicrm_mailing_group_event_subscribe with wrong params.
    */
   public function testMailerGroupSubscribeWrongParams() {
-    $params = array(
+    $params = [
       'email' => $this->_email,
       'group_id' => 'Wrong Group ID',
       'contact_id' => '2121',
       'time_stamp' => '20111111010101',
       'hash' => 'sasa',
-    );
+    ];
     $this->callAPIFailure('mailing_event_subscribe', 'create', $params);
   }
 
@@ -64,61 +46,55 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
    * Test civicrm_mailing_group_event_subscribe with given contact ID.
    */
   public function testMailerGroupSubscribeGivenContactId() {
-    $params = array(
+    $params = [
       'first_name' => 'Test',
       'last_name' => 'Test',
       'email' => $this->_email,
       'contact_type' => 'Individual',
-    );
+    ];
     $contactID = $this->individualCreate($params);
 
-    $params = array(
+    $params = [
       'email' => $this->_email,
       'group_id' => $this->_groupID,
       'contact_id' => $contactID,
       'hash' => 'b15de8b64e2cec34',
       'time_stamp' => '20101212121212',
-    );
+    ];
     $result = $this->callAPIAndDocument('mailing_event_subscribe', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
 
     $this->contactDelete($contactID);
   }
 
-  //-------- civicrm_mailing_group_event_unsubscribe methods-----------
-
   /**
    * Test civicrm_mailing_group_event_unsubscribe with wrong params.
    */
   public function testMailerGroupUnsubscribeWrongParams() {
-    $params = array(
+    $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
       'time_stamp' => '20101212121212',
-    );
+    ];
 
     $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
   }
-
-  //--------- civicrm_mailing_group_event_domain_unsubscribe methods -------
 
   /**
    * Test civicrm_mailing_group_event_domain_unsubscribe with wrong params.
    */
   public function testMailerGroupDomainUnsubscribeWrongParams() {
-    $params = array(
+    $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
       'org_unsubscribe' => 1,
       'time_stamp' => '20101212121212',
-    );
+    ];
 
     $this->callAPIFailure('mailing_event_unsubscribe', 'create', $params);
   }
-
-  //----------- civicrm_mailing_group_event_resubscribe methods--------
 
   /**
    * Test civicrm_mailing_group_event_resubscribe with wrong params type.
@@ -128,50 +104,48 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
    * Test civicrm_mailing_group_event_resubscribe with wrong params.
    */
   public function testMailerGroupResubscribeWrongParams() {
-    $params = array(
+    $params = [
       'job_id' => 'Wrong ID',
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
       'org_unsubscribe' => 'test',
       'time_stamp' => '20101212121212',
-    );
+    ];
     $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
   }
-
-  //------------------------ success case ---------------------
 
   /**
    * Test civicrm_mailing_group_event_subscribe and civicrm_mailing_event_confirm functions - success expected.
    */
   public function testMailerProcess() {
-    $params = array(
+    $params = [
       'first_name' => 'Test',
       'last_name' => 'Test',
       'email' => $this->_email,
       'contact_type' => 'Individual',
-    );
+    ];
     $contactID = $this->individualCreate($params);
 
-    $params = array(
+    $params = [
       'email' => $this->_email,
       'group_id' => $this->_groupID,
       'contact_id' => $contactID,
       'hash' => 'b15de8b64e2cec34',
       'time_stamp' => '20101212121212',
-    );
+    ];
     $result = $this->callAPISuccess('mailing_event_subscribe', 'create', $params);
 
     $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
 
-    $params = array(
+    $params = [
       'contact_id' => $result['values'][$result['id']]['contact_id'],
       'subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
       'hash' => $result['values'][$result['id']]['hash'],
       'time_stamp' => '20101212121212',
       'event_subscribe_id' => $result['values'][$result['id']]['subscribe_id'],
-    );
+    ];
 
-    $result = $this->callAPISuccess('mailing_event_confirm', 'create', $params);
+    $this->callAPISuccess('mailing_event_confirm', 'create', $params);
     $this->contactDelete($contactID);
   }
 

@@ -1,28 +1,13 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="contribute-form-contributionpage-widget-main"}
 <h3>{ts}Configure Widget{/ts}</h3>
 {if $showStatus}
 <div class="messages status no-popup">
@@ -32,7 +17,7 @@
 {/if}
 <div id="form" class="crm-block crm-form-block crm-contribution-contributionpage-widget-form-block">
     <div class="help">
-        {ts}CiviContribute widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page - and will provide a real-time display of current contribution results, and a direct link to this contribution page.{/ts} {help id="id-intro"}
+        {ts}CiviContribute widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page.  It will provide a real-time display of current contribution results and a direct link to this contribution page.{/ts} {help id="id-intro"}
     </div>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
@@ -46,7 +31,7 @@
             <tr class="crm-contribution-form-block-url_logo"><td class="label">{$form.url_logo.label}</span></td><td>{$form.url_logo.html}</td></tr>
             <tr class="crm-contribution-contributionpage-widget-form-block-button_title"><td class="label">{$form.button_title.label}</td><td>{$form.button_title.html}</td></tr>
             <tr class="crm-contribution-contributionpage-widget-form-block-about"><td class="label">{$form.about.label}<span class="crm-marker"> *</span></td><td>{$form.about.html}
-<br /><span class="description">{ts}Enter content for the about message. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server - reference them using complete URLs.{/ts}</span>
+<br /><span class="description">{ts}Enter content for the about message. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server&mdash;reference them using complete URLs.{/ts}</span>
 </td></tr>
 
         </table>
@@ -65,7 +50,7 @@
                         {ts}Click <strong>Save & Preview</strong> to save your settings and preview the widget on this page.{/ts}<br />
                     </div>
                 {/if}
-                <div style="text-align: center;width:260px">{$form._qf_Widget_refresh.html}</div>
+                <div>{$form._qf_Widget_refresh.html}</div>
             </div>
             <div class="col2">
                 {* Include "get widget code" section if widget has been created for this page and is_active. *}
@@ -75,7 +60,7 @@
                     </div>
                     <textarea rows="8" cols="50" name="widget_code" id="widget_code">{include file="CRM/Contribute/Page/Widget.tpl" widgetId=$widget_id cpageId=$cpageId}</textarea>
                     <br />
-                    <strong><a href="#" onclick="Widget.widget_code.select(); return false;">&raquo; Select Code</a></strong>
+                    <strong><a href="#" onclick="Widget.widget_code.select(); return false;"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Select Code{/ts}</a></strong>
                 {else}
                     <div class="description">
                         {ts}The code for adding this widget to web pages will be displayed here after you click <strong>Save and Preview</strong>.{/ts}
@@ -91,9 +76,6 @@
           {ts}Edit Widget Colors{/ts}
          </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
-            <div class="description">
-                {ts}Enter colors in hexadecimal format prefixed with <em>#</em>. EXAMPLE: <em>#FF0000</em> = Red. You can do a web search on 'hexadecimal colors' to find a chart of color codes.{/ts}
-            </div>
             <table class="form-layout-compressed">
             {foreach from=$colorFields item=field key=fieldName}
               <tr><td class="label">{$form.$fieldName.label}<span class="crm-marker"> *</span></td><td>{$form.$fieldName.html}</td></tr>
@@ -136,3 +118,6 @@
     }
 </script>
 {/literal}
+{/crmRegion}
+{crmRegion name="contribute-form-contributionpage-widget-post"}
+{/crmRegion}

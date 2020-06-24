@@ -1,4 +1,4 @@
-(function($, _) {
+(function($, _, Backbone) {
   if (!CRM.Designer) CRM.Designer = {};
 
   /**
@@ -370,13 +370,13 @@
           "theme": 'classic',
           "dots": false,
           "icons": false,
-          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+          "url": CRM.config.packagesBase + 'jquery/plugins/jstree/themes/classic/style.css'
         },
         'plugins': ['themes', 'json_data', 'ui', 'search']
       }).bind('loaded.jstree', function () {
         $('.crm-designer-palette-field', this).draggable({
           appendTo: '.crm-designer',
-          zIndex: $(this.$el).zIndex() + 5000,
+          zIndex: $(this.$el).css("zIndex") + 5000,
           helper: 'clone',
           connectToSortable: '.crm-designer-fields' // FIXME: tight canvas/palette coupling
         });
@@ -675,7 +675,7 @@
       });
       var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
-          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
+          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle" aria-hidden="true"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
         });
     },
     onChangeIsDuplicate: function(model, value, options) {
@@ -866,7 +866,7 @@
     initialize: function() {
       this.form = new Backbone.Form({
         model: this.model,
-        fields: ['title', 'help_pre', 'help_post', 'is_active']
+        fields: ['title', 'frontend_title', 'help_pre', 'help_post', 'is_active']
       });
       this.form.on('change', this.form.commit, this.form);
     },
@@ -875,4 +875,4 @@
     }
   });
 
-})(CRM.$, CRM._);
+})(CRM.$, CRM._, CRM.BB);

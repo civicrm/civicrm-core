@@ -14,14 +14,15 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
    * @return array
    */
   public function htmlToTextExamples() {
-    $cases = array(); // array(0 => string $html, 1 => string $text)
+    // array(0 => string $html, 1 => string $text)
+    $cases = [];
 
-    $cases[] = array(
+    $cases[] = [
       '<br/><p>',
       '',
-    );
+    ];
 
-    $cases[] = array(
+    $cases[] = [
       "\n<p>\n" .
       "This is a paragraph with <b>Bold</b> and <i>italics</i>\n" .
       "Also some <a href=\"http://www.example.com\">hrefs</a> and a\n" .
@@ -35,16 +36,16 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
       "------\n" .
       "[1] http://www.example.com\n" .
       "",
-    );
+    ];
 
-    $cases[] = array(
+    $cases[] = [
       "<p>\nA <a href=\"{action.do_something}\">token</a>\nis not treated as a relative URL",
       "A token [1] is not treated as a relative URL\n" .
       "\n" .
       "Links:\n" .
       "------\n" .
       "[1] {action.do_something}\n",
-    );
+    ];
 
     return $cases;
   }

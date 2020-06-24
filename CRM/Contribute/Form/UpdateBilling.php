@@ -1,79 +1,47 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for processing a contribution.
  */
-class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
-  protected $_crid = NULL;
-  protected $_coid = NULL;
+class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
 
   protected $_subscriptionDetails = NULL;
 
-  protected $_selfService = FALSE;
-
   public $_bltID = NULL;
 
   /**
-   * @var array current payment processor including a copy of the object in 'object' key
-   */
-  public $_paymentProcessor = array();
-
-  public $_paymentProcessorObj = NULL;
-
-  /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
-    $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+    parent::preProcess();
     if ($this->_crid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
-
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
       if ($this->_subscriptionDetails->membership_id) {
         $this->_mid = $this->_subscriptionDetails->membership_id;
       }
     }
 
-    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
     }
 
     if ($this->_mid) {
@@ -86,22 +54,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $this->_mode = 'auto_renew';
     }
 
-    if ((!$this->_crid && !$this->_coid && !$this->_mid) ||
-      ($this->_subscriptionDetails == CRM_Core_DAO::$_nullObject)
-    ) {
-      CRM_Core_Error::fatal('Required information missing.');
-    }
-    if (!CRM_Core_Permission::check('edit contributions')) {
-      $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE);
-      if (!CRM_Contact_BAO_Contact_Utils::validChecksum($this->_subscriptionDetails->contact_id, $userChecksum)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to cancel subscription.'));
-      }
-      $this->_selfService = TRUE;
+    if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->_subscriptionDetails)) {
+      throw new CRM_Core_Exception('Required information missing.');
     }
 
-    if (!$this->_paymentProcessor['object']->isSupported('updateSubscriptionBillingInfo')) {
-      CRM_Core_Error::fatal(ts("%1 processor doesn't support updating subscription billing details.",
-        array(1 => $this->_paymentProcessor['object']->_processorName)
+    if (!$this->_paymentProcessor['object']->supports('updateSubscriptionBillingInfo')) {
+      throw new CRM_Core_Exception(ts("%1 processor doesn't support updating subscription billing details.",
+        [1 => $this->_paymentProcessor['title']]
       ));
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
@@ -125,10 +84,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *   Default values
    */
   public function setDefaultValues() {
-    $this->_defaults = array();
+    $this->_defaults = [];
 
     if ($this->_subscriptionDetails->contact_id) {
-      $fields = array();
+      $fields = [];
       $names = array(
         'first_name',
         'middle_name',
@@ -177,22 +136,21 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $type = 'next';
-    if ($this->_selfService) {
+    if ($this->isSelfService()) {
       $type = 'submit';
     }
 
     $this->addButtons(array(
-        array(
-          'type' => $type,
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => $type,
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, TRUE, TRUE);
     $this->addFormRule(array('CRM_Contribute_Form_UpdateBilling', 'formRule'), $this);
@@ -212,7 +170,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // validate the payment instrument values (e.g. credit card number)
@@ -234,7 +192,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
     $fields["email-{$this->_bltID}"] = 1;
 
-    $processorParams = array();
+    $processorParams = [];
     foreach ($params as $key => $val) {
       $key = str_replace('billing_', '', $key);
       list($key) = explode('-', $key);
@@ -242,13 +200,12 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     }
     $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
     $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
-    $processorParams['month'] = $processorParams['credit_card_exp_date']['M'];
-    $processorParams['year'] = $processorParams['credit_card_exp_date']['Y'];
-    $processorParams['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
+    $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
+    $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
+    $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
     $processorParams['amount'] = $this->_subscriptionDetails->amount;
-
-    $updateSubscription = $this->_paymentProcessorObj->updateSubscriptionBillingInfo($message, $processorParams);
-
+    $message = '';
+    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
     }
@@ -296,7 +253,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       // format new address for display
       $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
       foreach ($addressParts as $part) {
-        $addressParts[$part] = CRM_Utils_Array::value($part, $processorParams);
+        $addressParts[$part] = $processorParams[$part] ?? NULL;
       }
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
@@ -306,7 +263,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
       foreach ($addressParts as $part) {
         $key = "{$part}-{$this->_bltID}";
-        $addressParts[$part] = CRM_Utils_Array::value($key, $this->_defaults);
+        $addressParts[$part] = $this->_defaults[$key] ?? NULL;
       }
       $this->_defaults['address'] = CRM_Utils_Address::format($addressParts);
 
@@ -341,17 +298,15 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       $activityParams = array(
         'source_contact_id' => $this->_subscriptionDetails->contact_id,
-        'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-          'Update Recurring Contribution Billing Details',
-          'name'
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey(
+          'CRM_Activity_BAO_Activity',
+          'activity_type_id',
+          'Update Recurring Contribution Billing Details'
         ),
         'subject' => ts('Recurring Contribution Billing Details Updated'),
         'details' => $message,
         'activity_date_time' => date('YmdHis'),
-        'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
-          'Completed',
-          'name'
-        ),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
       );
       $session = CRM_Core_Session::singleton();
       $cid = $session->get('userID');
@@ -379,10 +334,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
       $tplParams['contact'] = array('display_name' => $donorDisplayName);
 
-      $date = CRM_Utils_Date::format($processorParams['credit_card_exp_date']);
-      $tplParams['credit_card_exp_date'] = CRM_Utils_Date::mysqlToIso($date);
-      $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard($processorParams['credit_card_number']);
-      $tplParams['credit_card_type'] = $processorParams['credit_card_type'];
+      $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
 
       $sendTemplateParams = array(
         'groupName' => $this->_subscriptionDetails->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',

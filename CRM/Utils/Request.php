@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -82,34 +66,28 @@ class CRM_Utils_Request {
    *
    * @return mixed
    *   The value of the variable
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
-
-    // hack to detect stuff not yet converted to new style
-    if (!is_string($type)) {
-      CRM_Core_Error::backtrace();
-      CRM_Core_Error::fatal(ts("Please convert retrieve call to use new function signature"));
-    }
 
     $value = NULL;
     switch ($method) {
       case 'GET':
-        $value = CRM_Utils_Array::value($name, $_GET);
+        $value = self::getValue($name, $_GET);
         break;
 
       case 'POST':
-        $value = CRM_Utils_Array::value($name, $_POST);
+        $value = self::getValue($name, $_POST);
         break;
 
       default:
-        $value = CRM_Utils_Array::value($name, $_REQUEST);
+        $value = self::getValue($name, $_REQUEST);
         break;
     }
 
-    if (isset($value) &&
-      (CRM_Utils_Type::validate($value, $type, $abort, $name) === NULL)
-    ) {
-      $value = NULL;
+    if (isset($value)) {
+      $value = CRM_Utils_Type::validate($value, $type, $abort, $name);
     }
 
     if (!isset($value) && $store) {
@@ -117,7 +95,7 @@ class CRM_Utils_Request {
     }
 
     if (!isset($value) && $abort) {
-      CRM_Core_Error::fatal(ts("Could not find valid value for %1", array(1 => $name)));
+      throw new CRM_Core_Exception(ts('Could not find valid value for %1', [1 => $name]));
     }
 
     if (!isset($value) && $default) {
@@ -125,8 +103,10 @@ class CRM_Utils_Request {
     }
 
     // minor hack for action
-    if ($name == 'action' && is_string($value)) {
-      $value = CRM_Core_Action::resolve($value);
+    if ($name === 'action') {
+      if (!is_numeric($value) && is_string($value)) {
+        $value = CRM_Core_Action::resolve($value);
+      }
     }
 
     if (isset($value) && $store) {
@@ -137,6 +117,38 @@ class CRM_Utils_Request {
   }
 
   /**
+   * @param string $name
+   *   Name of the variable to be retrieved.
+   *
+   * @param array $method - '$_GET', '$_POST' or '$_REQUEST'.
+   *
+   * @return mixed
+   *   The value of the variable
+   */
+  protected static function getValue($name, $method) {
+    if (isset($method[$name])) {
+      return $method[$name];
+    }
+    // CRM-18384 - decode incorrect keys generated when &amp; is present in url
+    foreach ($method as $key => $value) {
+      if (strpos($key, 'amp;') !== FALSE) {
+        $method[str_replace('amp;', '', $key)] = $method[$key];
+        if (isset($method[$name])) {
+          return $method[$name];
+        }
+        else {
+          continue;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * @deprecated
+   *
+   * We should use a function that checks url values.
+   *
    * This is a replacement for $_REQUEST which includes $_GET/$_POST
    * but excludes $_COOKIE / $_ENV / $_SERVER.
    *
@@ -148,7 +160,7 @@ class CRM_Utils_Request {
     // http://www.php.net/manual/en/ini.core.php#ini.request-order
     // http://www.php.net/manual/en/ini.core.php#ini.variables-order
 
-    $result = array();
+    $result = [];
     if ($_GET) {
       $result = array_merge($result, $_GET);
     }
@@ -156,6 +168,66 @@ class CRM_Utils_Request {
       $result = array_merge($result, $_POST);
     }
     return $result;
+  }
+
+  /**
+   * Retrieve a variable from the http request.
+   *
+   * @param string $name
+   *   Name of the variable to be retrieved.
+   * @param string $type
+   *   Type of the variable (see CRM_Utils_Type for details).
+   *   Most common options are:
+   *   - 'Integer'
+   *   - 'Positive'
+   *   - 'CommaSeparatedIntegers'
+   *   - 'Boolean'
+   *   - 'String'
+   *
+   * @param mixed $defaultValue
+   *   Default value of the variable if not present.
+   * @param bool $isRequired
+   *   Is the variable required for this function to proceed without an exception.
+   * @param string $method
+   *   Where to look for the value - GET|POST|REQUEST
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public static function retrieveValue($name, $type, $defaultValue = NULL, $isRequired = FALSE, $method = 'REQUEST') {
+    $null = NULL;
+    return CRM_Utils_Request::retrieve((string) $name, (string) $type, $null, (bool) $isRequired, $defaultValue, $method, TRUE);
+  }
+
+  /**
+   * Retrieve the component from the action attribute of a form.
+   *
+   * Contribution Page forms and Event Management forms detect the value of a
+   * component (and therefore the desired tab key) by reaching into the "action"
+   * attribute of a form and reading the final item of the path. In WordPress,
+   * however, the URL may be urlencoded, and so the URL may need to be decoded
+   * before parsing it.
+   *
+   * @see https://lab.civicrm.org/dev/wordpress/issues/12#note_10699
+   *
+   * @param array $attributes
+   *   The form attributes array.
+   *
+   * @return string
+   *   The desired value.
+   */
+  public static function retrieveComponent($attributes) {
+    $url = $attributes['action'] ?? NULL;
+    // Whilst the following is a fallible universal test for urlencoded URLs,
+    // thankfully the "action" URL has a limited and predictable form and
+    // therefore this comparison is sufficient for our purposes.
+    if (rawurlencode(rawurldecode($url)) !== $url) {
+      $value = strtolower(basename(rawurldecode($url)));
+    }
+    else {
+      $value = strtolower(basename($url));
+    }
+    return $value;
   }
 
 }

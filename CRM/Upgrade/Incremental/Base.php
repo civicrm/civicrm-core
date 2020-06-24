@@ -1,29 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7.alpha1                                         |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Core\SettingsBag;
 
 /**
  * Base class for incremental upgrades
@@ -94,20 +80,20 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $funcName
    */
   protected function addTask($title, $funcName) {
-    $queue = CRM_Queue_Service::singleton()->load(array(
+    $queue = CRM_Queue_Service::singleton()->load([
       'type' => 'Sql',
       'name' => CRM_Upgrade_Form::QUEUE_NAME,
-    ));
+    ]);
 
     $args = func_get_args();
     $title = array_shift($args);
     $funcName = array_shift($args);
     $task = new CRM_Queue_Task(
-      array(get_class($this), $funcName),
+      [get_class($this), $funcName],
       $args,
       $title
     );
-    $queue->createItem($task, array('weight' => -1));
+    $queue->createItem($task, ['weight' => -1]);
   }
 
   /**
@@ -119,15 +105,204 @@ class CRM_Upgrade_Incremental_Base {
    * @throws \CiviCRM_API3_Exception
    */
   public static function removePaymentProcessorType(CRM_Queue_TaskContext $ctx, $name) {
-    $processors = civicrm_api3('PaymentProcessor', 'getcount', array('payment_processor_type_id' => $name));
+    $processors = civicrm_api3('PaymentProcessor', 'getcount', ['payment_processor_type_id' => $name]);
     if (empty($processors['result'])) {
-      $result = civicrm_api3('PaymentProcessorType', 'get', array(
+      $result = civicrm_api3('PaymentProcessorType', 'get', [
         'name' => $name,
         'return' => 'id',
-      ));
+      ]);
       if (!empty($result['id'])) {
-        civicrm_api3('PaymentProcessorType', 'delete', array('id' => $result['id']));
+        civicrm_api3('PaymentProcessorType', 'delete', ['id' => $result['id']]);
       }
+    }
+    return TRUE;
+  }
+
+  /**
+   * @param string $table_name
+   * @param string $constraint_name
+   * @return bool
+   */
+  public static function checkFKExists($table_name, $constraint_name) {
+    return CRM_Core_BAO_SchemaHandler::checkFKExists($table_name, $constraint_name);
+  }
+
+  /**
+   * Add a column to a table if it doesn't already exist
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $column
+   * @param string $properties
+   * @param bool $localizable is this a field that should be localized
+   * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   *
+   * @return bool
+   */
+  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $queries = [];
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
+      if ($domain->locales) {
+        if ($localizable) {
+          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+          foreach ($locales as $locale) {
+            if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
+              $queries[] = "ALTER TABLE `$table` ADD COLUMN `{$column}_{$locale}` $properties";
+            }
+          }
+        }
+        else {
+          $queries[] = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
+        }
+      }
+      else {
+        $queries[] = "ALTER TABLE `$table` ADD COLUMN `$column` $properties";
+      }
+      foreach ($queries as $query) {
+        CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version, TRUE);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Do any relevant message template updates.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $version
+   */
+  public static function updateMessageTemplates($ctx, $version) {
+    $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageTemplateObject->updateTemplates();
+
+  }
+
+  /**
+   * Re-save any valid values from contribute settings into the normal setting
+   * format.
+   *
+   * We render the array of contribution_invoice_settings and any that have
+   * metadata defined we add to the correct key. This is safe to run even if no
+   * settings are to be converted, per the test in
+   * testConvertUpgradeContributeSettings.
+   *
+   * @param $ctx
+   *
+   * @return bool
+   */
+  public static function updateContributeSettings($ctx) {
+    // Use a direct query as api now does some handling on this.
+    $settings = CRM_Core_DAO::executeQuery("SELECT value, domain_id FROM civicrm_setting WHERE name = 'contribution_invoice_settings'");
+
+    while ($settings->fetch()) {
+      $contributionSettings = (array) CRM_Utils_String::unserialize($settings->value);
+      foreach (array_merge(SettingsBag::getContributionInvoiceSettingKeys(), ['deferred_revenue_enabled' => 'deferred_revenue_enabled']) as $possibleKeyName => $settingName) {
+        if (!empty($contributionSettings[$possibleKeyName]) && empty(Civi::settings($settings->domain_id)->getExplicit($settingName))) {
+          Civi::settings($settings->domain_id)->set($settingName, $contributionSettings[$possibleKeyName]);
+        }
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Do any relevant smart group updates.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param array $actions
+   *
+   * @return bool
+   */
+  public function updateSmartGroups($ctx, $actions) {
+    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $groupUpdateObject->updateGroups($actions);
+    return TRUE;
+  }
+
+  /**
+   * Drop a column from a table if it exist.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $column
+   * @return bool
+   */
+  public static function dropColumn($ctx, $table, $column) {
+    if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
+        [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Add a index to a table column.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string|array $column
+   * @return bool
+   */
+  public static function addIndex($ctx, $table, $column) {
+    $tables = [$table => (array) $column];
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+
+    return TRUE;
+  }
+
+  /**
+   * Drop a index from a table if it exist.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @param string $indexName
+   * @return bool
+   */
+  public static function dropIndex($ctx, $table, $indexName) {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists($table, $indexName);
+
+    return TRUE;
+  }
+
+  /**
+   * Drop a table... but only if it's empty.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $table
+   * @return bool
+   */
+  public static function dropTableIfEmpty($ctx, $table) {
+    if (CRM_Core_DAO::checkTableExists($table)) {
+      if (!CRM_Core_DAO::checkTableHasData($table)) {
+        CRM_Core_BAO_SchemaHandler::dropTable($table);
+      }
+      else {
+        $ctx->log->warning("dropTableIfEmpty($table): Found data. Preserved table.");
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Rebuild Multilingual Schema.
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   *
+   * @return bool
+   */
+  public static function rebuildMultilingalSchema($ctx, $version = NULL) {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version);
     }
     return TRUE;
   }

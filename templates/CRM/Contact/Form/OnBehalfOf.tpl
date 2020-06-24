@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This file provides the HTML for the on-behalf-of form. Can also be used for related contact edit form. *}
@@ -140,6 +124,13 @@
             <div class="clear"></div>
         </div>
         {/if}
+        {if $addressSequence.supplemental_address_3}
+    <div class="crm-section {$form.address.$index.supplemental_address_3.id}-section">
+            <div class="label">{$form.address.$index.supplemental_address_3.label}</div>
+            <div class="content">{$form.address.$index.supplemental_address_3.html}</div>
+            <div class="clear"></div>
+        </div>
+        {/if}
         {if $addressSequence.city}
     <div class="crm-section {$form.address.$index.city.id}<-section">
             <div class="label">{$form.address.$index.city.label}</div>
@@ -180,7 +171,7 @@
             <div class="content">{$form.address.$index.geo_code_1.html}, {$form.address.$index.geo_code_2.html}
                 <br class="spacer"/>
                 <span class="description">
-                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-setup" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
+                    {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {docURL page="user/initial-set-up/installation-and-basic-set-up" text="(Refer to the Mapping and Geocoding section in the Installation and Basic Setup Chapter)"}</span>
             </div>
             <div class="clear"></div>
         </div>

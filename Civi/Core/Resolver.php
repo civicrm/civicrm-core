@@ -53,7 +53,7 @@ class Resolver {
    * @param string|array $id
    *   A callback expression; any of the following.
    *
-   * @return array
+   * @return array|callable
    *   A PHP callback. Do not serialize (b/c it may include an object).
    * @throws \RuntimeException
    */
@@ -77,7 +77,7 @@ class Resolver {
         case 'call':
           // Callback: Object/method in container.
           $obj = \Civi::service($url['host']);
-          return array($obj, ltrim($url['path'], '/'));
+          return [$obj, ltrim($url['path'], '/')];
 
         case 'api3':
           // Callback: API.
@@ -91,11 +91,11 @@ class Resolver {
           throw new \RuntimeException("Unsupported callback scheme: " . $url['scheme']);
       }
     }
-    elseif (in_array($id, array('0', '1'))) {
+    elseif (in_array($id, ['0', '1'])) {
       // Callback: Constant value.
       return new ResolverConstantCallback((int) $id);
     }
-    elseif ($id{0} >= 'A' && $id{0} <= 'Z') {
+    elseif ($id[0] >= 'A' && $id[0] <= 'Z') {
       // Object: New/default instance.
       return new $id();
     }
@@ -184,7 +184,7 @@ class ResolverApi {
    * Fire an API call.
    */
   public function __invoke() {
-    $apiParams = array();
+    $apiParams = [];
     if (isset($this->url['query'])) {
       parse_str($this->url['query'], $apiParams);
     }
@@ -197,7 +197,7 @@ class ResolverApi {
     }
 
     $result = civicrm_api3($this->url['host'], ltrim($this->url['path'], '/'), $apiParams);
-    return isset($result['values']) ? $result['values'] : NULL;
+    return $result['values'] ?? NULL;
   }
 
   /**
@@ -212,7 +212,7 @@ class ResolverApi {
    *   (e.g. "@1" => "firstValue").
    */
   protected function createPlaceholders($prefix, $args) {
-    $result = array();
+    $result = [];
     foreach ($args as $offset => $arg) {
       $result[$prefix . (1 + $offset)] = $arg;
     }
@@ -222,11 +222,11 @@ class ResolverApi {
   /**
    * Recursively interpolate values.
    *
-   * @code
+   * ```
    * $params = array('foo' => '@1');
    * $this->interpolate($params, array('@1'=> $object))
    * assert $data['foo'] == $object;
-   * @endcode
+   * ```
    *
    * @param array $array
    *   Array which may or many not contain a mix of tokens.
@@ -250,7 +250,8 @@ class ResolverApi {
 }
 
 class ResolverGlobalCallback {
-  private $mode, $path;
+  private $mode;
+  private $path;
 
   /**
    * Class constructor.
@@ -277,6 +278,7 @@ class ResolverGlobalCallback {
     }
     elseif ($this->mode === 'setter') {
       \CRM_Utils_Array::pathSet($GLOBALS, explode('/', $this->path), $arg1);
+      return NULL;
     }
     else {
       throw new \RuntimeException("Resolver failed: global:// must specify getter or setter mode.");

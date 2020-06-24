@@ -31,9 +31,13 @@
   </field>
   <field>
     <name>label</name>
+    <title>Label</title>
     <type>varchar</type>
     <length>128</length>
     <localizable>true</localizable>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Label for Membership Status</comment>
     <add>3.2</add>
   </field>
@@ -110,9 +114,12 @@
   </field>
   <field>
     <name>is_admin</name>
-    <title>Admin Assigned Only?</title>
+    <title>Administrator Only?</title>
     <type>boolean</type>
     <comment>Is this status for admin/manual assignment only.</comment>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -125,6 +132,9 @@
     <name>is_default</name>
     <title>Default Status?</title>
     <type>boolean</type>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <comment>Assign this status to a membership record if no other status match is found.</comment>
     <add>1.5</add>
   </field>
@@ -133,6 +143,9 @@
     <title>Is Active</title>
     <type>boolean</type>
     <default>1</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <comment>Is this membership_status enabled.</comment>
     <add>1.5</add>
   </field>
@@ -141,6 +154,9 @@
     <title>Is Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <comment>Is this membership_status reserved.</comment>
     <add>2.1</add>
   </field>

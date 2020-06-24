@@ -155,9 +155,6 @@ br.clear {
 #header, #content {
   width: 100%;
 }
-#header {
-  background-color: #69c;
-}
 #logo {
   vertical-align: middle;
   border: 0;
@@ -227,7 +224,7 @@ br.clear {
   background-color: #ddd;
   width: 16em;
   /* padding in px not ex because IE messes up 100% width tables otherwise */
-  padding: 10px;
+  padding: 20px;
   vertical-align: top;
 }
 
@@ -294,16 +291,6 @@ br.clear {
 /* Joomla Admin Menu alterations */
 /* Moved from civicrm.css in v3.2 */
 
-ul#civicrm-menu {
-  z-index: 1;
-  position:relative;
-  border: none;
-  left:0px;
-  height:0px;
-  padding: 2px 0px 25px 2px !important;
-  padding-bottom:25px !important; /*moz bottom */
-  padding-bottom:2px; /*ie bottom */
-}
 
 div#toolbar-box div.m {
   padding: 0px !important;
@@ -316,9 +303,6 @@ div#toolbar-box, div#toolbar-box div.m{
   height: auto;
 }
 
-ul#civicrm-menu li#crm-qsearch {
-  height:0px;
-}
 .crm-tab-button,
 .ui-tabs .ui-tabs-nav li {
   border: 1px;
@@ -374,4 +358,44 @@ ul#civicrm-menu li#crm-qsearch {
 
 .crm-container .disabled {
   font-weight: normal;
+}
+
+#crm-container .form-layout td.label,
+.crm-container .form-layout td.label {
+  width: inherit;
+}
+
+#crm-container .crm-event-form-fee-block .label {
+  background-color: inherit;
+  width: inherit;
+  display: block;
+}
+
+/* dev/core#874 the width:auto styling above causes the menubar colour picker to be squeezed */
+.crm-container input.crm-form-color {
+  width: 3.6em;
+}
+
+/* Remove Joomla subhead toolbar & whitespace border */
+	
+body.admin.com_civicrm .subhead-collapse {
+	display:none;
+}
+body.admin.com_civicrm .container-fluid.container-main {
+	padding: 0;
+	border-top: 1px solid #787878;
+}
+body.admin.com_civicrm.task-civicrmupgrade .container-fluid.container-main {
+	padding: 10px 25px 25px;
+}
+body.admin.com_civicrm #crm-nav-menu-container {
+	padding-bottom: 0 !important;
+}
+body.admin.com_civicrm #content-right {
+	padding: 12px;
+}
+
+/* Make footer admin bar hide behind popup windows (CRM-15723) */
+body.ui-dialog-open #status {
+  z-index: 100 !important;
 }

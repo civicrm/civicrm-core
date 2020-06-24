@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-profile-name-{$ufGroupName}">
@@ -36,7 +20,9 @@
 
   <div class="crm-submit-buttons">
     <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
-    <a class="button cancel" href="{$cancelURL}">{ts}Cancel{/ts}</a>
+    {if $includeCancelButton}
+      <a class="button cancel" href="{$cancelURL}">{$cancelButtonText}</a>
+    {/if}
   </div>
 {else}
 {if ! empty( $fields )}
@@ -154,7 +140,7 @@
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
                 {include file="CRM/Profile/Form/GreetingType.tpl"}
               {elseif ( $n eq 'group' && $form.group ) || ( $n eq 'tag' && $form.tag )}
-                {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n context="profile"}
+                {include file="CRM/Contact/Form/Edit/TagsAndGroups.tpl" type=$n context="profile" tableLayout=1}
               {elseif ( $form.$n.name eq 'image_URL' )}
                 {$form.$n.html}
                 {if !empty($imageURL)}
@@ -171,11 +157,8 @@
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {if
-                ( ( $n eq 'birth_date' ) or ( $n eq 'deceased_date' ) or ( $n eq 'activity_date_time' ) ) and $field.is_view neq 1 }
-                {include file="CRM/common/jcalendar.tpl" elementName=$n}
-                {else}
-                  {$form.$n.html}
+                {if $field.html_type neq 'File' || ($field.html_type eq 'File' && !$field.is_view)}
+                   {$form.$n.html}
                 {/if}
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
@@ -189,7 +172,9 @@
 
           {if $form.$n.type eq 'file'}
             <div class="crm-section file_displayURL-section file_displayURL{$n}-section"><div class="content">{$customFiles.$n.displayURL}</div></div>
-            <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
+            {if !$fields.$n.is_view}
+               <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
+            {/if}
           {/if}
         {/if}
 
@@ -223,12 +208,14 @@
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
-        <a class="button cancel" href="{$cancelURL}">
-          <span>
-            <i class="crm-i fa-times"></i>
-            {ts}Cancel{/ts}
-          </span>
-        </a>
+        {if $includeCancelButton}
+          <a class="button cancel" href="{$cancelURL}">
+            <span>
+              <i class="crm-i fa-times" aria-hidden="true"></i>
+              {$cancelButtonText}
+            </span>
+          </a>
+        {/if}
       </div>
     {/if}
     {if $help_post && $action neq 4}<br /><div class="messages help">{$help_post}</div>{/if}

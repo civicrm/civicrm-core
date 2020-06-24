@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,7 +25,7 @@ class CRM_Report_Utils_Get {
    * @return mixed|null
    */
   public static function getTypedValue($name, $type) {
-    $value = CRM_Utils_Array::value($name, $_GET);
+    $value = $_GET[$name] ?? NULL;
     if ($value === NULL) {
       return NULL;
     }
@@ -66,9 +50,12 @@ class CRM_Report_Utils_Get {
     $from = self::getTypedValue("{$fieldName}_from", $type);
     $to = self::getTypedValue("{$fieldName}_to", $type);
 
-    $relative = CRM_Utils_Array::value("{$fieldName}_relative", $_GET);
+    $relative = self::getTypedValue("{$fieldName}_relative", CRM_Utils_Type::T_STRING);
+    if ($relative !== NULL) {
+      $defaults["{$fieldName}_relative"] = $relative;
+    }
     if ($relative) {
-      list($from, $to) = CRM_Report_Form::getFromTo($relative, NULL, NULL);
+      list($from, $to) = CRM_Utils_Date::getFromTo($relative, NULL, NULL);
       $from = substr($from, 0, 8);
       $to = substr($to, 0, 8);
     }
@@ -110,6 +97,7 @@ class CRM_Report_Utils_Get {
       case 'ew':
       case 'nhas':
       case 'like':
+      case 'eq':
       case 'neq':
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Array::value('type', $field));
         if ($value !== NULL) {
@@ -174,6 +162,11 @@ class CRM_Report_Utils_Get {
         }
         break;
 
+      case 'nll':
+      case 'nnll':
+        $defaults["{$fieldName}_op"] = $fieldOP;
+        break;
+
       case 'in':
       case 'notin':
         // send the type as string so that multiple values can also be retrieved from url.
@@ -195,11 +188,11 @@ class CRM_Report_Utils_Get {
    * @param $defaults
    */
   public static function processChart(&$defaults) {
-    $chartType = CRM_Utils_Array::value("charts", $_GET);
-    if (in_array($chartType, array(
+    $chartType = $_GET["charts"] ?? NULL;
+    if (in_array($chartType, [
       'barChart',
       'pieChart',
-    ))) {
+    ])) {
       $defaults["charts"] = $chartType;
     }
   }
@@ -294,7 +287,7 @@ class CRM_Report_Utils_Get {
       }
       if (CRM_Utils_Array::value("ufld", $_GET) == 1) {
         // unset all display columns
-        $defaults['fields'] = array();
+        $defaults['fields'] = [];
       }
       if (!empty($urlFields)) {
         foreach ($reportFields as $tableName => $fields) {

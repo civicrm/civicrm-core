@@ -1,71 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
- * Class for civimember task actions
- *
+ * Class for member form task actions.
+ * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
  */
-class CRM_Member_Form_Task extends CRM_Core_Form {
-
-  /**
-   * The task being performed.
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The additional clause that we restrict the search with.
-   *
-   * @var string
-   */
-  protected $_componentClause = NULL;
-
-  /**
-   * The array that holds all the component ids.
-   *
-   * @var array
-   */
-  protected $_componentIds;
-
-  /**
-   * The array that holds all the contact ids.
-   *
-   * @var array
-   */
-  public $_contactIds;
+class CRM_Member_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * The array that holds all the member ids.
@@ -80,6 +34,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
    * @param
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     self::preProcessCommon($this);
@@ -87,19 +42,23 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param bool $useTable
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
-    $form->_memberIds = array();
+  public static function preProcessCommon(&$form) {
+    $form->_memberIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = $values['task'];
-    $memberTasks = CRM_Member_Task::tasks();
-    $form->assign('taskName', $memberTasks[$form->_task]);
+    $tasks = CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
+    if (!array_key_exists($form->_task, $tasks)) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+    $form->assign('taskName', $tasks[$form->_task]);
 
-    $ids = array();
-    if ($values['radio_ts'] == 'ts_sel') {
+    $ids = [];
+    if ($values['radio_ts'] === 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
           $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
@@ -141,7 +100,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
     }
 
     $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
+    if ($searchFormName === 'search') {
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/member/search', $urlParams));
     }
     else {
@@ -156,35 +115,9 @@ class CRM_Member_Form_Task extends CRM_Core_Form {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_memberIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_memberIds,
       'civicrm_membership'
     );
-  }
-
-  /**
-   * Simple shell that derived classes can call to add buttons to.
-   * the form with a customized title for the main Submit
-   *
-   * @param string $title
-   *   Title of the main button.
-   * @param string $nextType
-   * @param string $backType
-   * @param bool $submitOnce
-   *
-   * @return void
-   */
-  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-      array(
-        'type' => $nextType,
-        'name' => $title,
-        'isDefault' => TRUE,
-      ),
-      array(
-        'type' => $backType,
-        'name' => ts('Cancel'),
-      ),
-    ));
   }
 
 }

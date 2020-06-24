@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -49,14 +33,26 @@
 function smarty_block_crmButton($params, $text, &$smarty) {
   // Generate url (pass 'html' param as false to avoid double-encode by htmlAttributes)
   if (empty($params['href'])) {
-    $params['href'] = CRM_Utils_System::crmURL($params + array('h' => FALSE));
+    $params['href'] = CRM_Utils_System::crmURL($params + ['h' => FALSE]);
   }
   // Always add class 'button' - fixme probably should be crm-button
   $params['class'] = empty($params['class']) ? 'button' : 'button ' . $params['class'];
   // Any FA icon works
-  $icon = CRM_Utils_Array::value('icon', $params, 'pencil');
+  if (array_key_exists('icon', $params) && !$params['icon']) {
+    // icon=0 should produce a button with no icon
+    $iconMarkup = '';
+  }
+  else {
+    $icon = $params['icon'] ?? 'fa-pencil';
+    // Assume for now that all icons are Font Awesome v4.x but handle if it's
+    // specified
+    if (strpos($icon, 'fa-') !== 0) {
+      $icon = "fa-$icon";
+    }
+    $iconMarkup = "<i class='crm-i $icon' aria-hidden=\"true\"></i>&nbsp; ";
+  }
   // All other params are treated as html attributes
   CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');
   $attributes = CRM_Utils_String::htmlAttributes($params);
-  return "<a $attributes><span><i class='crm-i fa-$icon'></i>&nbsp; $text</span></a>";
+  return "<a $attributes><span>$iconMarkup$text</span></a>";
 }

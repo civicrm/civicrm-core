@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts}Your Event Registration has been cancelled.{/ts}</p>
    </td>
   </tr>
@@ -51,24 +51,7 @@
      {if $isShowLocation}
       <tr>
        <td colspan="2" {$valueStyle}>
-        {if $event.location.address.1.name}
-         {$event.location.address.1.name}<br />
-        {/if}
-        {if $event.location.address.1.street_address}
-         {$event.location.address.1.street_address}<br />
-        {/if}
-        {if $event.location.address.1.supplemental_address_1}
-         {$event.location.address.1.supplemental_address_1}<br />
-        {/if}
-        {if $event.location.address.1.supplemental_address_2}
-         {$event.location.address.1.supplemental_address_2}<br />
-        {/if}
-        {if $event.location.address.1.city}
-         {$event.location.address.1.city} {$event.location.address.1.postal_code}
-         {if $event.location.address.1.postal_code_suffix}
-          - {$event.location.address.1.postal_code_suffix}
-         {/if}
-        {/if}
+        {$event.location.address.1.display|nl2br}
        </td>
       </tr>
      {/if}

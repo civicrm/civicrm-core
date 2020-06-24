@@ -1,40 +1,24 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 abstract class CRM_Import_Parser {
   /**
    * Settings
    */
-  const MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
+  const MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
@@ -59,16 +43,19 @@ abstract class CRM_Import_Parser {
 
   /**
    * Total number of non empty lines
+   * @var int
    */
   protected $_totalCount;
 
   /**
    * Running total number of valid lines
+   * @var int
    */
   protected $_validCount;
 
   /**
    * Running total number of invalid rows
+   * @var int
    */
   protected $_invalidRowCount;
 
@@ -80,47 +67,50 @@ abstract class CRM_Import_Parser {
   protected $_maxLinesToProcess;
 
   /**
-   * Maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
-
-  /**
    * Array of error lines, bounded by MAX_ERROR
+   * @var array
    */
   protected $_errors;
 
   /**
    * Total number of conflict lines
+   * @var int
    */
   protected $_conflictCount;
 
   /**
    * Array of conflict lines
+   * @var array
    */
   protected $_conflicts;
 
   /**
    * Total number of duplicate (from database) lines
+   * @var int
    */
   protected $_duplicateCount;
 
   /**
    * Array of duplicate lines
+   * @var array
    */
   protected $_duplicates;
 
   /**
    * Running total number of warnings
+   * @var int
    */
   protected $_warningCount;
 
   /**
    * Maximum number of warnings to store
+   * @var int
    */
   protected $_maxWarningCount = self::MAX_WARNINGS;
 
   /**
    * Array of warning lines, bounded by MAX_WARNING
+   * @var array
    */
   protected $_warnings;
 
@@ -130,6 +120,33 @@ abstract class CRM_Import_Parser {
    * @var array
    */
   protected $_fields;
+
+  /**
+   * Metadata for all available fields, keyed by unique name.
+   *
+   * This is intended to supercede $_fields which uses a special sauce format which
+   * importableFieldsMetadata uses the standard getfields type format.
+   *
+   * @var array
+   */
+  protected $importableFieldsMetadata = [];
+
+  /**
+   * Get metadata for all importable fields in std getfields style format.
+   *
+   * @return array
+   */
+  public function getImportableFieldsMetadata(): array {
+    return $this->importableFieldsMetadata;
+  }
+
+  /**
+   * Set metadata for all importable fields in std getfields style format.
+   * @param array $importableFieldsMetadata
+   */
+  public function setImportableFieldsMetadata(array $importableFieldsMetadata) {
+    $this->importableFieldsMetadata = $importableFieldsMetadata;
+  }
 
   /**
    * Array of the fields that are actually part of the import process
@@ -192,7 +209,6 @@ abstract class CRM_Import_Parser {
    */
   public function __construct() {
     $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
   }
 
   /**
@@ -279,7 +295,7 @@ abstract class CRM_Import_Parser {
    *   (reference) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -293,10 +309,65 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Add progress bar to the import process. Calculates time remaining, status etc.
+   *
+   * @param $statusID
+   *   status id of the import process saved in $config->uploadDir.
+   * @param bool $startImport
+   *   True when progress bar is to be initiated.
+   * @param $startTimestamp
+   *   Initial timstamp when the import was started.
+   * @param $prevTimestamp
+   *   Previous timestamp when this function was last called.
+   * @param $totalRowCount
+   *   Total number of rows in the import file.
+   *
+   * @return NULL|$currTimestamp
+   */
+  public function progressImport($statusID, $startImport = TRUE, $startTimestamp = NULL, $prevTimestamp = NULL, $totalRowCount = NULL) {
+    $config = CRM_Core_Config::singleton();
+    $statusFile = "{$config->uploadDir}status_{$statusID}.txt";
+
+    if ($startImport) {
+      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
+      //do not force the browser to display the save dialog, CRM-7640
+      $contents = json_encode([0, $status]);
+      file_put_contents($statusFile, $contents);
+    }
+    else {
+      $rowCount = $this->_rowCount ?? $this->_lineCount;
+      $currTimestamp = time();
+      $totalTime = ($currTimestamp - $startTimestamp);
+      $time = ($currTimestamp - $prevTimestamp);
+      $recordsLeft = $totalRowCount - $rowCount;
+      if ($recordsLeft < 0) {
+        $recordsLeft = 0;
+      }
+      $estimatedTime = ($recordsLeft / 50) * $time;
+      $estMinutes = floor($estimatedTime / 60);
+      $timeFormatted = '';
+      if ($estMinutes > 1) {
+        $timeFormatted = $estMinutes . ' ' . ts('minutes') . ' ';
+        $estimatedTime = $estimatedTime - ($estMinutes * 60);
+      }
+      $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
+      $processedPercent = (int ) (($rowCount * 100) / $totalRowCount);
+      $statusMsg = ts('%1 of %2 records - %3 remaining',
+        [1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted]
+      );
+      $status = "<div class=\"description\">&nbsp; <strong>{$statusMsg}</strong></div>";
+      $contents = json_encode([$processedPercent, $status]);
+
+      file_put_contents($statusFile, $contents);
+      return $currTimestamp;
+    }
+  }
+
+  /**
    * @return array
    */
   public function getSelectValues() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
     }
@@ -307,7 +378,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getSelectTypes() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
         $values[$name] = $field->_hasLocationType;
@@ -320,7 +391,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getHeaderPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
         $values[$name] = $field->_headerPattern;
@@ -333,7 +404,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getDataPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
     }
@@ -442,6 +513,95 @@ abstract class CRM_Import_Parser {
     }
 
     return $fileName;
+  }
+
+  /**
+   * Check if contact is a duplicate .
+   *
+   * @param array $formatValues
+   *
+   * @return array
+   */
+  protected function checkContactDuplicate(&$formatValues) {
+    //retrieve contact id using contact dedupe rule
+    $formatValues['contact_type'] = $this->_contactType;
+    $formatValues['version'] = 3;
+    require_once 'CRM/Utils/DeprecatedUtils.php';
+    $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
+    return $error;
+  }
+
+  /**
+   * Parse a field which could be represented by a label or name value rather than the DB value.
+   *
+   * We will try to match name first or (per https://lab.civicrm.org/dev/core/issues/1285 if we have an id.
+   *
+   * but if not available then see if we have a label that can be converted to a name.
+   *
+   * @param string|int|null $submittedValue
+   * @param array $fieldSpec
+   *   Metadata for the field
+   *
+   * @return mixed
+   */
+  protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
+    // dev/core#1289 Somehow we have wound up here but the BAO has not been specified in the fieldspec so we need to check this but future us problem, for now lets just return the submittedValue
+    if (!isset($fieldSpec['bao'])) {
+      return $submittedValue;
+    }
+    /* @var \CRM_Core_DAO $bao */
+    $bao = $fieldSpec['bao'];
+    // For historical reasons use validate as context - ie disabled name matches ARE permitted.
+    $nameOptions = $bao::buildOptions($fieldSpec['name'], 'validate');
+    if (isset($nameOptions[$submittedValue])) {
+      return $submittedValue;
+    }
+    if (in_array($submittedValue, $nameOptions)) {
+      return array_search($submittedValue, $nameOptions, TRUE);
+    }
+
+    $labelOptions = array_flip($bao::buildOptions($fieldSpec['name'], 'match'));
+    if (isset($labelOptions[$submittedValue])) {
+      return array_search($labelOptions[$submittedValue], $nameOptions, TRUE);
+    }
+    return '';
+  }
+
+  /**
+   * This is code extracted from 4 places where this exact snippet was being duplicated.
+   *
+   * FIXME: Extracting this was a first step, but there's also
+   *  1. Inconsistency in the way other select options are handled.
+   *     Contribution adds handling for Select/Radio/Autocomplete
+   *     Participant/Activity only handles Select/Radio and misses Autocomplete
+   *     Membership is missing all of it
+   *  2. Inconsistency with the way this works vs. how it's implemented in Contact import.
+   *
+   * @param $customFieldID
+   * @param $value
+   * @param $fieldType
+   * @return array
+   */
+  public static function unserializeCustomValue($customFieldID, $value, $fieldType) {
+    $mulValues = explode(',', $value);
+    $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+    $values = [];
+    foreach ($mulValues as $v1) {
+      foreach ($customOption as $customValueID => $customLabel) {
+        $customValue = $customLabel['value'];
+        if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
+          (strtolower(trim($customValue)) == strtolower(trim($v1)))
+        ) {
+          if ($fieldType == 'CheckBox') {
+            $values[$customValue] = 1;
+          }
+          else {
+            $values[] = $customValue;
+          }
+        }
+      }
+    }
+    return $values;
   }
 
 }

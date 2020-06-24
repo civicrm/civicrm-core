@@ -1,33 +1,17 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="help">
     {ts}Personalize the contents and appearance of your personal campaign page here. You will be able to return to this page and make changes at any time.{/ts}
 </div>
 <fieldset class="crm-pcp-campaign-group">
-<div class="crm-block crm-contribution-campaign-form-block">
+<div class="crm-block crm-form-block crm-contribution-campaign-form-block">
 {crmRegion name="pcp-form-campaign"}
   <div class="crm-section crm-pcp-title-section crm-contribution-form-block-title">
     <div class="label">{$form.pcp_title.label}</div>
@@ -81,7 +65,7 @@
     <div class="label">{$form.is_honor_roll.label}</div>
     <div class="content">
       {$form.is_honor_roll.html}
-      <div class="description">{ts}If this option is checked, an "honor roll" will be displayed with the names (or nicknames) of the people who supported you. (Donors will have the option to remain anonymous. Their names will NOT be listed.){/ts}</div>{* [ML] string changed #9704 *}
+      <div class="description">{ts}If this option is checked, an "honor roll" will be displayed with the names (or nicknames) of the people who supported you. (Donors will have the option to remain anonymous. Their names will NOT be listed.){/ts}</div>
     </div>
     <div class="clear"></div>
   </div>
@@ -104,8 +88,8 @@
     <div class="clear"></div>
   </div>
 {/crmRegion}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>  
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </fieldset>
 <script type="text/javascript">
     // Always open attachment div by default for this form

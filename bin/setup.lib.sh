@@ -55,3 +55,20 @@ function has_commands() {
   done
   return 0
 }
+
+## Execute some PHP within CMS context
+## usage: cms_eval '<php-code>'
+function cms_eval() {
+  case "$GENCODE_CMS" in
+    [Dd]rupal*|[Bb]ackdrop)
+      drush ev "$1"
+      ;;
+    [Ww]ordPress*)
+      wp eval "$1"
+      ;;
+    *)
+      echo "Cannot boot (GENCODE_CMS=$GENCODE_CMS)" > /dev/stderr
+      exit 1
+      ;;
+  esac
+}

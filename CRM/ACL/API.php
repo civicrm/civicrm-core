@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_ACL_API {
 
@@ -57,8 +41,7 @@ class CRM_ACL_API {
    */
   public static function check($str, $contactID = NULL) {
     if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     if (!$contactID) {
@@ -85,6 +68,10 @@ class CRM_ACL_API {
    * @param bool $skipDeleteClause
    *   Don't add delete clause if this is true,.
    *   this means it is handled by generating query
+   * @param bool $skipOwnContactClause
+   *   Do not add 'OR contact_id = $userID' to the where clause.
+   *   This is a hideously inefficient query and should be avoided
+   *   wherever possible.
    *
    * @return string
    *   the group where clause for this user
@@ -95,25 +82,21 @@ class CRM_ACL_API {
     &$whereTables,
     $contactID = NULL,
     $onlyDeleted = FALSE,
-    $skipDeleteClause = FALSE
+    $skipDeleteClause = FALSE,
+    $skipOwnContactClause = FALSE
   ) {
     // the default value which is valid for the final AND
     $deleteClause = ' ( 1 ) ';
     if (!$skipDeleteClause) {
-      if (CRM_Core_Permission::check('access deleted contacts') and $onlyDeleted) {
-        $deleteClause = '(contact_a.is_deleted)';
+      if (CRM_Core_Permission::check('access deleted contacts')) {
+        if ($onlyDeleted) {
+          $deleteClause = '(contact_a.is_deleted)';
+        }
       }
       else {
-        // CRM-6181
+        // Exclude deleted contacts due to permissions
         $deleteClause = '(contact_a.is_deleted = 0)';
       }
-    }
-
-    // first see if the contact has edit / view all contacts
-    if (CRM_Core_Permission::check('edit all contacts') ||
-      ($type == self::VIEW && CRM_Core_Permission::check('view all contacts'))
-    ) {
-      return $deleteClause;
     }
 
     if (!$contactID) {
@@ -121,20 +104,23 @@ class CRM_ACL_API {
     }
     $contactID = (int) $contactID;
 
-    $where = implode(' AND ',
-      array(
-        CRM_ACL_BAO_ACL::whereClause($type,
-          $tables,
-          $whereTables,
-          $contactID
-        ),
-        $deleteClause,
-      )
-    );
+    // first see if the contact has edit / view all permission
+    if (CRM_Core_Permission::check('edit all contacts', $contactID) ||
+      ($type == self::VIEW && CRM_Core_Permission::check('view all contacts', $contactID))
+    ) {
+      return $deleteClause;
+    }
 
-    // Add permission on self
-    if ($contactID && (CRM_Core_Permission::check('edit my contact') ||
-      $type == self::VIEW && CRM_Core_Permission::check('view my contact'))
+    $whereClause = CRM_ACL_BAO_ACL::whereClause($type,
+      $tables,
+      $whereTables,
+      $contactID
+    );
+    $where = implode(' AND ', [$whereClause, $deleteClause]);
+
+    // Add permission on self if we really hate our server or have hardly any contacts.
+    if (!$skipOwnContactClause && $contactID && (CRM_Core_Permission::check('edit my contact') ||
+        $type == self::VIEW && CRM_Core_Permission::check('view my contact'))
     ) {
       $where = "(contact_a.id = $contactID OR ($where))";
     }
@@ -164,8 +150,7 @@ class CRM_ACL_API {
     $includedGroups = NULL
   ) {
     if ($contactID == NULL) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     if (!$contactID) {
@@ -187,10 +172,8 @@ class CRM_ACL_API {
    * @param string $tableName
    * @param null $allGroups
    * @param null $includedGroups
-   * @param bool $flush
    *
-   * @return array
-   *   the ids of the groups for which the user has permissions
+   * @return bool
    */
   public static function groupPermission(
     $type,
@@ -198,39 +181,23 @@ class CRM_ACL_API {
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL,
-    $flush = FALSE
+    $includedGroups = NULL
   ) {
 
-    static $cache = array();
-    $groups = array();
-    //@todo this is pretty hacky!!!
-    //adding a way for unit tests to flush the cache
-    if ($flush) {
-      $cache = array();
-      return NULL;
+    if (!isset(Civi::$statics[__CLASS__]) || !isset(Civi::$statics[__CLASS__]['group_permission'])) {
+      Civi::$statics[__CLASS__]['group_permission'] = [];
     }
+
     if (!$contactID) {
-      $session = CRM_Core_Session::singleton();
-      $contactID = NULL;
-      if ($session->get('userID')) {
-        $contactID = $session->get('userID');
-      }
+      $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     }
 
     $key = "{$tableName}_{$type}_{$contactID}";
-    if (array_key_exists($key, $cache)) {
-      $groups = &$cache[$key];
-    }
-    else {
-      $groups = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
-      $cache[$key] = $groups;
-    }
-    if (empty($groups)) {
-      return FALSE;
+    if (!array_key_exists($key, Civi::$statics[__CLASS__]['group_permission'])) {
+      Civi::$statics[__CLASS__]['group_permission'][$key] = self::group($type, $contactID, $tableName, $allGroups, $includedGroups);
     }
 
-    return in_array($groupID, $groups) ? TRUE : FALSE;
+    return in_array($groupID, Civi::$statics[__CLASS__]['group_permission'][$key]);
   }
 
 }

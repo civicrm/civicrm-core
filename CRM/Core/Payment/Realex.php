@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,6 @@
  +--------------------------------------------------------------------+
  */
 
-
 /*
  * Copyright (C) 2009
  * Licensed to CiviCRM under the Academic Free License version 3.0.
@@ -31,26 +30,19 @@
  * Written and contributed by Kirkdesigns (http://www.kirkdesigns.co.uk)
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  *
  * @package CRM
  * @author Tom Kirkpatrick <tkp@kirkdesigns.co.uk>
- * $Id$
  */
 class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   const AUTH_APPROVED = '00';
 
-  protected $_mode = NULL;
+  protected $_mode;
 
-  protected $_params = array();
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
+  protected $_params = [];
 
   /**
    * Constructor.
@@ -58,14 +50,11 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_Realex
+   * @param array $paymentProcessor
    */
   public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Realex');
 
     $this->_setParam('merchant_ref', $paymentProcessor['user_name']);
     $this->_setParam('secret', $paymentProcessor['password']);
@@ -84,24 +73,22 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @return array
    *   the result in a nice formatted array (or an error object)
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doDirectPayment(&$params) {
 
     if (!defined('CURLOPT_SSLCERT')) {
-      return self::error(9001, ts('RealAuth requires curl with SSL support'));
+      throw new PaymentProcessorException(ts('RealAuth requires curl with SSL support'), 9001);
     }
 
     $result = $this->setRealexFields($params);
-
-    if ($result !== TRUE) {
-      return $result;
-    }
 
     /**********************************************************
      * Check to see if we have a duplicate before we send
      **********************************************************/
     if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
-      return self::error(9004, ts('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.'));
+      throw new PaymentProcessorException(ts('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.'), 9004);
     }
 
     // Create sha1 hash for request
@@ -144,10 +131,10 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $submit = curl_init($this->_paymentProcessor['url_site']);
 
     if (!$submit) {
-      return self::error(9002, ts('Could not initiate connection to payment gateway'));
+      throw new PaymentProcessorException(ts('Could not initiate connection to payment gateway'), 9002);
     }
 
-    curl_setopt($submit, CURLOPT_HTTPHEADER, array('SOAPAction: ""'));
+    curl_setopt($submit, CURLOPT_HTTPHEADER, ['SOAPAction: ""']);
     curl_setopt($submit, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($submit, CURLOPT_TIMEOUT, 60);
     curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
@@ -164,7 +151,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $response_xml = curl_exec($submit);
 
     if (!$response_xml) {
-      return self::error(curl_errno($submit), curl_error($submit));
+      throw new PaymentProcessorException(curl_error($submit), curl_errno($submit));
     }
 
     curl_close($submit);
@@ -176,7 +163,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     // Parse the response xml
     $xml_parser = xml_parser_create();
     if (!xml_parse($xml_parser, $response_xml)) {
-      return self::error(9003, 'XML Error');
+      throw new PaymentProcessorException('XML Error', 9003);
     }
 
     $response = $this->xml_parse_into_assoc($response_xml);
@@ -187,29 +174,17 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
 
     // Return an error if authentication was not successful
     if ($response['RESULT'] !== self::AUTH_APPROVED) {
-      return self::error($response['RESULT'], ' ' . $response['MESSAGE']);
-    }
-
-    // Check the response hash
-    $hashme = "{$this->_getParam('timestamp')}.{$this->_getParam('merchant_ref')}.{$this->_getParam('order_id')}.{$response['RESULT']}.{$response['MESSAGE']}.{$response['PASREF']}.{$response['AUTHCODE']}";
-    $sha1hash = sha1($hashme);
-    $hashme = "$sha1hash.{$this->_getParam('secret')}";
-    $sha1hash = sha1($hashme);
-
-    if ($response['SHA1HASH'] != $sha1hash) {
-      // FIXME: Need to actually check this - I couldn't get the
-      // hashes to match so I'm commenting out for now'
-      // return self::error( 9001, "Hash error, please report this to the webmaster" );
+      throw new PaymentProcessorException($this->getDisplayError($response['RESULT'], ' ' . $response['MESSAGE']));
     }
 
     // FIXME: We are using the trxn_result_code column to store all these extra details since there
     // seems to be nowhere else to put them. This is THE WRONG THING TO DO!
-    $extras = array(
+    $extras = [
       'authcode' => $response['AUTHCODE'],
       'batch_id' => $response['BATCHID'],
       'message' => $response['MESSAGE'],
       'trxn_result_code' => $response['RESULT'],
-    );
+    ];
 
     $params['trxn_id'] = $response['PASREF'];
     $params['trxn_result_code'] = serialize($extras);
@@ -230,8 +205,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *   An array of the result with following keys:
    */
   public function xml_parse_into_assoc($xml) {
-    $input = array();
-    $result = array();
+    $input = [];
+    $result = [];
 
     $result['#error'] = FALSE;
     $result['#return'] = NULL;
@@ -250,11 +225,11 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
       }
       else {
         $result['#error'] = ts('Error parsing XML result - error code = %1 at line %2 char %3',
-          array(
+          [
             1 => xml_get_error_code($xmlparser),
             2 => xml_get_current_line_number($xmlparser),
             3 => xml_get_current_column_number($xmlparser),
-          )
+          ]
         );
       }
     }
@@ -262,25 +237,26 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
   }
 
   /**
-   * Private helper for  xml_parse_into_assoc, to recusively parsing the result
+   * Private helper for  xml_parse_into_assoc, to recursively parsing the result.
+   *
    * @param $input
    * @param int $depth
    *
    * @return array
    */
   public function _xml_parse($input, $depth = 1) {
-    $output = array();
-    $children = array();
+    $output = [];
+    $children = [];
 
     foreach ($input as $data) {
       if ($data['level'] == $depth) {
         switch ($data['type']) {
           case 'complete':
-            $output[$data['tag']] = isset($data['value']) ? $data['value'] : '';
+            $output[$data['tag']] = $data['value'] ?? '';
             break;
 
           case 'open':
-            $children = array();
+            $children = [];
             break;
 
           case 'close':
@@ -302,11 +278,11 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param array $params
    *
-   * @return bool
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function setRealexFields(&$params) {
     if ((int) $params['amount'] <= 0) {
-      return self::error(9001, ts('Amount must be positive'));
+      throw new PaymentProcessorException(ts('Amount must be positive'), 9001);
     }
 
     // format amount to be in smallest possible units
@@ -343,7 +319,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
         break;
 
       default:
-        return self::error(9001, ts('Credit card type not supported by Realex:') . ' ' . $params['credit_card_type']);
+        throw new PaymentProcessorException(ts('Credit card type not supported by Realex:') . ' ' . $params['credit_card_type'], 9001);
     }
 
     // get the card holder name - cater cor customized billing forms
@@ -364,16 +340,14 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $this->_setParam('country', $params['country']);
     $this->_setParam('post_code', $params['postal_code']);
     $this->_setParam('order_id', $params['invoiceID']);
-    $params['issue_number'] = (isset($params['issue_number']) ? $params['issue_number'] : '');
+    $params['issue_number'] = ($params['issue_number'] ?? '');
     $this->_setParam('issue_number', $params['issue_number']);
     $this->_setParam('varref', $params['contributionType_name']);
     $comment = $params['description'] . ' (page id:' . $params['contributionPageID'] . ')';
     $this->_setParam('comments', $comment);
-    //$this->_setParam('currency',      $params['currencyID']);
 
     // set the currency to the default which can be overrided.
-    $config = CRM_Core_Config::singleton();
-    $this->_setParam('currency', $config->defaultCurrency);
+    $this->_setParam('currency', CRM_Core_Config::singleton()->defaultCurrency);
 
     // Format the expiry date to MMYY
     $expmonth = (string) $params['month'];
@@ -391,10 +365,8 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     }
 
     // Create timestamp
-    $timestamp = strftime("%Y%m%d%H%M%S");
+    $timestamp = strftime('%Y%m%d%H%M%S');
     $this->_setParam('timestamp', $timestamp);
-
-    return TRUE;
   }
 
   /**
@@ -411,9 +383,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     if (isset($this->_params[$field])) {
       return $this->_params[$field];
     }
-    else {
-      return '';
-    }
+    return '';
   }
 
   /**
@@ -422,50 +392,12 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *
    * @param string $field
    * @param mixed $value
-   *
-   * @return bool
-   *   false if value is not a scalar, true if successful
    */
   public function _setParam($field, $value) {
     if (!is_scalar($value)) {
-      return FALSE;
+      return;
     }
-    else {
-      $this->_params[$field] = $value;
-    }
-  }
-
-  /**
-   * @param null $errorCode
-   * @param null $errorMessage
-   *
-   * @return object
-   */
-  public function &error($errorCode = NULL, $errorMessage = NULL) {
-    $e = CRM_Core_Error::singleton();
-
-    if ($errorCode) {
-      if ($errorCode == '101' || $errorCode == '102') {
-        $display_error = ts('Card declined by bank. Please try with a different card.');
-      }
-      elseif ($errorCode == '103') {
-        $display_error = ts('Card reported lost or stolen. This incident will be reported.');
-      }
-      elseif ($errorCode == '501') {
-        $display_error = ts("It appears that this transaction is a duplicate. Have you already submitted the form once? If so there may have been a connection problem. Check your email for a receipt for this transaction.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.");
-      }
-      elseif ($errorCode == '509') {
-        $display_error = $errorMessage;
-      }
-      else {
-        $display_error = ts('We were unable to process your payment at this time. Please try again later.');
-      }
-      $e->push($errorCode, 0, NULL, $display_error);
-    }
-    else {
-      $e->push(9001, 0, NULL, ts('We were unable to process your payment at this time. Please try again later.'));
-    }
-    return $e;
+    $this->_params[$field] = $value;
   }
 
   /**
@@ -475,7 +407,7 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
    *   the error message if any
    */
   public function checkConfig() {
-    $error = array();
+    $error = [];
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('Merchant ID is not set for this payment processor');
     }
@@ -487,9 +419,34 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     if (!empty($error)) {
       return implode('<p>', $error);
     }
-    else {
-      return NULL;
+    return NULL;
+  }
+
+  /**
+   * Get the error to display.
+   *
+   * @param string $errorCode
+   * @param string $errorMessage
+   *
+   * @return string
+   */
+  protected function getDisplayError($errorCode, $errorMessage): string {
+    if ($errorCode === '101' || $errorCode === '102') {
+      $display_error = ts('Card declined by bank. Please try with a different card.');
     }
+    elseif ($errorCode === '103') {
+      $display_error = ts('Card reported lost or stolen. This incident will be reported.');
+    }
+    elseif ($errorCode === '501') {
+      $display_error = ts('It appears that this transaction is a duplicate. Have you already submitted the form once? If so there may have been a connection problem. Check your email for a receipt for this transaction.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
+    }
+    elseif ($errorCode === '509') {
+      $display_error = $errorMessage;
+    }
+    else {
+      $display_error = ts('We were unable to process your payment at this time. Please try again later.');
+    }
+    return $display_error;
   }
 
 }

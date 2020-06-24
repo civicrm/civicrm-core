@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -40,7 +24,7 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
    * Are we operating in "single mode", i.e. updating the task of only
    * one specific contribution?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -55,7 +39,7 @@ class CRM_Contribute_Form_Task_Status extends CRM_Contribute_Form_Task {
     );
 
     if ($id) {
-      $this->_contributionIds = array($id);
+      $this->_contributionIds = [$id];
       $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
       $this->_single = TRUE;
       $this->assign('totalSelectedContributions', 1);
@@ -70,9 +54,7 @@ SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_status_id != 2
 AND    {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
       CRM_Core_Error::statusBounce(ts('Please select only online contributions with Pending status.'));
     }
@@ -86,15 +68,23 @@ AND    {$this->_componentClause}";
    * Build the form object.
    */
   public function buildQuickForm() {
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
-    unset($status[2]);
-    unset($status[5]);
-    unset($status[6]);
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses(
+      'contribution', $this->_contributionIds[0]
+    );
+    $byName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    // FIXME: if it's invalid to transition from Pending to
+    // In Progress or Overdue, we should move that logic to
+    // CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses.
+    foreach (['Pending', 'In Progress', 'Overdue'] as $suppress) {
+      unset($status[CRM_Utils_Array::key($suppress, $byName)]);
+    }
     $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
       $status,
       TRUE
     );
+    $this->add('checkbox', 'is_email_receipt', ts('Send e-mail receipt'));
+    $this->setDefaults(['is_email_receipt' => 1]);
 
     $contribIDs = implode(',', $this->_contributionIds);
     $query = "
@@ -110,16 +100,14 @@ FROM   civicrm_contact c,
        civicrm_contribution co
 WHERE  co.contact_id = c.id
 AND    co.id IN ( $contribIDs )";
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     // build a row for each contribution id
-    $this->_rows = array();
+    $this->_rows = [];
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
-    $defaults = array();
-    $now = date("m/d/Y");
-    $paidByOptions = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument();
+    $defaults = [];
+    $now = date("Y-m-d");
+    $paidByOptions = ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument();
 
     while ($dao->fetch()) {
       $row['contact_id'] = $dao->contact_id;
@@ -131,7 +119,7 @@ AND    co.id IN ( $contribIDs )";
       $this->addRule("trxn_id_{$row['contribution_id']}",
         ts('This Transaction ID already exists in the database. Include the account number for checks.'),
         'objectExists',
-        array('CRM_Contribute_DAO_Contribution', $dao->contribution_id, 'trxn_id')
+        ['CRM_Contribute_DAO_Contribution', $dao->contribution_id, 'trxn_id']
       );
 
       $row['fee_amount'] = &$this->add('text', "fee_amount_{$row['contribution_id']}", ts('Fee Amount'),
@@ -140,9 +128,7 @@ AND    co.id IN ( $contribIDs )";
       $this->addRule("fee_amount_{$row['contribution_id']}", ts('Please enter a valid amount.'), 'money');
       $defaults["fee_amount_{$row['contribution_id']}"] = 0.0;
 
-      $row['trxn_date'] = $this->addDate("trxn_date_{$row['contribution_id']}", FALSE,
-        ts('Receipt Date'), array('formatType' => 'activityDate')
-      );
+      $row['trxn_date'] = $this->add('datepicker', "trxn_date_{$row['contribution_id']}", ts('Transaction Date'), [], FALSE, ['time' => FALSE]);
       $defaults["trxn_date_{$row['contribution_id']}"] = $now;
 
       $this->add("text", "check_number_{$row['contribution_id']}", ts('Check Number'));
@@ -156,20 +142,19 @@ AND    co.id IN ( $contribIDs )";
 
     $this->assign_by_ref('rows', $this->_rows);
     $this->setDefaults($defaults);
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Update Pending Status'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'back',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Update Pending Status'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
-    $this->addFormRule(array('CRM_Contribute_Form_Task_Status', 'formRule'));
+    $this->addFormRule(['CRM_Contribute_Form_Task_Status', 'formRule']);
   }
 
   /**
@@ -182,7 +167,7 @@ AND    co.id IN ( $contribIDs )";
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
-    $seen = $errors = array();
+    $seen = $errors = [];
     foreach ($fields as $name => $value) {
       if (strpos($name, 'trxn_id_') !== FALSE) {
         if ($fields[$name]) {
@@ -196,7 +181,7 @@ AND    co.id IN ( $contribIDs )";
       if ((strpos($name, 'check_number_') !== FALSE) && $value) {
         $contribID = substr($name, 13);
 
-        if ($fields["payment_instrument_id_{$contribID}"] != CRM_Core_OptionGroup::getValue('payment_instrument', 'Check', 'name')) {
+        if ($fields["payment_instrument_id_{$contribID}"] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
           $errors["payment_instrument_id_{$contribID}"] = ts("Payment Method should be Check when a check number is entered for a contribution.");
         }
       }
@@ -209,32 +194,47 @@ AND    co.id IN ( $contribIDs )";
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $statusID = CRM_Utils_Array::value('contribution_status_id', $params);
 
+    // submit the form with values.
+    self::processForm($this, $params);
+
+    CRM_Core_Session::setStatus(ts('Contribution status has been updated for selected record(s).'), ts('Status Updated'), 'success');
+  }
+
+  /**
+   * Process the form with submitted params.
+   *
+   * Also supports unit test.
+   *
+   * @param CRM_Core_Form $form
+   * @param array $params
+   *
+   * @throws \Exception
+   */
+  public static function processForm($form, $params) {
+    $statusID = $params['contribution_status_id'] ?? NULL;
     $baseIPN = new CRM_Core_Payment_BaseIPN();
 
-    $transaction = new CRM_Core_Transaction();
-
     // get the missing pieces for each contribution
-    $contribIDs = implode(',', $this->_contributionIds);
+    $contribIDs = implode(',', $form->_contributionIds);
     $details = self::getDetails($contribIDs);
     $template = CRM_Core_Smarty::singleton();
 
     // for each contribution id, we just call the baseIPN stuff
-    foreach ($this->_rows as $row) {
-      $input = $ids = $objects = array();
+    foreach ($form->_rows as $row) {
+      $input = $ids = $objects = [];
       $input['component'] = $details[$row['contribution_id']]['component'];
 
       $ids['contact'] = $row['contact_id'];
       $ids['contribution'] = $row['contribution_id'];
       $ids['contributionRecur'] = NULL;
       $ids['contributionPage'] = NULL;
-      $ids['membership'] = CRM_Utils_Array::value('membership', $details[$row['contribution_id']]);
-      $ids['participant'] = CRM_Utils_Array::value('participant', $details[$row['contribution_id']]);
-      $ids['event'] = CRM_Utils_Array::value('event', $details[$row['contribution_id']]);
+      $ids['membership'] = $details[$row['contribution_id']]['membership'] ?? NULL;
+      $ids['participant'] = $details[$row['contribution_id']]['participant'] ?? NULL;
+      $ids['event'] = $details[$row['contribution_id']]['event'] ?? NULL;
 
       if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-        CRM_Core_Error::fatal();
+        CRM_Core_Error::statusBounce('Supplied data was not able to be validated');
       }
 
       $contribution = &$objects['contribution'];
@@ -244,11 +244,13 @@ AND    co.id IN ( $contribIDs )";
       );
 
       if ($statusID == array_search('Cancelled', $contributionStatuses)) {
+        $transaction = new CRM_Core_Transaction();
         $baseIPN->cancelled($objects, $transaction);
         $transaction->commit();
         continue;
       }
       elseif ($statusID == array_search('Failed', $contributionStatuses)) {
+        $transaction = new CRM_Core_Transaction();
         $baseIPN->failed($objects, $transaction);
         $transaction->commit();
         continue;
@@ -259,7 +261,6 @@ AND    co.id IN ( $contribIDs )";
           $contributionStatuses
         )
       ) {
-        $transaction->commit();
         continue;
       }
 
@@ -277,24 +278,26 @@ AND    co.id IN ( $contribIDs )";
       else {
         $input['trxn_id'] = $contribution->invoice_id;
       }
-      $input['trxn_date'] = CRM_Utils_Date::processDate($params["trxn_date_{$row['contribution_id']}"]);
+      $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' . date('H:i:s');
+      $input['is_email_receipt'] = !empty($params['is_email_receipt']);
 
-      // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
-      $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
+      // @todo calling CRM_Contribute_BAO_Contribution::completeOrder like this is a pattern in it's last gasps. Call contribute.completetransaction api.
+      CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
 
       // reset template values before processing next transactions
       $template->clearTemplateVars();
     }
-
-    CRM_Core_Session::setStatus(ts('Contribution status has been updated for selected record(s).'), ts('Status Updated'), 'success');
   }
 
   /**
-   * @param $contributionIDs
+   * @param string $contributionIDs
    *
    * @return array
    */
   public static function &getDetails($contributionIDs) {
+    if (empty($contributionIDs)) {
+      return [];
+    }
     $query = "
 SELECT    c.id              as contribution_id,
           c.contact_id      as contact_id     ,
@@ -307,18 +310,15 @@ LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
 LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
 WHERE     c.id IN ( $contributionIDs )";
 
-    $rows = array();
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
-    $rows = array();
+    $rows = [];
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
       $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
       $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
       if ($dao->membership_id) {
         if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
-          $rows[$dao->contribution_id]['membership'] = array();
+          $rows[$dao->contribution_id]['membership'] = [];
         }
         $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
       }

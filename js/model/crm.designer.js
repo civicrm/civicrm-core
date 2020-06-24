@@ -70,9 +70,7 @@
         label: this.getLabel(),
         entity_name: this.get('entityName'),
         field_type: this.getFieldSchema().civiFieldType,
-        // For some reason the 'formatting' field gets a random number appended in core so we mimic that here.
-        // TODO: Why?
-        field_name: this.get('fieldName') == 'formatting' ? 'formatting_' + (Math.floor(Math.random() * 8999) + 1000) : this.get('fieldName')
+        field_name: this.get('fieldName')
       });
       return model;
     }

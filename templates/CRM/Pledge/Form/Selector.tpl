@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
     {include file="CRM/common/pager.tpl" location="top"}
@@ -34,9 +18,7 @@
         {if ! $single and $context eq 'Search' }
             <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
         {/if}
-        {if $single}
             <th></th>
-        {/if}
         {foreach from=$columnHeaders item=header}
             <th scope="col">
                 {if $header.sort}
@@ -60,8 +42,8 @@
                 <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
             {if ! $single }
+                <td>{$row.contact_type}</td>
                 <td>
-                    {$row.contact_type} &nbsp;
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a>
                 </td>
             {/if}
@@ -80,7 +62,7 @@
     {* Dashboard only lists 10 most recent pledges. *}
     {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit }
         <tr class="even-row">
-            <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}">&raquo; {ts}Find more pledges{/ts}... </a></td>
+            <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more pledges{/ts}... </a></td>
         </tr>
     {/if}
 

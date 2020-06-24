@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -74,13 +58,6 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
   public $cleanURL;
 
   /**
-   * @var string
-   */
-  public $configAndLogDir;
-
-  public $templateCompileDir;
-
-  /**
    * The root directory of our template tree.
    * @var string
    */
@@ -94,20 +71,6 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
       $this->fatal('You need to define CIVICRM_DSN in civicrm.settings.php');
     }
     $this->dsn = defined('CIVICRM_DSN') ? CIVICRM_DSN : NULL;
-
-    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') && $loadFromDB) {
-      $this->fatal('You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php');
-    }
-
-    if (defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
-      $this->configAndLogDir = CRM_Utils_File::baseFilePath() . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
-      CRM_Utils_File::createDir($this->configAndLogDir);
-      CRM_Utils_File::restrictAccess($this->configAndLogDir);
-
-      $this->templateCompileDir = defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CRM_Utils_File::addTrailingSlash(CIVICRM_TEMPLATE_COMPILEDIR) : NULL;
-      CRM_Utils_File::createDir($this->templateCompileDir);
-      CRM_Utils_File::restrictAccess($this->templateCompileDir);
-    }
 
     if (!defined('CIVICRM_UF')) {
       $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');
@@ -133,11 +96,16 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
       $this->cleanURL = 0;
     }
 
-    $this->templateDir = array(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR);
+    $this->templateDir = [dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR];
 
     $this->initialized = 1;
   }
 
+  /**
+   * Exit processing after a fatal event, outputting the message.
+   *
+   * @param string $message
+   */
   private function fatal($message) {
     echo $message;
     exit();
@@ -147,7 +115,7 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
    * Include custom PHP and template paths
    */
   public function includeCustomPath() {
-    $customProprtyName = array('customPHPPathDir', 'customTemplateDir');
+    $customProprtyName = ['customPHPPathDir', 'customTemplateDir'];
     foreach ($customProprtyName as $property) {
       $value = $this->getSettings()->get($property);
       if (!empty($value)) {
@@ -168,14 +136,21 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
    */
   public static function getId() {
     if (!isset(Civi::$statics[__CLASS__]['id'])) {
-      Civi::$statics[__CLASS__]['id'] = md5(implode(\CRM_Core_DAO::VALUE_SEPARATOR, array(
-        defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1, // e.g. one database, multi URL
-        parse_url(CIVICRM_DSN, PHP_URL_PATH), // e.g. one codebase, multi database
-        \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''), // e.g. CMS vs extern vs installer
-        \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''), // e.g. name-based vhosts
-        \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''), // e.g. port-based vhosts
+      Civi::$statics[__CLASS__]['id'] = md5(implode(\CRM_Core_DAO::VALUE_SEPARATOR, [
+        // e.g. one database, multi URL
+        defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1,
+        // e.g. one codebase, multi database
+        parse_url(CIVICRM_DSN, PHP_URL_PATH),
+        // e.g. CMS vs extern vs installer
+        \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''),
+        // e.g. name-based vhosts
+        \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''),
+        // e.g. port-based vhosts
+        \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''),
+        // e.g. unit testing
+        defined('CIVICRM_TEST') ? 1 : 0,
         // Depending on deployment arch, these signals *could* be redundant, but who cares?
-      )));
+      ]));
     }
     return Civi::$statics[__CLASS__]['id'];
   }

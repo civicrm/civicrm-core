@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Participant Import Wizard - Step 3 (preview import results prior to actual data loading) *}
@@ -56,13 +40,13 @@
 </div>
  {* Summary Preview (record counts) *}
  <table id="preview-counts" class="report">
-    <tr><td class="label">{ts}Total Rows{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
         <td class="data">{$totalRowCount}</td>
         <td class="explanation">{ts}Total rows (participant records) in uploaded file.{/ts}</td>
     </tr>
 
     {if $invalidRowCount}
-    <tr class="error"><td class="label">{ts}Rows with Errors{/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Rows with Errors{/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
@@ -73,7 +57,7 @@
     {/if}
 
     {if $conflictRowCount}
-    <tr class="error"><td class="label">{ts}Conflicting Rows{/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows{/ts}</td>
         <td class="data">{$conflictRowCount}</td>
         <td class="explanation">{ts}Rows with conflicting participant IDs within this file. These rows will be skipped (not imported).{/ts}
             {if $conflictRowCount}
@@ -83,7 +67,7 @@
     </tr>
     {/if}
 
-    <tr><td class="label">{ts}Valid Rows{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Valid Rows{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Total rows to be imported.{/ts}</td>
     </tr>

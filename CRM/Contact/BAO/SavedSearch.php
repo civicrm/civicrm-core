@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -90,29 +74,74 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    *
    * @return array
    *   the values of the posted saved search used as default values in various Search Form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function &getFormValues($id) {
+  public static function getFormValues($id) {
+    $specialDateFields = [
+      'event_start_date_low' => 'event_date_low',
+      'event_end_date_high' => 'event_date_high',
+    ];
+
     $fv = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'form_values');
-    $result = NULL;
+    $result = [];
     if ($fv) {
-      // make sure u unserialize - since it's stored in serialized form
-      $result = unserialize($fv);
+      // make sure u CRM_Utils_String::unserialize - since it's stored in serialized form
+      $result = CRM_Utils_String::unserialize($fv);
     }
 
-    $specialFields = array('contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id');
+    $specialFields = ['contact_type', 'group', 'contact_tags', 'member_membership_type_id', 'member_status_id'];
     foreach ($result as $element => $value) {
       if (CRM_Contact_BAO_Query::isAlreadyProcessedForQueryFormat($value)) {
-        $id = CRM_Utils_Array::value(0, $value);
-        $value = CRM_Utils_Array::value(2, $value);
+        $id = $value[0] ?? NULL;
+        $value = $value[2] ?? NULL;
         if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $value = CRM_Utils_Array::value(key($value), $value);
+          $op = key($value);
+          $value = $value[$op] ?? NULL;
+          if (in_array($op, ['BETWEEN', '>=', '<='])) {
+            self::decodeRelativeFields($result, $id, $op, $value);
+            unset($result[$element]);
+            continue;
+          }
         }
-        $result[$id] = $value;
+        // Check for a date range field, which might be a standard date
+        // range or a relative date.
+        if (strpos($id, '_date_low') !== FALSE || strpos($id, '_date_high') !== FALSE) {
+          $entityName = strstr($id, '_date', TRUE);
+
+          // This is the default, for non relative dates. We will overwrite
+          // it if we determine this is a relative date.
+          $result[$id] = $value;
+          $result["{$entityName}_date_relative"] = 0;
+
+          if (!empty($result['relative_dates'])) {
+            if (array_key_exists($entityName, $result['relative_dates'])) {
+              // We have a match from a regular field.
+              $result[$id] = NULL;
+              $result["{$entityName}_date_relative"] = $result['relative_dates'][$entityName];
+            }
+            elseif (!empty($specialDateFields[$id])) {
+              // We may have a match on a special date field.
+              $entityName = strstr($specialDateFields[$id], '_date', TRUE);
+              if (array_key_exists($entityName, $result['relative_dates'])) {
+                $result[$id] = NULL;
+                $result["{$entityName}_relative"] = $result['relative_dates'][$entityName];
+              }
+            }
+          }
+        }
+        else {
+          $result[$id] = $value;
+        }
         unset($result[$element]);
         continue;
       }
       if (!empty($value) && is_array($value)) {
         if (in_array($element, $specialFields)) {
+          // Remove the element to minimise support for legacy formats. It is stored in $value
+          // so will be re-set with the right name.
+          unset($result[$element]);
           $element = str_replace('member_membership_type_id', 'membership_type_id', $element);
           $element = str_replace('member_status_id', 'membership_status_id', $element);
           CRM_Contact_BAO_Query::legacyConvertFormValues($element, $value);
@@ -121,20 +150,17 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
         // As per the OK (Operator as Key) value format, value array may contain key
         // as an operator so to ensure the default is always set actual value
         elseif (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $result[$element] = CRM_Utils_Array::value(key($value), $value);
+          $result[$element] = $value[key($value)] ?? NULL;
           if (is_string($result[$element])) {
             $result[$element] = str_replace("%", '', $result[$element]);
           }
         }
       }
-      if (substr($element, 0, 7) == 'custom_' &&
-        (substr($element, -5, 5) == '_from' || substr($element, -3, 3) == '_to')
-      ) {
-        // Ensure the _relative field is set if from or to are set to ensure custom date
-        // fields with 'from' or 'to' values are displayed when the are set in the smart group
-        // being loaded. (CRM-17116)
-        if (!isset($result[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'])) {
-          $result[CRM_Contact_BAO_Query::getCustomFieldName($element) . '_relative'] = 0;
+      // We should only set the relative key for custom date fields if it is not already set in the array.
+      $realField = str_replace(['_relative', '_low', '_high', '_to', '_high'], '', $element);
+      if (substr($element, 0, 7) == 'custom_' && CRM_Contact_BAO_Query::isCustomDateField($realField)) {
+        if (!isset($result[$realField . '_relative'])) {
+          $result[$realField . '_relative'] = 0;
         }
       }
       // check to see if we need to convert the old privacy array
@@ -150,7 +176,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
             unset($result['privacy']['do_not_toggle']);
           }
 
-          $result['privacy_options'] = array();
+          $result['privacy_options'] = [];
           foreach ($result['privacy'] as $name => $val) {
             if ($val) {
               $result['privacy_options'][] = $name;
@@ -158,6 +184,13 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
           }
         }
         unset($result['privacy']);
+      }
+    }
+
+    if ($customSearchClass = CRM_Utils_Array::value('customSearchClass', $result)) {
+      // check if there is a special function - formatSavedSearchFields defined in the custom search form
+      if (method_exists($customSearchClass, 'formatSavedSearchFields')) {
+        $customSearchClass::formatSavedSearchFields($result);
       }
     }
 
@@ -170,11 +203,22 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param int $id
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchParams($id) {
+    $savedSearch = \Civi\Api4\SavedSearch::get()
+      ->setCheckPermissions(FALSE)
+      ->addWhere('id', '=', $id)
+      ->execute()
+      ->first();
+    if ($savedSearch['api_entity']) {
+      return $savedSearch;
+    }
     $fv = self::getFormValues($id);
     //check if the saved search has mapping id
-    if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $id, 'mapping_id')) {
+    if ($savedSearch['mapping_id']) {
       return CRM_Core_BAO_Mapping::formattedFields($fv);
     }
     elseif (!empty($fv['customSearchID'])) {
@@ -224,7 +268,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       return CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $id);
     }
     else {
-      $tables = $whereTables = array('civicrm_contact' => 1);
+      $tables = $whereTables = ['civicrm_contact' => 1];
       $where = CRM_Contact_BAO_SavedSearch::whereClause($id, $tables, $whereTables);
       if (!$where) {
         $where = '( 1 )';
@@ -252,10 +296,10 @@ WHERE  $where";
         return CRM_Contact_BAO_SearchCustom::fromWhereEmail(NULL, $id);
       }
       else {
-        $tables = $whereTables = array('civicrm_contact' => 1, 'civicrm_email' => 1);
+        $tables = $whereTables = ['civicrm_contact' => 1, 'civicrm_email' => 1];
         $where = CRM_Contact_BAO_SavedSearch::whereClause($id, $tables, $whereTables);
         $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-        return array($from, $where);
+        return [$from, $where];
       }
     }
     else {
@@ -267,45 +311,8 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       $where = " ( 1 ) ";
       $tables['civicrm_contact'] = $whereTables['civicrm_contact'] = 1;
       $tables['civicrm_email'] = $whereTables['civicrm_email'] = 1;
-      return array($from, $where);
+      return [$from, $where];
     }
-  }
-
-  /**
-   * Given a saved search compute the clause and the tables and store it for future use.
-   */
-  public function buildClause() {
-    $fv = unserialize($this->form_values);
-
-    if ($this->mapping_id) {
-      $params = CRM_Core_BAO_Mapping::formattedFields($fv);
-    }
-    else {
-      $params = CRM_Contact_BAO_Query::convertFormValues($fv);
-    }
-
-    if (!empty($params)) {
-      $tables = $whereTables = array();
-      $this->where_clause = CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
-      if (!empty($tables)) {
-        $this->select_tables = serialize($tables);
-      }
-      if (!empty($whereTables)) {
-        $this->where_tables = serialize($whereTables);
-      }
-    }
-  }
-
-  /**
-   * Save the search.
-   *
-   * @param bool $hook
-   */
-  public function save($hook = TRUE) {
-    // first build the computed fields
-    $this->buildClause();
-
-    parent::save($hook);
   }
 
   /**
@@ -337,20 +344,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    */
   public static function create(&$params) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
-    if (isset($params['formValues']) &&
-      !empty($params['formValues'])
-    ) {
-      $savedSearch->form_values = serialize($params['formValues']);
-    }
-    else {
-      $savedSearch->form_values = NULL;
-    }
-
-    $savedSearch->is_active = CRM_Utils_Array::value('is_active', $params, 1);
-    $savedSearch->mapping_id = CRM_Utils_Array::value('mapping_id', $params, 'null');
-    $savedSearch->custom_search_id = CRM_Utils_Array::value('custom_search_id', $params, 'null');
-    $savedSearch->id = CRM_Utils_Array::value('id', $params, NULL);
-
+    $savedSearch->copyValues($params);
     $savedSearch->save();
 
     return $savedSearch;
@@ -367,10 +361,65 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     if ($fieldName == 'form_values') {
       // A dummy value for form_values.
       $this->{$fieldName} = serialize(
-          array('sort_name' => "SortName{$counter}"));
+          ['sort_name' => "SortName{$counter}"]);
     }
     else {
       parent::assignTestValues($fieldName, $fieldDef, $counter);
+    }
+  }
+
+  /**
+   * Store search variables in $queryParams which were skipped while processing query params,
+   * precisely at CRM_Contact_BAO_Query::fixWhereValues(...). But these variable are required in
+   * building smart group criteria otherwise it will cause issues like CRM-18585,CRM-19571
+   *
+   * @param array $queryParams
+   * @param array $formValues
+   */
+  public static function saveSkippedElement(&$queryParams, $formValues) {
+    // these are elements which are skipped in a smart group criteria
+    $specialElements = [
+      'operator',
+      'component_mode',
+      'display_relationship_type',
+      'uf_group_id',
+    ];
+    foreach ($specialElements as $element) {
+      if (!empty($formValues[$element])) {
+        $queryParams[] = [$element, '=', $formValues[$element], 0, 0];
+      }
+    }
+  }
+
+  /**
+   * Decode relative custom fields (converted by CRM_Contact_BAO_Query->convertCustomRelativeFields(...))
+   *  into desired formValues
+   *
+   * @param array $formValues
+   * @param string $fieldName
+   * @param string $op
+   * @param array|string|int $value
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function decodeRelativeFields(&$formValues, $fieldName, $op, $value) {
+    // check if its a custom date field, if yes then 'searchDate' format the value
+    if (CRM_Contact_BAO_Query::isCustomDateField($fieldName)) {
+      return;
+    }
+
+    switch ($op) {
+      case 'BETWEEN':
+        list($formValues[$fieldName . '_from'], $formValues[$fieldName . '_to']) = $value;
+        break;
+
+      case '>=':
+        $formValues[$fieldName . '_from'] = $value;
+        break;
+
+      case '<=':
+        $formValues[$fieldName . '_to'] = $value;
+        break;
     }
   }
 

@@ -61,7 +61,13 @@
     <title>Custom Group Subtype List</title>
     <default>NULL</default>
     <comment>FK to civicrm_option_value.id (for option group custom_data_type.)</comment>
+    <pseudoconstant>
+      <optionGroupName>custom_data_type</optionGroupName>
+    </pseudoconstant>
     <add>2.2</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>extends_entity_column_value</name>
@@ -69,6 +75,7 @@
     <title>Custom Group Subtype</title>
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.6</add>
   </field>
   <field>
@@ -87,7 +94,7 @@
   </field>
   <field>
     <name>collapse_display</name>
-    <type>int unsigned</type>
+    <type>boolean</type>
     <title>Collapse Custom Group?</title>
     <default>0</default>
     <comment>Will this group be in collapsed or expanded mode on initial display ?</comment>
@@ -133,6 +140,7 @@
     <type>boolean</type>
     <title>Custom Group Is Active?</title>
     <comment>Is this property active?</comment>
+    <default>1</default>
     <add>1.1</add>
   </field>
   <field>
@@ -147,6 +155,7 @@
     <type>boolean</type>
     <title>Supports Multiple Records</title>
     <comment>Does this group hold multiple values?</comment>
+    <default>0</default>
     <add>2.0</add>
   </field>
   <field>
@@ -165,7 +174,7 @@
   </field>
   <field>
     <name>collapse_adv_display</name>
-    <type>int unsigned</type>
+    <type>boolean</type>
     <title>Collapse Group Display</title>
     <default>0</default>
     <comment>Will this group be in collapsed or expanded mode on advanced search display ?</comment>
@@ -213,5 +222,22 @@
     <default>0</default>
     <comment>Is this a reserved Custom Group?</comment>
     <add>4.4</add>
+  </field>
+  <field>
+    <name>is_public</name>
+    <type>boolean</type>
+    <title>Custom Group Is Public?</title>
+    <default>1</default>
+    <comment>Is this property public?</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>crm-i icon class</comment>
+    <add>5.28</add>
   </field>
 </table>

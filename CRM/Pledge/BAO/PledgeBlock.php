@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
@@ -86,58 +70,18 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
   }
 
   /**
-   * Add pledgeBlock.
+   * Add or update pledgeBlock.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   *
    *
    * @return object
    */
-  public static function add(&$params) {
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'PledgeBlock', $params['id'], $params);
+  public static function add($params) {
+    // FIXME: This is assuming checkbox input like ['foo' => 1, 'bar' => 0, 'baz' => 1]. Not API friendly.
+    if (!empty($params['pledge_frequency_unit']) && is_array($params['pledge_frequency_unit'])) {
+      $params['pledge_frequency_unit'] = array_keys(array_filter($params['pledge_frequency_unit']));
     }
-    else {
-      CRM_Utils_Hook::pre('create', 'PledgeBlock', NULL, $params);
-    }
-
-    $pledgeBlock = new CRM_Pledge_DAO_PledgeBlock();
-
-    // fix for pledge_frequency_unit
-    $freqUnits = CRM_Utils_Array::value('pledge_frequency_unit', $params);
-
-    if ($freqUnits && is_array($freqUnits)) {
-      unset($params['pledge_frequency_unit']);
-      $newFreqUnits = array();
-      foreach ($freqUnits as $k => $v) {
-        if ($v) {
-          $newFreqUnits[$k] = $v;
-        }
-      }
-
-      $freqUnits = $newFreqUnits;
-      if (is_array($freqUnits) && !empty($freqUnits)) {
-        $freqUnits = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($freqUnits));
-        $pledgeBlock->pledge_frequency_unit = $freqUnits;
-      }
-      else {
-        $pledgeBlock->pledge_frequency_unit = '';
-      }
-    }
-
-    $pledgeBlock->copyValues($params);
-    $result = $pledgeBlock->save();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'PledgeBlock', $pledgeBlock->id, $pledgeBlock);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Pledge', $pledgeBlock->id, $pledgeBlock);
-    }
-
-    return $result;
+    return self::writeRecord($params);
   }
 
   /**
@@ -175,7 +119,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    * @return array
    */
   public static function getPledgeBlock($pageID) {
-    $pledgeBlock = array();
+    $pledgeBlock = [];
 
     $dao = new CRM_Pledge_DAO_PledgeBlock();
     $dao->entity_table = 'civicrm_contribution_page';
@@ -196,7 +140,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     //build pledge payment fields.
     if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.
-      $allPayments = array();
+      $allPayments = [];
       $returnProperties = array(
         'status_id',
         'scheduled_date',
@@ -209,9 +153,9 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       // get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
-      $nextPayment = array();
+      $nextPayment = [];
       $isNextPayment = FALSE;
-      $overduePayments = array();
+      $overduePayments = [];
       foreach ($allPayments as $payID => $value) {
         if ($allStatus[$value['status_id']] == 'Overdue') {
           $overduePayments[$payID] = array(
@@ -240,14 +184,14 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       }
 
       // build check box array for payments.
-      $payments = array();
+      $payments = [];
       if (!empty($overduePayments)) {
         foreach ($overduePayments as $id => $payment) {
           $label = ts("%1 - due on %2 (overdue)", array(
             1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
-            2 => CRM_Utils_Array::value('scheduled_date', $payment),
+            2 => $payment['scheduled_date'] ?? NULL,
           ));
-          $paymentID = CRM_Utils_Array::value('id', $payment);
+          $paymentID = $payment['id'] ?? NULL;
           $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $payment)));
         }
       }
@@ -255,14 +199,14 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       if (!empty($nextPayment)) {
         $label = ts("%1 - due on %2", array(
           1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
-          2 => CRM_Utils_Array::value('scheduled_date', $nextPayment),
+          2 => $nextPayment['scheduled_date'] ?? NULL,
         ));
-        $paymentID = CRM_Utils_Array::value('id', $nextPayment);
+        $paymentID = $nextPayment['id'] ?? NULL;
         $payments[] = $form->createElement('checkbox', $paymentID, NULL, $label, array('amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)));
       }
       // give error if empty or build form for payment.
       if (empty($payments)) {
-        CRM_Core_Error::fatal(ts("Oops. It looks like there is no valid payment status for online payment."));
+        throw new CRM_Core_Exception(ts('Oops. It looks like there is no valid payment status for online payment.'));
       }
       else {
         $form->assign('is_pledge_payment', TRUE);
@@ -281,25 +225,70 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $form->addRadio('is_pledge', ts('Pledge Frequency Interval'), $pledgeOptions,
         NULL, array('<br/>')
       );
-      $form->addElement('text', 'pledge_installments', ts('Installments'), array('size' => 3));
+      $form->addElement('text', 'pledge_installments', ts('Installments'), ['size' => 3, 'aria-label' => ts('Installments')]);
 
       if (!empty($pledgeBlock['is_pledge_interval'])) {
         $form->assign('is_pledge_interval', CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock));
-        $form->addElement('text', 'pledge_frequency_interval', NULL, array('size' => 3));
+        $form->addElement('text', 'pledge_frequency_interval', NULL, ['size' => 3, 'aria-label' => ts('Frequency Intervals')]);
       }
       else {
         $form->add('hidden', 'pledge_frequency_interval', 1);
       }
       // Frequency unit drop-down label suffixes switch from *ly to *(s)
       $freqUnitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $pledgeBlock['pledge_frequency_unit']);
-      $freqUnits = array();
+      $freqUnits = [];
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
       foreach ($freqUnitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
           $freqUnits[$val] = !empty($pledgeBlock['is_pledge_interval']) ? "{$frequencyUnits[$val]}(s)" : $frequencyUnits[$val];
         }
       }
-      $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits);
+      $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits, ['aria-label' => ts('Frequency Units')]);
+      // CRM-18854
+      if (!empty($pledgeBlock['is_pledge_start_date_visible'])) {
+        if (!empty($pledgeBlock['pledge_start_date'])) {
+          $defaults = [];
+          $date = (array) json_decode($pledgeBlock['pledge_start_date']);
+          foreach ($date as $field => $value) {
+            switch ($field) {
+              case 'contribution_date':
+                $form->add('datepicker', 'start_date', ts('First installment payment'), [], FALSE, ['time' => FALSE]);
+                $paymentDate = $value = date('Y-m-d');
+                $defaults['start_date'] = $value;
+                $form->assign('is_date', TRUE);
+                break;
+
+              case 'calendar_date':
+                $form->add('datepicker', 'start_date', ts('First installment payment'), [], FALSE, ['time' => FALSE]);
+                $defaults['start_date'] = $value;
+                $form->assign('is_date', TRUE);
+                $paymentDate = $value;
+                break;
+
+              case 'calendar_month':
+                $month = CRM_Utils_Date::getCalendarDayOfMonth();
+                $form->add('select', 'start_date', ts('Day of month installments paid'), $month);
+                $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate($value);
+                $defaults['start_date'] = $paymentDate;
+                break;
+
+              default:
+                break;
+
+            }
+            $form->setDefaults($defaults);
+            $form->assign('start_date_display', $paymentDate);
+            $form->assign('start_date_editable', FALSE);
+            if (!empty($pledgeBlock['is_pledge_start_date_editable'])) {
+              $form->assign('start_date_editable', TRUE);
+              if ($field == 'calendar_month') {
+                $form->assign('is_date', FALSE);
+                $form->setDefaults(array('start_date' => $value));
+              }
+            }
+          }
+        }
+      }
     }
   }
 

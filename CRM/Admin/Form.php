@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +25,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_id;
+  public $_id;
 
   /**
    * The default values for form fields.
@@ -69,12 +53,13 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   public function preProcess() {
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
+    Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
 
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
-    $this->_values = array();
+    $this->_values = [];
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       // this is needed if the form is outside the CRM name space
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $this->_values);
@@ -89,13 +74,23 @@ class CRM_Admin_Form extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    if (isset($this->_id) && empty($this->_values)) {
-      $this->_values = array();
-      $params = array('id' => $this->_id);
+    // Fetch defaults from the db
+    if (!empty($this->_id) && empty($this->_values) && CRM_Utils_Rule::positiveInteger($this->_id)) {
+      $this->_values = [];
+      $params = ['id' => $this->_id];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $this->_values);
     }
     $defaults = $this->_values;
+
+    // Allow defaults to be set from the url
+    if (empty($this->_id) && $this->_action & CRM_Core_Action::ADD) {
+      foreach ($_GET as $key => $val) {
+        if ($this->elementExists($key)) {
+          $defaults[$key] = $val;
+        }
+      }
+    }
 
     if ($this->_action == CRM_Core_Action::DELETE &&
       isset($defaults['name'])
@@ -116,28 +111,26 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
-      $this->addButtons(array(
-          array(
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
     else {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
   }
 

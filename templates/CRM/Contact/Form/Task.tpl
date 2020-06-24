@@ -1,48 +1,33 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {ts 1=$totalSelectedContacts}Number of selected contacts: %1{/ts}
 
 {if $searchtype eq 'ts_sel'}
 <div id="popupContainer">
-  <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
-    <thead>
-    <tr class="columnheader">
-      <th class="contact_details">{ts}Name{/ts}</th>
-    </tr>
-    </thead>
-
-    <tbody>
-      {foreach from=$value item='row'}
-      <tr class="{cycle values="odd-row,even-row"}">
-        <td class="name">{$row}</td>
+  <div class="crm-block crm-form-block crm-search-form-block">
+    <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
+      <thead>
+      <tr class="columnheader">
+        <th class="contact_details">{ts}Name{/ts}</th>
       </tr>
-      {/foreach}
-    </tbody>
-  </table>
+      </thead>
 
+      <tbody>
+        {foreach from=$value item='row'}
+        <tr class="{cycle values="odd-row,even-row"}">
+          <td class="name">{$row}</td>
+        </tr>
+        {/foreach}
+      </tbody>
+    </table>
+  </div>
 </div><br />
 <a href="#" id="popup-button" title="{ts}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
 {/if}

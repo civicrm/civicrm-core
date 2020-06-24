@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -42,17 +26,19 @@
  *   API result array
  */
 function civicrm_api3_option_value_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionValue');
+}
 
-  if (empty($params['option_group_id']) && !empty($params['option_group_name'])) {
-    $opt = array('version' => 3, 'name' => $params['option_group_name']);
-    $optionGroup = civicrm_api('OptionGroup', 'Get', $opt);
-    if (empty($optionGroup['id'])) {
-      return civicrm_api3_create_error("option group name does not correlate to a single option group");
-    }
-    $params['option_group_id'] = $optionGroup['id'];
-  }
-
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+/**
+ * Adjust Metadata for get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_option_value_get_spec(&$params) {
+  $params['option_group_id']['api.aliases'] = ['option_group_name'];
 }
 
 /**
@@ -65,7 +51,7 @@ function civicrm_api3_option_value_get($params) {
  *   API result array
  */
 function civicrm_api3_option_value_create($params) {
-  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionValue');
   if (!empty($params['id']) && !array_key_exists('option_group_id', $params)) {
     $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
       $params['id'], 'option_group_id', 'id'
@@ -75,7 +61,7 @@ function civicrm_api3_option_value_create($params) {
     $groupId = $params['option_group_id'];
   }
 
-  civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $groupId));
+  civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1, 'option_group_id' => $groupId]);
   return $result;
 }
 
@@ -90,7 +76,7 @@ function civicrm_api3_option_value_create($params) {
 function _civicrm_api3_option_value_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
   //continue to support component
-  $params['component_id']['api.aliases'] = array('component');
+  $params['component_id']['api.aliases'] = ['component'];
   //  $params['name']['api.aliases'] = array('label');
   $params['option_group_id']['api.required'] = TRUE;
 }
@@ -99,18 +85,18 @@ function _civicrm_api3_option_value_create_spec(&$params) {
  * Deletes an existing option value.
  *
  * @param array $params
- *
- * @return array
- *   API result array
+ * @return array API result array
+ * @throws API_Exception
  */
 function civicrm_api3_option_value_delete($params) {
   // We will get the option group id before deleting so we can flush pseudoconstants.
-  $optionGroupID = civicrm_api('option_value', 'getvalue', array('version' => 3, 'id' => $params['id'], 'return' => 'option_group_id'));
-  if (CRM_Core_BAO_OptionValue::del((int) $params['id'])) {
-    civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID));
+  $optionGroupID = civicrm_api('option_value', 'getvalue', ['version' => 3, 'id' => $params['id'], 'return' => 'option_group_id']);
+  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  if ($result) {
+    civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1, 'option_group_id' => $optionGroupID]);
     return civicrm_api3_create_success();
   }
   else {
-    civicrm_api3_create_error('Could not delete OptionValue ' . $params['id']);
+    throw new API_Exception('Could not delete OptionValue ' . $params['id']);
   }
 }

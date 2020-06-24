@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -31,7 +31,7 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
   {include file="CRM/Admin/Form/LabelFormats.tpl"}
 {else}
-
+<div class="crm-content-block crm-block">
   {if $rows}
     <div id="ltype">
       {strip}
@@ -53,8 +53,7 @@
               <td class="crm-labelFormat-name">{$row.groupName}</td>
               <td class="crm-labelFormat-order nowrap">{$row.weight}</td>
               <td class="crm-labelFormat-description">{$row.grouping}</td>
-              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}
-              <img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
+              <td class="crm-labelFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
               <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
                 &nbsp;</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
@@ -74,4 +73,5 @@
       {ts 1=$crmURL}There are no Label Formats configured. You can<a href='%1'>add one</a>.{/ts}
     </div>
   {/if}
+</div>
 {/if}

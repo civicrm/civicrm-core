@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Mail/mime.php';
@@ -62,7 +46,6 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
    */
   public static function &reply($job_id, $queue_id, $hash, $replyto = NULL) {
     // First make sure there's a matching queue event.
-
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
 
     $success = NULL;
@@ -118,6 +101,9 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $emails = CRM_Core_BAO_Email::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $contacts = CRM_Contact_BAO_Contact::getTableName();
+    $domain_id = CRM_Core_Config::domainID();
+    $domainValues = civicrm_api3('Domain', 'get', ['sequential' => 1, 'id' => $domain_id]);
+    $fromEmail = CRM_Core_BAO_Domain::getNoReplyEmailAddress();
 
     $eq = new CRM_Core_DAO();
     $eq->query("SELECT     $contacts.display_name as display_name,
@@ -138,11 +124,22 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       $parser = new ezcMailParser();
       $set = new ezcMailVariableSet($fullEmail);
       $parsed = array_shift($parser->parseMail($set));
-      $parsed->to = array(new ezcMailAddress($mailing->replyto_email));
+      $parsed->to = [new ezcMailAddress($mailing->replyto_email)];
 
       // CRM-5567: we need to set Reply-To: so that any response
       // to the forward goes to the sender of the reply
       $parsed->setHeader('Reply-To', $replyto instanceof ezcMailAddress ? $replyto : $parsed->from->__toString());
+
+      // Using the original from address may not be permitted by the mailer.
+      $fromName = empty($parsed->from->name) ? $parsed->from->email : "{$parsed->from->name} ({$parsed->from->email})";
+      $parsed->from = new ezcMailAddress($fromEmail, $fromName);
+
+      // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
+      $domainEmail = $domainValues['values'][0]['from_email'];
+      $parsed->setHeader('Resent-From', $domainEmail);
+      $parsed->setHeader('Resent-Date', date('r'));
+      // Rewrite any invalid Return-Path headers.
+      $parsed->setHeader('Return-Path', $fromEmail);
 
       // $h must be an array, so we can't use generateHeaders()'s result,
       // but we have to regenerate the headers because we changed To
@@ -150,16 +147,11 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       $h = $parsed->headers->getCaseSensitiveArray();
       $b = $parsed->generateBody();
 
-      // strip Return-Path of possible bounding brackets, CRM-4502
-      if (!empty($h['Return-Path'])) {
-        $h['Return-Path'] = trim($h['Return-Path'], '<>');
-      }
-
       // FIXME: ugly hack - find the first MIME boundary in
       // the body and make the boundary in the header match it
       $ct = $h['Content-Type'];
       if (substr_count($ct, 'boundary=')) {
-        $matches = array();
+        $matches = [];
         preg_match('/^--(.*)$/m', $b, $matches);
         $boundary = rtrim($matches[1]);
         $parts = explode('boundary=', $ct);
@@ -167,24 +159,20 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       }
     }
     else {
-      $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-
-      if (empty($eq->display_name)) {
-        $from = $eq->email;
-      }
-      else {
-        $from = "\"{$eq->display_name}\" <{$eq->email}>";
-      }
+      $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
 
       $message = new Mail_mime("\n");
 
-      $headers = array(
+      $headers = [
         'Subject' => "Re: {$mailing->subject}",
         'To' => $mailing->replyto_email,
-        'From' => $from,
+        'From' => "\"$fromName\" <$fromEmail>",
         'Reply-To' => empty($replyto) ? $eq->email : $replyto,
-        'Return-Path' => "do-not-reply@{$emailDomain}",
-      );
+        'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+        // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
+        'Resent-From' => $domainValues['values'][0]['from_email'],
+        'Resent-Date' => date('r'),
+      ];
 
       $message->setTxtBody($bodyTxt);
       $message->setHTMLBody($bodyHTML);
@@ -235,7 +223,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $to = empty($replyto) ? $eq->email : $replyto;
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->id = $mailing->reply_id;
     $component->find(TRUE);
 
@@ -244,18 +232,15 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-
-    $headers = array(
+    $headers = [
       'Subject' => $component->subject,
       'To' => $to,
-      'From' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
-      'Reply-To' => "do-not-reply@$emailDomain",
-      'Return-Path' => "do-not-reply@$emailDomain",
-    );
+      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+    ];
 
     // TODO: do we need reply tokens?
-
     $html = $component->body_html;
     if ($component->body_text) {
       $text = $component->body_text;
@@ -370,7 +355,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $reply = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -403,7 +388,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
+      $query .= " GROUP BY $queue.id, $contact.id, $reply.time_stamp ";
     }
 
     $orderBy = "sort_name ASC, {$reply}.time_stamp DESC";
@@ -426,17 +411,17 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $dao->query($query);
 
-    $results = array();
+    $results = [];
 
     while ($dao->fetch()) {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

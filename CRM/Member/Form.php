@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -37,16 +21,11 @@
  */
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
-  /**
-   * The id of the object being edited / created
-   *
-   * @var int
-   */
-  public $_id;
+  use CRM_Core_Form_EntityFormTrait;
 
   /**
    * Membership Type ID
-   * @var
+   * @var int
    */
   protected $_memType;
 
@@ -54,21 +33,21 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Array of from email ids
    * @var array
    */
-  protected $_fromEmails = array();
+  protected $_fromEmails = [];
 
   /**
    * Details of all enabled membership types.
    *
    * @var array
    */
-  protected $allMembershipTypeDetails = array();
+  protected $allMembershipTypeDetails = [];
 
   /**
    * Array of membership type IDs and whether they permit autorenewal.
    *
    * @var array
    */
-  protected $membershipTypeRenewalStatus = array();
+  protected $membershipTypeRenewalStatus = [];
 
   /**
    * Price set ID configured for the form.
@@ -85,28 +64,81 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public $_priceSet;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Membership';
+  }
+
+  /**
+   * @var array
+   */
+  protected $statusMessage = [];
+
+  /**
+   * Add to the status message.
+   *
+   * @param $message
+   */
+  protected function addStatusMessage($message) {
+    $this->statusMessage[] = $message;
+  }
+
+  /**
+   * Get the status message.
+   *
+   * @return string
+   */
+  protected function getStatusMessage() {
+    return implode(' ', $this->statusMessage);
+  }
+
+  /**
    * Values submitted to the form, processed along the way.
    *
    * @var array
    */
-  protected $_params = array();
+  protected $_params = [];
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected $entityFields = [];
 
   public function preProcess() {
     // Check for edit permission.
     if (!CRM_Core_Permission::checkActionPermission('CiviMember', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
+    if (!CRM_Member_BAO_Membership::statusAvailabilty()) {
+      // all possible statuses are disabled - redirect back to contact form
+      CRM_Core_Error::statusBounce(ts('There are no configured membership statuses. You cannot add this membership until your membership statuses are correctly configured'));
+    }
+
     parent::preProcess();
-    $params = array();
-    $params['context'] = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'membership');
+    $params = [];
+    $params['context'] = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $params['mode'] = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $params['mode'] = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
 
     $this->setContextVariables($params);
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
-    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, array(), TRUE);
+    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, [], TRUE);
     foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
       if ($membershipType['auto_renew']) {
         $this->_recurMembershipTypes[$index] = $membershipType;
@@ -124,9 +156,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *   defaults
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       CRM_Member_BAO_Membership::retrieve($params, $defaults);
       if (isset($defaults['minimum_fee'])) {
         $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
@@ -134,6 +166,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
       if (isset($defaults['status'])) {
         $this->assign('membershipStatus', $defaults['status']);
+      }
+
+      if (!empty($defaults['is_override'])) {
+        $defaults['is_override'] = CRM_Member_StatusOverrideTypes::PERMANENT;
+      }
+      if (!empty($defaults['status_override_end_date'])) {
+        $defaults['is_override'] = CRM_Member_StatusOverrideTypes::UNTIL_DATE;
       }
     }
 
@@ -148,6 +187,21 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         $defaults['member_of_contact_id'], 'display_name'
       );
     }
+    if (!empty($defaults['membership_type_id'])) {
+      $this->_memType = $defaults['membership_type_id'];
+    }
+    if (is_numeric($this->_memType)) {
+      $defaults['membership_type_id'] = [];
+      $defaults['membership_type_id'][0] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
+        $this->_memType,
+        'member_of_contact_id',
+        'id'
+      );
+      $defaults['membership_type_id'][1] = $this->_memType;
+    }
+    else {
+      $defaults['membership_type_id'] = $this->_memType;
+    }
     return $defaults;
   }
 
@@ -155,15 +209,11 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Build the form object.
    */
   public function buildQuickForm() {
+    $this->assignSalesTaxMetadataToTemplate();
 
-    if ($this->_mode) {
-      $this->add('select', 'payment_processor_id',
-        ts('Payment Processor'),
-        $this->_processors, TRUE,
-        array('onChange' => "buildAutoRenew( null, this.value, '{$this->_mode}');")
-      );
-      CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE);
-    }
+    $this->addPaymentProcessorSelect(TRUE, FALSE, TRUE);
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->getDefaultPaymentInstrumentId());
+    $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
     // Build the form for auto renew. This is displayed when in credit card mode or update mode.
     // The reason for showing it in update mode is not that clear.
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
@@ -172,65 +222,63 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       }
 
       $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
-        NULL, array('onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );")
+        NULL, ['onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );"]
       );
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $autoRenewElement->freeze();
       }
 
-      $this->assign('recurProcessor', json_encode($this->_recurPaymentProcessors));
       $this->addElement('checkbox',
         'auto_renew',
         ts('Membership renewed automatically')
       );
 
-      $this->assignPaymentRelatedVariables();
     }
     $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
     if ($this->_action & CRM_Core_Action::RENEW) {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Renew'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
     elseif ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Delete'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
     else {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'upload',
           'name' => ts('Save and New'),
           'subName' => 'new',
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
   }
 
@@ -285,21 +333,17 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $params
    */
   protected function setContextVariables($params) {
-    $variables = array(
+    $variables = [
       'action' => '_action',
       'context' => '_context',
       'id' => '_id',
       'cid' => '_contactID',
       'mode' => '_mode',
-    );
+    ];
     foreach ($variables as $paramKey => $classVar) {
       if (isset($params[$paramKey]) && !isset($this->$classVar)) {
         $this->$classVar = $params[$paramKey];
       }
-    }
-
-    if ($this->_mode) {
-      $this->assignPaymentRelatedVariables();
     }
 
     if ($this->_id) {
@@ -312,38 +356,25 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   /**
    * Create a recurring contribution record.
    *
-   * Recurring contribution parameters are set explicitly rather than merging paymentParams because it's hard
-   * to know the downstream impacts if we keep passing around the same array.
+   * @param array $contributionRecurParams
    *
-   * @param $paymentParams
+   * @param int $membershipID
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  protected function processRecurringContribution($paymentParams) {
-    $membershipID = $paymentParams['membership_type_id'][1];
-    $contributionRecurParams = array(
-      'contact_id' => $paymentParams['contactID'],
-      'amount' => $paymentParams['total_amount'],
-      'contribution_status_id' => 'Pending',
-      'payment_processor_id' => $paymentParams['payment_processor_id'],
-      'campaign_id' => $paymentParams['campaign_id'],
-      'financial_type_id' => $paymentParams['financial_type_id'],
-      'is_email_receipt' => $paymentParams['is_email_receipt'],
-      'payment_instrument_id' => $paymentParams['payment_instrument_id'],
-      'invoice_id' => $paymentParams['invoice_id'],
-    );
+  protected function processRecurringContribution($contributionRecurParams, $membershipID) {
 
-    $mapping = array(
+    $mapping = [
       'frequency_interval' => 'duration_interval',
       'frequency_unit' => 'duration_unit',
-    );
-    $membershipType = civicrm_api3('MembershipType', 'getsingle', array(
+    ];
+    $membershipType = civicrm_api3('MembershipType', 'getsingle', [
       'id' => $membershipID,
       'return' => $mapping,
-    ));
+    ]);
 
-    $returnParams = array('is_recur' => TRUE);
+    $returnParams = ['is_recur' => TRUE];
     foreach ($mapping as $recurringFieldName => $membershipTypeFieldName) {
       $contributionRecurParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];
       $returnParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];
@@ -364,14 +395,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected function ensurePriceParamsAreSet(&$formValues) {
     foreach ($formValues as $key => $value) {
-      if ((substr($key, 0, 6) == 'price_') && is_int(substr($key, 7))) {
+      if ((substr($key, 0, 6) == 'price_') && is_numeric(substr($key, 6))) {
         return;
       }
     }
     $priceFields = CRM_Member_BAO_Membership::setQuickConfigMembershipParameters(
       $formValues['membership_type_id'][0],
       $formValues['membership_type_id'][1],
-      $formValues['total_amount'],
+      CRM_Utils_Array::value('total_amount', $formValues),
       $this->_priceSetId
     );
     $formValues = array_merge($formValues, $priceFields['price_fields']);
@@ -386,7 +417,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @return array
    */
   protected static function getPriceSetDetails($params) {
-    $priceSetID = CRM_Utils_Array::value('price_set_id', $params);
+    $priceSetID = $params['price_set_id'] ?? NULL;
     if ($priceSetID) {
       return CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     }
@@ -406,12 +437,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @return int
    */
   protected static function getPriceSetID($params) {
-    $priceSetID = CRM_Utils_Array::value('price_set_id', $params);
+    $priceSetID = $params['price_set_id'] ?? NULL;
     if (!$priceSetID) {
       $priceSetDetails = self::getPriceSetDetails($params);
-      return key($priceSetDetails);
+      return (int) key($priceSetDetails);
     }
-    return $priceSetID;
+    return (int) $priceSetID;
   }
 
   /**
@@ -431,30 +462,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Assign billing name to the template.
-   */
-  protected function assignBillingName() {
-    $name = '';
-    if (!empty($this->_params['billing_first_name'])) {
-      $name = $this->_params['billing_first_name'];
-    }
-
-    if (!empty($this->_params['billing_middle_name'])) {
-      $name .= " {$this->_params['billing_middle_name']}";
-    }
-
-    if (!empty($this->_params['billing_last_name'])) {
-      $name .= " {$this->_params['billing_last_name']}";
-    }
-    $this->assign('billingName', $name);
-  }
-
-  /**
    * Wrapper function for unit tests.
    *
    * @param array $formValues
    */
   public function testSubmit($formValues) {
+    $this->setContextVariables($formValues);
     $this->_memType = $formValues['membership_type_id'][1];
     $this->_params = $formValues;
     $this->submit();

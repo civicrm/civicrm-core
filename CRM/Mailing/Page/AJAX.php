@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -47,12 +31,17 @@ class CRM_Mailing_Page_AJAX {
     $messageTemplate->selectAdd();
     $messageTemplate->selectAdd('msg_text, msg_html, msg_subject, pdf_format_id');
     $messageTemplate->find(TRUE);
-    $messages = array(
+    $messages = [
       'subject' => $messageTemplate->msg_subject,
       'msg_text' => $messageTemplate->msg_text,
       'msg_html' => $messageTemplate->msg_html,
       'pdf_format_id' => $messageTemplate->pdf_format_id,
-    );
+    ];
+
+    $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $templateId);
+    foreach ((array) $documentInfo as $info) {
+      list($messages['document_body']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
+    }
 
     CRM_Utils_JSON::output($messages);
   }
@@ -61,28 +50,8 @@ class CRM_Mailing_Page_AJAX {
    * Retrieve contact mailings.
    */
   public static function getContactMailings() {
-    $contactID = CRM_Utils_Type::escape($_GET['contact_id'], 'Integer');
-
-    $sortMapper = array();
-    foreach ($_GET['columns'] as $key => $value) {
-      $sortMapper[$key] = $value['data'];
-    };
-
-    $offset = isset($_GET['start']) ? CRM_Utils_Type::escape($_GET['start'], 'Integer') : 0;
-    $rowCount = isset($_GET['length']) ? CRM_Utils_Type::escape($_GET['length'], 'Integer') : 25;
-    $sort = isset($_GET['order'][0]['column']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_GET['order'][0]['column'], 'Integer'), $sortMapper) : NULL;
-    $sortOrder = isset($_GET['order'][0]['dir']) ? CRM_Utils_Type::escape($_GET['order'][0]['dir'], 'String') : 'asc';
-
-    $params = $_GET;
-    if ($sort && $sortOrder) {
-      $params['sortBy'] = $sort . ' ' . $sortOrder;
-    }
-
-    $params['page'] = ($offset / $rowCount) + 1;
-    $params['rp'] = $rowCount;
-
-    $params['contact_id'] = $contactID;
-    $params['context'] = $context;
+    $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $params += CRM_Core_Page_AJAX::validateParams(['contact_id' => 'Integer']);
 
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);

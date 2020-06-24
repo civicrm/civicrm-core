@@ -5,7 +5,7 @@
     pageTitle = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
-  angular.module('crmUi', [])
+  angular.module('crmUi', CRM.angRequires('crmUi'))
 
     // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
     // WISHLIST: crmCollapsed should support two-way/continuous binding
@@ -124,7 +124,7 @@
     // example: <div crm-ui-field="{title: ts('My Field')}"> {{mydata}} </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" /> </div>
     // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field')}"> <input crm-ui-id="subform.myfield" name="myfield" required /> </div>
-    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name')}"> {{mydata}} </div>
+    // example: <div crm-ui-field="{name: 'subform.myfield', title: ts('My Field'), help: hs('help_field_name'), required: true}"> {{mydata}} </div>
     .directive('crmUiField', function() {
       // Note: When writing new templates, the "label" position is particular. See/patch "var label" below.
       var templateUrls = {
@@ -255,12 +255,17 @@
           // immediately for initialization. Use retries/retryDelay to initialize such elements.
           var init = function (retries, retryDelay) {
             var input = $('#' + id);
-            if (input.length === 0) {
+            if (input.length === 0 && !attrs.crmUiForceRequired) {
               if (retries) {
                 $timeout(function(){
                   init(retries-1, retryDelay);
                 }, retryDelay);
               }
+              return;
+            }
+
+            if (attrs.crmUiForceRequired) {
+              scope.crmIsRequired = true;
               return;
             }
 
@@ -326,6 +331,7 @@
         link: function (scope, elm, attrs) {
           var iframe = $(elm)[0];
           iframe.setAttribute('width', '100%');
+          iframe.setAttribute('height', '250px');
           iframe.setAttribute('frameborder', '0');
 
           var refresh = function () {
@@ -353,6 +359,10 @@
           $(elm).parent().on('dialogresize dialogopen', function(e, ui) {
             $(this).css({padding: '0', margin: '0', overflow: 'hidden'});
             iframe.setAttribute('height', '' + $(this).innerHeight() + 'px');
+          });
+
+          $(elm).parent().on('dialogresize', function(e, ui) {
+            iframe.setAttribute('class', 'resized');
           });
 
           scope.$parent.$watch(attrs.crmUiIframe, refresh);
@@ -576,6 +586,7 @@
     .directive('crmUiSelect', function ($parse, $timeout) {
       return {
         require: '?ngModel',
+        priority: 1,
         scope: {
           crmUiSelect: '='
         },
@@ -588,7 +599,12 @@
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
                 // new item is added before selection is made
-                element.select2('val', ngModel.$modelValue);
+                var newVal = _.cloneDeep(ngModel.$modelValue);
+                // Fix possible data-type mismatch
+                if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
+                  newVal = newVal.length ? newVal.split(',') : [];
+                }
+                element.select2('val', newVal);
               });
             };
           }
@@ -606,7 +622,6 @@
             element.crmSelect2(scope.crmUiSelect || {});
             if (ngModel) {
               element.on('change', refreshModel);
-              $timeout(ngModel.$render);
             }
           }
 
@@ -631,7 +646,12 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              element.select2('val', ngModel.$modelValue);
+              var newVal = _.cloneDeep(ngModel.$modelValue);
+              // Fix possible data-type mismatch
+              if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
+                newVal = newVal.length ? newVal.split(',') : [];
+              }
+              element.select2('val', newVal);
             });
           };
           function refreshModel() {
@@ -655,6 +675,38 @@
       };
     })
 
+    // validate multiple email text
+    // usage: <input crm-multiple-email type="text" ng-model="myobj.field" />
+    .directive('crmMultipleEmail', function ($parse, $timeout) {
+      return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, ctrl) {
+          ctrl.$parsers.unshift(function(viewValue) {
+            // if empty value provided simply bypass validation
+            if (_.isEmpty(viewValue)) {
+              ctrl.$setValidity('crmMultipleEmail', true);
+              return viewValue;
+            }
+
+            // split email string on basis of comma
+            var emails = viewValue.split(',');
+            // regex pattern for single email
+            var emailRegex = /\S+@\S+\.\S+/;
+
+            var validityArr = emails.map(function(str){
+              return emailRegex.test(str.trim());
+            });
+
+            if ($.inArray(false, validityArr) > -1) {
+              ctrl.$setValidity('crmMultipleEmail', false);
+            } else {
+              ctrl.$setValidity('crmMultipleEmail', true);
+            }
+            return viewValue;
+          });
+        }
+      };
+    })
     // example <div crm-ui-tab id="tab-1" crm-title="ts('My Title')" count="3">...content...</div>
     // WISHLIST: use a full Angular component instead of an incomplete jQuery wrapper
     .directive('crmUiTab', function($parse) {
@@ -680,7 +732,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiTabSet: '@'
+          crmUiTabSet: '@',
+          tabSetOptions: '@'
         },
         templateUrl: '~/crmUi/tabset.html',
         transclude: true,
@@ -732,6 +785,7 @@
     })
 
     // example: <div crm-ui-wizard="myWizardCtrl"><div crm-ui-wizard-step crm-title="ts('Step 1')">...</div><div crm-ui-wizard-step crm-title="ts('Step 2')">...</div></div>
+    // example with custom nav classes: <div crm-ui-wizard crm-ui-wizard-nav-class="ng-animate-out ...">...</div>
     // Note: "myWizardCtrl" has various actions/properties like next() and $first().
     // WISHLIST: Allow each step to determine if it is "complete" / "valid" / "selectable"
     // WISHLIST: Allow each step to enable/disable (show/hide) itself
@@ -739,7 +793,8 @@
       return {
         restrict: 'EA',
         scope: {
-          crmUiWizard: '@'
+          crmUiWizard: '@',
+          crmUiWizardNavClass: '@' // string, A list of classes that will be added to the nav items
         },
         templateUrl: '~/crmUi/wizard.html',
         transclude: true,
@@ -769,17 +824,13 @@
             return steps[selectedIndex] && steps[selectedIndex].isStepValid();
           };
           this.iconFor = function(index) {
-            if (index < this.$index()) return '√';
-            if (index === this.$index()) return '»';
-            return ' ';
+            if (index < this.$index()) return 'crm-i fa-check';
+            if (index === this.$index()) return 'crm-i fa-angle-double-right';
+            return '';
           };
           this.isSelectable = function(step) {
             if (step.selected) return false;
-            var result = false;
-            angular.forEach(steps, function(otherStep, otherKey) {
-              if (step === otherStep && otherKey <= maxVisited) result = true;
-            });
-            return result;
+            return this.$validStep();
           };
 
           /*** @param Object step the $scope of the step */
@@ -824,6 +875,20 @@
         },
         link: function (scope, element, attrs) {
           scope.ts = CRM.ts(null);
+
+          element.find('.crm-wizard-buttons button[ng-click^=crmUiWizardCtrl]').click(function () {
+            // These values are captured inside the click handler to ensure the
+            // positions/sizes of the elements are captured at the time of the
+            // click vs. at the time this directive is initialized.
+            var topOfWizard = element.offset().top;
+            var heightOfMenu = $('#civicrm-menu').height() || 0;
+
+            $('html')
+              // stop any other animations that might be happening...
+              .stop()
+              // gracefully slide the user to the top of the wizard
+              .animate({scrollTop: topOfWizard - heightOfMenu}, 1000);
+          });
         }
       };
     })
@@ -854,7 +919,7 @@
             return;
           }
           if (attrs.crmIcon.substring(0,3) == 'fa-') {
-            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '"></i> ');
+            $(element).prepend('<i class="crm-i ' + attrs.crmIcon + '" aria-hidden="true"></i> ');
           }
           else {
             $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
@@ -869,6 +934,7 @@
     // example: <div crm-ui-wizard-step crm-title="ts('My Title')" ng-form="mySubForm">...content...</div>
     // If there are any conditional steps, then be sure to set a weight explicitly on *all* steps to maintain ordering.
     // example: <div crm-ui-wizard-step="100" crm-title="..." ng-if="...">...content...</div>
+    // example with custom classes: <div crm-ui-wizard-step="100" crm-ui-wizard-step-class="ng-animate-out ...">...content...</div>
     .directive('crmUiWizardStep', function() {
       var nextWeight = 1;
       return {
@@ -876,9 +942,10 @@
         restrict: 'EA',
         scope: {
           crmTitle: '@', // expression, evaluates to a printable string
-          crmUiWizardStep: '@' // int, a weight which determines the ordering of the steps
+          crmUiWizardStep: '@', // int, a weight which determines the ordering of the steps
+          crmUiWizardStepClass: '@' // string, A list of classes that will be added to the template
         },
-        template: '<div class="crm-wizard-step" ng-show="selected" ng-transclude/></div>',
+        template: '<div class="crm-wizard-step {{crmUiWizardStepClass}}" ng-show="selected" ng-transclude/></div>',
         transclude: true,
         link: function (scope, element, attrs, ctrls) {
           var crmUiWizardCtrl = ctrls[0], form = ctrls[1];
@@ -891,7 +958,7 @@
             return form.$valid;
           };
           crmUiWizardCtrl.add(scope);
-          element.on('$destroy', function(){
+          scope.$on('$destroy', function(){
             crmUiWizardCtrl.remove(scope);
           });
         }
@@ -980,8 +1047,11 @@
 
     // Sets document title & page title; attempts to override CMS title markup for the latter
     // WARNING: Use only once per route!
+    // WARNING: This directive works only if your AngularJS base page does not
+    // set a custom title (i.e., it has an initial title of "CiviCRM"). See the
+    // global variables pageTitle and documentTitle.
     // Example (same title for both): <h1 crm-page-title>{{ts('Hello')}}</h1>
-    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag"></i>{{ts('Hello')}}</h1>
+    // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" aria-hidden="true"></i>{{ts('Hello')}}</h1>
     .directive('crmPageTitle', function($timeout) {
       return {
         scope: {
@@ -996,7 +1066,7 @@
               // If the CMS has already added title markup to the page, use it
               $('h1').not('.crm-container h1').each(function() {
                 if (_.trim($(this).html()) === pageTitle) {
-                  $(this).html(newPageTitle);
+                  $(this).addClass('crm-page-title').html(newPageTitle);
                   $el.hide();
                 }
               });

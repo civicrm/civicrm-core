@@ -1,25 +1,9 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
--- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2015                                |
--- +--------------------------------------------------------------------+
--- | This file is a part of CiviCRM.                                    |
+-- | Copyright CiviCRM LLC. All rights reserved.                        |
 -- |                                                                    |
--- | CiviCRM is free software; you can copy, modify, and distribute it  |
--- | under the terms of the GNU Affero General Public License           |
--- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
--- |                                                                    |
--- | CiviCRM is distributed in the hope that it will be useful, but     |
--- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
--- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
--- | See the GNU Affero General Public License for more details.        |
--- |                                                                    |
--- | You should have received a copy of the GNU Affero General Public   |
--- | License and the CiviCRM Licensing Exception along                  |
--- | with this program; if not, contact CiviCRM LLC                     |
--- | at info[AT]civicrm[DOT]org. If you have questions about the        |
--- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- | This work is published under the GNU AGPLv3 license with some      |
+-- | permitted exceptions and without any warranty. For full license    |
+-- | and copyright information, see https://civicrm.org/licensing       |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from {$smarty.template}
@@ -126,7 +110,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1222, 1101, "SK", "Sikkim"),
 (1223, 1101, "TN", "Tamil Nadu"),
 (1224, 1101, "TR", "Tripura"),
-(1225, 1101, "UL", "Uttaranchal"),
+(1225, 1101, "UT", "Uttarakhand"),
 (1226, 1101, "UP", "Uttar Pradesh"),
 (1227, 1101, "WB", "West Bengal"),
 (1228, 1101, "AN", "Andaman and Nicobar Islands"),
@@ -135,6 +119,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1231, 1101, "DL", "Delhi"),
 (1232, 1101, "LD", "Lakshadweep"),
 (1233, 1101, "PY", "Pondicherry"),
+-- Note we believe all lower-case is correct for Poland. See https://github.com/civicrm/civicrm-core/pull/17107
 (1300, 1172, "MZ", "mazowieckie"),
 (1301, 1172, "PM", "pomorskie"),
 (1302, 1172, "DS", "dolnośląskie"),
@@ -281,8 +266,8 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1627, 1010, "T", "Tucuman"),
 (1628, 1014, "1", "Burgenland"),
 (1629, 1014, "2", "Kärnten"),
-(1630, 1014, "3", "Niederosterreich"),
-(1631, 1014, "4", "Oberosterreich"),
+(1630, 1014, "3", "Niederösterreich"),
+(1631, 1014, "4", "Oberösterreich"),
 (1632, 1014, "5", "Salzburg"),
 (1633, 1014, "6", "Steiermark"),
 (1634, 1014, "7", "Tirol"),
@@ -501,7 +486,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1847, 1033, "10", "Kyustendil"),
 (1848, 1033, "11", "Lovech"),
 (1849, 1033, "12", "Montana"),
-(1850, 1033, "13", "Pazardzik"),
+(1850, 1033, "13", "Pazardzhik"),
 (1851, 1033, "14", "Pernik"),
 (1852, 1033, "15", "Pleven"),
 (1853, 1033, "16", "Plovdiv"),
@@ -576,7 +561,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1922, 1029, "CE", "Ceara"),
 (1923, 1029, "DF", "Distrito Federal"),
 (1924, 1029, "ES", "Espirito Santo"),
-(1925, 1029, "FN", "Fernando de Noronha"),
 (1926, 1029, "GO", "Goias"),
 (1927, 1029, "MA", "Maranhao"),
 (1928, 1029, "MG", "Minas Gerais"),
@@ -873,7 +857,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2237, 1058, "US", "Ústecký kraj"),
 (2238, 1058, "VY", "Vysočina"),
 (2239, 1058, "ZL", "Zlínský kraj"),
-(2240, 1082, "BW", "Baden-Wuerttemberg"),
+(2240, 1082, "BW", "Baden-Württemberg"),
 (2241, 1082, "BY", "Bayern"),
 (2242, 1082, "HB", "Bremen"),
 (2243, 1082, "HH", "Hamburg"),
@@ -883,12 +867,12 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2247, 1082, "RP", "Rheinland-Pfalz"),
 (2248, 1082, "SL", "Saarland"),
 (2249, 1082, "SH", "Schleswig-Holstein"),
-(2250, 1082, "BR", "Berlin"),
+(2250, 1082, "BE", "Berlin"),
 (2251, 1082, "BB", "Brandenburg"),
 (2252, 1082, "MV", "Mecklenburg-Vorpommern"),
 (2253, 1082, "SN", "Sachsen"),
 (2254, 1082, "ST", "Sachsen-Anhalt"),
-(2255, 1082, "TH", "Thueringen"),
+(2255, 1082, "TH", "Thüringen"),
 (2256, 1060, "AS", "Ali Sabiah"),
 (2257, 1060, "DI", "Dikhil"),
 (2258, 1060, "DJ", "Djibouti"),
@@ -1830,11 +1814,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3345, 1110, "JA", "Jarash"),
 (3346, 1110, "MN", "Ma\'an"),
 (3347, 1110, "MD", "Madaba"),
-(3348, 1112, "110", "Nairobi Municipality"),
-(3349, 1112, "300", "Coast"),
-(3350, 1112, "500", "North-Eastern Kaskazini Mashariki"),
-(3351, 1112, "700", "Rift Valley"),
-(3352, 1112, "900", "Western Magharibi"),
+
+-- CRM-20062 Outdated provinces for Kenya removed .
+
 (3353, 1117, "GB", "Bishkek"),
 (3354, 1117, "B", "Batken"),
 (3355, 1117, "C", "Chu"),
@@ -2585,23 +2567,23 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4126, 1173, "01", "Aveiro"),
 (4127, 1173, "02", "Beja"),
 (4128, 1173, "03", "Braga"),
-(4129, 1173, "04", "Braganca"),
+(4129, 1173, "04", "Bragança"),
 (4130, 1173, "05", "Castelo Branco"),
-(4131, 1173, "06", "Colmbra"),
-(4132, 1173, "07", "Ovora"),
+(4131, 1173, "06", "Coimbra"),
+(4132, 1173, "07", "Évora"),
 (4133, 1173, "08", "Faro"),
 (4134, 1173, "09", "Guarda"),
 (4135, 1173, "10", "Leiria"),
 (4136, 1173, "11", "Lisboa"),
 (4137, 1173, "12", "Portalegre"),
 (4138, 1173, "13", "Porto"),
-(4139, 1173, "14", "Santarem"),
-(4140, 1173, "15", "Setubal"),
+(4139, 1173, "14", "Santarém"),
+(4140, 1173, "15", "Setúbal"),
 (4141, 1173, "16", "Viana do Castelo"),
 (4142, 1173, "17", "Vila Real"),
 (4143, 1173, "18", "Viseu"),
-(4144, 1173, "20", "Regiao Autonoma dos Acores"),
-(4145, 1173, "30", "Regiao Autonoma da Madeira"),
+(4144, 1173, "20", "Região Autónoma dos Açores"),
+(4145, 1173, "30", "Região Autónoma da Madeira"),
 (4146, 1168, "ASU", "Asuncion"),
 (4147, 1168, "16", "Alto Paraguay"),
 (4148, 1168, "10", "Alto Parana"),
@@ -2631,44 +2613,44 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4172, 1176, "B", "Bucuresti"),
 (4173, 1176, "AB", "Alba"),
 (4174, 1176, "AR", "Arad"),
-(4175, 1176, "AG", "Arges"),
-(4176, 1176, "BC", "Bacau"),
+(4175, 1176, "AG", "Argeș"),
+(4176, 1176, "BC", "Bacău"),
 (4177, 1176, "BH", "Bihor"),
-(4178, 1176, "BN", "Bistrita-Nasaud"),
-(4179, 1176, "BT", "Boto\'ani"),
-(4180, 1176, "BV", "Bra\'ov"),
-(4181, 1176, "BR", "Braila"),
-(4182, 1176, "BZ", "Buzau"),
-(4183, 1176, "CS", "Caras-Severin"),
-(4184, 1176, "CL", "Ca la ras\'i"),
+(4178, 1176, "BN", "Bistrița-Năsăud"),
+(4179, 1176, "BT", "Botoșani"),
+(4180, 1176, "BV", "Brașov"),
+(4181, 1176, "BR", "Brăila"),
+(4182, 1176, "BZ", "Buzău"),
+(4183, 1176, "CS", "Caraș-Severin"),
+(4184, 1176, "CL", "Călărași"),
 (4185, 1176, "CJ", "Cluj"),
-(4186, 1176, "CT", "Constant\'a"),
+(4186, 1176, "CT", "Constanța"),
 (4187, 1176, "CV", "Covasna"),
-(4188, 1176, "DB", "Dambovit\'a"),
+(4188, 1176, "DB", "Dâmbovița"),
 (4189, 1176, "DJ", "Dolj"),
-(4190, 1176, "GL", "Galat\'i"),
+(4190, 1176, "GL", "Galați"),
 (4191, 1176, "GR", "Giurgiu"),
 (4192, 1176, "GJ", "Gorj"),
 (4193, 1176, "HR", "Harghita"),
 (4194, 1176, "HD", "Hunedoara"),
-(4195, 1176, "IL", "Ialomit\'a"),
-(4196, 1176, "IS", "Ias\'i"),
+(4195, 1176, "IL", "Ialomița"),
+(4196, 1176, "IS", "Iași"),
 (4197, 1176, "IF", "Ilfov"),
-(4198, 1176, "MM", "Maramures"),
-(4199, 1176, "MH", "Mehedint\'i"),
-(4200, 1176, "MS", "Mures"),
-(4201, 1176, "NT", "Neamt"),
+(4198, 1176, "MM", "Maramureș"),
+(4199, 1176, "MH", "Mehedinți"),
+(4200, 1176, "MS", "Mureș"),
+(4201, 1176, "NT", "Neamț"),
 (4202, 1176, "OT", "Olt"),
 (4203, 1176, "PH", "Prahova"),
 (4204, 1176, "SM", "Satu Mare"),
-(4205, 1176, "SJ", "Sa laj"),
+(4205, 1176, "SJ", "Sălaj"),
 (4206, 1176, "SB", "Sibiu"),
 (4207, 1176, "SV", "Suceava"),
 (4208, 1176, "TR", "Teleorman"),
-(4209, 1176, "TM", "Timis"),
+(4209, 1176, "TM", "Timiș"),
 (4210, 1176, "TL", "Tulcea"),
 (4211, 1176, "VS", "Vaslui"),
-(4212, 1176, "VL", "Valcea"),
+(4212, 1176, "VL", "Vâlcea"),
 (4213, 1176, "VN", "Vrancea"),
 (4214, 1177, "AD", "Adygeya, Respublika"),
 (4215, 1177, "AL", "Altay, Respublika"),
@@ -3313,7 +3295,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4860, 1208, "TPQ", "Taipei County"),
 (4861, 1208, "TTT", "Taitung County"),
 (4862, 1208, "TAO", "Taoyuan County"),
-(4863, 1208, "YUN", "Yunlin Conuty"),
+(4863, 1208, "YUN", "Yunlin County"),
 (4864, 1208, "KEE", "Keelung City"),
 (4865, 1210, "01", "Arusha"),
 (4866, 1210, "02", "Dar-es-Salaam"),
@@ -3431,7 +3413,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4978, 1227, "71", "Midway Islands"),
 (4979, 1227, "76", "Navassa Island"),
 (4980, 1227, "95", "Palmyra Atoll"),
-(4981, 1227, "79", "Wake Ialand"),
+(4981, 1227, "79", "Wake Island"),
 (4982, 1229, "AR", "Artigsa"),
 (4983, 1229, "CA", "Canelones"),
 (4984, 1229, "CL", "Cerro Largo"),
@@ -4002,7 +3984,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1066, "LI", "La Libertad"),
 (NULL, 1066, "PA", "La Paz"),
 (NULL, 1066, "UN", "La Union"),
- 
+
 -- CRM-17660 Add missing Cameroon Provinces
 (NULL, 1038, "LT", "Littoral"),
 (NULL, 1038, "NW", "Nord-Ouest"),
@@ -4011,4 +3993,119 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1101, "TG", "Telangana"),
 
 -- CRM-17800
-(NULL, 1187, "04", "Ash Sharqiyah");
+(NULL, 1187, "04", "Ash Sharqiyah"),
+
+-- CRM-19134 Missing French overseas departments.
+(NULL, 1076, "GP", "Guadeloupe"),
+(NULL, 1076, "MQ", "Martinique"),
+(NULL, 1076, "GF", "Guyane"),
+(NULL, 1076, "RE", "La Réunion"),
+(NULL, 1076, "YT", "Mayotte"),
+
+-- CRM-20062 New counties of Kenya.
+(NULL, 1112, "01", "Baringo"),
+(NULL, 1112, "02", "Bomet"),
+(NULL, 1112, "03", "Bungoma"),
+(NULL, 1112, "04", "Busia"),
+(NULL, 1112, "05", "Elgeyo/Marakwet"),
+(NULL, 1112, "06", "Embu"),
+(NULL, 1112, "07", "Garissa"),
+(NULL, 1112, "08", "Homa Bay"),
+(NULL, 1112, "09", "Isiolo"),
+(NULL, 1112, "10", "Kajiado"),
+(NULL, 1112, "11", "Kakamega"),
+(NULL, 1112, "12", "Kericho"),
+(NULL, 1112, "13", "Kiambu"),
+(NULL, 1112, "14", "Kilifi"),
+(NULL, 1112, "15", "Kirinyaga"),
+(NULL, 1112, "16", "Kisii"),
+(NULL, 1112, "17", "Kisumu"),
+(NULL, 1112, "18", "Kitui"),
+(NULL, 1112, "19", "Kwale"),
+(NULL, 1112, "20", "Laikipia"),
+(NULL, 1112, "21", "Lamu"),
+(NULL, 1112, "22", "Machakos"),
+(NULL, 1112, "23", "Makueni"),
+(NULL, 1112, "24", "Mandera"),
+(NULL, 1112, "25", "Marsabit"),
+(NULL, 1112, "26", "Meru"),
+(NULL, 1112, "27", "Migori"),
+(NULL, 1112, "28", "Mombasa"),
+(NULL, 1112, "29", "Murang'a"),
+(NULL, 1112, "30", "Nairobi City"),
+(NULL, 1112, "31", "Nakuru"),
+(NULL, 1112, "32", "Nandi"),
+(NULL, 1112, "33", "Narok"),
+(NULL, 1112, "34", "Nyamira"),
+(NULL, 1112, "35", "Nyandarua"),
+(NULL, 1112, "36", "Nyeri"),
+(NULL, 1112, "37", "Samburu"),
+(NULL, 1112, "38", "Siaya"),
+(NULL, 1112, "39", "Taita/Taveta"),
+(NULL, 1112, "40", "Tana River"),
+(NULL, 1112, "41", "Tharaka-Nithi"),
+(NULL, 1112, "42", "Trans Nzoia"),
+(NULL, 1112, "43", "Turkana"),
+(NULL, 1112, "44", "Uasin Gishu"),
+(NULL, 1112, "45", "Vihiga"),
+(NULL, 1112, "46", "Wajir"),
+(NULL, 1112, "47", "West Pokot"),
+
+-- CRM-19993 Fixes for ISO compliance with countries and counties
+-- Add states for: India, Ghana, Sierra Leone, Saint Kitts & Nevis
+(NULL, 1101, "CH", "Chandigarh"),
+(NULL, 1083, "CP", "Central"),
+(NULL, 1083, "EP", "Eastern"),
+(NULL, 1083, "NP", "Northern"),
+(NULL, 1083, "WP", "Western"),
+(NULL, 1181, "K", "Saint Kitts"),
+(NULL, 1181, "N", "Nevis"),
+(NULL, 1190, "E", "Eastern"),
+(NULL, 1190, "N", "Northern"),
+(NULL, 1190, "S", "Southern"),
+
+-- CRM-21234 Missing subdivisions of Tajikistan.
+(NULL, 1209, "DU", "Dushanbe"),
+(NULL, 1209, "RA", "Nohiyahoi Tobei Jumhurí"),
+
+-- CRM-21268 Missing French overseas departments.
+(NULL, 1076, "WF", "Wallis-et-Futuna"),
+(NULL, 1076, "NC", "Nouvelle-Calédonie"),
+
+-- CRM-21532 Add French state/departments
+(NULL, 1076, "52", "Haute-Marne"),
+
+-- Add states for: Barbados and Antigua and Barbuda
+(NULL, 1009, "03", "Saint George"),
+(NULL, 1009, "04", "Saint John"),
+(NULL, 1009, "05", "Saint Mary"),
+(NULL, 1009, "06", "Saint Paul"),
+(NULL, 1009, "07", "Saint Peter"),
+(NULL, 1009, "08", "Saint Philip"),
+(NULL, 1009, "10", "Barbuda"),
+(NULL, 1009, "11", "Redonda"),
+(NULL, 1018, "01", "Christ Church"),
+(NULL, 1018, "02", "Saint Andrew"),
+(NULL, 1018, "03", "Saint George"),
+(NULL, 1018, "04", "Saint James"),
+(NULL, 1018, "05", "Saint John"),
+(NULL, 1018, "06", "Saint Joseph"),
+(NULL, 1018, "07", "Saint Lucy"),
+(NULL, 1018, "08", "Saint Michael"),
+(NULL, 1018, "09", "Saint Peter"),
+(NULL, 1018, "10", "Saint Philip"),
+(NULL, 1018, "11", "Saint Thomas"),
+
+-- CRM-21837 - Missing states for Gabon
+(NULL, 1080, "01", "Estuaire"),
+(NULL, 1080, "02", "Haut-Ogooué"),
+(NULL, 1080, "03", "Moyen-Ogooué"),
+(NULL, 1080, "04", "Ngounié"),
+(NULL, 1080, "05", "Nyanga"),
+(NULL, 1080, "06", "Ogooué-Ivindo"),
+(NULL, 1080, "07", "Ogooué-Lolo"),
+(NULL, 1080, "08", "Ogooué-Maritime"),
+(NULL, 1080, "09", "Woleu-Ntem"),
+
+-- dev/Core#131 Missing UK State
+(NULL, 1226, "MON", "Monmouthshire");

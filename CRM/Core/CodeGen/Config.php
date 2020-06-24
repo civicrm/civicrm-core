@@ -4,24 +4,19 @@
  * Generate configuration files
  */
 class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
-  public function run() {
-    $this->generateTemplateVersion();
 
+  public function run() {
     $this->setupCms();
   }
 
-  public function generateTemplateVersion() {
-    file_put_contents($this->config->tplCodePath . "/CRM/common/version.tpl", $this->config->db_version);
-  }
-
   public function setupCms() {
-    if (!in_array($this->config->cms, array(
+    if (!in_array($this->config->cms, [
       'backdrop',
       'drupal',
       'drupal8',
       'joomla',
       'wordpress',
-    ))) {
+    ])) {
       echo "Config file for '{$this->config->cms}' not known.";
       exit();
     }
@@ -35,12 +30,6 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
         throw new Exception("Failed to locate template for civicrm.config.php");
       }
     }
-
-    echo "Generating civicrm-version file\n";
-    $template = new CRM_Core_CodeGen_Util_Template('php');
-    $template->assign('db_version', $this->config->db_version);
-    $template->assign('cms', ucwords($this->config->cms));
-    $template->run('civicrm_version.tpl', $this->config->phpCodePath . "civicrm-version.php");
   }
 
   /**
@@ -50,7 +39,11 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
    *   path to config template
    */
   public function findConfigTemplate($cms) {
-    $candidates = array();
+    if (getenv('GENCODE_CONFIG_TEMPLATE')) {
+      return getenv('GENCODE_CONFIG_TEMPLATE');
+    }
+
+    $candidates = [];
     switch ($cms) {
       case 'backdrop':
         // FIXME!!!!
@@ -68,12 +61,12 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
       case 'drupal8':
         $candidates[] = "../../modules/civicrm/civicrm.config.php.drupal";
         $candidates[] = "../../../modules/civicrm/civicrm.config.php.drupal";
+        $candidates[] = "../../../modules/civicrm-drupal/civicrm.config.php.drupal";
         break;
 
       case 'wordpress':
         $candidates[] = "../../civicrm.config.php.wordpress";
         $candidates[] = "../WordPress/civicrm.config.php.wordpress";
-        $candidates[] = "../drupal/civicrm.config.php.drupal";
         break;
     }
     foreach ($candidates as $candidate) {

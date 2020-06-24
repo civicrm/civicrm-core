@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Contact Summary template for new tabbed interface. Replaces Basic.tpl *}
@@ -80,7 +64,7 @@
 
         {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
           <li class="crm-delete-action crm-contact-delete">
-            {crmButton p='civicrm/contact/view/delete' q="&reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
+            {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
               {ts}Delete Contact{/ts}
             {/crmButton}
           </li>
@@ -123,16 +107,11 @@
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
     <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
-        <li id="tab_summary" class="crm-tab-button ui-corner-all">
-          <a href="#contact-summary" title="{ts}Summary{/ts}">
-            <span> </span> {ts}Summary{/ts}
-            <em></em>
-          </a>
-        </li>
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
-            <a href="{$tabValue.url}" title="{$tabValue.title}">
-              {$tabValue.title}
+            <a href="{$tabValue.url}" title="{$tabValue.title|escape}">
+              <i class="{if $tabValue.icon}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
+              <span>{$tabValue.title}</span>
               {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
           </li>
@@ -164,40 +143,8 @@
                 </div>
               {/if}
                 <div class="{if !empty($imageURL)} float-left{/if}">
-                  <div class="crm-clear crm-summary-block">
-                    <div class="crm-summary-row">
-                      <div class="crm-label" id="tagLink">
-                        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}"
-                           title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
-                      </div>
-                      <div class="crm-content" id="tags">{$contactTag}</div>
-                    </div>
-                    <div class="crm-summary-row">
-                      <div class="crm-label">{ts}Contact Type{/ts}</div>
-                      <div class="crm-content crm-contact_type_label">
-                        {if isset($contact_type_label)}{$contact_type_label}{/if}
-                      </div>
-                    </div>
-                    <div class="crm-summary-row">
-                      <div class="crm-label">
-                        {ts}Contact ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
-                      </div>
-                      <div class="crm-content">
-                        <span class="crm-contact-contact_id">{$contactId}</span>
-                        {if !empty($userRecordUrl)}
-                          <span class="crm-contact-user_record_id">
-                            &nbsp;/&nbsp;<a title="View user record" class="user-record-link"
-                                            href="{$userRecordUrl}">{$userRecordId}</a>
-                          </span>
-                        {/if}
-                      </div>
-                    </div>
-                    <div class="crm-summary-row">
-                      <div class="crm-label">{ts}External ID{/ts}</div>
-                      <div class="crm-content crm-contact_external_identifier_label">
-                        {if isset($external_identifier)}{$external_identifier}{/if}
-                      </div>
-                    </div>
+                  <div class="crm-summary-basic-block crm-summary-block">
+                    {include file="CRM/Contact/Page/Inline/Basic.tpl"}
                   </div>
                 </div>
               {/crmRegion}
@@ -249,6 +196,7 @@
           </div><!-- #contact_panel -->
           {if $showAddress}
             <div class="contact_panel">
+              {crmRegion name="contact-addresses"}
               {assign var='locationIndex' value=1}
               {if $address}
                 {foreach from=$address item=add key=locationIndex}
@@ -265,26 +213,30 @@
                   {include file="CRM/Contact/Page/Inline/Address.tpl"}
                 </div>
               {/if}
-
+              {/crmRegion}
               </div> <!-- end of contact panel -->
             {/if}
             <div class="contact_panel">
               {if $showCommunicationPreferences}
                 <div class="contactCardLeft">
+                  {crmRegion name="contact-comm-pref"}
                   <div class="crm-summary-comm-pref-block">
                     <div class="crm-summary-block" id="communication-pref-block" >
                       {include file="CRM/Contact/Page/Inline/CommunicationPreferences.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardLeft -->
               {/if}
               {if $contact_type eq 'Individual' AND $showDemographics}
                 <div class="contactCardRight">
+                  {crmRegion name="contact-demographic"}
                   <div class="crm-summary-demographic-block">
                     <div class="crm-summary-block" id="demographic-block">
                       {include file="CRM/Contact/Page/Inline/Demographics.tpl"}
                     </div>
                   </div>
+                  {/crmRegion}
                 </div> <!-- contactCardRight -->
               {/if}
               <div class="clear"></div>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -46,12 +30,12 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     $this->_formValues = $formValues;
 
     // Define the columns for search result rows
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Contribution Count') => 'donation_count',
       ts('Contribution Amount') => 'donation_amount',
-    );
+    ];
 
     // define component access permission needed
     $this->_permissionedComponent = 'CiviContribute';
@@ -63,6 +47,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
+    $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
 
     /**
      * You can define a custom title for the search form
@@ -84,18 +70,15 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     );
     $form->addRule('max_amount', ts('Please enter a valid amount (numbers and decimal point only).'), 'money');
 
-    $form->addDate('start_date', ts('Contribution Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
-
     $form->addSelect('financial_type_id',
-      array('entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search')
+      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search']
     );
 
     /**
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('min_amount', 'max_amount', 'start_date', 'end_date'));
+    $form->assign('elements', ['min_amount', 'max_amount']);
   }
 
   /**
@@ -190,6 +173,20 @@ civicrm_contact AS contact_a {$this->_aclFrom}
   }
 
   /**
+   * Get the metadata for fields to be included on the contact search form.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'receive_date' => ['title' => ''],
+    ];
+    $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
+    foreach ($fields as $fieldName => $field) {
+      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+    }
+    return $fields;
+  }
+
+  /**
    * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
    *
    * @param bool $includeContactIDs
@@ -197,26 +194,49 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [
+      "contrib.contact_id = contact_a.id",
+      "contrib.is_test = 0",
+    ];
 
-    $clauses[] = "contrib.contact_id = contact_a.id";
-    $clauses[] = "contrib.is_test = 0";
-
-    $startTime = !empty($this->_formValues['start_date_time']) ? $this->_formValues['start_date_time'] : '00:00:00';
-    $endTime = !empty($this->_formValues['end_date_time']) ? $this->_formValues['end_date_time'] : '23:59:59';
-
-    $startDate = CRM_Utils_Date::processDate($this->_formValues['start_date'], $startTime);
-    if ($startDate) {
-      $clauses[] = "contrib.receive_date >= $startDate";
+    foreach ([
+      'receive_date_relative',
+      'receive_date_low',
+      'receive_date_high',
+    ] as $dateFieldName) {
+      $dateParams[$dateFieldName] = CRM_Utils_Array::value(
+        $dateFieldName,
+        $this->_formValues
+      );
     }
 
-    $endDate = CRM_Utils_Date::processDate($this->_formValues['end_date'], $endTime);
-    if ($endDate) {
-      $clauses[] = "contrib.receive_date <= $endDate";
+    if ($dateParams['receive_date_relative']) {
+      list($relativeFrom, $relativeTo) = CRM_Utils_Date::getFromTo($dateParams['receive_date_relative'], $dateParams['receive_date_low'], $dateParams['receive_date_high']);
+    }
+    else {
+      if (strlen($dateParams['receive_date_low']) == 10) {
+        $relativeFrom = $dateParams['receive_date_low'] . ' 00:00:00';
+      }
+      else {
+        $relativeFrom = $dateParams['receive_date_low'];
+      }
+      if (strlen($dateParams['receive_date_high']) == 10) {
+        $relativeTo = $dateParams['receive_date_high'] . ' 23:59:59';
+      }
+      else {
+        $relativeTo = $dateParams['receive_date_high'];
+      }
+    }
+
+    if ($relativeFrom) {
+      $clauses[] = "contrib.receive_date >= '{$relativeFrom}'";
+    }
+    if ($relativeTo) {
+      $clauses[] = "contrib.receive_date <= '{$relativeTo}'";
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -248,14 +268,14 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function having($includeContactIDs = FALSE) {
-    $clauses = array();
-    $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
+    $clauses = [];
+    $min = $this->_formValues['min_amount'] ?? NULL;
     if ($min) {
       $min = CRM_Utils_Rule::cleanMoney($min);
       $clauses[] = "sum(contrib.total_amount) >= $min";
     }
 
-    $max = CRM_Utils_Array::value('max_amount', $this->_formValues);
+    $max = $this->_formValues['max_amount'] ?? NULL;
     if ($max) {
       $max = CRM_Utils_Rule::cleanMoney($max);
       $clauses[] = "sum(contrib.total_amount) <= $max";
@@ -274,9 +294,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
   public function count() {
     $sql = $this->all();
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 

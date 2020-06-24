@@ -4,7 +4,7 @@ The list below are enums from the database (except the last 2).
 private $preferred_communication_method = array('Phone', 'Email', 'Post');
 private $greeting_type = array('Formal', 'Informal', 'Honorific', 'Custom', 'Other');
 private $contact_type = array('Individual', 'Household', 'Organization');
-private $gender = array('Female', 'Male', 'Transgender');
+private $gender = array('Female', 'Male', 'Other');
 private $phone_type = array('Phone', 'Mobile', 'Fax', 'Pager');
 
 // almost enums

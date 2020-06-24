@@ -72,6 +72,7 @@
     <name>options</name>
     <type>text</type>
     <comment>Options for the service (JSON)</comment>
+    <serialize>JSON</serialize>
     <add>4.6</add>
   </field>
   

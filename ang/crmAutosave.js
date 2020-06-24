@@ -1,7 +1,7 @@
 /// crmAutosave
 (function(angular, $, _) {
 
-  angular.module('crmAutosave', ['crmUtil']);
+  angular.module('crmAutosave', CRM.angRequires('crmAutosave'));
 
   // usage:
   //   var autosave = new CrmAutosaveCtrl({

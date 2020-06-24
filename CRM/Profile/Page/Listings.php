@@ -1,82 +1,65 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  */
 
 /**
  * This implements the profile page for all contacts. It uses a selector
  * object to do the actual dispay. The fields displayd are controlled by
- * the admin
+ * the admin.
  */
 class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
   /**
-   * All the fields that are listings related
+   * All the fields that are listings related.
    *
    * @var array
    */
   protected $_fields;
 
   /**
-   * The custom fields for this domain
+   * The custom fields for this domain.
    *
    * @var array
    */
   protected $_customFields;
 
   /**
-   * The input params from the request
+   * The input params from the request.
    *
    * @var array
    */
   protected $_params;
 
   /**
-   * The group id that we are editing
+   * The group id that we are editing.
    *
    * @var int
    */
   protected $_gid;
 
   /**
-   * State whether to display search form or not
+   * State whether to display search form or not.
    *
    * @var int
    */
   protected $_search;
 
   /**
-   * Should we display a map
+   * Should we display a map.
    *
    * @var int
    */
@@ -85,14 +68,14 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
+   * @var array
    */
-  protected $_profileIds = array();
+  protected $_profileIds = [];
 
   /**
    * Extracts the parameters from the request and constructs information for
    * the selector object to do a query
    *
-   * @return void
    */
   public function preProcess() {
 
@@ -117,7 +100,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
       // check if we are rendering mixed profiles
       if (CRM_Core_BAO_UFGroup::checkForMixProfiles($this->_profileIds)) {
-        CRM_Core_Error::fatal(ts('You cannot combine profiles of multiple types.'));
+        CRM_Core_Error::statusBounce(ts('You cannot combine profiles of multiple types.'));
       }
 
       $this->_gid = $this->_profileIds[0];
@@ -143,9 +126,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     );
 
     $this->_customFields = CRM_Core_BAO_CustomField::getFieldsForImport(NULL, FALSE, FALSE, FALSE, TRUE, TRUE);
-    $this->_params = array();
+    $this->_params = [];
 
-    $resetArray = array(
+    $resetArray = [
       'group',
       'tag',
       'preferred_communication_method',
@@ -155,22 +138,22 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       'do_not_sms',
       'do_not_trade',
       'gender',
-    );
+    ];
 
     foreach ($this->_fields as $name => $field) {
       if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
         $from = CRM_Utils_Request::retrieve($name . '_from', 'String', $this);
         $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
-        $value = array();
+        $value = [];
         if ($from && $to) {
-          $value['from'] = $from;
-          $value['to'] = $to;
+          $value[$name . '_from'] = $from;
+          $value[$name . '_to'] = $to;
         }
         elseif ($from) {
-          $value['from'] = $from;
+          $value[$name . '_from'] = $from;
         }
         elseif ($to) {
-          $value['to'] = $to;
+          $value[$name . '_to'] = $to;
         }
       }
       elseif ((substr($name, 0, 7) == 'custom_') &&
@@ -216,21 +199,21 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
       if (($name == 'group' || $name == 'tag') && !empty($value) && !is_array($value)) {
         $v = explode(',', $value);
-        $value = array();
+        $value = [];
         foreach ($v as $item) {
           $value[$item] = 1;
         }
       }
 
-      $customField = CRM_Utils_Array::value($name, $this->_customFields);
+      $customField = $this->_customFields[$name] ?? NULL;
 
       if (!empty($_POST) && empty($_POST[$name])) {
         if ($customField) {
           // reset checkbox/radio because a form does not send null checkbox values
           if (in_array($customField['html_type'],
-            array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select')
+            ['Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select']
           )) {
-            // only reset on a POST submission if we dont see any value
+            // only reset on a POST submission if we don't see any value
             $value = NULL;
             $this->set($name, $value);
           }
@@ -249,13 +232,18 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($operator) {
           $this->_params[$name . '_operator'] = $operator;
         }
-        $this->_params[$name] = $this->_fields[$name]['value'] = $value;
+        if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
+          $this->_params += $value;
+        }
+        else {
+          $this->_params[$name] = $this->_fields[$name]['value'] = $value;
+        }
       }
     }
 
     // set the prox params
     // need to ensure proximity searching is enabled
-    $proximityVars = array(
+    $proximityVars = [
       'street_address',
       'city',
       'postal_code',
@@ -263,7 +251,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       'country_id',
       'distance',
       'distance_unit',
-    );
+    ];
     foreach ($proximityVars as $var) {
       $value = CRM_Utils_Request::retrieve("prox_{$var}",
         'String',
@@ -282,7 +270,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Run this page (figure out the action needed and perform it).
    *
-   * @return void
    */
   public function run() {
     $this->preProcess();
@@ -295,7 +282,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();
       $ufgroupDAO->id = $this->_gid;
       if (!$ufgroupDAO->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        CRM_Core_Error::statusBounce('Unable to find matching UF Group');
       }
     }
 
@@ -396,7 +383,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $controller->run();
     }
 
-    //CRM-6862 -run form cotroller after
+    //CRM-6862 -run form controller after
     //selector, since it erase $_POST
     $formController->run();
 
@@ -414,8 +401,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $params = $session->get('profileParams');
 
-    $details = array();
-    $ufGroupParam = array('id' => $gid);
+    $details = [];
+    $ufGroupParam = ['id' => $gid];
     CRM_Core_BAO_UFGroup::retrieve($ufGroupParam, $details);
 
     // make sure this group can be mapped
@@ -423,7 +410,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       CRM_Core_Error::statusBounce(ts('This profile does not have the map feature turned on.'));
     }
 
-    $groupId = CRM_Utils_Array::value('limit_listings_group_id', $details);
+    $groupId = $details['limit_listings_group_id'] ?? NULL;
 
     // add group id to params if a uf group belong to a any group
     if ($groupId) {
@@ -431,7 +418,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         $params['group'][$groupId] = 1;
       }
       else {
-        $params['group'] = array($groupId => 1);
+        $params['group'] = [$groupId => 1];
       }
     }
 
@@ -492,9 +479,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    *
    * @return string
    */
-  /**
-   * @return string
-   */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
@@ -504,9 +488,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    * Default extra tpl file basically just replaces .tpl with .extra.tpl
    * i.e. we dont override
    *
-   * @return string
-   */
-  /**
    * @return string
    */
   public function overrideExtraTemplateFileName() {

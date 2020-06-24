@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {htxt id="manage_groups-title"}
@@ -37,7 +21,7 @@
   {ts}Group Type{/ts}
 {/htxt}
 {htxt id="id-group-type"}
-{capture assign=docLinkAccess}{docURL page="user/current/initial-set-up/permissions-and-access-control/"}{/capture}
+{capture assign=docLinkAccess}{docURL page="user/initial-set-up/permissions-and-access-control/"}{/capture}
 {capture assign=docLinkMail}{docURL page="user/email/what-is-civimail" text="CiviMail component"}{/capture}
 <p>{if $config->userFramework neq 'Joomla'}{ts 1=$docLinkAccess}Check 'Access Control' if you want to use this group to assign access permissions to a set of contacts. %1{/ts}{/if} {ts 1=$docLinkMail}Check 'Mailing List' if you are using this group as a mailing list in the %1.{/ts}</p>
 {/htxt} 

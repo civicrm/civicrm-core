@@ -1,35 +1,28 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Payment\PropertyBag;
 
 /**
  * Class CRM_Core_Payment_AuthorizeNetTest
  * @group headless
  */
 class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
+
+  use \Civi\Test\GuzzleTestTrait;
+
+  /**
+   * @var \CRM_Core_Payment_AuthorizeNet
+   */
+  protected $processor;
 
   public function setUp() {
     parent::setUp();
@@ -40,11 +33,44 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // for some strange unknown reason, in batch mode this value gets set to null
     // so crude hack here to avoid an exception and hence an error
-    $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
+    $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
   }
 
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+  }
+
+  /**
+   * Test doing a one-off payment.
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testSinglePayment() {
+    $this->createMockHandler([$this->getExpectedSinglePaymentResponse()]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+    $params = $this->getBillingParams();
+    $params['amount'] = 5.24;
+    $this->processor->doPayment($params);
+    $this->assertEquals($this->getExpectedSinglePaymentRequest(), $this->getRequestBodies()[0]);
+  }
+
+  /**
+   * Get the expected response from Authorize.net.
+   *
+   * @return string
+   */
+  public function getExpectedSinglePaymentResponse() {
+    return '"1","1","1","(TESTMODE) This transaction has been approved.","000000","P","0","","","5.24","CC","auth_capture","","John","O&#39;Connor","","","","","","","","","","","","","","","","","","","","","","","",""';
+  }
+
+  /**
+   *  Get the expected request from Authorize.net.
+   *
+   * @return string
+   */
+  public function getExpectedSinglePaymentRequest() {
+    return 'x_login=4y5BfuW7jm&x_tran_key=4cAmW927n8uLf5J8&x_email_customer=&x_first_name=John&x_last_name=O%27Connor&x_address=&x_city=&x_state=&x_zip=&x_country=&x_customer_ip=&x_email=&x_invoice_num=&x_amount=5.24&x_currency_code=&x_description=&x_cust_id=&x_relay_response=FALSE&x_delim_data=TRUE&x_delim_char=%2C&x_encap_char=%22&x_card_num=4444333322221111&x_card_code=123&x_exp_date=10%2F2022&x_test_request=TRUE';
   }
 
   /**
@@ -53,15 +79,18 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
   public function testCreateSingleNowDated() {
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
-    $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
+    $this->createMockHandler([$this->getExpectedResponse()]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+    $firstName = 'John';
+    $lastName = "O\'Connor";
+    $nameParams = ['first_name' => 'John', 'last_name' => $lastName];
     $contactId = $this->individualCreate($nameParams);
 
-    $invoiceID = sha1(rand());
-    $amount = rand(100, 1000) . '.00';
+    $invoiceID = 123456;
+    $amount = 7;
 
-    $contributionRecurParams = array(
+    $recur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $contactId,
       'amount' => $amount,
       'currency' => 'USD',
@@ -74,74 +103,59 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'is_test' => 1,
       'payment_processor_id' => $this->_paymentProcessorID,
-    );
-    $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams);
+    ]);
 
-    $contributionParams = array(
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $contactId,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 'Donation',
       'receive_date' => date('Ymd'),
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
       'currency' => 'USD',
-      'contribution_recur_id' => $recur->id,
+      'contribution_recur_id' => $recur['id'],
       'is_test' => 1,
       'contribution_status_id' => 2,
-    );
-    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
+    ]);
 
-    $params = array(
+    $billingParams = $this->getBillingParams();
+
+    $params = array_merge($billingParams, [
       'qfKey' => '08ed21c7ca00a1f7d32fff2488596ef7_4454',
       'hidden_CreditCard' => 1,
-      'billing_first_name' => $firstName,
-      'billing_middle_name' => "",
-      'billing_last_name' => $lastName,
-      'billing_street_address-5' => '8 Hobbitton Road',
-      'billing_city-5' => 'The Shire',
-      'billing_state_province_id-5' => 1012,
-      'billing_postal_code-5' => 5010,
-      'billing_country_id-5' => 1228,
-      'credit_card_number' => '4007000000027',
-      'cvv2' => 123,
-      'credit_card_exp_date' => array(
-        'M' => 10,
-        'Y' => 2019,
-      ),
-      'credit_card_type' => 'Visa',
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 12,
       'financial_type_id' => $this->_financialTypeId,
       'is_email_receipt' => 1,
-      'from_email_address' => "{$firstName}.{$lastName}@example.com",
+      'from_email_address' => 'john.smith@example.com',
       'receive_date' => date('Ymd'),
       'receipt_date_time' => '',
       'payment_processor_id' => $this->_paymentProcessorID,
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
-      'source' => "Mordor",
+      'source' => 'Mordor',
       'soft_credit_to' => '',
       'soft_contact_id' => '',
       'billing_state_province-5' => 'IL',
       'state_province-5' => 'IL',
       'billing_country-5' => 'US',
       'country-5' => 'US',
-      'year' => 2019,
-      'month' => 10,
+      'year' => 2025,
+      'month' => 9,
       'ip_address' => '127.0.0.1',
       'amount' => 7,
       'amount_level' => 0,
       'currencyID' => 'USD',
-      'pcp_display_in_roll' => "",
-      'pcp_roll_nickname' => "",
-      'pcp_personal_note' => "",
-      'non_deductible_amount' => "",
-      'fee_amount' => "",
-      'net_amount' => "",
+      'pcp_display_in_roll' => '',
+      'pcp_roll_nickname' => '',
+      'pcp_personal_note' => '',
+      'non_deductible_amount' => '',
+      'fee_amount' => '',
+      'net_amount' => '',
       'invoiceID' => $invoiceID,
-      'contribution_page_id' => "",
+      'contribution_page_id' => '',
       'thankyou_date' => NULL,
       'honor_contact_id' => NULL,
       'first_name' => $firstName,
@@ -155,47 +169,54 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'contributionType_name' => 'My precious',
       'contributionType_accounting_code' => '',
       'contributionPageID' => '',
-      'email' => "{$firstName}.{$lastName}@example.com",
+      'email' => 'john.smith@example.com',
       'contactID' => $contactId,
-      'contributionID' => $contribution->id,
+      'contributionID' => $contribution['id'],
       'contributionTypeID' => $this->_financialTypeId,
-      'contributionRecurID' => $recur->id,
-    );
+      'contributionRecurID' => $recur['id'],
+    ]);
 
     // turn verifySSL off
     Civi::settings()->set('verifySSL', '0');
-    $this->doPayment($params);
+    $this->processor->doPayment($params);
     // turn verifySSL on
     Civi::settings()->set('verifySSL', '0');
 
     // if subscription was successful, processor_id / subscription-id must not be null
-    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id',
+    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id',
       'id', 'Failed to create subscription with Authorize.'
     );
 
-    // cancel it or the transaction will be rejected by A.net if the test is re-run
-    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
-    $message = '';
-    $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
-    $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
+    $requests = $this->getRequestBodies();
+    $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d')), $requests[0]);
+    $header = $this->getRequestHeaders()[0];
+    $this->assertEquals(['apitest.authorize.net'], $header['Host']);
+    $this->assertEquals(['text/xml; charset=UTF8'], $header['Content-Type']);
+
+    $this->assertEquals([
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+    ], $this->container[0]['options']['curl']);
   }
 
   /**
    * Create a single post dated payment as a recurring transaction.
    */
   public function testCreateSinglePostDated() {
-    $start_date = date('Ymd', strtotime("+ 1 week"));
+    $this->createMockHandler([$this->getExpectedResponse()]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+    $start_date = date('Ymd', strtotime('+ 1 week'));
 
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
-    $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
+    $firstName = 'John';
+    $lastName = "O'Connor";
+    $nameParams = ['first_name' => $firstName, 'last_name' => $lastName];
     $contactId = $this->individualCreate($nameParams);
 
-    $ids = array('contribution' => NULL);
-    $invoiceID = sha1(rand());
-    $amount = rand(100, 1000) . '.00';
+    $invoiceID = 123456;
+    $amount = 70.23;
 
-    $contributionRecurParams = array(
+    $contributionRecurParams = [
       'contact_id' => $contactId,
       'amount' => $amount,
       'currency' => 'USD',
@@ -205,31 +226,31 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'start_date' => $start_date,
       'create_date' => date('Ymd'),
       'invoice_id' => $invoiceID,
-      'contribution_status_id' => 2,
+      'contribution_status_id' => '',
       'is_test' => 1,
       'payment_processor_id' => $this->_paymentProcessorID,
-    );
-    $recur = CRM_Contribute_BAO_ContributionRecur::add($contributionRecurParams, $ids);
+    ];
+    $recur = $this->callAPISuccess('ContributionRecur', 'create', $contributionRecurParams);
 
-    $contributionParams = array(
+    $contributionParams = [
       'contact_id' => $contactId,
       'financial_type_id' => $this->_financialTypeId,
       'receive_date' => $start_date,
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
       'currency' => 'USD',
-      'contribution_recur_id' => $recur->id,
+      'contribution_recur_id' => $recur['id'],
       'is_test' => 1,
       'contribution_status_id' => 2,
-    );
+    ];
 
-    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
-    $params = array(
+    $params = [
       'qfKey' => '00ed21c7ca00a1f7d555555596ef7_4454',
       'hidden_CreditCard' => 1,
       'billing_first_name' => $firstName,
-      'billing_middle_name' => "",
+      'billing_middle_name' => '',
       'billing_last_name' => $lastName,
       'billing_street_address-5' => '8 Hobbitton Road',
       'billing_city-5' => 'The Shire',
@@ -238,10 +259,10 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'billing_country_id-5' => 1228,
       'credit_card_number' => '4007000000027',
       'cvv2' => 123,
-      'credit_card_exp_date' => array(
+      'credit_card_exp_date' => [
         'M' => 11,
-        'Y' => 2019,
-      ),
+        'Y' => 2022,
+      ],
       'credit_card_type' => 'Visa',
       'is_recur' => 1,
       'frequency_interval' => 1,
@@ -256,27 +277,27 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'price_set_id' => '',
       'total_amount' => $amount,
       'currency' => 'USD',
-      'source' => "Mordor",
+      'source' => 'Mordor',
       'soft_credit_to' => '',
       'soft_contact_id' => '',
       'billing_state_province-5' => 'IL',
       'state_province-5' => 'IL',
       'billing_country-5' => 'US',
       'country-5' => 'US',
-      'year' => 2019,
+      'year' => 2022,
       'month' => 10,
       'ip_address' => '127.0.0.1',
-      'amount' => 70,
+      'amount' => 70.23,
       'amount_level' => 0,
       'currencyID' => 'USD',
-      'pcp_display_in_roll' => "",
-      'pcp_roll_nickname' => "",
-      'pcp_personal_note' => "",
-      'non_deductible_amount' => "",
-      'fee_amount' => "",
-      'net_amount' => "",
-      'invoice_id' => "",
-      'contribution_page_id' => "",
+      'pcp_display_in_roll' => '',
+      'pcp_roll_nickname' => '',
+      'pcp_personal_note' => '',
+      'non_deductible_amount' => '',
+      'fee_amount' => '',
+      'net_amount' => '',
+      'invoice_id' => '',
+      'contribution_page_id' => '',
       'thankyou_date' => NULL,
       'honor_contact_id' => NULL,
       'invoiceID' => $invoiceID,
@@ -288,57 +309,357 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'state_province' => 'IL',
       'postal_code' => 5010,
       'country' => 'US',
-      'contributionType_name' => 'My precious',
-      'contributionType_accounting_code' => '',
       'contributionPageID' => '',
-      'email' => "{$firstName}.{$lastName}@example.com",
+      'email' => 'john.smith@example.com',
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
-      'contributionTypeID' => $this->_financialTypeId,
-      'contributionRecurID' => $recur->id,
-    );
+      'contributionRecurID' => $recur['id'],
+    ];
 
     // if cancel-subscription has been called earlier 'subscriptionType' would be set to cancel.
     // to make a successful call for another trxn, we need to set it to something else.
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('subscriptionType', 'create');
 
-    // turn verifySSL off
-    Civi::settings()->set('verifySSL', '0');
-    $this->doPayment($params);
-    // turn verifySSL on
-    Civi::settings()->set('verifySSL', '0');
+    $this->processor->doPayment($params);
 
     // if subscription was successful, processor_id / subscription-id must not be null
-    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id',
+    $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id',
       'id', 'Failed to create subscription with Authorize.'
     );
 
-    // cancel it or the transaction will be rejected by A.net if the test is re-run
-    $subscriptionID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $recur->id, 'processor_id');
-    $message = '';
-    $result = $this->processor->cancelSubscription($message, array('subscriptionId' => $subscriptionID));
-    $this->assertTrue($result, 'Failed to cancel subscription with Authorize.');
+    $response = $this->getResponseBodies();
+    $this->assertEquals($this->getExpectedResponse(), $response[0], 3);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d', strtotime($start_date)), 70.23, 3, 4007000000027, '2022-10'), $requests[0]);
   }
 
   /**
-   * Process payment against the Authorize.net test server.
+   * Get the content that we expect to see sent out.
    *
-   * Skip the test if the server is unresponsive.
+   * @param int $contactID
+   * @param string $startDate
    *
-   * @param array $params
+   * @param int $amount
+   * @param int $occurrences
+   * @param int $cardNumber
+   * @param string $cardExpiry
    *
-   * @throws PHPUnit_Framework_SkippedTestError
+   * @return string
    */
-  public function doPayment($params) {
-    try {
-      $this->processor->doPayment($params);
-    }
-    catch (Exception $e) {
-      $this->assertTrue(substr($e->getMessage(), 0, 32) == 'E00001: Internal Error Occurred.',
-        'AuthorizeNet failed for unknown reason.');
-      $this->markTestSkipped('AuthorizeNet test server is not in a good mood so we can\'t test this right now');
-    }
+  public function getExpectedRequest($contactID, $startDate, $amount = 7, $occurrences = 12, $cardNumber = 4444333322221111, $cardExpiry = '2025-09') {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBCreateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+  <refId>123456</refId>
+  <subscription>
+        <paymentSchedule>
+      <interval>
+        <length>1</length>
+        <unit>months</unit>
+      </interval>
+      <startDate>' . $startDate . '</startDate>
+      <totalOccurrences>' . $occurrences . '</totalOccurrences>
+    </paymentSchedule>
+    <amount>' . $amount . '</amount>
+    <payment>
+      <creditCard>
+        <cardNumber>' . $cardNumber . '</cardNumber>
+        <expirationDate>' . $cardExpiry . '</expirationDate>
+      </creditCard>
+    </payment>
+      <order>
+     <invoiceNumber>1</invoiceNumber>
+        </order>
+       <customer>
+      <id>' . $contactID . '</id>
+      <email>john.smith@example.com</email>
+    </customer>
+    <billTo>
+      <firstName>John</firstName>
+      <lastName>O\'Connor</lastName>
+      <address>8 Hobbiton Road</address>
+      <city>The Shire</city>
+      <state>IL</state>
+      <zip>5010</zip>
+      <country>US</country>
+    </billTo>
+  </subscription>
+</ARBCreateSubscriptionRequest>
+';
+  }
+
+  /**
+   * Get a successful response to setting up a recurring.
+   *
+   * @return string
+   */
+  public function getExpectedResponse() {
+    return '﻿<?xml version="1.0" encoding="utf-8"?><ARBCreateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><refId>8d468ca1b1dd5c2b56c7</refId><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><subscriptionId>6632052</subscriptionId><profile><customerProfileId>1512023280</customerProfileId><customerPaymentProfileId>1512027350</customerPaymentProfileId></profile></ARBCreateSubscriptionResponse>';
+  }
+
+  /**
+   * Get some basic billing parameters.
+   *
+   * @return array
+   */
+  protected function getBillingParams(): array {
+    return [
+      'billing_first_name' => 'John',
+      'billing_middle_name' => '',
+      'billing_last_name' => "O'Connor",
+      'billing_street_address-5' => '8 Hobbitton Road',
+      'billing_city-5' => 'The Shire',
+      'billing_state_province_id-5' => 1012,
+      'billing_postal_code-5' => 5010,
+      'billing_country_id-5' => 1228,
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => 123,
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => 2025,
+      ],
+      'credit_card_type' => 'Visa',
+      'year' => 2022,
+      'month' => 10,
+    ];
+  }
+
+  /**
+   * Test the update billing function.
+   */
+  public function testUpdateBilling() {
+    $this->setUpClient($this->getExpectedUpdateResponse());
+    $params = [
+      'qfKey' => '52e3078a34158a80b18d0e3c690c5b9f_2369',
+      'entryURL' => 'http://dmaster.local/civicrm/contribute/updatebilling?reset=1&amp;crid=2&amp;cid=202&amp;context=contribution',
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => ['M' => '3', 'Y' => '2022'],
+      'credit_card_type' => 'Visa',
+      'first_name' => 'q',
+      'middle_name' => '',
+      'last_name' => 't',
+      'street_address' => 'y',
+      'city' => 'xyz',
+      'state_province_id' => '1587',
+      'postal_code' => '777',
+      'country_id' => '1006',
+      'state_province' => 'Bengo',
+      'country' => 'Angola',
+      'month' => '3',
+      'year' => '2022',
+      'subscriptionId' => 6656444,
+      'amount' => '6.00',
+    ];
+    $message = '';
+    $result = $this->processor->updateSubscriptionBillingInfo($message, $params);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals('I00001: Successful.', $message);
+    $this->assertTrue($result);
+    $this->assertEquals($this->getExpectedUpdateRequest(), $requests[0]);
+  }
+
+  /**
+   * Test change subscription function.
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testChangeSubscription() {
+    $this->setUpClient($this->getExpectedUpdateResponse());
+    $params = [
+      'hidden_custom' => '1',
+      'hidden_custom_group_count' => ['' => 1],
+      'qfKey' => '38588554ecd5c01d5ecdedf3870d9100_7980',
+      'entryURL' => 'http://dmaster.local/civicrm/contribute/updaterecur?reset=1&amp;action=update&amp;crid=2&amp;cid=202&amp;context=contribution',
+      'amount' => '9.67',
+      'currency' => 'USD',
+      'installments' => '8',
+      'is_notify' => '1',
+      'financial_type_id' => '3',
+      '_qf_default' => 'UpdateSubscription:next',
+      '_qf_UpdateSubscription_next' => 'Save',
+      'id' => '2',
+      'subscriptionId' => 1234,
+    ];
+    $message = '';
+    $result = $this->processor->changeSubscriptionAmount($message, $params);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals('I00001: Successful.', $message);
+    $this->assertTrue($result);
+    $this->assertEquals($this->getExpectedChangeSubscriptionRequest(), $requests[0]);
+  }
+
+  /**
+   * Get the expected request string for updateBilling.
+   *
+   * @return string
+   */
+  public function getExpectedUpdateRequest() {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+  <subscriptionId>6656444</subscriptionId>
+  <subscription>
+    <payment>
+      <creditCard>
+        <cardNumber>4444333322221111</cardNumber>
+        <expirationDate>2022-03</expirationDate>
+      </creditCard>
+    </payment>
+    <billTo>
+      <firstName>q</firstName>
+      <lastName>t</lastName>
+      <address>y</address>
+      <city>xyz</city>
+      <state>Bengo</state>
+      <zip>777</zip>
+      <country>Angola</country>
+    </billTo>
+  </subscription>
+</ARBUpdateSubscriptionRequest>
+';
+  }
+
+  /**
+   * Get the expected response string for update billing.
+   *
+   * @return string
+   */
+  public function getExpectedUpdateResponse() {
+    return 'HTTP/1.1 200 OK
+Cache-Control: no-store
+Pragma: no-cache
+Content-Type: application/xml; charset=utf-8
+X-OPNET-Transaction-Trace: a2_4345e2c4-e273-46be-8517-8e6c8c408f5c-11416-3580701
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: x-requested-with,cache-control,content-type,origin,method,SOAPAction
+Access-Control-Allow-Methods: PUT,OPTIONS,POST,GET
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000
+X-Cnection: close
+Date: Thu, 11 Jun 2020 23:19:48 GMT
+Content-Length: 557
+
+﻿<?xml version="1.0" encoding="utf-8"?><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text>';
+  }
+
+  /**
+   * Get the expected outgoing request for changeSubscription.
+   *
+   * @return string
+   */
+  protected function getExpectedChangeSubscriptionRequest() {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+<subscriptionId>1234</subscriptionId>
+  <subscription>
+    <paymentSchedule>
+    <totalOccurrences>8</totalOccurrences>
+    </paymentSchedule>
+    <amount>9.67</amount>
+   </subscription>
+</ARBUpdateSubscriptionRequest>
+';
+  }
+
+  /**
+   * Get the expected incoming response for changeSubscription.
+   *
+   * @return string
+   */
+  protected function getExpectedChangeSubscriptionResponse() {
+    return 'HTTP/1.1 200 OK
+Cache-Control: no-store
+Pragma: no-cache
+Content-Type: application/xml; charset=utf-8
+X-OPNET-Transaction-Trace: a2_e77aa7be-8f98-4f54-ba8a-e8a7f3d9e5ab-8400-7232961
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: x-requested-with,cache-control,content-type,origin,method,SOAPAction
+Access-Control-Allow-Methods: PUT,OPTIONS,POST,GET
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000
+X-Cnection: close
+Date: Fri, 12 Jun 2020 00:18:11 GMT
+Content-Length: 492
+
+﻿<?xml version="1.0" encoding="utf-8"?><ARBUpdateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><profile><customerProfileId>1512214263</customerProfileId><customerPaymentProfileId>1512250079</customerPaymentProfileId></profile></ARBUpdateSubscriptionResponse>';
+  }
+
+  /**
+   * Setup the guzzle client, helper.
+   *
+   * @param string $response
+   */
+  protected function setUpClient($response) {
+    $this->createMockHandler([$response]);
+    $this->setUpClientWithHistoryContainer();
+    $this->processor->setGuzzleClient($this->getGuzzleClient());
+  }
+
+  /**
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testCancelRecurring() {
+    $this->setUpClient($this->getExpectedCancelResponse());
+    $propertyBag = new PropertyBag();
+    $propertyBag->setContributionRecurID(9);
+    $propertyBag->setIsNotifyProcessorOnCancelRecur(TRUE);
+    $propertyBag->setRecurProcessorID(6656333);
+    $this->processor->doCancelRecurring($propertyBag);
+    $requests = $this->getRequestBodies();
+    $this->assertEquals($this->getExpectedCancelRequest(), $requests[0]);
+  }
+
+  /**
+   * Get expected incoming cancel response.
+   *
+   * @return string
+   */
+  protected function getExpectedCancelResponse() {
+    return 'HTTP/1.1 200 OK
+Cache-Control: no-store
+Pragma: no-cache
+Content-Type: application/xml; charset=utf-8
+X-OPNET-Transaction-Trace: a2_e77aa7be-8f98-4f54-ba8a-e8a7f3d9e5ab-8400-7311552
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: x-requested-with,cache-control,content-type,origin,method,SOAPAction
+Access-Control-Allow-Methods: PUT,OPTIONS,POST,GET
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31536000
+X-Cnection: close
+Date: Fri, 12 Jun 2020 00:52:00 GMT
+Content-Length: 361
+
+﻿<?xml version="1.0" encoding="utf-8"?><ARBCancelSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages></ARBCancelSubscriptionResponse>';
+  }
+
+  /**
+   * Get the expected outgoing cancel request.
+   *
+   * @return string
+   */
+  protected function getExpectedCancelRequest() {
+    return '<?xml version="1.0" encoding="utf-8"?>
+<ARBCancelSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
+  <merchantAuthentication>
+    <name>4y5BfuW7jm</name>
+    <transactionKey>4cAmW927n8uLf5J8</transactionKey>
+  </merchantAuthentication>
+  <subscriptionId>6656333</subscriptionId>
+</ARBCancelSubscriptionRequest>
+';
+
   }
 
 }

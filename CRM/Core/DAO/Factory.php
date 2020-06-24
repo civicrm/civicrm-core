@@ -5,7 +5,7 @@
  */
 class CRM_Core_DAO_Factory {
 
-  static $_classes = array(
+  public static $_classes = [
     'Domain' => 'data',
     'Country' => 'singleton',
     'County' => 'singleton',
@@ -13,40 +13,36 @@ class CRM_Core_DAO_Factory {
     'GeoCoord' => 'singleton',
     'IMProvider' => 'singleton',
     'MobileProvider' => 'singleton',
-  );
+  ];
 
-  static $_prefix = array(
-    'business' => 'CRM/Core/BAO/',
-    'data' => 'CRM/Core/DAO/',
-  );
-
-  static $_suffix = '.php';
+  public static $_prefix = [
+    'business' => 'CRM_Core_BAO_',
+    'data' => 'CRM_Core_DAO_',
+  ];
 
   /**
    * @param string $className
    *
    * @return mixed
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
-  static function &create($className) {
-    $type = CRM_Utils_Array::value($className, self::$_classes);
+  public static function create($className) {
+    $type = self::$_classes[$className] ?? NULL;
     if (!$type) {
-      CRM_Core_Error::fatal("class $className not found");
+      throw new CRM_Core_Exception("class $className not found");
     }
 
-    $file = self::$_prefix[$type] . $className;
-    $class = str_replace('/', '_', $file);
-
-    require_once($file . self::$_suffix);
+    $class = self::$_prefix[$type] . $className;
 
     if ($type == 'singleton') {
       $newObj = $class::singleton();
     }
     else {
       // this is either 'business' or 'data'
-      $newObj = new $class;
+      $newObj = new $class();
     }
 
     return $newObj;
   }
+
 }

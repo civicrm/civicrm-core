@@ -6,6 +6,7 @@
   <name>civicrm_event</name>
   <add>1.7</add>
   <log>true</log>
+  <icon>fa-calendar</icon>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -52,7 +53,7 @@
     <uniqueName>event_description</uniqueName>
     <title>Event Description</title>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>8</rows>
       <cols>60</cols>
     </html>
@@ -122,6 +123,7 @@
     <add>1.7</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -135,6 +137,7 @@
     <add>1.7</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -167,6 +170,7 @@
     <add>1.8</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -176,6 +180,7 @@
     <add>1.8</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
@@ -328,7 +333,7 @@
   <field>
     <name>default_role_id</name>
     <uniqueName>default_role_id</uniqueName>
-    <title>Default Role ID</title>
+    <title>Default Role</title>
     <import>true</import>
     <type>int unsigned</type>
     <default>1</default>
@@ -345,7 +350,7 @@
     <name>intro_text</name>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -359,7 +364,7 @@
     <title>Footer Message</title>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -384,7 +389,7 @@
     <name>confirm_text</name>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -398,7 +403,7 @@
     <type>text</type>
     <title>Footer Text</title>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -504,7 +509,7 @@
     <name>thankyou_text</name>
     <type>text</type>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -518,7 +523,7 @@
     <type>text</type>
     <title>Footer Text</title>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>6</rows>
       <cols>50</cols>
     </html>
@@ -545,7 +550,7 @@
     <comment>The text displayed to the user in the main form</comment>
     <add>2.0</add>
     <html>
-      <type>Text</type>
+      <type>RichTextEditor</type>
     </html>
   </field>
   <field>
@@ -768,7 +773,8 @@
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
-      <nameColumn>numeric_code</nameColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>

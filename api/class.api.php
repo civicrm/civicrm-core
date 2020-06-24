@@ -4,36 +4,36 @@
  *
  * This class allows to consume the API, either from within a module that knows civicrm already:
  *
- * @code
+ * ```
  *   require_once('api/class.api.php');
  *   $api = new civicrm_api3();
- * @endcode
+ * ```
  *
  * or from any code on the same server as civicrm
  *
- * @code
+ * ```
  *   require_once('/your/civi/folder/api/class.api.php');
  *   // the path to civicrm.settings.php
  *   $api = new civicrm_api3 (array('conf_path'=> '/your/path/to/your/civicrm/or/joomla/site));
- * @endcode
+ * ```
  *
  * or to query a remote server via the rest api
  *
- * @code
+ * ```
  *   $api = new civicrm_api3 (array ('server' => 'http://example.org',
  *                                   'api_key'=>'theusersecretkey',
  *                                   'key'=>'thesitesecretkey'));
- * @endcode
+ * ```
  *
  * No matter how initialised and if civicrm is local or remote, you use the class the same way.
  *
- * @code
+ * ```
  *   $api->{entity}->{action}($params);
- * @endcode
+ * ```
  *
  * So, to get the individual contacts:
  *
- * @code
+ * ```
  *   if ($api->Contact->Get(array('contact_type'=>'Individual','return'=>'sort_name,current_employer')) {
  *     // each key of the result array is an attribute of the api
  *     echo "\n contacts found " . $api->count;
@@ -44,37 +44,37 @@
  *   } else {
  *     echo $api->errorMsg();
  *   }
- * @endcode
+ * ```
  *
  * Or, to create an event:
  *
- * @code
+ * ```
  *   if ($api->Event->Create(array('title'=>'Test','event_type_id' => 1,'is_public' => 1,'start_date' => 19430429))) {
  *     echo "created event id:". $api->id;
  *   } else {
  *     echo $api->errorMsg();
  *   }
- * @endcode
+ * ```
  *
  * To make it easier, the Actions can either take for input an
  * associative array $params, or simply an id. The following two lines
  * are equivalent.
  *
- * @code
+ * ```
  *   $api->Activity->Get (42);
  *   $api->Activity->Get (array('id'=>42));
- * @endcode
+ * ```
  *
  *
  * You can also get the result like civicrm_api does, but as an object
  * instead of an array (eg $entity->attribute instead of
  * $entity['attribute']).
  *
- * @code
+ * ```
  *   $result = $api->result;
  *   // is the json encoded result
  *   echo $api;
- * @endcode
+ * ```
  */
 class civicrm_api3 {
 
@@ -85,8 +85,8 @@ class civicrm_api3 {
    */
   public function __construct($config = NULL) {
     $this->local      = TRUE;
-    $this->input      = array();
-    $this->lastResult = array();
+    $this->input      = [];
+    $this->lastResult = [];
     if (isset($config) && isset($config['server'])) {
       // we are calling a remote server via REST
       $this->local = FALSE;
@@ -164,13 +164,13 @@ class civicrm_api3 {
    *
    * @return \stdClass
    */
-  private function remoteCall($entity, $action, $params = array()) {
+  private function remoteCall($entity, $action, $params = []) {
     $query = $this->uri . "?entity=$entity&action=$action";
-    $fields = http_build_query(array(
+    $fields = http_build_query([
       'key' => $this->key,
       'api_key' => $this->api_key,
       'json' => json_encode($params),
-    ));
+    ]);
 
     if (function_exists('curl_init')) {
       // To facilitate debugging without leaking info, entity & action
@@ -187,7 +187,7 @@ class civicrm_api3 {
         $res->is_error = 1;
         $res->error_message = curl_error($ch);
         $res->level = "cURL";
-        $res->error = array('cURL error' => curl_error($ch));
+        $res->error = ['cURL error' => curl_error($ch)];
         return $res;
       }
       curl_close($ch);
@@ -202,7 +202,7 @@ class civicrm_api3 {
       $res->is_error = 1;
       $res->error_message = 'Unable to parse returned JSON';
       $res->level = 'json_decode';
-      $res->error = array('Unable to parse returned JSON' => $result);
+      $res->error = ['Unable to parse returned JSON' => $result];
       $res->row_result = $result;
     }
     return $res;
@@ -217,9 +217,9 @@ class civicrm_api3 {
    *
    * @return bool
    */
-  private function call($entity, $action = 'Get', $params = array()) {
+  private function call($entity, $action = 'Get', $params = []) {
     if (is_int($params)) {
-      $params = array('id' => $params);
+      $params = ['id' => $params];
     }
     elseif (is_string($params)) {
       $params = json_decode($params);
@@ -240,7 +240,7 @@ class civicrm_api3 {
       $this->lastResult = json_decode(json_encode(civicrm_api($entity, $action, $params)));
     }
     // Reset the input to be ready for a new call.
-    $this->input = array();
+    $this->input = [];
     if (property_exists($this->lastResult, 'is_error')) {
       return !$this->lastResult->is_error;
     }

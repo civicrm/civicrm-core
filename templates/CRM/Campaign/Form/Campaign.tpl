@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-campaign-form-block">
@@ -58,12 +42,11 @@
   </tr>
   <tr class="crm-campaign-form-block-start_date">
       <td class="label">{$form.start_date.label}</td>
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=start_date}
-      </td>
+      <td class="view-value">{$form.start_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-end_date">
       <td class="label">{$form.end_date.label}</td>
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=end_date}</td>
+      <td class="view-value">{$form.end_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-status_id">
       <td class="label">{$form.status_id.label}</td>
@@ -95,26 +78,10 @@
   </tr>
   </table>
 
-  <div id="customData"></div>
+  {include file="CRM/common/customDataBlock.tpl"}
 
 {/if}
 <div class="crm-submit-buttons">
      {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
-
-{* include custom data js *}
-{include file="CRM/common/customData.tpl"}
-
-{literal}
-<script type="text/javascript">
-  CRM.$(function($) {
-    {/literal}{if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-    {else}
-      CRM.buildCustomData( '{$customDataType}' );
-    {/if}
-    {literal}
-  });
-</script>
-{/literal}

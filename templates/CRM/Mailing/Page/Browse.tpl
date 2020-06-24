@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $sms}
@@ -65,10 +49,21 @@
       {foreach from=$rows item=row}
       <tr id="crm-mailing_{$row.id}" class="{cycle values="odd-row,even-row"} crm-mailing crm-mailing_status-{$row.status}">
         <td class="crm-mailing-name">{$row.name}</td>
+        {if $multilingual}
+          <td class="crm-mailing-language">{$row.language}</td>
+        {/if}
         <td class="crm-mailing-status crm-mailing_status-{$row.status}">{$row.status}</td>
-        <td class="crm-mailing-created_by"><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.created_id}>{$row.created_by}</a></td>
+        <td class="crm-mailing-created_by">
+          <a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.created_id} title="{$row.created_by|escape}">
+            {$row.created_by|mb_truncate:20:"..."}
+          </a>
+        </td>
         <td class="crm-mailing-created_date">{$row.created_date}</td>
-        <td class="crm-mailing-scheduled_by"><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.scheduled_id}>{$row.scheduled_by}</a></td>
+        <td class="crm-mailing-scheduled_by">
+          <a href ={crmURL p='civicrm/contact/view' q="reset=1&cid="}{$row.scheduled_id} title="{$row.scheduled_by|escape}">
+            {$row.scheduled_by|mb_truncate:20:"..."}
+          </a>
+        </td>
         <td class="crm-mailing-scheduled">{$row.scheduled}</td>
         <td class="crm-mailing-start">{$row.start}</td>
         <td class="crm-mailing-end">{$row.end}</td>

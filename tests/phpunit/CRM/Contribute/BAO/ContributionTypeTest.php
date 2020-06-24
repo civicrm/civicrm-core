@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -44,12 +28,12 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
    * Check method add()
    */
   public function testAdd() {
-    $params = array(
+    $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
 
     $result = $this->assertDBNotNull('CRM_Financial_BAO_FinancialType', $contributionType->id,
@@ -64,15 +48,15 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
    * Check method retrive()
    */
   public function testRetrieve() {
-    $params = array(
+    $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
 
-    $defaults = array();
+    $defaults = [];
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
 
     $this->assertEquals($result->name, 'Donations', 'Verify financial type name.');
@@ -82,12 +66,12 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
    * Check method setIsActive()
    */
   public function testSetIsActive() {
-    $params = array(
+    $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
     $result = CRM_Financial_BAO_FinancialType::setIsActive($contributionType->id, 0);
     $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
@@ -103,16 +87,16 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
    * Check method del()
    */
   public function testdel() {
-    $params = array(
+    $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $contributionType = CRM_Financial_BAO_FinancialType::add($params, $ids);
 
     CRM_Financial_BAO_FinancialType::del($contributionType->id);
-    $params = array('id' => $contributionType->id);
+    $params = ['id' => $contributionType->id];
     $result = CRM_Financial_BAO_FinancialType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }

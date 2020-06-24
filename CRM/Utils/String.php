@@ -1,35 +1,22 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+
+use function xKerman\Restricted\unserialize;
+use xKerman\Restricted\UnserializeFailedException;
 
 require_once 'HTML/QuickForm/Rule/Email.php';
 
@@ -47,7 +34,7 @@ class CRM_Utils_String {
   /**
    * Convert a display name into a potential variable name.
    *
-   * @param $title title of the string
+   * @param string $title title of the string
    * @param int $maxLength
    *
    * @return string
@@ -84,6 +71,11 @@ class CRM_Utils_String {
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
 
+    //If there are no ascii characters present.
+    if ($name == $char) {
+      $name = self::createRandom($len, self::ALPHANUMERIC);
+    }
+
     if ($len) {
       // lets keep variable names short
       return substr($name, 0, $len);
@@ -94,33 +86,17 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * Convert possibly underscore separated words to camel case.
    *
-   * @param string $string
-   *
+   * @param string $str
+   * @param bool $ucFirst
+   *   Should the first letter be capitalized like `CamelCase` or lower like `camelCase`
    * @return string
    */
-  public static function convertStringToCamel($string) {
-    $map = array(
-      'acl' => 'Acl',
-      'ACL' => 'Acl',
-      'im' => 'Im',
-      'IM' => 'Im',
-    );
-    if (isset($map[$string])) {
-      return $map[$string];
-    }
-
-    $fragments = explode('_', $string);
-    foreach ($fragments as & $fragment) {
-      $fragment = ucfirst($fragment);
-    }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
-    }
-    return implode('', $fragments);
+  public static function convertStringToCamel($str, $ucFirst = TRUE) {
+    $fragments = explode('_', $str);
+    $camel = implode('', array_map('ucfirst', $fragments));
+    return $ucFirst ? $camel : lcfirst($camel);
   }
 
   /**
@@ -153,7 +129,7 @@ class CRM_Utils_String {
    *   The last component
    */
   public static function getClassName($string, $char = '_') {
-    $names = array();
+    $names = [];
     if (!is_array($string)) {
       $names = explode($char, $string);
     }
@@ -236,7 +212,7 @@ class CRM_Utils_String {
       return TRUE;
     }
     else {
-      $order = array('ASCII');
+      $order = ['ASCII'];
       if ($utf8) {
         $order[] = 'UTF-8';
       }
@@ -260,7 +236,7 @@ class CRM_Utils_String {
   public static function regex($str, $regexRules) {
     // redact the regular expressions
     if (!empty($regexRules) && isset($str)) {
-      static $matches, $totalMatches, $match = array();
+      static $matches, $totalMatches, $match = [];
       foreach ($regexRules as $pattern => $replacement) {
         preg_match_all($pattern, $str, $matches);
         if (!empty($matches[0])) {
@@ -286,7 +262,7 @@ class CRM_Utils_String {
       }
       return $match;
     }
-    return CRM_Core_DAO::$_nullArray;
+    return [];
   }
 
   /**
@@ -328,7 +304,7 @@ class CRM_Utils_String {
       // iconv('ISO-8859-1', 'UTF-8', $str);
     }
     else {
-      $enc = mb_detect_encoding($str, array('UTF-8'), TRUE);
+      $enc = mb_detect_encoding($str, ['UTF-8'], TRUE);
       return ($enc !== FALSE);
     }
   }
@@ -437,7 +413,7 @@ class CRM_Utils_String {
    *   the converted string
    */
   public static function htmlToText($html) {
-    require_once 'packages/html2text/rcube_html2text.php';
+    require_once 'html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
     $converter = new rcube_html2text($token_html);
     $token_text = $converter->get_text();
@@ -508,7 +484,7 @@ class CRM_Utils_String {
     $string = trim($string);
 
     $values = explode("\n", $string);
-    $result = array();
+    $result = [];
     foreach ($values as $value) {
       list($n, $v) = CRM_Utils_System::explode('=', $value, 2);
       if (!empty($v)) {
@@ -529,7 +505,7 @@ class CRM_Utils_String {
    *   only the first alternative found (or the text without alternatives)
    */
   public static function stripAlternatives($full) {
-    $matches = array();
+    $matches = [];
     preg_match('/-ALTERNATIVE ITEM 0-(.*?)-ALTERNATIVE ITEM 1-.*-ALTERNATIVE END-/s', $full, $matches);
 
     if (isset($matches[1]) &&
@@ -583,7 +559,7 @@ class CRM_Utils_String {
     }
 
     if ($_searchChars == NULL) {
-      $_searchChars = array(
+      $_searchChars = [
         '&',
         ';',
         ',',
@@ -601,7 +577,7 @@ class CRM_Utils_String {
         "\r\n",
         "\n",
         "\t",
-      );
+      ];
       $_replaceChar = '_';
     }
 
@@ -615,7 +591,6 @@ class CRM_Utils_String {
 
     return str_replace($search, $replace, $string);
   }
-
 
   /**
    * Use HTMLPurifier to clean up a text string and remove any potential
@@ -633,6 +608,7 @@ class CRM_Utils_String {
     if (!$_filter) {
       $config = HTMLPurifier_Config::createDefault();
       $config->set('Core.Encoding', 'UTF-8');
+      $config->set('Attr.AllowedFrameTargets', ['_blank', '_self', '_parent', '_top']);
 
       // Disable the cache entirely
       $config->set('Cache.DefinitionImpl', NULL);
@@ -652,13 +628,10 @@ class CRM_Utils_String {
    * @return string
    */
   public static function ellipsify($string, $maxLen) {
-    $len = strlen($string);
-    if ($len <= $maxLen) {
+    if (mb_strlen($string, 'UTF-8') <= $maxLen) {
       return $string;
     }
-    else {
-      return substr($string, 0, $maxLen - 3) . '...';
-    }
+    return mb_substr($string, 0, $maxLen - 3, 'UTF-8') . '...';
   }
 
   /**
@@ -693,10 +666,10 @@ class CRM_Utils_String {
   public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
-      return array($defaultPrefix, $string);
+      return [$defaultPrefix, $string];
     }
     else {
-      return array(substr($string, 0, $pos), substr($string, 1 + $pos));
+      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
     }
   }
 
@@ -780,6 +753,80 @@ class CRM_Utils_String {
   }
 
   /**
+   * When a user supplies a URL (e.g. to an image), we'd like to:
+   *  - Remove the protocol and domain name if the URL points to the current
+   *    site.
+   *  - Keep the domain name for remote URLs.
+   *  - Optionally, force remote URLs to use https instead of http (which is
+   *    useful for images)
+   *
+   * @param string $url
+   *   The URL to simplify. Examples:
+   *     "https://example.org/sites/default/files/coffee-mug.jpg"
+   *     "sites/default/files/coffee-mug.jpg"
+   *     "http://i.stack.imgur.com/9jb2ial01b.png"
+   * @param bool $forceHttps = FALSE
+   *   If TRUE, ensure that remote URLs use https. If a URL with
+   *   http is supplied, then we'll change it to https.
+   *   This is useful for situations like showing a premium product on a
+   *   contribution, because (as reported in CRM-14283) if the user gets a
+   *   browser warning like "page contains insecure elements" on a contribution
+   *   page, that's a very bad thing. Thus, even if changing http to https
+   *   breaks the image, that's better than leaving http content in a
+   *   contribution page.
+   *
+   * @return string
+   *   The simplified URL. Examples:
+   *     "/sites/default/files/coffee-mug.jpg"
+   *     "https://i.stack.imgur.com/9jb2ial01b.png"
+   */
+  public static function simplifyURL($url, $forceHttps = FALSE) {
+    $config = CRM_Core_Config::singleton();
+    $siteURLParts = self::simpleParseUrl($config->userFrameworkBaseURL);
+    $urlParts = self::simpleParseUrl($url);
+
+    // If the image is locally hosted, then only give the path to the image
+    $urlIsLocal
+      = ($urlParts['host+port'] == '')
+      | ($urlParts['host+port'] == $siteURLParts['host+port']);
+    if ($urlIsLocal) {
+      // and make sure it begins with one forward slash
+      return preg_replace('_^/*(?=.)_', '/', $urlParts['path+query']);
+    }
+
+    // If the URL is external, then keep the full URL as supplied
+    else {
+      return $forceHttps ? preg_replace('_^http://_', 'https://', $url) : $url;
+    }
+  }
+
+  /**
+   * A simplified version of PHP's parse_url() function.
+   *
+   * @param string $url
+   *   e.g. "https://example.com:8000/foo/bar/?id=1#fragment"
+   *
+   * @return array
+   *   Will always contain keys 'host+port' and 'path+query', even if they're
+   *   empty strings. Example:
+   *   [
+   *     'host+port' => "example.com:8000",
+   *     'path+query' => "/foo/bar/?id=1",
+   *   ]
+   */
+  public static function simpleParseUrl($url) {
+    $parts = parse_url($url);
+    $host = $parts['host'] ?? '';
+    $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+    $path = $parts['path'] ?? '';
+    $query = isset($parts['query']) ? '?' . $parts['query'] : '';
+    return [
+      'host+port' => "$host$port",
+      'path+query' => "$path$query",
+    ];
+  }
+
+  /**
    * Formats a string of attributes for insertion in an html tag.
    *
    * @param array $attributes
@@ -837,7 +884,7 @@ class CRM_Utils_String {
    */
   public static function filterByWildcards($patterns, $allStrings, $allowNew = FALSE) {
     $patterns = (array) $patterns;
-    $result = array();
+    $result = [];
     foreach ($patterns as $pattern) {
       if (!\CRM_Utils_String::endsWith($pattern, '*')) {
         if ($allowNew || in_array($pattern, $allStrings)) {
@@ -854,6 +901,112 @@ class CRM_Utils_String {
       }
     }
     return array_values(array_unique($result));
+  }
+
+  /**
+   * Safely unserialize a string of scalar or array values (but not objects!)
+   *
+   * Use `xkerman/restricted-unserialize` to unserialize strings using PHP's
+   * serialization format. `restricted-unserialize` works like PHP's built-in
+   * `unserialize` function except that it does not deserialize object instances,
+   * making it immune to PHP Object Injection {@see https://www.owasp.org/index.php/PHP_Object_Injection}
+   * vulnerabilities.
+   *
+   * Note: When dealing with user inputs, it is generally recommended to use
+   * safe, standard data interchange formats such as JSON rather than PHP's
+   * serialization format when dealing with user input.
+   *
+   * @param string|NULL $string
+   *
+   * @return mixed
+   */
+  public static function unserialize($string) {
+    if (!is_string($string)) {
+      return FALSE;
+    }
+    try {
+      return unserialize($string);
+    }
+    catch (UnserializeFailedException $e) {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Returns the plural form of an English word.
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function pluralize($str) {
+    $lastLetter = substr($str, -1);
+    $lastTwo = substr($str, -2);
+    if ($lastLetter == 's' || $lastTwo == 'ch') {
+      return $str . 'es';
+    }
+    if ($lastLetter == 'y' && $lastTwo != 'ey') {
+      return substr($str, 0, -1) . 'ies';
+    }
+    return $str . 's';
+  }
+
+  /**
+   * Generic check as to whether any tokens are in the given string.
+   *
+   * It might be a smarty token OR a CiviCRM token. In both cases the
+   * absence of a '{' indicates no token is present.
+   *
+   * @param string $string
+   *
+   * @return bool
+   */
+  public static function stringContainsTokens(string $string) {
+    return strpos($string, '{') !== FALSE;
+  }
+
+  /**
+   * Parse a string through smarty without creating a smarty template file per string.
+   *
+   * This function is for swapping out any smarty tokens that appear in a string
+   * and are not re-used much if at all. For example parsing a contact's greeting
+   * does not need to be cached are there are some minor security / data privacy benefits
+   * to not caching them per file. We also save disk space, reduce I/O and disk clearing time.
+   *
+   * Doing this is cleaning in Smarty3 which we are alas not using
+   * https://www.smarty.net/docs/en/resources.string.tpl
+   *
+   * However, it highlights that smarty-eval is not evil-eval and still have the security applied.
+   *
+   * In order to replicate that in Smarty2 I'm using {eval} per
+   * https://www.smarty.net/docsv2/en/language.function.eval.tpl#id2820446
+   * From the above:
+   * - Evaluated variables are treated the same as templates. They follow the same escapement and security features just as if they were templates.
+   * - Evaluated variables are compiled on every invocation, the compiled versions are not saved! However if you have caching enabled, the output
+   *   will be cached with the rest of the template.
+   *
+   * Our set up does not have caching enabled and my testing suggests this still works fine with it
+   * enabled so turning it off before running this is out of caution based on the above.
+   *
+   * When this function is run only one template file is created (for the eval) tag no matter how
+   * many times it is run. This compares to it otherwise creating one file for every parsed string.
+   *
+   * @param string $templateString
+   *
+   * @return string
+   */
+  public static function parseOneOffStringThroughSmarty($templateString) {
+    if (!CRM_Utils_String::stringContainsTokens($templateString)) {
+      // Skip expensive smarty processing.
+      return $templateString;
+    }
+    $smarty = CRM_Core_Smarty::singleton();
+    $cachingValue = $smarty->caching;
+    $smarty->caching = 0;
+    $smarty->assign('smartySingleUseString', $templateString);
+    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
+    $smarty->caching = $cachingValue;
+    $smarty->assign('smartySingleUseString', NULL);
+    return $templateString;
   }
 
 }

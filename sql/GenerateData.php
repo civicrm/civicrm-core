@@ -1,34 +1,18 @@
 <?php
-/**
- * +--------------------------------------------------------------------+
- * | CiviCRM version 4.7                                                |
- * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2015                                |
- * +--------------------------------------------------------------------+
- * | This file is a part of CiviCRM.                                    |
- * |                                                                    |
- * | CiviCRM is free software; you can copy, modify, and distribute it  |
- * | under the terms of the GNU Affero General Public License           |
- * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- * |                                                                    |
- * | CiviCRM is distributed in the hope that it will be useful, but     |
- * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- * | See the GNU Affero General Public License for more details.        |
- * |                                                                    |
- * | You should have received a copy of the GNU Affero General Public   |
- * | License and the CiviCRM Licensing Exception along                  |
- * | with this program; if not, contact CiviCRM LLC                     |
- * | at info[AT]civicrm[DOT]org. If you have questions about the        |
- * | GNU Affero General Public License or the licensing of CiviCRM,     |
- * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- * +--------------------------------------------------------------------+
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -196,16 +180,23 @@ class CRM_GCD {
     $this->householdIndividual = array_combine($this->Household, $this->householdIndividual);
   }
 
-  /*********************************
+  /*
    * private members
-   *********************************/
+   *
+   */
 
-  // enum's from database
+  /**
+   * enum's from database
+   * @var array
+   */
   private $preferredCommunicationMethod = array('1', '2', '3', '4', '5');
   private $contactType = array('Individual', 'Household', 'Organization');
   private $phoneType = array('1', '2', '3', '4');
 
-  // customizable enums (foreign keys)
+  /**
+   * customizable enums (foreign keys)
+   * @var array
+   */
   private $prefix = array(
     // Female
     1 => array(
@@ -219,35 +210,56 @@ class CRM_GCD {
       4 => 'Dr.',
     ),
   );
+  /**
+   * @var array
+   */
   private $suffix = array(1 => 'Jr.', 2 => 'Sr.', 3 => 'II', 4 => 'III');
   private $gender = array(1 => 'female', 2 => 'male');
 
-  // store domain id's
+  /**
+   * store domain id's
+   * @var array
+   */
   private $domain = array();
 
-  // store contact id's
+  /**
+   * store contact id's
+   * @var array
+   */
   private $contact = array();
   private $Individual = array();
   private $Household = array();
   private $Organization = array();
 
   // store which contacts have a location entity
-  // for automatic management of is_primary field
+  /**
+   * for automatic management of is_primary field
+   * @var array
+   */
   private $location = array(
     'Email' => array(),
     'Phone' => array(),
     'Address' => array(),
   );
 
-  // stores the strict individual id and household id to individual id mapping
+  /**
+   * stores the strict individual id and household id to individual id mapping
+   * @var array
+   */
   private $strictIndividual = array();
   private $householdIndividual = array();
   private $householdName = array();
 
-  // sample data in xml format
+  /**
+   * sample data in xml format
+   * @var array
+   */
   private $sampleData = array();
 
-  // private vars
+  /**
+   * private vars
+   * @var array
+   */
   private $startCid;
   private $numIndividual = 0;
   private $numHousehold = 0;
@@ -258,10 +270,11 @@ class CRM_GCD {
 
   private $groupMembershipStatus = array('Added', 'Removed', 'Pending');
   private $subscriptionHistoryMethod = array('Admin', 'Email');
+  private $deceasedContactIds = array();
 
   /*********************************
    * private methods
-   ********************************
+   * *******************************
    * @param int $size
    * @return string
    */
@@ -374,7 +387,7 @@ class CRM_GCD {
 
     // number of seconds per year
     $numSecond = 31536000;
-    $dateFormat = "Ymdhis";
+    $dateFormat = "YmdHis";
     $today = time();
 
     // both are defined
@@ -430,7 +443,7 @@ class CRM_GCD {
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->insert()) {
-        echo "ERROR INSERT: " . mysql_error() . "\n";
+        echo "ERROR INSERT: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -444,7 +457,7 @@ class CRM_GCD {
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
       if (!$dao->update()) {
-        echo "ERROR UPDATE: " . mysql_error() . "\n";
+        echo "ERROR UPDATE: " . mysqli_error($dao->getConnection()->connection) . "\n";
         print_r($dao);
         exit(1);
       }
@@ -637,7 +650,13 @@ class CRM_GCD {
       }
 
       // Deceased probability based on age
-      if ($age > 40) {
+      if ($contact->gender_id && $contact->gender_id == 2) {
+        $checkAge = 64;
+      }
+      else {
+        $checkAge = 68;
+      }
+      if ($age > $checkAge && count($this->deceasedContactIds) < 4) {
         $contact->is_deceased = $this->probability(($age - 30) / 100);
         if ($contact->is_deceased && $this->probability(.7)) {
           $contact->deceased_date = $this->randomDate();
@@ -674,6 +693,9 @@ class CRM_GCD {
       $contact->hash = crc32($contact->sort_name);
       $contact->id = $cid;
       $this->_update($contact);
+      if ($contact->is_deceased) {
+        $this->deceasedContactIds[] = $cid;
+      }
     }
   }
 
@@ -1091,8 +1113,6 @@ class CRM_GCD {
       $group->visibility = 'Public Pages';
       $group->is_active = 1;
       $group->save();
-      $group->buildClause();
-      $group->save();
     }
 
     // 60 are for newsletter
@@ -1167,7 +1187,8 @@ class CRM_GCD {
     //In this function when we add groups that time we are cache the contact fields
     //But at the end of setup we are appending sample custom data, so for consistency
     //reset the cache.
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
+    CRM_Core_BAO_Cache::resetCaches();
   }
 
   /**
@@ -1199,7 +1220,7 @@ class CRM_GCD {
     $contactDAO->find();
 
     $count = 0;
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     while ($contactDAO->fetch()) {
       if ($count++ > 2) {
         break;
@@ -1246,7 +1267,6 @@ class CRM_GCD {
         $this->stateMap[$dao->abbreviation] = $dao->id;
         $this->states[$dao->id] = $dao->name;
       }
-      $dao->free();
     }
 
     $offset = mt_rand(1, 43000);
@@ -1318,7 +1338,7 @@ class CRM_GCD {
   private function addMembership() {
     $contact = new CRM_Contact_DAO_Contact();
     $contact->query("SELECT id FROM civicrm_contact where contact_type = 'Individual'");
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     while ($contact->fetch()) {
       $contacts[] = $contact->id;
     }
@@ -1693,7 +1713,7 @@ INSERT INTO civicrm_activity_contact
   (contact_id, activity_id, record_type_id)
 VALUES
 ";
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $currentActivityID = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_activity");
     $currentActivityID -= 50;
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
@@ -1843,7 +1863,7 @@ order by cc.id; ";
     $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
       cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
     $where = 'WHERE cefa.account_relationship = 1';
-    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount();
+    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4);
     foreach ($components as $component) {
       if ($component == 'contribution') {
         $from = 'FROM `civicrm_contribution` contribution';
@@ -1951,7 +1971,7 @@ AND    a.details = 'Membership Payment'
     $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id)
 SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1  FROM `civicrm_participant` cp
 LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
-group by `contact_id`;";
+group by `contact_id`, `fee_amount`, `title`;";
 
     $this->_query($sql);
 
@@ -1976,22 +1996,6 @@ AND    a.details = 'Participant Payment'
     $this->_query($sql);
   }
 
-}
-
-/**
- * @param null $str
- *
- * @return bool
- */
-function user_access($str = NULL) {
-  return TRUE;
-}
-
-/**
- * @return array
- */
-function module_list() {
-  return array();
 }
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");

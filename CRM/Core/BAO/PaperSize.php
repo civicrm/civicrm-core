@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,43 +39,46 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
 
   /**
    * Static holder for the Paper Size Option Group ID.
+   * @var int
    */
   private static $_gid = NULL;
 
   /**
    * Paper Size fields stored in the 'value' field of the Option Value table.
+   * @var array
    */
-  private static $optionValueFields = array(
-    'metric' => array(
+  private static $optionValueFields = [
+    'metric' => [
       'name' => 'metric',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'mm',
-    ),
-    'width' => array(
+    ],
+    'width' => [
       'name' => 'width',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 612,
-    ),
-    'height' => array(
+    ],
+    'height' => [
       'name' => 'height',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 792,
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get Option Group ID for Paper Sizes.
    *
    * @return int
    *   Group ID (null if Group ID doesn't exist)
+   * @throws CRM_Core_Exception
    */
   private static function _getGid() {
     if (!self::$_gid) {
       self::$_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'paper_size', 'id', 'name');
       if (!self::$_gid) {
-        CRM_Core_Error::fatal(ts('Paper Size Option Group not found in database.'));
+        throw new CRM_Core_Exception(ts('Paper Size Option Group not found in database.'));
       }
     }
     return self::$_gid;
@@ -84,7 +87,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Paper Size list.
    *
-   * @param array (reference) $list List of Paper Sizes
+   * @param array $list List of Paper Sizes
    * @param string $returnURL
    *   URL of page calling this function.
    *
@@ -104,7 +107,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   (reference)   Paper Size list
    */
   public static function &getList($namesOnly = FALSE) {
-    static $list = array();
+    static $list = [];
     if (self::_getGid()) {
       // get saved Paper Sizes from Option Value table
       $dao = new CRM_Core_DAO_OptionValue();
@@ -131,13 +134,13 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   Name/value pairs containing the default Paper Size values.
    */
   public static function &getDefaultValues() {
-    $params = array('is_active' => 1, 'is_default' => 1);
-    $defaults = array();
+    $params = ['is_active' => 1, 'is_default' => 1];
+    $defaults = [];
     if (!self::retrieve($params, $defaults)) {
       foreach (self::$optionValueFields as $name => $field) {
         $defaults[$name] = $field['default'];
       }
-      $filter = array('option_group_id' => self::_getGid());
+      $filter = ['option_group_id' => self::_getGid()];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $filter);
     }
     return $defaults;
@@ -155,8 +158,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   (reference) associative array of name/value pairs
    */
   public static function &getPaperFormat($field, $val) {
-    $params = array('is_active' => 1, $field => $val);
-    $paperFormat = array();
+    $params = ['is_active' => 1, $field => $val];
+    $paperFormat = [];
     if (self::retrieve($params, $paperFormat)) {
       return $paperFormat;
     }
@@ -196,7 +199,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @param string $field
    *   Name of a Paper Size field.
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param array $values associative array of name/value pairs containing
    *                                           Paper Size field selections
    *
    * @param null $default
@@ -263,9 +266,10 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Save the Paper Size in the DB.
    *
-   * @param array (reference) $values associative array of name/value pairs
+   * @param array $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
+   * @throws CRM_Core_Exception
    */
   public function savePaperSize(&$values, $id) {
     // get the Option Group ID for Paper Sizes (create one if it doesn't exist)
@@ -274,7 +278,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
     // clear other default if this is the new default Paper Size
     if ($values['is_default']) {
       $query = "UPDATE civicrm_option_value SET is_default = 0 WHERE option_group_id = $group_id";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
     if ($id) {
       // fetch existing record
@@ -309,12 +313,12 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
     // make sure serialized array will fit in the 'value' column
     $attribute = CRM_Core_DAO::getAttribute('CRM_Core_BAO_PaperSize', 'value');
     if (strlen($this->value) > $attribute['maxlength']) {
-      CRM_Core_Error::fatal(ts('Paper Size does not fit in database.'));
+      throw new CRM_Core_Exception(ts('Paper Size does not fit in database.'));
     }
     $this->save();
 
     // fix duplicate weights
-    $filter = array('option_group_id' => self::_getGid());
+    $filter = ['option_group_id' => self::_getGid()];
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $filter);
   }
 
@@ -323,7 +327,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @param int $id
    *   ID of the Paper Size to be deleted.
-   *
+   * @throws CRM_Core_Exception
    */
   public static function del($id) {
     if ($id) {
@@ -331,14 +335,14 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
         if ($dao->option_group_id == self::_getGid()) {
-          $filter = array('option_group_id' => self::_getGid());
+          $filter = ['option_group_id' => self::_getGid()];
           CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $id, $filter);
           $dao->delete();
           return;
         }
       }
     }
-    CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
   }
 
 }

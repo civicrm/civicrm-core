@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for renewing memberships for a contact  *}
@@ -58,9 +42,9 @@
     </div>
     <div>{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
-      <tr class="crm-member-membershiprenew-form-block-payment_processor_id">
-        <td class="label">{$form.payment_processor_id.label}</td>
-        <td class="html-adjust">{$form.payment_processor_id.html}</td>
+      <tr class="crm-member-membershiprenew-form-block-contact-id">
+        <td class="label">{$form.contact_id.label}</td>
+        <td>{$form.contact_id.html}</td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-org_name">
         <td class="label">{ts}Membership Organization and Type{/ts}</td>
@@ -88,7 +72,7 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
+        <td>{$form.renewal_date.html}</td>
       </tr>
       <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
         <td colspan="2" class="description">
@@ -118,7 +102,8 @@
               <legend>{ts}Renewal Payment and Receipt{/ts}</legend>
       {/if}
       {include file="CRM/Member/Form/MembershipCommon.tpl"}
-      {if $emailExists and $outBound_option != 2}
+    </table>
+    {if $emailExists and $outBound_option != 2}
       <table class="form-layout">
         <tr class="crm-{$formClass}-form-block-send_receipt">
           <td class="label">{$form.send_receipt.label}</td>
@@ -128,7 +113,7 @@
         </tr>
         <tr id="fromEmail">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
         </tr>
         <tr id="notice" class="crm-member-membershiprenew-form-block-receipt_text_renewal">
           <td class="label">{$form.receipt_text_renewal.label}</td>
@@ -139,9 +124,7 @@
       </table>
     {/if}
 
-    <div id="customData"></div>
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customDataBlock.tpl"}
 
     <div>{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
@@ -179,14 +162,6 @@
 
   {if !$membershipMode}
     {include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="payment_instrument_id"
-    trigger_value       = '4'
-    target_element_id   ="checkNumber"
-    target_element_type ="table-row"
-    field_type          ="select"
-    invert              = 0
-    }
-    {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="send_receipt"
     trigger_value       =""
     target_element_id   ="fromEmail"
@@ -200,12 +175,6 @@
     CRM.$(function($) {
       $('#membershipOrgType').hide();
       $('#changeNumTerms').hide();
-      {/literal}
-      CRM.buildCustomData('{$customDataType}');
-      {if $customDataSubType}
-      CRM.buildCustomData('{$customDataType}', {$customDataSubType});
-      {/if}
-      {literal}
     });
 
     function checkPayment() {

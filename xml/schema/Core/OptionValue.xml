@@ -28,7 +28,8 @@
     <pseudoconstant>
       <table>civicrm_option_group</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -46,7 +47,7 @@
     <title>Option Label</title>
     <type>varchar</type>
     <required>true</required>
-    <length>255</length>
+    <length>512</length>
     <localizable>true</localizable>
     <comment>Option string as displayed to users - e.g. the label in an HTML OPTION tag.</comment>
     <add>1.5</add>
@@ -81,6 +82,7 @@
   <field>
     <name>filter</name>
     <type>int unsigned</type>
+    <default>0</default>
     <comment>Bitwise logic can be used to create subsets of options within an option_group for different uses.</comment>
     <add>1.5</add>
   </field>
@@ -182,6 +184,27 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <add>2.2</add>
+    <pseudoconstant>
+      <optionGroupName>visibility</optionGroupName>
+    </pseudoconstant>
+  </field>
+  <field>
+    <name>icon</name>
+    <title>Icon</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>crm-i icon class</comment>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>color</name>
+    <title>Color</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Hex color value e.g. #ffffff</comment>
+    <default>NULL</default>
+    <add>4.7</add>
   </field>
   <index>
     <name>index_option_group_id_value</name>

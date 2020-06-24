@@ -31,11 +31,6 @@
  */
 
 /**
- *  Include parent class definition
- */
-require_once 'CiviTest/CiviTestSuite.php';
-
-/**
  *  Class containing all API v3 test suites
  *
  * @package   CiviCRM

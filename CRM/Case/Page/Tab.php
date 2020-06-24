@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +25,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
 
@@ -59,7 +43,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     if ($this->_contactId) {
       $this->assign('contactId', $this->_contactId);
@@ -67,10 +51,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
       if ($this->_id && ($this->_action & CRM_Core_Action::VIEW)) {
         //user might have special permissions to view this case, CRM-5666
         if (!CRM_Core_Permission::check('access all cases and activities')) {
-          $session = CRM_Core_Session::singleton();
-          $userCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'), 'any');
+          $userCases = CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any']);
           if (!array_key_exists($this->_id, $userCases)) {
-            CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+            CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
           }
         }
       }
@@ -80,7 +63,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
     else {
       if ($this->_action & CRM_Core_Action::VIEW) {
-        CRM_Core_Error::fatal('Contact Id is required for view action.');
+        CRM_Core_Error::statusBounce('Contact Id is required for view action.');
       }
     }
 
@@ -179,7 +162,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    */
   public function run() {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullArray);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     if ($context == 'standalone' && !$contactID) {
       $this->_action = CRM_Core_Action::ADD;
@@ -191,7 +174,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
 
     $this->assign('action', $this->_action);
 
-    $this->setContext();
+    self::setContext($this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
@@ -217,35 +200,38 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  static public function &links() {
+  public static function &links() {
     $config = CRM_Core_Config::singleton();
 
     if (!(self::$_links)) {
       $deleteExtra = ts('Are you sure you want to delete this case?');
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('Manage'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%',
           'title' => ts('Delete Case'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
 
-  public function setContext() {
-    $context = $this->get('context');
+  /**
+   * @param CRM_Core_Form $form
+   */
+  public static function setContext(&$form) {
+    $context = $form->get('context');
     $url = NULL;
 
-    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
@@ -253,9 +239,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
 
     switch ($context) {
       case 'activity':
-        if ($this->_contactId) {
+        if ($form->_contactId) {
           $url = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&force=1&cid={$this->_contactId}&selectedChild=activity"
+            "reset=1&force=1&cid={$form->_contactId}&selectedChild=activity"
           );
         }
         break;
@@ -281,12 +267,12 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'fulltext':
-        $action = CRM_Utils_Request::retrieve('action', 'String', $this);
+        $action = CRM_Utils_Request::retrieve('action', 'String', $form);
         $urlParams = 'force=1';
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::RENEW) {
-          if ($this->_contactId) {
-            $urlParams .= '&cid=' . $this->_contactId;
+          if ($form->_contactId) {
+            $urlParams .= '&cid=' . $form->_contactId;
           }
           $urlParams .= '&context=fulltext&action=view';
           $urlString = 'civicrm/contact/view/case';
@@ -298,9 +284,9 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         break;
 
       default:
-        if ($this->_contactId) {
+        if ($form->_contactId) {
           $url = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&force=1&cid={$this->_contactId}&selectedChild=case"
+            "reset=1&force=1&cid={$form->_contactId}&selectedChild=case"
           );
         }
         break;

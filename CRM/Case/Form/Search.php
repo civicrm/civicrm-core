@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -46,21 +30,29 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
   /**
    * Prefix for the controller
+   * @var string
    */
   protected $_prefix = 'case_';
+
+  /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Case';
+  }
 
   /**
    * Processing needed for buildForm and later.
@@ -70,7 +62,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
-      CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You are not authorized to access this page.'));
     }
 
     //validate case configuration.
@@ -83,50 +75,12 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     /**
      * set the button names
      */
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
+    $this->sortNameOnly = TRUE;
 
-    /*
-     * we allow the controller to set force/reset externally, useful when we are being
-     * driven by the wizard framework
-     */
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-
-    $this->assign('context', $this->_context);
-
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST) && !$this->controller->isModal()) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
-
-    if (empty($this->_formValues)) {
-      if (isset($this->_ssID)) {
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-      }
-    }
-
-    if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Case_Selector_Search($this->_queryParams,
@@ -147,7 +101,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::TRANSFER,
@@ -174,15 +128,13 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
         $this->addRowSelectors($rows);
       }
 
-      $permission = CRM_Core_Permission::getPermission();
-
-      $tasks = CRM_Case_Task::permissionedTaskTitles($permission);
+      $tasks = CRM_Case_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
 
       if (!empty($this->_formValues['case_deleted'])) {
-        unset($tasks[1]);
+        unset($tasks[CRM_Case_Task::TASK_DELETE]);
       }
       else {
-        unset($tasks[4]);
+        unset($tasks[CRM_Case_Task::RESTORE_CASES]);
       }
 
       $this->addTaskMenu($tasks);
@@ -230,9 +182,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->fixFormValues();
-
     if (isset($this->_ssID) && empty($_POST)) {
       // if we are editing / running a saved search and the form has not been posted
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
@@ -240,19 +192,22 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     //search for civicase
     if (!$this->_force) {
+      // @todo - stop changing formValues - respect submitted form values, change a working array.
       if (array_key_exists('case_owner', $this->_formValues) && !$this->_formValues['case_owner']) {
         $this->_formValues['case_owner'] = 0;
       }
     }
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
+    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -264,13 +219,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -294,7 +242,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::SESSION,
@@ -309,80 +257,30 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $controller->run();
   }
 
-  /**
-   * Add the rules (mainly global rules) for form.
-   *
-   * All local rules are added near the element
-   *
-   * @see valid_date
-   */
-  public function addRules() {
-    $this->addFormRule(array('CRM_Case_Form_Search', 'formRule'));
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = array();
-    $defaults = $this->_formValues;
-    return $defaults;
-  }
-
   public function fixFormValues() {
     if (!$this->_force) {
       return;
     }
 
-    $caseStatus = CRM_Utils_Request::retrieve('status', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseStatus = CRM_Utils_Request::retrieve('status', 'Positive');
     if ($caseStatus) {
       $this->_formValues['case_status_id'] = $caseStatus;
       $this->_defaults['case_status_id'] = $caseStatus;
     }
-    $caseType = CRM_Utils_Request::retrieve('type', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseType = CRM_Utils_Request::retrieve('type', 'Positive');
     if ($caseType) {
       $this->_formValues['case_type_id'] = (array) $caseType;
       $this->_defaults['case_type_id'] = (array) $caseType;
     }
 
-    $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date');
     if ($caseFromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($caseFromDate);
       $this->_formValues['case_start_date_low'] = $date;
       $this->_defaults['case_start_date_low'] = $date;
     }
 
-    $caseToDate = CRM_Utils_Request::retrieve('pend', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $caseToDate = CRM_Utils_Request::retrieve('pend', 'Date');
     if ($caseToDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($caseToDate);
       $this->_formValues['case_start_date_high'] = $date;
@@ -415,21 +313,12 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       }
 
       // Now if case_owner is set in the url/post, use that instead.
-      $caseOwner = CRM_Utils_Request::retrieve('case_owner', 'Positive',
-        CRM_Core_DAO::$_nullObject
-      );
+      $caseOwner = CRM_Utils_Request::retrieve('case_owner', 'Positive');
       if ($caseOwner) {
         $this->_formValues['case_owner'] = $caseOwner;
         $this->_defaults['case_owner'] = $caseOwner;
       }
     }
-  }
-
-  /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
   }
 
   /**
@@ -439,6 +328,15 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Find Cases');
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Case' => CRM_Case_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }

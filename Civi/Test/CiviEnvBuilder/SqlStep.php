@@ -1,5 +1,6 @@
 <?php
 namespace Civi\Test\CiviEnvBuilder;
+
 class SqlStep implements StepInterface {
   private $sql;
 
@@ -10,7 +11,6 @@ class SqlStep implements StepInterface {
   public function __construct($sql) {
     $this->sql = $sql;
   }
-
 
   public function getSig() {
     return md5($this->sql);

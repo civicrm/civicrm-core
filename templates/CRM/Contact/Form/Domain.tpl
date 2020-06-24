@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for viewing and editing Domain information (for system-generated emails CiviMail-related values) *}
@@ -44,20 +28,6 @@
         </td>
     </tr>
     </table>
-  <h3>{ts}System-generated Mail Settings{/ts}</h3>
-    <table class="form-layout-compressed">
-    <tr>
-      <td>
-        {$form.email_name.label} {help id="from-name"}<br />
-        {$form.email_name.html}
-      </td>
-      <td class="">
-        {$form.email_address.label} {help id="from-email"}<br />
-        {$form.email_address.html}
-           <br /><span class="description">(info@example.org)</span>
-      </td>
-    </tr>
-    </table>
 
     <h3>{ts}Default Organization Address{/ts}</h3>
         <div class="description">{ts 1=&#123;domain.address&#125;}CiviMail mailings must include the sending organization's address. This is done by putting the %1 token in either the body or footer of the mailing. This token may also be used in regular 'Email - send now' messages and in other Message Templates. The token is replaced by the address entered below when the message is sent.{/ts}</div>
@@ -76,7 +46,7 @@
 
     {if ($action eq 4)}
     <div class="action-link">
-    <a href="{crmURL q="action=update&reset=1"}" id="editDomainInfo">&raquo; {ts}Edit Domain Information{/ts}</a>
+    <a href="{crmURL q="action=update&reset=1"}" id="editDomainInfo"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Edit Domain Information{/ts}</a>
     </div>
     {/if}
 {if !($action eq 4)}

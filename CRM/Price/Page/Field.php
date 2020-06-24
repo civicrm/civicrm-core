@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -62,7 +46,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
   /**
    * The price set is reserved or not.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_isSetReserved = FALSE;
 
@@ -74,44 +58,42 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    */
   public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Price Field'),
           'url' => 'civicrm/admin/price/field',
           'qs' => 'action=update&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Edit Price'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview Field'),
           'url' => 'civicrm/admin/price/field',
           'qs' => 'action=preview&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Preview Price'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/price/field',
           'qs' => 'action=delete&reset=1&sid=%%sid%%&fid=%%fid%%',
           'title' => ts('Delete Price'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
 
   /**
    * Browse all price set fields.
-   *
-   * @return void
    */
   public function browse() {
     $resourceManager = CRM_Core_Resources::singleton();
@@ -119,7 +101,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }
 
-    $priceField = array();
+    $priceField = [];
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     // fkey is sid
@@ -129,27 +111,23 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
     // display taxTerm for priceFields
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $taxTerm = Civi::settings()->get('tax_term');
+    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
     while ($priceFieldBAO->fetch()) {
-      $priceField[$priceFieldBAO->id] = array();
+      $priceField[$priceFieldBAO->id] = [];
       CRM_Core_DAO::storeValues($priceFieldBAO, $priceField[$priceFieldBAO->id]);
 
       // get price if it's a text field
       if ($priceFieldBAO->html_type == 'Text') {
-        $optionValues = array();
-        $params = array('price_field_id' => $priceFieldBAO->id);
+        $optionValues = [];
+        $params = ['price_field_id' => $priceFieldBAO->id];
 
         CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
+        $priceField[$priceFieldBAO->id]['price'] = $optionValues['amount'] ?? NULL;
         $financialTypeId = $optionValues['financial_type_id'];
-        if (!array_key_exists($financialTypeId, $financialTypes)) {
-          unset($priceField[$priceFieldBAO->id]);
-          continue;
-        }
-        $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
         if ($invoicing && isset($taxRate[$financialTypeId])) {
           $priceField[$priceFieldBAO->id]['tax_rate'] = $taxRate[$financialTypeId];
           $getTaxDetails = TRUE;
@@ -189,10 +167,10 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(
         self::actionLinks(),
         $action,
-        array(
+        [
           'fid' => $priceFieldBAO->id,
           'sid' => $this->_sid,
-        ),
+        ],
         ts('more'),
         FALSE,
         'priceField.row.actions',
@@ -218,8 +196,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    *
    * @param string $action
    *   The action to be invoked.
-   *
-   * @return void
    */
   public function edit($action) {
     // create a simple controller for editing price data
@@ -264,12 +240,12 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $this->assign('isReserved', $this->_isSetReserved);
 
       CRM_Price_BAO_PriceSet::checkPermission($this->_sid);
-      $comps = array(
+      $comps = [
         'Event' => 'civicrm_event',
         'Contribution' => 'civicrm_contribution_page',
         'EventTemplate' => 'civicrm_event_template',
-      );
-      $priceSetContexts = array();
+      ];
+      $priceSetContexts = [];
       foreach ($comps as $name => $table) {
         if (array_key_exists($table, $usedBy)) {
           $priceSetContexts[] = $name;
@@ -306,7 +282,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $groupTitle = CRM_Price_BAO_PriceSet::getTitle($this->_sid);
       $this->assign('sid', $this->_sid);
       $this->assign('groupTitle', $groupTitle);
-      CRM_Utils_System::setTitle(ts('%1 - Price Fields', array(1 => $groupTitle)));
+      CRM_Utils_System::setTitle(ts('%1 - Price Fields', [1 => $groupTitle]));
     }
 
     // assign vars to templates

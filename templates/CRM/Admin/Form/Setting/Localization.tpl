@@ -1,33 +1,17 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+<div class="help">
+  {ts}Configure CiviCRM for your country and language.{/ts}
+  {docURL page="i18n Administrator's Guide: Using CiviCRM in your own language" resource="wiki"}
+</div>
 <div class="crm-block crm-form-block crm-localization-form-block">
-  <div class="help">
-    {ts}Configure CiviCRM for your country and language.{/ts}
-    {docURL page="i18n Administrator's Guide: Using CiviCRM in your own language" resource="wiki"}
-  </div>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"} </div>
     <h3>{ts}Language and Currency{/ts}</h3>
         <table class="form-layout-compressed">
@@ -48,13 +32,22 @@
              </tr>
           {/if}
             <tr class="crm-localization-form-block-inheritLocale">
-                <td class="label">{$form.inheritLocale.label} {help id='inheritLocale' title=$form.inheritLocale.label}</td>
-                <td>{$form.inheritLocale.html}</td>
+              <td class="label">{$form.inheritLocale.label}</td>
+              <td>{$form.inheritLocale.html}<br />
+                <span class="description">{$settings_fields.inheritLocale.description}</span>
+              </td>
             </tr>
+          {if !$form.languageLimit}
+            <tr class="crm-localization-form-block-uiLanguages">
+                <td class="label">{$form.uiLanguages.label}</td>
+                <td>{$form.uiLanguages.html}</td>
+            </tr>
+          {/if}
           <tr class="crm-localization-form-contact_default_language">
             <td class="label">{$form.contact_default_language.label}</td>
             <td>{$form.contact_default_language.html}<br />
-              <span class="description">{ts}Default language (if any) for contact records.{/ts}</span></td>
+              <span class="description">{$settings_fields.contact_default_language.description}</span>
+            </td>
           </tr>
             <tr class="crm-localization-form-block-defaultCurrency">
                 <td class="label">{$form.defaultCurrency.label} {help id='defaultCurrency' title=$form.defaultCurrency.label}</td>
@@ -78,7 +71,7 @@
             </tr>
             <tr class="crm-localization-form-block-moneyvalueformat">
                 <td class="label">{$form.moneyvalueformat.label} {help id='moneyvalueformat' title=$form.moneyvalueformat.label}</td>
-                <td>{$form.moneyvalueformat.html}</td>
+                <td>{$form.moneyvalueformat.html}<br> Note that this setting is proposed to be deprecated as per this <a href="https://lab.civicrm.org/dev/core/-/issues/1494">Gitlab Issue</a></td>
             </tr>
             <tr class="crm-localization-form-block-customTranslateFunction">
                 <td class="label">{$form.customTranslateFunction.label} {help id='customTranslateFunction' title=$form.customTranslateFunction.label}</td>
@@ -114,7 +107,7 @@
         </table>
     <h3>{ts}Multiple Languages Support{/ts}</h3>
       <table class="form-layout-compressed">
-        {if $form.languageLimit}
+        {if $form.makeSinglelingual}
           <tr class="crm-localization-form-block-makeSinglelingual_description">
               <td></td>
               <td><span class="description">{ts 1="http://documentation.civicrm.org"}This is a multilingual installation. It contains certain schema differences compared to regular installations of CiviCRM. Please <a href="%1">refer to the documentation</a> for details.{/ts}</span></td>
@@ -123,19 +116,19 @@
               <td class="label">{$form.makeSinglelingual.label}</td>
               <td>{$form.makeSinglelingual.html}<br />
               <span class="description">{ts}Check this box and click 'Save' to switch this installation from multi- to single-language.{/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>
+              <span class="description font-red">{$warning}</span></td>
           </tr>
         {elseif $form.makeMultilingual}
           <tr class="crm-localization-form-block-makeMultilingual">
               <td class="label">{$form.makeMultilingual.label}</td>
               <td>{$form.makeMultilingual.html}<br />
               <span class="description">{ts}Check this box and click 'Save' to switch this installation from single- to multi-language, then add further languages.{/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>
+              <span class="description font-red">{$warning}</span></td>
         {else}
           <tr class="crm-localization-form-block-description">
               <td>
-              <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts} {ts}(Multilingual support currently cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
-              <span class="description" style="color:red">{$warning}</span></td>
+              <span class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled.{/ts} {ts}(Multilingual support currently cannot be enabled on installations with enabled logging.){/ts}</span><br /><br />
+              <span class="description font-red">{$warning}</span></td>
           </tr>
         {/if}
       </table>

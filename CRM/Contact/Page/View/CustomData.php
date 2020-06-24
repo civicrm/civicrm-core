@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,7 +23,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   /**
    * The id of the object being viewed (note/relationship etc).
    *
-   * @int
+   * @var int
    */
   public $_groupId;
 
@@ -101,12 +85,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
     $this->assign('editOwnCustomData', $editOwnCustomData);
 
     if ($this->_action == CRM_Core_Action::BROWSE) {
-      //Custom Groups Inline
-      $entityType = CRM_Contact_BAO_Contact::getContactType($this->_contactId);
-      $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId);
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, $this, $this->_contactId,
-        $this->_groupId, $entitySubType
-      );
 
       $displayStyle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
         $this->_groupId,
@@ -115,7 +93,8 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
       if ($this->_multiRecordDisplay != 'single') {
         $id = "custom_{$this->_groupId}";
-        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $groupTree[$this->_groupId]['table_name']);
+        $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
+        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $tableName);
       }
 
       if ($displayStyle === 'Tab with table' && $this->_multiRecordDisplay != 'single') {
@@ -134,22 +113,29 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         $page->set('multiRecordFieldListing', $multiRecordFieldListing);
         $page->set('pageViewType', 'customDataView');
         $page->set('contactType', $ctype);
-        $page->assign('viewCustomData', array(
-          $this->_groupId => array(
-            $this->_groupId => $groupTree[$this->_groupId],
-          ),
-        ));
+        $page->_headersOnly = TRUE;
         $page->run();
       }
       else {
+        //Custom Groups Inline
+        $entityType = CRM_Contact_BAO_Contact::getContactType($this->_contactId);
+        $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId);
         $recId = NULL;
         if ($this->_multiRecordDisplay == 'single') {
           $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
-          CRM_Utils_System::setTitle(ts('View %1 Record', array(1 => $groupTitle)));
+          CRM_Utils_System::setTitle(ts('View %1 Record', [1 => $groupTitle]));
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, TRUE, $this->_cgcount
+          );
 
           $recId = $this->_recId;
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $this->assign('skipTitle', 1);
+        }
+        else {
+          $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
+            $this->_groupId, $entitySubType
+          );
         }
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId);
       }

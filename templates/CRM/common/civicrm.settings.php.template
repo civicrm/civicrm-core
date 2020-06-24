@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,6 +28,7 @@
 /**
  * CiviCRM Configuration File.
  */
+global $civicrm_root, $civicrm_setting, $civicrm_paths;
 
 /**
  * Content Management System (CMS) Host:
@@ -65,13 +66,17 @@ if (!defined('CIVICRM_UF')) {
 /**
  * Content Management System (CMS) Datasource:
  *
- * Update this setting with your CMS (Drupal, Backdrop CMS, or Joomla) database username, server and DB name.
+ * Update this setting with your CMS (Drupal, Backdrop CMS, or Joomla) database username, password, server and DB name.
+ * If any of these contain a single quote or backslash, escape those characters with a backslash: \' and \\, respectively.
+ *
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
 if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
   define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true');
 }
+
+// %%extraSettings%%
 
 /**
  * CiviCRM Database Settings
@@ -92,6 +97,9 @@ if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
  *      CiviCRM DB Name = civicrm, CiviCRM DB User = civicrm
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true');
  *
+ * If your username, password, server or DB name contain a single quote or backslash, escape those characters
+ * with a backslash: \' and \\, respectively.
+ *
  */
 if (!defined('CIVICRM_DSN')) {
   if (CIVICRM_UF === 'UnitTests' && isset($GLOBALS['_CV']['TEST_DB_DSN'])) {
@@ -101,6 +109,14 @@ if (!defined('CIVICRM_DSN')) {
     define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true');
   }
 }
+
+/**
+ * CiviCRM DSN Mode
+ * Used to determine if you want CiviCRM to automatically change the dsn to mysqli if its avaliable.
+ * Uncomment and edit below as necessary
+ */
+// define ('DB_DSN_MODE', 'auto');
+
 
 /**
  * CiviCRM Logging Database
@@ -168,6 +184,21 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 }
 
 /**
+ * SMARTY Compile Check:
+ *
+ * This tells Smarty whether to check for recompiling or not. Recompiling
+ * does not need to happen unless a template or config file is changed.
+ * Typically you enable this during development, and disable for production.
+ *
+ * Related issue:
+ * https://lab.civicrm.org/dev/core/issues/1073
+ *
+ */
+//if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK')) {
+//  define( 'CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
+//}
+
+/**
  * Site URLs:
  *
  * This section defines absolute and relative URLs to access the host CMS (Backdrop, Drupal, or Joomla) resources.
@@ -208,47 +239,55 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  *
  * Uncomment and edit the below as appropriate.
  */
- // Add this line only once above any settings overrides.
- //  global $civicrm_setting;
 
  // Override the Temporary Files directory.
- // $civicrm_setting['Directory Preferences']['customFileUploadDir'] = '/path/to/upload';
+ // $civicrm_setting['domain']['uploadDir'] = '/path/to/upload-dir' ;
 
  // Override the custom files upload directory.
- // $civicrm_setting['Directory Preferences']['uploadDir'] = '/path/to/upload-dir' ;
+ // $civicrm_setting['domain']['customFileUploadDir'] = '/path/to/custom-dir';
 
  // Override the images directory.
- // $civicrm_setting['Directory Preferences']['imageUploadDir'] = '/path/to/image-upload-dir' ;
+ // $civicrm_setting['domain']['imageUploadDir'] = '/path/to/image-upload-dir' ;
 
  // Override the custom templates directory.
- // $civicrm_setting['Directory Preferences']['customTemplateDir'] = '/path/to/template-dir';
+ // $civicrm_setting['domain']['customTemplateDir'] = '/path/to/template-dir';
 
  // Override the Custom php path directory.
- // $civicrm_setting['Directory Preferences']['customPHPPathDir'] = '/path/to/custom-php-dir';
+ // $civicrm_setting['domain']['customPHPPathDir'] = '/path/to/custom-php-dir';
 
  // Override the extensions directory.
- // $civicrm_setting['Directory Preferences']['extensionsDir'] = '/path/to/extensions-dir';
+ // $civicrm_setting['domain']['extensionsDir'] = '/path/to/extensions-dir';
 
  // Override the resource url
- // $civicrm_setting['URL Preferences']['userFrameworkResourceURL'] = 'http://example.com/example-resource-url/';
+ // $civicrm_setting['domain']['userFrameworkResourceURL'] = 'http://example.com/example-resource-url/';
 
  // Override the Image Upload URL (System Settings > Resource URLs)
- // $civicrm_setting['URL Preferences']['imageUploadURL'] = 'http://example.com/example-image-upload-url';
+ // $civicrm_setting['domain']['imageUploadURL'] = 'http://example.com/example-image-upload-url';
 
  // Override the Custom CiviCRM CSS URL
- // $civicrm_setting['URL Preferences']['customCSSURL'] = 'http://example.com/example-css-url' ;
+ // $civicrm_setting['domain']['customCSSURL'] = 'http://example.com/example-css-url' ;
 
  // Override the extensions resource URL
- // $civicrm_setting['URL Preferences']['extensionsURL'] = 'http://example.com/pathtoextensiondir'
+ // $civicrm_setting['domain']['extensionsURL'] = 'http://example.com/pathtoextensiondir'
 
  // Disable display of Community Messages on home dashboard
- // $civicrm_setting['CiviCRM Preferences']['communityMessagesUrl'] = false;
+ // $civicrm_setting['domain']['communityMessagesUrl'] = false;
 
  // Disable automatic download / installation of extensions
- // $civicrm_setting['Extension Preferences']['ext_repo_url'] = false;
+ // $civicrm_setting['domain']['ext_repo_url'] = false;
+
+ // set triggers to be managed offline per CRM-18212
+ // $civicrm_setting['domain']['logging_no_trigger_permission'] = 1;
 
  // Override the CMS root path defined by cmsRootPath.
  // define('CIVICRM_CMSDIR', '/path/to/install/root/');
+
+ // Opt-out of announcements by the CiviCRM core team for releases, paid services, events, etc. Separate each preferred optout category with a comma:
+ //   "offers": paid service offers
+ //   "asks": requests for donations or membership signup/renewal to CiviCRM
+ //   "releases": major release announcements
+ //   "events": announcements of local/national upcoming events
+ // $civicrm_setting['domain']['communityMessagesUrl'] = 'https://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}&lang={lang}&co={co}&optout=offers,asks';
 
 
 /**
@@ -280,10 +319,27 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 // define( 'CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log');
 // }
 
+/**
+ * This setting will only work if CIVICRM_MAIL_LOG is defined.  Mail will be logged and then sent.
+ */
+//if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
+//  define( 'CIVICRM_MAIL_LOG_AND_SEND', 1);
+//}
+
 
 if (!defined('CIVICRM_DOMAIN_ID')) {
   define( 'CIVICRM_DOMAIN_ID', 1);
 }
+
+/**
+ * Setting to define the environment in which this CiviCRM instance is running.
+ * Note the setting here must be value from the option group 'Environment',
+ * (see Administration > System Settings > Option Groups, Options beside Environment)
+ * which by default has three option values: 'Production', 'Staging', 'Development'.
+ * NB: defining a value for environment here prevents it from being set
+ * via the browser.
+ */
+// $civicrm_setting['domain']['environment'] = 'Production';
 
 /**
  * Settings to enable external caching using a cache server.  This is an
@@ -322,14 +378,21 @@ if (!defined('CIVICRM_DB_CACHE_HOST')) {
 }
 
 /**
- * Change this if you are not using the standard port for your cache server
+ * Change this if you are not using the standard port for your cache server.
+ *
+ * The standard port for Memcache & APCCache is 11211. For Redis it is 6379.
  */
 if (!defined('CIVICRM_DB_CACHE_PORT')) {
-  define('CIVICRM_DB_CACHE_PORT', 11211 );
+  if (CIVICRM_DB_CACHE_CLASS === 'Redis') {
+    define('CIVICRM_DB_CACHE_PORT', 6379 );
+  }
+  else {
+    define('CIVICRM_DB_CACHE_PORT', 11211);
+  }
 }
 
 /**
- * Change this if your cache server requires a password (currently only works 
+ * Change this if your cache server requires a password (currently only works
  * with Redis)
  */
 if (!defined('CIVICRM_DB_CACHE_PASSWORD')) {
@@ -354,6 +417,14 @@ if (!defined('CIVICRM_DB_CACHE_TIMEOUT')) {
  */
 if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
   define('CIVICRM_DB_CACHE_PREFIX', '');
+}
+
+/**
+ * The cache system traditionally allowed a wide range of cache-keys, but some
+ * cache-keys are prohibited by PSR-16.
+ */
+if (!defined('CIVICRM_PSR16_STRICT')) {
+  define('CIVICRM_PSR16_STRICT', FALSE);
 }
 
 /**
@@ -385,6 +456,13 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 // }
 
 /**
+ * Define how many times to retry a transaction when the DB hits a deadlock
+ * (ie. the database is locked by another transaction). This is an
+ * advanced setting intended for high-traffic databases & experienced developers/ admins.
+ */
+define('CIVICRM_DEADLOCK_RETRIES', 3);
+
+/**
  * Configure MySQL to throw more errors when encountering unusual SQL expressions.
  *
  * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
@@ -394,10 +472,35 @@ if (!defined('CIVICRM_DB_CACHE_PREFIX')) {
 // define('CIVICRM_MYSQL_STRICT', TRUE );
 // }
 
+/**
+ * Specify whether the CRM_Core_BAO_Cache should use the legacy
+ * direct-to-SQL-mode or the interim PSR-16 adapter.
+ */
+// define('CIVICRM_BAO_CACHE_ADAPTER', 'CRM_Core_BAO_Cache_Psr16');
+
 if (CIVICRM_UF === 'UnitTests') {
   if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');
   if (!defined('CIVICRM_MYSQL_STRICT')) define('CIVICRM_MYSQL_STRICT', true);
 }
+
+/**
+ * Whether to include the hash in config log filenames. Defaults to TRUE.
+ * Disable only if you have configured the logfiles to be outside the docroot
+ * using the civicrm.log path setting.
+ *
+ */
+// if (!defined('CIVICRM_LOG_HASH'))  {
+//   define('CIVICRM_LOG_HASH', FALSE );
+// }
+
+/**
+ * The maximum size a log file may be before it's rotated, in bytes.
+ * Set to 0 to disable rotation (only recommended if you have an
+ * external logrotate configuration).
+ */
+// if (!defined('CIVICRM_LOG_ROTATESIZE')) {
+//   define('CIVICRM_LOG_ROTATESIZE', 0 );
+// }
 
 /**
  *
@@ -416,6 +519,12 @@ if ( set_include_path( $include_path ) === false ) {
 
 if (!defined('CIVICRM_CLEANURL')) {
   if ( function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
+    define('CIVICRM_CLEANURL', 1 );
+  }
+  elseif ( function_exists('config_get') && config_get('system.core', 'clean_url') != 0) {
+    define('CIVICRM_CLEANURL', 1 );
+  }
+  elseif( function_exists('get_option') && get_option('permalink_structure') != '' ) {
     define('CIVICRM_CLEANURL', 1 );
   }
   else {

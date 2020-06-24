@@ -171,6 +171,7 @@ function checkColumns(parentRow) {
 
   parentRow.find('div .required').each(function () {
     //special case to handle contact autocomplete select
+    // @todo WHY OH WHY is this duplicated on the tpl file?
     var fieldId = cj(this).attr('id');
     if (fieldId.substring(0, 16) == 'primary_contact_') {
       // if display value is set then make sure we also check if contact id is set

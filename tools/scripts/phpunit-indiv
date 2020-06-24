@@ -54,6 +54,8 @@ fi
 
 #phpunit-ls "$TESTSUITE"
 $BINDIR/phpunit-ls "$TESTSUITE" | while read FILE CLASS METHOD ; do
+  if [ -z "$FILE" -o ! -f "$FILE" ]; then continue; fi
+  echo "[[Processing $FILE $CLASS::$METHOD]]"
   ## Optionally reset DBs
   if [ -n "$CIVIBUILD_RESTORE" ]; then
     civibuild restore "$CIVIBUILD_RESTORE"

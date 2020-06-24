@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -39,14 +23,14 @@
  */
 class CRM_Utils_Address_BatchUpdate {
 
-  var $start = NULL;
-  var $end = NULL;
-  var $geocoding = 1;
-  var $parse = 1;
-  var $throttle = 0;
+  public $start = NULL;
+  public $end = NULL;
+  public $geocoding = 1;
+  public $parse = 1;
+  public $throttle = 0;
 
-  var $returnMessages = array();
-  var $returnError = 0;
+  public $returnMessages = [];
+  public $returnError = 0;
 
   /**
    * Class constructor.
@@ -69,11 +53,9 @@ class CRM_Utils_Address_BatchUpdate {
    */
   public function run() {
 
-    $config = &CRM_Core_Config::singleton();
-
     // do check for geocoding.
     $processGeocode = FALSE;
-    if (empty($config->geocodeMethod)) {
+    if (!CRM_Utils_GeocodeProvider::getUsableClassName()) {
       if (CRM_Utils_String::strtobool($this->geocoding) === TRUE) {
         $this->returnMessages[] = ts('Error: You need to set a mapping provider under Administer > System Settings > Mapping and Geocoding');
         $this->returnError = 1;
@@ -120,31 +102,30 @@ class CRM_Utils_Address_BatchUpdate {
     }
 
     // do check for parse street address.
-    return $this->processContacts($config, $processGeocode, $parseStreetAddress);
+    return $this->processContacts($processGeocode, $parseStreetAddress);
   }
 
   /**
    * Process contacts.
    *
-   * @param CRM_Core_Config $config
    * @param bool $processGeocode
    * @param bool $parseStreetAddress
    *
    * @return array
    * @throws Exception
    */
-  public function processContacts(&$config, $processGeocode, $parseStreetAddress) {
+  public function processContacts($processGeocode, $parseStreetAddress) {
     // build where clause.
-    $clause = array('( c.id = a.contact_id )');
-    $params = array();
+    $clause = ['( c.id = a.contact_id )'];
+    $params = [];
     if ($this->start) {
       $clause[] = "( c.id >= %1 )";
-      $params[1] = array($this->start, 'Integer');
+      $params[1] = [$this->start, 'Integer'];
     }
 
     if ($this->end) {
       $clause[] = "( c.id <= %2 )";
-      $params[2] = array($this->end, 'Integer');
+      $params[2] = [$this->end, 'Integer'];
     }
 
     if ($processGeocode) {
@@ -161,6 +142,7 @@ class CRM_Utils_Address_BatchUpdate {
                a.street_address,
                a.city,
                a.postal_code,
+               a.country_id,
                s.name as state,
                o.name as country
     FROM       civicrm_contact  c
@@ -174,22 +156,20 @@ class CRM_Utils_Address_BatchUpdate {
     $totalGeocoded = $totalAddresses = $totalAddressParsed = 0;
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-    if ($processGeocode) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php';
-    }
 
-    $unparseableContactAddress = array();
+    $unparseableContactAddress = [];
     while ($dao->fetch()) {
       $totalAddresses++;
-      $params = array(
+      $params = [
         'street_address' => $dao->street_address,
         'postal_code' => $dao->postal_code,
         'city' => $dao->city,
         'state_province' => $dao->state,
         'country' => $dao->country,
-      );
+        'country_id' => $dao->country_id,
+      ];
 
-      $addressParams = array();
+      $addressParams = [];
 
       // process geocode.
       if ($processGeocode) {
@@ -203,8 +183,7 @@ class CRM_Utils_Address_BatchUpdate {
             usleep(5000000);
           }
 
-          $className = $config->geocodeMethod;
-          $className::format($params, TRUE);
+          CRM_Core_BAO_Address::addGeocoderData($params);
 
           // see if we got a geocode error, in this case we'll trigger a fatal
           // CRM-13760
@@ -212,7 +191,7 @@ class CRM_Utils_Address_BatchUpdate {
             isset($params['geo_code_error']) &&
             $params['geo_code_error'] == 'OVER_QUERY_LIMIT'
           ) {
-            CRM_Core_Error::fatal('Aborting batch geocoding. Hit the over query limit on geocoder.');
+            throw new CRM_Core_Exception('Aborting batch geocoding. Hit the over query limit on geocoder.');
           }
 
           array_shift($params);
@@ -224,10 +203,7 @@ class CRM_Utils_Address_BatchUpdate {
 
         if (isset($params['geo_code_1']) && $params['geo_code_1'] != 'null') {
           $totalGeocoded++;
-          $addressParams['geo_code_1'] = $params['geo_code_1'];
-          $addressParams['geo_code_2'] = $params['geo_code_2'];
-          $addressParams['postal_code'] = $params['postal_code'];
-          $addressParams['postal_code_suffix'] = CRM_Utils_Array::value('postal_code_suffix', $params);
+          $addressParams = $params;
         }
       }
 
@@ -262,22 +238,21 @@ class CRM_Utils_Address_BatchUpdate {
         $address->id = $dao->address_id;
         $address->copyValues($addressParams);
         $address->save();
-        $address->free();
       }
     }
 
-    $this->returnMessages[] = ts("Addresses Evaluated: %1", array(
+    $this->returnMessages[] = ts("Addresses Evaluated: %1", [
       1 => $totalAddresses,
-      )) . "\n";
+    ]) . "\n";
     if ($processGeocode) {
-      $this->returnMessages[] = ts("Addresses Geocoded: %1", array(
-          1 => $totalGeocoded,
-        )) . "\n";
+      $this->returnMessages[] = ts("Addresses Geocoded: %1", [
+        1 => $totalGeocoded,
+      ]) . "\n";
     }
     if ($parseStreetAddress) {
-      $this->returnMessages[] = ts("Street Addresses Parsed: %1", array(
-          1 => $totalAddressParsed,
-        )) . "\n";
+      $this->returnMessages[] = ts("Street Addresses Parsed: %1", [
+        1 => $totalAddressParsed,
+      ]) . "\n";
       if ($unparseableContactAddress) {
         $this->returnMessages[] = "<br />\n" . ts("Following is the list of contacts whose address is not parsed:") . "<br />\n";
         foreach ($unparseableContactAddress as $contactLink) {
@@ -295,9 +270,20 @@ class CRM_Utils_Address_BatchUpdate {
    * @return array
    */
   public function returnResult() {
-    $result = array();
+    $result = [];
     $result['is_error'] = $this->returnError;
-    $result['messages'] = implode("", $this->returnMessages);
+    $result['messages'] = '';
+    // Pad message size to allow for prefix added by CRM_Core_JobManager.
+    $messageSize = 255;
+    // Ensure that each message can fit in the civicrm_job_log.data column.
+    foreach ($this->returnMessages as $message) {
+      $messageSize += strlen($message);
+      if ($messageSize > CRM_Utils_Type::BLOB_SIZE) {
+        $result['messages'] .= '...';
+        break;
+      }
+      $result['messages'] .= $message;
+    }
     return $result;
   }
 

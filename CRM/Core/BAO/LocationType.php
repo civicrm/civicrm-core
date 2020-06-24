@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -36,9 +20,10 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultLocationType = NULL;
-  static $_billingLocationType = NULL;
+  public static $_defaultLocationType = NULL;
+  public static $_billingLocationType = NULL;
 
   /**
    * Class constructor.
@@ -76,9 +61,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
-   *
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_LocationType', $id, 'is_active', $is_active);
@@ -93,8 +77,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    */
   public static function &getDefault() {
     if (self::$_defaultLocationType == NULL) {
-      $params = array('is_default' => 1);
-      $defaults = array();
+      $params = ['is_default' => 1];
+      $defaults = [];
       self::$_defaultLocationType = self::retrieve($params, $defaults);
     }
     return self::$_defaultLocationType;
@@ -107,7 +91,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    */
   public static function getBilling() {
     if (self::$_billingLocationType == NULL) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', [], 'validate');
       self::$_billingLocationType = array_search('Billing', $locationTypes);
     }
     return self::$_billingLocationType;
@@ -133,7 +117,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
     $locationType->copyValues($params);
     if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     $locationType->save();
@@ -148,7 +132,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    */
   public static function del($locationTypeId) {
-    $entity = array('address', 'phone', 'email', 'im');
+    $entity = ['address', 'phone', 'email', 'im'];
     //check dependencies
     foreach ($entity as $key) {
       if ($key == 'im') {

@@ -1,25 +1,9 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
--- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2015                                |
--- +--------------------------------------------------------------------+
--- | This file is a part of CiviCRM.                                    |
+-- | Copyright CiviCRM LLC. All rights reserved.                        |
 -- |                                                                    |
--- | CiviCRM is free software; you can copy, modify, and distribute it  |
--- | under the terms of the GNU Affero General Public License           |
--- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
--- |                                                                    |
--- | CiviCRM is distributed in the hope that it will be useful, but     |
--- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
--- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
--- | See the GNU Affero General Public License for more details.        |
--- |                                                                    |
--- | You should have received a copy of the GNU Affero General Public   |
--- | License and the CiviCRM Licensing Exception along                  |
--- | with this program; if not, contact CiviCRM LLC                     |
--- | at info[AT]civicrm[DOT]org. If you have questions about the        |
--- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at https://civicrm.org/licensing        |
+-- | This work is published under the GNU AGPLv3 license with some      |
+-- | permitted exceptions and without any warranty. For full license    |
+-- | and copyright information, see https://civicrm.org/licensing       |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from {$smarty.template}
@@ -107,9 +91,9 @@ SELECT @option_group_id_act  := max(id) from civicrm_option_group where name = '
 SELECT @option_value_max_val := max(ROUND(civicrm_option_value.value)) from civicrm_option_value where option_group_id = @option_group_id_act;
 
 INSERT INTO
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `icon`)
 VALUES
-   (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1);
+   (@option_group_id_act, 'Interview', (SELECT @option_value_max_val := @option_value_max_val + 1), 'Interview',  NULL, 0, NULL, @option_value_max_val, 'Conduct a phone or in person interview.', 0, 0, 1, 'fa-comment-o');
 
 INSERT INTO `civicrm_contact_type`
   ( `name`, `label`,`image_URL`, `parent_id`, `is_active`,`is_reserved`)
@@ -135,12 +119,12 @@ INSERT INTO `civicrm_contact_type`
 -- Add sample dashlets
 
 INSERT INTO `civicrm_dashboard`
-    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `column_no`, `is_minimized`, `is_active`, `weight`, `is_fullscreen`, `fullscreen_url`)
+    ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `is_active`, `fullscreen_url`)
     VALUES
-    ( @domain_id, 'report/7', '{ts escape="sql"}Donor Summary{/ts}'       , 'civicrm/report/instance/7?reset=1&section=1&snippet=5&charts=barChart',  'access CiviContribute', 'AND', 0, 0,'1', 4, '1', 'civicrm/report/instance/7?reset=1&section=1&snippet=5&charts=barChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/14', '{ts escape="sql"}Top Donors{/ts}'            , 'civicrm/report/instance/14?reset=1&section=2&snippet=5',                 'access CiviContribute', 'AND', 0, 0,'1', 5, '1', 'civicrm/report/instance/14?reset=1&section=2&snippet=5&context=dashletFullscreen'),
-    ( @domain_id, 'report/27', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/27?reset=1&section=1&snippet=5&charts=pieChart', 'access CiviEvent'     , 'AND', 0, 0,'1', 6, '1', 'civicrm/report/instance/27?reset=1&section=1&snippet=5&charts=pieChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/22', '{ts escape="sql"}Membership Summary{/ts}'  , 'civicrm/report/instance/22?reset=1&section=2&snippet=5',                 'access CiviMember'    , 'AND', 0, 0,'1', 7, '1', 'civicrm/report/instance/22?reset=1&section=2&snippet=5&context=dashletFullscreen');
+    ( @domain_id, 'report/7',  '{ts escape="sql"}Donor Summary{/ts}',        'civicrm/report/instance/7?reset=1&section=1&charts=barChart',  'access CiviContribute', 'AND', '1', 'civicrm/report/instance/7?reset=1&section=1&charts=barChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/14', '{ts escape="sql"}Top Donors{/ts}',           'civicrm/report/instance/14?reset=1&section=2',                 'access CiviContribute', 'AND', '1', 'civicrm/report/instance/14?reset=1&section=2&context=dashletFullscreen'),
+    ( @domain_id, 'report/27', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart', 'access CiviEvent'     , 'AND', '1', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/22', '{ts escape="sql"}Membership Summary{/ts}',   'civicrm/report/instance/22?reset=1&section=2',                 'access CiviMember'    , 'AND', '1', 'civicrm/report/instance/22?reset=1&section=2&context=dashletFullscreen');
 
 -- INSERT sample data for membership
 
@@ -251,4 +235,3 @@ VALUES
     (@priceFieldID,'bass','Bass','25',1,1,1,2),
     (@priceFieldID,'tenor','Tenor','40',2,1,0,2),
     (@priceFieldID,'soprano','Soprano','50',3,1,0,2);
-

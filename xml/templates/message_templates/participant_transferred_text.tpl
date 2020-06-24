@@ -1,4 +1,4 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
 {ts 1=$to_participant}Your Event Registration has been transferred to %1.{/ts}
 
@@ -12,19 +12,7 @@
 {ts}Participant Role{/ts}: {$participant.role}
 
 {if $isShowLocation}
-{if $event.location.address.1.name}
-
-{$event.location.address.1.name}
-{/if}
-{if $event.location.address.1.street_address}{$event.location.address.1.street_address}
-{/if}
-{if $event.location.address.1.supplemental_address_1}{$event.location.address.1.supplemental_address_1}
-{/if}
-{if $event.location.address.1.supplemental_address_2}{$event.location.address.1.supplemental_address_2}
-{/if}
-{if $event.location.address.1.city}{$event.location.address.1.city} {$event.location.address.1.postal_code}{if $event.location.address.1.postal_code_suffix} - $event.location.address.1.postal_code_suffix}{/if}
-{/if}
-
+{$event.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
 {if $event.location.phone.1.phone || $event.location.email.1.email}

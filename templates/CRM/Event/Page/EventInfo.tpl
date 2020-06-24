@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for displaying event information *}
@@ -28,7 +12,7 @@
 {if $registerClosed }
 <div class="spacer"></div>
 <div class="messages status no-popup">
-  <i class="crm-i fa-info-circle"></i>
+  <i class="crm-i fa-info-circle" aria-hidden="true"></i>
      &nbsp;{ts}Registration is closed for this event{/ts}
   </div>
 {/if}
@@ -39,7 +23,7 @@
   <li>
     <div id="crm-event-links-wrapper">
       <span id="crm-event-configure-link" class="crm-hover-button">
-        <span title="{ts}Configure this event.{/ts}" class="crm-i fa-wrench"></span>
+        <span title="{ts}Configure this event.{/ts}" class="crm-i fa-wrench" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
         <div class="crm-event-links-list-inner">
@@ -63,7 +47,7 @@
   <li>
     <div id="crm-participant-wrapper">
       <span id="crm-participant-links" class="crm-hover-button">
-        <span title="{ts}Participant listing links.{/ts}" class="crm-i fa-search"></span>
+        <span title="{ts}Participant listing links.{/ts}" class="crm-i fa-search" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-participant-list" style="margin-left: -25px;">
         <div class="crm-participant-list-inner">
@@ -96,7 +80,7 @@
       {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-top">
-            <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
+            <a href="{$registerURL}" title="{$registerText|escape:'html'}" class="button crm-register-button"><span>{$registerText}</span></a>
           </div>
         {/if}
       {/crmRegion}
@@ -115,24 +99,21 @@
   {/if}
   <div class="clear"></div>
   <div class="crm-section event_date_time-section">
-      <div class="label"><label>{ts}When{/ts}</label></div>
+      <div class="label">{ts}When{/ts}</div>
       <div class="content">
-            <abbr class="dtstart" title="{$event.event_start_date|crmDate}">
-            {$event.event_start_date|crmDate}</abbr>
+        {strip}
+            {$event.event_start_date|crmDate}
             {if $event.event_end_date}
-                &nbsp; {ts}through{/ts} &nbsp;
+                &nbsp;{ts}through{/ts}&nbsp;
                 {* Only show end time if end date = start date *}
                 {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
-                    <abbr class="dtend" title="{$event.event_end_date|crmDate:0:1}">
                     {$event.event_end_date|crmDate:0:1}
-                    </abbr>
                 {else}
-                    <abbr class="dtend" title="{$event.event_end_date|crmDate}">
                     {$event.event_end_date|crmDate}
-                    </abbr>
                 {/if}
             {/if}
-        </div>
+        {/strip}
+      </div>
     <div class="clear"></div>
   </div>
 
@@ -140,7 +121,7 @@
 
         {if $location.address.1}
             <div class="crm-section event_address-section">
-                <div class="label"><label>{ts}Location{/ts}</label></div>
+                <div class="label">{ts}Location{/ts}</div>
                 <div class="content">{$location.address.1.display|nl2br}</div>
                 <div class="clear"></div>
             </div>
@@ -153,7 +134,7 @@
               <div class="content">
                     {assign var=showDirectly value="1"}
                     {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly}
-                    <br /><a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
+                    <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>
           </div>
@@ -164,19 +145,22 @@
 
   {if $location.phone.1.phone || $location.email.1.email}
       <div class="crm-section event_contact-section">
-          <div class="label"><label>{ts}Contact{/ts}</label></div>
+          <div class="label">{ts}Contact{/ts}</div>
           <div class="content">
-              {* loop on any phones and emails for this event *}
               {foreach from=$location.phone item=phone}
                   {if $phone.phone}
-                      {if $phone.phone_type_id}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}:
-                          <span class="tel">{$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if} </span> <br />
-                      {/if}
+                    <div class="crm-eventinfo-contact-phone">
+                      {* @todo This should use "{ts 1=$phone.phone_type_display 2=$phone}%1: %2{/ts}" because some language have nbsp before column *}
+                      {if $phone.phone_type_id}{$phone.phone_type_display}:{else}{ts}Phone:{/ts}{/if}
+                      <span class="tel">{$phone.phone}{if $phone.phone_ext}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
+                    </div>
+                  {/if}
               {/foreach}
-
               {foreach from=$location.email item=email}
                   {if $email.email}
+                    <div class="crm-eventinfo-contact-email">
                       {ts}Email:{/ts} <span class="email"><a href="mailto:{$email.email}">{$email.email}</a></span>
+                    </div>
                   {/if}
               {/foreach}
           </div>
@@ -186,7 +170,7 @@
 
   {if $event.is_monetary eq 1 && $feeBlock.value}
       <div class="crm-section event_fees-section">
-          <div class="label"><label>{$event.fee_label}</label></div>
+          <div class="label">{$event.fee_label}</div>
           <div class="content">
               <table class="form-layout-compressed fee_block-table">
                   {foreach from=$feeBlock.value name=fees item=value}
@@ -227,13 +211,15 @@
       {crmRegion name="event-page-eventinfo-actionlinks-bottom"}
         {if $allowRegistration}
           <div class="action-link section register_link-section register_link-bottom">
-            <a href="{$registerURL}" title="{$registerText}" class="button crm-register-button"><span>{$registerText}</span></a>
+            <a href="{$registerURL}" title="{$registerText|escape:'html'}" class="button crm-register-button"><span>{$registerText}</span></a>
           </div>
         {/if}
       {/crmRegion}
     </div>
     {if $event.is_public }
-        <br />{include file="CRM/Event/Page/iCalLinks.tpl"}
+        <div class="action-link section iCal_links-section">
+          {include file="CRM/Event/Page/iCalLinks.tpl"}
+        </div>
     {/if}
 
     {if $event.is_share }

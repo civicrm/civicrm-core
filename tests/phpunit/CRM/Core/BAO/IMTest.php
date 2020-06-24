@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }
@@ -13,16 +14,16 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
    * Add() method (create and update modes)
    */
   public function testAdd() {
-    $contactId = Contact::createIndividual();
+    $contactId = $this->individualCreate();
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'name' => 'jane.doe',
       'provider_id' => 1,
       'is_primary' => 1,
       'location_type_id' => 1,
       'contact_id' => $contactId,
-    );
+    ];
 
     CRM_Core_BAO_IM::add($params);
 
@@ -32,13 +33,13 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
 
     // Now call add() to modify an existing IM
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'id' => $imId,
       'contact_id' => $contactId,
       'provider_id' => 3,
       'name' => 'doe.jane',
-    );
+    ];
 
     CRM_Core_BAO_IM::add($params);
 
@@ -47,18 +48,14 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'name', 'id', 'Database check on updated IM name record.');
     $this->assertEquals($isEditIM, 'doe.jane', 'Verify IM provider_id value is doe.jane.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
   /**
    * AllIMs() method - get all IMs for our contact, with primary IM first
    */
   public function testAllIMs() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute(
-      $this->_dbconn,
-      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml')
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml');
 
     $contactId = 69;
     $IMs = CRM_Core_BAO_IM::allIMs($contactId);
@@ -70,7 +67,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $this->assertEquals('alan1.smith1', $firstIMValue[0]['name'], 'Confirm primary IM value.');
     $this->assertEquals(1, $firstIMValue[0]['is_primary'], 'Confirm first IM is primary.');
 
-    Contact::delete($contactId);
+    $this->contactDelete($contactId);
   }
 
 }

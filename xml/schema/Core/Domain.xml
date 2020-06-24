@@ -91,12 +91,9 @@
     <type>text</type>
     <title>Domain Configuration</title>
     <comment>Backend configuration.</comment>
-    <html>
-      <type>TextArea</type>
-      <rows>20</rows>
-      <cols>80</cols>
-    </html>
+    <serialize>PHP</serialize>
     <add>1.6</add>
+    <drop>5.23</drop>
   </field>
   <field>
     <name>version</name>
@@ -131,6 +128,7 @@
     <type>text</type>
     <title>Supported Languages</title>
     <comment>list of locales supported by the current db state (NULL for single-lang install)</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>2.1</add>
   </field>
   <field>
@@ -138,11 +136,7 @@
     <type>text</type>
     <title>Language Customizations</title>
     <comment>Locale specific string overrides</comment>
-    <html>
-      <type>TextArea</type>
-      <rows>20</rows>
-      <cols>80</cols>
-    </html>
+    <serialize>PHP</serialize>
     <add>3.2</add>
   </field>
 </table>

@@ -1,6 +1,6 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
-  angular.module('crmUtil', []);
+  angular.module('crmUtil', CRM.angRequires('crmUtil'));
 
   // Angular implementation of CRM.api3
   // @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
@@ -16,6 +16,11 @@
       var deferred = $q.defer();
       var p;
       var backend = crmApi.backend || CRM.api3;
+      if (params && params.body_html) {
+        // CRM-18474 - remove Unicode Character 'LINE SEPARATOR' (U+2028)
+        // and 'PARAGRAPH SEPARATOR' (U+2029) from the html if present.
+        params.body_html = params.body_html.replace(/([\u2028]|[\u2029])/g, '\n');
+      }
       if (_.isObject(entity)) {
         // eval content is locally generated.
         /*jshint -W061 */
@@ -298,6 +303,58 @@
       };
 
       return this;
+    };
+  });
+
+  // Run a given function. If it is already running, wait for it to finish before running again.
+  // If multiple requests are made before the first request finishes, all but the last will be ignored.
+  // This prevents overwhelming the server with redundant queries during e.g. an autocomplete search while the user types.
+  // Given function should return an angular promise. crmThrottle will deliver the contents when resolved.
+  angular.module('crmUtil').factory('crmThrottle', function($q) {
+    var pending = [],
+      executing = [];
+    return function(func) {
+      var deferred = $q.defer();
+
+      function checkResult(result, success) {
+        _.pull(executing, func);
+        if (_.includes(pending, func)) {
+          runNext();
+        } else if (success) {
+          deferred.resolve(result);
+        } else {
+          deferred.reject(result);
+        }
+      }
+
+      function runNext() {
+        executing.push(func);
+        _.pull(pending, func);
+        func().then(function(result) {
+          checkResult(result, true);
+        }, function(result) {
+          checkResult(result, false);
+        });
+      }
+
+      if (!_.includes(executing, func)) {
+        runNext();
+      } else if (!_.includes(pending, func)) {
+        pending.push(func);
+      }
+      return deferred.promise;
+    };
+  });
+
+  angular.module('crmUtil').factory('crmLoadScript', function($q) {
+    return function(url) {
+      var deferred = $q.defer();
+
+      CRM.loadScript(url).done(function() {
+        deferred.resolve(true);
+      });
+
+      return deferred.promise;
     };
   });
 

@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if (!$chartEnabled || !$chartSupported )&& $rows}
@@ -40,12 +24,12 @@
                 {/if}
                 {if !$skip}
                    {if $header.colspan}
-                       <th colspan={$header.colspan}>{$header.title}</th>
+                       <th colspan={$header.colspan}>{$header.title|escape}</th>
                       {assign var=skip value=true}
                       {assign var=skipCount value=`$header.colspan`}
                       {assign var=skipMade  value=1}
                    {else}
-                       <th {$class}>{$header.title}</th>
+                       <th {$class}>{$header.title|escape}</th>
                    {assign var=skip value=false}
                    {/if}
                 {else} {* for skip case *}
@@ -93,7 +77,7 @@
                     {$l}/if{$r}
                     <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}"><th colspan="{$columnCount}">
 
-                        <h{$h}>{$section.title}: {$l}$printValue|default:"<em>none</em>"{$r}
+                        <h{$h}>{$section.title|escape}: {$l}$printValue|default:"<em>none</em>"{$r}
                             ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
                         </h{$h}>
                     </th></tr>
@@ -110,9 +94,10 @@
                 {foreach from=$columnHeaders item=header key=field}
                     {assign var=fieldLink value=$field|cat:"_link"}
                     {assign var=fieldHover value=$field|cat:"_hover"}
+                    {assign var=fieldClass value=$field|cat:"_class"}
                     <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
                         {if $row.$fieldLink}
-                            <a title="{$row.$fieldHover}" href="{$row.$fieldLink}">
+                            <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if $row.$fieldClass} class="{$row.$fieldClass}"{/if}>
                         {/if}
 
                         {if $row.$field eq 'Subtotal'}

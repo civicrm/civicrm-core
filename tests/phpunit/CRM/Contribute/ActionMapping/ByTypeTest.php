@@ -1,31 +1,23 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
+ * Class CRM_Contribute_ActionMapping_ByTypeTest
+ * @group ActionSchedule
+ *
+ * This class tests various configurations of scheduled-reminders, with a focus on
+ * reminders for *contribution types*. It follows a design/pattern described in
+ * AbstractMappingTest.
+ *
+ * @see \Civi\ActionSchedule\AbstractMappingTest
  * @group headless
  */
 class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\AbstractMappingTest {
@@ -44,81 +36,122 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    *        - subject: regex
    */
   public function createTestCases() {
-    $cs = array();
+    $cs = [];
 
-    $cs[] = array(
+    // FIXME: CRM-19415: The right email content goes out, but it appears that the dates are incorrect.
+    //    $cs[] = array(
+    //      '2015-02-01 00:00:00',
+    //      'addAliceDues scheduleForAny startOnTime useHelloFirstName alsoRecipientBob',
+    //      array(
+    //        array(
+    //          'time' => '2015-02-01 00:00:00',
+    //          'to' => array('alice@example.org'),
+    //          'subject' => '/Hello, Alice.*via subject/',
+    //        ),
+    //        array(
+    //          'time' => '2015-02-01 00:00:00',
+    //          'to' => array('bob@example.org'),
+    //          'subject' => '/Hello, Bob.*via subject/',
+    //          // It might make more sense to get Alice's details... but path of least resistance...
+    //        ),
+    //      ),
+    //    );
+
+    $cs[] = [
       '2015-02-01 00:00:00',
-      'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstNameStatus',
-      array(
-        array(
-          'time' => '2015-02-01 00:00:00',
-          'to' => array('alice@example.org'),
-          'subject' => '/Hello, Alice. @Completed.*via subject/',
-        ),
-      ),
-    );
+      'addAliceDues scheduleForAny startOnTime useHelloFirstName limitToRecipientBob',
+      [],
+    ];
 
-    $cs[] = array(
+    $cs[] = [
+      '2015-02-01 00:00:00',
+      'addAliceDues scheduleForAny startOnTime useHelloFirstName limitToRecipientAlice',
+      [
+        [
+          'time' => '2015-02-01 00:00:00',
+          'to' => ['alice@example.org'],
+          'subject' => '/Hello, Alice.*via subject/',
+        ],
+      ],
+    ];
+
+    $cs[] = [
+      '2015-02-01 00:00:00',
+      // 'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstName',
+      'addAliceDues addBobDonation scheduleForDues startOnTime useHelloFirstNameStatus',
+      [
+        [
+          'time' => '2015-02-01 00:00:00',
+          'to' => ['alice@example.org'],
+          'subject' => '/Hello, Alice. @Completed.*via subject/',
+        ],
+      ],
+    ];
+
+    $cs[] = [
       '2015-02-01 00:00:00',
       'addAliceDues addBobDonation scheduleForAny startOnTime useHelloFirstName',
-      array(
-        array(
+      [
+        [
           'time' => '2015-02-01 00:00:00',
-          'to' => array('alice@example.org'),
+          'to' => ['alice@example.org'],
           'subject' => '/Hello, Alice.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-01 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
-    $cs[] = array(
+    $cs[] = [
       '2015-02-02 00:00:00',
       'addAliceDues addBobDonation scheduleForDonation startWeekBefore repeatTwoWeeksAfter useHelloFirstName',
-      array(
-        array(
+      [
+        [
           'time' => '2015-01-26 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-02 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-09 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-16 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
-    $cs[] = array(
+    $cs[] = [
       '2015-02-03 00:00:00',
       'addAliceDues addBobDonation scheduleForSoftCreditor startWeekAfter useHelloFirstName',
-      array(
-        array(
+      [
+        [
           'time' => '2015-02-10 00:00:00',
-          'to' => array('carol@example.org'),
+          'to' => ['carol@example.org'],
           'subject' => '/Hello, Carol.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     return $cs;
   }
 
+  /**
+   * Create a contribution record for Alice with type "Member Dues".
+   */
   public function addAliceDues() {
-    $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '100',
@@ -128,18 +161,21 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'net_amount' => '95',
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'soft_credit' => array(
-        '1' => array(
+      'soft_credit' => [
+        '1' => [
           'contact_id' => $this->contacts['carol']['id'],
           'amount' => 50,
           'soft_credit_type_id' => 3,
-        ),
-      ),
-    ));
+        ],
+      ],
+    ]);
   }
 
+  /**
+   * Create a contribution record for Bob with type "Donation".
+   */
   public function addBobDonation() {
-    $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['bob']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '150',
@@ -149,23 +185,32 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'net_amount' => '145',
       'source' => 'SSF',
       'contribution_status_id' => 2,
-    ));
+    ]);
   }
 
+  /**
+   * Schedule message delivery for contributions of type "Member Dues".
+   */
   public function scheduleForDues() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(1));
-    $this->schedule->entity_status = CRM_Utils_Array::implodePadded(array(1));
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([1]);
+    $this->schedule->entity_status = CRM_Utils_Array::implodePadded([1]);
   }
 
+  /**
+   * Schedule message delivery for contributions of type "Donation".
+   */
   public function scheduleForDonation() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(2));
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
+  /**
+   * Schedule message delivery for any contribution, regardless of type.
+   */
   public function scheduleForAny() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
@@ -173,6 +218,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
+  /**
+   * Schedule message delivery to the 'soft credit' assignee.
+   */
   public function scheduleForSoftCreditor() {
     $this->schedule->mapping_id = CRM_Contribute_ActionMapping_ByType::MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
@@ -180,7 +228,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
     $this->schedule->limit_to = 1;
     $this->schedule->recipient = 'soft_credit_type';
-    $this->schedule->recipient_listing = CRM_Utils_Array::implodePadded(array(3));
+    $this->schedule->recipient_listing = CRM_Utils_Array::implodePadded([3]);
   }
 
   public function useHelloFirstNameStatus() {

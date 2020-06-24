@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -81,12 +65,12 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function createUser(&$params, $mail) {
-    $form_state = array();
-    $form_state['values'] = array(
+    $form_state = [];
+    $form_state['values'] = [
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
       'op' => 'Create new account',
-    );
+    ];
 
     $admin = user_access('administer users');
     if (!variable_get('user_email_verification', TRUE) || $admin) {
@@ -122,10 +106,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   public function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
-      $user = user_load(array('uid' => $ufID));
+      $user = user_load(['uid' => $ufID]);
       if ($user->mail != $ufName) {
-        user_save($user, array('mail' => $ufName));
-        $user = user_load(array('uid' => $ufID));
+        user_save($user, ['mail' => $ufName]);
+        $user = user_load(['uid' => $ufID]);
       }
     }
   }
@@ -165,6 +149,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       $errors['cms_name'] = $nameError;
     }
 
+    // LOWER in query below roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
     $sql = "
       SELECT name, mail
       FROM {users}
@@ -180,22 +165,22 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $user = NULL;
 
     if (!empty($row)) {
-      $dbName = CRM_Utils_Array::value('name', $row);
-      $dbEmail = CRM_Utils_Array::value('mail', $row);
+      $dbName = $row['name'] ?? NULL;
+      $dbEmail = $row['mail'] ?? NULL;
       if (strtolower($dbName) == strtolower($name)) {
         $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.',
-          array(1 => $name)
+          [1 => $name]
         );
       }
       if (strtolower($dbEmail) == strtolower($email)) {
         if (empty($email)) {
           $errors[$emailName] = ts('You cannot create an email account for a contact with no email',
-            array(1 => $email)
+            [1 => $email]
           );
         }
         else {
           $errors[$emailName] = ts('This email %1 already has an account associated with it. Please select another email.',
-            array(1 => $email)
+            [1 => $email]
           );
         }
       }
@@ -224,7 +209,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
         if (stripos($crumbs['url'], 'id%%')) {
-          $args = array('cid', 'mid');
+          $args = ['cid', 'mid'];
           foreach ($args as $a) {
             $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
               FALSE, NULL, $_GET
@@ -244,7 +229,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function resetBreadCrumb() {
-    $bc = array();
+    $bc = [];
     drupal_set_breadcrumb($bc);
   }
 
@@ -287,6 +272,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $base_url = str_replace('http://', 'https://', $base_url);
   }
 
+  /**
+   * Get the name of the table that stores the user details.
+   *
+   * @return string
+   */
   protected function getUsersTableName() {
     $userFrameworkUsersTableName = Civi::settings()->get('userFrameworkUsersTableName');
     if (empty($userFrameworkUsersTableName)) {
@@ -312,7 +302,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
     $dbDrupal = DB::connect($config->userFrameworkDSN);
     if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
+      throw new CRM_Core_Exception("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
     }
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -333,16 +323,16 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       else {
         //success
         if ($loadCMSBootstrap) {
-          $bootStrapParams = array();
+          $bootStrapParams = [];
           if ($name && $password) {
-            $bootStrapParams = array(
+            $bootStrapParams = [
               'name' => $name,
               'pass' => $password,
-            );
+            ];
           }
           CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
         }
-        return array($contactID, $row['uid'], mt_rand());
+        return [$contactID, $row['uid'], mt_rand()];
       }
     }
     return FALSE;
@@ -353,7 +343,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    */
   public function loadUser($username) {
     global $user;
-    $user = user_load(array('name' => $username));
+    $user = user_load(['name' => $username]);
     if (empty($user->uid)) {
       return FALSE;
     }
@@ -377,7 +367,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * FIXME: Document values accepted/required by $params
    */
-  public function userLoginFinalize($params = array()) {
+  public function userLoginFinalize($params = []) {
     user_authenticate_finalize($params);
   }
 
@@ -385,10 +375,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * Determine the native ID of the CMS user.
    *
    * @param string $username
-   * @return int|NULL
+   * @return int|null
    */
   public function getUfId($username) {
-    $user = user_load(array('name' => $username));
+    $user = user_load(['name' => $username]);
     if (empty($user->uid)) {
       return NULL;
     }
@@ -416,7 +406,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @return bool
    */
-  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
     $cmsPath = $this->cmsRootPath($realPath);
 
@@ -470,14 +460,14 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
     global $user;
     // If $uid is passed in, authentication has been done already.
-    $uid = CRM_Utils_Array::value('uid', $params);
+    $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       //load user, we need to check drupal permissions.
       $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
 
       if ($name) {
-        $user = user_authenticate(array('name' => $name, 'pass' => $pass));
+        $user = user_authenticate(['name' => $name, 'pass' => $pass]);
         if (!$user->uid) {
           if ($throwError) {
             echo '<br />Sorry, unrecognized username or password.';
@@ -537,6 +527,12 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       // drush anyway takes care of multisite install etc
       return drush_get_context('DRUSH_DRUPAL_ROOT');
     }
+
+    global $civicrm_paths;
+    if (!empty($civicrm_paths['cms.root']['path'])) {
+      return $civicrm_paths['cms.root']['path'];
+    }
+
     // CRM-7582
     $pathVars = explode('/',
       str_replace('//', '/',
@@ -589,7 +585,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       user_is_logged_in() &&
       function_exists('user_uid_optional_to_arg')
     ) {
-      $ufID = user_uid_optional_to_arg(array());
+      $ufID = user_uid_optional_to_arg([]);
     }
 
     return $ufID;
@@ -616,10 +612,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       //url prefix / path.
       if (isset($language->prefix) &&
         $language->prefix &&
-        in_array($mode, array(
+        in_array($mode, [
           LANGUAGE_NEGOTIATION_PATH,
           LANGUAGE_NEGOTIATION_PATH_DEFAULT,
-        ))
+        ])
       ) {
 
         if ($addLanguagePart) {
@@ -688,10 +684,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getModules() {
-    $result = array();
+    $result = [];
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     while ($row = db_fetch_object($q)) {
-      $result[] = new CRM_Core_Module('drupal.' . $row->name, ($row->status == 1) ? TRUE : FALSE);
+      $result[] = new CRM_Core_Module('drupal.' . $row->name, $row->status == 1);
     }
     return $result;
   }
@@ -719,7 +715,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *   Drupal User ID.
    */
   public function og_membership_create($ogID, $drupalID) {
-    og_save_subscription($ogID, $drupalID, array('is_active' => 1));
+    og_save_subscription($ogID, $drupalID, ['is_active' => 1]);
   }
 
   /**
@@ -746,9 +742,18 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     else {
       $timezone = variable_get('date_default_timezone', NULL);
     }
+
+    // Retrieved timezone will be represented as GMT offset in seconds but, according
+    // to the doc for the overridden method, ought to be returned as a region string
+    // (e.g., America/Havana).
+    if (strlen($timezone)) {
+      $timezone = timezone_name_from_abbr("", (int) $timezone);
+    }
+
     if (!$timezone) {
       $timezone = parent::getTimeZoneString();
     }
+
     return $timezone;
   }
 
@@ -767,7 +772,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if (PHP_SAPI != 'cli') {
       set_time_limit(300);
     }
-    $rows = array();
+    $rows = [];
     $id = 'uid';
     $mail = 'mail';
     $name = 'name';
@@ -794,16 +799,13 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       else {
         $contactMatching++;
       }
-      if (is_object($match)) {
-        $match->free();
-      }
     }
 
-    return array(
+    return [
       'contactCount' => $contactCount,
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
-    );
+    ];
   }
 
 }

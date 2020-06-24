@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,11 +25,15 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    */
   public function preProcess() {
     if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
-      CRM_Core_Error::fatal(ts('The <a href="%1">SMS Provider</a> has not been configured or is not active.', array(1 => CRM_Utils_System::url('civicrm/admin/sms/provider', 'reset=1'))));
+      CRM_Core_Error::statusBounce(ts('The <a href="%1">SMS Provider</a> has not been configured or is not active.', [1 => CRM_Utils_System::url('civicrm/admin/sms/provider', 'reset=1')]));
     }
 
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/mailing/browse', 'reset=1&sms=1'));
+
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $this->assign('isAdmin', 1);
+    }
   }
 
   /**
@@ -56,7 +44,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
 
-    $defaults = array();
+    $defaults = [];
 
     if ($mailingID) {
       $mailing = new CRM_Mailing_DAO_Mailing();
@@ -66,7 +54,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
       $defaults['name'] = $mailing->name;
       if (!$continue) {
-        $defaults['name'] = ts('Copy of %1', array(1 => $mailing->name));
+        $defaults['name'] = ts('Copy of %1', [1 => $mailing->name]);
       }
       else {
         // CRM-7590, reuse same mailing ID if we are continuing
@@ -75,7 +63,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
       $dao = new CRM_Mailing_DAO_MailingGroup();
 
-      $mailingGroups = array();
+      $mailingGroups = [];
       $dao->mailing_id = $mailingID;
       $dao->find();
       while ($dao->fetch()) {
@@ -83,7 +71,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       }
 
       $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
-      $defaults['excludeGroups'] = CRM_Utils_Array::value('Exclude', $mailingGroups['civicrm_group']);
+      $defaults['excludeGroups'] = $mailingGroups['civicrm_group']['Exclude'] ?? NULL;
 
       $defaults['includeMailings'] = CRM_Utils_Array::value('Include', CRM_Utils_Array::value('civicrm_mailing', $mailingGroups));
       $defaults['excludeMailings'] = CRM_Utils_Array::value('Exclude', CRM_Utils_Array::value('civicrm_mailing', $mailingGroups));
@@ -107,24 +95,30 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       TRUE
     );
 
+    $this->add('select', 'sms_provider_id',
+      ts('Select SMS Provider'),
+      CRM_Utils_Array::collect('title', CRM_SMS_BAO_Provider::getProviders()),
+      TRUE
+    );
+
     // Get the mailing groups.
     $groups = CRM_Core_PseudoConstant::nestedGroup('Mailing');
 
     // Get the sms mailing list.
     $mailings = CRM_Mailing_PseudoConstant::completed('sms');
     if (!$mailings) {
-      $mailings = array();
+      $mailings = [];
     }
 
     // run the groups through a hook so users can trim it if needed
     CRM_Utils_Hook::mailingGroups($this, $groups, $mailings);
 
-    $select2style = array(
+    $select2style = [
       'multiple' => TRUE,
       'style' => 'width: 100%; max-width: 60em;',
       'class' => 'crm-select2',
       'placeholder' => ts('- select -'),
-    );
+    ];
 
     $this->add('select', 'includeGroups',
       ts('Include Group(s)'),
@@ -153,20 +147,20 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       $select2style
     );
 
-    $this->addFormRule(array('CRM_SMS_Form_Group', 'formRule'));
+    $this->addFormRule(['CRM_SMS_Form_Group', 'formRule']);
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'next',
         'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    );
+      ],
+    ];
 
     $this->addButtons($buttons);
 
@@ -177,15 +171,20 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   public function postProcess() {
     $values = $this->controller->exportValues($this->_name);
 
-    $groups = array();
+    $groups = [];
 
-    foreach (array(
+    foreach ([
       'name',
       'group_id',
       'is_sms',
-    ) as $n) {
+      'sms_provider_id',
+    ] as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
+        if ($n == 'sms_provider_id') {
+          // Get the from Name.
+          $params['from_name'] = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $params['sms_provider_id'], 'username');
+        }
       }
     }
 
@@ -212,7 +211,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       }
     }
 
-    $mailings = array();
+    $mailings = [];
     if (is_array($inMailings)) {
       foreach ($inMailings as $key => $id) {
         if ($id) {
@@ -231,7 +230,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $session = CRM_Core_Session::singleton();
     $params['groups'] = $groups;
     $params['mailings'] = $mailings;
-    $ids = array();
+    $ids = [];
     if ($this->get('mailing_id')) {
 
       // don't create a new mass sms if already exists
@@ -241,10 +240,10 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
 
       // delete previous includes/excludes, if mailing already existed
-      foreach (array(
+      foreach ([
         'groups',
         'mailings',
-      ) as $entity) {
+      ] as $entity) {
         $mg = new CRM_Mailing_DAO_MailingGroup();
         $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;
@@ -266,12 +265,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
     $this->set('mailing_id', $mailing->id);
 
     // also compute the recipients and store them in the mailing recipients table
-    CRM_Mailing_BAO_Mailing::getRecipients($mailing->id,
-      $mailing->id,
-      TRUE,
-      FALSE,
-      'sms'
-    );
+    CRM_Mailing_BAO_Mailing::getRecipients($mailing->id);
 
     $count = CRM_Mailing_BAO_Recipients::mailingSize($mailing->id);
     $this->set('count', $count);
@@ -307,13 +301,13 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
-    $errors = array();
+    $errors = [];
     if (isset($fields['includeGroups']) &&
       is_array($fields['includeGroups']) &&
       isset($fields['excludeGroups']) &&
       is_array($fields['excludeGroups'])
     ) {
-      $checkGroups = array();
+      $checkGroups = [];
       $checkGroups = array_intersect($fields['includeGroups'], $fields['excludeGroups']);
       if (!empty($checkGroups)) {
         $errors['excludeGroups'] = ts('Cannot have same groups in Include Group(s) and Exclude Group(s).');
@@ -325,7 +319,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       isset($fields['excludeMailings']) &&
       is_array($fields['excludeMailings'])
     ) {
-      $checkMailings = array();
+      $checkMailings = [];
       $checkMailings = array_intersect($fields['includeMailings'], $fields['excludeMailings']);
       if (!empty($checkMailings)) {
         $errors['excludeMailings'] = ts('Cannot have same sms in Include mailing(s) and Exclude mailing(s).');

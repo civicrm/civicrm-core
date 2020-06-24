@@ -121,6 +121,7 @@
      <path>civicrm/contact/merge</path>
      <title>Merge Contact</title>
      <page_callback>CRM_Contact_Form_Merge</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
   </item>
   <item>
      <path>civicrm/contact/email</path>
@@ -247,7 +248,7 @@
   </item>
   <item>
      <path>civicrm/dashlet/getting-started</path>
-     <title>Getting Started</title>
+     <title>CiviCRM Resources</title>
      <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
   </item>
 
@@ -342,7 +343,6 @@
    <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
    <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
    <adminGroup>Manage</adminGroup>
-   <icon>admin/small/duplicate_matching.png</icon>
    <weight>105</weight>
 </item>
 <item>
@@ -400,6 +400,7 @@
   <path_arguments>action=add</path_arguments>
   <title>Activities</title>
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
+  <access_arguments>send SMS</access_arguments>
 </item>
   <item>
     <path>civicrm/ajax/contactrelationships</path>

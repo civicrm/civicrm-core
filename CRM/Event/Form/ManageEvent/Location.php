@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -53,7 +37,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    *
    * @var array
    */
-  protected $_locationIds = array();
+  protected $_locationIds = [];
 
   /**
    * The variable, for storing location block id with event
@@ -64,26 +48,28 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
    * Get the db values for this form.
+   * @var array
    */
-  public $_values = array();
+  public $_values = [];
 
   /**
    * Set variables up before form is built.
    */
   public function preProcess() {
     parent::preProcess();
+    $this->setSelectedChild('location');
 
     $this->_values = $this->get('values');
     if ($this->_id && empty($this->_values)) {
       //get location values.
-      $params = array(
+      $params = [
         'entity_id' => $this->_id,
         'entity_table' => 'civicrm_event',
-      );
+      ];
       $this->_values = CRM_Core_BAO_Location::getValues($params);
 
       //get event values.
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       CRM_Event_BAO_Event::retrieve($params, $this->_values);
       $this->set('values', $this->_values);
     }
@@ -124,7 +110,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Event_Form_ManageEvent_Location', 'formRule'));
+    $this->addFormRule(['CRM_Event_Form_ManageEvent_Location', 'formRule']);
   }
 
   /**
@@ -138,7 +124,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public static function formRule($fields) {
     // check for state/country mapping
-    $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
+    $errors = CRM_Contact_Form_Edit_Address::formRule($fields);
 
     return empty($errors) ? TRUE : $errors;
   }
@@ -147,16 +133,13 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    * Function to build location block.
    */
   public function buildQuickForm() {
-    //load form for child blocks
-    if ($this->_addBlockName) {
-      $className = "CRM_Contact_Form_Edit_{$this->_addBlockName}";
-      return $className::buildQuickForm($this);
-    }
+    CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 2);
+    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
+    CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 2);
 
     $this->applyFilter('__ALL__', 'trim');
-
-    //build location blocks.
-    CRM_Contact_Form_Location::buildQuickForm($this);
 
     //fix for CRM-1971
     $this->assign('action', $this->_action);
@@ -184,20 +167,19 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       $locationEvents = array_unique($locationEvents);
     }
 
-    $events = array();
     if (!empty($locationEvents)) {
       $this->assign('locEvents', TRUE);
-      $optionTypes = array(
+      $optionTypes = [
         '1' => ts('Create new location'),
         '2' => ts('Use existing location'),
-      );
+      ];
 
       $this->addRadio('location_option', ts("Choose Location"), $optionTypes);
 
       if (!isset($locationEvents[$this->_oldLocBlockId]) || (!$this->_oldLocBlockId)) {
-        $locationEvents = array('' => ts('- select -')) + $locationEvents;
+        $locationEvents = ['' => ts('- select -')] + $locationEvents;
       }
-      $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents);
+      $this->add('select', 'loc_event_id', ts('Use Location'), $locationEvents, FALSE, ['class' => 'crm-select2']);
     }
     $this->addElement('advcheckbox', 'is_show_location', ts('Show Location?'));
     parent::buildQuickForm();
@@ -231,7 +213,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       );
     }
 
-    // if 'create new loc' optioin is selected OR selected new loc is different
+    $this->_values['address'] = $this->_values['phone'] = $this->_values['email'] = [];
+    // if 'create new loc' option is selected OR selected new loc is different
     // from old one, go ahead and delete the old loc provided thats not being
     // used by any other event
     if ($this->_oldLocBlockId && $deleteOldBlock) {
@@ -243,11 +226,11 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $params['entity_id'] = $this->_id;
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    foreach (array(
-               'address',
-               'phone',
-               'email',
-             ) as $block) {
+    foreach ([
+      'address',
+      'phone',
+      'email',
+    ] as $block) {
       if (empty($params[$block]) || !is_array($params[$block])) {
         continue;
       }
@@ -256,12 +239,14 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
           $values['is_primary'] = 1;
         }
         $values['location_type_id'] = ($defaultLocationType->id) ? $defaultLocationType->id : 1;
+        if (isset($this->_values[$block][$count])) {
+          $values['id'] = $this->_values[$block][$count]['id'];
+        }
       }
     }
 
     // create/update event location
-    $location = CRM_Core_BAO_Location::create($params, TRUE, 'event');
-    $params['loc_block_id'] = $location['id'];
+    $params['loc_block_id'] = CRM_Core_BAO_Location::create($params, TRUE, 'event')['id'];
 
     // finally update event params
     $params['id'] = $this->_id;

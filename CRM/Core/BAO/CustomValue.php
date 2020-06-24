@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -157,7 +141,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     }
   }
 
-
   /**
    * @param array $formValues
    * @return null
@@ -183,14 +166,14 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
       if (is_array($formValues[$key])) {
         if (!in_array(key($formValues[$key]), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $formValues[$key] = array('IN' => $formValues[$key]);
+          $formValues[$key] = ['IN' => $formValues[$key]];
         }
       }
       elseif (($htmlType == 'TextArea' ||
           ($htmlType == 'Text' && $dataType == 'String')
         ) && strstr($formValues[$key], '%')
       ) {
-        $formValues[$key] = array('LIKE' => $formValues[$key]);
+        $formValues[$key] = ['LIKE' => $formValues[$key]];
       }
     }
   }
@@ -207,15 +190,32 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     // first we need to find custom value table, from custom group ID
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 
+    // Retrieve the $entityId so we can pass that to the hook.
+    $entityID = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
+      1 => [$customValueID, 'Integer'],
+    ]);
+
     // delete custom value from corresponding custom value table
     $sql = "DELETE FROM {$tableName} WHERE id = {$customValueID}";
     CRM_Core_DAO::executeQuery($sql);
 
     CRM_Utils_Hook::custom('delete',
       $customGroupID,
-      NULL,
+      $entityID,
       $customValueID
     );
+  }
+
+  /**
+   * ACL clause for an APIv4 custom pseudo-entity (aka multi-record custom group extending Contact).
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    $clauses = [
+      'entity_id' => CRM_Utils_SQL::mergeSubquery('Contact'),
+    ];
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }

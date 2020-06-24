@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if ($action eq 1 or $action eq 2 or $action eq 4 or $action eq 8  and !$usedBy) and !$isReserved}
@@ -54,6 +38,9 @@
           <tr>
             <th>{ts}Option Label{/ts}</th>
             <th>{ts}Option Amount{/ts}</th>
+            <th>{ts}Non-deductible Amount{/ts}</th>
+            <th>{ts}Pre Help{/ts}</th>
+            <th>{ts}Post Help{/ts}</th>
             {if $isEvent}
               <th>{ts}Participant Count{/ts}</th>
               <th>{ts}Maximum{/ts}</th>
@@ -74,16 +61,19 @@
             <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
               <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
+              <td class="crm-price-option-non-deductible-amount">{$row.non_deductible_amount|crmMoney}</td>
+              <td class="crm-price-option-pre-help">{$row.help_pre}</td>
+              <td class="crm-price-option-post-help">{$row.help_post}</td>
               {if $isEvent}
                 <td class="crm-price-option-count">{$row.count}</td>
                 <td class="crm-price-option-max">{$row.max_value}</td>
               {/if}
-              <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
+              <td class="crm-price-option-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight}</td>
               {if $getTaxDetails}
                 <td>{if $row.tax_rate != '' }
-                      {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
+                      {$taxTerm} ({$row.tax_rate}%)
                     {/if}
                 </td>
                 <td>{$row.tax_amount|crmMoney}</td>

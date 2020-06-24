@@ -32,7 +32,8 @@
   <field>
     <name>time_stamp</name>
     <title>Confirm Timestamp</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP</default>
     <required>true</required>
     <comment>When this confirmation event occurred.</comment>
   </field>

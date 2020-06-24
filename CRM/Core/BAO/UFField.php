@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,10 +22,96 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
   /**
    * Batch entry fields.
+   * @var array
    */
   private static $_contriBatchEntryFields = NULL;
   private static $_memberBatchEntryFields = NULL;
 
+  /**
+   * Create UFField object.
+   *
+   * @param array $params
+   *   Array per getfields metadata.
+   *
+   * @return \CRM_Core_BAO_UFField
+   * @throws \API_Exception
+   */
+  public static function create($params) {
+    $id = $params['id'] ?? NULL;
+
+    $op = empty($id) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre('UFField', $op, $id, $params);
+    // Merge in data from existing field
+    if (!empty($id)) {
+      $UFField = new CRM_Core_BAO_UFField();
+      $UFField->id = $params['id'];
+      if ($UFField->find(TRUE)) {
+        $defaults = $UFField->toArray();
+        // This will be calculated based on field name
+        unset($defaults['field_type']);
+        $params += $defaults;
+      }
+      else {
+        throw new API_Exception("UFFIeld id {$params['id']} not found.");
+      }
+    }
+
+    // Validate field_name
+    if (strpos($params['field_name'], 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($params['field_name'])) {
+      throw new API_Exception('The field_name is not valid');
+    }
+
+    // Supply default label if not set
+    if (empty($id) && !isset($params['label'])) {
+      $params['label'] = self::getAvailableFieldTitles()[$params['field_name']];
+    }
+
+    // Supply field_type if not set
+    if (empty($params['field_type']) && strpos($params['field_name'], 'formatting') !== 0) {
+      $params['field_type'] = CRM_Utils_Array::pathGet(self::getAvailableFieldsFlat(), [$params['field_name'], 'field_type']);
+    }
+    elseif (empty($params['field_type'])) {
+      $params['field_type'] = 'Formatting';
+    }
+
+    // Generate unique name for formatting fields
+    if ($params['field_name'] === 'formatting') {
+      $params['field_name'] = 'formatting_' . substr(uniqid(), -4);
+    }
+
+    if (self::duplicateField($params)) {
+      throw new API_Exception("The field was not added. It already exists in this profile.");
+    }
+
+    //@todo why is this even optional? Surely weight should just be 'managed' ??
+    if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
+      $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
+    }
+
+    // Set values for uf field properties and save
+    $ufField = new CRM_Core_DAO_UFField();
+    $ufField->copyValues($params);
+
+    if ($params['field_name'] == 'url') {
+      $ufField->location_type_id = 'null';
+    }
+    else {
+      $ufField->website_type_id = 'null';
+    }
+    if (!strstr($params['field_name'], 'phone')) {
+      $ufField->phone_type_id = 'null';
+    }
+
+    $ufField->save();
+
+    $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufField->uf_group_id, TRUE);
+    CRM_Core_BAO_UFGroup::updateGroupTypes($ufField->uf_group_id, $fieldsType);
+
+    CRM_Utils_Hook::post('UFField', $op, $ufField->id, $ufField);
+
+    civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
+    return $ufField;
+  }
 
   /**
    * Fetch object based on array of properties.
@@ -58,20 +128,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Get the form title.
-   *
-   * @param int $id
-   *   Id of uf_form.
-   *
-   * @return string
-   *   title
-   *
-   */
-  public static function getTitle($id) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $groupId, 'title');
-  }
-
-  /**
    * Update the is_active flag in the db.
    *
    * @param int $id
@@ -79,8 +135,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     //check if custom data profile field is disabled
@@ -119,30 +175,29 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *
    * @param array $params
    *   An associative array with field and values.
-   * @param $ids
    *
-   * @return mixed
-   * @ids   array $ids    array that containd ids
-   *
+   * @return bool
    */
-  public static function duplicateField($params, $ids) {
+  public static function duplicateField($params) {
     $ufField = new CRM_Core_DAO_UFField();
-    $ufField->uf_group_id = CRM_Utils_Array::value('uf_group', $ids);
-    $ufField->field_type = $params['field_name'][0];
-    $ufField->field_name = $params['field_name'][1];
-    if ($params['field_name'][1] == 'url') {
-      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name'], NULL);
+    $ufField->uf_group_id = $params['uf_group_id'] ?? NULL;
+    $ufField->field_type = $params['field_type'] ?? NULL;
+    $ufField->field_name = $params['field_name'] ?? NULL;
+    $ufField->website_type_id = $params['website_type_id'] ?? NULL;
+    if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
+      // primary location type have NULL value in DB
+      $ufField->whereAdd("location_type_id IS NULL");
     }
     else {
-      $ufField->location_type_id = (CRM_Utils_Array::value(2, $params['field_name'])) ? $params['field_name'][2] : 'NULL';
+      $ufField->location_type_id = $params['location_type_id'] ?? NULL;
     }
-    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name']);
+    $ufField->phone_type_id = $params['phone_type_id'] ?? NULL;
 
-    if (!empty($ids['uf_field'])) {
-      $ufField->whereAdd("id <> " . CRM_Utils_Array::value('uf_field', $ids));
+    if (!empty($params['id'])) {
+      $ufField->whereAdd("id <> " . $params['id']);
     }
 
-    return $ufField->find(TRUE);
+    return (bool) $ufField->find(TRUE);
   }
 
   /**
@@ -157,9 +212,9 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
                         FROM   civicrm_uf_field f, civicrm_uf_group g
                         WHERE  f.uf_group_id = g.id
                           AND  g.id = %1 AND f.field_name LIKE 'custom%'";
-    $p = array(1 => array($gId, 'Integer'));
+    $p = [1 => [$gId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
-    $customFieldIds = array();
+    $customFieldIds = [];
     $isMultiRecordFieldPresent = FALSE;
     while ($dao->fetch()) {
       if ($customId = CRM_Core_BAO_CustomField::getKeyID($dao->field_name)) {
@@ -192,42 +247,6 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Add the UF Field.
-   *
-   * @param array $params
-   *   (reference) array containing the values submitted by the form.
-   *
-   * @return CRM_Core_BAO_UFField
-   */
-  public static function add(&$params) {
-    // set values for uf field properties and save
-    $ufField = new CRM_Core_DAO_UFField();
-    $ufField->copyValues($params);
-    $ufField->field_type = $params['field_name'][0];
-    $ufField->field_name = $params['field_name'][1];
-
-    //should not set location type id for Primary
-    $locationTypeId = NULL;
-    if ($params['field_name'][1] == 'url') {
-      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
-    }
-    else {
-      $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
-      $ufField->website_type_id = NULL;
-    }
-    if ($locationTypeId) {
-      $ufField->location_type_id = $locationTypeId;
-    }
-    else {
-      $ufField->location_type_id = 'null';
-    }
-
-    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
-
-    return $ufField->save();
-  }
-
-  /**
    * Automatically determine one weight and modify others.
    *
    * @param array $params
@@ -238,10 +257,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // fix for CRM-316
     $oldWeight = NULL;
 
-    if (!empty($params['field_id'])) {
-      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
+    if (!empty($params['field_id']) || !empty($params['id'])) {
+      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', !empty($params['id']) ? $params['id'] : $params['field_id'], 'weight', 'id');
     }
-    $fieldValues = array('uf_group_id' => $params['group_id']);
+    $fieldValues = ['uf_group_id' => !empty($params['uf_group_id']) ? $params['uf_group_id'] : $params['group_id']];
     return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
   }
 
@@ -254,13 +273,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *   Set the is_active field.
    */
   public static function setUFField($customFieldId, $is_active) {
-    //find the profile id given custom field
+    // Find the profile id given custom field.
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->field_name = "custom_" . $customFieldId;
 
     $ufField->find();
     while ($ufField->fetch()) {
-      //enable/ disable profile
+      // Enable/ disable profile.
       CRM_Core_BAO_UFField::setIsActive($ufField->id, $is_active);
     }
   }
@@ -318,11 +337,11 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
                         FROM   civicrm_custom_field, civicrm_custom_group
                         WHERE  civicrm_custom_field.custom_group_id = civicrm_custom_group.id
                           AND  civicrm_custom_group.id = %1";
-    $p = array(1 => array($customGroupId, 'Integer'));
+    $p = [1 => [$customGroupId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
 
     while ($dao->fetch()) {
-      //enable/ disable profile
+      // Enable/ disable profile.
       CRM_Core_BAO_UFField::setUFField($dao->custom_field_id, $is_active);
     }
   }
@@ -377,7 +396,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @return bool
    */
   public static function checkContactActivityProfileTypeByGroupType($ufGroupType) {
-    $profileTypes = array();
+    $profileTypes = [];
     if ($ufGroupType) {
       $typeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $ufGroupType);
       $profileTypes = explode(',', $typeParts[0]);
@@ -386,7 +405,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     if (empty($profileTypes)) {
       return FALSE;
     }
-    $components = array('Contribution', 'Participant', 'Membership');
+    $components = ['Contribution', 'Participant', 'Membership'];
     if (!in_array('Activity', $profileTypes)) {
       return FALSE;
     }
@@ -401,7 +420,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       }
     }
 
-    $contactTypes = array('Individual', 'Household', 'Organization');
+    $contactTypes = ['Individual', 'Household', 'Organization'];
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
 
     $profileTypeComponent = array_intersect($components, $profileTypes);
@@ -437,7 +456,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $ufGroup->id = $ufGroupId;
     $ufGroup->find(TRUE);
 
-    $profileTypes = array();
+    $profileTypes = [];
     if ($ufGroup->group_type) {
       $typeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $ufGroup->group_type);
       $profileTypes = explode(',', $typeParts[0]);
@@ -480,7 +499,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     $ufGroup->id = $ufGroupId;
     $ufGroup->find(TRUE);
 
-    $profileTypes = array();
+    $profileTypes = [];
     if ($ufGroup->group_type) {
       $typeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $ufGroup->group_type);
       $profileTypes = explode(',', $typeParts[0]);
@@ -502,9 +521,9 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // suppress any subtypes if present
     CRM_Contact_BAO_ContactType::suppressSubTypes($profileTypes);
 
-    $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
-    $components = array('Contribution', 'Participant', 'Membership', 'Activity');
-    $fields = array();
+    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
+    $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
+    $fields = [];
 
     // check for mix profile condition
     if (count($profileTypes) > 1) {
@@ -570,11 +589,11 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    */
   public static function calculateProfileType($ufGroupType, $returnMixType = TRUE, $onlyPure = FALSE, $skipComponentType = FALSE) {
     // profile types
-    $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
+    $contactTypes = ['Contact', 'Individual', 'Household', 'Organization'];
     $subTypes = CRM_Contact_BAO_ContactType::subTypes();
-    $components = array('Contribution', 'Participant', 'Membership', 'Activity');
+    $components = ['Contribution', 'Participant', 'Membership', 'Activity'];
 
-    $profileTypes = array();
+    $profileTypes = [];
     if ($ufGroupType) {
       $typeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $ufGroupType);
       $profileTypes = explode(',', $typeParts[0]);
@@ -605,7 +624,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     }
     else {
       //check the there are any components include in profile
-      $componentCount = array();
+      $componentCount = [];
       foreach ($components as $value) {
         if (in_array($value, $profileTypes)) {
           $componentCount[] = $value;
@@ -613,14 +632,14 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       }
 
       //check contact type included in profile
-      $contactTypeCount = array();
+      $contactTypeCount = [];
       foreach ($contactTypes as $value) {
         if (in_array($value, $profileTypes)) {
           $contactTypeCount[] = $value;
         }
       }
       // subtype counter
-      $subTypeCount = array();
+      $subTypeCount = [];
       foreach ($subTypes as $value) {
         if (in_array($value, $profileTypes)) {
           $subTypeCount[] = $value;
@@ -681,8 +700,8 @@ SELECT ufg.id as id
 
     $ufGroup = CRM_Core_DAO::executeQuery($query);
 
-    $fields = array();
-    $validProfiles = array('Individual', 'Organization', 'Household', 'Contribution');
+    $fields = [];
+    $validProfiles = ['Individual', 'Organization', 'Household', 'Contribution'];
     while ($ufGroup->fetch()) {
       $profileType = self::getProfileType($ufGroup->id);
       if (in_array($profileType, $validProfiles)) {
@@ -768,16 +787,16 @@ SELECT  id
     list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
     $profileFields = civicrm_api3('uf_field', 'get', array_merge($profileFilter,
-      array(
+      [
         'is_active' => 1,
         'return' => 'field_name, is_required',
-        'options' => array(
+        'options' => [
           'limit' => 0,
-        ),
-      )
+        ],
+      ]
     ));
     //check for valid fields ( fields that are present in billing block )
-    $validBillingFields = array(
+    $validBillingFields = [
       'first_name',
       'middle_name',
       'last_name',
@@ -787,16 +806,16 @@ SELECT  id
       'state_province',
       'postal_code',
       'country',
-    );
-    $requiredBillingFields = array_diff($validBillingFields, array('middle_name', 'supplemental_address_1'));
-    $validProfileFields = array();
-    $requiredProfileFields = array();
+    ];
+    $requiredBillingFields = array_diff($validBillingFields, ['middle_name', 'supplemental_address_1']);
+    $validProfileFields = [];
+    $requiredProfileFields = [];
 
     foreach ($profileFields['values'] as $field) {
       if (in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
       }
-      if ($field['is_required']) {
+      if (!empty($field['is_required'])) {
         $requiredProfileFields[] = $field['field_name'];
       }
     }
@@ -807,7 +826,7 @@ SELECT  id
 
     if (!empty($index) && (
         // it's empty so we set it OR
-        !CRM_Utils_array::value($prefixName, $profileAddressFields)
+        !CRM_Utils_Array::value($prefixName, $profileAddressFields)
         //we are dealing with billing id (precedence)
         || $index == $billing_id
         // we are dealing with primary & billing not set
@@ -823,7 +842,7 @@ SELECT  id
 
     $potentiallyMissingRequiredFields = array_diff($requiredBillingFields, $requiredProfileFields);
     CRM_Core_Resources::singleton()
-      ->addSetting(array('billing' => array('billingProfileIsHideable' => empty($potentiallyMissingRequiredFields))));
+      ->addSetting(['billing' => ['billingProfileIsHideable' => empty($potentiallyMissingRequiredFields)]]);
   }
 
   /**
@@ -833,28 +852,28 @@ SELECT  id
    * @param array $defaults : Form defaults
    * @return array, multidimensional; e.g. $result['FieldGroup']['field_name']['label']
    */
-  public static function getAvailableFields($gid = NULL, $defaults = array()) {
-    $fields = array(
-      'Contact' => array(),
+  public static function getAvailableFields($gid = NULL, $defaults = []) {
+    $fields = [
+      'Contact' => [],
       'Individual' => CRM_Contact_BAO_Contact::importableFields('Individual', FALSE, FALSE, TRUE, TRUE, TRUE),
       'Household' => CRM_Contact_BAO_Contact::importableFields('Household', FALSE, FALSE, TRUE, TRUE, TRUE),
       'Organization' => CRM_Contact_BAO_Contact::importableFields('Organization', FALSE, FALSE, TRUE, TRUE, TRUE),
-    );
+    ];
 
     // include hook injected fields
     $fields['Contact'] = array_merge($fields['Contact'], CRM_Contact_BAO_Query_Hook::singleton()->getFields());
 
     // add current employer for individuals
-    $fields['Individual']['current_employer'] = array(
+    $fields['Individual']['current_employer'] = [
       'name' => 'organization_name',
       'title' => ts('Current Employer'),
-    );
+    ];
 
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options', TRUE, NULL, TRUE
     );
 
-    if (!$addressOptions['county']) {
+    if (empty($addressOptions['county'])) {
       unset($fields['Individual']['county'], $fields['Household']['county'], $fields['Organization']['county']);
     }
 
@@ -875,11 +894,11 @@ SELECT  id
     //unset extension
     unset($fields['Contact']['phone_ext']);
     //add psedo field
-    $fields['Contact']['phone_and_ext'] = array(
+    $fields['Contact']['phone_and_ext'] = [
       'name' => 'phone_and_ext',
       'title' => ts('Phone and Extension'),
       'hasLocationType' => 1,
-    );
+    ];
 
     // include Subtypes For Profile
     $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
@@ -900,10 +919,10 @@ SELECT  id
         unset($contribFields['is_test']);
         unset($contribFields['is_pay_later']);
         unset($contribFields['contribution_id']);
-        $contribFields['contribution_note'] = array(
+        $contribFields['contribution_note'] = [
           'name' => 'contribution_note',
           'title' => ts('Contribution Note'),
-        );
+        ];
         $fields['Contribution'] = array_merge($contribFields, self::getContribBatchEntryFields());
       }
     }
@@ -939,6 +958,8 @@ SELECT  id
         'membership_type_id',
         'member_is_test',
         'is_override',
+        'member_is_override',
+        'status_override_end_date',
         'status_id',
         'member_is_pay_later'
       );
@@ -958,10 +979,7 @@ SELECT  id
         CRM_Utils_Array::remove($caseFields,
           'case_id',
           'case_type',
-          'case_start_date',
-          'case_end_date',
           'case_role',
-          'case_status',
           'case_deleted'
         );
       }
@@ -977,12 +995,12 @@ SELECT  id
       $fields['Activity'] = $activityFields;
     }
 
-    $fields['Formatting']['format_free_html_' . rand(1000, 9999)] = array(
+    $fields['Formatting']['format_free_html_' . rand(1000, 9999)] = [
       'name' => 'free_html',
       'import' => FALSE,
       'export' => FALSE,
       'title' => 'Free HTML',
-    );
+    ];
 
     // Sort by title
     foreach ($fields as &$values) {
@@ -990,14 +1008,14 @@ SELECT  id
     }
 
     //group selected and unwanted fields list
-    $ufFields = $gid ? CRM_Core_BAO_UFGroup::getFields($gid, FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE) : array();
-    $groupFieldList = array_merge($ufFields, array(
+    $ufFields = $gid ? CRM_Core_BAO_UFGroup::getFields($gid, FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE) : [];
+    $groupFieldList = array_merge($ufFields, [
       'note',
       'email_greeting_custom',
       'postal_greeting_custom',
       'addressee_custom',
       'id',
-    ));
+    ]);
     //unset selected fields
     foreach ($groupFieldList as $key => $value) {
       if (is_int($key)) {
@@ -1013,6 +1031,8 @@ SELECT  id
       unset($fields[$value['field_type']][$key]);
     }
 
+    // Allow extensions to alter the array of entity => fields permissible in a CiviCRM Profile.
+    CRM_Utils_Hook::alterUFFields($fields);
     return $fields;
   }
 
@@ -1021,24 +1041,33 @@ SELECT  id
    *
    * @param bool $force
    *
-   * @return array, multidimensional; e.g. $result['field_name']['label']
+   * @return array
+   *   e.g. $result['field_name']['label']
    */
   public static function getAvailableFieldsFlat($force = FALSE) {
-    // FIXME reset when data model changes
-    static $result = NULL;
-    if ($result === NULL || $force) {
-      $fieldTree = self::getAvailableFields();
-      $result = array();
-      foreach ($fieldTree as $field_type => $fields) {
-        foreach ($fields as $field_name => $field) {
-          if (!isset($result[$field_name])) {
-            $field['field_type'] = $field_type;
-            $result[$field_name] = $field;
+    if (!isset(Civi::$statics['UFFieldsFlat']) || $force) {
+      Civi::$statics['UFFieldsFlat'] = [];
+      foreach (self::getAvailableFields() as $fieldType => $fields) {
+        foreach ($fields as $fieldName => $field) {
+          if (!isset(Civi::$statics['UFFieldsFlat'][$fieldName])) {
+            $field['field_type'] = $fieldType;
+            Civi::$statics['UFFieldsFlat'][$fieldName] = $field;
           }
         }
       }
     }
-    return $result;
+    return Civi::$statics['UFFieldsFlat'];
+  }
+
+  /**
+   * Get a list of fields which can be added to profiles in the format [name => title]
+   *
+   * @return array
+   */
+  public static function getAvailableFieldTitles() {
+    $fields = self::getAvailableFieldsFlat();
+    $fields['formatting'] = ['title' => ts('Formatting')];
+    return CRM_Utils_Array::collect('title', $fields);
   }
 
   /**
@@ -1057,32 +1086,32 @@ SELECT  id
    */
   public static function getContribBatchEntryFields() {
     if (self::$_contriBatchEntryFields === NULL) {
-      self::$_contriBatchEntryFields = array(
-        'send_receipt' => array(
+      self::$_contriBatchEntryFields = [
+        'send_receipt' => [
           'name' => 'send_receipt',
           'title' => ts('Send Receipt'),
-        ),
-        'soft_credit' => array(
+        ],
+        'soft_credit' => [
           'name' => 'soft_credit',
           'title' => ts('Soft Credit'),
-        ),
-        'soft_credit_type' => array(
+        ],
+        'soft_credit_type' => [
           'name' => 'soft_credit_type',
           'title' => ts('Soft Credit Type'),
-        ),
-        'product_name' => array(
+        ],
+        'product_name' => [
           'name' => 'product_name',
           'title' => ts('Premiums'),
-        ),
-        'contribution_note' => array(
+        ],
+        'contribution_note' => [
           'name' => 'contribution_note',
           'title' => ts('Contribution Note'),
-        ),
-        'contribution_soft_credit_pcp_id' => array(
+        ],
+        'contribution_soft_credit_pcp_id' => [
           'name' => 'contribution_soft_credit_pcp_id',
           'title' => ts('Personal Campaign Page'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_contriBatchEntryFields;
   }
@@ -1092,40 +1121,44 @@ SELECT  id
    */
   public static function getMemberBatchEntryFields() {
     if (self::$_memberBatchEntryFields === NULL) {
-      self::$_memberBatchEntryFields = array(
-        'send_receipt' => array(
+      self::$_memberBatchEntryFields = [
+        'send_receipt' => [
           'name' => 'send_receipt',
           'title' => ts('Send Receipt'),
-        ),
-        'soft_credit' => array(
+        ],
+        'soft_credit' => [
           'name' => 'soft_credit',
           'title' => ts('Soft Credit'),
-        ),
-        'product_name' => array(
+        ],
+        'product_name' => [
           'name' => 'product_name',
           'title' => ts('Premiums'),
-        ),
-        'financial_type' => array(
+        ],
+        'financial_type' => [
           'name' => 'financial_type',
           'title' => ts('Financial Type'),
-        ),
-        'total_amount' => array(
+        ],
+        'total_amount' => [
           'name' => 'total_amount',
           'title' => ts('Total Amount'),
-        ),
-        'receive_date' => array(
+        ],
+        'receive_date' => [
           'name' => 'receive_date',
           'title' => ts('Date Received'),
-        ),
-        'payment_instrument' => array(
+        ],
+        'payment_instrument' => [
           'name' => 'payment_instrument',
           'title' => ts('Payment Method'),
-        ),
-        'contribution_status_id' => array(
+        ],
+        'contribution_status_id' => [
           'name' => 'contribution_status_id',
           'title' => ts('Contribution Status'),
-        ),
-      );
+        ],
+        'trxn_id' => [
+          'name' => 'contribution_trxn_id',
+          'title' => ts('Contribution Transaction ID'),
+        ],
+      ];
     }
     return self::$_memberBatchEntryFields;
   }

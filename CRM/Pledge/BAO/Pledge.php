@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
@@ -37,7 +21,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -153,20 +137,15 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();
 
-    $paymentParams = array();
-    $paymentParams['status_id'] = CRM_Utils_Array::value('status_id', $params);
+    $paymentParams = [];
     if (!empty($params['installment_amount'])) {
       $params['amount'] = $params['installment_amount'] * $params['installments'];
     }
 
-    // get All Payments status types.
-    $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
-    // update the pledge status only if it does NOT come from form
-    if (!isset($params['pledge_status_id'])) {
+    if (!isset($params['pledge_status_id']) && !isset($params['status_id'])) {
       if (isset($params['contribution_id'])) {
         if ($params['installments'] > 1) {
-          $params['status_id'] = array_search('In Progress', $paymentStatusTypes);
+          $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'In Progress');
         }
       }
       else {
@@ -174,10 +153,11 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
           $params['status_id'] = CRM_Pledge_BAO_PledgePayment::calculatePledgeStatus($params['id']);
         }
         else {
-          $params['status_id'] = array_search('Pending', $paymentStatusTypes);
+          $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
         }
       }
     }
+    $paymentParams['status_id'] = $params['status_id'] ?? NULL;
 
     $pledge = self::add($params);
     if (is_a($pledge, 'CRM_Core_Error')) {
@@ -215,7 +195,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
         'actual_amount',
       );
       foreach ($paymentKeys as $key) {
-        $paymentParams[$key] = CRM_Utils_Array::value($key, $params, NULL);
+        $paymentParams[$key] = $params[$key] ?? NULL;
       }
       CRM_Pledge_BAO_PledgePayment::create($paymentParams);
     }
@@ -226,7 +206,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       "action=view&reset=1&id={$pledge->id}&cid={$pledge->contact_id}&context=home"
     );
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviPledge', CRM_Core_Action::UPDATE)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/pledge',
         "action=update&reset=1&id={$pledge->id}&cid={$pledge->contact_id}&context=home"
@@ -350,30 +330,18 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @return array|null
    */
   public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
-    $where = array();
+    $where = [];
     $select = $from = $queryDate = NULL;
-    // get all status
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $statusId = array_search($status, $allStatus);
+    $statusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $status);
 
     switch ($status) {
       case 'Completed':
-        $statusId = array_search('Cancelled', $allStatus);
-        $where[] = 'status_id != ' . $statusId;
+        $where[] = 'status_id != ' . CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Cancelled');
         break;
 
       case 'Cancelled':
-        $where[] = 'status_id = ' . $statusId;
-        break;
-
       case 'In Progress':
-        $where[] = 'status_id = ' . $statusId;
-        break;
-
       case 'Pending':
-        $where[] = 'status_id = ' . $statusId;
-        break;
-
       case 'Overdue':
         $where[] = 'status_id = ' . $statusId;
         break;
@@ -397,7 +365,7 @@ GROUP BY  currency
     $start = substr($startDate, 0, 8);
     $end = substr($endDate, 0, 8);
     $pCount = 0;
-    $pamount = array();
+    $pamount = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $pCount += $dao->pledge_count;
@@ -412,8 +380,7 @@ GROUP BY  currency
       ),
     );
 
-    $where = array();
-    $statusId = array_search($status, $allStatus);
+    $where = [];
     switch ($status) {
       case 'Completed':
         $select = 'sum( total_amount ) as received_pledge , count( cd.id ) as received_count';
@@ -461,7 +428,7 @@ GROUP BY  currency
 ";
     if ($select) {
       $dao = CRM_Core_DAO::executeQuery($query);
-      $amount = array();
+      $amount = [];
       $count = 0;
 
       while ($dao->fetch()) {
@@ -495,7 +462,7 @@ GROUP BY  currency
    *   return the list of pledge fields
    */
   public static function getHonorContacts($honorId) {
-    $params = array();
+    $params = [];
     $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
     $honorDAO->contact_id = $honorId;
     $honorDAO->find();
@@ -512,7 +479,7 @@ GROUP BY  currency
             'honor_type' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $honorDAO->soft_credit_type_id),
             'honorId' => $pledgeDAO->contact_id,
             'amount' => $pledgeDAO->amount,
-            'status' => CRM_Contribute_PseudoConstant::contributionStatus($pledgeDAO->status_id),
+            'status' => CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $pledgeDAO->status_id),
             'create_date' => $pledgeDAO->create_date,
             'acknowledge_date' => $pledgeDAO->acknowledge_date,
             'type' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
@@ -539,7 +506,7 @@ GROUP BY  currency
    */
   public static function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
-    $allPayments = $payments = array();
+    $allPayments = $payments = [];
 
     // get All Payments status types.
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -549,7 +516,7 @@ GROUP BY  currency
 
     if (!empty($allPayments)) {
       foreach ($allPayments as $payID => $values) {
-        $contributionValue = $contributionStatus = array();
+        $contributionValue = $contributionStatus = [];
         if (isset($values['contribution_id'])) {
           $contributionParams = array('id' => $values['contribution_id']);
           $returnProperties = array('contribution_status_id', 'receive_date');
@@ -557,14 +524,14 @@ GROUP BY  currency
             $contributionParams, $contributionStatus, $returnProperties
           );
           $contributionValue = array(
-            'status' => CRM_Utils_Array::value('contribution_status_id', $contributionStatus),
-            'receive_date' => CRM_Utils_Array::value('receive_date', $contributionStatus),
+            'status' => $contributionStatus['contribution_status_id'] ?? NULL,
+            'receive_date' => $contributionStatus['receive_date'] ?? NULL,
           );
         }
         $payments[$payID] = array_merge($contributionValue,
           array(
-            'amount' => CRM_Utils_Array::value('scheduled_amount', $values),
-            'due_date' => CRM_Utils_Array::value('scheduled_date', $values),
+            'amount' => $values['scheduled_amount'] ?? NULL,
+            'due_date' => $values['scheduled_date'] ?? NULL,
           )
         );
 
@@ -606,7 +573,7 @@ GROUP BY  currency
       'domain' => array('name', 'phone', 'address', 'email'),
       'contact' => CRM_Core_SelectValues::contactTokens(),
     );
-    $domainValues = array();
+    $domainValues = [];
     foreach ($tokens['domain'] as $token) {
       $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
     }
@@ -630,12 +597,12 @@ GROUP BY  currency
 
     // handle custom data.
     if (!empty($params['hidden_custom'])) {
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', CRM_Core_DAO::$_nullObject, $params['id']);
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
       $pledgeParams = array(array('pledge_id', '=', $params['id'], 0, 0));
-      $customGroup = array();
+      $customGroup = [];
       // retrieve custom data
       foreach ($groupTree as $groupID => $group) {
-        $customFields = $customValues = array();
+        $customFields = $customValues = [];
         if ($groupID == 'info') {
           continue;
         }
@@ -659,8 +626,8 @@ GROUP BY  currency
 
     // check for online pledge.
     if (!empty($params['receipt_from_email'])) {
-      $userName = CRM_Utils_Array::value('receipt_from_name', $params);
-      $userEmail = CRM_Utils_Array::value('receipt_from_email', $params);
+      $userName = $params['receipt_from_name'] ?? NULL;
+      $userEmail = $params['receipt_from_email'] ?? NULL;
     }
     elseif (!empty($params['from_email_id'])) {
       $receiptFrom = $params['from_email_id'];
@@ -671,8 +638,8 @@ GROUP BY  currency
     }
     else {
       // set the domain values.
-      $userName = CRM_Utils_Array::value('name', $domainValues);
-      $userEmail = CRM_Utils_Array::value('email', $domainValues);
+      $userName = $domainValues['name'] ?? NULL;
+      $userEmail = $domainValues['email'] ?? NULL;
     }
 
     if (!isset($receiptFrom)) {
@@ -695,9 +662,9 @@ GROUP BY  currency
     $activityType = 'Pledge Acknowledgment';
     $activity = new CRM_Activity_DAO_Activity();
     $activity->source_record_id = $params['id'];
-    $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-      $activityType,
-      'name'
+    $activity->activity_type_id = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+      'activity_type_id',
+      $activityType
     );
 
     // FIXME: Translate
@@ -708,15 +675,15 @@ GROUP BY  currency
         'subject' => $subject,
         'source_contact_id' => $params['contact_id'],
         'source_record_id' => $params['id'],
-        'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-          $activityType,
-          'name'
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+          'activity_type_id',
+          $activityType
         ),
         'activity_date_time' => CRM_Utils_Date::isoToMysql($params['acknowledge_date']),
         'is_test' => $params['is_test'],
         'status_id' => 2,
         'details' => $details,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+        'campaign_id' => $params['campaign_id'] ?? NULL,
       );
 
       // lets insert assignee record.
@@ -725,7 +692,7 @@ GROUP BY  currency
       }
 
       if (is_a(CRM_Activity_BAO_Activity::create($activityParams), 'CRM_Core_Error')) {
-        CRM_Core_Error::fatal("Failed creating Activity for acknowledgment");
+        throw new CRM_Core_Exception('Failed creating Activity for acknowledgment');
       }
     }
   }
@@ -738,10 +705,10 @@ GROUP BY  currency
    * @return array
    *   array of exportable Fields
    */
-  public static function exportableFields($checkPermission) {
+  public static function exportableFields($checkPermission = TRUE) {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
-        self::$_exportableFields = array();
+        self::$_exportableFields = [];
       }
 
       $fields = CRM_Pledge_DAO_Pledge::export();
@@ -765,22 +732,22 @@ GROUP BY  currency
 
       $pledgeFields = array(
         'pledge_status' => array(
-          'title' => 'Pledge Status',
+          'title' => ts('Pledge Status'),
           'name' => 'pledge_status',
           'data_type' => CRM_Utils_Type::T_STRING,
         ),
         'pledge_frequency_unit' => array(
-          'title' => 'Pledge Frequency Unit',
+          'title' => ts('Pledge Frequency Unit'),
           'name' => 'pledge_frequency_unit',
           'data_type' => CRM_Utils_Type::T_ENUM,
         ),
         'pledge_frequency_interval' => array(
-          'title' => 'Pledge Frequency Interval',
+          'title' => ts('Pledge Frequency Interval'),
           'name' => 'pledge_frequency_interval',
           'data_type' => CRM_Utils_Type::T_INT,
         ),
         'pledge_contribution_page_id' => array(
-          'title' => 'Pledge Contribution Page Id',
+          'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
         ),
@@ -806,17 +773,19 @@ GROUP BY  currency
    *   associated array of pledge id(s)
    */
   public static function getContactPledges($contactID) {
-    $pledgeDetails = array();
-    $pledgeStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $pledgeDetails = [];
+    $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
+      FALSE, FALSE, FALSE, NULL, 'name'
+    );
 
-    $status = array();
+    $status = [];
 
     // get pending and in progress status
     foreach (array(
-               'Pending',
-               'In Progress',
-               'Overdue',
-             ) as $name) {
+      'Pending',
+      'In Progress',
+      'Overdue',
+    ) as $name) {
       if ($statusId = array_search($name, $pledgeStatuses)) {
         $status[] = $statusId;
       }
@@ -864,24 +833,19 @@ GROUP BY  currency
    */
   public static function updatePledgeStatus($params) {
 
-    $returnMessages = array();
+    $returnMessages = [];
 
     $sendReminders = CRM_Utils_Array::value('send_reminders', $params, FALSE);
 
-    $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $allStatus = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
+    $allPledgeStatus = CRM_Core_OptionGroup::values('pledge_status',
+      TRUE, FALSE, FALSE, NULL, 'name', TRUE
+    );
+    unset($allPledgeStatus['Completed'], $allPledgeStatus['Cancelled']);
+    unset($allStatus['Completed'], $allStatus['Cancelled'], $allStatus['Failed']);
 
-    // unset statues that we never use for pledges
-    foreach (array(
-               'Completed',
-               'Cancelled',
-               'Failed',
-             ) as $statusKey) {
-      if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
-        unset($allStatus[$key]);
-      }
-    }
-
-    $statusIds = implode(',', array_keys($allStatus));
+    $statusIds = implode(',', $allStatus);
+    $pledgeStatusIds = implode(',', $allPledgeStatus);
     $updateCnt = 0;
 
     $query = "
@@ -910,14 +874,14 @@ SELECT  pledge.contact_id              as contact_id,
         ) as amount_paid
         FROM      civicrm_pledge pledge, civicrm_pledge_payment payment
         WHERE     pledge.id = payment.pledge_id
-        AND     payment.status_id IN ( {$statusIds} ) AND pledge.status_id IN ( {$statusIds} )
+        AND     payment.status_id IN ( {$statusIds} ) AND pledge.status_id IN ( {$pledgeStatusIds} )
         GROUP By  payment.id
         ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $now = date('Ymd');
-    $pledgeDetails = $contactIds = $pledgePayments = $pledgeStatus = array();
+    $pledgeDetails = $contactIds = $pledgePayments = $pledgeStatus = [];
     while ($dao->fetch()) {
       $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($dao->contact_id);
 
@@ -948,23 +912,23 @@ SELECT  pledge.contact_id              as contact_id,
 
       if (CRM_Utils_Date::overdue(CRM_Utils_Date::customFormat($dao->scheduled_date, '%Y%m%d'),
           $now
-        ) && $dao->payment_status != array_search('Overdue', $allStatus)
+        ) && $dao->payment_status != $allStatus['Overdue']
       ) {
         $pledgePayments[$dao->pledge_id][$dao->payment_id] = $dao->payment_id;
       }
     }
+    $allPledgeStatus = array_flip($allPledgeStatus);
 
     // process the updating script...
-
     foreach ($pledgePayments as $pledgeId => $paymentIds) {
       // 1. update the pledge /pledge payment status. returns new status when an update happens
-      $returnMessages[] = "Checking if status update is needed for Pledge Id: {$pledgeId} (current status is {$allStatus[$pledgeStatus[$pledgeId]]})";
+      $returnMessages[] = "Checking if status update is needed for Pledge Id: {$pledgeId} (current status is {$allPledgeStatus[$pledgeStatus[$pledgeId]]})";
 
       $newStatus = CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeId, $paymentIds,
-        array_search('Overdue', $allStatus), NULL, 0, FALSE, TRUE
+        $allStatus['Overdue'], NULL, 0, FALSE, TRUE
       );
       if ($newStatus != $pledgeStatus[$pledgeId]) {
-        $returnMessages[] = "- status updated to: {$allStatus[$newStatus]}";
+        $returnMessages[] = "- status updated to: {$allPledgeStatus[$newStatus]}";
         $updateCnt += 1;
       }
     }
@@ -977,7 +941,7 @@ SELECT  pledge.contact_id              as contact_id,
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
-      $domainValues = array();
+      $domainValues = [];
       foreach ($tokens['domain'] as $token) {
         $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
       }
@@ -1075,18 +1039,20 @@ SELECT  pledge.contact_id              as contact_id,
                 'source_contact_id' => $contactId,
                 'source_record_id' => $paymentId,
                 'assignee_contact_id' => $contactId,
-                'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
-                  $activityType,
-                  'name'
+                'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity',
+                  'activity_type_id',
+                  $activityType
                 ),
-                'activity_date_time' => CRM_Utils_Date::isoToMysql($now),
                 'due_date_time' => CRM_Utils_Date::isoToMysql($details['scheduled_date']),
                 'is_test' => $details['is_test'],
                 'status_id' => 2,
                 'campaign_id' => $details['campaign_id'],
               );
-              if (is_a(civicrm_api('activity', 'create', $activityParams), 'CRM_Core_Error')) {
-                $returnMessages[] = "Failed creating Activity for acknowledgment";
+              try {
+                civicrm_api3('activity', 'create', $activityParams);
+              }
+              catch (CiviCRM_API3_Exception $e) {
+                $returnMessages[] = "Failed creating Activity for Pledge Reminder: " . $e->getMessage();
                 return array('is_error' => 1, 'message' => $returnMessages);
               }
               $returnMessages[] = "Payment reminder sent to: {$pledgerName} - {$toEmail}";
@@ -1108,10 +1074,11 @@ SELECT  pledge.contact_id              as contact_id,
    * @param int $pledgeID
    */
   public static function cancel($pledgeID) {
-    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
     $paymentIDs = self::findCancelablePayments($pledgeID);
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $cancelled = array_search('Cancelled', $status);
     CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $paymentIDs, NULL,
-      $statuses['Cancelled'], 0, FALSE, TRUE
+      $cancelled, 0, FALSE, TRUE
     );
   }
 
@@ -1123,7 +1090,7 @@ SELECT  pledge.contact_id              as contact_id,
    *   Array of int (civicrm_pledge_payment.id)
    */
   public static function findCancelablePayments($pledgeID) {
-    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus());
+    $statuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'));
 
     $paymentDAO = new CRM_Pledge_DAO_PledgePayment();
     $paymentDAO->pledge_id = $pledgeID;
@@ -1133,7 +1100,7 @@ SELECT  pledge.contact_id              as contact_id,
     ));
     $paymentDAO->find();
 
-    $paymentIDs = array();
+    $paymentIDs = [];
     while ($paymentDAO->fetch()) {
       $paymentIDs[] = $paymentDAO->id;
     }
@@ -1161,9 +1128,9 @@ SELECT  pledge.contact_id              as contact_id,
     }
 
     return civicrm_api3('pledge_payment', 'getcount', array(
-        'pledge_id' => $pledgeID,
-        'status_id' => array('IN' => self::getTransactionalStatus()),
-      ));
+      'pledge_id' => $pledgeID,
+      'contribution_id' => array('IS NOT NULL' => TRUE),
+    ));
   }
 
   /**
@@ -1192,13 +1159,114 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
-   * Get array of non transactional statuses.
+   * Create array for recur record for pledge.
    * @return array
-   *   non transactional status ids
+   *   params for recur record
    */
-  protected static function getTransactionalStatus() {
-    $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    return array_diff(array_flip($paymentStatus), self::getNonTransactionalStatus());
+  public static function buildRecurParams($params) {
+    $recurParams = array(
+      'is_recur' => TRUE,
+      'auto_renew' => TRUE,
+      'frequency_unit' => $params['pledge_frequency_unit'],
+      'frequency_interval' => $params['pledge_frequency_interval'],
+      'installments' => $params['pledge_installments'],
+      'start_date' => $params['receive_date'],
+    );
+    return $recurParams;
+  }
+
+  /**
+   * Get pledge start date.
+   *
+   * @return string
+   *   start date
+   */
+  public static function getPledgeStartDate($date, $pledgeBlock) {
+    $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
+    foreach ($startDate as $field => $value) {
+      if (!empty($date) && empty($pledgeBlock['is_pledge_start_date_editable'])) {
+        return $date;
+      }
+      if (empty($date)) {
+        $date = $value;
+      }
+      switch ($field) {
+        case 'contribution_date':
+          if (empty($date)) {
+            $date = date('Ymd');
+          }
+          break;
+
+        case 'calendar_date':
+          $date = date('Ymd', strtotime($date));
+          break;
+
+        case 'calendar_month':
+          $date = self::getPaymentDate($date);
+          $date = date('Ymd', strtotime($date));
+          break;
+
+        default:
+          break;
+
+      }
+    }
+    return $date;
+  }
+
+  /**
+   * Get first payment date for pledge.
+   *
+   * @param int $day
+   *
+   * @return bool|string
+   */
+  public static function getPaymentDate($day) {
+    if ($day == 31) {
+      // Find out if current month has 31 days, if not, set it to 30 (last day).
+      $t = date('t');
+      if ($t != $day) {
+        $day = $t;
+      }
+    }
+    $current = date('d');
+    switch (TRUE) {
+      case ($day == $current):
+        $date = date('m/d/Y');
+        break;
+
+      case ($day > $current):
+        $date = date('m/d/Y', mktime(0, 0, 0, date('m'), $day, date('Y')));
+        break;
+
+      case ($day < $current):
+        $date = date('m/d/Y', mktime(0, 0, 0, date('m', strtotime("+1 month")), $day, date('Y')));
+        break;
+
+      default:
+        break;
+
+    }
+    return $date;
+  }
+
+  /**
+   * Override buildOptions to hack out some statuses.
+   *
+   * @todo instead of using & hacking the shared optionGroup contribution_status use a separate one.
+   *
+   * @param string $fieldName
+   * @param string $context
+   * @param array $props
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
+    $result = parent::buildOptions($fieldName, $context, $props);
+    if ($fieldName == 'status_id') {
+      $result = array_diff($result, array('Failed'));
+    }
+    return $result;
   }
 
 }

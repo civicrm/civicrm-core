@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
   protected $_groupID = NULL;
@@ -56,10 +40,10 @@ SELECT   title, description
    AND   visibility != 'User and User Admin Only'
    AND   $groupTypeCondition";
 
-      $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->fetch()) {
         $this->assign('groupName', $dao->title);
-        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', array(1 => $dao->title)));
+        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', [1 => $dao->title]));
       }
       else {
         CRM_Core_Error::statusBounce("The specified group is not configured for this action OR The group doesn't exist.");
@@ -100,10 +84,10 @@ SELECT   id, title, description
    AND   visibility != 'User and User Admin Only'
    AND   $groupTypeCondition
 ORDER BY title";
-      $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
-      $rows = array();
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $rows = [];
       while ($dao->fetch()) {
-        $row = array();
+        $row = [];
         $row['id'] = $dao->id;
         $row['title'] = $dao->title;
         $row['description'] = $dao->description;
@@ -115,10 +99,10 @@ ORDER BY title";
         $rows[] = $row;
       }
       if (empty($rows)) {
-        CRM_Core_Error::fatal(ts('There are no public mailing list groups to display.'));
+        throw new CRM_Core_Exception(ts('There are no public mailing list groups to display.'));
       }
       $this->assign('rows', $rows);
-      $this->addFormRule(array('CRM_Mailing_Form_Subscribe', 'formRule'));
+      $this->addFormRule(['CRM_Mailing_Form_Subscribe', 'formRule']);
     }
 
     $addCaptcha = TRUE;
@@ -147,24 +131,20 @@ ORDER BY title";
     }
 
     if ($addCaptcha) {
-      // add captcha
-      $captcha = CRM_Utils_ReCAPTCHA::singleton();
-      $captcha->add($this);
-      $this->assign('isCaptcha', TRUE);
+      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Subscribe'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Subscribe'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -178,13 +158,13 @@ ORDER BY title";
         return TRUE;
       }
     }
-    return array('_qf_default' => 'Please select one or more mailing lists.');
+    return ['_qf_default' => 'Please select one or more mailing lists.'];
   }
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    $groups = array();
+    $groups = [];
     if ($this->_groupID) {
       $groups[] = $this->_groupID;
     }

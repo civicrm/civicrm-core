@@ -68,7 +68,7 @@
     <default>NULL</default>
     <add>2.2</add>
     <html>
-      <type>TexArea</type>
+      <type>TextArea</type>
     </html>
   </field>
   <field>
@@ -77,7 +77,7 @@
     <default>NULL</default>
     <add>2.2</add>
     <html>
-      <type>TexArea</type>
+      <type>TextArea</type>
     </html>
   </field>
   <field>
@@ -175,7 +175,8 @@
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
-      <nameColumn>numeric_code</nameColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>

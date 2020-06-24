@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block">
@@ -51,9 +35,21 @@
         <td class="label">{$form.amount.label}</td>
         <td>{$form.amount.html}</td>
       </tr>
+      <tr class="crm-price-option-form-block-non-deductible-amount">
+        <td class="label">{$form.non_deductible_amount.label}</td>
+        <td>{$form.non_deductible_amount.html}</td>
+      </tr>
       <tr class="crm-price-option-form-block-description">
         <td class="label">{$form.description.label}</td>
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='description' id=$optionId}{/if}{$form.description.html}</td>
+      </tr>
+      <tr class="crm-price-option-form-block-help-pre">
+        <td class="label">{$form.help_pre.label}</td>
+        <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='help_pre' id=$optionId}{/if}{$form.help_pre.html}</td>
+      </tr>
+      <tr class="crm-price-option-form-block-help-post">
+        <td class="label">{$form.help_post.label}</td>
+        <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='help_post' id=$optionId}{/if}{$form.help_post.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-financial-type">
         <td class="label">{$form.financial_type_id.label}</td>
@@ -94,6 +90,10 @@
         <td>{$form.is_default.html}</td>
       </tr>
       {/if}
+      <tr class="crm-price-field-form-block-visibility_id">
+        <td class="label">{$form.visibility_id.label}</td>
+        <td>&nbsp;{$form.visibility_id.html} {help id="id-visibility-options" file="CRM/Price/Page/Field.hlp"}</td>
+      </tr>
     </table>
 
   {literal}
@@ -118,4 +118,3 @@
   </div>
 
 </div>
-

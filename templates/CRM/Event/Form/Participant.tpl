@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
@@ -122,7 +106,7 @@
           }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
+          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
         }
         else {
           cj('#validate_pricefield').hide( ).html('');
@@ -138,13 +122,13 @@
    .focus(
      function() {
        feeAmount = cj(this).val();
-       feeAmount = parseInt(feeAmount);
+       feeAmount = Number(feeAmount.replace(/[^0-9\.]+/g,""));
      }
    )
    .change(
     function() {
       userModifiedAmount = cj(this).val();
-      userModifiedAmount = parseInt(userModifiedAmount);
+      userModifiedAmount = Number(userModifiedAmount.replace(/[^0-9\.]+/g,""));
       if (userModifiedAmount < feeAmount) {
         cj('#status_id').val(partiallyPaidStatusId).change();
       }
@@ -153,6 +137,12 @@
 
   cj('form[name=Participant]').on("click", '.validate',
     function(e) {
+      if (CRM.$('#total_amount').length == 0) {
+        var $balance = CRM.$('#payment-info-balance');
+        if ($balance.length > 0 && parseFloat($balance.attr('data-balance')) == 0) {
+          return true;
+        }
+      }
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
       if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
@@ -178,6 +168,16 @@
     {assign var=registerMode value="LIVE"}
   {/if}
   <div class="crm-block crm-form-block crm-participant-form-block">
+    {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
+      <div class="action-link css_right crm-link-credit-card-mode">
+        {if $contactId}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
+        {else}
+          {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
+        {/if}
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
+      </div>
+    {/if}
     <div class="view-content">
       {if $participantMode}
         <div class="help">
@@ -211,17 +211,10 @@
         {else} {* If action is other than Delete *}
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
-          {if $single and $context neq 'standalone'}
-            <tr class="crm-participant-form-block-displayName">
-              <td class="label font-size12pt"><label>{ts}Participant{/ts}</label></td>
-              <td class="font-size12pt view-value">{$displayName}&nbsp;</td>
-            </tr>
-            {else}
-            <tr class="crm-participant-form-contact-id">
-              <td class="label">{$form.contact_id.label}</td>
-              <td>{$form.contact_id.html}</td>
-            </tr>
-          {/if}
+          <tr class="crm-participant-form-contact-id">
+            <td class="label">{$form.contact_id.label}</td>
+            <td>{$form.contact_id.html}</td>
+          </tr>
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
               <tr class="crm-participant-form-block-additionalParticipants">
@@ -243,12 +236,6 @@
               </tr>
             {/if}
           {/if}
-          {if $participantMode}
-            <tr class="crm-participant-form-block-payment_processor_id">
-              <td class="label nowrap">{$form.payment_processor_id.label}</td>
-              <td>{$form.payment_processor_id.html}</td>
-            </tr>
-          {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td>
             <td class="view-value">
@@ -268,13 +255,7 @@
           </tr>
           <tr class="crm-participant-form-block-register_date">
             <td class="label">{$form.register_date.label}</td>
-            <td>
-              {if $hideCalendar neq true}
-                    {include file="CRM/common/jcalendar.tpl" elementName=register_date}
-                  {else}
-                    {$form.register_date.value|crmDate}
-                  {/if}
-            </td>
+            <td>{$form.register_date.html}</td>
           </tr>
           <tr class="crm-participant-form-block-status_id">
             <td class="label">{$form.status_id.label}</td>
@@ -286,6 +267,12 @@
             <td class="label">{$form.source.label}</td><td>{$form.source.html|crmAddClass:huge}<br />
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
+          {if $participantMode}
+            <tr class="crm-participant-form-block-payment_processor_id">
+              <td class="label nowrap">{$form.payment_processor_id.label}</td>
+              <td>{$form.payment_processor_id.html}</td>
+            </tr>
+          {/if}
         </table>
        {if $participantId and $hasPayment}
         <table class='form-layout'>
@@ -324,7 +311,7 @@
   {* JS block for ADD or UPDATE actions only *}
   {if $action eq 1 or $action eq 2}
     {if $participantId and $hasPayment}
-      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
 
     {*include custom data js file*}
@@ -351,8 +338,8 @@
           $('#campaign_id', $form).select2('val', info.campaign_id);
 
           // Event and event-type custom data
-          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal});
-          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal});
+          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal}, null, null, null, true);
+          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal}, null, null, null, true);
 
           buildFeeBlock();
         });
@@ -385,6 +372,7 @@
           {if $urlPathVar}
           dataUrl += '&' + '{$urlPathVar}';
           {/if}
+          dataUrl += '&' + 'is_backoffice=1';
 
           {literal}
           var eventId = $('[name=event_id], #event_id', $form).val();
@@ -398,7 +386,7 @@
             return;
           }
 
-          var participantId  = "{/literal}{$participantId}{literal}";
+          var participantId  = {/literal}{$participantId|@json_encode}{literal};
 
           if (participantId) {
             dataUrl += '&participantId=' + participantId;
@@ -424,7 +412,7 @@
         }
 
         {/literal}
-        CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
+        CRM.buildCustomData( '{$customDataType}', null, null );
         {if $eventID}
           CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
         {/if}

@@ -1,11 +1,12 @@
-{contact.email_greeting},
-
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $event.confirm_email_text AND (not $isOnWaitlist AND not $isRequireApproval)}
 {$event.confirm_email_text}
 
 {else}
-Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to {if $participant_status}{$participant_status}{else}{if $isOnWaitlist}waitlisted{else}registered{/if}{/if}.
-
+  {ts}Thank you for your registration.{/ts}
+  {if $participant_status}{ts 1=$participant_status}This is a confirmation that your registration has been received and your status has been updated to %1.{/ts}
+  {else}{if $isOnWaitlist}{ts}This is a confirmation that your registration has been received and your status has been updated to waitlisted.{/ts}{else}{ts}This is a confirmation that your registration has been received and your status has been updated to registered.{/ts}{/if}
+  {/if}
 {/if}
 
 {if $isOnWaitlist}
@@ -36,9 +37,6 @@ Thank you for your participation.  This letter is a confirmation that your regis
 {$pay_later_receipt}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
-{else}
-
-{ts}Please print this confirmation for your records.{/ts}
 {/if}
 
 
@@ -73,19 +71,7 @@ Thank you for your participation.  This letter is a confirmation that your regis
 {/if}
 
 {if $isShowLocation}
-{if $location.address.1.name}
-
-{$location.address.1.name}
-{/if}
-{if $location.address.1.street_address}{$location.address.1.street_address}
-{/if}
-{if $location.address.1.supplemental_address_1}{$location.address.1.supplemental_address_1}
-{/if}
-{if $location.address.1.supplemental_address_2}{$location.address.1.supplemental_address_2}
-{/if}
-{if $location.address.1.city}{$location.address.1.city}, {$location.address.1.state_province} {$location.address.1.postal_code}{if $location.address.1.postal_code_suffix} - {$location.address.1.postal_code_suffix}{/if}
-{/if}
-
+{$location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
 {if $location.phone.1.phone || $location.email.1.email}
@@ -110,7 +96,7 @@ Thank you for your participation.  This letter is a confirmation that your regis
 {if $payer.name}
 You were registered by: {$payer.name}
 {/if}
-{if $event.is_monetary} {* This section for Paid events only.*}
+{if $event.is_monetary and not $isRequireApproval} {* This section for Paid events only.*}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
@@ -213,7 +199,7 @@ You were registered by: {$payer.name}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode ne 'notify' and !$isAmountzero and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and !$isOnWaitlist and !$isRequireApproval}
+{if $billingName}
 
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
@@ -225,7 +211,7 @@ You were registered by: {$payer.name}
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later and !$isOnWaitlist and !$isRequireApproval}
+{if $credit_card_type}
 ==========================================================={if $pricesetFieldsCount }===================={/if}
 
 {ts}Credit Card Information{/ts}

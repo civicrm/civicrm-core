@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -38,16 +22,19 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Id of the contact that is being edited
+   * @var int
    */
   public $_contactId;
 
   /**
    * Type of contact being edited
+   * @var string
    */
   public $_contactType;
 
   /**
    * Sub type of contact being edited
+   * @var string
    */
   public $_contactSubType;
 
@@ -69,7 +56,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Common preprocess: fetch contact ID and contact type
    */
   public function preProcess() {
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE, NULL, $_REQUEST);
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->assign('contactId', $this->_contactId);
 
     // get contact type and subtype
@@ -96,17 +83,17 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   public function buildQuickForm() {
     CRM_Contact_Form_Inline_Lock::buildQuickForm($this, $this->_contactId);
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'upload',
         'name' => ts('Save'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    );
+      ],
+    ];
     $this->addButtons($buttons);
   }
 
@@ -114,7 +101,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Override default cancel action.
    */
   public function cancelAction() {
-    $response = array('status' => 'cancel');
+    $response = ['status' => 'cancel'];
     CRM_Utils_JSON::output($response);
   }
 
@@ -124,7 +111,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $params = array();
+    $defaults = $params = [];
     $params['id'] = $this->_contactId;
 
     CRM_Contact_BAO_Contact::getValues($params, $defaults);
@@ -175,11 +162,11 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
       'contact_view_options', TRUE
     );
     $smarty->assign('changeLog', $viewOptions['log']);
-    $ret = array('markup' => $smarty->fetch('CRM/common/contactFooter.tpl'));
+    $ret = ['markup' => $smarty->fetch('CRM/common/contactFooter.tpl')];
     if ($includeCount) {
       $ret['count'] = CRM_Contact_BAO_Contact::getCountComponent('log', $cid);
     }
-    return array('changeLog' => $ret);
+    return ['changeLog' => $ret];
   }
 
 }

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * Redefine the upload action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  */
 class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
@@ -96,19 +80,22 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
         $newName = CRM_Utils_File::makeFileName($value['name']);
         $status = $element->moveUploadedFile($this->_uploadDir, $newName);
         if (!$status) {
-          CRM_Core_Error::statusBounce(ts('We could not move the uploaded file %1 to the upload directory %2. Please verify that the \'Temporary Files\' setting points to a valid path which is writable by your web server.', array(
-                1 => $value['name'],
-                2 => $this->_uploadDir,
-              )));
+          CRM_Core_Error::statusBounce(ts('We could not move the uploaded file %1 to the upload directory %2. Please verify that the \'Temporary Files\' setting points to a valid path which is writable by your web server.', [
+            1 => $value['name'],
+            2 => $this->_uploadDir,
+          ]));
         }
         if (!empty($data['values'][$pageName][$uploadName]['name'])) {
           @unlink($this->_uploadDir . $data['values'][$pageName][$uploadName]);
         }
 
-        $data['values'][$pageName][$uploadName] = array(
+        $value = [
           'name' => $this->_uploadDir . $newName,
           'type' => $value['type'],
-        );
+        ];
+        //CRM-19460 handle brackets if present in $uploadName, similar things we do it for all other inputs.
+        $value = $element->_prepareValue($value, TRUE);
+        $data['values'][$pageName] = HTML_QuickForm::arrayMerge($data['values'][$pageName], $value);
       }
     }
   }

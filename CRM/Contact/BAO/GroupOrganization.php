@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganization {
 
@@ -48,41 +32,22 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @return CRM_Contact_DAO_GroupOrganization
    */
   public static function add(&$params) {
-    $formattedValues = array();
-    self::formatValues($params, $formattedValues);
-    $dataExists = self::dataExists($formattedValues);
-    if (!$dataExists) {
+    if (!empty($params['group_organization'])) {
+      $params['id'] = $params['group_organization'];
+    }
+    $dataExists = self::dataExists($params);
+    if (!$dataExists && empty($params['id'])) {
       return NULL;
     }
     $groupOrganization = new CRM_Contact_DAO_GroupOrganization();
-    $groupOrganization->copyValues($formattedValues);
-    // we have ensured we have group_id & organization_id so we can do a find knowing that
-    // this can only find a matching record
-    $groupOrganization->find(TRUE);
+    $groupOrganization->copyValues($params);
+    if (!isset($params['id'])) {
+      // we have ensured we have group_id & organization_id so we can do a find knowing that
+      // this can only find a matching record
+      $groupOrganization->find(TRUE);
+    }
     $groupOrganization->save();
     return $groupOrganization;
-  }
-
-  /**
-   * Format the params.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $formatedValues
-   *   (reference ) an assoc array of name/value pairs.
-   */
-  public static function formatValues(&$params, &$formatedValues) {
-    if (!empty($params['group_organization'])) {
-      $formatedValues['id'] = $params['group_organization'];
-    }
-
-    if (!empty($params['group_id'])) {
-      $formatedValues['group_id'] = $params['group_id'];
-    }
-
-    if (!empty($params['organization_id'])) {
-      $formatedValues['organization_id'] = $params['organization_id'];
-    }
   }
 
   /**

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -39,19 +23,19 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    * Return a list of persistent and transient queue providers.
    */
   public function getQueueSpecs() {
-    $queueSpecs = array();
-    $queueSpecs[] = array(
-      array(
+    $queueSpecs = [];
+    $queueSpecs[] = [
+      [
         'type' => 'Sql',
         'name' => 'test-queue',
-      ),
-    );
-    $queueSpecs[] = array(
-      array(
+      ],
+    ];
+    $queueSpecs[] = [
+      [
         'type' => 'Memory',
         'name' => 'test-queue',
-      ),
-    );
+      ],
+    ];
     return $queueSpecs;
   }
 
@@ -66,7 +50,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
   public function tearDown() {
     CRM_Utils_Time::resetTime();
 
-    $tablesToTruncate = array('civicrm_queue_item');
+    $tablesToTruncate = ['civicrm_queue_item'];
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -80,15 +64,15 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'b',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'c',
-    ));
+    ]);
 
     $this->assertEquals(3, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -100,9 +84,9 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertEquals('b', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'd',
-    ));
+    ]);
 
     $this->assertEquals(2, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -127,9 +111,9 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
+    ]);
 
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
@@ -156,9 +140,9 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
     CRM_Utils_Time::setTime('2012-04-01 1:00:00');
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
+    ]);
 
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
@@ -171,7 +155,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertEquals(FALSE, $item2);
 
     // pass expiration mark
-    CRM_Utils_Time::setTime('2012-04-01 2:00:01');
+    CRM_Utils_Time::setTime('2012-04-01 2:00:03');
     $item3 = $this->queue->claimItem();
     $this->assertEquals('a', $item3->data['test-key']);
     $this->assertEquals(1, $this->queue->numberOfItems());
@@ -190,11 +174,10 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
-    require_once 'CRM/Utils/Time.php';
     CRM_Utils_Time::setTime('2012-04-01 1:00:00');
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
+    ]);
 
     $item = $this->queue->claimItem();
     $this->assertEquals('a', $item->data['test-key']);
@@ -223,17 +206,17 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    */
   public function testCreateResetTrue($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'b',
-    ));
+    ]);
     $this->assertEquals(2, $this->queue->numberOfItems());
     unset($this->queue);
 
     $queue2 = $this->queueService->create(
-      $queueSpec + array('reset' => TRUE)
+      $queueSpec + ['reset' => TRUE]
     );
     $this->assertEquals(0, $queue2->numberOfItems());
   }
@@ -246,12 +229,12 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    */
   public function testCreateResetFalse($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'b',
-    ));
+    ]);
     $this->assertEquals(2, $this->queue->numberOfItems());
     unset($this->queue);
 
@@ -271,12 +254,12 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
    */
   public function testLoad($queueSpec) {
     $this->queue = $this->queueService->create($queueSpec);
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'b',
-    ));
+    ]);
     $this->assertEquals(2, $this->queue->numberOfItems());
     unset($this->queue);
 

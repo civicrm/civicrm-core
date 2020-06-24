@@ -62,6 +62,7 @@
     <title>Domain ID</title>
     <comment>Which site is this mailing for</comment>
     <add>4.6</add>
+    <required>true</required>
   </field>
   <field>
     <name>testing_criteria</name>
@@ -121,7 +122,9 @@
   <field>
     <name>created_date</name>
     <title>AB Test Created Date</title>
-    <type>datetime</type>
+    <type>timestamp</type>
+    <required>false</required>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>When was this item created</comment>
     <add>4.6</add>
     <html>

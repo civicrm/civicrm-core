@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -59,11 +43,15 @@ class CRM_Queue_Runner {
   public $onEnd;
   public $onEndUrl;
   public $pathPrefix;
-  // queue-runner id; used for persistence
+  /**
+   * queue-runner id; used for persistence
+   * @var int
+   */
   public $qrid;
 
   /**
-   * @var array whether to display buttons, eg ('retry' => TRUE, 'skip' => FALSE)
+   * @var array
+   * Whether to display buttons, eg ('retry' => TRUE, 'skip' => FALSE)
    */
   public $buttons;
 
@@ -109,10 +97,10 @@ class CRM_Queue_Runner {
     $this->queue = $runnerSpec['queue'];
     $this->errorMode = CRM_Utils_Array::value('errorMode', $runnerSpec, self::ERROR_ABORT);
     $this->isMinimal = CRM_Utils_Array::value('isMinimal', $runnerSpec, FALSE);
-    $this->onEnd = CRM_Utils_Array::value('onEnd', $runnerSpec, NULL);
-    $this->onEndUrl = CRM_Utils_Array::value('onEndUrl', $runnerSpec, NULL);
+    $this->onEnd = $runnerSpec['onEnd'] ?? NULL;
+    $this->onEndUrl = $runnerSpec['onEndUrl'] ?? NULL;
     $this->pathPrefix = CRM_Utils_Array::value('pathPrefix', $runnerSpec, 'civicrm/queue');
-    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, array('retry' => TRUE, 'skip' => TRUE));
+    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, ['retry' => TRUE, 'skip' => TRUE]);
     // perhaps this value should be randomized?
     $this->qrid = $this->queue->getName();
   }
@@ -122,7 +110,7 @@ class CRM_Queue_Runner {
    */
   public function __sleep() {
     // exclude taskCtx
-    return array(
+    return [
       'title',
       'queue',
       'errorMode',
@@ -132,7 +120,7 @@ class CRM_Queue_Runner {
       'pathPrefix',
       'qrid',
       'buttons',
-    );
+    ];
   }
 
   /**
@@ -300,7 +288,7 @@ class CRM_Queue_Runner {
     }
 
     // Fallback; web UI does redirect in Javascript
-    $result = array();
+    $result = [];
     $result['is_error'] = 0;
     $result['numberOfItems'] = 0;
     $result['is_continue'] = 0;
@@ -324,10 +312,10 @@ class CRM_Queue_Runner {
   public function formatTaskResult($isOK, $exception = NULL) {
     $numberOfItems = $this->queue->numberOfItems();
 
-    $result = array();
+    $result = [];
     $result['is_error'] = $isOK ? 0 : 1;
     $result['exception'] = $exception;
-    $result['last_task_title'] = isset($this->lastTaskTitle) ? $this->lastTaskTitle : '';
+    $result['last_task_title'] = $this->lastTaskTitle ?? '';
     $result['numberOfItems'] = $this->queue->numberOfItems();
     if ($result['numberOfItems'] <= 0) {
       // nothing to do

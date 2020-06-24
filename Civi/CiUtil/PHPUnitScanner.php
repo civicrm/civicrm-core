@@ -7,6 +7,7 @@ use Symfony\Component\Finder\Finder;
  * Search for PHPUnit test cases
  */
 class PHPUnitScanner {
+
   /**
    * @param $path
    * @return array <string> class names
@@ -32,7 +33,7 @@ class PHPUnitScanner {
    * @throws \Exception
    */
   public static function findTestClasses($paths) {
-    $testClasses = array();
+    $testClasses = [];
     $finder = new Finder();
 
     foreach ($paths as $path) {
@@ -77,17 +78,17 @@ class PHPUnitScanner {
    *   - method: string
    */
   public static function findTestsByPath($paths) {
-    $r = array();
+    $r = [];
     $testClasses = self::findTestClasses($paths);
     foreach ($testClasses as $testFile => $testClass) {
       $clazz = new \ReflectionClass($testClass);
       foreach ($clazz->getMethods() as $method) {
         if (preg_match('/^test/', $method->name)) {
-          $r[] = array(
+          $r[] = [
             'file' => $testFile,
             'class' => $testClass,
             'method' => $method->name,
-          );
+          ];
         }
       }
     }

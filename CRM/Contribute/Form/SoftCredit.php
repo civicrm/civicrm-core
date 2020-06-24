@@ -1,65 +1,24 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class build form elements for select existing or create new soft block.
  */
 class CRM_Contribute_Form_SoftCredit {
-
-  /**
-   * Set variables up before form is built.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public static function preProcess(&$form) {
-    $contriDAO = new CRM_Contribute_DAO_Contribution();
-    $contriDAO->id = $form->_id;
-    $contriDAO->find(TRUE);
-    if ($contriDAO->contribution_page_id) {
-      $ufJoinParams = array(
-        'module' => 'soft_credit',
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $contriDAO->contribution_page_id,
-      );
-      $profileId = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-
-      //check if any honree profile is enabled if yes then assign its profile type to $_honoreeProfileType
-      // which will be used to constraint soft-credit contact type in formRule, CRM-13981
-      if (!empty($profileId[0]) && !empty($profileId[2])) {
-        $form->_honoreeProfileType = CRM_Core_BAO_UFGroup::getContactType($profileId[0]);
-      }
-    }
-  }
 
   /**
    * Function used to build form element for soft credit block.
@@ -76,7 +35,7 @@ class CRM_Contribute_Form_SoftCredit {
       if ($ufJoinDAO->find(TRUE)) {
         $jsonData = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoinDAO->module_data, TRUE, 'soft_credit');
         if ($jsonData) {
-          foreach (array('honor_block_title', 'honor_block_text') as $name) {
+          foreach (['honor_block_title', 'honor_block_text'] as $name) {
             $form->assign($name, $jsonData[$name]);
           }
 
@@ -93,7 +52,7 @@ class CRM_Contribute_Form_SoftCredit {
     }
 
     // by default generate 10 blocks
-    $item_count = 11;
+    $item_count = $form->_softCreditItemCount;
 
     $showSoftCreditRow = 2;
     if ($form->getAction() & CRM_Core_Action::UPDATE) {
@@ -121,15 +80,15 @@ class CRM_Contribute_Form_SoftCredit {
     }
 
     for ($rowNumber = 1; $rowNumber <= $item_count; $rowNumber++) {
-      $form->addEntityRef("soft_credit_contact_id[{$rowNumber}]", ts('Contact'), array('create' => TRUE));
+      $form->addEntityRef("soft_credit_contact_id[{$rowNumber}]", ts('Contact'), ['create' => TRUE]);
 
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
 
-      $form->addSelect("soft_credit_type[{$rowNumber}]", array(
-          'entity' => 'contribution_soft',
-          'field' => 'soft_credit_type_id',
-          'label' => ts('Type'),
-        ));
+      $form->addSelect("soft_credit_type[{$rowNumber}]", [
+        'entity' => 'contribution_soft',
+        'field' => 'soft_credit_type_id',
+        'label' => ts('Type'),
+      ]);
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
         $form->add('hidden', "soft_credit_id[{$rowNumber}]",
           $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
@@ -142,7 +101,7 @@ class CRM_Contribute_Form_SoftCredit {
     $form->assign('rowCount', $item_count);
     $form->addElement('hidden', 'sct_default_id',
       CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
-      array('id' => 'sct_default_id')
+      ['id' => 'sct_default_id']
     );
   }
 
@@ -160,7 +119,7 @@ class CRM_Contribute_Form_SoftCredit {
     if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
       $form->assign('siteHasPCPs', 1);
       // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
-      $form->add('text', "pcp_made_through_id$suffix", ts('Credit to a Personal Campaign Page'), array('class' => 'twenty', 'placeholder' => ts('- select -')));
+      $form->add('text', "pcp_made_through_id$suffix", ts('Credit to a Personal Campaign Page'), ['class' => 'twenty', 'placeholder' => ts('- select -')]);
       // stores the label
       $form->add('hidden', "pcp_made_through$suffix");
       $form->addElement('checkbox', "pcp_display_in_roll$suffix", ts('Display in Honor Roll?'), NULL);
@@ -189,14 +148,14 @@ class CRM_Contribute_Form_SoftCredit {
     if (!empty($form->_softCreditInfo['pcp_id'])) {
       $noPCP = FALSE;
       $pcpInfo = $form->_softCreditInfo;
-      $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);
+      $pcpId = $pcpInfo['pcp_id'] ?? NULL;
       $pcpTitle = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcpId, 'title');
       $contributionPageTitle = CRM_PCP_BAO_PCP::getPcpPageTitle($pcpId, 'contribute');
       $defaults['pcp_made_through'] = CRM_Utils_Array::value('sort_name', $pcpInfo) . " :: " . $pcpTitle . " :: " . $contributionPageTitle;
-      $defaults['pcp_made_through_id'] = CRM_Utils_Array::value('pcp_id', $pcpInfo);
-      $defaults['pcp_display_in_roll'] = CRM_Utils_Array::value('pcp_display_in_roll', $pcpInfo);
-      $defaults['pcp_roll_nickname'] = CRM_Utils_Array::value('pcp_roll_nickname', $pcpInfo);
-      $defaults['pcp_personal_note'] = CRM_Utils_Array::value('pcp_personal_note', $pcpInfo);
+      $defaults['pcp_made_through_id'] = $pcpInfo['pcp_id'] ?? NULL;
+      $defaults['pcp_display_in_roll'] = $pcpInfo['pcp_display_in_roll'] ?? NULL;
+      $defaults['pcp_roll_nickname'] = $pcpInfo['pcp_roll_nickname'] ?? NULL;
+      $defaults['pcp_personal_note'] = $pcpInfo['pcp_personal_note'] ?? NULL;
     }
 
     $form->assign('noSoftCredit', $noSoftCredit);
@@ -216,12 +175,12 @@ class CRM_Contribute_Form_SoftCredit {
    *   Array of errors
    */
   public static function formRule($fields, $errors, $self) {
-    $errors = array();
+    $errors = [];
 
     // if honor roll fields are populated but no PCP is selected
     if (empty($fields['pcp_made_through_id'])) {
       if (!empty($fields['pcp_display_in_roll']) || !empty($fields['pcp_roll_nickname']) ||
-        CRM_Utils_Array::value('pcp_personal_note', $fields)
+        !empty($fields['pcp_personal_note'])
       ) {
         $errors['pcp_made_through_id'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');
       }
@@ -232,7 +191,7 @@ class CRM_Contribute_Form_SoftCredit {
       foreach ($fields['soft_credit_amount'] as $key => $val) {
         if (!empty($fields['soft_credit_contact_id'][$key])) {
           if ($repeat[$fields['soft_credit_contact_id'][$key]] > 1) {
-            $errors["soft_credit_contact[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
+            $errors["soft_credit_contact_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
           }
           if ($self->_action == CRM_Core_Action::ADD && $fields['soft_credit_amount'][$key]
             && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))
@@ -241,10 +200,6 @@ class CRM_Contribute_Form_SoftCredit {
           }
           if (empty($fields['soft_credit_amount'][$key])) {
             $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
-          }
-          $contactType = CRM_Contact_BAO_Contact::getContactType($fields['soft_credit_contact_id'][$key]);
-          if ($self->_honoreeProfileType && $self->_honoreeProfileType != $contactType) {
-            $errors["soft_credit_contact[$key]"] = ts('Please choose a contact of type %1', array(1 => $self->_honoreeProfileType));
           }
         }
       }

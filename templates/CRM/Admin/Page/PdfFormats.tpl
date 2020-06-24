@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -32,6 +32,7 @@
     {capture assign="messageTemplatesURL"}{crmURL p="civicrm/admin/messageTemplates" q="reset=1"}{/capture}
     {ts 1=$messageTemplatesURL}You can configure one or more PDF Page Formats for your CiviCRM installation. PDF Page Formats may be assigned to <strong><a href="%1">Message Templates</a></strong> to use when creating PDF letters.{/ts}
   </div>
+<div class="crm-content-block crm-block">
 {if $rows}
     <div id="ltype">
         {strip}
@@ -49,7 +50,7 @@
         <tr id="row_{$row.id}" class="crm-pdfFormat {cycle values="odd-row,even-row"} {$row.class}">
             <td class="crm-pdfFormat-name">{$row.name}</td>
             <td class="crm-pdfFormat-description">{$row.description}</td>
-            <td class="crm-pdfFormat-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
+            <td class="crm-pdfFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
           <td class="crm-pdfFormat-order nowrap">{$row.weight}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
@@ -69,3 +70,4 @@
       {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
 {/if}
+</div>

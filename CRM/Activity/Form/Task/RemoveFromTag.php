@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -67,7 +51,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
   }
 
   public function addRules() {
-    $this->addFormRule(array('CRM_Activity_Form_Task_RemoveFromTag', 'formRule'));
+    $this->addFormRule(['CRM_Activity_Form_Task_RemoveFromTag', 'formRule']);
   }
 
   /**
@@ -77,7 +61,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
    * @return array
    */
   public static function formRule($form, $rule) {
-    $errors = array();
+    $errors = [];
     if (empty($form['tag']) && empty($form['activity_taglist'])) {
       $errors['_qf_default'] = "Please select atleast one tag.";
     }
@@ -91,7 +75,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $activityTags = $tagList = array();
+    $activityTags = $tagList = [];
 
     // check if contact tags exists
     if (!empty($params['tag'])) {
@@ -120,27 +104,27 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     // merge contact and taglist tags
     $allTags = CRM_Utils_Array::crmArrayMerge($activityTags, $tagList);
 
-    $this->_name = array();
+    $this->_name = [];
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
       list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_activityHolderIds,
         $key, 'civicrm_activity', FALSE);
 
-      $status = array(
-        ts('%count activity un-tagged', array(
+      $status = [
+        ts('%count activity un-tagged', [
           'count' => $removed,
           'plural' => '%count activities un-tagged',
-        )),
-      );
+        ]),
+      ];
       if ($notRemoved) {
-        $status[] = ts('1 activity already did not have this tag', array(
+        $status[] = ts('1 activity already did not have this tag', [
           'count' => $notRemoved,
           'plural' => '%count activities already did not have this tag',
-        ));
+        ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
     }
   }
 

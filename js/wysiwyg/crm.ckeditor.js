@@ -1,6 +1,5 @@
 // https://civicrm.org/licensing
 (function($, _) {
-  var scriptLoaded = false;
 
   function getInstance(item) {
     var name = $(item).attr("name"),
@@ -13,18 +12,9 @@
     }
   }
 
-  function loadScript(url) {
-    var deferred = $.Deferred(),
-      script = document.createElement('script');
-    script.onload = function() {deferred.resolve();};
-    script.src = url;
-    document.getElementsByTagName("head")[0].appendChild(script);
-    return deferred;
-  }
+  CRM.wysiwyg.supportsFileUploads = true;
 
-  CRM.wysiwyg.supportsFileUploads =  true;
-
-  CRM.wysiwyg.create = function(item) {
+  CRM.wysiwyg._create = function(item) {
     var deferred = $.Deferred();
 
     function onReady() {
@@ -58,13 +48,18 @@
       editor.on('maximize', function (e) {
         $('#civicrm-menu').toggle(e.data === 2);
       });
+      $(editor.element.$).trigger('crmWysiwygCreate', ['ckeditor', editor]);
       deferred.resolve();
     }
-    
+
     function initialize() {
       var
-        browseUrl = CRM.config.resourceBase + "packages/kcfinder/browse.php?cms=civicrm",
-        uploadUrl = CRM.config.resourceBase + "packages/kcfinder/upload.php?cms=civicrm";
+        browseUrl = CRM.config.packagesBase + "kcfinder/browse.php?cms=civicrm",
+        uploadUrl = CRM.config.packagesBase + "kcfinder/upload.php?cms=civicrm&format=json",
+        preset = $(item).data('preset') || 'default',
+        // This variable is always an array but a legacy extension could be setting it as a string.
+        customConfig = (typeof CRM.config.CKEditorCustomConfig === 'string') ? CRM.config.CKEditorCustomConfig :
+          (CRM.config.CKEditorCustomConfig[preset] || CRM.config.CKEditorCustomConfig.default);
 
       $(item).addClass('crm-wysiwyg-enabled');
 
@@ -75,8 +70,7 @@
         filebrowserUploadUrl: uploadUrl + '&type=files',
         filebrowserImageUploadUrl: uploadUrl + '&type=images',
         filebrowserFlashUploadUrl: uploadUrl + '&type=flash',
-        allowedContent: true, // For CiviMail!
-        customConfig: CRM.config.CKEditorCustomConfig,
+        customConfig: customConfig,
         on: {
           instanceReady: onReady
         }
@@ -91,10 +85,7 @@
       if (window.CKEDITOR) {
         initialize();
       } else {
-        if (scriptLoaded === false) {
-          scriptLoaded = loadScript(CRM.config.resourceBase + 'bower_components/ckeditor/ckeditor.js');
-        }
-        scriptLoaded.done(initialize);
+        CRM.loadScript(CRM.config.resourceBase + 'bower_components/ckeditor/ckeditor.js').done(initialize);
       }
     } else {
       deferred.reject();

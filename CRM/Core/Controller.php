@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -38,7 +22,7 @@
  * for other useful tips and suggestions
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'HTML/QuickForm/Controller.php';
@@ -82,7 +66,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * so the display routine needs to not do any work. (The
    * parent object takes care of the display)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_embedded = FALSE;
 
@@ -94,7 +78,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Useful when we run form in non civicrm context
    * and we need to transfer control back.(eg. drupal)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_skipRedirection = FALSE;
 
@@ -102,14 +86,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var boolean
+   * @var bool
    */
   public $_print = 0;
 
   /**
    * Should we generate a qfKey, true by default
    *
-   * @var boolean
+   * @var bool
    */
   public $_generateQFKey = TRUE;
 
@@ -144,7 +128,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * The destination if set will override the destination the code wants to send it to.
    *
-   * @var string;
+   * @var string
    */
   public $_destination = NULL;
 
@@ -170,6 +154,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   Should we add a unique sequence number to the end of the key.
    * @param bool $ignoreKey
    *   Should we not set a qfKey for this controller (for standalone forms).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct(
     $title = NULL,
@@ -214,15 +200,15 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // only use the civicrm cache if we have a valid key
     // else we clash with other users CRM-7059
     if (!empty($this->_key)) {
-      CRM_Core_Session::registerAndRetrieveSessionObjects(array(
+      CRM_Core_Session::registerAndRetrieveSessionObjects([
         "_{$name}_container",
-        array('CiviCRM', $this->_scope),
-      ));
+        ['CiviCRM', $this->_scope],
+      ]);
     }
 
-    $this->HTML_QuickForm_Controller($name, $modal);
+    parent::__construct($name, $modal);
 
-    $snippet = CRM_Utils_Array::value('snippet', $_REQUEST);
+    $snippet = $_REQUEST['snippet'] ?? NULL;
     if ($snippet) {
       if ($snippet == 3) {
         $this->_print = CRM_Core_Smarty::PRINT_PDF;
@@ -239,7 +225,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
-      elseif (in_array($snippet, array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+      elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
@@ -275,12 +261,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   public function fini() {
-    CRM_Core_BAO_Cache::storeSessionToCache(array(
-        "_{$this->_name}_container",
-        array('CiviCRM', $this->_scope),
-      ),
-      TRUE
-    );
+    CRM_Core_BAO_Cache::storeSessionToCache([
+      "_{$this->_name}_container",
+      ['CiviCRM', $this->_scope],
+    ], TRUE);
   }
 
   /**
@@ -300,11 +284,23 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       return NULL;
     }
 
-    $key = CRM_Utils_Array::value('qfKey', $_REQUEST, NULL);
-    if (!$key && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    // We need a form key. Check _POST first, then _GET.
+    // @todo Note: we currently have to check $_REQUEST, too, since that
+    // is currently overwritten by civicrm_api3_contribution_page_validate.
+    // It's bad form to use $_REQUEST because it's ambiguous; and it's bad form
+    // to change superglobals anyway. If PR
+    // https://github.com/civicrm/civicrm-core/pull/17324
+    // and/or related get merged, then we should remove the REQUEST reference here.
+    $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+    if (!$key && in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'])) {
+      // Generate a key if this is an initial request without one.
+      // We allow HEAD here because it is used by bots to validate URLs, so if
+      // we issue a 500 server error to them they may think the site is broken.
       $key = CRM_Core_Key::get($name, $addSequence);
     }
     else {
+      // Other requests that usually change data (POST, but feasibly DELETE,
+      // PUT, PATCH...) always require a valid key.
       $key = CRM_Core_Key::validate($key, $name, $addSequence);
     }
 
@@ -382,7 +378,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param array $uploadNames for the various upload buttons (note u can have more than 1 upload)
    */
   public function addActions($uploadDirectory = NULL, $uploadNames = NULL) {
-    $names = array(
+    $names = [
       'display' => 'CRM_Core_QuickForm_Action_Display',
       'next' => 'CRM_Core_QuickForm_Action_Next',
       'back' => 'CRM_Core_QuickForm_Action_Back',
@@ -393,7 +389,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       'done' => 'CRM_Core_QuickForm_Action_Done',
       'jump' => 'CRM_Core_QuickForm_Action_Jump',
       'submit' => 'CRM_Core_QuickForm_Action_Submit',
-    );
+    ];
 
     foreach ($names as $name => $classPath) {
       $action = new $classPath($this->_stateMachine);
@@ -433,8 +429,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     $pages = $stateMachine->getPages();
     foreach ($pages as $name => $value) {
       $className = CRM_Utils_Array::value('className', $value, $name);
-      $title = CRM_Utils_Array::value('title', $value);
-      $options = CRM_Utils_Array::value('options', $value);
+      $title = $value['title'] ?? NULL;
+      $options = $value['options'] ?? NULL;
       $stateName = CRM_Utils_String::getClassName($className);
       if (!empty($value['className'])) {
         $formName = $name;
@@ -457,8 +453,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       if ($options) {
         $$stateName->setOptions($options);
       }
-      if (property_exists($$stateName, 'urlPath') && isset($_GET[CRM_Core_Config::singleton()->userFrameworkURLVar])) {
-        $$stateName->urlPath = explode('/', $_GET[CRM_Core_Config::singleton()->userFrameworkURLVar]);
+      if (property_exists($$stateName, 'urlPath')) {
+        $$stateName->urlPath = explode('/', (string) CRM_Utils_System::currentPath());
       }
       $this->addPage($$stateName);
       $this->addAction($stateName, new HTML_QuickForm_Action_Direct());
@@ -480,7 +476,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function getButtonName() {
     $data = &$this->container();
-    return CRM_Utils_Array::value('_qf_button_name', $data);
+    return $data['_qf_button_name'] ?? NULL;
   }
 
   /**
@@ -535,12 +531,12 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return array
    */
   public function wizardHeader($currentPageName) {
-    $wizard = array();
-    $wizard['steps'] = array();
+    $wizard = [];
+    $wizard['steps'] = [];
     $count = 0;
     foreach ($this->_pages as $name => $page) {
       $count++;
-      $wizard['steps'][] = array(
+      $wizard['steps'][] = [
         'name' => $name,
         'title' => $page->getTitle(),
         //'link'      => $page->getLink ( ),
@@ -549,7 +545,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         'valid' => TRUE,
         'stepNumber' => $count,
         'collapsed' => FALSE,
-      );
+      ];
 
       if ($name == $currentPageName) {
         $wizard['currentStepNumber'] = $count;
@@ -570,16 +566,16 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param array $wizard
    */
   public function addWizardStyle(&$wizard) {
-    $wizard['style'] = array(
+    $wizard['style'] = [
       'barClass' => '',
-      'stepPrefixCurrent' => '&raquo;',
-      'stepPrefixPast' => '&#x2714;',
+      'stepPrefixCurrent' => '<i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;',
+      'stepPrefixPast' => '<i class="crm-i fa-check" aria-hidden="true"></i>&nbsp;',
       'stepPrefixFuture' => ' ',
       'subStepPrefixCurrent' => '&nbsp;&nbsp;',
       'subStepPrefixPast' => '&nbsp;&nbsp;',
       'subStepPrefixFuture' => '&nbsp;&nbsp;',
       'showTitle' => 1,
-    );
+    ];
   }
 
   /**
@@ -830,7 +826,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   public function invalidKeyCommon() {
     $msg = ts("We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.") . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
-    CRM_Core_Error::fatal($msg);
+    throw new CRM_Core_Exception($msg);
   }
 
   /**

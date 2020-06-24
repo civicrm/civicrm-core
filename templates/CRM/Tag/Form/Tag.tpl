@@ -1,111 +1,103 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing tags  *}
+{crmStyle file='bower_components/jstree/dist/themes/default/style.min.css'}
 {literal}
-<style>
-  #tagtree .highlighted > span {
-    background-color: #fefca6;
-  }
-  #tagtree .helpicon ins {
-    display: none;
-  }
-  #tagtree ins.jstree-icon {
-    cursor: pointer;
-  }
-</style>
 <script type="text/javascript">
   (function($, _){{/literal}
     var entityID={$entityID},
       entityTable='{$entityTable}',
       $form = $('form.{$form.formClass}');
     {literal}
-    CRM.updateContactSummaryTags = function() {
-      var tags = [];
-      $('#tagtree input:checkbox:checked+span label').each(function() {
-        tags.push($(this).text());
-      });
-      $('input.crm-contact-tagset').each(function() {
-        var setTags = _.pluck($(this).select2('data'), 'label');
-        tags = tags.concat(setTags);
-      });
-      // contact summary tabs and search forms both listen for this event
-      $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
-      // update summary tab
-      $("#contact-summary #tags").html(tags.join(', '));
-    };
 
     $(function() {
-      function highlightSelected() {
-        $("ul input:not(:checked)", '#tagtree').each(function () {
-          $(this).closest("li").removeClass('highlighted');
-        });
-        $("ul input:checked", '#tagtree').each(function () {
-          $(this).parents("li[id^=tag]").addClass('highlighted');
-        });
-      }
-      highlightSelected();
 
-      $("#tagtree input").change(function(){
-        var tagid = this.id.replace("check_", "");
-        var op = (this.checked) ? 'create' : 'delete';
-        var api = CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid}, true);
-        highlightSelected();
-        CRM.updateContactSummaryTags();
-      });
-      var childTag = "{/literal}{$loadjsTree}{literal}";
-      if (childTag) {
-        //load js tree.
+      // Display tags on the contact summary
+      function updateContactSummaryTags() {
+        var tags = [],
+          selected = $("#tagtree").jstree(true).get_selected(true);
+        $.each(selected, function(k, item) {
+          var $tag = $(item.text);
+          tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML($tag.attr('title')) || '') + '">' + $tag.text() + '</span>');
+        });
+        $('input.crm-contact-tagset').each(function() {
+          $.each($(this).select2('data'), function (i, tag) {
+            tags.push('<span class="crm-tag-item" title="' + ($.parseHTML(tag.description.text) || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + tag.label + '</span>');
+          });
+        });
+        // contact summary tabs and search forms both listen for this event
+        $($form).closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
+        // update summary tab
+        $("#contact-summary #tags").html(tags.join(' '));
+      }
+
+      // Load js tree.
+      CRM.loadScript(CRM.config.resourceBase + 'bower_components/jstree/dist/jstree.min.js').done(function() {
         $("#tagtree").jstree({
-          plugins : ["themes", "html_data"],
-          themes: {
-            "theme": 'classic',
-            "dots": false,
-            "icons": false,
-            "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
+          plugins : ['search', 'wholerow', 'checkbox'],
+          core: {
+            animation: 100,
+            themes: {
+              "theme": 'classic',
+              "dots": false,
+              "icons": false
+            }
+          },
+          'search': {
+            'case_insensitive' : true,
+            'show_only_matches': true
+          },
+          checkbox: {
+            three_state: false
           }
-        });
-      }
-      {/literal}
-      {if $permission neq 'edit'}
-        {literal}
-          $("#tagtree input").prop('disabled', true);
-        {/literal}
-      {/if}
-      {literal}
+        })
+          .on('select_node.jstree deselect_node.jstree', function(e, selected) {
+            var id = selected.node.a_attr.id.replace('tag_', ''),
+              op = e.type === 'select_node' ? 'create' : 'delete';
+            CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: id}, true);
+            updateContactSummaryTags();
+          });
+      });
 
-      $(document).on('change', 'input.crm-contact-tagset', CRM.updateContactSummaryTags);
+      $(document).on('change', 'input.crm-contact-tagset', updateContactSummaryTags);
+
+      $('input[name=filter_tag_tree]', '#Tag').on('keyup change', function() {
+        $("#tagtree").jstree(true).search($(this).val());
+      });
     });
   })(CRM.$, CRM._);
   {/literal}
 </script>
 <div id="Tag" class="view-content">
-  <h3>{if !$hideContext}{ts}Tags{/ts}{/if}</h3>
-  <div id="tagtree">
-    {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
-  </div>
-  <br />
-{include file="CRM/common/Tagset.tpl"}
+  <table class="">
+    <thead>
+      <tr>
+        <th>{ts}Tag Tree{/ts}</th>
+        {if $tagsetInfo.contact}<th>{ts}Tag Sets{/ts}</th>{/if}
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
+          <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+          <div id="tagtree">
+            {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
+          </div>
+        </td>
+        {if $tagsetInfo.contact}
+        <td>
+          {include file="CRM/common/Tagset.tpl"}
+        </td>
+        {/if}
+      </tr>
+    </tbody>
+  </table>
 </div>

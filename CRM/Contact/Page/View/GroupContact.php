@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
 
@@ -37,15 +21,15 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    */
   public function browse() {
 
-    $count = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, NULL, NULL, TRUE);
+    $count = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, NULL, NULL, TRUE, FALSE, FALSE, TRUE, NULL, TRUE);
 
-    $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added');
-    $pending = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Pending');
-    $out = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Removed');
+    $in = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Added', NULL, FALSE, FALSE, FALSE, TRUE, NULL, TRUE);
+    $pending = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Pending', NULL, FALSE, FALSE, FALSE, TRUE, NULL, TRUE);
+    $out = CRM_Contact_BAO_GroupContact::getContactGroup($this->_contactId, 'Removed', NULL, FALSE, FALSE, FALSE, TRUE, NULL, TRUE);
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
     // section
-    $staticGroups = array();
+    $staticGroups = [];
     if (!empty($in)) {
       foreach ($in as $group) {
         $staticGroups[$group['group_id']] = 1;
@@ -176,7 +160,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
       return FALSE;
     }
 
-    $ids = array($contactID);
+    $ids = [$contactID];
     $method = 'Admin';
 
     $session = CRM_Core_Session::singleton();

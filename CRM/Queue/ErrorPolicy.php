@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,12 +13,12 @@
  * To ensure that PHP errors or unhandled exceptions are reported in JSON
  * format, wrap this around your code. For example:
  *
- * @code
+ * ```
  * $errorContainer = new CRM_Queue_ErrorPolicy();
  * $errorContainer->call(function() {
  *    ...include some files, do some work, etc...
  * });
- * @endcode
+ * ```
  *
  * Note: Most of the code in this class is pretty generic vis-a-vis error
  * handling -- except for 'reportError', whose message format is only
@@ -49,7 +33,7 @@ class CRM_Queue_ErrorPolicy {
    *   PHP error level to capture (e.g. E_PARSE|E_USER_ERROR).
    */
   public function __construct($level = NULL) {
-    register_shutdown_function(array($this, 'onShutdown'));
+    register_shutdown_function([$this, 'onShutdown']);
     if ($level === NULL) {
       $level = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
     }
@@ -61,16 +45,16 @@ class CRM_Queue_ErrorPolicy {
    */
   public function activate() {
     $this->active = TRUE;
-    $this->backup = array();
-    foreach (array(
-               'display_errors',
-               'html_errors',
-               'xmlrpc_errors',
-             ) as $key) {
+    $this->backup = [];
+    foreach ([
+      'display_errors',
+      'html_errors',
+      'xmlrpc_errors',
+    ] as $key) {
       $this->backup[$key] = ini_get($key);
       ini_set($key, 0);
     }
-    set_error_handler(array($this, 'onError'), $this->level);
+    set_error_handler([$this, 'onError'], $this->level);
     // FIXME make this temporary/reversible
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
@@ -81,11 +65,11 @@ class CRM_Queue_ErrorPolicy {
   public function deactivate() {
     $this->errorScope = NULL;
     restore_error_handler();
-    foreach (array(
-               'display_errors',
-               'html_errors',
-               'xmlrpc_errors',
-             ) as $key) {
+    foreach ([
+      'display_errors',
+      'html_errors',
+      'xmlrpc_errors',
+    ] as $key) {
       ini_set($key, $this->backup[$key]);
     }
     $this->active = FALSE;
@@ -155,11 +139,11 @@ class CRM_Queue_ErrorPolicy {
    *   The PHP error (with "type", "message", etc).
    */
   public function reportError($error) {
-    $response = array(
+    $response = [
       'is_error' => 1,
       'is_continue' => 0,
       'exception' => htmlentities(sprintf('Error %s: %s in %s, line %s', $error['type'], $error['message'], $error['file'], $error['line'])),
-    );
+    ];
     global $activeQueueRunner;
     if (is_object($activeQueueRunner)) {
       $response['last_task_title'] = $activeQueueRunner->lastTaskTitle;
@@ -178,10 +162,10 @@ class CRM_Queue_ErrorPolicy {
   public function reportException(Exception $e) {
     CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', CRM_Core_Error::formatTextException($e));
 
-    $response = array(
+    $response = [
       'is_error' => 1,
       'is_continue' => 0,
-    );
+    ];
 
     $config = CRM_Core_Config::singleton();
     if ($config->backtrace || CRM_Core_Config::isUpgradeMode()) {

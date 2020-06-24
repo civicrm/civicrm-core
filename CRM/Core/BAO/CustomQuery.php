@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
@@ -79,10 +63,10 @@ class CRM_Core_BAO_CustomQuery {
   public $_qill;
 
   /**
-   * @deprecated
    * No longer needed due to CRM-17646 refactoring, but still used in some places
    *
    * @var array
+   * @deprecated
    */
   public $_options;
 
@@ -94,9 +78,16 @@ class CRM_Core_BAO_CustomQuery {
   public $_fields;
 
   /**
+   * @return array
+   */
+  public function getFields() {
+    return $this->_fields;
+  }
+
+  /**
    * Searching for contacts?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_contactSearch;
 
@@ -107,7 +98,7 @@ class CRM_Core_BAO_CustomQuery {
    *
    * @var array
    */
-  static $extendsMap = array(
+  public static $extendsMap = [
     'Contact' => 'civicrm_contact',
     'Individual' => 'civicrm_contact',
     'Household' => 'civicrm_contact',
@@ -126,7 +117,7 @@ class CRM_Core_BAO_CustomQuery {
     'Address' => 'civicrm_address',
     'Campaign' => 'civicrm_campaign',
     'Survey' => 'civicrm_survey',
-  );
+  ];
 
   /**
    * Class constructor.
@@ -140,20 +131,20 @@ class CRM_Core_BAO_CustomQuery {
    * @param bool $contactSearch
    * @param array $locationSpecificFields
    */
-  public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
-    $this->_ids = &$ids;
+  public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = []) {
+    $this->_ids = $ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
-    $this->_select = array();
-    $this->_element = array();
-    $this->_tables = array();
-    $this->_whereTables = array();
-    $this->_where = array();
-    $this->_qill = array();
-    $this->_options = array();
+    $this->_select = [];
+    $this->_element = [];
+    $this->_tables = [];
+    $this->_whereTables = [];
+    $this->_where = [];
+    $this->_qill = [];
+    $this->_options = [];
 
-    $this->_fields = array();
     $this->_contactSearch = $contactSearch;
+    $this->_fields = CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
     if (empty($this->_ids)) {
       return;
@@ -177,37 +168,16 @@ SELECT f.id, f.label, f.data_type,
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      // get the group dao to figure which class this custom field extends
-      $extends = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $dao->custom_group_id, 'extends');
-      if (array_key_exists($extends, self::$extendsMap)) {
-        $extendsTable = self::$extendsMap[$extends];
-      }
-      elseif (in_array($extends, CRM_Contact_BAO_ContactType::subTypes())) {
-        // if $extends is a subtype, refer contact table
-        $extendsTable = self::$extendsMap['Contact'];
-      }
-      $this->_fields[$dao->id] = array(
-        'id' => $dao->id,
-        'label' => $dao->label,
-        'extends' => $extendsTable,
-        'data_type' => $dao->data_type,
-        'html_type' => $dao->html_type,
-        'is_search_range' => $dao->is_search_range,
-        'column_name' => $dao->column_name,
-        'table_name' => $dao->table_name,
-        'option_group_id' => $dao->option_group_id,
-      );
-
       // Deprecated (and poorly named) cache of field attributes
-      $this->_options[$dao->id] = array(
-        'attributes' => array(
+      $this->_options[$dao->id] = [
+        'attributes' => [
           'label' => $dao->label,
           'data_type' => $dao->data_type,
           'html_type' => $dao->html_type,
-        ),
-      );
+        ],
+      ];
 
-      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, array(), 'search');
+      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, [], 'search');
       if ($options) {
         $this->_options[$dao->id] += $options;
       }
@@ -227,62 +197,32 @@ SELECT f.id, f.label, f.data_type,
       return;
     }
 
-    foreach ($this->_fields as $id => $field) {
+    foreach (array_keys($this->_ids) as $id) {
+      // Ignore any custom field ids within the ids array that are not present in the fields array.
+      if (empty($this->_fields[$id])) {
+        continue;
+      }
+      $field = $this->_fields[$id];
+
+      if ($this->_contactSearch && $field['search_table'] === 'contact_a') {
+        CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
+      }
+
       $name = $field['table_name'];
       $fieldName = 'custom_' . $field['id'];
       $this->_select["{$name}_id"] = "{$name}.id as {$name}_id";
       $this->_element["{$name}_id"] = 1;
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
-      $joinTable = NULL;
-      // CRM-14265
-      if ($field['extends'] == 'civicrm_group') {
-        return;
-      }
-      elseif ($field['extends'] == 'civicrm_contact') {
-        $joinTable = 'contact_a';
-      }
-      elseif ($field['extends'] == 'civicrm_contribution') {
-        $joinTable = $field['extends'];
-      }
-      elseif (in_array($field['extends'], self::$extendsMap)) {
-        $joinTable = $field['extends'];
-      }
-      else {
-        return;
-      }
 
-      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
-
-      if ($this->_ids[$id]) {
-        $this->_whereTables[$name] = $this->_tables[$name];
-      }
-
-      if ($joinTable) {
-        $joinClause = 1;
-        $joinTableAlias = $joinTable;
-        // Set location-specific query
-        if (isset($this->_locationSpecificCustomFields[$id])) {
-          list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$id];
-          $joinTableAlias = "$locationType-address";
-          $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
-        }
-        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
-        if ($this->_ids[$id]) {
-          $this->_whereTables[$name] = $this->_tables[$name];
-        }
-        if ($joinTable != 'contact_a') {
-          $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
-        }
-        elseif ($this->_contactSearch) {
-          CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
-        }
-      }
+      $this->joinCustomTableForField($field);
     }
   }
 
   /**
    * Generate the where clause and also the english language equivalent.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function where() {
     foreach ($this->_ids as $id => $values) {
@@ -293,8 +233,6 @@ SELECT f.id, f.label, f.data_type,
       ) {
         continue;
       }
-
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
 
       foreach ($values as $tuple) {
         list($name, $op, $value, $grouping, $wildcard) = $tuple;
@@ -322,6 +260,8 @@ SELECT f.id, f.label, f.data_type,
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
+        // Ensure the table is joined in (eg if in where but not select).
+        $this->joinCustomTableForField($field);
         switch ($field['data_type']) {
           case 'String':
           case 'StateProvince':
@@ -334,36 +274,50 @@ SELECT f.id, f.label, f.data_type,
               // fix $value here to escape sql injection attacks
               if (!is_array($value)) {
                 if ($field['data_type'] == 'String') {
-                  $value = CRM_Utils_Type::escape($strtolower($value), 'String');
+                  $value = CRM_Utils_Type::escape($value, 'String');
                 }
-                else {
+                elseif ($value) {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
                 }
+                $value = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $value);
+                $value = str_replace('|', '[:separator:]', $value);
               }
               elseif ($isSerialized) {
                 if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
                   $op = key($value);
                   $value = $value[$op];
                 }
-                $value = implode(',', (array) $value);
+                // CRM-19006: escape characters like comma, | before building regex pattern
+                $value = (array) $value;
+                foreach ($value as $key => $val) {
+                  $value[$key] = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $val);
+                  $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
+                  if ($field['data_type'] == 'String') {
+                    $value[$key] = CRM_Utils_Type::escape($value[$key], 'String');
+                  }
+                  elseif ($value) {
+                    $value[$key] = CRM_Utils_Type::escape($value[$key], 'Integer');
+                  }
+                }
+                $value = implode(',', $value);
               }
 
               // CRM-14563,CRM-16575 : Special handling of multi-select custom fields
               if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
-                if (strstr($op, 'IN')) {
-                  $value = str_replace(",", "$sp|$sp", $value);
-                  $value = str_replace('(', '[[.left-parenthesis.]]', $value);
-                  $value = str_replace(')', '[[.right-parenthesis.]]', $value);
-                }
+                $value = str_replace(",", "$sp|$sp", $value);
+                $value = str_replace(['[:comma:]', '(', ')'], [',', '[(]', '[)]'], $value);
+
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
                 if (!$wildcard) {
                   foreach (explode("|", $value) as $val) {
+                    $val = str_replace('[:separator:]', '\|', $val);
                     $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $val, 'String');
                   }
                 }
                 else {
+                  $value = str_replace('[:separator:]', '\|', $value);
                   $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
                 }
               }
@@ -383,7 +337,7 @@ SELECT f.id, f.label, f.data_type,
 
           case 'Int':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));;
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Boolean':
@@ -398,35 +352,46 @@ SELECT f.id, f.label, f.data_type,
               $qillValue = $value ? 'Yes' : 'No';
             }
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Link':
           case 'Memo':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Money':
             $value = CRM_Utils_Array::value($op, (array) $value, $value);
             if (is_array($value)) {
               foreach ($value as $key => $val) {
-                $value[$key] = CRM_Utils_Rule::cleanMoney($value[$key]);
+                // @todo - this clean money should be in the form layer - it's highly likely to be doing more harm than good here
+                // Note the only place I can find that this code is reached by is searching a custom money field in advanced search.
+                // with euro style comma separators this doesn't work - with or without this cleanMoney.
+                // So this should be removed but is not increasing the brokeness IMHO
+                $value[$op][$key] = CRM_Utils_Rule::cleanMoney($value[$key]);
               }
             }
             else {
+              // @todo - this clean money should be in the form layer - it's highly likely to be doing more harm than good here
+              // comments per above apply. cleanMoney
               $value = CRM_Utils_Rule::cleanMoney($value);
             }
 
           case 'Float':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Date':
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, array(), CRM_Utils_Type::T_DATE);
-            $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+            if (substr($name, -9, 9) !== '_relative'
+              && substr($name, -4, 4) !== '_low'
+              && substr($name, -5, 5) !== '_high') {
+              // Relative dates are handled in the buildRelativeDateQuery function.
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
+              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
+              $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+            }
             break;
 
           case 'File':
@@ -463,7 +428,7 @@ SELECT f.id, f.label, f.data_type,
 
     $whereStr = NULL;
     if (!empty($this->_where)) {
-      $clauses = array();
+      $clauses = [];
       foreach ($this->_where as $grouping => $values) {
         if (!empty($values)) {
           $clauses[] = ' ( ' . implode(' AND ', $values) . ' ) ';
@@ -474,11 +439,42 @@ SELECT f.id, f.label, f.data_type,
       }
     }
 
-    return array(
+    return [
       implode(' , ', $this->_select),
       implode(' ', $this->_tables),
       $whereStr,
-    );
+    ];
+  }
+
+  /**
+   * Join the custom table for the field in (if not already in the query).
+   *
+   * @param array $field
+   */
+  protected function joinCustomTableForField($field) {
+    $name = $field['table_name'];
+    $join = "\nLEFT JOIN $name ON $name.entity_id = {$field['search_table']}.id";
+    $this->_tables[$name] = $this->_tables[$name] ?? $join;
+    $this->_whereTables[$name] = $this->_whereTables[$name] ?? $join;
+
+    $joinTable = $field['search_table'];
+    if ($joinTable) {
+      $joinClause = 1;
+      $joinTableAlias = $joinTable;
+      // Set location-specific query
+      if (isset($this->_locationSpecificCustomFields[$field['id']])) {
+        list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$field['id']];
+        $joinTableAlias = "$locationType-address";
+        $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
+      }
+      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
+      if (!empty($this->_ids[$field['id']])) {
+        $this->_whereTables[$name] = $this->_tables[$name];
+      }
+      if ($joinTable !== 'contact_a') {
+        $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
+      }
+    }
   }
 
 }

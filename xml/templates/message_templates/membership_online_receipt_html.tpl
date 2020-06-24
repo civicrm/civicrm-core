@@ -11,7 +11,7 @@
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="500" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
@@ -21,21 +21,19 @@
 
   <tr>
    <td>
-
+     {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $receipt_text}
      <p>{$receipt_text|htmlize}</p>
     {/if}
 
     {if $is_pay_later}
      <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
-    {else}
-     <p>{ts}Please print this confirmation for your records.{/ts}</p>
     {/if}
 
    </td>
   </tr>
   </table>
-  <table width="500" style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
+  <table style="width:100%; max-width:500px; border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse;">
 
      {if $membership_assign && !$useForMember}
       <tr>
@@ -91,8 +89,7 @@
          {$membership_amount|crmMoney}
         </td>
        </tr>
-       {if $amount}
-        {if ! $is_separate_payment }
+       {if $amount && !$is_separate_payment }
          <tr>
           <td {$labelStyle}>
            {ts}Contribution Amount{/ts}
@@ -101,25 +98,15 @@
            {$amount|crmMoney}
           </td>
          </tr>
-        {else}
          <tr>
-          <td {$labelStyle}>
-           {ts}Additional Contribution{/ts}
-          </td>
-          <td {$valueStyle}>
-           {$amount|crmMoney}
-          </td>
+           <td {$labelStyle}>
+           {ts}Total{/ts}
+            </td>
+            <td {$valueStyle}>
+            {$amount+$membership_amount|crmMoney}
+           </td>
          </tr>
-        {/if}
        {/if}
-       <tr>
-        <td {$labelStyle}>
-         {ts}Total{/ts}
-        </td>
-        <td {$valueStyle}>
-         {$amount+$membership_amount|crmMoney}
-        </td>
-       </tr>
 
       {elseif !$useForMember && $lineItem and $priceSetID and !$is_quick_config}
 
@@ -316,18 +303,21 @@
       </tr>
      {/if}
      {if $is_recur}
-      {if $contributeMode eq 'notify' or $contributeMode eq 'directIPN'}
        <tr>
         <td colspan="2" {$labelStyle}>
-         {ts 1=$cancelSubscriptionUrl}This membership will be renewed automatically. You can cancel the auto-renewal option by <a href="%1">visiting this web page</a>.{/ts}
+         {ts}This membership will be renewed automatically.{/ts}
+         {if $cancelSubscriptionUrl}
+           {ts 1=$cancelSubscriptionUrl}You can cancel the auto-renewal option by <a href="%1">visiting this web page</a>.{/ts}
+         {/if}
         </td>
        </tr>
-       <tr>
-        <td colspan="2" {$labelStyle}>
-         {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
-        </td>
-       </tr>
-      {/if}
+       {if $updateSubscriptionBillingUrl}
+         <tr>
+          <td colspan="2" {$labelStyle}>
+           {ts 1=$updateSubscriptionBillingUrl}You can update billing details for this automatically renewed membership by <a href="%1">visiting this web page</a>.{/ts}
+          </td>
+         </tr>
+       {/if}
      {/if}
 
      {if $honor_block_is_active}
@@ -402,35 +392,33 @@
       {/foreach}
      {/if}
 
-     {if ! ($contributeMode eq 'notify' OR $contributeMode eq 'directIPN') and $is_monetary}
-      {if $is_pay_later}
+     {if $billingName}
        <tr>
-        <th {$headerStyle}>
-         {ts}Registered Email{/ts}
-        </th>
-       </tr>
-       <tr>
+         <th {$headerStyle}>
+           {ts}Billing Name and Address{/ts}
+         </th>
+      </tr>
+      <tr>
         <td colspan="2" {$valueStyle}>
-         {$email}
+          {$billingName}<br />
+          {$address|nl2br}<br />
+          {$email}
         </td>
-       </tr>
-      {elseif $amount GT 0 OR $membership_amount GT 0}
-       <tr>
+      </tr>
+    {elseif $email}
+      <tr>
         <th {$headerStyle}>
-         {ts}Billing Name and Address{/ts}
+          {ts}Registered Email{/ts}
         </th>
-       </tr>
-       <tr>
+      </tr>
+      <tr>
         <td colspan="2" {$valueStyle}>
-         {$billingName}<br />
-         {$address|nl2br}<br />
-         {$email}
+          {$email}
         </td>
-       </tr>
-      {/if}
-     {/if}
+      </tr>
+    {/if}
 
-     {if $contributeMode eq 'direct' AND !$is_pay_later AND ($amount GT 0 OR $membership_amount GT 0)}
+     {if $credit_card_type}
       <tr>
        <th {$headerStyle}>
         {ts}Credit Card Information{/ts}

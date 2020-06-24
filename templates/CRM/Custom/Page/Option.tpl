@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8}
@@ -42,6 +26,7 @@
           <tr class="columnheader">
             <th class='crm-custom_option-label'>{ts}Label{/ts}</th>
             <th class='crm-custom_option-value'>{ts}Value{/ts}</th>
+	          <th class='crm-custom_option-description'>{ts}Description{/ts}</th>
             <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
             <th class='crm-custom_option-is_active'>{ts}Enabled?{/ts}</th>
             <th class='crm-custom_option-links'>&nbsp;</th>
@@ -69,6 +54,7 @@
               "aoColumns"  : [
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
+                              {sClass:'crm-custom_option-description'},
                               {sClass:'crm-custom_option-default_value'},
                               {sClass:'crm-custom_option-is_active'},
                               {sClass:'crm-custom_option-links'},
@@ -101,12 +87,11 @@
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
                 $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
                 $('td:eq(0)', nRow).prepend('<span class="crm-i fa-arrows crm-grip" />');
-                $('td:eq(2)', nRow).addClass('crmf-default_value');
+                $('td:eq(3)', nRow).addClass('crmf-default_value').html(CRM.utils.formatIcon('fa-check', ts('Default'), nRow.cells[3].innerText));
                 return nRow;
               },
               "fnDrawCallback": function() {
-                // FIXME: trigger crmLoad and crmEditable would happen automatically
-                $('.crm-editable').crmEditable();
+                $(this).trigger('crmLoad');
               },
 
               "fnServerData": function ( sSource, aoData, fnCallback ) {
@@ -158,7 +143,10 @@
       {/literal}
 
       <div class="action-link">
-          {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {crmButton q="reset=1&action=map&fid=$fid&gid=$gid" class="action-item open-inline-noreturn" icon="sort-alpha-asc"}{ts}Alphabetize Options{/ts}{/crmButton}
+          {if !$isOptionGroupLocked}
+            {crmButton q="reset=1&action=add&fid=$fid&gid=$gid" class="action-item" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
+          {/if}
           {crmButton p="civicrm/admin/custom/group/field" q="reset=1&action=browse&gid=$gid" class="action-item cancel" icon="times"}{ts}Done{/ts}{/crmButton}
       </div>
     </div>

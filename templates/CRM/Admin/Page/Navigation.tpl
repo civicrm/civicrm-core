@@ -1,173 +1,134 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action eq 1 or $action eq 2 or $action eq 8}
   {include file="CRM/Admin/Form/Navigation.tpl"}
 {else}
   <div class="help">
-    {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
+    {capture assign="displayPrefUrl"}href="{crmURL p='civicrm/admin/setting/preferences/display' q='reset=1'}"{/capture}
+    {capture assign="searchPrefUrl"}href="{crmURL p='civicrm/admin/setting/search' q='reset=1'}"{/capture}
+    <p>{ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}</p>
+    <p>{ts 1=$displayPrefUrl}The menu color and position can be adjusted on the <a %1>Display Preferences</a> screen.{/ts}</p>
+    <p>{ts 1=$searchPrefUrl}Quicksearch options can be edited on the <a %1>Search Preferences</a> screen.{/ts}</p>
   </div>
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}&nbsp;&nbsp;&nbsp;&nbsp;
-        <span id="reset-menu" class="status" style="display:none">
-        {capture assign=rebuildURL}{crmURL p='civicrm/admin/menu' q="reset=1"}{/capture}
-          {ts 1=$rebuildURL}<a href='%1' title="Reload page"><strong>Click here</strong></a> to reload the page and see your changes in the menu bar above.{/ts}
-        </span><br/><br/>
+      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}
     </div>
     <div class="spacer"></div>
+    <div style="padding-left: 48px;"><img src="{$config->resourceBase}i/logo_sm.png" /></div>
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
     <div class="spacer"></div>
     <div>
       <a href="#" class="nav-reset crm-hover-button">
         {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
-        <i class="crm-i fa-undo"></i> {ts}Cleanup reports menu{/ts}
+        <i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
       </a>
     </div>
     <div class="spacer"></div>
   </div>
   {literal}
-  <style type="text/css">
-    #navigation-tree li {
-      font-weight: normal;
-    }
-    #navigation-tree > ul > li {
-      font-weight: bold;
-    }
-  </style>
   <script type="text/javascript">
     CRM.$(function($) {
       $("#navigation-tree").jstree({
-        plugins: [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
-        json_data: {
-          ajax:{
-            dataType: "json",
-            url: {/literal}"{crmURL p='civicrm/ajax/menu' h=0 q='key='}{crmKey name='civicrm/ajax/menu'}"{literal}
+        plugins: ["dnd", "contextmenu"],
+        core: {
+          data: function(tree, callBack) {
+            CRM.api3('Navigation', 'get', {
+              domain_id: {/literal}{$config->domainID()}{literal},
+              options: {limit: 0, sort: 'weight'},
+              return: ['label', 'parent_id', 'icon'],
+              name: {'!=': 'Home'},
+              sequential: 1
+            }).then(function(data) {
+              var items = [];
+              $.each(data.values, function(key, value) {
+                items.push({
+                  id: value.id,
+                  text: value.label,
+                  icon: value.icon || false,
+                  parent: value.parent_id || '#'
+                });
+              });
+              callBack(items);
+            });
           },
-          progressive_render: true
+          progressive_render: true,
+          check_callback: true
         },
-        themes: {
-          "theme": 'classic',
-          "dots": true,
-          "icons": false,
-          "url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/classic/style.css'
-        },
-        rules: {
-          droppable: [ "tree-drop" ],
-          multiple: true,
-          deletable: "all",
-          draggable: "all"
-        },
-        crrm: {
-          move: {
-            check_move: function(m) {
-              var homeMenuId = {/literal}"{$homeMenuId}"{literal};
-              if ( $( m.r[0] ).attr('id').replace("node_","") == homeMenuId ||
-                $( m.o[0] ).attr('id').replace("node_","") == homeMenuId ) {
-                return false;
-              } else {
-                return true;
-              }
-            }
-          }
+        dnd: {
+          copy: false
         },
         contextmenu: {
-          items: {
-            create: false,
-            ccp: {
-              label : "{/literal}{ts escape='js'}Edit{/ts}{literal}",
-              visible: function (node, obj) { if(node.length != 1) return false;
-                return obj.check("renameable", node); },
-              action: function (node, obj) {
-                var nid = $(node).prop('id');
-                var nodeID = nid.substr( 5 );
-                var editURL = {/literal}"{crmURL p='civicrm/admin/menu' h=0 q='action=update&reset=1&id='}"{literal} + nodeID;
-                CRM.loadForm(editURL).on('crmFormSuccess', function() {
-                  $("#navigation-tree").jstree('refresh');
-                  $("#reset-menu").show( );
-                });
+          items: function (node, callBack) {
+            var items = {
+              add: {
+                label: "{/literal}{ts escape='js'}Add{/ts}{literal}",
+                icon: 'crm-i fa-plus',
+                action: editForm
               },
-              submenu: false
-            }
+              edit: {
+                label: "{/literal}{ts escape='js'}Edit{/ts}{literal}",
+                icon: 'crm-i fa-pencil',
+                action: editForm
+              },
+              delete: {
+                label: "{/literal}{ts escape='js'}Delete{/ts}{literal}",
+                icon: 'crm-i fa-trash',
+                action: function (menu) {
+                  var nodeID = menu.reference.attr('id').replace('_anchor', ''),
+                    node = $("#navigation-tree").jstree(true).get_node(nodeID),
+                    menuName = node.text;
+                  var deleteMsg = {/literal}"{ts escape='js'}Are you sure you want to delete this menu item:{/ts} " + '"'{literal} + menuName + {/literal}'"? {ts escape='js'}This action cannot be undone.{/ts}'{literal};
+                  if (node.children.length) {
+                    deleteMsg += {/literal}"<br /><br />" + ts('{ts escape='js' 1='<strong>%1</strong>'}%1 sub-menu items will also be deleted.{/ts}'{literal}, {1: node.children.length});
+                  }
+                  CRM.confirm({message: deleteMsg})
+                    .on('crmConfirm:yes', function() {
+                      CRM.api3('Navigation', 'delete', {id: nodeID}, true).then(refreshMenubar);
+                      $("#navigation-tree").jstree(true).delete_node(menu.reference.closest('li'));
+                    });
+                }
+              }
+            };
+            callBack(items);
           }
         }
-
-      }).bind("rename.jstree", function ( e,node ) {
-        var nodeID  = node.rslt.obj.attr('id').replace("node_","");
-        var newName = node.rslt.new_name;
+      }).on("move_node.jstree", function (e, data) {
+        var nodeID = data.node.id;
+        var refID = data.parent === '#' ? '' : data.parent;
+        var ps = data.position;
         var postURL = {/literal}"{crmURL p='civicrm/ajax/menutree' h=0 q='key='}{crmKey name='civicrm/ajax/menutree'}"{literal};
-        $.get( postURL + '&type=rename&id=' + nodeID + '&data=' + newName,
-          function (data) {
-            $("#reset-menu").show( );
-          }
-        );
-
-      }).bind("remove.jstree", function( e,node ) {
-        var menuName  = node.rslt.obj.find('a').first( ).text( );
-        var nodeID  = node.rslt.obj.attr('id').replace("node_","");
-
-        // don't allow deleting of home
-        var homeMenuId = {/literal}"{$homeMenuId}"{literal};
-        if ( nodeID == homeMenuId ) {
-          var cannotDeleteMsg = {/literal}"{ts escape='js'}You cannot delete this menu item:{/ts}" + " "{literal} + menuName;
-          CRM.alert( cannotDeleteMsg, {/literal}"{ts escape='js'}Cannot Delete{/ts}"{literal} );
-          $("#navigation-tree").jstree('refresh');
-          return false;
-        }
-        var deleteMsg = {/literal}"{ts escape='js'}Are you sure you want to delete this menu item:{/ts}" + " "{literal} + menuName + {/literal}" ? {ts}This action cannot be undone.{/ts}"{literal};
-        var isDelete  = confirm( deleteMsg );
-        if ( isDelete ) {
-          var postURL = {/literal}"{crmURL p='civicrm/ajax/menutree' h=0 q='key='}{crmKey name='civicrm/ajax/menutree'}"{literal};
-          $.get( postURL + '&type=delete&id=' + nodeID,
-            function (data) {
-              $("#reset-menu").show( );
-            }
-          );
-        } else {
-          $("#navigation-tree").jstree('refresh');
-        }
-
-      }).bind("move_node.jstree", function ( e,node ) {
-        node.rslt.o.each(function (i) {
-          var nodeID = node.rslt.o.attr('id').replace("node_","");
-          var refID  = node.rslt.np.attr('id').replace("node_","");
-          if (isNaN( refID ) ){ refID =''; }
-          var ps = node.rslt.cp+i;
-          var postURL = {/literal}"{crmURL p='civicrm/ajax/menutree' h=0 q='key='}{crmKey name='civicrm/ajax/menutree'}"{literal};
-          $.get( postURL + '&type=move&id=' +  nodeID + '&ref_id=' + refID + '&ps='+ps,
-            function (data) {
-              $("#reset-menu").show( );
-            });
-        });
+        CRM.status({}, $.get( postURL + '&type=move&id=' +  nodeID + '&ref_id=' + refID + '&ps='+ps).then(refreshMenubar));
       });
+
+      function editForm(menu) {
+        var nodeID = menu.reference.attr('id').replace('_anchor', ''),
+          action = menu.item.icon === 'crm-i fa-pencil' ? 'update' : 'add',
+          args = {reset: 1, action: action};
+        if (action === 'add') {
+          args.parent_id = nodeID;
+        } else {
+          args.id = nodeID;
+        }
+        CRM.loadForm(CRM.url('civicrm/admin/menu', args)).on('crmFormSuccess', function() {
+          $("#navigation-tree").jstree(true).refresh();
+          refreshMenubar();
+        });
+      }
+
       $('#new-menu-item a.button')
         .on('click', CRM.popup)
         .on('crmPopupFormSuccess', function() {
-          $("#navigation-tree").jstree('refresh');
-          $("#reset-menu").show();
+          $("#navigation-tree").jstree(true).refresh();
+          refreshMenubar();
         });
 
       $('a.nav-reset').on('click', function(e) {
@@ -179,13 +140,20 @@
           .on('crmConfirm:yes', function() {
             $('#crm-container').block();
             CRM.api3('Navigation', 'reset', {'for': 'report'}, true)
-              .done(function() {
+              .then(function() {
                 $('#crm-container').unblock();
-                $("#navigation-tree").jstree('refresh');
-                $("#reset-menu").show();
-              })
+                $("#navigation-tree").jstree(true).refresh();
+                refreshMenubar();
+              });
           });
       });
+
+      // Force-refresh the menubar by resetting the cache code
+      function refreshMenubar() {
+        CRM.menubar.destroy();
+        CRM.menubar.cacheCode = Math.random();
+        CRM.menubar.initialize();
+      }
     });
 </script>
 {/literal}

@@ -7,6 +7,7 @@
   <comment>Contact Membership records.</comment>
   <add>1.5</add>
   <log>true</log>
+  <icon>fa-id-badge</icon>
   <field>
     <name>id</name>
     <uniqueName>membership_id</uniqueName>
@@ -61,6 +62,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Membership Type</label>
     </html>
     <add>1.5</add>
   </field>
@@ -82,7 +84,9 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
+    <uniqueName>membership_join_date</uniqueName>
   </field>
   <field>
     <name>start_date</name>
@@ -96,6 +100,7 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -110,6 +115,7 @@
     <add>1.5</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -153,8 +159,10 @@
   </foreignKey>
   <field>
     <name>is_override</name>
+    <uniqueName>member_is_override</uniqueName>
     <title>Status Override</title>
     <import>true</import>
+    <export>true</export>
     <headerPattern>/override$/i</headerPattern>
     <type>boolean</type>
     <comment>Admin users may set a manual status which overrides the calculated status. When this flag is true, automated status update scripts should NOT modify status for the record.</comment>
@@ -162,6 +170,18 @@
       <type>CheckBox</type>
     </html>
     <add>1.5</add>
+  </field>
+  <field>
+    <name>status_override_end_date</name>
+    <title>Status Override End Date</title>
+    <type>date</type>
+    <default>NULL</default>
+    <import>true</import>
+    <comment>Then end date of membership status override if 'Override until selected date' override type is selected.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>owner_membership_id</name>
@@ -188,6 +208,7 @@
     <type>int</type>
     <comment>Maximum number of related memberships (membership_type override).</comment>
     <add>4.3</add>
+    <export>true</export>
     <html>
       <type>Text</type>
     </html>
@@ -219,8 +240,10 @@
   </field>
   <field>
     <name>contribution_recur_id</name>
+    <uniqueName>membership_recur_id</uniqueName>
     <title>Membership Recurring Contribution</title>
     <type>int unsigned</type>
+    <export>true</export>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each membership in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
     <add>3.3</add>
   </field>

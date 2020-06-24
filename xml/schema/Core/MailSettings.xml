@@ -135,4 +135,19 @@
     <comment>folder to poll from when using IMAP, path to poll from when using Maildir, etc.</comment>
     <add>2.2</add>
   </field>
+  <field>
+    <name>activity_status</name>
+    <title>Activity Status</title>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Name of status to use when creating email to activity.</comment>
+    <add>4.7</add>
+    <pseudoconstant>
+      <optionGroupName>activity_status</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
 </table>

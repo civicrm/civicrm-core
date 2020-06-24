@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -41,14 +25,14 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   /**
    * Is this user someone with access for the entire system.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_viewAdminUser = FALSE;
   protected $_editAdminUser = FALSE;
 
   /**
    * Am in in view permission or edit permission?
-   * @var boolean
+   * @var bool
    */
   protected $_viewPermission = FALSE;
   protected $_editPermission = FALSE;
@@ -61,23 +45,22 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   protected $_viewPermissionedGroups;
   protected $_editPermissionedGroups;
 
-
   /**
    * Given a permission string, check for access requirements
    *
    * @param string $str
    *   The permission to check.
    *
-   * @param int $contactID
+   * @param int $userId
    *
    * @return bool
    *   true if yes, else false
    */
-  public function check($str, $contactID = NULL) {
-    $str = $this->translatePermission($str, 'Drupal', array(
+  public function check($str, $userId = NULL) {
+    $str = $this->translatePermission($str, 'Drupal', [
       'view user account' => 'access user profiles',
       'administer users' => 'administer users',
-    ));
+    ]);
     if ($str == CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }
@@ -85,7 +68,11 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
       return TRUE;
     }
     if (function_exists('user_access')) {
-      return user_access($str) ? TRUE : FALSE;
+      $account = NULL;
+      if ($userId) {
+        $account = user_load($userId);
+      }
+      return user_access($str, $account);
     }
     return TRUE;
   }
@@ -142,13 +129,13 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
    *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
-    static $_cache = array();
+    static $_cache = [];
 
     if (isset($_cache[$permissionName])) {
       return $_cache[$permissionName];
     }
 
-    $uids = array();
+    $uids = [];
     $sql = "
       SELECT {users}.uid, {role_permission}.permission
       FROM {users}

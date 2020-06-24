@@ -1,0 +1,72 @@
+Delivered-To: my@example.com
+Received: by 10.112.67.71 with SMTP id l7csp45921lbt;
+        Thu, 23 Jan 2014 12:45:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20120113;
+        h=mime-version:from:to:subject:message-id:date:content-type;
+        bh=UGTp5DX2SZvxoM2GPLjZwRcpcz4/3zeLJyMyYuTvOI0=;
+        b=lbtNQ3EnmzubKV0sbek27d5E0+yCG4FXwcKrk3+mfgJ2nDUHeBvQNz/fyL+ppmJs6h
+         XHZzakNN0JAeQh9AxELPYlRM5iTYcRe2zFiBGvU0YMcoIoDZOV3r8RvpfcRm5IYQCNS5
+         LJmRJsvPN+mwgKhdYmBqWezjasQSVVlaHMVt59CdH106pp1FixWFrSxl0r465/IhlbWR
+         p1geZmq89piISVsNemXT8n5src0OuqMQCFW4m4LZbk6JKdCuS3ErnJ6t6ODSmzRW+0Lv
+         WkiXuxKefj/d5OHdgUb9YHDQMb8EU3Gh4q0udoqkTV1l87Lfq2c/2NpH9tk/2dbN9MaA
+         65hA==
+X-Received: by 10.67.22.67 with SMTP id hq3mr9981350pad.132.1390509942011;
+        Thu, 23 Jan 2014 12:45:42 -0800 (PST)
+MIME-Version: 1.0
+Return-Path: <>
+Received: by 10.67.22.67 with SMTP id hq3mr12327267pad.132; Thu, 23 Jan 2014
+ 12:45:42 -0800 (PST)
+From: Mail Delivery Subsystem <mailer-daemon@googlemail.com>
+To: b.2.1.aaaaaaaaaaaaaaaa@example.com
+X-Failed-Recipients: undeliverable@example.com
+Subject: Delivery Status Notification (Failure)
+Message-ID: <047d7b5dbbd42675d704f0a953a8@google.com>
+Date: Thu, 23 Jan 2014 20:45:42 +0000
+Content-Type: text/plain; charset=ISO-8859-1
+
+Delivery to the following recipient failed permanently:
+
+     undeliverable@example.com
+
+Technical details of permanent failure:
+Google tried to deliver your message, but it was rejected by the server for the recipient domain example.com by aspmx.l.google.com. [74.125.129.26].
+
+The error that the other server returned was:
+550-5.1.1 The email account that you tried to reach does not exist. Please try
+550-5.1.1 double-checking the recipient's email address for typos or
+550-5.1.1 unnecessary spaces. Learn more at
+550 5.1.1 http://support.google.com/mail/bin/answer.py?answer=6596 yy4si15401666pbc.69 - gsmtp
+
+----- Original message -----
+
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20130820;
+        h=x-gm-message-state:from:content-type:subject:message-id:date:to
+         :mime-version;
+        bh=pmXAuF/5WEKUL4czT4KPvdj7HdW4O6/bnJxxnzhDxS4=;
+        b=OLUdt6zYl0SwEk+7rmWCcpxDxpELnUMFnU8LGHDZxefjkFcugCUCGb4SEFo0uW+FEv
+         JYxv9xteYtVZ4pfy40ggFUtN5mXnn/B8WSI0Y+/BF5Ow2FpKXKk932+Jhi+DPRDc7fB0
+         YdpwO9CqEDx0FHi6r1G7uKmse8Y6ekfO8zCq48t4SQ9A39P1pNESj3KSIhaaBP/PdMVu
+         VezOOwae71dMviH6WSiDksIJgw+cRXcxpWNU/mjn+Yf7lk2PHYn2vrhCni2Q3Trr2PpK
+         oNQBiGHbxSGDeHX8r+DsoWeSIvaXxH8y0AICSnTMAXqFuzEEhFHFFkqrXwn0ZWgLyK3F
+         Vjaw==
+X-Gm-Message-State: ALoCoQkkZ5zeZN9IR1iF+yKdq/RaFqQbP/XzNV3rJ2PRHd9eagL83ZI9HrH5oEWtcQWqI11+gALC
+X-Received: by 10.67.22.67 with SMTP id hq3mr9981324pad.132.1390509941690;
+        Thu, 23 Jan 2014 12:45:41 -0800 (PST)
+Return-Path: <my@example.com>
+Received: from [10.1.1.2] ([121.99.62.224])
+        by mx.google.com with ESMTPSA id vx10sm65825229pac.17.2014.01.23.12.45.38
+        for <undeliverable@example.com>
+        (version=TLSv1 cipher=ECDHE-RSA-RC4-SHA bits=128/128);
+        Thu, 23 Jan 2014 12:45:40 -0800 (PST)
+From: My Mail <my@example.com>
+Content-Type: multipart/signed; boundary="Apple-Mail=_2E4B9F97-76BD-4F9D-94C0-5DEC92528786"; protocol="application/pgp-signature"; micalg=pgp-sha1
+Subject: test
+Message-Id: <20E88533-8A36-4405-8125-FDC61CD6AB56@example.co>
+Date: Fri, 24 Jan 2014 09:45:37 +1300
+To: undeliverable@example.com
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+X-Mailer: Apple Mail (2.1827)
+
+test

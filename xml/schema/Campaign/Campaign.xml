@@ -5,7 +5,7 @@
   <name>civicrm_campaign</name>
   <comment>Campaign Details.</comment>
   <add>3.3</add>
-
+  <icon>fa-bullhorn</icon>
   <field>
     <name>id</name>
     <title>Campaign ID</title>

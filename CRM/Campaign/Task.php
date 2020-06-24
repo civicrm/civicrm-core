@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,22 +20,20 @@
  *
  * Used by the search forms.
  */
-class CRM_Campaign_Task {
-  const INTERVIEW = 1, RESERVE = 2, RELEASE = 3, PRINT_VOTERS = 4;
+class CRM_Campaign_Task extends CRM_Core_Task {
 
   /**
-   * The task array
-   *
-   * @var array
+   * Campaign tasks
    */
-  static $_tasks = NULL;
+  const
+    INTERVIEW = 601,
+    RESERVE = 602,
+    RELEASE = 603;
 
   /**
-   * The optional task array
-   *
-   * @var array
+   * @var string
    */
-  static $_optionalTasks = NULL;
+  public static $objectType = 'campaign';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -60,61 +42,42 @@ class CRM_Campaign_Task {
    * @return array
    *   the set of tasks for a group of voters.
    */
-  public static function &tasks() {
+  public static function tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(
-        1 => array(
+      self::$_tasks = [
+        self::INTERVIEW => [
           'title' => ts('Record Respondents Interview'),
-          'class' => array(
+          'class' => [
             'CRM_Campaign_Form_Task_Interview',
             'CRM_Campaign_Form_Task_Release',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        2 => array(
+        ],
+        self::RESERVE => [
           'title' => ts('Reserve Respondents'),
-          'class' => array(
+          'class' => [
             'CRM_Campaign_Form_Task_Reserve',
             'CRM_Campaign_Form_Task_Interview',
             'CRM_Campaign_Form_Task_Release',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        3 => array(
+        ],
+        self::RELEASE => [
           'title' => ts('Release Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Release',
           'result' => FALSE,
-        ),
-        4 => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Print',
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
+
+      parent::tasks();
     }
-
-    CRM_Utils_Hook::searchTasks('campaign', self::$_tasks);
-
-    asort(self::$_tasks);
 
     return self::$_tasks;
-  }
-
-  /**
-   * These tasks are the core set of task titles
-   * on voters.
-   *
-   * @return array
-   *   the set of task titles
-   */
-  public static function &taskTitles() {
-    self::tasks();
-    $titles = array();
-    foreach (self::$_tasks as $id => $value) {
-      $titles[$id] = $value['title'];
-    }
-
-    return $titles;
   }
 
   /**
@@ -122,13 +85,15 @@ class CRM_Campaign_Task {
    * of the user
    *
    * @param int $permission
+   * @param array $params
    *
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function &permissionedTaskTitles($permission) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     $tasks = self::taskTitles();
 
+    $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
     return $tasks;
   }
 
@@ -143,15 +108,15 @@ class CRM_Campaign_Task {
    */
   public static function getTask($value) {
     self::tasks();
-    if (!$value || !CRM_Utils_Array::value($value, self::$_tasks)) {
-      // make the interview task by default
-      $value = 1;
+    if (!$value || empty(self::$_tasks[$value])) {
+      // Set the interview task as default
+      $value = self::INTERVIEW;
     }
 
-    return array(
+    return [
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
-    );
+    ];
   }
 
 }

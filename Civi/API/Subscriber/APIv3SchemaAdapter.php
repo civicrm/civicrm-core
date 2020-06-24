@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -35,16 +19,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * and validates that the fields are provided correctly.
  */
 class APIv3SchemaAdapter implements EventSubscriberInterface {
+
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::PREPARE => array(
-        array('onApiPrepare', Events::W_MIDDLE),
-        array('onApiPrepare_validate', Events::W_LATE),
-      ),
-    );
+    return [
+      'civi.api.prepare' => [
+        ['onApiPrepare', Events::W_MIDDLE],
+        ['onApiPrepare_validate', Events::W_LATE],
+      ],
+    ];
   }
 
   /**
@@ -81,6 +66,9 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    */
   public function onApiPrepare_validate(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
+    if ($apiRequest['version'] > 3) {
+      return;
+    }
     // Not sure why this is omitted for generic actions. It would make sense
     // to omit 'getfields', but that's only one generic action.
 
@@ -96,7 +84,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    * @return array
    */
   public function getDefaults($fields) {
-    $defaults = array();
+    $defaults = [];
 
     foreach ($fields as $field => $values) {
       if (isset($values['api.default'])) {
@@ -112,7 +100,7 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    * @return array
    */
   public function getRequired($fields) {
-    $required = array('version');
+    $required = ['version'];
 
     foreach ($fields as $field => $values) {
       if (!empty($values['api.required'])) {

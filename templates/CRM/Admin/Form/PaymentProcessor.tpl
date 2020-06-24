@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/configuring Payment Processors used by a particular site/domain.  *}
@@ -30,20 +14,18 @@
 
 {if $action eq 8}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
-        {ts}WARNING: Deleting this Payment Processor may result in some transaction pages being rendered inactive.{/ts} {ts}Do you want to continue?{/ts}
+    <div class="icon inform-icon"></div>
+    {$deleteMessage|escape}
   </div>
 {else}
   <table class="form-layout-compressed">
-    <tr class="crm-paymentProcessor-form-block-payment_processor_type">
-        <td class="label">{$form.payment_processor_type_id.label}</td><td>{$form.payment_processor_type_id.html} {help id='proc-type'}</td>
-    </tr>
-    <tr class="crm-paymentProcessor-form-block-name">
-        <td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
-    </tr>
-    <tr class="crm-paymentProcessor-form-block-description">
-        <td class="label">{$form.description.label}</td><td>{$form.description.html}</td>
-    </tr>
+    {* This works for the fields managed from the EntityFields trait - see RelationshipType.tpl for end goal in this tpl *}
+    {foreach from=$entityFields item=fieldSpec}
+      {assign var=fieldName value=$fieldSpec.name}
+      <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+        {include file="CRM/Core/Form/Field.tpl"}
+      </tr>
+    {/foreach}
 
     <tr class="crm-paymentProcessor-form-block-financial_account">
       <td class="label">{$form.financial_account_id.label}</td>
@@ -65,6 +47,10 @@
     <tr class="crm-paymentProcessor-form-block-is_default">
         <td></td><td>{$form.is_default.html}&nbsp;{$form.is_default.label}</td>
     </tr>
+    <tr class="crm-paymentProcessor-form-block-accept_credit_cards">
+        <td class="label">{$form.accept_credit_cards.label}</td><td>{$form.accept_credit_cards.html}<br />
+        <span class="description">{ts}Select Credit Card Types that this payment processor can accept{/ts}</span></td>
+    </tr>
   </table>
 <fieldset>
 <legend>{ts}Processor Details for Live Payments{/ts}</legend>
@@ -84,7 +70,7 @@
 {/if}
 {if $form.subject}
         <tr class="crm-paymentProcessor-form-block-subject">
-            <td class="label">{$form.subject.label}</td><td>{$form.subject.html}</td>
+            <td class="label">{$form.subject.label}</td><td>{$form.subject.html} {help id=$ppTypeName|cat:'-live-subject' title=$form.subject.label}</td>
         </tr>
 {/if}
         <tr class="crm-paymentProcessor-form-block-url_site">
@@ -125,7 +111,7 @@
 {/if}
 {if $form.test_subject}
         <tr class="crm-paymentProcessor-form-block-test_subject">
-            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html}</td>
+            <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html} {help id=$ppTypeName|cat:'-test-subject' title=$form.test_subject.label}</td>
         </tr>
 {/if}
         <tr class="crm-paymentProcessor-form-block-test_url_site">

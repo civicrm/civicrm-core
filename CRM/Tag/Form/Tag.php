@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -76,20 +60,20 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     $this->assign('tagged', $entityTag);
 
     // get the list of all the categories
-    $allTag = CRM_Core_BAO_Tag::getTagsUsedFor($this->_entityTable);
+    $allTags = CRM_Core_BAO_Tag::getTagsUsedFor($this->_entityTable, FALSE);
 
     // need to append the array with the " checked " if contact is tagged with the tag
-    foreach ($allTag as $tagID => $varValue) {
+    foreach ($allTags as $tagID => $varValue) {
       if (in_array($tagID, $entityTag)) {
-        $tagAttribute = array(
+        $tagAttribute = [
           'checked' => 'checked',
           'id' => "tag_{$tagID}",
-        );
+        ];
       }
       else {
-        $tagAttribute = array(
+        $tagAttribute = [
           'id' => "tag_{$tagID}",
-        );
+        ];
       }
 
       $tagChk[$tagID] = $this->createElement('checkbox', $tagID, '', '', $tagAttribute);
@@ -99,20 +83,9 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
     $tags = new CRM_Core_BAO_Tag();
     $tree = $tags->getTree($this->_entityTable, TRUE);
-
-    // let's not load jstree if there are not children. This also fixes blank
-    // display at the beginning of checkboxes
-    $loadJsTree = CRM_Utils_Array::retrieveValueRecursive($tree, 'children');
-    $this->assign('loadjsTree', FALSE);
-    if (!empty($loadJsTree)) {
-      CRM_Core_Resources::singleton()
-        ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-        ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
-      $this->assign('loadjsTree', TRUE);
-    }
     $this->assign('tree', $tree);
 
-    $this->assign('tag', $allTag);
+    $this->assign('allTags', $allTags);
 
     //build tag widget
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
@@ -124,7 +97,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Tag');
+    CRM_Utils_System::flushCache();
 
     // array contains the posted values
     // exportvalues is not used because its give value 1 of the checkbox which were checked by default,

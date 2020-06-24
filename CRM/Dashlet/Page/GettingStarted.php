@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -44,12 +28,13 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
 
   /**
    * Define tokens available for getting started
+   * @var array
    */
-  static $_tokens = array(
-    'crmurl' => array(
+  public static $_tokens = [
+    'crmurl' => [
       'configbackend' => 'civicrm/admin/configtask',
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get the final, usable URL string (after interpolating any variables)
@@ -70,7 +55,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    * List gettingStarted page as dashlet.
    */
   public function run() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'dashlet');
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'dashlet');
 
     // Assign smarty variables.
     $this->assign('context', $context);
@@ -87,27 +72,23 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    * @return array
    */
   private function _gettingStarted() {
-    // Fetch data from cache
-    $cache = CRM_Core_DAO::executeQuery("SELECT data, created_date FROM civicrm_cache
-      WHERE group_name = 'dashboard' AND path = 'gettingStarted'");
-    if ($cache->fetch()) {
-      $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
-      // Refresh data after CACHE_DAYS
-      if (strtotime($cache->created_date) < $expire) {
-        $new_data = $this->_getHtml($this->gettingStartedUrl());
-        // If fetching the new html was successful, return it
-        // Otherwise use the old cached data - it's better than nothing
-        if ($new_data) {
-          return $new_data;
-        }
+    $tsLocale = CRM_Core_I18n::getLocale();
+    $key = 'dashboard_gettingStarted_' . $tsLocale;
+    $value = Civi::cache('community_messages')->get($key);
+
+    if (!$value) {
+      $value = $this->_getHtml($this->gettingStartedUrl());
+
+      if ($value) {
+        Civi::cache('community_messages')->set($key, $value, (60 * 60 * 24 * self::CACHE_DAYS));
       }
-      return unserialize($cache->data);
     }
-    return $this->_getHtml($this->gettingStartedUrl());
+
+    return $value;
   }
 
   /**
-   * Get html and cache results.
+   * Get html.
    *
    * @param $url
    *
@@ -115,21 +96,17 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    *   array of gettingStarted items; or NULL if not available
    */
   public function _getHtml($url) {
-
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
     list ($status, $html) = $httpClient->get($url);
+
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }
 
     $tokensList = CRM_Utils_Token::getTokens($html);
     $this->replaceLinkToken($tokensList, $html);
-    if ($html) {
-      CRM_Core_BAO_Cache::setItem($html, 'dashboard', 'gettingStarted');
-    }
     return $html;
   }
-
 
   /**
    * @param array $tokensList
@@ -143,7 +120,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
         if (!empty(self::$_tokens[$categories][$token])) {
           $value = self::$_tokens[$categories][$token];
           if ($categories == 'crmurl') {
-            $value = CRM_Utils_System::url($value, "reset=1", FALSE, NULL, TRUE, TRUE);
+            $value = CRM_Utils_System::url($value, "reset=1");
           }
         }
         CRM_Utils_Token::token_replace($categories, $token, $value, $str);

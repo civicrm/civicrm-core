@@ -1,63 +1,48 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for Site Url.
  */
 class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
-  protected $_settings = array(
+  protected $_settings = [
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'defaultExternUrl' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'userFrameworkResourceURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'imageUploadURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'customCSSURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'extensionsURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Resource URLs'));
-    $settingFields = civicrm_api('setting', 'getfields', array(
+    $settingFields = civicrm_api('setting', 'getfields', [
       'version' => 3,
-    ));
+    ]);
 
     $this->addYesNo('enableSSL', ts('Force Secure URLs (SSL)'));
     $this->addYesNo('verifySSL', ts('Verify SSL Certs'));
     // FIXME: verifySSL should use $_settings instead of manually adding fields
     $this->assign('verifySSL_description', $settingFields['values']['verifySSL']['description']);
 
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Url', 'formRule'));
+    $this->addFormRule(['CRM_Admin_Form_Setting_Url', 'formRule']);
 
     parent::buildQuickForm();
   }
@@ -78,9 +63,9 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
         )
       );
       if (!CRM_Utils_System::checkURL($url, TRUE)) {
-        $errors = array(
+        $errors = [
           'enableSSL' => ts('You need to set up a secure server before you can use the Force Secure URLs option'),
-        );
+        ];
         return $errors;
       }
     }

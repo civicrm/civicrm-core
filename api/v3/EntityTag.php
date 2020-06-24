@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -42,20 +26,7 @@
  * @return array
  */
 function civicrm_api3_entity_tag_get($params) {
-
-  if (empty($params['entity_id'])) {
-    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
-  }
-  else {
-    //do legacy non-standard behaviour
-    $values = CRM_Core_BAO_EntityTag::getTag($params['entity_id'], $params['entity_table']);
-
-    $result = array();
-    foreach ($values as $v) {
-      $result[$v] = array('tag_id' => $v);
-    }
-    return civicrm_api3_create_success($result, $params, 'EntityTag');
-  }
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -67,7 +38,7 @@ function civicrm_api3_entity_tag_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_entity_tag_get_spec(&$params) {
-  $params['entity_id']['api.aliases'] = array('contact_id');
+  $params['entity_id']['api.aliases'] = ['contact_id'];
   $params['entity_table']['api.default'] = 'civicrm_contact';
 }
 
@@ -114,7 +85,7 @@ function _civicrm_api3_entity_tag_delete_spec(&$params) {
  */
 function _civicrm_api3_entity_tag_common($params, $op = 'add') {
 
-  $entityIDs   = array();
+  $entityIDs = $tagIDs = [];
   $entityTable = 'civicrm_contact';
   if (is_array($params)) {
     foreach ($params as $n => $v) {
@@ -122,7 +93,12 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
         $entityIDs[] = $v;
       }
       elseif (substr($n, 0, 6) == 'tag_id') {
-        $tagIDs[] = $v;
+        if (is_array($v)) {
+          $tagIDs = array_merge($tagIDs, $v);
+        }
+        else {
+          $tagIDs[] = $v;
+        }
       }
       elseif (substr($n, 0, 12) == 'entity_table') {
         $entityTable = $v;
@@ -143,7 +119,7 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
     }
   }
 
-  $values = array('is_error' => 0);
+  $values = ['is_error' => 0];
   if ($op == 'add') {
     $values['total_count'] = $values['added'] = $values['not_added'] = 0;
     foreach ($tagIDs as $tagID) {
@@ -163,5 +139,43 @@ function _civicrm_api3_entity_tag_common($params, $op = 'add') {
       $values['not_removed'] += $nr;
     }
   }
+  if (empty($values['added']) && empty($values['removed'])) {
+    $values['is_error'] = 1;
+    $values['error_message'] = "Unable to $op tags";
+  }
   return $values;
+}
+
+/**
+ * Replace tags for an entity
+ */
+function civicrm_api3_entity_tag_replace($params) {
+  $transaction = new CRM_Core_Transaction();
+  try {
+
+    $baseParams = _civicrm_api3_generic_replace_base_params($params);
+    unset($baseParams['tag_id']);
+
+    // Lookup pre-existing records
+    $preexisting = civicrm_api3('entity_tag', 'get', $baseParams);
+    $preexisting = array_column($preexisting['values'], 'tag_id');
+    $toAdd = $params['tag_id'] ?? array_column($params['values'], 'tag_id');
+    $toRemove = array_diff($preexisting, $toAdd);
+
+    $result = [];
+    if ($toAdd) {
+      $result = _civicrm_api3_entity_tag_common(array_merge($baseParams, ['tag_id' => $toAdd]), 'add');
+    }
+    if ($toRemove) {
+      $result += _civicrm_api3_entity_tag_common(array_merge($baseParams, ['tag_id' => $toRemove]), 'remove');
+    }
+    // Not really errors
+    unset($result['is_error'], $result['error_message']);
+
+    return civicrm_api3_create_success($result, $params, 'EntityTag', 'replace');
+  }
+  catch (Exception $e) {
+    $transaction->rollback();
+    return civicrm_api3_create_error($e->getMessage());
+  }
 }

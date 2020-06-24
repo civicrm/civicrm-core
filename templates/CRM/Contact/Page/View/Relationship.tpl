@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Relationship tab within View Contact - browse, and view relationships for a contact *}
@@ -36,17 +20,16 @@
 
     {* display current relationships *}
     <h3>{ts}Current Relationships{/ts}</h3>
-    {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}
-    <div id="permission-legend" class="crm-content-block">
-      <span class="crm-marker">* </span>
-      {ts}Indicates a permissioned relationship. This contact can be viewed and updated by the other.{/ts}
+    <div id="permission-legend" class="help">
+      <span class="crm-label">Permissioned Relationships: </span>
+      {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 afterText=true}
     </div>
+    {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}
 
     <div class="spacer"></div>
-    <p></p>
     {* display past relationships *}
-    <div class="label font-red">{ts}Inactive Relationships{/ts}</div>
-    <div class="description">{ts}These relationships are Disabled OR have a past End Date.{/ts}</div>
+    <h3 class="font-red">{ts}Inactive Relationships{/ts}</h3>
+    <div class="help">{ts}These relationships are Disabled OR have a past End Date.{/ts}</div>
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="past"}
   </div>
 

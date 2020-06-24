@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
@@ -55,10 +39,10 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
    */
   public static function getTrackerURL($url, $mailing_id, $queue_id) {
 
-    static $urlCache = array();
+    static $urlCache = [];
 
-    if (array_key_exists($url, $urlCache)) {
-      return $urlCache[$url] . "&qid=$queue_id";
+    if (array_key_exists($mailing_id . $url, $urlCache)) {
+      return $urlCache[$mailing_id . $url] . "&qid=$queue_id";
     }
 
     // hack for basic CRM-1014 and CRM-1151 and CRM-3492 compliance:
@@ -73,7 +57,6 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     else {
 
       $hrefExists = FALSE;
-      $config = CRM_Core_Config::singleton();
 
       $tracker = new CRM_Mailing_BAO_TrackableURL();
       if (preg_match('/^href/i', $url)) {
@@ -83,23 +66,22 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
       $tracker->url = $url;
       $tracker->mailing_id = $mailing_id;
-      if (strlen($tracker->url) > 254) {
-        return $url;
-      }
+
       if (!$tracker->find(TRUE)) {
         $tracker->save();
       }
       $id = $tracker->id;
-      $tracker->free();
 
-      $redirect = $config->userFrameworkResourceURL . "extern/url.php?u=$id";
-      $urlCache[$url] = $redirect;
+      $redirect = CRM_Utils_System::externUrl('extern/url', "u=$id");
+      $urlCache[$mailing_id . $url] = $redirect;
     }
 
-    $returnUrl = "{$urlCache[$url]}&qid={$queue_id}";
+    // This looks silly - calling the hook twice. This smells like an accident. Restoring old cache-based lookup.
+    // $returnUrl = CRM_Utils_System::externUrl('extern/url', "u=$id&qid=$queue_id");
+    $returnUrl = "{$urlCache[$mailing_id . $url]}&qid={$queue_id}";
 
     if ($hrefExists) {
-      $returnUrl = "href='{$returnUrl}'";
+      $returnUrl = "href='{$returnUrl}' rel='nofollow'";
     }
 
     return $returnUrl;
@@ -121,35 +103,6 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     }
 
     return NULL;
-  }
-
-  /**
-   * @param $msg
-   * @param int $mailing_id
-   * @param int $queue_id
-   * @param bool $onlyHrefs
-   */
-  public static function scan_and_replace(&$msg, $mailing_id, $queue_id, $onlyHrefs = FALSE) {
-    if (!$mailing_id) {
-      return;
-    }
-
-    $protos = '(https?|ftp)';
-    $letters = '\w';
-    $gunk = '/#~:.?+=&%@!\-';
-    $punc = '.:?\-';
-    $any = "{$letters}{$gunk}{$punc}";
-    if ($onlyHrefs) {
-      $pattern = "{\\b(href=([\"'])?($protos:[$any]+?(?=[$punc]*[^$any]|$))([\"'])?)}im";
-    }
-    else {
-      $pattern = "{\\b($protos:[$any]+?(?=[$punc]*[^$any]|$))}eim";
-    }
-
-    $trackURL = CRM_Mailing_BAO_TrackableURL::getTrackerURL('\\1', $mailing_id, $queue_id);
-    $replacement = $onlyHrefs ? ("href=\"{$trackURL}\"") : ("\"{$trackURL}\"");
-
-    $msg = preg_replace($pattern, $replacement, $msg);
   }
 
 }

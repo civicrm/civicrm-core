@@ -1,4 +1,5 @@
 <?php
+use Civi\Api4\ContactType;
 
 /**
  * Class CRM_Contact_BAO_ContactType_ContactTypeTest
@@ -8,108 +9,76 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $labelsub1 = 'sub1_individual' . substr(sha1(rand()), 0, 7);
-    $params = array(
-      'label' => $labelsub1,
-      'name' => $labelsub1,
-      // Individual
-      'parent_id' => 1,
+    $params = [
+      'label' => 'sub1_individual',
+      'name' => 'sub1_individual',
+      'parent_id:name' => 'Individual',
       'is_active' => 1,
-    );
-    $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->subTypesIndividual[] = $params['name'];
+    ];
 
-    $labelsub2 = 'sub2_individual' . substr(sha1(rand()), 0, 7);
-    $params = array(
-      'label' => $labelsub2,
-      'name' => $labelsub2,
-      // Individual
-      'parent_id' => 1,
-      'is_active' => 1,
-    );
-    $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->subTypesIndividual[] = $params['name'];
+    $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
 
-    $labelsub = 'sub_organization' . substr(sha1(rand()), 0, 7);
-    $params = array(
-      'label' => $labelsub,
-      'name' => $labelsub,
-      // Organization
-      'parent_id' => 3,
+    $params = [
+      'label' => 'sub2_individual',
+      'name' => 'sub2_individual',
+      'parent_id:name' => 'Individual',
       'is_active' => 1,
-    );
-    $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->subTypesOrganization[] = $params['name'];
+    ];
 
-    $labelhousehold = 'sub_household' . substr(sha1(rand()), 0, 7);
-    $params = array(
-      'label' => $labelhousehold,
-      'name' => $labelhousehold,
-      // Household
-      'parent_id' => 2,
+    $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
+
+    $params = [
+      'label' => 'sub_organization',
+      'name' => 'sub_organization',
+      'parent_id:name' => 'Organization',
       'is_active' => 1,
-    );
-    $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->subTypesHousehold[] = $params['name'];
+    ];
+
+    $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
+
+    $params = [
+      'label' => 'sub_household',
+      'name' => 'sub_household',
+      'parent_id:name' => 'Household',
+      'is_active' => 1,
+    ];
+    $this->ids['ContactType'][] = ContactType::create()->setValues($params)->execute()->first()['id'];
   }
 
   /**
-   * Test contactTypes() and subTypes() methods with valid data
-   * success expected
+   * Cleanup contact types.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function tearDown() {
+    parent::tearDown();
+    ContactType::delete()->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
+  }
+
+  /**
+   * Test contactTypes() and subTypes() methods return correct contact types.
    */
   public function testGetMethods() {
-
-    // check all contact types
-    $contactTypes = array('Individual', 'Organization', 'Household');
-    $result = CRM_Contact_BAO_ContactType::contactTypes('Individual');
-    foreach ($contactTypes as $type) {
-      $this->assertEquals(in_array($type, $result), TRUE);
-    }
+    $result = CRM_Contact_BAO_ContactType::contactTypes(TRUE);
+    $this->assertEquals(array_keys($this->getExpectedContactTypes()), $result);
 
     // check for type:Individual
     $result = CRM_Contact_BAO_ContactType::subTypes('Individual');
-    foreach ($result as $subtype) {
-      $subTypeName = in_array($subtype, $this->subTypesIndividual);
-      if (!empty($subTypeName)) {
-        $this->assertEquals($subTypeName, TRUE);
-      }
-      $this->assertEquals(in_array($subtype, $this->subTypesOrganization), FALSE);
-      $this->assertEquals(in_array($subtype, $this->subTypesHousehold), FALSE);
-    }
+    $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Individual')), $result);
 
     // check for type:Organization
     $result = CRM_Contact_BAO_ContactType::subTypes('Organization');
-    foreach ($result as $subtype) {
-      $this->assertEquals(in_array($subtype, $this->subTypesIndividual), FALSE);
-      $subTypeName = in_array($subtype, $this->subTypesOrganization);
-      if (!empty($subTypeName)) {
-        $this->assertEquals($subTypeName, TRUE);
-      }
-      $subTypeName = in_array($subTypeName, $this->subTypesHousehold);
-      if (empty($subTypeName)) {
-        $this->assertEquals($subTypeName, FALSE);
-      }
-    }
+    $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Organization')), $result);
 
     // check for type:Household
     $result = CRM_Contact_BAO_ContactType::subTypes('Household');
-    foreach ($result as $subtype) {
-      $this->assertEquals(in_array($subtype, $this->subTypesIndividual), FALSE);
-      $this->assertEquals(in_array($subtype, $this->subTypesOrganization), FALSE);
-      $this->assertEquals(in_array($subtype, $this->subTypesHousehold), TRUE);
-    }
+    $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Household')), $result);
 
-    // check for all conatct types
+    // check for all contact types
     $result = CRM_Contact_BAO_ContactType::subTypes();
-    foreach ($this->subTypesIndividual as $subtype) {
-      $this->assertEquals(in_array($subtype, $result), TRUE);
-    }
-    foreach ($this->subTypesOrganization as $subtype) {
-      $this->assertEquals(in_array($subtype, $result), TRUE);
-    }
-    foreach ($this->subTypesHousehold as $subtype) {
-      $this->assertEquals(in_array($subtype, $result), TRUE);
-    }
+    $subtypes = array_keys($this->getExpectedAllSubtypes());
+    $this->assertEquals(sort($subtypes), sort($result));
   }
 
   /**
@@ -121,9 +90,197 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $result = CRM_Contact_BAO_ContactType::subTypes($params);
     $this->assertEquals(empty($result), TRUE);
 
-    $params = array('invalid');
+    $params = ['invalid'];
     $result = CRM_Contact_BAO_ContactType::subTypes($params);
     $this->assertEquals(empty($result), TRUE);
+  }
+
+  /**
+   * Test function for getting contact types.
+   *
+   * @throws \API_Exception
+   */
+  public function testContactTypeInfo() {
+    $blahType = ['is_active' => 0, 'name' => 'blah', 'label' => 'blah blah', 'parent_id:name' => 'Individual'];
+    $createdType = ContactType::create()->setValues($blahType)->execute()->first();
+    $activeTypes = CRM_Contact_BAO_ContactType::contactTypeInfo();
+    $expected = $this->getExpectedContactTypes();
+    $this->assertEquals($expected, $activeTypes);
+    $allTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
+    $expected['blah'] = [
+      'is_active' => 0,
+      'name' => 'blah',
+      'label' => 'blah blah',
+      'id' => $createdType['id'],
+      'parent_id' => 1,
+      'is_reserved' => 0,
+      'parent' => 'Individual',
+      'parent_label' => 'Individual',
+    ];
+    $this->assertEquals($expected, $allTypes);
+  }
+
+  /**
+   * Get all expected types.
+   *
+   * @return array
+   */
+  public function getExpectedContactTypes() {
+    return [
+      'Individual' =>
+        [
+          'id' => '1',
+          'name' => 'Individual',
+          'label' => 'Individual',
+          'is_active' => '1',
+          'is_reserved' => '1',
+        ],
+      'Household' =>
+        [
+          'id' => '2',
+          'name' => 'Household',
+          'label' => 'Household',
+          'is_active' => '1',
+          'is_reserved' => '1',
+        ],
+      'Organization' =>
+        [
+          'id' => '3',
+          'name' => 'Organization',
+          'label' => 'Organization',
+          'is_active' => '1',
+          'is_reserved' => '1',
+        ],
+      'Student' =>
+        [
+          'id' => '4',
+          'name' => 'Student',
+          'label' => 'Student',
+          'parent_id' => '1',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Individual',
+          'parent_label' => 'Individual',
+        ],
+      'Parent' =>
+        [
+          'id' => '5',
+          'name' => 'Parent',
+          'label' => 'Parent',
+          'parent_id' => '1',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Individual',
+          'parent_label' => 'Individual',
+        ],
+      'Staff' =>
+        [
+          'id' => '6',
+          'name' => 'Staff',
+          'label' => 'Staff',
+          'parent_id' => '1',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Individual',
+          'parent_label' => 'Individual',
+        ],
+      'Team' =>
+        [
+          'id' => '7',
+          'name' => 'Team',
+          'label' => 'Team',
+          'parent_id' => '3',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Organization',
+          'parent_label' => 'Organization',
+        ],
+      'Sponsor' =>
+        [
+          'id' => '8',
+          'name' => 'Sponsor',
+          'label' => 'Sponsor',
+          'parent_id' => '3',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Organization',
+          'parent_label' => 'Organization',
+        ],
+      'sub1_individual' =>
+        [
+          'id' => $this->ids['ContactType'][0],
+          'name' => 'sub1_individual',
+          'label' => 'sub1_individual',
+          'parent_id' => '1',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Individual',
+          'parent_label' => 'Individual',
+        ],
+      'sub2_individual' =>
+        [
+          'id' => $this->ids['ContactType'][1],
+          'name' => 'sub2_individual',
+          'label' => 'sub2_individual',
+          'parent_id' => '1',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Individual',
+          'parent_label' => 'Individual',
+        ],
+      'sub_organization' =>
+        [
+          'id' => $this->ids['ContactType'][2],
+          'name' => 'sub_organization',
+          'label' => 'sub_organization',
+          'parent_id' => '3',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Organization',
+          'parent_label' => 'Organization',
+        ],
+      'sub_household' =>
+        [
+          'id' => $this->ids['ContactType'][3],
+          'name' => 'sub_household',
+          'label' => 'sub_household',
+          'parent_id' => '2',
+          'is_active' => '1',
+          'is_reserved' => '0',
+          'parent' => 'Household',
+          'parent_label' => 'Household',
+        ],
+    ];
+  }
+
+  /**
+   * Get subtypes for all main types.
+   *
+   * @return array
+   */
+  public function getExpectedAllSubtypes() {
+    return array_merge(
+      $this->getExpectedContactSubTypes('Individual'),
+      $this->getExpectedContactSubTypes('Household'),
+      $this->getExpectedContactSubTypes('Organization')
+    );
+  }
+
+  /**
+   * Get the expected subtypes of the given contact type.
+   *
+   * @param string $parentType
+   *
+   * @return array
+   */
+  public function getExpectedContactSubTypes($parentType) {
+    $expected = $this->getExpectedContactTypes();
+    foreach ($expected as $index => $values) {
+      if (($values['parent_label'] ?? '') !== $parentType) {
+        unset($expected[$index]);
+      }
+    }
+    return $expected;
   }
 
   /**
@@ -132,12 +289,12 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    */
   public function testAdd() {
 
-    $params = array(
+    $params = [
       'label' => 'indiviSubType',
       'name' => 'indiviSubType',
       'parent_id' => 1,
       'is_active' => 1,
-    );
+    ];
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->assertEquals($result->label, $params['label']);
     $this->assertEquals($result->name, $params['name']);
@@ -145,12 +302,12 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals($result->is_active, $params['is_active']);
     CRM_Contact_BAO_ContactType::del($result->id);
 
-    $params = array(
+    $params = [
       'label' => 'householdSubType',
       'name' => 'householdSubType',
       'parent_id' => 2,
       'is_active' => 0,
-    );
+    ];
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->assertEquals($result->label, $params['label']);
     $this->assertEquals($result->name, $params['name']);
@@ -165,13 +322,13 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   public function testAddInvalid1() {
 
     // parent id does not exist in db
-    $params = array(
+    $params = [
       'label' => 'subType',
       'name' => 'subType',
       // non existent
       'parent_id' => 100,
       'is_active' => 1,
-    );
+    ];
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->assertEquals($result, NULL);
   }
@@ -179,10 +336,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   public function testAddInvalid2() {
 
     // params does not have name and label keys
-    $params = array(
+    $params = [
       'parent_id' => 1,
       'is_active' => 1,
-    );
+    ];
     $result = CRM_Contact_BAO_ContactType::add($params);
     $this->assertEquals($result, NULL);
   }
@@ -190,40 +347,39 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   public function testAddInvalid3() {
 
     // params does not have parent_id
-    $params = array(
+    $params = [
       'label' => 'subType',
       'name' => 'subType',
       'is_active' => 1,
-    );
+    ];
     $result = CRM_Contact_BAO_ContactType::add($params);
-    $this->assertEquals($result, NULL, 'In line' . __LINE__);
+    $this->assertEquals($result, NULL);
   }
 
   /**
-   * Test del() with valid data
-   * success expected
+   * Test del() with valid data.
    */
   public function testDel() {
 
-    $params = array(
+    $params = [
       'label' => 'indiviSubType',
       'name' => 'indiviSubType',
       'parent_id' => 1,
       'is_active' => 1,
-    );
+    ];
     $subtype = CRM_Contact_BAO_ContactType::add($params);
-
-    $del = CRM_Contact_BAO_ContactType::del($subtype->id);
     $result = CRM_Contact_BAO_ContactType::subTypes();
-    $this->assertEquals($del, TRUE);
-    $this->assertEquals(in_array($subtype->name, $result), TRUE);
+    $this->assertEquals(TRUE, in_array($subtype->name, $result, TRUE));
+    $this->callAPISuccess('ContactType', 'delete', ['id' => $subtype->id]);
+
+    $result = CRM_Contact_BAO_ContactType::subTypes();
+    $this->assertEquals(FALSE, in_array($subtype->name, $result, TRUE));
   }
 
   /**
    * Test del() with invalid data
    */
   public function testDelInvalid() {
-
     $del = CRM_Contact_BAO_ContactType::del(NULL);
     $this->assertEquals($del, FALSE);
   }

@@ -15,6 +15,13 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
    * @throws \CRM_Core_Exception
    */
   public function run() {
+    $qunitJsFile = Civi::paths()->getPath('[civicrm.bower]/qunit/qunit/qunit.js');
+    $qunitJsUrl = Civi::paths()->getUrl('[civicrm.bower]/qunit/qunit/qunit.js');
+    $qunitCssUrl = Civi::paths()->getUrl('[civicrm.bower]/qunit/qunit/qunit.css');
+    if (!file_exists($qunitJsFile)) {
+      throw new \CRM_Core_Exception("QUnit is not available. Please install it in [civicrm.bower]/qunit.");
+    }
+
     list ($ext, $suite) = $this->getRequestExtAndSuite();
     if (empty($ext) || empty($suite)) {
       throw new CRM_Core_Exception("FIXME: Not implemented: QUnit browser");
@@ -43,10 +50,10 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       CRM_Core_Resources::singleton()->addScriptFile($ext, "tests/qunit/$suite/test.js", 1000, 'html-header');
     }
 
-    CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', array(1 => $ext, 2 => $suite)));
+    CRM_Utils_System::setTitle(ts('QUnit: %2 (%1)', [1 => $ext, 2 => $suite]));
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'bower_components/qunit/qunit/qunit.js', 1, 'html-header')
-      ->addStyleFile('civicrm', 'bower_components/qunit/qunit/qunit.css', 1, 'html-header');
+      ->addScriptUrl($qunitJsUrl, 1, 'html-header')
+      ->addStyleUrl($qunitCssUrl, 1, 'html-header');
     parent::run();
   }
 
@@ -56,21 +63,20 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
    * @return array
    */
   public function getRequestExtAndSuite() {
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
     if ($arg[1] == 'dev'
       && CRM_Utils_Array::value(2, $arg) == 'qunit'
       && isset($arg[3])
       && isset($arg[4])
     ) {
-      return array(
+      return [
         trim(CRM_Utils_Type::escape($arg[3], 'String'), '/'),
         trim(CRM_Utils_Type::escape($arg[4], 'String'), '/'),
-      );
+      ];
     }
     else {
-      return array(NULL, NULL);
+      return [NULL, NULL];
     }
   }
 

@@ -1,36 +1,31 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-smtp-form-block">
-<div class="help">
-  <p>{ts}CiviCRM offers several options to send emails. The default option should work fine on linux systems. If you are using windows, you probably need to enter settings for your SMTP/Sendmail server. You can send a test email to check your settings by clicking "Save and Send Test Email". If you're unsure of the correct values, check with your system administrator, ISP or hosting provider.{/ts}</p>
-  <p>{ts}If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.{/ts}</p>
-  <p>{ts}If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.{/ts}</p>
-
-</div>
+  <div>
+  <h3>{ts}General{/ts}</h3>
      <table class="form-layout-compressed">
+       <tr class="crm-smtp-form-block-allow_mail_from_logged_in_contact">
+         <td class="label">{$form.allow_mail_from_logged_in_contact.html}</td>
+         <td>{$form.allow_mail_from_logged_in_contact.label} {help id=allow_mail_contact_email}</td>
+       </tr>
+     </table>
+  </div>
+  {crmRegion name="smtp-mailer-config"}
+  <div class="crm-smtp-mailer-form-block">
+  <h3>{ts}Mailer Configuration{/ts}</h3>
+  <div class="help">
+    <p>{ts}CiviCRM offers several options to send emails. You can send a test email to check your settings by clicking "Save and Send Test Email". If you're unsure of the correct values, check with your system administrator, ISP or hosting provider.{/ts}</p>
+    <p>{ts}If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.{/ts}</p>
+    <p>{ts}If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.{/ts}</p>
+  </div>
+     <table>
            <tr class="crm-smtp-form-block-outBound_option">
               <td class="label">{$form.outBound_option.label}</td>
               <td>{$form.outBound_option.html}</td>
@@ -92,14 +87,13 @@
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl"}
         </div>
-</div>
 
 {literal}
 <script type="text/javascript">
     CRM.$(function($) {
       var mailSetting = $("input[name='outBound_option']:checked").val( );
 
-      var archiveWarning = "{/literal}{ts escape='js'}WARNING: You are switching from a testing mode (Redirect to Database) to a live mode. Check Mailings > Archived Mailings, and delete any test mailings that are not in Completed status prior to running the mailing cron job for the first time. This will ensure that test mailings are not actually sent out.{/ts}{literal}"
+      var archiveWarning = "{/literal}{ts escape='js'}WARNING: You are switching from a testing mode (Redirect to Database) to a live mode. Check Mailings > Archived Mailings, and delete any test mailings that are not in Completed status prior to running the mailing cron job for the first time. This will ensure that test mailings are not actually sent out.{/ts}{literal}";
 
         showHideMailOptions( $("input[name='outBound_option']:checked").val( ) ) ;
 
@@ -142,3 +136,6 @@
 
 </script>
 {/literal}
+  </div>
+  {/crmRegion}
+</div>

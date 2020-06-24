@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-accordion-wrapper collapsed">
@@ -50,10 +34,22 @@
             <td>{$form.post_URL.html} {help id='id-post_URL' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
 
-        <tr class="crm-uf-advancesetting-form-block-cancel_URL">
+        <tr class="crm-uf-advancesetting-form-block-add_cancel_button">
+            <td class="label"></td>
+            <td>{$form.add_cancel_button.html} {$form.add_cancel_button.label} {help id='id-add_cancel_button' file="CRM/UF/Form/Group.hlp"}</td>
+        </tr>
+
+        <tr class="cancel_button_section crm-uf-advancesetting-form-block-cancel_URL">
             <td class="label">{$form.cancel_URL.label}</td>
             <td>{$form.cancel_URL.html} {help id='id-cancel_URL' file="CRM/UF/Form/Group.hlp"}</td>
         </tr>
+
+        {foreach from=$advancedFieldsConverted item=fieldName}
+          {assign var=fieldSpec value=$entityFields.$fieldName}
+          <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName} {$fieldSpec.class}">
+            {include file="CRM/Core/Form/Field.tpl"}
+          </tr>
+        {/foreach}
 
         <tr class="crm-uf-advancesetting-form-block-add_captcha">
             <td class="label"></td>
@@ -92,3 +88,13 @@
     </div><!-- / .crm-block -->
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+{literal}
+  <script type="text/javascript">
+  CRM.$(function($) {
+    $('.cancel_button_section').toggle($('#add_cancel_button').is(":checked"));
+    $('#add_cancel_button').click(function() {
+      $('.cancel_button_section').toggle($(this).is(":checked"));
+    });
+  });
+  </script>
+{/literal}

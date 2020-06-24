@@ -36,14 +36,13 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Changes and modifications (c) 2007-2015 by CiviCRM LLC
+ * Changes and modifications (c) 2007-2017 by CiviCRM LLC
  *
  */
 
 /**
  * CiviCRM Installer
  */
-
 ini_set('max_execution_time', 3000);
 
 if (stristr(PHP_OS, 'WIN')) {
@@ -55,37 +54,29 @@ else {
   define('CIVICRM_WINDOWS', 0);
 }
 
-// set installation type - drupal
-if (!session_id()) {
-  if (defined('PANTHEON_ENVIRONMENT')) {
-    ini_set('session.save_handler', 'files');
-  }
-  session_start();
-}
-
-// unset civicrm session if any
-if (array_key_exists('CiviCRM', $_SESSION)) {
-  unset($_SESSION['CiviCRM']);
-}
-
-if (isset($_GET['civicrm_install_type'])) {
-  $_SESSION['civicrm_install_type'] = $_GET['civicrm_install_type'];
-}
-else {
-  if (!isset($_SESSION['civicrm_install_type'])) {
-    $_SESSION['civicrm_install_type'] = "drupal";
-  }
-}
-
 global $installType;
 global $crmPath;
 global $pkgPath;
 global $installDirPath;
 global $installURLPath;
 
-$installType = strtolower($_SESSION['civicrm_install_type']);
+// Set the install type
+// this is sent as a query string when the page is first loaded
+// and subsequently posted to the page as a hidden field
+// only permit acceptable installation types to prevent issues;
+$acceptableInstallTypes = ['drupal', 'wordpress', 'backdrop'];
+if (isset($_POST['civicrm_install_type']) && in_array($_POST['civicrm_install_type'], $acceptableInstallTypes)) {
+  $installType = $_POST['civicrm_install_type'];
+}
+elseif (isset($_GET['civicrm_install_type']) && in_array(strtolower($_GET['civicrm_install_type']), $acceptableInstallTypes)) {
+  $installType = strtolower($_GET['civicrm_install_type']);
+}
+else {
+  // default value if not set and not an acceptable install type.
+  $installType = "drupal";
+}
 
-if ($installType == 'drupal') {
+if ($installType == 'drupal' || $installType == 'backdrop') {
   $crmPath = dirname(dirname($_SERVER['SCRIPT_FILENAME']));
   $installDirPath = $installURLPath = '';
 }
@@ -100,48 +91,19 @@ else {
   errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
+$composerJsonPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'composer.json';
+if (file_exists($composerJsonPath)) {
+  $composerJson = json_decode(file_get_contents($composerJsonPath), 1);
+  $minPhpVer = preg_replace(';[~^];', '', $composerJson['require']['php']);
+  if (!version_compare(phpversion(), $minPhpVer, '>=')) {
+    errorDisplayPage('PHP Version Requirement', sprintf("CiviCRM requires PHP %s+. The web server is running PHP %s.", $minPhpVer, phpversion()), FALSE);
+  }
+}
+
 $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
-
-// Load civicrm database config
-if (isset($_POST['mysql'])) {
-  $databaseConfig = $_POST['mysql'];
-}
-else {
-  $databaseConfig = array(
-    "server"   => "localhost",
-    "username" => "civicrm",
-    "password" => "",
-    "database" => "civicrm",
-  );
-}
-
-if ($installType == 'wordpress') {
-  //WP Database Data
-  $databaseConfig = array(
-    "server"   => DB_HOST,
-    "username" => DB_USER,
-    "password" => DB_PASSWORD,
-    "database" => DB_NAME,
-  );
-}
-
-if ($installType == 'drupal') {
-  // Load drupal database config
-  if (isset($_POST['drupal'])) {
-    $drupalConfig = $_POST['drupal'];
-  }
-  else {
-    $drupalConfig = array(
-      "server" => "localhost",
-      "username" => "drupal",
-      "password" => "",
-      "database" => "drupal",
-    );
-  }
-}
 
 $loadGenerated = 0;
 if (isset($_POST['loadGenerated'])) {
@@ -158,21 +120,28 @@ foreach ($langs as $locale => $_) {
   }
 }
 
-// Set the locale (required by CRM_Core_Config)
+// Set the CMS
 // This is mostly sympbolic, since nothing we do during the install
 // really requires CIVICRM_UF to be defined.
 $installTypeToUF = array(
   'wordpress' => 'WordPress',
   'drupal' => 'Drupal',
+  'backdrop' => 'Backdrop',
 );
 
-$uf = (isset($installTypeToUF[$installType]) ? $installTypeToUF[$installType] : 'Drupal');
+$uf = ($installTypeToUF[$installType] ?? 'Drupal');
 define('CIVICRM_UF', $uf);
 
+// Set the Locale (required by CRM_Core_Config)
 global $tsLocale;
 
 $tsLocale = 'en_US';
 $seedLanguage = 'en_US';
+
+// Backwards compatibility with default location of l10n files
+if (!defined('CIVICRM_L10N_BASEDIR') && file_exists($crmPath . DIRECTORY_SEPARATOR . 'l10n')) {
+  define('CIVICRM_L10N_BASEDIR', $crmPath . DIRECTORY_SEPARATOR . 'l10n');
+}
 
 // CRM-16801 This validates that seedLanguage is valid by looking in $langs.
 // NB: the variable is initial a $_REQUEST for the initial page reload,
@@ -182,7 +151,7 @@ if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']]
   $tsLocale = $_REQUEST['seedLanguage'];
 }
 
-$config = CRM_Core_Config::singleton(FALSE);
+CRM_Core_Config::singleton(FALSE);
 $GLOBALS['civicrm_default_error_scope'] = NULL;
 
 // The translation files are in the parent directory (l10n)
@@ -205,6 +174,12 @@ if ($installType == 'drupal') {
     $siteDir . CIVICRM_DIRECTORY_SEPARATOR .
     'civicrm.settings.php'
   );
+}
+elseif ($installType == 'backdrop') {
+  $object = new CRM_Utils_System_Backdrop();
+  $cmsPath = $object->cmsRootPath();
+  $siteDir = getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
+  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR . 'civicrm.settings.php');
 }
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
@@ -232,6 +207,18 @@ if ($installType == 'drupal') {
   }
 }
 
+if ($installType == 'backdrop') {
+  // Lets check only /modules/.
+  $pattern = '/' . preg_quote(CIVICRM_DIRECTORY_SEPARATOR . 'modules', CIVICRM_DIRECTORY_SEPARATOR) . '/';
+
+  if (!preg_match($pattern, str_replace("\\", "/", $_SERVER['SCRIPT_FILENAME']))) {
+    $directory = 'modules';
+    $errorTitle = ts("Oops! Please correct your install location");
+    $errorMsg = ts("Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>%1</strong> directory below your Drupal root directory.", array(1 => $directory));
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+
 // Exit with error if CiviCRM has already been installed.
 if ($alreadyInstalled) {
   $errorTitle = ts("Oops! CiviCRM is already installed");
@@ -244,9 +231,15 @@ if ($alreadyInstalled) {
       $siteDir,
     ));
   }
+  if ($installType == 'backdrop') {
+    $settings_directory = implode(CIVICRM_DIRECTORY_SEPARATOR, array(
+      ts('[your Backdrop root directory]'),
+      $siteDir,
+    ));
+  }
 
   $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, ts('Installation Guide'), NULL, NULL, "wiki");
-  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, <a href='%2'>refer to the online documentation</a>.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
+  $errorMsg = ts("CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>%1</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online documentation: %2.</li></ul>", array(1 => $settings_directory, 2 => $docLink));
   errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
@@ -280,9 +273,49 @@ if ($installType == 'drupal') {
     }
   }
 
+  // Bootstrap Drupal to get settings and user
+  $base_root = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+  $base_root .= '://' . $_SERVER['HTTP_HOST'];
+  $base_url = $base_root;
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+
+  // Check that user is logged in and has administrative permissions
+  // This is necessary because the script exposes the database settings in the form and these could be viewed by unauthorised users
+  if ((!function_exists('user_access')) || (!user_access('administer site configuration'))) {
+    $errorTitle = ts("You don't have permission to access this page");
+    $errorMsg = ts("The installer can only be run by a user with the permission to administer site configuration.");
+    errorDisplayPage($errorTitle, $errorMsg);
+    exit();
+  }
+
   if (!defined('VERSION') or version_compare(VERSION, '6.0') < 0) {
     $errorTitle = ts("Oops! Incorrect Drupal version");
     $errorMsg = ts("This version of CiviCRM can only be used with Drupal 6.x or 7.x. Please ensure that '%1' exists if you are running Drupal 7.0 and over.", array(1 => implode("' or '", $drupalVersionFiles)));
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+elseif ($installType == 'backdrop') {
+  // Ensure that they have downloaded the correct version of CiviCRM
+  if ($civicrm_version['cms'] != 'Backdrop') {
+    $errorTitle = ts("Oops! Incorrect CiviCRM version");
+    $errorMsg = ts("This installer can only be used for the Backdrop version of CiviCRM.");
+    errorDisplayPage($errorTitle, $errorMsg);
+  }
+
+  define('BACKDROP_ROOT', $cmsPath);
+
+  $backdropVersionFiles = array(
+    // Backdrop
+    implode(CIVICRM_DIRECTORY_SEPARATOR, array($cmsPath, 'core', 'includes', 'bootstrap.inc')),
+  );
+  foreach ($backdropVersionFiles as $backdropVersionFile) {
+    if (file_exists($backdropVersionFile)) {
+      require_once $backdropVersionFile;
+    }
+  }
+  if (!defined('BACKDROP_VERSION') or version_compare(BACKDROP_VERSION, '1.0') < 0) {
+    $errorTitle = ts("Oops! Incorrect Backdrop version");
+    $errorMsg = ts("This version of CiviCRM can only be used with Backdrop 1.x. Please ensure that '%1' exists if you are running Backdrop 1.0 and over.", array(1 => implode("' or '", $backdropVersionFiles)));
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
@@ -295,6 +328,70 @@ elseif ($installType == 'wordpress') {
     $errorTitle = ts("Oops! Incorrect CiviCRM version");
     $errorMsg = ts("This installer can only be used for the WordPress version of CiviCRM.");
     errorDisplayPage($errorTitle, $errorMsg);
+  }
+}
+
+// Load CiviCRM database config
+if (isset($_POST['mysql'])) {
+  $databaseConfig = $_POST['mysql'];
+}
+
+if ($installType == 'wordpress') {
+  // Load WP database config
+  if (isset($_POST['mysql'])) {
+    $databaseConfig = $_POST['mysql'];
+  }
+  else {
+    $databaseConfig = array(
+      "server" => DB_HOST,
+      "username" => DB_USER,
+      "password" => DB_PASSWORD,
+      "database" => DB_NAME,
+    );
+  }
+}
+
+if ($installType == 'drupal') {
+  // Load drupal database config
+  if (isset($_POST['drupal'])) {
+    $drupalConfig = $_POST['drupal'];
+  }
+  else {
+    $dbServer = $databases['default']['default']['host'];
+    if (!empty($databases['default']['default']['port'])) {
+      $dbServer .= ':' . $databases['default']['default']['port'];
+    }
+    $drupalConfig = array(
+      "server" => $dbServer,
+      "username" => $databases['default']['default']['username'],
+      "password" => $databases['default']['default']['password'],
+      "database" => $databases['default']['default']['database'],
+    );
+  }
+}
+
+if ($installType == 'backdrop') {
+  // Load backdrop database config
+  if (isset($_POST['backdrop'])) {
+    $backdropConfig = $_POST['backdrop'];
+  }
+  else {
+    $backdropConfig = array(
+      "server" => "localhost",
+      "username" => "backdrop",
+      "password" => "",
+      "database" => "backdrop",
+    );
+  }
+}
+
+// By default set CiviCRM database to be same as CMS database
+if (!isset($databaseConfig)) {
+  if (($installType == 'drupal') && (isset($drupalConfig))) {
+    $databaseConfig = $drupalConfig;
+  }
+  if (($installType == 'backdrop') && (isset($backdropConfig))) {
+    $databaseConfig = $backdropConfig;
   }
 }
 
@@ -311,6 +408,9 @@ if ($databaseConfig) {
   $dbReq->checkdatabase($databaseConfig, 'CiviCRM');
   if ($installType == 'drupal') {
     $dbReq->checkdatabase($drupalConfig, 'Drupal');
+  }
+  if ($installType == 'backdrop') {
+    $dbReq->checkdatabase($backdropConfig, 'Backdrop');
   }
 }
 
@@ -340,7 +440,10 @@ else {
  *  $description[2] - The test error to show, if it goes wrong
  */
 class InstallRequirements {
-  var $errors, $warnings, $tests;
+  public $errors;
+  public $warnings;
+  public $tests;
+  public $conn;
 
   // @see CRM_Upgrade_Form::MINIMUM_THREAD_STACK
   const MINIMUM_THREAD_STACK = 192;
@@ -351,7 +454,7 @@ class InstallRequirements {
    * @param $dbName
    */
   public function checkdatabase($databaseConfig, $dbName) {
-    if ($this->requireFunction('mysql_connect',
+    if ($this->requireFunction('mysqli_connect',
       array(
         ts("PHP Configuration"),
         ts("MySQL support"),
@@ -377,12 +480,12 @@ class InstallRequirements {
         )
       )
       ) {
-        @$this->requireMySQLVersion("5.1",
+        @$this->requireMySQLVersion(CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           array(
             ts("MySQL %1 Configuration", array(1 => $dbName)),
-            ts("MySQL version at least %1", array(1 => '5.1')),
-            ts("MySQL version %1 or higher is required, you are running MySQL %2.", array(1 => '5.1', 2 => mysql_get_server_info())),
-            ts("MySQL %1", array(1 => mysql_get_server_info())),
+            ts("MySQL version at least %1", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER)),
+            ts("MySQL version %1 or higher is required, you are running MySQL %2.", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER, 2 => mysqli_get_server_info($this->conn))),
+            ts("MySQL %1", array(1 => mysqli_get_server_info($this->conn))),
           )
         );
         $this->requireMySQLAutoIncrementIncrementOne($databaseConfig['server'],
@@ -394,6 +497,18 @@ class InstallRequirements {
             ts("An auto_increment_increment value greater than 1 is not currently supported. Please see issue CRM-7923 for further details and potential workaround."),
           )
         );
+        $testDetails = array(
+          ts("MySQL %1 Configuration", array(1 => $dbName)),
+          ts("Is the provided database name valid?"),
+          ts("The database name provided is not valid. Please use only 0-9, a-z, A-Z, _ and - as characters in the name."),
+        );
+        if (!CRM_Core_DAO::requireSafeDBName($databaseConfig['database'])) {
+          $this->error($testDetails);
+          return FALSE;
+        }
+        else {
+          $this->testing($testDetails);
+        }
         $this->requireMySQLThreadStack($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -407,7 +522,7 @@ class InstallRequirements {
           )
         );
       }
-      $onlyRequire = ($dbName == 'Drupal') ? TRUE : FALSE;
+      $onlyRequire = $dbName == 'Drupal' || $dbName == 'Backdrop';
       $this->requireDatabaseOrCreatePermissions(
         $databaseConfig['server'],
         $databaseConfig['username'],
@@ -420,7 +535,18 @@ class InstallRequirements {
         ),
         $onlyRequire
       );
-      if ($dbName != 'Drupal') {
+      if ($dbName != 'Drupal' && $dbName != 'Backdrop') {
+        $this->requireNoExistingData(
+          $databaseConfig['server'],
+          $databaseConfig['username'],
+          $databaseConfig['password'],
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts("Does the database have data from a previous installation?"),
+            ts("CiviCRM data from previous installation exists in '%1'.", array(1 => $databaseConfig['database'])),
+          )
+        );
         $this->requireMySQLInnoDB($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -461,8 +587,44 @@ class InstallRequirements {
             ts('Unable to create triggers. This MySQL user is missing the CREATE TRIGGERS  privilege.'),
           )
         );
+        $this->requireMySQLUtf8mb4($databaseConfig['server'],
+          $databaseConfig['username'],
+          $databaseConfig['password'],
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts('Is the <code>utf8mb4</code> character set supported?'),
+            ts('This MySQL server does not support the <code>utf8mb4</code> character set.'),
+          )
+        );
       }
     }
+  }
+
+  /**
+   * Connect via mysqli.
+   *
+   * This is exactly the same as mysqli_connect(), except that it accepts
+   * the port as part of the `$host`.
+   *
+   * @param string $host
+   *   Ex: 'localhost', 'localhost:3307', '127.0.0.1:3307', '[::1]', '[::1]:3307'.
+   * @param string $username
+   * @param string $password
+   * @param string $database
+   * @return \mysqli
+   */
+  protected function connect($host, $username, $password, $database = '') {
+    $hostParts = explode(':', $host);
+    if (count($hostParts) > 1 && strrpos($host, ']') !== strlen($host) - 1) {
+      $port = array_pop($hostParts);
+      $host = implode(':', $hostParts);
+    }
+    else {
+      $port = NULL;
+    }
+    $conn = @mysqli_connect($host, $username, $password, $database, $port);
+    return $conn;
   }
 
   /**
@@ -473,15 +635,13 @@ class InstallRequirements {
 
     $this->errors = NULL;
 
-    $this->requirePHPVersion('5.3.4', array(
+    $this->requirePHPVersion(array(
       ts("PHP Configuration"),
-      ts("PHP5 installed"),
-      NULL,
-      ts("PHP version %1", array(1 => phpversion())),
+      ts("PHP7 installed"),
     ));
 
     // Check that we can identify the root folder successfully
-    $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'README.txt',
+    $this->requireFile($crmPath . CIVICRM_DIRECTORY_SEPARATOR . 'README.md',
       array(
         ts("File permissions"),
         ts("Does the webserver know where files are stored?"),
@@ -528,6 +688,15 @@ class InstallRequirements {
         $siteDir,
       );
     }
+    elseif ($installType == 'backdrop') {
+
+      // make sure that we can write to sites/default and files/
+      $writableDirectories = array(
+        $cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
+        'files',
+        $cmsPath,
+      );
+    }
     elseif ($installType == 'wordpress') {
       // make sure that we can write to uploads/civicrm/
       $upload_dir = wp_upload_dir();
@@ -546,16 +715,6 @@ class InstallRequirements {
         NULL,
       );
       $this->requireWriteable($dirName, $testDetails, TRUE);
-    }
-
-    //check for Config.IDS.ini, file may exist in re-install
-    $configIDSiniDir = array($cmsPath, 'sites', $siteDir, 'files', 'civicrm', 'upload', 'Config.IDS.ini');
-
-    if (is_array($configIDSiniDir) && !empty($configIDSiniDir)) {
-      $configIDSiniFile = implode(CIVICRM_DIRECTORY_SEPARATOR, $configIDSiniDir);
-      if (file_exists($configIDSiniFile)) {
-        unlink($configIDSiniFile);
-      }
     }
 
     // Check for rewriting
@@ -578,10 +737,17 @@ class InstallRequirements {
     ));
 
     // Check for MySQL support
-    $this->requireFunction('mysql_connect', array(
+    $this->requireFunction('mysqli_connect', array(
       ts("PHP Configuration"),
       ts("MySQL support"),
       ts("MySQL support not included in PHP."),
+    ));
+
+    // Check for XML support
+    $this->requireFunction('simplexml_load_file', array(
+      ts("PHP Configuration"),
+      ts("SimpleXML support"),
+      ts("SimpleXML support not included in PHP."),
     ));
 
     // Check for JSON support
@@ -589,6 +755,13 @@ class InstallRequirements {
       ts("PHP Configuration"),
       ts("JSON support"),
       ts("JSON support not included in PHP."),
+    ));
+
+    // check for Multibyte support such as mb_substr. Required for proper handling of Multilingual setups.
+    $this->requireFunction('mb_substr', array(
+      ts("PHP Configuration"),
+      ts("Multibyte support"),
+      ts("Multibyte support not enabled in PHP."),
     ));
 
     // Check for xcache_isset and emit warning if exists
@@ -721,36 +894,30 @@ class InstallRequirements {
   }
 
   /**
-   * @param $minVersion
-   * @param $testDetails
-   * @param null $maxVersion
+   * @param array $testDetails
+   * @return bool
    */
-  public function requirePHPVersion($minVersion, $testDetails, $maxVersion = NULL) {
+  public function requirePHPVersion($testDetails) {
 
     $this->testing($testDetails);
 
     $phpVersion = phpversion();
-    $aboveMinVersion = version_compare($phpVersion, $minVersion) >= 0;
-    $belowMaxVersion = $maxVersion ? version_compare($phpVersion, $maxVersion) < 0 : TRUE;
+    $aboveMinVersion = version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0;
 
-    if ($aboveMinVersion && $belowMaxVersion) {
-      if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
-        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk.', array(
-          1 => phpversion(),
+    if ($aboveMinVersion) {
+      if (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) < 0) {
+        $testDetails[2] = ts('This webserver is running an outdated version of PHP (%1). It is strongly recommended to upgrade to PHP %2 or later, as older versions can present a security risk. The preferred version is %3.', array(
+          1 => $phpVersion,
           2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
+          3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
         ));
         $this->warning($testDetails);
       }
       return TRUE;
     }
 
-    if (!$testDetails[2]) {
-      if (!$aboveMinVersion) {
-        $testDetails[2] = ts("You need PHP version %1 or later, only %2 is installed. Please upgrade your server, or ask your web-host to do so.", array(1 => $minVersion, 2 => $phpVersion));
-      }
-      else {
-        $testDetails[2] = ts("PHP version %1 is not supported. PHP version earlier than %2 is required. You might want to downgrade your server, or ask your web-host to do so.", array(1 => $maxVersion, 2 => $phpVersion));
-      }
+    if (empty($testDetails[2])) {
+      $testDetails[2] = ts("You need PHP version %1 or later, only %2 is installed. Please upgrade your server, or ask your web-host to do so.", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER, 2 => $phpVersion));
     }
 
     $this->error($testDetails);
@@ -855,13 +1022,13 @@ class InstallRequirements {
    */
   public function requireMysqlConnection($server, $username, $password, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $this->conn = $this->connect($server, $username, $password);
 
-    if ($conn) {
+    if ($this->conn) {
       return TRUE;
     }
     else {
-      $testDetails[2] .= ": " . mysql_error();
+      $testDetails[2] .= ": " . mysqli_connect_error();
       $this->error($testDetails);
     }
   }
@@ -872,13 +1039,13 @@ class InstallRequirements {
    */
   public function requireMySQLServer($server, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, NULL, NULL);
+    $conn = $this->connect($server, NULL, NULL);
 
-    if ($conn || mysql_errno() < 2000) {
+    if ($conn || mysqli_connect_errno() < 2000) {
       return TRUE;
     }
     else {
-      $testDetails[2] .= ": " . mysql_error();
+      $testDetails[2] .= ": " . mysqli_connect_error();
       $this->error($testDetails);
     }
   }
@@ -890,13 +1057,13 @@ class InstallRequirements {
   public function requireMySQLVersion($version, $testDetails) {
     $this->testing($testDetails);
 
-    if (!mysql_get_server_info()) {
+    if (!mysqli_get_server_info($this->conn)) {
       $testDetails[2] = ts('Cannot determine the version of MySQL installed. Please ensure at least version %1 is installed.', array(1 => $version));
       $this->warning($testDetails);
     }
     else {
       list($majorRequested, $minorRequested) = explode('.', $version);
-      list($majorHas, $minorHas) = explode('.', mysql_get_server_info());
+      list($majorHas, $minorHas) = explode('.', mysqli_get_server_info($this->conn));
 
       if (($majorHas > $majorRequested) || ($majorHas == $majorRequested && $minorHas >= $minorRequested)) {
         return TRUE;
@@ -917,7 +1084,7 @@ class InstallRequirements {
    */
   public function requireMySQLInnoDB($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] .= ' ' . ts("Could not determine if MySQL has InnoDB support. Assuming no.");
       $this->error($testDetails);
@@ -925,8 +1092,8 @@ class InstallRequirements {
     }
 
     $innodb_support = FALSE;
-    $result = mysql_query("SHOW ENGINES", $conn);
-    while ($values = mysql_fetch_array($result)) {
+    $result = mysqli_query($conn, "SHOW ENGINES");
+    while ($values = mysqli_fetch_array($result)) {
       if ($values['Engine'] == 'InnoDB') {
         if (strtolower($values['Support']) == 'yes' ||
           strtolower($values['Support']) == 'default'
@@ -952,25 +1119,26 @@ class InstallRequirements {
    */
   public function requireMySQLTempTables($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not login to the database.');
       $this->error($testDetails);
       return;
     }
 
-    if (!@mysql_select_db($database, $conn)) {
+    if (!@mysqli_select_db($conn, $database)) {
       $testDetails[2] = ts('Could not select the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysql_query('CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)', $conn);
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $tempTableName . ' (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a temp table.');
       $this->error($testDetails);
     }
-    $result = mysql_query('DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
   }
 
   /**
@@ -982,36 +1150,35 @@ class InstallRequirements {
    */
   public function requireMySQLTrigger($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not login to the database.');
       $this->error($testDetails);
       return;
     }
 
-    if (!@mysql_select_db($database, $conn)) {
+    if (!@mysqli_select_db($conn, $database)) {
       $testDetails[2] = ts('Could not select the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysql_query('CREATE TABLE civicrm_install_temp_table_test (test text)', $conn);
+    $result = mysqli_query($conn, 'CREATE TABLE civicrm_install_temp_table_test (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a table in the database.');
       $this->error($testDetails);
     }
 
-    $result = mysql_query('CREATE TRIGGER civicrm_install_temp_table_test_trigger BEFORE INSERT ON civicrm_install_temp_table_test FOR EACH ROW BEGIN END');
+    $result = mysqli_query($conn, 'CREATE TRIGGER civicrm_install_temp_table_test_trigger BEFORE INSERT ON civicrm_install_temp_table_test FOR EACH ROW BEGIN END');
     if (!$result) {
-      mysql_query('DROP TABLE civicrm_install_temp_table_test');
+      mysqli_query($conn, 'DROP TABLE civicrm_install_temp_table_test');
       $testDetails[2] = ts('Could not create a database trigger.');
       $this->error($testDetails);
     }
 
-    mysql_query('DROP TRIGGER civicrm_install_temp_table_test_trigger');
-    mysql_query('DROP TABLE civicrm_install_temp_table_test');
+    mysqli_query($conn, 'DROP TRIGGER civicrm_install_temp_table_test_trigger');
+    mysqli_query($conn, 'DROP TABLE civicrm_install_temp_table_test');
   }
-
 
   /**
    * @param $server
@@ -1022,43 +1189,44 @@ class InstallRequirements {
    */
   public function requireMySQLLockTables($server, $username, $password, $database, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not connect to the database server.');
       $this->error($testDetails);
       return;
     }
 
-    if (!@mysql_select_db($database, $conn)) {
+    if (!@mysqli_select_db($conn, $database)) {
       $testDetails[2] = ts('Could not select the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysql_query('CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)', $conn);
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $tempTableName . ' (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a table in the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysql_query('LOCK TABLES civicrm_install_temp_table_test WRITE', $conn);
+    $result = mysqli_query($conn, 'LOCK TABLES ' . $tempTableName . ' WRITE');
     if (!$result) {
       $testDetails[2] = ts('Could not obtain a write lock for the database table.');
       $this->error($testDetails);
-      $result = mysql_query('DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
       return;
     }
 
-    $result = mysql_query('UNLOCK TABLES', $conn);
+    $result = mysqli_query($conn, 'UNLOCK TABLES');
     if (!$result) {
       $testDetails[2] = ts('Could not release the lock for the database table.');
       $this->error($testDetails);
-      $result = mysql_query('DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
       return;
     }
 
-    $result = mysql_query('DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
   }
 
   /**
@@ -1069,21 +1237,21 @@ class InstallRequirements {
    */
   public function requireMySQLAutoIncrementIncrementOne($server, $username, $password, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not connect to the database server.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysql_query("SHOW variables like 'auto_increment_increment'", $conn);
+    $result = mysqli_query($conn, "SHOW variables like 'auto_increment_increment'");
     if (!$result) {
       $testDetails[2] = ts('Could not query database server variables.');
       $this->error($testDetails);
       return;
     }
     else {
-      $values = mysql_fetch_row($result);
+      $values = mysqli_fetch_row($result);
       if ($values[1] == 1) {
         $testDetails[3] = ts('MySQL server auto_increment_increment is 1');
       }
@@ -1103,31 +1271,63 @@ class InstallRequirements {
    */
   public function requireMySQLThreadStack($server, $username, $password, $database, $minValueKB, $testDetails) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
     if (!$conn) {
       $testDetails[2] = ts('Could not connect to the database server.');
       $this->error($testDetails);
       return;
     }
 
-    if (!@mysql_select_db($database, $conn)) {
+    if (!@mysqli_select_db($conn, $database)) {
       $testDetails[2] = ts('Could not select the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysql_query("SHOW VARIABLES LIKE 'thread_stack'", $conn); // bytes => kb
+    // bytes => kb
+    $result = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'");
     if (!$result) {
       $testDetails[2] = ts('Could not get information about the thread_stack of the database.');
       $this->error($testDetails);
     }
     else {
-      $values = mysql_fetch_row($result);
+      $values = mysqli_fetch_row($result);
       if ($values[1] < (1024 * $minValueKB)) {
         $testDetails[2] = ts('MySQL "thread_stack" is %1 kb', array(1 => ($values[1] / 1024)));
         $this->error($testDetails);
       }
     }
+  }
+
+  /**
+   * @param $server
+   * @param $username
+   * @param $password
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireNoExistingData(
+    $server,
+    $username,
+    $password,
+    $database,
+    $testDetails
+  ) {
+    $this->testing($testDetails);
+    $conn = $this->connect($server, $username, $password);
+
+    @mysqli_select_db($conn, $database);
+    $contactRecords = mysqli_query($conn, "SELECT count(*) as contactscount FROM civicrm_contact");
+    if ($contactRecords) {
+      $contactRecords = mysqli_fetch_object($contactRecords);
+      if ($contactRecords->contactscount > 0) {
+        $this->error($testDetails);
+        return;
+      }
+    }
+
+    $testDetails[3] = ts('CiviCRM data from previous installation does not exist in %1.', array(1 => $database));
+    $this->testing($testDetails);
   }
 
   /**
@@ -1147,10 +1347,10 @@ class InstallRequirements {
     $onlyRequire = FALSE
   ) {
     $this->testing($testDetails);
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
 
     $okay = NULL;
-    if (@mysql_select_db($database)) {
+    if (@mysqli_select_db($conn, $database)) {
       $okay = "Database '$database' exists";
     }
     elseif ($onlyRequire) {
@@ -1159,7 +1359,8 @@ class InstallRequirements {
       return;
     }
     else {
-      if (@mysql_query("CREATE DATABASE $database")) {
+      $query = sprintf("CREATE DATABASE %s", mysqli_real_escape_string($conn, $database));
+      if (@mysqli_query($conn, $query)) {
         $okay = ts("Able to create a new database.");
       }
       else {
@@ -1192,6 +1393,57 @@ class InstallRequirements {
     else {
       $testDetails[2] = " (" . ts('the following PHP variables are missing: %1', array(1 => implode(", ", $missing))) . ")";
       $this->error($testDetails);
+    }
+  }
+
+  /**
+   * @param $server
+   * @param string $username
+   * @param $password
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireMysqlUtf8mb4($server, $username, $password, $database, $testDetails) {
+    $this->testing($testDetails);
+    $conn = $this->connect($server, $username, $password);
+    if (!$conn) {
+      $testDetails[2] = ts('Could not connect to the database server.');
+      $this->error($testDetails);
+      return;
+    }
+
+    if (!@mysqli_select_db($conn, $database)) {
+      $testDetails[2] = ts('Could not select the database.');
+      $this->error($testDetails);
+      return;
+    }
+
+    $result = mysqli_query($conn, 'CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
+    if (!$result) {
+      $testDetails[2] = ts('It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true');
+      $this->warning($testDetails);
+      return;
+    }
+    $result = mysqli_query($conn, 'DROP TABLE civicrm_utf8mb4_test');
+
+    // Ensure that the MySQL driver supports utf8mb4 encoding.
+    $version = mysqli_get_client_info();
+    if (strpos($version, 'mysqlnd') !== FALSE) {
+      // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
+      $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
+      if (version_compare($version, '5.0.9', '<')) {
+        $testDetails[2] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.';
+        $this->warning($testDetails);
+        return;
+      }
+    }
+    else {
+      // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
+      if (version_compare($version, '5.5.3', '<')) {
+        $testDetails[2] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.';
+        $this->warning($testDetails);
+        return;
+      }
     }
   }
 
@@ -1262,14 +1514,14 @@ class InstallRequirements {
    * @return int
    */
   public function hasErrors() {
-    return count($this->errors);
+    return !empty($this->errors);
   }
 
   /**
    * @return int
    */
   public function hasWarnings() {
-    return count($this->warnings);
+    return !empty($this->warnings);
   }
 
 }
@@ -1278,6 +1530,7 @@ class InstallRequirements {
  * Class Installer
  */
 class Installer extends InstallRequirements {
+
   /**
    * @param $server
    * @param $username
@@ -1285,14 +1538,14 @@ class Installer extends InstallRequirements {
    * @param $database
    */
   public function createDatabaseIfNotExists($server, $username, $password, $database) {
-    $conn = @mysql_connect($server, $username, $password);
+    $conn = $this->connect($server, $username, $password);
 
-    if (@mysql_select_db($database)) {
+    if (@mysqli_select_db($conn, $database)) {
       // skip if database already present
       return;
     }
-
-    if (@mysql_query("CREATE DATABASE $database")) {
+    $query = sprintf("CREATE DATABASE %s", mysqli_real_escape_string($conn, $database));
+    if (@mysqli_query($conn, $query)) {
     }
     else {
       $errorTitle = ts("Oops! Could not create database %1", array(1 => $database));
@@ -1392,6 +1645,13 @@ class Installer extends InstallRequirements {
         // now enable civicrm module.
         module_enable(array('civicrm', 'civicrmtheme'));
 
+        // SystemInstallEvent will be called from here with the first call of CRM_Core_Config,
+        // which calls Core_BAO_ConfigSetting::applyLocale(), who will default to calling
+        // Civi::settings()->get('lcMessages');
+        // Therefore, we need to pass the seedLanguage before that.
+        global $civicrm_setting;
+        $civicrm_setting['domain']['lcMessages'] = $config['seedLanguage'];
+
         // clear block, page, theme, and hook caches
         drupal_flush_all_caches();
 
@@ -1402,13 +1662,88 @@ class Installer extends InstallRequirements {
         $GLOBALS['user'] = $original_user;
         drupal_save_session(TRUE);
 
+        $output .= '</ul>';
+        $output .= '</div>';
+        $output .= '</body>';
+        $output .= '</html>';
+        echo $output;
+      }
+      elseif (
+        $installType == 'backdrop'
+      ) {
+
+        // clean output
+        @ob_clean();
+
+        $output .= '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+        $output .= '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">';
+        $output .= '<head>';
+        $output .= '<title>' . ts('CiviCRM Installed') . '</title>';
+        $output .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+        $output .= '<link rel="stylesheet" type="text/css" href="template.css" />';
+        $output .= '</head>';
+        $output .= '<body>';
+        $output .= '<div style="padding: 1em;"><p class="good">' . ts('CiviCRM has been successfully installed') . '</p>';
+        $output .= '<ul>';
+
+        $backdropURL = civicrm_cms_base();
+        $backdropPermissionsURL = "{$backdropURL}index.php?q=admin/config/people/permissions";
+        $backdropURL .= "index.php?q=civicrm/admin/configtask&reset=1";
+
+        $output .= "<li>" . ts("Backdrop user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a %1>review these permissions</a> to ensure that they are appropriate for your requirements (<a %2>learn more...</a>)", array(1 => "target='_blank' href='{$backdropPermissionsURL}'", 2 => "target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'")) . "</li>";
+        $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$backdropURL'")) . "</li>";
+        $output .= $commonOutputMessage;
+
+        // automatically enable CiviCRM module once it is installed successfully.
+        // so we need to Bootstrap Drupal, so that we can call drupal hooks.
+        global $cmsPath, $crmPath;
+
+        // relative / abosolute paths are not working for drupal, hence using chdir()
+        chdir($cmsPath);
+
+        // Force the re-initialisation of the config singleton on the next call
+        // since so far, we had used the Config object without loading the DB.
+        $c = CRM_Core_Config::singleton(FALSE);
+        $c->free();
+
+        include_once "./core/includes/bootstrap.inc";
+        include_once "./core/includes/unicode.inc";
+        include_once "./core/includes/config.inc";
+
+        backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
+
+        // prevent session information from being saved.
+        backdrop_save_session(FALSE);
+
+        // Force the current user to anonymous.
+        $original_user = $GLOBALS['user'];
+        $GLOBALS['user'] = backdrop_anonymous_user();
+
+        // explicitly setting error reporting, since we cannot handle drupal related notices
+        error_reporting(1);
+
+        // rebuild modules, so that civicrm is added
+        system_rebuild_module_data();
+
+        // now enable civicrm module.
+        module_enable(array('civicrm', 'civicrmtheme'));
+
+        // clear block, page, theme, and hook caches
+        backdrop_flush_all_caches();
+
+        //add basic backdrop permissions
+        civicrm_install_set_backdrop_perms();
+
+        // restore the user.
+        $GLOBALS['user'] = $original_user;
+        backdrop_save_session(TRUE);
+
         //change the default language to one chosen
         if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
           civicrm_api3('Setting', 'create', array(
-              'domain_id' => 'current_domain',
-              'lcMessages' => $config['seedLanguage'],
-            )
-          );
+            'domain_id' => 'current_domain',
+            'lcMessages' => $config['seedLanguage'],
+          ));
         }
 
         $output .= '</ul>';
@@ -1485,12 +1820,13 @@ class Installer extends InstallRequirements {
         $output .= "<li>" . ts("Use the <a %1>Configuration Checklist</a> to review and configure settings for your new site", array(1 => "target='_blank' href='$cmsURL'")) . "</li>";
         $output .= $commonOutputMessage;
 
-        echo '</ul>';
-        echo '</div>';
+        $output .= '</ul>';
+        $output .= '</div>';
+        echo $output;
 
         $c = CRM_Core_Config::singleton(FALSE);
         $c->free();
-        $wpInstallRedirect = admin_url("?page=CiviCRM&q=civicrm&reset=1");
+        $wpInstallRedirect = admin_url('admin.php?page=CiviCRM&q=civicrm&reset=1');
         echo "<script>
          window.location = '$wpInstallRedirect';
         </script>";
@@ -1537,6 +1873,36 @@ function civicrm_install_set_drupal_perms() {
   }
 }
 
+function civicrm_install_set_backdrop_perms() {
+  $perms = array(
+    'access all custom data',
+    'access uploaded files',
+    'make online contributions',
+    'profile create',
+    'profile edit',
+    'profile view',
+    'register for events',
+    'view event info',
+    'view event participants',
+    'access CiviMail subscribe/unsubscribe pages',
+  );
+
+  // Adding a permission that has not yet been assigned to a module by
+  // a hook_permission implementation results in a database error.
+  // CRM-9042
+  $allPerms = array_keys(module_invoke_all('permission'));
+  foreach (array_diff($perms, $allPerms) as $perm) {
+    watchdog('civicrm',
+      'Cannot grant the %perm permission because it does not yet exist.',
+      array('%perm' => $perm),
+      WATCHDOG_ERROR
+    );
+  }
+  $perms = array_intersect($perms, $allPerms);
+  user_role_grant_permissions(BACKDROP_AUTHENTICATED_ROLE, $perms);
+  user_role_grant_permissions(BACKDROP_ANONYMOUS_ROLE, $perms);
+}
+
 /**
  * @param $cmsPath
  * @param $str
@@ -1557,7 +1923,7 @@ function getSiteDir($cmsPath, $str) {
     preg_quote($modules, CIVICRM_DIRECTORY_SEPARATOR) . "/",
     $_SERVER['SCRIPT_FILENAME'], $matches
   );
-  $siteDir = isset($matches[1]) ? $matches[1] : 'default';
+  $siteDir = $matches[1] ?? 'default';
 
   if (strtolower($siteDir) == 'all') {
     // For this case - use drupal's way of finding out multi-site directory
@@ -1586,14 +1952,21 @@ function getSiteDir($cmsPath, $str) {
  * @param $showRefer
  */
 function errorDisplayPage($errorTitle, $errorMsg, $showRefer = TRUE) {
-  if ($showRefer) {
-    $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
 
-    if (function_exists('ts')) {
-      $errorMsg .= '<p>' . ts("<a %1>Refer to the online documentation for more information</a>", array(1 => "href='$docLink'")) . '</p>';
+  // Add a link to the documentation
+  if ($showRefer) {
+    if (is_callable(array('CRM_Utils_System', 'docURL2'))) {
+      $docLink = CRM_Utils_System::docURL2('Installation and Upgrades', FALSE, 'Installation Guide', NULL, NULL, "wiki");
     }
     else {
-      $errorMsg .= '<p>' . sprintf("<a %s>Refer to the online documentation for more information</a>", "href='$docLink'") . '</p>';
+      $docLink = '';
+    }
+
+    if (function_exists('ts')) {
+      $errorMsg .= '<p>' . ts("Refer to the online documentation for more information: ") . $docLink . '</p>';
+    }
+    else {
+      $errorMsg .= '<p>' . 'Refer to the online documentation for more information: ' . $docLink . '</p>';
     }
   }
 

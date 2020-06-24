@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -35,7 +19,7 @@
  * implement the Selector/Api.interface.php class
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -104,6 +88,7 @@ class CRM_Core_Selector_Controller {
 
   /**
    * The objectAction for the WebObject
+   * @var int
    */
   protected $_action;
 
@@ -164,7 +149,7 @@ class CRM_Core_Selector_Controller {
    *
    * @var array
    */
-  public static $_properties = array('columnHeaders', 'rows', 'rowsEmpty');
+  public static $_properties = ['columnHeaders', 'rows', 'rowsEmpty'];
 
   /**
    * Should we compute actions dynamically (since they are quite verbose)
@@ -209,9 +194,9 @@ class CRM_Core_Selector_Controller {
       $this->_sortID .= '_u';
     }
 
-    $params = array(
+    $params = [
       'pageID' => $this->_pageID,
-    );
+    ];
 
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
@@ -323,6 +308,7 @@ class CRM_Core_Selector_Controller {
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       if ($this->_output == self::EXPORT) {
         // export the rows.
+        CRM_Core_Error::deprecatedFunctionWarning('This code is believed to be unreachable & to be later removed. Please log how you reached it in gitlab');
         CRM_Core_Report_Excel::writeCSVFile($this->_object->getExportFileName(),
           $columnHeaders,
           $rows
@@ -339,18 +325,34 @@ class CRM_Core_Selector_Controller {
       // output requires paging/sorting capability
       $rows = self::getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
-      $rowsEmpty = count($rows) ? FALSE : TRUE;
+      $reorderedHeaders = [];
+      $noWeightHeaders = [];
+      foreach ($columnHeaders as $key => $columnHeader) {
+        // So far only contribution selector sets weight, so just use key if not.
+        // Extension writers will need to fix other getColumnHeaders (or add a wrapper)
+        // to extend.
+        if (isset($columnHeader['weight'])) {
+          $reorderedHeaders[$columnHeader['weight']] = $columnHeader;
+        }
+        else {
+          $noWeightHeaders[$key] = $columnHeader;
+        }
+      }
+      ksort($reorderedHeaders);
+      // Merge headers not containing weight to ordered headers
+      $finalColumnHeaders = array_merge($reorderedHeaders, $noWeightHeaders);
+
       $qill = $this->getQill();
       $summary = $this->getSummary();
       // if we need to store in session, lets update session
       if ($this->_output & self::SESSION) {
-        $this->_store->set("{$this->_prefix}columnHeaders", $columnHeaders);
+        $this->_store->set("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         if ($this->_dynamicAction) {
           $this->_object->removeActions($rows);
         }
         $this->_store->set("{$this->_prefix}rows", $rows);
         $this->_store->set("{$this->_prefix}rowCount", $this->_total);
-        $this->_store->set("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        $this->_store->set("{$this->_prefix}rowsEmpty", !$rows);
         $this->_store->set("{$this->_prefix}qill", $qill);
         $this->_store->set("{$this->_prefix}summary", $summary);
       }
@@ -358,9 +360,9 @@ class CRM_Core_Selector_Controller {
         self::$_template->assign_by_ref("{$this->_prefix}pager", $this->_pager);
         self::$_template->assign_by_ref("{$this->_prefix}sort", $this->_sort);
 
-        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $columnHeaders);
+        self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
-        self::$_template->assign("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        self::$_template->assign("{$this->_prefix}rowsEmpty", !$rows);
         self::$_template->assign("{$this->_prefix}qill", $qill);
         self::$_template->assign("{$this->_prefix}summary", $summary);
       }

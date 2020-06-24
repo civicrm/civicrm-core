@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -52,13 +36,13 @@
  * @group headless
  */
 class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
-  protected $_tablesToTruncate = array(
+  protected $_tablesToTruncate = [
     'civicrm_address',
     'civicrm_saved_search',
     'civicrm_contact',
     'civicrm_option_value',
     'civicrm_option_group',
-  );
+  ];
 
   /**
    * @return CRM_Contact_Form_Search_Custom_SamplTestDataProvider
@@ -86,19 +70,11 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
   public function testCount($fv, $count, $ids, $full) {
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testCount\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
 
-    $this->assertEquals($count, $obj->count(),
-      'In line ' . __LINE__
-    );
+    $this->assertEquals($count, $obj->count());
   }
 
   /**
@@ -114,24 +90,19 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
     // Truncate affected tables
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testAll\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
+
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
-    $sql = $obj->all();
+    $sql = $obj->all(0, 0, 'contact_id');
     $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $all = array();
+    $all = [];
     while ($dao->fetch()) {
-      $all[] = array(
+      $all[] = [
         'contact_id' => $dao->contact_id,
         'contact_type' => $dao->contact_type,
         'household_name' => $dao->sort_name,
-      );
+      ];
     }
     asort($all);
     $this->assertEquals($full, $all);
@@ -150,18 +121,12 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
     // Truncate affected tables
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testContactIDs\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
     $sql = $obj->contactIDs();
     $this->assertTrue(is_string($sql));
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $contacts = array();
+    $contacts = [];
     while ($dao->fetch()) {
       $contacts[$dao->contact_id] = 1;
     }
@@ -175,7 +140,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
    *  It returns an array of translated name => keys
    */
   public function testColumns() {
-    $formValues = array();
+    $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Sample($formValues);
     $columns = $obj->columns();
     $this->assertTrue(is_array($columns));
@@ -197,7 +162,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
    *  It returns NULL
    */
   public function testSummary() {
-    $formValues = array();
+    $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $this->assertNull($obj->summary());
   }
@@ -207,7 +172,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
    *  Returns the path to the file as a string
    */
   public function testTemplateFile() {
-    $formValues = array();
+    $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $fileName = $obj->templateFile();
     $this->assertTrue(is_string($fileName));
@@ -222,15 +187,10 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
   public function testSavedSearch() {
     $this->quickCleanup($this->_tablesToTruncate);
 
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
 
-    $dataset[1] = array('id' => array(12));
-    $dataset[2] = array('id' => array(10, 11));
+    $dataset[1] = ['id' => [12]];
+    $dataset[2] = ['id' => [10, 11]];
 
     $ssdao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_saved_search");
     while ($ssdao->fetch()) {
@@ -239,7 +199,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
       $sql = $obj->contactIDs();
       $this->assertTrue(is_string($sql));
       $dao = CRM_Core_DAO::executeQuery($sql);
-      $contacts = array();
+      $contacts = [];
       while ($dao->fetch()) {
         $contacts[] = $dao->contact_id;
       }

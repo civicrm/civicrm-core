@@ -199,4 +199,11 @@
     <comment>skip this url being exposed to breadcrumb</comment>
     <add>2.2</add>
   </field>
+  <field>
+    <name>module_data</name>
+    <title>Other menu data</title>
+    <type>text</type>
+    <comment>All other menu metadata not stored in other fields</comment>
+    <add>4.7</add>
+  </field>
 </table>

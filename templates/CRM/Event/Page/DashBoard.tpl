@@ -1,46 +1,24 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* CiviEvent DashBoard (launch page) *}
 {capture assign=newEventURL}{crmURL p="civicrm/event/add" q="action=add&reset=1"}{/capture}
 {capture assign=configPagesURL}{crmURL p="civicrm/event/manage" q="reset=1"}{/capture}
-{capture assign=icalFile}{crmURL p='civicrm/event/ical' q="reset=1" fe=1 a=1}{/capture}
-{capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1" fe=1 a=1}{/capture}
-{capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1" fe=1 a=1}{/capture}
-{capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1 a=1}{/capture}
 
 {if $eventSummary.total_events}
-    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list"></i> {ts}Manage Events{/ts}</span></a>
-    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o"></i> {ts}New Event{/ts}</span></a>
+    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list" aria-hidden="true"></i> {ts}Manage Events{/ts}</span></a>
+    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o" aria-hidden="true"></i> {ts}New Event{/ts}</span></a>
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
-      <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
-      <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
-      <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
-      <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a></h3>
+      {include file="CRM/Event/Page/iCalLinks.tpl"}
+    </h3>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -109,7 +87,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts}Map event location{/ts}">&raquo;&nbsp;{ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i>&nbsp;{ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -121,10 +99,10 @@
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
                       {* Schedule Reminders requires a different query string. *}
                       {if $v.url EQ 'civicrm/event/manage/reminder'}
-                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                        <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
                             href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$id`"}">{$v.title}</a></li>
                       {else}
-                        <li><a title="{$v.title}" class="action-item crm-hover-button no-popup {$status}"
+                        <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
                             href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
                       {/if}
                     {/foreach}
@@ -140,7 +118,7 @@
     </tbody>
     </table>
     {if $eventSummary.total_events GT 10}
-     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}">&raquo; {ts}Browse more events{/ts}...</a></div>
+     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Browse more events{/ts}...</a></div>
     {/if}
 {else}
     <br />

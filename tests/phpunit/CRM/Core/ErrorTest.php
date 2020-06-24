@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -91,6 +75,24 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     foreach ($logFiles as $logFile) {
       $this->assertRegexp($pattern, file_get_contents($logFile));
     }
+  }
+
+  /**
+   * Check that a debugger is created and there is no error when passing in a prefix.
+   *
+   * Do some basic content checks.
+   */
+  public function testDebugLoggerFormat() {
+    $log = CRM_Core_Error::createDebugLogger('my-test');
+    $log->log('Mary had a little lamb');
+    $log->log('Little lamb');
+    $config = CRM_Core_Config::singleton();
+    $fileContents = file_get_contents($log->_filename);
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . 'my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $log->_filename);
+    // The 5 here is a bit arbitrary - on my local the date part is 15 chars (Mar 29 05:29:16) - but we are just checking that
+    // there are chars for the date at the start.
+    $this->assertTrue(strpos($fileContents, '[info] Mary had a little lamb') > 10);
+    $this->assertContains('[info] Little lamb', $fileContents);
   }
 
 }

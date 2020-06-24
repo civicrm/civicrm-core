@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/scheduling reminders.  *}
@@ -44,7 +28,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong><br /></td>
+        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>OR</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
@@ -60,11 +44,11 @@
     <tr id="repeatFields" class="crm-scheduleReminder-form-block-repeatFields"><td></td><td>
         <table class="form-layout-compressed">
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-            <td class="label">{$form.repetition_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
+            <td class="label">{$form.repetition_frequency_interval.label} <span class="crm-marker">*</span>&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
           <td>{$form.repetition_frequency_unit.html}</td>
           </tr>
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-             <td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
+             <td class="label">{$form.end_frequency_interval.label} <span class="crm-marker">*</span>&nbsp;&nbsp;{$form.end_frequency_interval.html}
            <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
           </tr>
         </table>
@@ -194,7 +178,7 @@
       $('#mode', $form).change(loadMsgBox);
 
       function populateRecipient() {
-        var mappingID = $('#entity_0', $form).val();
+        var mappingID = $('#entity_0', $form).val() || $('[name^=mappingID]', $form).val();
         var recipient = $("#recipient", $form).val();
         $("#recipientList", $form).hide();
         if ($('#limit_to').val() != '' ) {

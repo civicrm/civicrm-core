@@ -1,28 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-pledge-userdashboard-pre"}
+{/crmRegion}
 {if $context eq 'user'}
 <div class="view-content">
 {if $pledge_rows}
@@ -44,12 +30,14 @@
     <td class="crm-pledge-pledge_next_pay_date">{$row.pledge_next_pay_date|truncate:10:''|crmDate}</td>
     <td class="crm-pledge-pledge_next_pay_amount">{$row.pledge_next_pay_amount|crmMoney:$row.pledge_currency}</td>
     <td class="crm-pledge-pledge_status crm-pledge-pledge_status_{$row.pledge_status}">{$row.pledge_status}</td>
-    <td>
-      {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }
-        <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
-      {/if}
-      <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
-    </td>
+    {if !$userChecksum}
+      <td>
+        {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }
+          <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
+        {/if}
+        <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
+      </td>
+    {/if}
    </tr>
   {/foreach}
 </table>
@@ -99,3 +87,5 @@
 </div>
 {* main if close*}
 {/if}
+{crmRegion name="crm-pledge-userdashboard-post"}
+{/crmRegion}

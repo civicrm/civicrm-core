@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
@@ -33,62 +17,56 @@ namespace Civi\API;
  * event is dispatched.
  *
  * Event subscribers which are concerned about the order of execution should assign
- * a weight to their subscription (such as W_EARLY, W_MIDDLE, or W_LATE).
- * W_LATE).
+ * a priority to their subscription (such as W_EARLY, W_MIDDLE, or W_LATE).
  */
 class Events {
 
   /**
-   * Determine whether the API request is allowed for the current user.
-   * For successful execution, at least one listener must invoke
-   * $event->authorize().
-   *
    * @see AuthorizeEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
-  const AUTHORIZE = 'api.authorize';
+  const AUTHORIZE = 'civi.api.authorize';
 
   /**
-   * Determine which API provider executes the given request. For successful
-   * execution, at least one listener must invoke
-   * $event->setProvider($provider).
-   *
    * @see ResolveEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
-  const RESOLVE = 'api.resolve';
+  const RESOLVE = 'civi.api.resolve';
 
   /**
-   * Apply pre-execution logic
-   *
    * @see PrepareEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
-  const PREPARE = 'api.prepare';
+  const PREPARE = 'civi.api.prepare';
 
   /**
    * Apply post-execution logic
    *
    * @see RespondEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
-  const RESPOND = 'api.respond';
+  const RESPOND = 'civi.api.respond';
 
   /**
    * Handle any exceptions.
    *
    * @see ExceptionEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
-  const EXCEPTION = 'api.exception';
+  const EXCEPTION = 'civi.api.exception';
 
   /**
-   * Weight - Early
+   * Priority - Higher numbers execute earlier
    */
   const W_EARLY = 100;
 
   /**
-   * Weight - Middle
+   * Priority - Middle
    */
   const W_MIDDLE = 0;
 
   /**
-   * Weight - Late
+   * Priority - Lower numbers execute later
    */
   const W_LATE = -100;
 
@@ -96,13 +74,25 @@ class Events {
    * @return array<string>
    */
   public static function allEvents() {
-    return array(
-      self::AUTHORIZE,
-      self::EXCEPTION,
-      self::PREPARE,
-      self::RESOLVE,
-      self::RESPOND,
-    );
+    return [
+      'civi.api.authorize',
+      'civi.api.exception',
+      'civi.api.prepare',
+      'civi.api.resolve',
+      'civi.api.respond',
+    ];
+  }
+
+  /**
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @see \CRM_Utils_Hook::eventDefs
+   */
+  public static function hookEventDefs($e) {
+    $e->inspector->addEventClass('civi.api.authorize', 'Civi\API\Event\AuthorizeEvent');
+    $e->inspector->addEventClass('civi.api.exception', 'Civi\API\Event\ExceptionEvent');
+    $e->inspector->addEventClass('civi.api.prepare', 'Civi\API\Event\PrepareEvent');
+    $e->inspector->addEventClass('civi.api.resolve', 'Civi\API\Event\ResolveEvent');
+    $e->inspector->addEventClass('civi.api.respond', 'Civi\API\Event\RespondEvent');
   }
 
 }

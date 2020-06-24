@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,17 +13,19 @@
  * This class handles all SOAP client requests.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_SoapServer {
 
   /**
    * Number of seconds we should let a soap process idle
+   * @var int
    */
-  static $soap_timeout = 0;
+  public static $soap_timeout = 0;
 
   /**
    * Cache the actual UF Class
+   * @var string
    */
   public $ufClass;
 
@@ -117,12 +103,12 @@ class CRM_Utils_SoapServer {
   public function authenticate($name, $pass, $loadCMSBootstrap = FALSE) {
     require_once str_replace('_', DIRECTORY_SEPARATOR, $this->ufClass) . '.php';
 
-    if ($this->ufClass == 'CRM_Utils_System_Joomla') {
+    if ($this->ufClass == 'CRM_Utils_System_Joomla'
+      || $this->ufClass == 'CRM_Utils_System_WordPress') {
       $loadCMSBootstrap = TRUE;
     }
 
-    $className = $this->ufClass;
-    $result =& $className::authenticate($name, $pass, $loadCMSBootstrap);
+    $result = CRM_Utils_System::authenticate($name, $pass, $loadCMSBootstrap);
 
     if (empty($result)) {
       throw new SoapFault('Client', 'Invalid login');
@@ -149,15 +135,16 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_bounce($key, $job, $queue, $hash, $body) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'event_queue_id' => $queue,
       'hash' => $hash,
       'body' => $body,
       'version' => 3,
-    );
-    return civicrm_api('Mailing', 'event_bounce', $params);
+    ];
+    $result = civicrm_api('Mailing', 'event_bounce', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -173,15 +160,16 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_unsubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'org_unsubscribe' => 0,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'version' => 3,
-    );
-    return civicrm_api('MailingGroup', 'event_unsubscribe', $params);
+    ];
+    $result = civicrm_api('MailingGroup', 'event_unsubscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -195,15 +183,16 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_domain_unsubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'org_unsubscribe' => 1,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'version' => 3,
-    );
-    return civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
+    ];
+    $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -217,15 +206,16 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_resubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'org_unsubscribe' => 0,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'version' => 3,
-    );
-    return civicrm_api('MailingGroup', 'event_resubscribe', $params);
+    ];
+    $result = civicrm_api('MailingGroup', 'event_resubscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -239,12 +229,13 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_subscribe($key, $email, $domain, $group) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'email' => $email,
       'group_id' => $group,
       'version' => 3,
-    );
-    return civicrm_api('MailingGroup', 'event_subscribe', $params);
+    ];
+    $result = civicrm_api('MailingGroup', 'event_subscribe', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -258,15 +249,16 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_confirm($key, $contact, $subscribe, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'contact_id' => $contact,
       'subscribe_id' => $subscribe,
       'time_stamp' => date('YmdHis'),
       'event_subscribe_id' => $subscribe,
       'hash' => $hash,
       'version' => 3,
-    );
-    return civicrm_api('Mailing', 'event_confirm', $params);
+    ];
+    $result = civicrm_api('Mailing', 'event_confirm', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -284,7 +276,7 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_reply($key, $job, $queue, $hash, $bodyTxt, $rt, $bodyHTML = NULL, $fullEmail = NULL) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'event_queue_id' => $queue,
       'hash' => $hash,
@@ -294,8 +286,9 @@ class CRM_Utils_SoapServer {
       'fullEmail' => $fullEmail,
       'time_stamp' => date('YmdHis'),
       'version' => 3,
-    );
-    return civicrm_api('Mailing', 'event_reply', $params);
+    ];
+    $result = civicrm_api('Mailing', 'event_reply', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -310,14 +303,15 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_forward($key, $job, $queue, $hash, $email) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'email' => $email,
       'version' => 3,
-    );
-    return civicrm_api('Mailing', 'event_forward', $params);
+    ];
+    $result = civicrm_api('Mailing', 'event_forward', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
   /**
@@ -330,7 +324,8 @@ class CRM_Utils_SoapServer {
   public function get_contact($key, $params) {
     $this->verify($key);
     $params['version'] = 3;
-    return civicrm_api('contact', 'get', $params);
+    $result = civicrm_api('contact', 'get', $params);
+    return CRM_Utils_Array::encode_items($result);
   }
 
 }

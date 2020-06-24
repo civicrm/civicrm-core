@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -40,7 +24,19 @@
  * @return array
  */
 function civicrm_api3_membership_status_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MembershipStatus');
+}
+
+/**
+ * Adjust Metadata for Create action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_status_create_spec(&$params) {
+  $params['name']['api.required'] = 1;
 }
 
 /**
@@ -74,9 +70,9 @@ function civicrm_api3_membership_status_get($params) {
  */
 function civicrm_api3_membership_status_update($params) {
 
-  civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  civicrm_api3_verify_mandatory($params, NULL, ['id']);
   //don't allow duplicate names.
-  $name = CRM_Utils_Array::value('name', $params);
+  $name = $params['name'] ?? NULL;
   if ($name) {
     $status = new CRM_Member_DAO_MembershipStatus();
     $status->name = $params['name'];
@@ -96,8 +92,9 @@ function civicrm_api3_membership_status_update($params) {
     }
     $membershipStatusBAO->save();
   }
-  $membershipStatus = array();
-  _civicrm_api3_object_to_array(clone($membershipStatusBAO), $membershipStatus);
+  $membershipStatus = [];
+  $cloneBAO = clone($membershipStatusBAO);
+  _civicrm_api3_object_to_array($cloneBAO, $membershipStatus);
   $membershipStatus['is_error'] = 0;
   return $membershipStatus;
 }
@@ -108,13 +105,17 @@ function civicrm_api3_membership_status_update($params) {
  * This API is used for deleting a membership status
  *
  * @param array $params
- *
  * @return array
+ * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_membership_status_delete($params) {
 
   $memberStatusDelete = CRM_Member_BAO_MembershipStatus::del($params['id'], TRUE);
-  return $memberStatusDelete ? civicrm_api3_create_error($memberStatusDelete['error_message']) : civicrm_api3_create_success();
+  if ($memberStatusDelete) {
+    throw new API_Exception($memberStatusDelete['error_message']);
+  }
+  return civicrm_api3_create_success();
 }
 
 /**
@@ -145,7 +146,7 @@ SELECT start_date, end_date, join_date, membership_type_id
  WHERE id = %1
 ";
 
-  $params = array(1 => array($membershipID, 'Integer'));
+  $params = [1 => [$membershipID, 'Integer']];
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
     $membershipTypeID = empty($membershipParams['membership_type_id']) ? $dao->membership_type_id : $membershipParams['membership_type_id'];
@@ -156,9 +157,23 @@ SELECT start_date, end_date, join_date, membership_type_id
     }
   }
   else {
-    $dao->free();
     throw new API_Exception('did not find a membership record');
   }
-  $dao->free();
   return $result;
+}
+
+/**
+ * Adjust Metadata for Calc action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_status_calc_spec(&$params) {
+  $params['membership_id']['api.required'] = 1;
+  $params['membership_id']['title'] = 'Membership ID';
+  $params['ignore_admin_only']['title'] = 'Ignore admin only statuses';
+  $params['ignore_admin_only']['description'] = 'Ignore statuses that are for admin/manual assignment only';
+  $params['ignore_admin_only']['type'] = CRM_Utils_Type::T_BOOLEAN;
 }

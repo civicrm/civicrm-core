@@ -1,7 +1,7 @@
 <?php
 /*
    +----------------------------------------------------------------------------+
-   | PayflowPro Core Payment Module for CiviCRM version 4.7                     |
+   | Payflow Pro Core Payment Module for CiviCRM version 5                      |
    +----------------------------------------------------------------------------+
    | Licensed to CiviCRM under the Academic Free License version 3.0            |
    |                                                                            |
@@ -9,21 +9,12 @@
    +---------------------------------------------------------------------------+
   */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * Class CRM_Core_Payment_PayflowPro.
  */
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
-  // (not used, implicit in the API, might need to convert?)
-  const
-    CHARSET = 'UFT-8';
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
 
   /**
    * Constructor
@@ -36,7 +27,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Payflow Pro');
   }
 
   /*
@@ -44,6 +34,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * the processor. It is the main function for processing on-server
    * credit card transactions
    */
+
   /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
@@ -57,7 +48,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
+      throw new PaymentProcessorException(ts('Payflow Pro requires curl with SSL support'));
     }
 
     /*
@@ -89,7 +80,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      *
      */
 
-    $payflow_query_array = array(
+    $payflow_query_array = [
       'USER' => $user,
       'VENDOR' => $this->_paymentProcessor['user_name'],
       'PARTNER' => $this->_paymentProcessor['signature'],
@@ -102,7 +93,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'CVV2' => $params['cvv2'],
       'EXPDATE' => urlencode(sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2)),
       'ACCTTYPE' => urlencode($params['credit_card_type']),
-      'AMT' => urlencode($params['amount']),
+      'AMT' => urlencode($this->getAmount($params)),
       'CURRENCY' => urlencode($params['currency']),
       'FIRSTNAME' => $params['billing_first_name'],
       //credit card name
@@ -121,17 +112,17 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'ORDERDESC' => urlencode($params['description']),
       'VERBOSITY' => 'MEDIUM',
       'BILLTOCOUNTRY' => urlencode($params['country']),
-    );
+    ];
 
     if ($params['installments'] == 1) {
-      $params['is_recur'] == FALSE;
+      $params['is_recur'] = FALSE;
     }
 
     if ($params['is_recur'] == TRUE) {
 
       $payflow_query_array['TRXTYPE'] = 'R';
       $payflow_query_array['OPTIONALTRX'] = 'S';
-      $payflow_query_array['OPTIONALTRXAMT'] = $params['amount'];
+      $payflow_query_array['OPTIONALTRXAMT'] = $this->getAmount($params);
       //Amount of the initial Transaction. Required
       $payflow_query_array['ACTION'] = 'A';
       //A for add recurring (M-modify,C-cancel,R-reactivate,I-inquiry,P-payment
@@ -256,7 +247,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      * Check to see if we have a duplicate before we send
      */
     if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
-      return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
+      throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9003);
     }
 
     // ie. url at payment processor to submit to.
@@ -267,8 +258,12 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * Payment successfully sent to gateway - process the response now
      */
-    $result = strstr($responseData, "RESULT");
-    $nvpArray = array();
+    $result = strstr($responseData, 'RESULT');
+    if (empty($result)) {
+      throw new PaymentProcessorException('No RESULT code from PayPal.', 9016);
+    }
+
+    $nvpArray = [];
     while (strlen($result)) {
       // name
       $keypos = strpos($result, '=');
@@ -299,7 +294,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
         /*******************************************************
          * Success !
-         * This is a successful transaction. PayFlow Pro does return further information
+         * This is a successful transaction. Payflow Pro does return further information
          * about transactions to help you identify fraud including whether they pass
          * the cvv check, the avs check. This is stored in
          * CiviCRM as part of the transact
@@ -316,95 +311,57 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         return $params;
 
       case 1:
-        return self::errorExit(9008, "There is a payment processor configuration problem. This is usually due to invalid account information or ip restrictions on the account.  You can verify ip restriction by logging         // into Manager.  See Service Settings >> Allowed IP Addresses.   ");
+        throw new PaymentProcessorException('There is a payment processor configuration problem. This is usually due to invalid account information or ip restrictions on the account.  You can verify ip restriction by logging         // into Manager.  See Service Settings >> Allowed IP Addresses.   ', 9003);
 
       case 12:
         // Hard decline from bank.
-        return self::errorExit(9009, "Your transaction was declined   ");
+        throw new PaymentProcessorException('Your transaction was declined   ', 9009);
 
       case 13:
         // Voice authorization required.
-        return self::errorExit(9010, "Your Transaction is pending. Contact Customer Service to complete your order.");
+        throw new PaymentProcessorException('Your Transaction is pending. Contact Customer Service to complete your order.', 9010);
 
       case 23:
         // Issue with credit card number or expiration date.
-        return self::errorExit(9011, "Invalid credit card information. Please re-enter.");
+        throw new PaymentProcessorException('Invalid credit card information. Please re-enter.', 9011);
 
       case 26:
-        return self::errorExit(9012, "You have not configured your payment processor with the correct credentials. Make sure you have provided both the <vendor> and the <user> variables ");
+        throw new PaymentProcessorException('You have not configured your payment processor with the correct credentials. Make sure you have provided both the <vendor> and the <user> variables ', 9012);
 
       default:
-        return self::errorExit(9013, "Error - from payment processor: [" . $result_code . " " . $nvpArray['RESPMSG'] . "] ");
+        throw new PaymentProcessorException('Error - from payment processor: [' . $result_code . " " . $nvpArray['RESPMSG'] . "] ", 9013);
     }
-
-    return self::errorExit(9014, "Check the code - all transactions should have been headed off before they got here. Something slipped through the net");
   }
 
-  /*
-   * Produces error message and returns from class
-   */
   /**
-   * @param null $errorCode
-   * @param null $errorMessage
-   *
-   * @return object
-   */
-  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
-    $e = CRM_Core_Error::singleton();
-    if ($errorCode) {
-      $e->push($errorCode, 0, NULL, $errorMessage);
-    }
-    else {
-      $e->push(9000, 0, NULL, 'Unknown System Error.');
-    }
-    return $e;
-  }
-
-
-  /*
    * NOTE: 'doTransferCheckout' not implemented
-   */
-  /**
+   *
    * @param array $params
    * @param $component
    *
    * @throws Exception
    */
   public function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
+    throw new CRM_Core_Exception(ts('This function is not implemented'));
   }
 
-  /*
+  /**
    * This public function checks to see if we have the right processor config values set
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
    *  register any credit card details
    *
-   * @param string $mode
-   *   The mode we are operating in (live or test) - not used.
-   *
-   * returns string $errorMsg if any errors found - null if OK
-   */
-
-  //  function checkConfig( $mode )          // CiviCRM V1.9 Declaration
-
-  /**
-   * CiviCRM V2.0 Declaration
-   * This function checks to see if we have the right config values
-   *
-   * @internal param string $mode the mode we are operating in (live or test)
-   *
-   * @return string
-   *   the error message if any
+   * @return string|null
+   *   the error message if any, null if OK
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ' ' . ts('ssl_merchant_id is not set for this payment processor');
     }
 
     if (empty($this->_paymentProcessor['url_site'])) {
-      $errorMsg[] = ' ' . ts('URL is not set for %1', array(1 => $this->_paymentProcessor['name']));
+      $errorMsg[] = ' ' . ts('URL is not set for %1', [1 => $this->_paymentProcessor['name']]);
     }
 
     if (!empty($errorMsg)) {
@@ -414,12 +371,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       return NULL;
     }
   }
-  //end check config
 
-  /*
-   * convert to a name/value pair (nvp) string
-   */
   /**
+   * convert to a name/value pair (nvp) string
+   *
    * @param $payflow_query_array
    *
    * @return array|string
@@ -433,22 +388,15 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     return $payflow_query;
   }
 
-  /*
-   * Submit transaction using CuRL
-   * @submiturl string Url to direct HTTPS GET to
-   * @payflow_query value string to be posted
-   */
   /**
-   * @param $submiturl
-   * @param $payflow_query
+   * Submit transaction using cURL
+   *
+   * @param string $submiturl Url to direct HTTPS GET to
+   * @param $payflow_query value string to be posted
    *
    * @return mixed|object
    */
   public function submit_transaction($submiturl, $payflow_query) {
-    /*
-     * Submit transaction using CuRL
-     */
-
     // get data ready for API
     $user_agent = $_SERVER['HTTP_USER_AGENT'];
     // Here's your custom headers; adjust appropriately for your setup:
@@ -463,7 +411,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     $headers[] = "X-VPS-Timeout: 45";
     //random unique number  - the transaction is retried using this transaction ID
     // in this function but if that doesn't work and it is re- submitted
-    // it is treated as a new attempt. PayflowPro doesn't allow
+    // it is treated as a new attempt. Payflow Pro doesn't allow
     // you to change details (e.g. card no) when you re-submit
     // you can only try the same details
     $headers[] = "X-VPS-Request-ID: " . rand(1, 1000000000);
@@ -524,6 +472,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         break;
       }
     }
+    if ($responseHeaders['http_code'] != 200) {
+      throw new PaymentProcessorException('Error connecting to the Payflow Pro API server.', 9015);
+    }
 
     /*
      * Transaction submitted -
@@ -547,14 +498,13 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         $errorDesc = "Connection to payment gateway failed";
       }
       if ($errorNum = 60) {
-        return self::errorExit($errorNum, "Curl error - " . $errorDesc .
-          " Try this link for more information http://curl.haxx.se/d
-                                         ocs/sslcerts.html"
-        );
+        throw new PaymentProcessorException('Curl error - ' . $errorDesc .
+          ' Try this link for more information http://curl.haxx.se/d
+                                         ocs/sslcerts.html', $errorNum);
       }
 
-      return self::errorExit($errorNum, "Curl error - " . $errorDesc .
-        "  processor response = " . $processorResponse
+      throw new PaymentProcessorException("Curl error - " . $errorDesc .
+        "  processor response = " . $processorResponse, $errorNum
       );
     }
 
@@ -566,8 +516,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      */
     if (($responseData === FALSE) || (strlen($responseData) == 0)) {
       curl_close($ch);
-      return self::errorExit(9006, "Error: Connection to payment gateway failed - no data
-                                           returned. Gateway url set to $submiturl");
+      throw new PaymentProcessorException("Error: Connection to payment gateway failed - no data
+                                           returned. Gateway url set to $submiturl", 9006);
     }
 
     /*
@@ -575,7 +525,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      */
     if (empty($responseData)) {
       curl_close($ch);
-      return self::errorExit(9007, "Error: No data returned from payment gateway.");
+      throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
 
     /*
@@ -583,85 +533,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      */
     curl_close($ch);
     return $responseData;
-  }
-  //end submit_transaction
-
-  /**
-   * @param int $recurringProfileID
-   * @param int $processorID
-   *
-   * @throws Exception
-   */
-  public function getRecurringTransactionStatus($recurringProfileID, $processorID) {
-    if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('PayFlowPro requires curl with SSL support'));
-    }
-
-    /*
-     * define variables for connecting with the gateway
-     */
-
-    //if you have not set up a separate user account the vendor name is used as the username
-    if (!$this->_paymentProcessor['subject']) {
-      $user = $this->_paymentProcessor['user_name'];
-    }
-    else {
-      $user = $this->_paymentProcessor['subject'];
-    }
-    //$recurringProfileID = "RT0000000001";
-    //     c  $trythis =        $this->getRecurringTransactionStatus($recurringProfileID,17);
-
-    /*
-     *Create the array of variables to be sent to the processor from the $params array
-     * passed into this function
-     *
-     */
-
-    $payflow_query_array = array(
-      'USER' => $user,
-      'VENDOR' => $this->_paymentProcessor['user_name'],
-      'PARTNER' => $this->_paymentProcessor['signature'],
-      'PWD' => $this->_paymentProcessor['password'],
-      // C - Direct Payment using credit card
-      'TENDER' => 'C',
-      // A - Authorization, S - Sale
-      'TRXTYPE' => 'R',
-      'ACTION' => 'I',
-      //A for add recurring
-      //(M-modify,C-cancel,R-reactivate,
-      //I-inquiry,P-payment
-      'ORIGPROFILEID' => $recurringProfileID,
-      'PAYMENTHISTORY' => 'Y',
-    );
-
-    $payflow_query = $this->convert_to_nvp($payflow_query_array);
-    echo $payflow_query;
-    $submiturl = $this->_paymentProcessor['url_site'];
-    //ie. url at payment processor to submit to.
-    $responseData = self::submit_transaction($submiturl, $payflow_query);
-    /*
-     * Payment successfully sent to gateway - process the response now
-     */
-
-    $result = strstr($responseData, "RESULT");
-    $nvpArray = array();
-    while (strlen($result)) {
-      // name
-      $keypos = strpos($result, '=');
-      $keyval = substr($result, 0, $keypos);
-      // value
-      $valuepos = strpos($result, '&') ? strpos($result, '&') : strlen($result);
-      $valval = substr($result, $keypos + 1, $valuepos - $keypos - 1);
-      // decoding the respose
-      $nvpArray[$keyval] = $valval;
-      $result = substr($result, $valuepos + 1, strlen($result));
-    }
-    // get the result code to validate.
-    $result_code = $nvpArray['RESULT'];
-    print_r($responseData);
-
-    //RESPMSG=Invalid Profile ID: Invalid recurring profile ID
-    //RT0000000001
   }
 
 }

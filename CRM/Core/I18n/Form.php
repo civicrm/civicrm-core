@@ -1,41 +1,24 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
+
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
-    global $tsLocale;
+    $tsLocale = CRM_Core_I18n::getLocale();
     $this->_locales = array_keys($config->languageLimit);
 
     // get the part of the database we want to edit and validate it
@@ -44,14 +27,14 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $id = CRM_Utils_Request::retrieve('id', 'Int', $this);
     $this->_structure = CRM_Core_I18n_SchemaStructure::columns();
     if (!isset($this->_structure[$table][$field])) {
-      CRM_Core_Error::fatal("$table.$field is not internationalized.");
+      CRM_Core_Error::statusBounce("$table.$field is not internationalized.");
     }
 
     $this->addElement('hidden', 'table', $table);
     $this->addElement('hidden', 'field', $field);
     $this->addElement('hidden', 'id', $id);
 
-    $cols = array();
+    $cols = [];
     foreach ($this->_locales as $locale) {
       $cols[] = "{$field}_{$locale} {$locale}";
     }
@@ -66,7 +49,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $widget = $widgets[$table][$field];
 
     // attributes
-    $attributes = array('class' => '');
+    $attributes = ['class' => ''];
     if (isset($widget['rows'])) {
       $attributes['rows'] = $widget['rows'];
     }
@@ -77,7 +60,10 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     if ($widget['type'] == 'RichTextEditor') {
       $widget['type'] = 'wysiwyg';
-      $attributes['class'] .= ' collapsed';
+      $attributes['class'] = 'collapsed';
+    }
+    elseif ($widget['type'] == 'Text') {
+      $attributes['class'] = 'huge';
     }
 
     $languages = CRM_Core_I18n::languages(TRUE);
@@ -120,15 +106,15 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     // validate table and field
     if (!isset($this->_structure[$table][$field])) {
-      CRM_Core_Error::fatal("$table.$field is not internationalized.");
+      CRM_Core_Error::statusBounce("$table.$field is not internationalized.");
     }
 
-    $cols = array();
-    $params = array(array($values['id'], 'Int'));
+    $cols = [];
+    $params = [[$values['id'], 'Int']];
     $i = 1;
     foreach ($this->_locales as $locale) {
       $cols[] = "{$field}_{$locale} = %$i";
-      $params[$i] = array($values["{$field}_{$locale}"], 'String');
+      $params[$i] = [$values["{$field}_{$locale}"], 'String'];
       $i++;
     }
     $query = "UPDATE $table SET " . implode(', ', $cols) . " WHERE id = %0";

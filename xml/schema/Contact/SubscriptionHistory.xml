@@ -59,8 +59,9 @@
   <field>
     <name>date</name>
     <title>Group Membership Action Date</title>
-    <type>datetime</type>
+    <type>timestamp</type>
     <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>Date of the (un)subscription</comment>
     <add>1.1</add>
   </field>

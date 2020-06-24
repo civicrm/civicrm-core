@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,31 +25,16 @@
  */
 function civicrm_api3_relationship_type_create($params) {
 
-  if (!isset($params['label_a_b'])) {
-
+  // @todo should we when id is empty?
+  if (!isset($params['label_a_b']) && !empty($params['name_a_b'])) {
     $params['label_a_b'] = $params['name_a_b'];
   }
 
-  if (!isset($params['label_b_a'])) {
-
+  if (!isset($params['label_b_a']) && !empty($params['name_b_a'])) {
     $params['label_b_a'] = $params['name_b_a'];
   }
 
-  $ids = array();
-  if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for relationship type ID');
-  }
-  else {
-    $ids['relationshipType'] = CRM_Utils_Array::value('id', $params);
-  }
-
-  $relationType = CRM_Contact_BAO_RelationshipType::add($params, $ids);
-
-  $relType = array();
-
-  _civicrm_api3_object_to_array($relationType, $relType[$relationType->id]);
-
-  return civicrm_api3_create_success($relType, $params, 'RelationshipType', 'create', $relationType);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'RelationshipType');
 }
 
 /**
@@ -77,8 +46,6 @@ function civicrm_api3_relationship_type_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_relationship_type_create_spec(&$params) {
-  $params['contact_type_a']['api.required'] = 1;
-  $params['contact_type_b']['api.required'] = 1;
   $params['name_a_b']['api.required'] = 1;
   $params['name_b_a']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
@@ -117,8 +84,8 @@ function civicrm_api3_relationship_type_delete($params) {
  * @return array
  */
 function _civicrm_api3_relationship_type_getlist_defaults($request) {
-  return array(
+  return [
     'label_field' => 'label_a_b',
     'search_field' => 'label_a_b',
-  );
+  ];
 }

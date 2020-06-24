@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -44,6 +28,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
    * @param array $params
    *
    * @return array
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
     $statusPreference = new CRM_Core_BAO_StatusPreference();
@@ -58,15 +43,15 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
       $params['ignore_severity'] = CRM_Utils_Check::severityMap($params['ignore_severity']);
     }
     if ($params['ignore_severity'] > 7) {
-      CRM_Core_Error::fatal(ts('You can not pass a severity level higher than 7.'));
+      throw new CRM_Core_Exception(ts('You can not pass a severity level higher than 7.'));
     }
     // If severity is now blank, you have an invalid severity string.
     if (is_null($params['ignore_severity'])) {
-      CRM_Core_Error::fatal(ts('Invalid string passed as severity level.'));
+      throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
     }
 
     // Check if this StatusPreference already exists.
-    if (empty($params['id']) && CRM_Utils_Array::value('name', $params)) {
+    if (empty($params['id']) && !empty($params['name'])) {
       $statusPreference->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
       $statusPreference->name = $params['name'];
 
@@ -75,7 +60,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
 
     $statusPreference->copyValues($params);
 
-    $edit = ($statusPreference->id) ? TRUE : FALSE;
+    $edit = (bool) $statusPreference->id;
     if ($edit) {
       CRM_Utils_Hook::pre('edit', 'StatusPreference', $statusPreference->id, $statusPreference);
     }

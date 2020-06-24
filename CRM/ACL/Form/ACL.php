@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
@@ -110,28 +94,26 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       return;
     }
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL');
-
     $this->add('text', 'name', ts('Description'), CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL', 'name'), TRUE);
 
-    $operations = array('' => ts('- select -')) + CRM_ACL_BAO_ACL::operation();
+    $operations = ['' => ts('- select -')] + CRM_ACL_BAO_ACL::operation();
     $this->add('select',
       'operation',
       ts('Operation'),
       $operations, TRUE
     );
 
-    $objTypes = array(
+    $objTypes = [
       '1' => ts('A group of contacts'),
       '2' => ts('A profile'),
       '3' => ts('A set of custom data fields'),
-    );
+    ];
 
     if (CRM_Core_Permission::access('CiviEvent')) {
       $objTypes['4'] = ts('Events');
     }
 
-    $extra = array('onclick' => "showObjectSelect();");
+    $extra = ['onclick' => "showObjectSelect();"];
     $this->addRadio('object_type',
       ts('Type of Data'),
       $objTypes,
@@ -140,31 +122,31 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     );
 
     $label = ts('Role');
-    $role = array(
+    $role = [
       '-1' => ts('- select role -'),
       '0' => ts('Everyone'),
-    ) + CRM_Core_OptionGroup::values('acl_role');
+    ] + CRM_Core_OptionGroup::values('acl_role');
     $this->add('select', 'entity_id', $label, $role, TRUE);
 
-    $group = array(
+    $group = [
       '-1' => ts('- select -'),
       '0' => ts('All Groups'),
-    ) + CRM_Core_PseudoConstant::group();
+    ] + CRM_Core_PseudoConstant::group();
 
-    $customGroup = array(
+    $customGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
-    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
 
-    $ufGroup = array(
+    $ufGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Profiles'),
-    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
-    $event = array(
+    $event = [
       '-1' => ts('- select -'),
       '0' => ts('All Events'),
-    ) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+    ] + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 
     $this->add('select', 'group_id', ts('Group'), $group);
     $this->add('select', 'custom_group_id', ts('Custom Data'), $customGroup);
@@ -173,7 +155,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
 
-    $this->addFormRule(array('CRM_ACL_Form_ACL', 'formRule'));
+    $this->addFormRule(['CRM_ACL_Form_ACL', 'formRule']);
   }
 
   /**
@@ -189,7 +171,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       $errors['entity_id'] = ts('Please assign this permission to a Role.');
     }
 
-    $validOperations = array('View', 'Edit');
+    $validOperations = ['View', 'Edit'];
     $operationMessage = ts("Only 'View' and 'Edit' operations are valid for this type of data");
 
     // Figure out which type of object we're permissioning on and make sure user has selected a value.
@@ -254,7 +236,9 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
    */
   public function postProcess() {
     // note this also resets any ACL cache
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
+    // reset ACL and system caches.
+    CRM_Core_BAO_Cache::resetCaches();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_ACL_BAO_ACL::del($this->_id);

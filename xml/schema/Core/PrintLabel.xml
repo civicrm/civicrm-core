@@ -22,7 +22,7 @@
     <title>Title</title>
     <type>varchar</type>
     <length>255</length>
-    <comment>User title for for this label layout</comment>
+    <comment>User title for this label layout</comment>
     <add>4.4</add>
   </field>
   <field>
@@ -71,6 +71,7 @@
     <type>longtext</type>
     <comment>contains json encode configurations options</comment>
     <add>4.4</add>
+    <serialize>JSON</serialize>
   </field>
   <field>
     <name>is_default</name>

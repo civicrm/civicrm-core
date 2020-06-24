@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -42,12 +26,13 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * Are we operating in "single mode", i.e. sending email to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Cache shared address message so we don't query twice
+   * @var string
    */
   protected $_sharedAddressMessage = NULL;
 
@@ -68,10 +53,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::RESTORE);
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
     }
     elseif (!CRM_Core_Permission::check('delete contacts')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to delete this contact.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact.'));
     }
 
     $this->assign('trash', Civi::settings()->get('contact_undelete') and !$this->_skipUndelete);
@@ -83,13 +68,13 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     if ($cid) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
       }
       elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
-        CRM_Core_Error::fatal(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
+        CRM_Core_Error::statusBounce(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
 
-      $this->_contactIds = array($cid);
+      $this->_contactIds = [$cid];
       $this->_single = TRUE;
       $this->assign('totalSelectedContacts', 1);
     }
@@ -100,7 +85,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->_sharedAddressMessage = $this->get('sharedAddressMessage');
     if (!$this->_restore && !$this->_sharedAddressMessage) {
       // we check for each contact for shared contact address
-      $sharedContactList = array();
+      $sharedContactList = [];
       $sharedAddressCount = 0;
       foreach ($this->_contactIds as $contactId) {
         // check if a contact that is being deleted has any shared addresses
@@ -114,25 +99,25 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
         }
       }
 
-      $this->_sharedAddressMessage = array(
+      $this->_sharedAddressMessage = [
         'count' => $sharedAddressCount,
         'contactList' => $sharedContactList,
-      );
+      ];
 
       if ($sharedAddressCount > 0) {
         if (count($this->_contactIds) > 1) {
           // more than one contact deleted
-          $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', array(
-              'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
-              'count' => $sharedAddressCount,
-            ));
+          $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', [
+            'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
+            'count' => $sharedAddressCount,
+          ]);
         }
         else {
           // only one contact deleted
-          $message = ts('This contact has an address record which is shared with 1 other contact.', array(
-              'plural' => 'This contact has an address record which is shared with %count other contacts.',
-              'count' => $sharedAddressCount,
-            ));
+          $message = ts('This contact has an address record which is shared with 1 other contact.', [
+            'plural' => 'This contact has an address record which is shared with %count other contacts.',
+            'count' => $sharedAddressCount,
+          ]);
         }
         CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
       }
@@ -150,7 +135,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     if ($this->_single) {
       // also fix the user context stack in case the user hits cancel
-      $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'basic');
+      $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'basic');
       if ($context == 'search' && CRM_Utils_Rule::qfKey($this->_searchKey)) {
         $urlParams = "&context=$context&key=$this->_searchKey";
       }
@@ -168,7 +153,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $this->addDefaultButtons($label, 'done');
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Task_Delete', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Task_Delete', 'formRule'], $this);
   }
 
   /**
@@ -186,7 +171,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    */
   public static function formRule($fields, $files, $self) {
     // CRM-12929
-    $error = array();
+    $error = [];
     if ($self->_skipUndelete) {
       CRM_Financial_BAO_FinancialItem::checkContactPresent($self->_contactIds, $error);
     }
@@ -197,43 +182,27 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
+    if ($this->_restore) {
+      $this->doRestore();
+      return;
+    }
     $session = CRM_Core_Session::singleton();
     $currentUserId = $session->get('userID');
 
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'basic');
-    $urlParams = 'force=1';
-    $urlString = "civicrm/contact/search/$context";
-
-    if (CRM_Utils_Rule::qfKey($this->_searchKey)) {
-      $urlParams .= "&qfKey=$this->_searchKey";
-    }
-    elseif ($context == 'search') {
-      $urlParams .= "&qfKey={$this->controller->_key}";
-      $urlString = 'civicrm/contact/search';
-    }
-    elseif ($context == 'smog') {
-      $urlParams .= "&qfKey={$this->controller->_key}&context=smog";
-      $urlString = 'civicrm/group/search';
-    }
-    else {
-      $urlParams = "reset=1";
-      $urlString = 'civicrm/dashboard';
-    }
-
-    // Delete/Restore Contacts. Report errors.
+    // Delete Contacts. Report errors.
     $deleted = 0;
-    $not_deleted = array();
+    $not_deleted = [];
     foreach ($this->_contactIds as $cid) {
       $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
       if (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
-        $session->setStatus(ts("'%1' cannot be deleted because the information is used for special system purposes.", array(1 => $name)), 'Cannot Delete Domain Contact', 'error');
+        $session->setStatus(ts("'%1' cannot be deleted because the information is used for special system purposes.", [1 => $name]), 'Cannot Delete Domain Contact', 'error');
         continue;
       }
-      if ($currentUserId == $cid && !$this->_restore) {
-        $session->setStatus(ts("You are currently logged in as '%1'. You cannot delete yourself.", array(1 => $name)), 'Unable To Delete', 'error');
+      if ($currentUserId == $cid) {
+        $session->setStatus(ts("You are currently logged in as '%1'. You cannot delete yourself.", [1 => $name]), 'Unable To Delete', 'error');
         continue;
       }
-      if (CRM_Contact_BAO_Contact::deleteContact($cid, $this->_restore, $this->_skipUndelete)) {
+      if (CRM_Contact_BAO_Contact::deleteContact($cid, FALSE, $this->_skipUndelete)) {
         $deleted++;
       }
       else {
@@ -243,27 +212,19 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     }
     if ($deleted) {
       $title = ts('Deleted');
-      if ($this->_restore) {
-        $title = ts('Restored');
-        $status = ts('%1 has been restored from the trash.', array(
-            1 => $name,
-            'plural' => '%count contacts restored from trash.',
-            'count' => $deleted,
-          ));
-      }
-      elseif ($this->_skipUndelete) {
-        $status = ts('%1 has been permanently deleted.', array(
-            1 => $name,
-            'plural' => '%count contacts permanently deleted.',
-            'count' => $deleted,
-          ));
+      if ($this->_skipUndelete) {
+        $status = ts('%1 has been permanently deleted.', [
+          1 => $name,
+          'plural' => '%count contacts permanently deleted.',
+          'count' => $deleted,
+        ]);
       }
       else {
-        $status = ts('%1 has been moved to the trash.', array(
-            1 => $name,
-            'plural' => '%count contacts moved to trash.',
-            'count' => $deleted,
-          ));
+        $status = ts('%1 has been moved to the trash.', [
+          1 => $name,
+          'plural' => '%count contacts moved to trash.',
+          'count' => $deleted,
+        ]);
       }
       $session->setStatus($status, $title, 'success');
     }
@@ -274,7 +235,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $session->setStatus('<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>' . $status, $title, 'error');
     }
 
-    if (isset($this->_sharedAddressMessage) && $this->_sharedAddressMessage['count'] > 0 && !$this->_restore) {
+    if (isset($this->_sharedAddressMessage) && $this->_sharedAddressMessage['count'] > 0) {
       if (count($this->_sharedAddressMessage['contactList']) == 1) {
         $message = ts('The following contact had been sharing an address with a contact you just deleted. Their address will no longer be shared, but has not been removed or altered.');
       }
@@ -283,17 +244,66 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       }
       $message .= '<ul><li>' . implode('</li><li>', $this->_sharedAddressMessage['contactList']) . '</li></ul>';
 
-      $session->setStatus($message, ts('Shared Addesses Owner Deleted'), 'info', array('expires' => 0));
+      $session->setStatus($message, ts('Shared Addesses Owner Deleted'), 'info', ['expires' => 0]);
 
       $this->set('sharedAddressMessage', NULL);
     }
 
-    if ($this->_single && empty($this->_skipUndelete)) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_contactIds[0]}"));
+    $this->setRedirection();
+  }
+
+  /**
+   * Set the url for the contact to be redirected to.
+   */
+  protected function setRedirection() {
+
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'basic');
+    $urlParams = 'force=1';
+    $urlString = "civicrm/contact/search/$context";
+
+    if (CRM_Utils_Rule::qfKey($this->_searchKey)) {
+      $urlParams .= "&qfKey=$this->_searchKey";
+    }
+    elseif ($context === 'search') {
+      $urlParams .= "&qfKey={$this->controller->_key}";
+      $urlString = 'civicrm/contact/search';
+    }
+    elseif ($context === 'smog') {
+      $urlParams .= "&qfKey={$this->controller->_key}&context=smog";
+      $urlString = 'civicrm/group/search';
     }
     else {
-      $session->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
+      $urlParams = 'reset=1';
+      $urlString = 'civicrm/dashboard';
     }
+    if ($this->_single && empty($this->_skipUndelete)) {
+      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_contactIds[0]}"));
+    }
+    else {
+      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
+    }
+  }
+
+  /**
+   * Restore the selected contact/s from the trash.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function doRestore() {
+    $name = '';
+    if (count($this->_contactIds) === 1) {
+      $name = Civi\Api4\Contact::get()->addWhere('id', 'IN', $this->_contactIds)->setSelect(['display_name'])->execute()->first()['display_name'];
+    }
+    Civi\Api4\Contact::update()->addWhere('id', 'IN', $this->_contactIds)->setValues(['is_deleted' => 0])->execute();
+    $title = ts('Restored');
+    $status = ts('%1 has been restored from the trash.', [
+      1 => $name,
+      'plural' => '%count contacts restored from trash.',
+      'count' => count($this->_contactIds),
+    ]);
+    CRM_Core_Session::setStatus($status, $title, 'success');
+    $this->setRedirection();
   }
 
 }

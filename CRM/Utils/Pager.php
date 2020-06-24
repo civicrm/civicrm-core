@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -75,7 +59,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
     $this->initialize($params);
 
-    $this->Pager_Sliding($params);
+    parent::__construct($params);
 
     list($offset, $limit) = $this->getOffsetAndRowCount();
     $start = $offset + 1;
@@ -88,37 +72,37 @@ class CRM_Utils_Pager extends Pager_Sliding {
       $statusMessage = '';
     }
     else {
-      $statusMessage = ts('%1 - %2 of %3', array(1 => $start, 2 => $end, 3 => $params['total']));
+      $statusMessage = ts('%1 - %2 of %3', [1 => $start, 2 => $end, 3 => $params['total']]);
     }
     $params['status'] = str_replace('%%StatusMessage%%', $statusMessage, $params['status']);
 
-    $this->_response = array(
+    $this->_response = [
       'first' => $this->getFirstPageLink(),
       'back' => $this->getBackPageLink(),
       'next' => $this->getNextPageLink(),
       'last' => $this->getLastPageLink(),
       'currentPage' => $this->getCurrentPageID(),
       'numPages' => $this->numPages(),
-      'csvString' => CRM_Utils_Array::value('csvString', $params),
-      'status' => CRM_Utils_Array::value('status', $params),
-      'buttonTop' => CRM_Utils_Array::value('buttonTop', $params),
-      'buttonBottom' => CRM_Utils_Array::value('buttonBottom', $params),
+      'csvString' => $params['csvString'] ?? NULL,
+      'status' => $params['status'] ?? NULL,
+      'buttonTop' => $params['buttonTop'] ?? NULL,
+      'buttonBottom' => $params['buttonBottom'] ?? NULL,
       'currentLocation' => $this->getCurrentLocation(),
-    );
+    ];
 
     /**
      * A page cannot have two variables with the same form name. Hence in the
      * pager display, we have a form submission at the top with the normal
      * page variable, but a different form element for one at the bottom.
      */
-    $this->_response['titleTop'] = ts('Page %1 of %2', array(
-        1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
-        2 => $this->_response['numPages'],
-      ));
-    $this->_response['titleBottom'] = ts('Page %1 of %2', array(
-        1 => '<input size="2" maxlength="3" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />',
-        2 => $this->_response['numPages'],
-      ));
+    $this->_response['titleTop'] = ts('Page %1 of %2', [
+      1 => '<input size="2" maxlength="4" name="' . self::PAGE_ID . '" type="text" value="' . $this->_response['currentPage'] . '" />',
+      2 => $this->_response['numPages'],
+    ]);
+    $this->_response['titleBottom'] = ts('Page %1 of %2', [
+      1 => '<input size="2" maxlength="4" name="' . self::PAGE_ID_BOTTOM . '" type="text" value="' . $this->_response['currentPage'] . '" />',
+      2 => $this->_response['numPages'],
+    ]);
   }
 
   /**
@@ -148,8 +132,8 @@ class CRM_Utils_Pager extends Pager_Sliding {
     $params['separator'] = '';
     $params['spacesBeforeSeparator'] = 1;
     $params['spacesAfterSeparator'] = 1;
-    $params['extraVars'] = array('force' => 1);
-    $params['excludeVars'] = array('reset', 'snippet', 'section');
+    $params['extraVars'] = ['force' => 1];
+    $params['excludeVars'] = ['reset', 'snippet', 'section'];
 
     // set previous and next text labels
     $params['prevImg'] = ' ' . ts('&lt; Previous');
@@ -248,15 +232,14 @@ class CRM_Utils_Pager extends Pager_Sliding {
 
     $offset = ($pageId - 1) * $this->_perPage;
 
-    return array($offset, $this->_perPage);
+    return [$offset, $this->_perPage];
   }
 
   /**
    * @return string
    */
   public function getCurrentLocation() {
-    $config = CRM_Core_Config::singleton();
-    $path = CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET);
+    $path = CRM_Utils_System::currentPath();
     return CRM_Utils_System::url($path, CRM_Utils_System::getLinksUrl(self::PAGE_ID, FALSE, TRUE), FALSE, NULL, FALSE) . $this->getCurrentPageID();
   }
 

@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmMailingAB', ['ngRoute', 'ui.utils', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3']);
+  angular.module('crmMailingAB', CRM.angRequires('crmMailingAB'));
   angular.module('crmMailingAB').config([
     '$routeProvider',
     function($routeProvider) {
@@ -32,6 +32,9 @@
         templateUrl: '~/crmMailingAB/EditCtrl/main.html',
         controller: 'CrmMailingABEditCtrl',
         resolve: {
+          mailingFields: function(crmMetadata) {
+            return crmMetadata.getFields('Mailing');
+          },
           abtest: function($route, CrmMailingAB) {
             var abtest = new CrmMailingAB($route.current.params.id == 'new' ? null : $route.current.params.id);
             return abtest.load();

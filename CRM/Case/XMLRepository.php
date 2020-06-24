@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * The XMLRepository is responsible for loading XML for case-types.
  * It includes any bulk operations that apply across the list of all XML
@@ -38,17 +22,20 @@ class CRM_Case_XMLRepository {
   private static $singleton;
 
   /**
-   * @var array<String,SimpleXMLElement>
+   * @var array
+   * <String,SimpleXMLElement>
    */
-  protected $xml = array();
+  protected $xml = [];
 
   /**
-   * @var array|NULL
+   * @var array|null
    */
   protected $hookCache = NULL;
 
   /**
-   * @var array|NULL symbolic names of case-types
+   * Symbolic names of case-types.
+   *
+   * @var array|null
    */
   protected $allCaseTypes = NULL;
 
@@ -63,13 +50,20 @@ class CRM_Case_XMLRepository {
     return self::$singleton;
   }
 
+  public function flush() {
+    $this->xml = [];
+    $this->hookCache = NULL;
+    $this->allCaseTypes = NULL;
+    CRM_Core_DAO::$_dbColumnValueCache = [];
+  }
+
   /**
    * Class constructor.
    *
    * @param array $allCaseTypes
    * @param array $xml
    */
-  public function __construct($allCaseTypes = NULL, $xml = array()) {
+  public function __construct($allCaseTypes = NULL, $xml = []) {
     $this->allCaseTypes = $allCaseTypes;
     $this->xml = $xml;
   }
@@ -100,7 +94,7 @@ class CRM_Case_XMLRepository {
     //  throw new CRM_Core_Exception("Cannot load caseType with malformed name [$caseType]");
     //}
 
-    if (!CRM_Utils_Array::value($caseType, $this->xml)) {
+    if (empty($this->xml[$caseType])) {
       $fileXml = $this->retrieveFile($caseType);
       if ($fileXml) {
         $this->xml[$caseType] = $fileXml;
@@ -136,7 +130,9 @@ class CRM_Case_XMLRepository {
     if ($fileName && file_exists($fileName)) {
       // read xml file
       $dom = new DomDocument();
-      $dom->load($fileName);
+      $xmlString = file_get_contents($fileName);
+      $dom->loadXML($xmlString);
+      $dom->documentURI = $fileName;
       $dom->xinclude();
       $fileXml = simplexml_import_dom($dom);
     }
@@ -167,14 +163,14 @@ class CRM_Case_XMLRepository {
       if (isset($config->customTemplateDir) && $config->customTemplateDir) {
         // check if the file exists in the custom templates directory
         $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
+          [
             $config->customTemplateDir,
             'CRM',
             'Case',
             'xml',
             'configuration',
             "$caseType.xml",
-          )
+          ]
         );
       }
     }
@@ -183,24 +179,24 @@ class CRM_Case_XMLRepository {
       if (!file_exists($fileName)) {
         // check if file exists locally
         $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
+          [
             dirname(__FILE__),
             'xml',
             'configuration',
             "$caseType.xml",
-          )
+          ]
         );
       }
 
       if (!file_exists($fileName)) {
         // check if file exists locally
         $fileName = implode(DIRECTORY_SEPARATOR,
-          array(
+          [
             dirname(__FILE__),
             'xml',
             'configuration.sample',
             "$caseType.xml",
-          )
+          ]
         );
       }
     }
@@ -213,7 +209,7 @@ class CRM_Case_XMLRepository {
    */
   public function getCaseTypesViaHook() {
     if ($this->hookCache === NULL) {
-      $this->hookCache = array();
+      $this->hookCache = [];
       CRM_Utils_Hook::caseTypes($this->hookCache);
     }
     return $this->hookCache;
@@ -233,7 +229,7 @@ class CRM_Case_XMLRepository {
    * @return array<string> symbolic-names of activity-types
    */
   public function getAllDeclaredActivityTypes() {
-    $result = array();
+    $result = [];
 
     $p = new CRM_Case_XMLProcessor_Process();
     foreach ($this->getAllCaseTypes() as $caseTypeName) {
@@ -247,10 +243,12 @@ class CRM_Case_XMLRepository {
   }
 
   /**
+   * Relationships are straight from XML, described from perspective of non-client
+   *
    * @return array<string> symbolic-names of relationship-types
    */
   public function getAllDeclaredRelationshipTypes() {
-    $result = array();
+    $result = [];
 
     $p = new CRM_Case_XMLProcessor_Process();
     foreach ($this->getAllCaseTypes() as $caseTypeName) {

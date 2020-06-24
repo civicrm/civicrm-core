@@ -1,3 +1,4 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $receipt_text}
 {$receipt_text}
 {/if}
@@ -6,9 +7,6 @@
 ===========================================================
 {$pay_later_receipt}
 ===========================================================
-{else}
-
-{ts}Please print this receipt for your records.{/ts}
 {/if}
 
 {if $amount}
@@ -64,10 +62,15 @@
 {ts}Transaction #{/ts}: {$trxn_id}
 {/if}
 
-{if $is_recur and ($contributeMode eq 'notify' or $contributeMode eq 'directIPN')}
-{ts}This is a recurring contribution. You can cancel future contributions at:{/ts}
+{if $is_recur}
+{ts}This is a recurring contribution.{/ts}
+
+{if $cancelSubscriptionUrl}
+{ts}You can cancel future contributions at:{/ts}
 
 {$cancelSubscriptionUrl}
+
+{/if}
 
 {if $updateSubscriptionBillingUrl}
 {ts}You can update billing details for this recurring contribution at:{/ts}
@@ -75,10 +78,13 @@
 {$updateSubscriptionBillingUrl}
 
 {/if}
+
+{if $updateSubscriptionUrl}
 {ts}You can update recurring contribution amount or change the number of installments for this recurring contribution at:{/ts}
 
 {$updateSubscriptionUrl}
 
+{/if}
 {/if}
 
 {if $honor_block_is_active}
@@ -120,14 +126,7 @@
 {/foreach}
 {/if}
 
-{if !( $contributeMode eq 'notify' OR $contributeMode eq 'directIPN' ) and $is_monetary}
-{if $is_pay_later && !$isBillingAddressRequiredForPayLater}
-===========================================================
-{ts}Registered Email{/ts}
-
-===========================================================
-{$email}
-{elseif $amount GT 0}
+{if $billingName}
 ===========================================================
 {ts}Billing Name and Address{/ts}
 
@@ -136,9 +135,14 @@
 {$address}
 
 {$email}
-{/if} {* End ! is_pay_later condition. *}
-{/if}
-{if $contributeMode eq 'direct' AND !$is_pay_later AND $amount GT 0}
+{elseif $email}
+===========================================================
+{ts}Registered Email{/ts}
+
+===========================================================
+{$email}
+{/if} {* End billingName or Email*}
+{if $credit_card_type}
 
 ===========================================================
 {ts}Credit Card Information{/ts}

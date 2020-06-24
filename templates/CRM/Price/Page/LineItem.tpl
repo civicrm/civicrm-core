@@ -1,30 +1,18 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
 {* Displays contribution/event fees when price set is used. *}
+{if !$currency && $fee_currency}
+  {assign var=currency value="$fee_currency"}
+{/if}
+
 {foreach from=$lineItem item=value key=priceset}
   {if $value neq 'skip'}
     {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
@@ -36,6 +24,9 @@
     <table>
       <tr class="columnheader">
         <th>{ts}Item{/ts}</th>
+        {if $displayLineItemFinancialType}
+          <th>{ts}Financial Type{/ts}</th>
+        {/if}
         {if $context EQ "Membership"}
           <th class="right">{ts}Fee{/ts}</th>
         {else}
@@ -59,26 +50,29 @@
       </tr>
       {foreach from=$value item=line}
         <tr{if $line.qty EQ 0} class="cancelled"{/if}>
-          <td>{if $line.html_type eq 'Text'}{$line.label}{else}{$line.field_title} - {$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
+          <td>{if $line.field_title && $line.html_type neq 'Text'}{$line.field_title} &ndash; {$line.label}{else}{$line.label}{/if} {if $line.description}<div class="description">{$line.description}</div>{/if}</td>
+          {if $displayLineItemFinancialType}
+            <td>{$line.financial_type}</td>
+          {/if}
           {if $context NEQ "Membership"}
             <td class="right">{$line.qty}</td>
-            <td class="right">{$line.unit_price|crmMoney}</td>
+            <td class="right">{$line.unit_price|crmMoney:$currency}</td>
     {else}
-            <td class="right">{$line.line_total|crmMoney}</td>
+            <td class="right">{$line.line_total|crmMoney:$currency}</td>
           {/if}
     {if !$getTaxDetails && $context NEQ "Membership"}
-      <td class="right">{$line.line_total|crmMoney}</td>
+      <td class="right">{$line.line_total|crmMoney:$currency}</td>
     {/if}
     {if $getTaxDetails}
-      <td class="right">{$line.line_total|crmMoney}</td>
+      <td class="right">{$line.line_total|crmMoney:$currency}</td>
       {if $line.tax_rate != "" || $line.tax_amount != ""}
-        <td class="right">{$taxTerm} ({$line.tax_rate|string_format:"%.2f"}%)</td>
-        <td class="right">{$line.tax_amount|crmMoney}</td>
+        <td class="right">{$taxTerm} ({$line.tax_rate}%)</td>
+        <td class="right">{$line.tax_amount|crmMoney:$currency}</td>
       {else}
         <td></td>
         <td></td>
       {/if}
-      <td class="right">{$line.line_total+$line.tax_amount|crmMoney}</td>
+      <td class="right">{$line.line_total+$line.tax_amount|crmMoney:$currency}</td>
     {/if}
           {if $pricesetFieldsCount}
             <td class="right">{$line.participant_count}</td>
@@ -92,13 +86,13 @@
 <div class="crm-section no-label total_amount-section">
   <div class="content bold">
     {if $getTaxDetails && $totalTaxAmount}
-      {ts}Total Tax Amount{/ts}: {$totalTaxAmount|crmMoney}<br />
+      {ts 1=$taxTerm}Total %1 Amount{/ts}: {$totalTaxAmount|crmMoney:$currency}<br />
     {/if}
     {if $context EQ "Contribution"}
       {ts}Contribution Total{/ts}:
     {elseif $context EQ "Event"}
       {if $totalTaxAmount}
-        {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney}{/ts}<br />
+        {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney:$currency}{/ts}<br />
       {/if}
       {ts}Event Total{/ts}:
     {elseif $context EQ "Membership"}
@@ -106,7 +100,7 @@
     {else}
       {ts}Total Amount{/ts}:
     {/if}
-    {$totalAmount|crmMoney}
+    {$totalAmount|crmMoney:$currency}
   </div>
   <div class="clear"></div>
   <div class="content bold">

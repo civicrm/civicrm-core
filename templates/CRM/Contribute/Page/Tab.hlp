@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {htxt id="id-contrib_source-title"}
@@ -28,6 +12,13 @@
 {/htxt}
 {htxt id="id-contrib_source"}
 {ts}Optional identifier for the contribution source (campaign name, event, mailer, etc.).{/ts}
+{/htxt}
+
+{htxt id="id-total_amount-title"}
+  {ts}Total Amount{/ts}
+{/htxt}
+{htxt id="id-total_amount"}
+{ts 1='target="_blank" href="https://civicrm.org/extensions/line-item-editor"'}You are not allowed to change the total amount as it will lead to incorrect line item entries. You can either delete or recreate or install <a %1>Line Item Editor</a>.{/ts}
 {/htxt}
 
 {htxt id="id-financial_type-title"}
@@ -78,7 +69,7 @@
 <p>
 {ts}When contributions are made via a Personal Campaign Page a soft credit (of type 'Personal Campaign Page') is automatically created and assigned to the 'owner' of the the Personal Campaign Page.{/ts}
 </p>
-{/htxt} 
+{/htxt}
 
 {htxt id="adjust-payment-amount-title"}
   {ts}Payment Amount{/ts}

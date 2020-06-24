@@ -1,4 +1,7 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
+{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}
+
 {if !$isAdditional and $participant.id}
 
 ===========================================================
@@ -42,19 +45,7 @@ Click this link to go to a web page where you can confirm your registration onli
 {ts}Participant Role{/ts}: {$participant.role}
 
 {if $isShowLocation}
-{if $event.location.address.1.name}
-
-{$event.location.address.1.name}
-{/if}
-{if $event.location.address.1.street_address}{$event.location.address.1.street_address}
-{/if}
-{if $event.location.address.1.supplemental_address_1}{$event.location.address.1.supplemental_address_1}
-{/if}
-{if $event.location.address.1.supplemental_address_2}{$event.location.address.1.supplemental_address_2}
-{/if}
-{if $event.location.address.1.city}{$event.location.address.1.city} {$event.location.address.1.postal_code}{if $event.location.address.1.postal_code_suffix} - {$event.location.address.1.postal_code_suffix}{/if}
-{/if}
-
+{$event.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
 {if $event.location.phone.1.phone || $event.location.email.1.email}

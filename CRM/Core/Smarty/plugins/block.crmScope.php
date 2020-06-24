@@ -5,7 +5,7 @@
  *
  * Example:
  *
- * @code
+ * ```
  * {tsScope x=1}
  *   Expect {$x}==1
  *   {tsScope x=2}
@@ -13,7 +13,7 @@
  *   {/tsScope}
  *   Expect {$x}==1
  * {/tsScope}
- * @endcode
+ * ```
  *
  * @param array $params
  *   Must define 'name'.

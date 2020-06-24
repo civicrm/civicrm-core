@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {capture assign=multiURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
@@ -94,7 +78,7 @@
       <tr><td>{ts}A spreadsheet-like file with the contact data in each row. Data fields are separated by commas. You can export to a "CSV" file from most spreadsheet applications, many database managers, as well as other contact management and address book applications. Consult the documentation for your application if you're not sure how to do this. Save this file to your local hard drive (or an accessible drive on your network) - and then choose that file as your Import Upload File.{/ts}</td></tr>
       <tr><td><strong>{ts}SQL Query{/ts}</strong></td></tr>
       <tr><td>{ts}A direct SQL query in the form of a SELECT query. For example:{/ts}</td></tr>
-      <tr><td><code>SELECT first_name, last_name, email FROM somedatabase.sometable</code><td></tr>
+      <tr><td><code>SELECT first_name, last_name, email FROM somedatabase.sometable</code></td></tr>
       <tr><td>{ts}This query can be against a different database, but that database has to be on the same database server and the CiviCRM database user has to have the SELECT privilege (and any other privileges required to execute the query).{/ts}</td></tr>
     </table>
   </p>

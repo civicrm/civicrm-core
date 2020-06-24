@@ -1,36 +1,12 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
  */
 
 /**
@@ -75,14 +51,14 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     if ($this->_id) {
       $this->_grantType = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
     }
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('action', $this->_action);
     $this->assign('context', $this->_context);
 
     //check permission for action.
     if (!CRM_Core_Permission::checkActionPermission('CiviGrant', $this->_action)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
     $this->setPageTitle(ts('Grant'));
@@ -141,22 +117,11 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       if (isset($defaults['amount_granted'])) {
         $defaults['amount_granted'] = CRM_Utils_Money::format($defaults['amount_granted'], NULL, '%a');
       }
-
-      $dates = array(
-        'application_received_date',
-        'decision_date',
-        'money_transfer_date',
-        'grant_due_date',
-      );
-
-      foreach ($dates as $key) {
-        if (!empty($defaults[$key])) {
-          list($defaults[$key]) = CRM_Utils_Date::setDateDefaults($defaults[$key]);
-        }
-      }
     }
     else {
-      list($defaults['application_received_date']) = CRM_Utils_Date::setDateDefaults();
+      if ($this->_contactID) {
+        $defaults['contact_id'] = $this->_contactID;
+      }
     }
 
     return $defaults;
@@ -170,36 +135,35 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   public function buildQuickForm() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Grant_DAO_Grant');
-    $this->addSelect('grant_type_id', array('onChange' => "CRM.buildCustomData( 'Grant', this.value );"), TRUE);
+    $this->addSelect('grant_type_id', ['onChange' => "CRM.buildCustomData( 'Grant', this.value );"], TRUE);
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Grant');
     $this->assign('customDataSubType', $this->_grantType);
     $this->assign('entityID', $this->_id);
 
-    $this->addSelect('status_id', array(), TRUE);
+    $this->addSelect('status_id', [], TRUE);
 
-    $this->addDate('application_received_date', ts('Application Received'), FALSE, array('formatType' => 'custom'));
-    $this->addDate('decision_date', ts('Grant Decision'), FALSE, array('formatType' => 'custom'));
-    $this->addDate('money_transfer_date', ts('Money Transferred'), FALSE, array('formatType' => 'custom'));
-    $this->addDate('grant_due_date', ts('Grant Report Due'), FALSE, array('formatType' => 'custom'));
+    $this->add('datepicker', 'application_received_date', ts('Application Received'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'decision_date', ts('Grant Decision'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'money_transfer_date', ts('Money Transferred'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'grant_due_date', ts('Grant Report Due'), [], FALSE, ['time' => FALSE]);
 
     $this->addElement('checkbox', 'grant_report_received', ts('Grant Report Received?'), NULL);
     $this->add('textarea', 'rationale', ts('Rationale'), $attributes['rationale']);
@@ -223,27 +187,27 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'js' => array('onclick' => "return verify( );"),
-          'subName' => 'new',
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'js' => ['onclick' => "return verify( );"],
+        'subName' => 'new',
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
-    if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Applicant'), array('create' => TRUE), TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Applicant'), ['create' => TRUE], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
   }
 
@@ -276,7 +240,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     $params['contact_id'] = $this->_contactID;
-    $ids['note'] = array();
+    $ids['note'] = [];
     if ($this->_noteId) {
       $ids['note']['id'] = $this->_noteId;
     }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -44,21 +28,29 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   protected $_queryParams;
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Pledge';
+  }
+
+  /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "pledge_";
 
@@ -67,48 +59,11 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function preProcess() {
 
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
-    // we allow the controller to set force/reset externally, useful when we are being
-    // driven by the wizard framework
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
-
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST) && !$this->controller->isModal()) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
-
-    if (empty($this->_formValues)) {
-      if (isset($this->_ssID)) {
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-      }
-    }
-
-    if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
-    }
+    parent::preProcess();
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
     $selector = new CRM_Pledge_Selector_Search($this->_queryParams,
@@ -128,7 +83,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::TRANSFER,
@@ -145,7 +100,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addSortNameField();
+    $this->addContactSearchFields();
 
     CRM_Pledge_BAO_Query::buildSearchForm($this);
 
@@ -155,9 +110,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
         $this->addRowSelectors($rows);
       }
 
-      $permission = CRM_Core_Permission::getPermission();
-
-      $this->addTaskMenu(CRM_Pledge_Task::permissionedTaskTitles($permission));
+      $this->addTaskMenu(CRM_Pledge_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()));
     }
 
   }
@@ -185,6 +138,36 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Pledger Tag(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Pledger Group(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getContactTypeLabel() {
+    return ts('Pledger Contact Type');
+  }
+
+  /**
    * The post processing of the form gets done here.
    *
    * Key things done during post processing are
@@ -203,7 +186,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $this->_done = TRUE;
 
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
 
     $this->fixFormValues();
 
@@ -212,7 +195,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["pledge_test"] = 0;
     }
 
-    foreach (array('pledge_amount_low', 'pledge_amount_high') as $f) {
+    foreach (['pledge_amount_low', 'pledge_amount_high'] as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
@@ -227,7 +210,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -239,13 +221,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -269,7 +244,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::SESSION,
@@ -291,38 +266,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @see valid_date
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Pledge_Form_Search', 'formRule'));
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = array();
-    $defaults = $this->_formValues;
-    return $defaults;
+    $this->addFormRule(['CRM_Pledge_Form_Search', 'formRule']);
   }
 
   public function fixFormValues() {
@@ -331,26 +275,20 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     }
 
     // set pledge payment related fields
-    $status = CRM_Utils_Request::retrieve('status', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
+    $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
-      $this->_formValues['pledge_payment_status_id'] = array($status => 1);
-      $this->_defaults['pledge_payment_status_id'] = array($status => 1);
+      $this->_formValues['pledge_payment_status_id'] = [$status => 1];
+      $this->_defaults['pledge_payment_status_id'] = [$status => 1];
     }
 
-    $fromDate = CRM_Utils_Request::retrieve('start', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
     if ($fromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
       $this->_formValues['pledge_payment_date_low'] = $date;
       $this->_defaults['pledge_payment_date_low'] = $date;
     }
 
-    $toDate = CRM_Utils_Request::retrieve('end', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $toDate = CRM_Utils_Request::retrieve('end', 'Date');
     if ($toDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($toDate);
       $this->_formValues['pledge_payment_date_high'] = $date;
@@ -358,19 +296,15 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     }
 
     // set pledge related fields
-    $pledgeStatus = CRM_Utils_Request::retrieve('pstatus', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
-    if ($pledgeStatus) {
-      $statusValues = CRM_Contribute_PseudoConstant::contributionStatus();
+    $pledgeStatus = CRM_Utils_Request::retrieve('pstatus', 'String');
 
-      // Remove status values that are only used for recurring contributions for now (Failed).
-      unset($statusValues['4']);
+    if ($pledgeStatus) {
+      $statusValues = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
 
       // we need set all statuses except Cancelled
       unset($statusValues[$pledgeStatus]);
 
-      $statuses = array();
+      $statuses = [];
       foreach ($statusValues as $statusId => $value) {
         $statuses[$statusId] = 1;
       }
@@ -379,17 +313,13 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['pledge_status_id'] = $statuses;
     }
 
-    $pledgeFromDate = CRM_Utils_Request::retrieve('pstart', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $pledgeFromDate = CRM_Utils_Request::retrieve('pstart', 'Date');
     if ($pledgeFromDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($pledgeFromDate);
       $this->_formValues['pledge_create_date_low'] = $this->_defaults['pledge_create_date_low'] = $date;
     }
 
-    $pledgeToDate = CRM_Utils_Request::retrieve('pend', 'Date',
-      CRM_Core_DAO::$_nullObject
-    );
+    $pledgeToDate = CRM_Utils_Request::retrieve('pend', 'Date');
     if ($pledgeToDate) {
       list($date) = CRM_Utils_Date::setDateDefaults($pledgeToDate);
       $this->_formValues['pledge_create_date_high'] = $this->_defaults['pledge_create_date_high'] = $date;
@@ -411,19 +341,22 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
    */
   public function getTitle() {
     return ts('Find Pledges');
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Pledge' => CRM_Pledge_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['PledgePayment' => CRM_Pledge_BAO_Query::getPledgePaymentSearchFieldMetadata()]);
   }
 
 }

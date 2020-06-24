@@ -119,7 +119,7 @@
     <comment>Is this property active?</comment>
     <add>1.6</add>
     <html>
-      <type>Checkbox</type>
+      <type>CheckBox</type>
     </html>
   </field>
 </table>

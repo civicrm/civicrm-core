@@ -9,6 +9,9 @@
   width: 95%;
   height: 20em;
 }
+.crmMailing input.crm-form-date {
+  width: 10em;
+}
 
 .crmMailing-recip-est {
   background: #ee8;
@@ -82,10 +85,6 @@ input[name=preview_test_email]:-ms-input-placeholder {
   border-radius: 5px;
   font-size: 1.2em;
   float: none;
-}
-.crm-container a.crmMailing-submit-button div {
-  background: url(../i/check.gif) no-repeat left center;
-  padding-left: 20px;
 }
 .crm-container a.crmMailing-submit-button.disabled,
 .crm-container a.crmMailing-submit-button.blocking {

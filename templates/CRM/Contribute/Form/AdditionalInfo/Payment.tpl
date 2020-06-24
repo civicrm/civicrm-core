@@ -1,51 +1,57 @@
-
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
 {* build recurring contribution block. *}
 {if $buildRecurBlock}
 {literal}
   <script type="text/javascript" >
 
-    function enablePeriod( )
-    {
-      var frUnit = cj( '#frequency_unit' );
-      var frInerval = cj( '#frequency_interval' );
-      var installments = cj( '#installments' );
+    function enablePeriod() {
+      var frUnit = cj('#frequency_unit');
+      var frInerval = cj('#frequency_interval');
+      var installments = cj('#installments');
       isDisabled = false;
 
-      if ( cj( 'input:radio[name="is_recur"]:checked').val() == 0 )  {
+      if (cj('input:radio[name="is_recur"]:checked').val() == 0)  {
         isDisabled = true;
-        frInerval.val( '' );
-        installments.val( '' );
+        frInerval.val('');
+        installments.val('');
       }
 
-      frUnit.prop( 'disabled', isDisabled );
-      frInerval.prop( 'disabled', isDisabled );
-      installments.prop( 'disabled', isDisabled );
+      frUnit.prop('disabled', isDisabled);
+      frInerval.prop('disabled', isDisabled);
+      installments.prop('disabled', isDisabled);
     }
 
-    function buildRecurBlock( processorId ) {
-      if ( !processorId ) processorId = cj( "#payment_processor_id" ).val( );
+    function buildRecurBlock(processorId) {
+      if (!processorId) processorId = cj("#payment_processor_id").val();
       var recurPaymentProIds = {/literal}'{$recurringPaymentProcessorIds}'{literal};
-      var funName = ( cj.inArray(processorId, recurPaymentProIds.split(',')) > -1 ) ? 'show' : 'hide';
+      var funName = (cj.inArray(processorId, recurPaymentProIds.split(',')) > -1) ? 'show' : 'hide';
 
       var priceSet = cj("#price_set_id");
-      if ( priceSet && priceSet.val( ) ) {
+      if (priceSet && priceSet.val()) {
         funName = 'hide';
         //reset the values of recur block.
-        if ( cj( 'input:radio[name="is_recur"]:checked').val() ) {
+        if (cj('input:radio[name="is_recur"]:checked').val()) {
           cj("#installments").val('');
           cj("#frequency_interval").val('');
-          cj( 'input:radio[name="is_recur"]')[0].checked = true;
+          cj('input:radio[name="is_recur"]')[0].checked = true;
         }
       }
 
-
-      enablePeriod( );
-      eval( 'cj( "#recurringPaymentBlock" ).' + funName + "( )" );
+      enablePeriod();
+      eval('cj("#recurringPaymentBlock").' + funName + "()");
     }
 
     CRM.$(function($) {
-      buildRecurBlock( null );
-      enablePeriod( );
+      buildRecurBlock(null);
+      enablePeriod();
     });
 
   </script>

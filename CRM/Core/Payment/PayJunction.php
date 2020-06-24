@@ -8,24 +8,21 @@
  *
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  *
  * @package CRM
  * @author Michael Morris and Gene Chi @ Phase2 Technology <mmorris@phase2technology.com>
- * $Id$
- *
+ */
+require_once 'PayJunction/pjClasses.php';
+
+/**
+ * Class CRM_Core_Payment_PayJunction.
  */
 class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
-  # (not used, implicit in the API, might need to convert?)
+  // (not used, implicit in the API, might need to convert?)
   const CHARSET = 'UFT-8';
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
 
   /**
    * Constructor.
@@ -33,17 +30,11 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * @param string $mode
    *   The mode of operation: live or test.
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_PayJunction
+   * @param array $paymentProcessor
    */
   public function __construct($mode, &$paymentProcessor) {
-    //require PayJunction API library
-    require_once 'PayJunction/pjClasses.php';
-
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('PayJunction');
   }
 
   /**
@@ -55,6 +46,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    *
    * @return array
    *   the result in an nice formatted array (or an error object)
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doDirectPayment(&$params) {
     $logon = $this->_paymentProcessor['user_name'];
@@ -66,18 +58,18 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     $pjpgCustInfo->setEmail($params['email']);
 
-    $billing = array(
-      "logon" => $logon,
-      "password" => $password,
-      "url_site" => $url_site,
-      "first_name" => $params['first_name'],
-      "last_name" => $params['last_name'],
-      "address" => $params['street_address'],
-      "city" => $params['city'],
-      "province" => $params['state_province'],
-      "postal_code" => $params['postal_code'],
-      "country" => $params['country'],
-    );
+    $billing = [
+      'logon' => $logon,
+      'password' => $password,
+      'url_site' => $url_site,
+      'first_name' => $params['first_name'],
+      'last_name' => $params['last_name'],
+      'address' => $params['street_address'],
+      'city' => $params['city'],
+      'province' => $params['state_province'],
+      'postal_code' => $params['postal_code'],
+      'country' => $params['country'],
+    ];
     $pjpgCustInfo->setBilling($billing);
 
     // create pjpgTransaction object
@@ -85,7 +77,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     $expiry_string = sprintf('%04d%02d', $params['year'], $params['month']);
 
-    $txnArray = array(
+    $txnArray = [
       'type' => 'purchase',
       'order_id' => $my_orderid,
       'amount' => sprintf('%01.2f', $params['amount']),
@@ -94,7 +86,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       'crypt_type' => '7',
       'cavv' => $params['cvv2'],
       'cust_id' => $params['contact_id'],
-    );
+    ];
 
     // Allow further manipulation of params via custom hooks
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $txnArray);
@@ -105,8 +97,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     $pjpgTxn->setCustInfo($pjpgCustInfo);
 
     // empty installments convert to 999 because PayJunction do not allow open end donation
-    if ($params['installments'] == "") {
-      $params['installments'] = "999";
+    if ($params['installments'] === '') {
+      $params['installments'] = '999';
     }
 
     // create recurring object
@@ -126,7 +118,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
       $numRecurs = $params['installments'];
 
-      $recurArray = array(
+      $recurArray = [
         'dc_schedule_create' => $dc_schedule_create,
         // (day | week | month)
         'recur_unit' => $recurUnit,
@@ -137,7 +129,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
         'period' => $recurInterval,
         'dc_schedule_start' => $dc_schedule_start,
         'amount' => sprintf('%01.2f', $params['amount']),
-      );
+      ];
 
       $pjpgRecur = new pjpgRecur($recurArray);
 
@@ -153,14 +145,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     $pjpgResponse = $pjpgHttpPost->getPJpgResponse();
 
     if (self::isError($pjpgResponse)) {
-      return self::error($pjpgResponse);
-    }
-
-    /* Check for application errors */
-
-    $result = self::checkResult($pjpgResponse);
-    if (is_a($result, 'CRM_Core_Error')) {
-      return $result;
+      throw new PaymentProcessorException($pjpgResponse);
     }
 
     // Success
@@ -170,6 +155,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     return $params;
   }
+
   // end function doDirectPayment
 
   /**
@@ -182,23 +168,11 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
   public function isError(&$response) {
     $responseCode = $response['dc_response_code'];
 
-    if ($responseCode == "00" || $responseCode == "85") {
+    if ($responseCode === "00" || $responseCode === "85") {
       return FALSE;
     }
-    else {
-      return TRUE;
-    }
-  }
+    return TRUE;
 
-
-  /**
-   * ignore for now, more elaborate error handling later.
-   * @param $response
-   *
-   * @return mixed
-   */
-  public function &checkResult(&$response) {
-    return $response;
   }
 
   /**
@@ -215,28 +189,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     if (isset($this->_params[$field])) {
       return $this->_params[$field];
     }
-    else {
-      return '';
-    }
-  }
-
-  /**
-   * @param null $error
-   *
-   * @return object
-   */
-  public function &error($error = NULL) {
-    $e = CRM_Core_Error::singleton();
-    if ($error) {
-      $e->push($error['dc_response_code'],
-        0, NULL,
-        $error['dc_response_message']
-      );
-    }
-    else {
-      $e->push(9001, 0, NULL, "Unknown System Error.");
-    }
-    return $e;
+    return '';
   }
 
   /**
@@ -265,7 +218,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    *   the error message if any
    */
   public function checkConfig() {
-    $error = array();
+    $error = [];
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('Username is not set for this payment processor');
     }
@@ -281,9 +234,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     if (!empty($error)) {
       return implode('<p>', $error);
     }
-    else {
-      return NULL;
-    }
+    return NULL;
   }
 
 }

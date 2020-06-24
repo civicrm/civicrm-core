@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -42,14 +42,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   protected $_mode = NULL;
 
   /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
-
-  /**
    * Constructor.
    *
    * @param string $mode
@@ -63,7 +55,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
 
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('DPS Payment Express');
   }
 
   /**
@@ -77,7 +68,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   public function checkConfig() {
     $config = CRM_Core_Config::singleton();
 
-    $error = array();
+    $error = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('UserID is not set in the Administer &raquo; System Settings &raquo; Payment Processors');
@@ -103,7 +94,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *   Assoc array of input parameters for this transaction.
    */
   public function doDirectPayment(&$params) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
+    throw new CRM_Core_Exception(ts('This function is not implemented'));
   }
 
   /**
@@ -118,10 +109,10 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     $component = strtolower($component);
     $config = CRM_Core_Config::singleton();
     if ($component != 'contribute' && $component != 'event') {
-      CRM_Core_Error::fatal(ts('Component is invalid'));
+      throw new CRM_Core_Exception(ts('Component is invalid'));
     }
 
-    $url = $config->userFrameworkResourceURL . "extern/pxIPN.php";
+    $url = CRM_Utils_System::externUrl('extern/pxIPN');
 
     if ($component == 'event') {
       $cancelURL = CRM_Utils_System::url('civicrm/event/register',
@@ -151,7 +142,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       $privateData .= ",f={$params['participantID']},g={$params['eventID']}";
     }
     elseif ($component == 'contribute') {
-      $membershipID = CRM_Utils_Array::value('membershipID', $params);
+      $membershipID = $params['membershipID'] ?? NULL;
       if ($membershipID) {
         $privateData .= ",e=$membershipID";
       }
@@ -159,7 +150,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
 
     }
 
-    $dpsParams = array(
+    $dpsParams = [
       'AmountInput' => str_replace(",", "", number_format($params['amount'], 2)),
       'CurrencyInput' => $params['currencyID'],
       'MerchantReference' => $merchantRef,
@@ -171,7 +162,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       'TxnId' => '',
       'UrlFail' => $url,
       'UrlSuccess' => $url,
-    );
+    ];
     // Allow further manipulation of params via custom hooks
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $dpsParams);
 
@@ -211,7 +202,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       }
       else {
         // calling DPS failed
-        CRM_Core_Error::fatal(ts('Unable to establish connection to the payment gateway.'));
+        throw new CRM_Core_Exception(ts('Unable to establish connection to the payment gateway.'));
       }
     }
     else {

@@ -129,6 +129,15 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Supported recurring frequency units.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+    </html>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>2.1</add>
   </field>
   <field>
@@ -146,6 +155,14 @@
     <default>0</default>
     <comment>if true - asks user for recurring installments</comment>
     <add>4.3</add>
+  </field>
+  <field>
+    <name>adjust_recur_start_date</name>
+    <title>Adjust Recurring Start Date</title>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>if true - user is able to adjust payment start date</comment>
+    <add>4.7</add>
   </field>
   <field>
     <name>is_pay_later</name>
@@ -402,7 +419,8 @@
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
-      <nameColumn>numeric_code</nameColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -441,5 +459,19 @@
     <default>0</default>
     <comment>if true - billing block is required for online contribution page</comment>
     <add>4.6</add>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Public Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <default>NULL</default>
+    <comment>Contribution Page Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.20</add>
+    <uniqueName>contribution_page_frontend_title</uniqueName>
   </field>
 </table>

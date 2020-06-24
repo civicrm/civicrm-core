@@ -1,30 +1,14 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/configuring Scheduled Jobs.  *}
-<h3>{if $action eq 1}{ts}New Scheduled Job{/ts}{elseif $action eq 2}{ts}Edit Scheduled Job{/ts}{elseif $action eq 128}{ts}Execute Scheduled Job{/ts}{else}{ts}Delete Scheduled Job{/ts}{/if}</h3>
+<h3>{if $action eq 1}{ts}New Scheduled Job{/ts}{elseif $action eq 2}{ts}Edit Scheduled Job{/ts}{elseif $action eq 4}{ts}Execute Scheduled Job{/ts}{else}{ts}Delete Scheduled Job{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-job-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
@@ -33,10 +17,10 @@
       <div class="icon inform-icon"></div>
         {ts}WARNING: Deleting this Scheduled Job will cause some important site functionality to stop working.{/ts} {ts}Do you want to continue?{/ts}
   </div>
-{elseif $action eq 128}
+{elseif $action eq 4}
   <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {ts}Are you sure you would like to execute this job?{/ts}
+        {ts 1=$jobName}Are you sure you would like to execute %1 job?{/ts}
   </div>
 {else}
   <table class="form-layout-compressed">
@@ -50,7 +34,7 @@
         <td class="label">{$form.run_frequency.label}</td><td>{$form.run_frequency.html}</td>
     </tr>
     <tr class="crm-job-form-block-api_action">
-        <td class="label">{ts}API call:{/ts}</td>
+        <td class="label"><label>{ts}API call:{/ts}</label></td>
         <td>
 
         <div id="fname"><br/>
@@ -102,7 +86,7 @@ CRM.$(function($) {
       </td>
     </tr>
     <tr class="crm-job-form-block-parameters">
-      <td class="label">{$form.parameters.label}<br />{docURL page="Managing Scheduled Jobs" resource="wiki"}</td>
+      <td class="label">{$form.parameters.label}<br />{docURL page="user/initial-set-up/scheduled-jobs/#parameters"}</td>
       <td>{$form.parameters.html}</td>
     </tr>
     <tr class="crm-job-form-block-scheduled-run-date">

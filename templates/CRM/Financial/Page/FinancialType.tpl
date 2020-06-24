@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action eq 1 or $action eq 2 or $action eq 8}
@@ -33,6 +17,7 @@
       <p>{ts 1=$acctLink}Each financial type relates to a number of <a href="%1">financial accounts</a> to track income, accounts receivable, and fees.</p>{/ts}
     </div>
 
+<div class="crm-content-block crm-block">
 {if $rows}
 <div id="ltype">
 <p></p>
@@ -41,11 +26,11 @@
   {* handle enable/disable actions*}
    {include file="CRM/common/enableDisableApi.tpl"}
    {include file="CRM/common/jsortable.tpl"}
-        <table cellpadding="0" cellspacing="0" border="0">
-           <thead class="sticky">
+        <table cellpadding="0" cellspacing="0" border="0" class="row-highlight">
+          <thead class="sticky">
             <th>{ts}Name{/ts}</th>
             <th>{ts}Description{/ts}</th>
-      <th>{ts}Financial Accounts{/ts}</th>
+            <th>{ts}Financial Accounts{/ts}</th>
             <th>{ts}Deductible?{/ts}</th>
             <th>{ts}Reserved?{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
@@ -78,4 +63,5 @@
       {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
+</div>
 {/if}

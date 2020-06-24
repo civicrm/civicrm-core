@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
  /**
   * @package CRM
-  * @copyright CiviCRM LLC (c) 2004-2015
+  * @copyright CiviCRM LLC https://civicrm.org/licensing
   */
 
 /**
@@ -40,9 +24,24 @@
  * or in vain.
  */
 class CRM_Utils_QueryFormatter {
+  /**
+   * Generate queries using SQL LIKE expressions.
+   */
   const LANG_SQL_LIKE = 'like';
+
+  /**
+   * Generate queries using MySQL FTS expressions.
+   */
   const LANG_SQL_FTS = 'fts';
+
+  /**
+   * Generate queries using MySQL's boolean FTS expressions.
+   */
   const LANG_SQL_FTSBOOL = 'ftsbool';
+
+  /**
+   * Generate queries using Solr expressions.
+   */
   const LANG_SOLR = 'solr';
 
   /**
@@ -73,6 +72,11 @@ class CRM_Utils_QueryFormatter {
    */
   const MODE_WILDWORDS_SUFFIX = 'wildwords-suffix';
 
+  /**
+   * Singleton object.
+   *
+   * @var \CRM_Utils_QueryFormatter|null
+   */
   static protected $singleton;
 
   /**
@@ -151,6 +155,67 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
+   * Create a SQL WHERE expression for matching against a list of
+   * text columns.
+   *
+   * @param string $table
+   *   Eg "civicrm_note" or "civicrm_note mynote".
+   * @param array|string $columns
+   *   List of columns to search against.
+   *   Eg "first_name" or "activity_details".
+   * @param string $queryText
+   * @return string
+   *   SQL, eg "MATCH (col1) AGAINST (queryText)" or "col1 LIKE '%queryText%'"
+   */
+  public function formatSql($table, $columns, $queryText) {
+    if ($queryText === '*' || $queryText === '%' || empty($queryText)) {
+      return '(1)';
+    }
+
+    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
+
+    if (strpos($table, ' ') === FALSE) {
+      $tableName = $tableAlias = $table;
+    }
+    else {
+      list ($tableName, $tableAlias) = explode(' ', $table);
+    }
+    if (is_scalar($columns)) {
+      $columns = [$columns];
+    }
+
+    $clauses = [];
+    if (CRM_Core_InnoDBIndexer::singleton()
+      ->hasDeclaredIndex($tableName, $columns)
+    ) {
+      $formattedQuery = $this->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_FTSBOOL);
+
+      $prefixedFieldNames = [];
+      foreach ($columns as $fieldName) {
+        $prefixedFieldNames[] = "$tableAlias.$fieldName";
+      }
+
+      $clauses[] = sprintf("MATCH (%s) AGAINST ('%s' IN BOOLEAN MODE)",
+        implode(',', $prefixedFieldNames),
+        $strtolower(CRM_Core_DAO::escapeString($formattedQuery))
+      );
+    }
+    else {
+      //CRM_Core_Session::setStatus(ts('Cannot use FTS for %1 (%2)', array(
+      //  1 => $table,
+      //  2 => implode(', ', $fullTextFields),
+      //)));
+
+      $formattedQuery = $this->format($queryText, CRM_Utils_QueryFormatter::LANG_SQL_LIKE);
+      $escapedText = $strtolower(CRM_Core_DAO::escapeString($formattedQuery));
+      foreach ($columns as $fieldName) {
+        $clauses[] = "$tableAlias.$fieldName LIKE '{$escapedText}'";
+      }
+    }
+    return implode(' OR ', $clauses);
+  }
+
+  /**
    * Format Fts.
    *
    * @param string $text
@@ -211,6 +276,20 @@ class CRM_Utils_QueryFormatter {
    */
   protected function _formatFtsBool($text, $mode) {
     $result = NULL;
+    $operators = ['+', '-', '~', '(', ')'];
+    $wildCards = ['@', '%', '*'];
+    $expression = preg_quote(implode('', array_merge($operators, $wildCards)), '/');
+
+    //Return if searched string ends with an unsupported operator.
+    //Or if the string contains an invalid joint occurrence of operators.
+    foreach ($operators as $val) {
+      if ($text == '@' || CRM_Utils_String::endsWith($text, $val) || preg_match("/[{$expression}]{2,}/", $text)) {
+        $csid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'CRM_Contact_Form_Search_Custom_FullText', 'value', 'name');
+        $url = CRM_Utils_System::url("civicrm/contact/search/custom", "csid={$csid}&reset=1");
+        $operators = implode("', '", $operators);
+        CRM_Core_Error::statusBounce("Full-Text Search does not support the use of a search with two attached operators or string ending with any of these operators ('{$operators}' or a single '@'). Please adjust your search term and try again.", $url, 'Invalid Search String');
+      }
+    }
 
     // normalize user-inputted wildcards
     $text = str_replace('%', '*', $text);
@@ -233,7 +312,7 @@ class CRM_Utils_QueryFormatter {
     else {
       switch ($mode) {
         case self::MODE_NONE:
-          $result = $this->mapWords($text, '+word');
+          $result = $this->mapWords($text, '+word', TRUE);
           break;
 
         case self::MODE_PHRASE:
@@ -304,22 +383,45 @@ class CRM_Utils_QueryFormatter {
    *   User-supplied query string.
    * @param string $template
    *   A prototypical description of each word, eg "word%" or "word*" or "*word*".
+   * @param bool $quotes
+   *   True if each searched keyword need to be surrounded with quotes.
    * @return string
    */
-  protected function mapWords($text, $template) {
-    $result = array();
-    foreach ($this->parseWords($text) as $word) {
+  protected function mapWords($text, $template, $quotes = FALSE) {
+    $result = [];
+    foreach ($this->parseWords($text, $quotes) as $word) {
       $result[] = str_replace('word', $word, $template);
     }
     return implode(' ', $result);
   }
 
   /**
-   * @param $text
+   * @param string $text
+   * @param bool $quotes
    * @return array
    */
-  protected function parseWords($text) {
-    return explode(' ', preg_replace('/[ \r\n\t]+/', ' ', trim($text)));
+  protected function parseWords($text, $quotes) {
+    //NYSS 9692 special handling for emails
+    if (preg_match('/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/', $text)) {
+      $parts = explode('@', $text);
+      $parts[1] = stristr($parts[1], '.', TRUE);
+      $text = implode(' ', $parts);
+    }
+
+    //NYSS also replace other occurrences of @
+    $replacedText = preg_replace('/[ \r\n\t\@]+/', ' ', trim($text));
+    //filter empty values if any
+    $keywords = array_filter(explode(' ', $replacedText));
+
+    //Ensure each searched keywords are wrapped in double quotes.
+    if ($quotes) {
+      foreach ($keywords as &$val) {
+        if (!is_numeric($val)) {
+          $val = "\"{$val}\"";
+        }
+      }
+    }
+    return $keywords;
   }
 
   /**
@@ -345,13 +447,13 @@ class CRM_Utils_QueryFormatter {
    * @return array
    */
   public static function getModes() {
-    return array(
+    return [
       self::MODE_NONE,
       self::MODE_PHRASE,
       self::MODE_WILDPHRASE,
       self::MODE_WILDWORDS,
       self::MODE_WILDWORDS_SUFFIX,
-    );
+    ];
   }
 
   /**
@@ -360,12 +462,12 @@ class CRM_Utils_QueryFormatter {
    * @return array
    */
   public static function getLanguages() {
-    return array(
+    return [
       self::LANG_SOLR,
       self::LANG_SQL_FTS,
       self::LANG_SQL_FTSBOOL,
       self::LANG_SQL_LIKE,
-    );
+    ];
   }
 
   /**

@@ -43,6 +43,7 @@ J5PACK=0
 WP5PACK=0
 SK5PACK=0
 L10NPACK=0
+REPOREPORT=0
 
 # Display usage
 display_usage()
@@ -122,7 +123,7 @@ check_conf()
     echo "Current directory is : $THIS_DIR";
     exit 1
   else
-    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
+    export DM_SOURCEDIR DM_GENFILESDIR DM_TMPDIR DM_TARGETDIR DM_PHP DM_RSYNC DM_ZIP DM_VERSION DM_REF_CORE DM_REF_DRUPAL DM_REF_DRUPAL6 DM_REF_DRUPAL8 DM_REF_JOOMLA DM_REF_WORDPRESS DM_REF_PACKAGES
     if [ ! -d "$DM_SOURCEDIR" ]; then
       echo; echo "ERROR! " DM_SOURCEDIR "directory not found!"; echo "(if you get empty directory name, it might mean that one of necessary variables is not set)"; echo;
     fi
@@ -192,6 +193,12 @@ case $1 in
   WP5PACK=1
   ;;
 
+  # REPO REPORT PHP5
+  report)
+  echo; echo "Generating repo report module"; echo;
+  REPOREPORT=1
+  ;;
+
   # ALL
   all)
   echo; echo "Generating all the tarballs we've got (not the directories). "; echo;
@@ -202,6 +209,7 @@ case $1 in
   WP5PACK=1
   SKPACK=1
   L10NPACK=1
+  REPOREPORT=1
   ;;
 
   # USAGE
@@ -226,10 +234,14 @@ if [ -d "$DM_SOURCEDIR/drupal" ]; then
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
   GENCODE_CMS=Drupal
 fi
+if [ -d "$DM_SOURCEDIR/drupal-8" ]; then
+  dm_git_checkout "$DM_SOURCEDIR/drupal-8" "$DM_REF_DRUPAL8"
+fi
 
-## Get latest dependencies
+## Get fresh dependencies
+[ -d "$DM_SOURCEDIR/vendor" ] && rm -rf $DM_SOURCEDIR/vendor
+[ -d "$DM_SOURCEDIR/bower_components" ] && rm -rf $DM_SOURCEDIR/bower_components
 dm_generate_vendor "$DM_SOURCEDIR"
-dm_generate_bower "$DM_SOURCEDIR"
 
 # Before anything - regenerate DAOs
 
@@ -283,6 +295,20 @@ if [ "$WP5PACK" = 1 ]; then
   echo; echo "Packaging for Wordpress, PHP5 version"; echo;
   dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
   bash $P/dists/wordpress_php5.sh
+fi
+
+if [ "$REPOREPORT" = 1 ]; then
+  echo; echo "Preparing repository report"; echo;
+  env \
+    L10NPACK="$L10NPACK" \
+    BPACK="$BPACK" \
+    D56PACK="$D56PACK" \
+    D5PACK="$D5PACK" \
+    D7DIR="$D7DIR" \
+    SKPACK="$SKPACK" \
+    J5PACK="$J5PACK" \
+    WP5PACK="$WP5PACK" \
+    bash $P/dists/repo-report.sh
 fi
 
 unset DM_SOURCEDIR DM_GENFILESDIR DM_TARGETDIR DM_TMPDIR DM_PHP DM_RSYNC DM_VERSION DM_ZIP

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,11 +25,12 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * referenced in the journal entries that isn't defined anywhere.
    *
    * Possibly in the future this could be selected by the user.
+   * @var array
    */
-  public static $complementaryTables = array(
+  public static $complementaryTables = [
     'ACCNT',
     'CUST',
-  );
+  ];
 
   /**
    * Class constructor.
@@ -123,7 +108,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
 
     CRM_Utils_Hook::batchQuery($sql);
 
-    $params = array(1 => array($batchId, 'String'));
+    $params = [1 => [$batchId, 'String']];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
     return $dao;
@@ -139,7 +124,9 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
     $fileName = $config->uploadDir . 'Financial_Transactions_' . $this->_batchIds . '_' . date('YmdHis') . '.' . $this->getFileExtension();
     $this->_downloadFile[] = $config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($fileName));
     $out = fopen($fileName, 'w');
-    fputcsv($out, $export['headers']);
+    if (!empty($export['headers'])) {
+      fputcsv($out, $export['headers']);
+    }
     unset($export['headers']);
     if (!empty($export)) {
       foreach ($export as $fields) {
@@ -158,7 +145,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    */
   public function formatHeaders($values) {
     $arrayKeys = array_keys($values);
-    $headers = '';
+    $headers = [];
     if (!empty($arrayKeys)) {
       foreach ($values[$arrayKeys[0]] as $title => $value) {
         $headers[] = $title;
@@ -172,16 +159,15 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    *
    * @param array $export
    */
-  public function makeCSV($export) {
+  public function makeExport($export) {
     // getting data from admin page
     $prefixValue = Civi::settings()->get('contribution_invoice_settings');
 
     foreach ($export as $batchId => $dao) {
-      $financialItems = array();
+      $financialItems = [];
       $this->_batchIds = $batchId;
 
-      $batchItems = array();
-      $queryResults = array();
+      $queryResults = [];
 
       while ($dao->fetch()) {
         $creditAccountName = $creditAccountType = $creditAccount = NULL;
@@ -198,7 +184,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
 
         $invoiceNo = CRM_Utils_Array::value('invoice_prefix', $prefixValue) . "" . $dao->contribution_id;
 
-        $financialItems[] = array(
+        $financialItems[] = [
           'Batch ID' => $dao->batch_id,
           'Invoice No' => $invoiceNo,
           'Contact ID' => $dao->contact_id,
@@ -220,14 +206,13 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
           'Credit Account Name' => $creditAccountName,
           'Credit Account Type' => $creditAccountType,
           'Item Description' => $dao->item_description,
-        );
+        ];
 
         end($financialItems);
-        $batchItems[] = &$financialItems[key($financialItems)];
         $queryResults[] = get_object_vars($dao);
       }
 
-      CRM_Utils_Hook::batchItems($queryResults, $batchItems);
+      CRM_Utils_Hook::batchItems($queryResults, $financialItems);
 
       $financialItems['headers'] = self::formatHeaders($financialItems);
       self::export($financialItems);

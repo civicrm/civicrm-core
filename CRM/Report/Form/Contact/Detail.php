@@ -1,382 +1,367 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   const ROW_COUNT_LIMIT = 10;
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
-  );
+  ];
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
    */
+  protected $groupFilterNotOptimised = TRUE;
+
   /**
+   * Store the joins for civicrm_activity_contact
+   *
+   * Activities are retrieved by a union of four queries in order to catch
+   * activities where the contact is the source, target, assignee, or case
+   * contact.
+   *
+   * @var array
+   */
+  protected $activityContactJoin = [];
+
+  /**
+   * Class constructor.
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Contact Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => ts('First Name'),
-          ),
-          'middle_name' => array(
+          ],
+          'middle_name' => [
             'title' => ts('Middle Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => ts('Last Name'),
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'title' => ts('Birth Date'),
-          ),
-          'age' => array(
+          ],
+          'age' => [
             'title' => ts('Age'),
             'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Contact Subtype'),
-          ),
-        ),
-        'filters' => array(
-          'id' => array(
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ),
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-          ),
-          'gender_id' => array(
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ),
-          'birth_date' => array(
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-          ),
-        ),
+          ],
+        ],
+        'filters' => $this->getBasicContactFilters(),
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'sort_name' => array(
+        'order_bys' => [
+          'sort_name' => [
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
             'default_order' => 'ASC',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => ts('First Name'),
-          ),
-          'gender_id' => array(
+          ],
+          'gender_id' => [
             'name' => 'gender_id',
             'title' => ts('Gender'),
-          ),
-          'birth_date' => array(
+          ],
+          'birth_date' => [
             'name' => 'birth_date',
             'title' => ts('Birth Date'),
-          ),
-          'contact_type' => array(
+          ],
+          'contact_type' => [
             'title' => ts('Contact Type'),
-          ),
-          'contact_sub_type' => array(
+          ],
+          'contact_sub_type' => [
             'title' => ts('Contact Subtype'),
-          ),
-        ),
-      ),
-      'civicrm_address' => array(
+          ],
+        ],
+      ],
+      'civicrm_address' => [
         'dao' => 'CRM_Core_DAO_Address',
         'grouping' => 'contact-fields',
-        'fields' => array(
+        'fields' => [
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-          'state_province_id' => array(
+          'state_province_id' => [
             'title' => ts('State/Province'),
-          ),
-        ),
-        'order_bys' => array(
-          'state_province_id' => array('title' => 'State/Province'),
-          'city' => array('title' => 'City'),
-          'postal_code' => array('title' => 'Postal Code'),
-        ),
-      ),
-      'civicrm_country' => array(
+          ],
+        ],
+        'order_bys' => [
+          'street_address' => ['title' => ts('Street Address')],
+          'state_province_id' => ['title' => ts('State/Province')],
+          'city' => ['title' => ts('City')],
+          'postal_code' => ['title' => ts('Postal Code')],
+        ],
+      ],
+      'civicrm_country' => [
         'dao' => 'CRM_Core_DAO_Country',
-        'fields' => array(
-          'name' => array('title' => 'Country', 'default' => TRUE),
-        ),
-        'order_bys' => array(
-          'name' => array('title' => 'Country'),
-        ),
+        'fields' => [
+          'name' => ['title' => ts('Country'), 'default' => TRUE],
+        ],
+        'order_bys' => [
+          'name' => ['title' => ts('Country')],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_email' => array(
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'title' => ts('Email'),
             'no_repeat' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'email' => array(
+        'order_bys' => [
+          'email' => [
             'title' => ts('Email'),
-          ),
-        ),
-      ),
-      'civicrm_contribution' => array(
+          ],
+        ],
+      ],
+      'civicrm_contribution' => [
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contribution_id' => array(
+          ],
+          'contribution_id' => [
             'title' => ts('Contribution'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'total_amount' => array('default' => TRUE),
-          'financial_type_id' => array(
+          ],
+          'total_amount' => ['default' => TRUE],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
             'default' => TRUE,
-          ),
+          ],
           'trxn_id' => NULL,
-          'receive_date' => array('default' => TRUE),
+          'receive_date' => ['default' => TRUE],
           'receipt_date' => NULL,
-          'contribution_status_id' => array(
+          'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'default' => TRUE,
-          ),
+          ],
           'contribution_source' => NULL,
-        ),
-      ),
-      'civicrm_membership' => array(
+        ],
+      ],
+      'civicrm_membership' => [
         'dao' => 'CRM_Member_DAO_Membership',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'membership_id' => array(
+          ],
+          'membership_id' => [
             'title' => ts('Membership'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'membership_type_id' => array(
+          ],
+          'membership_type_id' => [
             'title' => ts('Membership Type'),
             'default' => TRUE,
-          ),
-          'join_date' => NULL,
-          'membership_start_date' => array(
+          ],
+          'join_date' => [
+            'title' => ts('Join Date'),
+          ],
+          'membership_start_date' => [
             'title' => ts('Start Date'),
             'default' => TRUE,
-          ),
-          'membership_end_date' => array(
+          ],
+          'membership_end_date' => [
             'title' => ts('End Date'),
             'default' => TRUE,
-          ),
-          'membership_status_id' => array(
+          ],
+          'membership_status_id' => [
             'name' => 'status_id',
             'title' => ts('Membership Status'),
             'default' => TRUE,
-          ),
-          'source' => array('title' => 'Membership Source'),
-        ),
-      ),
-      'civicrm_participant' => array(
+          ],
+          'source' => ['title' => ts('Membership Source')],
+        ],
+      ],
+      'civicrm_participant' => [
         'dao' => 'CRM_Event_DAO_Participant',
-        'fields' => array(
-          'contact_id' => array(
+        'fields' => [
+          'contact_id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'participant_id' => array(
+          ],
+          'participant_id' => [
             'title' => ts('Participant'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'event_id' => array('default' => TRUE),
-          'participant_status_id' => array(
+          ],
+          'event_id' => ['default' => TRUE],
+          'participant_status_id' => [
             'name' => 'status_id',
             'title' => ts('Participant Status'),
             'default' => TRUE,
-          ),
-          'role_id' => array(
+          ],
+          'role_id' => [
             'title' => ts('Role'),
             'default' => TRUE,
-          ),
-          'participant_register_date' => array(
+          ],
+          'participant_register_date' => [
             'title' => ts('Register Date'),
             'default' => TRUE,
-          ),
-          'fee_level' => array(
+          ],
+          'fee_level' => [
             'title' => ts('Fee Level'),
             'default' => TRUE,
-          ),
-          'fee_amount' => array(
+          ],
+          'fee_amount' => [
             'title' => ts('Fee Amount'),
             'default' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_relationship' => array(
+          ],
+        ],
+      ],
+      'civicrm_relationship' => [
         'dao' => 'CRM_Contact_DAO_Relationship',
-        'fields' => array(
-          'relationship_id' => array(
+        'fields' => [
+          'relationship_id' => [
             'name' => 'id',
             'title' => ts('Relationship'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'relationship_type_id' => array(
+          ],
+          'relationship_type_id' => [
             'title' => ts('Relationship Type'),
             'default' => TRUE,
-          ),
-          'contact_id_b' => array(
+          ],
+          'contact_id_b' => [
             'title' => ts('Relationship With'),
             'default' => TRUE,
-          ),
-          'start_date' => array(
-            'title' => 'Start Date ',
+          ],
+          'start_date' => [
+            'title' => ts('Start Date'),
             'type' => CRM_Report_Form::OP_DATE,
-          ),
-          'end_date' => array(
-            'title' => 'End Date ',
+          ],
+          'end_date' => [
+            'title' => ts('End Date'),
             'type' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-      ),
-      'civicrm_activity' => array(
+          ],
+        ],
+      ],
+      'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Activity'),
             'no_repeat' => TRUE,
             'default' => TRUE,
-          ),
-          'activity_type_id' => array(
+          ],
+          'activity_type_id' => [
             'title' => ts('Activity Type'),
             'default' => TRUE,
-          ),
-          'subject' => array(
+          ],
+          'subject' => [
             'title' => ts('Subject'),
             'default' => TRUE,
-          ),
-          'activity_date_time' => array(
+          ],
+          'activity_date_time' => [
             'title' => ts('Activity Date'),
             'default' => TRUE,
-          ),
-          'activity_status_id' => array(
+          ],
+          'activity_status_id' => [
             'name' => 'status_id',
             'title' => ts('Activity Status'),
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_activity_target' => array(
+      ],
+      'civicrm_activity_target' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'target_contact_id' => array(
+        'fields' => [
+          'target_contact_id' => [
             'title' => ts('With Contact'),
             'name' => 'contact_id',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_activity_assignment' => array(
+      ],
+      'civicrm_activity_assignment' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'assignee_contact_id' => array(
+        'fields' => [
+          'assignee_contact_id' => [
             'title' => ts('Assigned to'),
             'name' => 'contact_id',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_activity_source' => array(
+      ],
+      'civicrm_activity_source' => [
         'dao' => 'CRM_Activity_DAO_ActivityContact',
-        'fields' => array(
-          'source_contact_id' => array(
-            'title' => ts('Added By'),
+        'fields' => [
+          'source_contact_id' => [
+            'title' => ts('Added by'),
             'name' => 'contact_id',
             'default' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'activity-fields',
-      ),
-      'civicrm_phone' => array(
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array(
+        'fields' => [
           'phone' => NULL,
-          'phone_ext' => array(
+          'phone_ext' => [
             'title' => ts('Phone Extension'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-    );
+      ],
+    ];
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
@@ -388,15 +373,15 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
-    $this->_component = array(
+    $select = [];
+    $this->_columnHeaders = [];
+    $this->_component = [
       'contribution_civireport',
       'membership_civireport',
       'participant_civireport',
       'relationship_civireport',
       'activity_civireport',
-    );
+    ];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -406,8 +391,8 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             //isolate the select clause compoenent wise
             if (in_array($table['alias'], $this->_component)) {
               $select[$table['alias']][] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeadersComponent[$table['alias']]["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_columnHeadersComponent[$table['alias']]["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+              $this->_columnHeadersComponent[$table['alias']]["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+              $this->_columnHeadersComponent[$table['alias']]["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
             }
             elseif ($table['alias'] ==
               $this->_aliases['civicrm_activity_target'] ||
@@ -430,12 +415,12 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
               $tableName = $table['alias'];
               $select['activity_civireport'][] = "$tableName.display_name as {$tableName}_{$fieldName}, $addContactId ";
-              $this->_columnHeadersComponent['activity_civireport']["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_columnHeadersComponent['activity_civireport']["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+              $this->_columnHeadersComponent['activity_civireport']["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+              $this->_columnHeadersComponent['activity_civireport']["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             }
           }
@@ -461,120 +446,161 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     return $errors;
   }
 
   public function from() {
-    $group = " ";
     $this->_from = "
-        FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}";
+      FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
+    ";
 
-    if ($this->isTableSelected('civicrm_country') ||
-      $this->isTableSelected('civicrm_address')
-    ) {
-      $this->_from .= "
-            LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1 ) ";
+    $this->joinAddressFromContact();
+    $this->joinCountryFromAddress();
+    $this->joinPhoneFromContact();
+    $this->joinEmailFromContact();
+
+    // only include tables that are in from clause
+    $componentTables = array_intersect($this->_aliases, $this->_component);
+    $componentTables = array_flip($componentTables);
+    $this->_selectedTables = array_diff($this->_selectedTables, $componentTables);
+
+    if (!empty($this->_selectComponent['contribution_civireport'])) {
+      $this->_formComponent['contribution_civireport'] = <<<HERESQL
+      FROM
+        civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
+HERESQL;
+    }
+    if (!empty($this->_selectComponent['membership_civireport'])) {
+      $this->_formComponent['membership_civireport'] = <<<HERESQL
+      FROM
+        civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_membership']}.contact_id
+HERESQL;
+    }
+    if (!empty($this->_selectComponent['participant_civireport'])) {
+      $this->_formComponent['participant_civireport'] = <<<HERESQL
+      FROM
+        civicrm_contact {$this->_aliases['civicrm_contact']}
+        INNER JOIN civicrm_participant {$this->_aliases['civicrm_participant']}
+        ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_participant']}.contact_id
+HERESQL;
     }
 
-    if ($this->isTableSelected('civicrm_email')) {
-      $this->_from .= "
-            LEFT JOIN  civicrm_email {$this->_aliases['civicrm_email']}
-                   ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id AND
-                      {$this->_aliases['civicrm_email']}.is_primary = 1) ";
+    if (!empty($this->_selectComponent['activity_civireport'])) {
+
+      // First, prepare all the joins to filter activities by contact
+      $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+
+      $aliasMap = [
+        'Activity Assignees' => 'civicrm_activity_assignment',
+        'Activity Targets' => 'civicrm_activity_target',
+        'Activity Source' => 'civicrm_activity_source',
+      ];
+
+      $this->activityContactJoin['case'] = <<<HERESQL
+        JOIN civicrm_case_activity
+          ON civicrm_case_activity.activity_id = activity_civireport.id
+        JOIN civicrm_case
+          ON civicrm_case_activity.case_id = civicrm_case.id
+        JOIN civicrm_case_contact
+          ON civicrm_case_contact.case_id = civicrm_case.id
+          AND civicrm_case_contact.contact_id IN ([FILTERCONTACTSHERE])
+HERESQL;
+
+      // Collect the joins for civicrm_contact to each of the activity contact joins
+      $contactJoins = [];
+
+      foreach ($activityContacts as $recordTypeId => $label) {
+        if (empty($aliasMap[$label])) {
+          continue;
+        }
+
+        // Inner join on this record type
+        $this->activityContactJoin[$recordTypeId] = <<<HERESQL
+          JOIN civicrm_activity_contact {$aliasMap[$label]}
+            ON activity_civireport.id = {$aliasMap[$label]}.activity_id
+              AND {$aliasMap[$label]}.record_type_id = $recordTypeId
+              AND {$aliasMap[$label]}.contact_id IN ([FILTERCONTACTSHERE])
+HERESQL;
+
+        // Cycle through other record types to add left joins
+        foreach ($activityContacts as $recordTypeIdX => $labelX) {
+          if ($recordTypeIdX == $recordTypeId || empty($aliasMap[$labelX])) {
+            continue;
+          }
+          $this->activityContactJoin[$recordTypeId] .= <<<HERESQL
+            LEFT JOIN civicrm_activity_contact {$aliasMap[$labelX]}
+              ON activity_civireport.id = {$aliasMap[$labelX]}.activity_id
+                AND {$aliasMap[$labelX]}.record_type_id = $recordTypeIdX
+HERESQL;
+        }
+
+        // Add to the joins for case activities
+        $this->activityContactJoin['case'] .= <<<HERESQL
+          LEFT JOIN civicrm_activity_contact {$aliasMap[$label]}
+            ON activity_civireport.id = {$aliasMap[$label]}.activity_id
+              AND {$aliasMap[$label]}.record_type_id = $recordTypeId
+HERESQL;
+
+        // Each activity_contact join gets joined to civicrm_contact
+        $contactJoins[] = <<<HERESQL
+        LEFT JOIN civicrm_contact {$this->_aliases[$aliasMap[$label]]}
+          ON $aliasMap[$label].contact_id = {$this->_aliases[$aliasMap[$label]]}.id
+HERESQL;
+      }
+
+      // civicrm_contact joins into a single string
+      $contactJoins = implode(PHP_EOL, $contactJoins);
+
+      // Now filter out component activities that should be suppressed
+      $compInfo = CRM_Core_Component::getEnabledComponents();
+      $componentsList = [];
+      foreach ($compInfo as $compObj) {
+        if ($compObj->info['showActivitiesInCore']) {
+          $componentsList[] = $compObj->componentID;
+        }
+      }
+      $componentClause = "civicrm_option_value.component_id IS NULL";
+      if (!empty($componentsList)) {
+        $componentsIn = implode(', ', $componentsList);
+        $componentClause = <<<HERESQL
+        ( $componentClause
+          OR civicrm_option_value.component_id IN ($componentsIn) )
+HERESQL;
+      }
+
+      $this->_formComponent['activity_civireport'] = <<<HERESQL
+      FROM
+          civicrm_activity {$this->_aliases['civicrm_activity']}
+          [ACTIVITYCONTACTJOINSHERE]
+          $contactJoins
+          JOIN civicrm_option_value
+            ON {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value
+            AND $componentClause
+          JOIN civicrm_option_group
+            ON civicrm_option_group.id = civicrm_option_value.option_group_id
+            AND civicrm_option_group.name = 'activity_type'
+HERESQL;
     }
 
-    if ($this->isTableSelected('civicrm_phone')) {
-      $this->_from .= "
-            LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
-                   ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                      {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
-    }
-
-    if ($this->isTableSelected('civicrm_country')) {
-      $this->_from .= "
-            LEFT JOIN civicrm_country {$this->_aliases['civicrm_country']}
-                   ON {$this->_aliases['civicrm_address']}.country_id = {$this->_aliases['civicrm_country']}.id AND
-                      {$this->_aliases['civicrm_address']}.is_primary = 1 ";
-    }
-
-    $this->_from .= "{$group}";
-
-    foreach ($this->_component as $val) {
-      if (!empty($this->_selectComponent['contribution_civireport'])) {
-        $this->_formComponent['contribution_civireport'] = " FROM
-                            civicrm_contact  {$this->_aliases['civicrm_contact']}
-                            INNER JOIN civicrm_contribution       {$this->_aliases['civicrm_contribution']}
-                                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-                            {$group}
-                    ";
-      }
-      if (!empty($this->_selectComponent['membership_civireport'])) {
-        $this->_formComponent['membership_civireport'] = " FROM
-                            civicrm_contact  {$this->_aliases['civicrm_contact']}
-                            INNER JOIN civicrm_membership       {$this->_aliases['civicrm_membership']}
-                                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_membership']}.contact_id
-                            {$group} ";
-      }
-      if (!empty($this->_selectComponent['participant_civireport'])) {
-        $this->_formComponent['participant_civireport'] = " FROM
-                            civicrm_contact  {$this->_aliases['civicrm_contact']}
-                            INNER JOIN civicrm_participant       {$this->_aliases['civicrm_participant']}
-                                    ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_participant']}.contact_id
-                            {$group} ";
-      }
-
-      if (!empty($this->_selectComponent['activity_civireport'])) {
-        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-        $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-        $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
-
-        $this->_formComponent['activity_civireport'] = "FROM
-                        civicrm_activity {$this->_aliases['civicrm_activity']}
-                        LEFT JOIN civicrm_activity_contact civicrm_activity_target ON
-                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id AND
-                            civicrm_activity_target.record_type_id = {$targetID}
-                        LEFT JOIN civicrm_activity_contact civicrm_activity_assignment ON
-                            {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                      civicrm_activity_assignment.record_type_id = {$assigneeID}
-                        LEFT JOIN civicrm_activity_contact civicrm_activity_source
-                            ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id AND
-                            civicrm_activity_source.record_type_id = {$sourceID}
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']} ON
-                            civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
-
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_assignment']} ON
-                            civicrm_activity_assignment.contact_id = {$this->_aliases['civicrm_activity_assignment']}.id
-                        LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_source']} ON
-                            civicrm_activity_source.contact_id = {$this->_aliases['civicrm_activity_source']}.id
-                        LEFT JOIN civicrm_option_value ON
-                            ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
-                        LEFT JOIN civicrm_option_group ON
-                            civicrm_option_group.id = civicrm_option_value.option_group_id
-                        LEFT JOIN civicrm_case_activity ON
-                            civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
-                        LEFT JOIN civicrm_case ON
-                            civicrm_case_activity.case_id = civicrm_case.id
-                        LEFT JOIN civicrm_case_contact ON
-                            civicrm_case_contact.case_id = civicrm_case.id ";
-      }
-
-      if (!empty($this->_selectComponent['relationship_civireport'])) {
-        $this->_formComponent['relationship_civireport'] = "FROM
-                            civicrm_relationship {$this->_aliases['civicrm_relationship']}
-
-                            LEFT JOIN civicrm_contact  {$this->_aliases['civicrm_contact']} ON
-                                {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_b
-                            LEFT JOIN civicrm_contact  contact_a ON
-                               contact_a.id = {$this->_aliases['civicrm_relationship']}.contact_id_a ";
-      }
+    if (!empty($this->_selectComponent['relationship_civireport'])) {
+      $this->_formComponent['relationship_civireport'] = <<<HERESQL
+      FROM
+        civicrm_relationship {$this->_aliases['civicrm_relationship']}
+        LEFT JOIN civicrm_contact  {$this->_aliases['civicrm_contact']}
+          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_relationship']}.contact_id_b
+        LEFT JOIN civicrm_contact  contact_a
+          ON contact_a.id = {$this->_aliases['civicrm_relationship']}.contact_id_a
+HERESQL;
     }
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -582,14 +608,14 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           $clause = NULL;
           if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE
           ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to);
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             $clause = $this->whereClause($field,
               $op,
               CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
@@ -614,8 +640,6 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     if ($this->_aclWhere) {
       $this->_where .= " AND {$this->_aclWhere} ";
     }
-
-    $this->_where .= " GROUP BY {$this->_aliases['civicrm_contact']}.id ";
   }
 
   /**
@@ -624,21 +648,22 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
   public function clauseComponent() {
     $selectedContacts = implode(',', $this->_contactSelected);
     $contribution = $membership = $participant = NULL;
-    $eligibleResult = $rows = $tempArray = array();
+    $eligibleResult = $rows = $tempArray = [];
     foreach ($this->_component as $val) {
       if (!empty($this->_selectComponent[$val]) &&
         ($val != 'activity_civireport' && $val != 'relationship_civireport')
       ) {
-        $sql = "{$this->_selectComponent[$val]} {$this->_formComponent[$val]}
-                         WHERE    {$this->_aliases['civicrm_contact']}.id IN ( $selectedContacts )
-                         GROUP BY {$this->_aliases['civicrm_contact']}.id,{$val}.id ";
+        $sql = <<<HERESQL
+        {$this->_selectComponent[$val]} {$this->_formComponent[$val]}
+        WHERE {$this->_aliases['civicrm_contact']}.id IN ( $selectedContacts )
+HERESQL;
 
         $dao = CRM_Core_DAO::executeQuery($sql);
         while ($dao->fetch()) {
           $countRecord = 0;
           $eligibleResult[$val] = $val;
           $CC = 'civicrm_' . substr_replace($val, '', -11, 11) . '_contact_id';
-          $row = array();
+          $row = [];
           foreach ($this->_columnHeadersComponent[$val] as $key => $value) {
             $countRecord++;
             $row[$key] = $dao->$key;
@@ -656,18 +681,19 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     if (!empty($this->_selectComponent['relationship_civireport'])) {
 
-      $relTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE);
+      $relTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
 
       $val = 'relationship_civireport';
       $eligibleResult[$val] = $val;
-      $sql = "{$this->_selectComponent[$val]},{$this->_aliases['civicrm_contact']}.display_name as contact_b_name,  contact_a.id as contact_a_id , contact_a.display_name  as contact_a_name  {$this->_formComponent[$val]}
-                         WHERE    ({$this->_aliases['civicrm_contact']}.id IN ( $selectedContacts )
-                                  OR
-                                  contact_a.id IN ( $selectedContacts ) ) AND
-                                  {$this->_aliases['civicrm_relationship']}.is_active = 1 AND
-                                  contact_a.is_deleted = 0 AND
-                                  {$this->_aliases['civicrm_contact']}.is_deleted = 0
-                         GROUP BY {$this->_aliases['civicrm_relationship']}.id";
+      $sql = <<<HERESQL
+      {$this->_selectComponent[$val]},{$this->_aliases['civicrm_contact']}.display_name as contact_b_name, contact_a.id as contact_a_id, contact_a.display_name as contact_a_name
+      {$this->_formComponent[$val]}
+      WHERE ({$this->_aliases['civicrm_contact']}.id IN ( $selectedContacts )
+          OR contact_a.id IN ( $selectedContacts ) )
+        AND {$this->_aliases['civicrm_relationship']}.is_active = 1
+        AND contact_a.is_deleted = 0
+        AND {$this->_aliases['civicrm_contact']}.is_deleted = 0
+HERESQL;
 
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
@@ -697,38 +723,35 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     }
 
     if (!empty($this->_selectComponent['activity_civireport'])) {
-
-      $componentClause = "civicrm_option_value.component_id IS NULL";
-      $componentsIn = NULL;
-      $compInfo = CRM_Core_Component::getEnabledComponents();
-      foreach ($compInfo as $compObj) {
-        if ($compObj->info['showActivitiesInCore']) {
-          $componentsIn = $componentsIn ? ($componentsIn . ', ' .
-            $compObj->componentID) : $compObj->componentID;
-        }
-      }
-      if ($componentsIn) {
-        $componentClause = "( $componentClause OR
-                                      civicrm_option_value.component_id IN ($componentsIn) )";
-      }
-
       $val = 'activity_civireport';
       $eligibleResult[$val] = $val;
-      $sql = "{$this->_selectComponent[$val]} ,
-                 {$this->_aliases['civicrm_activity_source']}.display_name as added_by {$this->_formComponent[$val]}
 
-                 WHERE ( civicrm_activity_source.contact_id IN ($selectedContacts) OR
-                         civicrm_activity_target.contact_id IN ($selectedContacts) OR
-                         civicrm_activity_assignment.contact_id IN ($selectedContacts) OR
-                         civicrm_case_contact.contact_id IN ($selectedContacts) ) AND
-                         civicrm_option_group.name = 'activity_type' AND
-                         {$this->_aliases['civicrm_activity']}.is_test = 0 AND
-                         ($componentClause)
+      // The activities we want to show are those where the contact is the
+      // target, assignee, source, or the client on a case.  Since the vast
+      // majority of activities will not involve the client, it's impractical to
+      // retrieve all activities and use OR clauses in the WHERE.  Instead, we
+      // use a union of subqueries for each of the four ways activities might
+      // join to the contact.
+      $unionParts = [];
+      foreach ($this->activityContactJoin as $activityContactJoinClauses) {
+        $fromClauses = str_replace(
+          '[ACTIVITYCONTACTJOINSHERE]',
+          str_replace('[FILTERCONTACTSHERE]', $selectedContacts, $activityContactJoinClauses),
+          $this->_formComponent[$val]
+        );
+        $unionParts[] = <<<HERESQL
+        (
+          {$this->_selectComponent[$val]},
+          {$this->_aliases['civicrm_activity_source']}.display_name as added_by,
+          {$this->_aliases['civicrm_activity']}.activity_date_time as date_time_for_sort
+          $fromClauses
 
-                 GROUP BY {$this->_aliases['civicrm_activity']}.id
+          WHERE {$this->_aliases['civicrm_activity']}.is_test = 0
+        )
+HERESQL;
+      }
 
-                 ORDER BY {$this->_aliases['civicrm_activity']}.activity_date_time desc  ";
-
+      $sql = implode(' UNION ', $unionParts) . ' ORDER BY date_time_for_sort DESC';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         foreach ($this->_columnHeadersComponent[$val] as $key => $value) {
@@ -768,7 +791,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
    * @return array
    */
   public function statistics(&$rows) {
-    $statistics = array();
+    $statistics = [];
 
     $count = count($rows);
     if ($this->_rollup && ($this->_rollup != '')) {
@@ -806,7 +829,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
 
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = $this->_contactSelected = array();
+    $rows = $graphRows = $this->_contactSelected = [];
     $this->buildRows($sql, $rows);
     foreach ($rows as $key => $val) {
       $rows[$key]['contactID'] = $val['civicrm_contact_id'];
@@ -867,34 +890,14 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Summary for this Contact');
+        $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts('View Contact Record');
         $entryFound = TRUE;
       }
 
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
-      }
+      // Handle ID to label conversion for contact fields
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
 
-      // display birthday in the configured custom format
-      if (array_key_exists('civicrm_contact_birth_date', $row)) {
-        $birthDate = $row['civicrm_contact_birth_date'];
-        if ($birthDate) {
-          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
-        }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_address_state_province_id', $row)) {
-        if ($value = $row['civicrm_address_state_province_id']) {
-          $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        }
-        $entryFound = TRUE;
-      }
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
@@ -923,7 +926,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             }
 
             if ($val = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
-              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($val);
+              $componentRows[$contactID][$component][$rowNum]['civicrm_contribution_contribution_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($val, 'label');
             }
             $entryFound = TRUE;
           }
@@ -956,7 +959,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             }
             if ($val = CRM_Utils_Array::value('civicrm_participant_role_id', $row)) {
               $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $val);
-              $value = array();
+              $value = [];
               foreach ($roles as $role) {
                 $value[$role] = CRM_Event_PseudoConstant::participantRole($role, FALSE);
               }

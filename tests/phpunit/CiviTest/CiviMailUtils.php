@@ -1,26 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -43,15 +28,17 @@
 /**
  * Class CiviMailUtils
  */
-class CiviMailUtils extends PHPUnit_Framework_TestCase {
+class CiviMailUtils extends PHPUnit\Framework\TestCase {
 
   /**
-   * @var mixed current outbound email option
+   * Current outbound email option
+   * @var mixed
    */
   protected $_outBound_option = NULL;
 
   /**
-   * @var bool is this a webtest
+   * Is this a webtest
+   * @var bool
    */
   protected $_webtest = FALSE;
 
@@ -165,7 +152,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       if ($dao->fetch()) {
         $msg = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {
@@ -184,21 +170,19 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * @param string $type
    *   'raw'|'ezc'.
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
+   *
    * @return array(ezcMail)|array(string)
    */
   public function getAllMessages($type = 'raw') {
-    $msgs = array();
+    $msgs = [];
 
     if ($this->_webtest) {
-      throw new Exception("Not implementated: getAllMessages for WebTest");
+      throw new CRM_Core_Exception('Not implemented: getAllMessages for WebTest');
     }
-    else {
-      $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
-      while ($dao->fetch()) {
-        $msgs[] = $dao->headers . "\n\n" . $dao->body;
-      }
-      $dao->free();
+    $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
+    while ($dao->fetch()) {
+      $msgs[] = $dao->headers . "\n\n" . $dao->body;
     }
 
     switch ($type) {
@@ -249,7 +233,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    *
    * @return \ezcMail|string
    */
-  public function checkMailLog($strings, $absentStrings = array(), $prefix = '') {
+  public function checkMailLog($strings, $absentStrings = [], $prefix = '') {
     $mail = $this->getMostRecentEmail('raw');
     return $this->checkMailForStrings($strings, $absentStrings, $prefix, $mail);
   }
@@ -265,7 +249,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    *
    * @return \ezcMail|string
    */
-  public function checkAllMailLog($strings, $absentStrings = array(), $prefix = '') {
+  public function checkAllMailLog($strings, $absentStrings = [], $prefix = '') {
     $mails = $this->getAllMessages('raw');
     $mail = implode(',', $mails);
     return $this->checkMailForStrings($strings, $absentStrings, $prefix, $mail);
@@ -287,7 +271,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    *   Array($msgPos => array($recipPos => $emailAddr)).
    */
   public function assertRecipients($expectedRecipients) {
-    $recipients = array();
+    $recipients = [];
     foreach ($this->getAllMessages('ezc') as $message) {
       $recipients[] = CRM_Utils_Array::collect('email', $message->to);
     }
@@ -313,7 +297,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    *   Array(string $subj).
    */
   public function assertSubjects($expectedSubjects) {
-    $subjects = array();
+    $subjects = [];
     foreach ($this->getAllMessages('ezc') as $message) {
       /** @var ezcMail $message */
       $subjects[] = $message->subject;
@@ -331,15 +315,20 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
    * Remove any sent messages from the log.
    *
    * @param int $limit
+   *  How many recent messages to remove, defaults to 0 (all).
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
-  public function clearMessages($limit = 1) {
+  public function clearMessages($limit = 0) {
     if ($this->_webtest) {
-      throw new Exception("Not implementated: clearMessages for WebTest");
+      throw new \CRM_Core_Exception("Not implemented: clearMessages for WebTest");
     }
     else {
-      CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_spool ORDER BY id DESC LIMIT ' . $limit);
+      $sql = 'DELETE FROM civicrm_mailing_spool ORDER BY id DESC';
+      if ($limit) {
+        $sql .= ' LIMIT ' . $limit;
+      }
+      CRM_Core_DAO::executeQuery($sql);
     }
   }
 
@@ -368,7 +357,7 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       $this->_ut->assertContains($string, $mail, "$string .  not found in  $mail  $prefix");
     }
     foreach ($absentStrings as $string) {
-      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");;
+      $this->_ut->assertEmpty(strstr($mail, $string), "$string  incorrectly found in $mail $prefix");
     }
     return $mail;
   }

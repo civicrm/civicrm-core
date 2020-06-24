@@ -1,33 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 namespace Civi\API\Subscriber;
 
 use Civi\API\Events;
+use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -51,11 +36,11 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_EARLY),
-      ),
-    );
+    return [
+      'civi.api.authorize' => [
+        ['onApiAuthorize', Events::W_EARLY],
+      ],
+    ];
   }
 
   /**
@@ -66,17 +51,21 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   public $kernel;
 
   /**
-   * @var string, the entity for which we want to manage permissions
+   * The entity for which we want to manage permissions.
+   *
+   * @var string
    */
   protected $entityName;
 
   /**
-   * @var array <string> the actions for which we want to manage permissions
+   * The actions for which we want to manage permissions
+   *
+   * @var string[]
    */
   protected $actions;
 
   /**
-   * @var string, SQL. Given a file ID, determine the entity+table it's attached to.
+   * SQL SELECT query - Given a file ID, determine the entity+table it's attached to.
    *
    * ex: "SELECT if(cf.id,1,0) as is_valid, cef.entity_table, cef.entity_id
    * FROM civicrm_file cf
@@ -88,14 +77,18 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    *  - is_valid: "1" if %1 identifies an actual record; otherwise "0"
    *  - entity_table: NULL or the name of a related table
    *  - entity_id: NULL or the ID of a row in the related table
+   *
+   * @var string
    */
   protected $lookupDelegateSql;
 
   /**
-   * @var string, SQL. Get a list of (field_name, table_name, extends) tuples.
+   * SQL SELECT query. Get a list of (field_name, table_name, extends) tuples.
    *
    * For example, one tuple might be ("custom_123", "civicrm_value_mygroup_4",
    * "Activity").
+   *
+   * @var string
    */
   protected $lookupCustomFieldSql;
 
@@ -107,7 +100,9 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
   protected $lookupCustomFieldCache;
 
   /**
-   * @var array list of related tables for which FKs are allowed
+   * List of related tables for which FKs are allowed.
+   *
+   * @var array
    */
   protected $allowedDelegates;
 
@@ -129,7 +124,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function __construct($kernel, $entityName, $actions, $lookupDelegateSql, $lookupCustomFieldSql, $allowedDelegates = NULL) {
     $this->kernel = $kernel;
-    $this->entityName = \CRM_Utils_String::convertStringToCamel($entityName);
+    $this->entityName = AllCoreTables::convertEntityNameToCamel($entityName, TRUE);
     $this->actions = $actions;
     $this->lookupDelegateSql = $lookupDelegateSql;
     $this->lookupCustomFieldSql = $lookupCustomFieldSql;
@@ -144,9 +139,9 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
-    if ($apiRequest['version'] == 3 && \CRM_Utils_String::convertStringToCamel($apiRequest['entity']) == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
+    if ($apiRequest['version'] == 3 && AllCoreTables::convertEntityNameToCamel($apiRequest['entity'], TRUE) == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
       if (isset($apiRequest['params']['field_name'])) {
-        $fldIdx = \CRM_Utils_Array::index(array('field_name'), $this->getCustomFields());
+        $fldIdx = \CRM_Utils_Array::index(['field_name'], $this->getCustomFields());
         if (empty($fldIdx[$apiRequest['params']['field_name']])) {
           throw new \Exception("Failed to map custom field to entity table");
         }
@@ -179,6 +174,9 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       }
 
       if (isset($apiRequest['params']['entity_table'])) {
+        if (!\CRM_Core_DAO_AllCoreTables::isCoreTable($apiRequest['params']['entity_table'])) {
+          throw new \API_Exception("Unrecognized target entity table {$apiRequest['params']['entity_table']}");
+        }
         $this->authorizeDelegate(
           $apiRequest['action'],
           $apiRequest['params']['entity_table'],
@@ -197,14 +195,19 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    *   The API action (e.g. "create").
    * @param string $entityTable
    *   The target entity table (e.g. "civicrm_mailing").
-   * @param int|NULL $entityId
+   * @param int|null $entityId
    *   The target entity ID.
    * @param array $apiRequest
    *   The full API request.
+   * @throws \Exception
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function authorizeDelegate($action, $entityTable, $entityId, $apiRequest) {
+    if ($this->isTrusted($apiRequest)) {
+      return;
+    }
+
     $entity = $this->getDelegatedEntityName($entityTable);
     if (!$entity) {
       throw new \API_Exception("Failed to run permission check: Unrecognized target entity table ($entityTable)");
@@ -213,29 +216,26 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       throw new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity): Missing entity_id");
     }
 
-    if ($this->isTrusted($apiRequest)) {
-      return;
-    }
-
     /**
      * @var \Exception $exception
      */
     $exception = NULL;
     $self = $this;
     \CRM_Core_Transaction::create(TRUE)->run(function($tx) use ($entity, $action, $entityId, &$exception, $self) {
-      $tx->rollback(); // Just to be safe.
+      // Just to be safe.
+      $tx->rollback();
 
-      $params = array(
+      $params = [
         'version' => 3,
         'check_permissions' => 1,
         'id' => $entityId,
-      );
+      ];
 
-      $result = $self->kernel->run($entity, $self->getDelegatedAction($action), $params);
+      $result = $self->kernel->runSafe($entity, $self->getDelegatedAction($action), $params);
       if ($result['is_error'] || empty($result['values'])) {
-        $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", array(
+        $exception = new \Civi\API\Exception\UnauthorizedException("Authorization failed on ($entity,$entityId)", [
           'cause' => $result,
-        ));
+        ]);
       }
     });
 
@@ -321,25 +321,25 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    * @throws \Exception
    */
   public function getDelegate($id) {
-    $query = \CRM_Core_DAO::executeQuery($this->lookupDelegateSql, array(
-      1 => array($id, 'Positive'),
-    ));
+    $query = \CRM_Core_DAO::executeQuery($this->lookupDelegateSql, [
+      1 => [$id, 'Positive'],
+    ]);
     if ($query->fetch()) {
       if (!preg_match('/^civicrm_value_/', $query->entity_table)) {
         // A normal attachment directly on its entity.
-        return array($query->is_valid, $query->entity_table, $query->entity_id);
+        return [$query->is_valid, $query->entity_table, $query->entity_id];
       }
 
       // Ex: Translate custom-field table ("civicrm_value_foo_4") to
       // entity table ("civicrm_activity").
-      $tblIdx = \CRM_Utils_Array::index(array('table_name'), $this->getCustomFields());
+      $tblIdx = \CRM_Utils_Array::index(['table_name'], $this->getCustomFields());
       if (isset($tblIdx[$query->entity_table])) {
-        return array($query->is_valid, $tblIdx[$query->entity_table]['entity_table'], $query->entity_id);
+        return [$query->is_valid, $tblIdx[$query->entity_table]['entity_table'], $query->entity_id];
       }
       throw new \Exception('Failed to lookup entity table for custom field.');
     }
     else {
-      return array(FALSE, NULL, NULL);
+      return [FALSE, NULL, NULL];
     }
   }
 
@@ -359,14 +359,14 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function getCustomFields() {
     $query = \CRM_Core_DAO::executeQuery($this->lookupCustomFieldSql);
-    $rows = array();
+    $rows = [];
     while ($query->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'field_name' => $query->field_name,
         'table_name' => $query->table_name,
         'extends' => $query->extends,
         'entity_table' => \CRM_Core_BAO_CustomGroup::getTableNameByEntityName($query->extends),
-      );
+      ];
     }
     return $rows;
   }

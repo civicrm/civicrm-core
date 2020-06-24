@@ -5,6 +5,7 @@
   <name>civicrm_persistent</name>
   <comment>DB Template Customization strings</comment>
   <add>3.2</add>
+  <drop>5.20</drop>
   <field>
     <name>id</name>
     <title>Persistent ID</title>

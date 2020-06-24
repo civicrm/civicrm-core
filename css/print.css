@@ -124,3 +124,8 @@ table.form-layout td, table.form-layout th {
     font-style       : italic;
     float            : right;
 }
+
+/* Fix for CRM-19869 */
+tr {
+    page-break-inside: avoid;
+}

@@ -37,7 +37,6 @@
     <name>contact_id</name>
     <title>Contact ID</title>
     <type>int unsigned</type>
-    <uniqueName>case_contact_id</uniqueName>
     <required>true</required>
     <comment>Contact ID of contact record given case belongs to.</comment>
     <html>
@@ -56,6 +55,7 @@
     <name>UI_case_contact_id</name>
     <fieldName>case_id</fieldName>
     <fieldName>contact_id</fieldName>
+    <unique>true</unique>
     <add>2.1</add>
   </index>
 </table>

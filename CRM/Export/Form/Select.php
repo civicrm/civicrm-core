@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -36,7 +20,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Export_Form_Select extends CRM_Core_Form {
+class CRM_Export_Form_Select extends CRM_Core_Form_Task {
 
   /**
    * Various Contact types.
@@ -78,6 +62,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    $this->preventAjaxSubmit();
+
     //special case for custom search, directly give option to download csv file
     $customSearchID = $this->get('customSearchID');
     if ($customSearchID) {
@@ -89,8 +75,70 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
 
     $this->_selectAll = FALSE;
     $this->_exportMode = self::CONTACT_EXPORT;
-    $this->_componentIds = array();
+    $this->_componentIds = [];
     $this->_componentClause = NULL;
+
+    // we need to determine component export
+    $components = CRM_Export_BAO_Export::getComponents();
+
+    // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
+    // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
+    switch ($this->getQueryMode()) {
+      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
+        $entityShortname = 'Contribute';
+        $entityDAOName = $entityShortname;
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_MEMBER:
+        $entityShortname = 'Member';
+        $entityDAOName = 'Membership';
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_EVENT:
+        $entityShortname = 'Event';
+        $entityDAOName = $entityShortname;
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_PLEDGE:
+        $entityShortname = 'Pledge';
+        $entityDAOName = $entityShortname;
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_CASE:
+        $entityShortname = 'Case';
+        $entityDAOName = $entityShortname;
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_GRANT:
+        $entityShortname = 'Grant';
+        $entityDAOName = $entityShortname;
+        break;
+
+      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
+        $entityShortname = 'Activity';
+        $entityDAOName = $entityShortname;
+        break;
+
+      default:
+        $entityShortname = $this->getComponentName();
+        $entityDAOName = $this->controller->get('entity') ?? $entityShortname;
+    }
+
+    if (in_array($entityShortname, $components)) {
+      $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
+      $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
+      $taskClassName = "CRM_{$entityShortname}_Task";
+      if (isset($formTaskClassName::$entityShortname)) {
+        $this::$entityShortname = $formTaskClassName::$entityShortname;
+        if (isset($formTaskClassName::$tableName)) {
+          $this::$tableName = $formTaskClassName::$tableName;
+        }
+      }
+      else {
+        $this::$entityShortname = $entityShortname;
+        $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entityDAOName));
+      }
+    }
 
     // get the submitted values based on search
     if ($this->_action == CRM_Core_Action::ADVANCED) {
@@ -103,46 +151,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       $values = $this->controller->exportValues('Custom');
     }
     else {
-      // we need to determine component export
-      $stateMachine = $this->controller->getStateMachine();
-
-      $formName = CRM_Utils_System::getClassName($stateMachine);
-      $componentName = explode('_', $formName);
-      $components = array('Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
-
-      if (in_array($componentName[1], $components)) {
-        switch ($componentName[1]) {
-          case 'Contribute':
-            $this->_exportMode = self::CONTRIBUTE_EXPORT;
-            break;
-
-          case 'Member':
-            $this->_exportMode = self::MEMBER_EXPORT;
-            break;
-
-          case 'Event':
-            $this->_exportMode = self::EVENT_EXPORT;
-            break;
-
-          case 'Pledge':
-            $this->_exportMode = self::PLEDGE_EXPORT;
-            break;
-
-          case 'Case':
-            $this->_exportMode = self::CASE_EXPORT;
-            break;
-
-          case 'Grant':
-            $this->_exportMode = self::GRANT_EXPORT;
-            break;
-
-          case 'Activity':
-            $this->_exportMode = self::ACTIVITY_EXPORT;
-            break;
-        }
-
-        $className = "CRM_{$componentName[1]}_Form_Task";
-        $className::preProcessCommon($this, TRUE);
+      if (in_array($entityShortname, $components) && $entityShortname !== 'Contact') {
         $values = $this->controller->exportValues('Search');
       }
       else {
@@ -164,53 +173,17 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
       }
     }
 
-    $componentMode = $this->get('component_mode');
-    switch ($componentMode) {
-      case 2:
-        CRM_Contribute_Form_Task::preProcessCommon($this, TRUE);
-        $this->_exportMode = self::CONTRIBUTE_EXPORT;
-        $componentName = array('', 'Contribute');
-        break;
+    $formTaskClassName::preProcessCommon($this);
 
-      case 3:
-        CRM_Event_Form_Task::preProcessCommon($this, TRUE);
-        $this->_exportMode = self::EVENT_EXPORT;
-        $componentName = array('', 'Event');
-        break;
+    // $component is used on CRM/Export/Form/Select.tpl to display extra information for contact export
+    ($this->_exportMode == self::CONTACT_EXPORT) ? $component = FALSE : $component = TRUE;
+    $this->assign('component', $component);
 
-      case 4:
-        CRM_Activity_Form_Task::preProcessCommon($this, TRUE);
-        $this->_exportMode = self::ACTIVITY_EXPORT;
-        $componentName = array('', 'Activity');
-        break;
-
-      case 5:
-        CRM_Member_Form_Task::preProcessCommon($this, TRUE);
-        $this->_exportMode = self::MEMBER_EXPORT;
-        $componentName = array('', 'Member');
-        break;
-
-      case 6:
-        CRM_Case_Form_Task::preProcessCommon($this, TRUE);
-        $this->_exportMode = self::CASE_EXPORT;
-        $componentName = array('', 'Case');
-        break;
-    }
-
+    // Set the task title
+    $componentTasks = $taskClassName::taskTitles();
     $this->_task = $values['task'];
-    if ($this->_exportMode == self::CONTACT_EXPORT) {
-      $contactTasks = CRM_Contact_Task::taskTitles();
-      $taskName = $contactTasks[$this->_task];
-      $component = FALSE;
-      CRM_Contact_Form_Task::preProcessCommon($this, TRUE);
-    }
-    else {
-      $this->assign('taskName', "Export $componentName[1]");
-      $className = "CRM_{$componentName[1]}_Task";
-      $componentTasks = $className::tasks();
-      $taskName = $componentTasks[$this->_task];
-      $component = TRUE;
-    }
+    $taskName = $componentTasks[$this->_task];
+    $this->assign('taskName', $taskName);
 
     if ($this->_componentTable) {
       $query = "
@@ -223,8 +196,7 @@ FROM   {$this->_componentTable}
       $totalSelectedRecords = count($this->_componentIds);
     }
     $this->assign('totalSelectedRecords', $totalSelectedRecords);
-    $this->assign('taskName', $taskName);
-    $this->assign('component', $component);
+
     // all records actions = save a search
     if (($values['radio_ts'] == 'ts_all') || ($this->_task == CRM_Contact_Task::SAVE_SEARCH)) {
       $this->_selectAll = TRUE;
@@ -250,37 +222,37 @@ FROM   {$this->_componentTable}
    */
   public function buildQuickForm() {
     //export option
-    $exportOptions = $mergeOptions = $postalMailing = array();
+    $exportOptions = $mergeOptions = $postalMailing = [];
     $exportOptions[] = $this->createElement('radio',
       NULL, NULL,
       ts('Export PRIMARY fields'),
       self::EXPORT_ALL,
-      array('onClick' => 'showMappingOption( );')
+      ['onClick' => 'showMappingOption( );']
     );
     $exportOptions[] = $this->createElement('radio',
       NULL, NULL,
       ts('Select fields for export'),
       self::EXPORT_SELECTED,
-      array('onClick' => 'showMappingOption( );')
+      ['onClick' => 'showMappingOption( );']
     );
 
     $mergeOptions[] = $this->createElement('radio',
       NULL, NULL,
       ts('Do not merge'),
       self::EXPORT_MERGE_DO_NOT_MERGE,
-      array('onclick' => 'showGreetingOptions( );')
+      ['onclick' => 'showGreetingOptions( );']
     );
     $mergeOptions[] = $this->createElement('radio',
       NULL, NULL,
       ts('Merge All Contacts with the Same Address'),
       self::EXPORT_MERGE_SAME_ADDRESS,
-      array('onclick' => 'showGreetingOptions( );')
+      ['onclick' => 'showGreetingOptions( );']
     );
     $mergeOptions[] = $this->createElement('radio',
       NULL, NULL,
       ts('Merge Household Members into their Households'),
       self::EXPORT_MERGE_HOUSEHOLD,
-      array('onclick' => 'showGreetingOptions( );')
+      ['onclick' => 'showGreetingOptions( );']
     );
 
     $postalMailing[] = $this->createElement('advcheckbox',
@@ -295,9 +267,9 @@ FROM   {$this->_componentTable}
       $this->_greetingOptions = self::getGreetingOptions();
 
       foreach ($this->_greetingOptions as $key => $value) {
-        $fieldLabel = ts('%1 (merging > 2 contacts)', array(1 => ucwords(str_replace('_', ' ', $key))));
+        $fieldLabel = ts('%1 (when merging contacts)', [1 => ucwords(str_replace('_', ' ', $key))]);
         $this->addElement('select', $key, $fieldLabel,
-          $value, array('onchange' => "showOther(this);")
+          $value, ['onchange' => "showOther(this);"]
         );
         $this->addElement('text', "{$key}_other", '');
       }
@@ -308,33 +280,32 @@ FROM   {$this->_componentTable}
       $this->addGroup($postalMailing, 'postal_mailing_export', ts('Postal Mailing Export'), '<br/>');
 
       $this->addElement('select', 'additional_group', ts('Additional Group for Export'),
-        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(),
-        array('class' => 'crm-select2 huge')
+        ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(),
+        ['class' => 'crm-select2 huge']
       );
     }
 
     $this->buildMapping();
 
-    $this->setDefaults(array(
+    $this->setDefaults([
       'exportOption' => self::EXPORT_ALL,
       'mergeOption' => self::EXPORT_MERGE_DO_NOT_MERGE,
-    ));
+    ]);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Continue'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Continue'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
-    $this->addFormRule(array('CRM_Export_Form_Select', 'formRule'), $this);
+    $this->addFormRule(['CRM_Export_Form_Select', 'formRule'], $this);
   }
 
   /**
@@ -349,24 +320,24 @@ FROM   {$this->_componentTable}
    * @return bool|array
    *   mixed true or array of errors
    */
-  static public function formRule($params, $files, $self) {
-    $errors = array();
+  public static function formRule($params, $files, $self) {
+    $errors = [];
 
     if (CRM_Utils_Array::value('mergeOption', $params) == self::EXPORT_MERGE_SAME_ADDRESS &&
       $self->_matchingContacts
     ) {
-      $greetings = array(
+      $greetings = [
         'postal_greeting' => 'postal_greeting_other',
         'addressee' => 'addressee_other',
-      );
+      ];
 
       foreach ($greetings as $key => $value) {
-        $otherOption = CRM_Utils_Array::value($key, $params);
+        $otherOption = $params[$key] ?? NULL;
 
         if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
 
           $label = ucwords(str_replace('_', ' ', $key));
-          $errors[$value] = ts('Please enter a value for %1 (merging > 2 contacts), or select a pre-configured option from the list.', array(1 => $label));
+          $errors[$value] = ts('Please enter a value for %1 (when merging contacts), or select a pre-configured option from the list.', [1 => $label]);
         }
       }
     }
@@ -377,7 +348,7 @@ FROM   {$this->_componentTable}
   /**
    * Process the uploaded file.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -393,23 +364,7 @@ FROM   {$this->_componentTable}
     // all submitted options or any other argument
     $exportParams = $params;
 
-    if (!empty($this->_greetingOptions)) {
-      foreach ($this->_greetingOptions as $key => $value) {
-        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
-          if ($this->_greetingOptions[$key][$option] == ts('Other')) {
-            $exportParams[$key] = $exportParams["{$key}_other"];
-          }
-          elseif ($this->_greetingOptions[$key][$option] == ts('List of names')) {
-            $exportParams[$key] = '';
-          }
-          else {
-            $exportParams[$key] = $this->_greetingOptions[$key][$option];
-          }
-        }
-      }
-    }
-
-    $mappingId = CRM_Utils_Array::value('mapping', $params);
+    $mappingId = $params['mapping'] ?? NULL;
     if ($mappingId) {
       $this->set('mappingId', $mappingId);
     }
@@ -420,7 +375,7 @@ FROM   {$this->_componentTable}
     if ($exportOption == self::EXPORT_ALL) {
       CRM_Export_BAO_Export::exportComponents($this->_selectAll,
         $this->_componentIds,
-        $this->get('queryParams'),
+        (array) $this->get('queryParams'),
         $this->get(CRM_Utils_Sort::SORT_ORDER),
         NULL,
         $this->get('returnProperties'),
@@ -485,12 +440,11 @@ FROM   {$this->_componentTable}
         break;
     }
 
-    $mappingTypeId = CRM_Core_OptionGroup::getValue('mapping_type', $exportType, 'name');
-    $this->set('mappingTypeId', $mappingTypeId);
+    $this->set('mappingTypeId', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $exportType));
 
-    $mappings = CRM_Core_BAO_Mapping::getMappings($mappingTypeId);
+    $mappings = CRM_Core_BAO_Mapping::getMappings($exportType, TRUE);
     if (!empty($mappings)) {
-      $this->add('select', 'mapping', ts('Use Saved Field Mapping'), array('' => '-select-') + $mappings);
+      $this->add('select2', 'mapping', ts('Use Saved Field Mapping'), $mappings, FALSE, ['placeholder' => ts('- select -')]);
     }
   }
 
@@ -498,22 +452,22 @@ FROM   {$this->_componentTable}
    * @return array
    */
   public static function getGreetingOptions() {
-    $options = array();
-    $greetings = array(
+    $options = [];
+    $greetings = [
       'postal_greeting' => 'postal_greeting_other',
       'addressee' => 'addressee_other',
-    );
+    ];
 
     foreach ($greetings as $key => $value) {
-      $params = array();
+      $params = [];
       $optionGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $key, 'id', 'name');
 
       CRM_Core_DAO::commonRetrieveAll('CRM_Core_DAO_OptionValue', 'option_group_id', $optionGroupId,
-        $params, array('label', 'filter')
+        $params, ['label', 'filter']
       );
 
       $greetingCount = 1;
-      $options[$key] = array("$greetingCount" => ts('List of names'));
+      $options[$key] = ["$greetingCount" => ts('List of names')];
 
       foreach ($params as $id => $field) {
         if (CRM_Utils_Array::value('filter', $field) == 4) {
@@ -525,6 +479,31 @@ FROM   {$this->_componentTable}
     }
 
     return $options;
+  }
+
+  /**
+   * Get the query mode (eg. CRM_Contact_BAO_Query::MODE_CASE)
+   *
+   * @return int
+   */
+  public function getQueryMode() {
+    return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
+  }
+
+  /**
+   * Get the name of the component.
+   *
+   * @return array
+   */
+  protected function getComponentName(): string {
+    // CRM_Export_Controller_Standalone has this method
+    if (method_exists($this->controller, 'getComponent')) {
+      return $this->controller->getComponent();
+    }
+    // For others, just guess based on the name of the controller
+    $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
+    $componentName = explode('_', $formName);
+    return $componentName[1];
   }
 
 }

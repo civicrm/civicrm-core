@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -58,25 +42,25 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
-    $form->addField("phone[$blockId][phone_type_id]", array(
+    $form->addField("phone[$blockId][phone_type_id]", [
       'entity' => 'phone',
       'class' => 'eight',
       'placeholder' => NULL,
-    ));
+    ]);
     //main phone number with crm_phone class
-    $form->addField("phone[$blockId][phone]", array('entity' => 'phone', 'class' => 'crm_phone twelve'));
-    $form->addField("phone[$blockId][phone_ext]", array('entity' => 'phone'));
+    $form->addField("phone[$blockId][phone]", ['entity' => 'phone', 'class' => 'crm_phone twelve', 'aria-label' => ts('Phone %1', [1 => $blockId])]);
+    $form->addField("phone[$blockId][phone_ext]", ['entity' => 'phone', 'aria-label' => ts('Phone Extension %1', [1 => $blockId])]);
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
-      $form->addField("phone[$blockId][location_type_id]", array(
+      $form->addField("phone[$blockId][location_type_id]", [
         'entity' => 'phone',
-          'class' => 'eight',
-          'placeholder' => NULL,
-          'option_url' => NULL,
-        ));
+        'class' => 'eight',
+        'placeholder' => NULL,
+        'option_url' => NULL,
+      ]);
 
       //is_Primary radio
-      $js = array('id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
+      $js = ['id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );', 'aria-label' => ts('Phone %1 is primary?', [1 => $blockId])];
       $form->addElement('radio', "phone[$blockId][is_primary]", '', '', '1', $js);
     }
     // TODO: set this up as a group, we need a valid phone_type_id if we have a  phone number

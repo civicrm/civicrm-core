@@ -109,6 +109,12 @@ Download the latest version and copy the font files from the lib/fonts directori
 EOREADME
 }
 
+## usage: simple_replace <filename> <old-string> <new-string>
+## This is a bit like 'sed -i', but dumber and more cross-platform.
+function simple_replace() {
+  php -r 'file_put_contents($argv[1], str_replace($argv[2], $argv[3], file_get_contents($argv[1])));' "$@"
+}
+
 ##############################################################################
 ## Remove example/CLI scripts. They're not needed and increase the attack-surface.
 safe_delete vendor/dompdf/dompdf/dompdf.php
@@ -120,3 +126,6 @@ safe_delete vendor/phenx/php-font-lib/www
 safe_delete vendor/dompdf/dompdf/lib/fonts/DejaVu*
 make_font_cache > vendor/dompdf/dompdf/lib/fonts/dompdf_font_family_cache.dist.php
 make_font_readme > vendor/dompdf/dompdf/lib/fonts/README.DejaVuFonts.txt
+
+# Remove debug_print_backtrace(), which can leak system details. Put backtrace in log.
+simple_replace vendor/dompdf/dompdf/lib/html5lib/TreeBuilder.php 'debug_print_backtrace();' 'CRM_Core_Error::backtrace("backTrace", TRUE);'

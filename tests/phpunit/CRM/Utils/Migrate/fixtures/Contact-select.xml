@@ -16,6 +16,7 @@
       <is_multiple>0</is_multiple>
       <collapse_adv_display>0</collapse_adv_display>
       <is_reserved>0</is_reserved>
+      <is_public>1</is_public>
     </CustomGroup>
   </CustomGroups>
   <CustomFields>

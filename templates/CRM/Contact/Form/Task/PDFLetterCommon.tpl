@@ -1,52 +1,43 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {*common template for compose PDF letters*}
 {if $form.template.html}
 <table class="form-layout-compressed">
     <tr>
-      <td class="label-left">{$form.template.label}</td>
-      <td>{$form.template.html}</td>
+      <td class="label-left">
+        {$form.template.label}
+        {help id="template" title=$form.template.label file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+      </td>
+      <td>
+        {$form.template.html} {ts}OR{/ts} {$form.document_file.html}
+      </td>
     </tr>
     <tr>
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
+    {if $form.campaign_id}
     <tr>
       <td class="label-left">{$form.campaign_id.label}</td>
       <td>{$form.campaign_id.html}</td>
     </tr>
+    {/if}
 </table>
 {/if}
 
-<div class="crm-accordion-wrapper collapsed">
+<div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
     <div class="crm-accordion-header">
         {$form.pdf_format_header.html}
     </div>
     <div class="crm-accordion-body">
-      <div class="crm-block crm-form-block crm-pdf-format-form-block">
+      <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
       <tr>
         <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
@@ -85,6 +76,15 @@
   </div>
 </div>
 
+<div class="crm-accordion-wrapper crm-document-accordion ">
+  <div class="crm-accordion-header">
+    {ts}Preview Document{/ts}
+  </div><!-- /.crm-accordion-header -->
+  <div class="crm-accordion-body">
+    <div id='document-preview'></div>
+  </div><!-- /.crm-accordion-body -->
+</div><!-- /.crm-accordion-wrapper -->
+
 <div class="crm-accordion-wrapper crm-html_email-accordion ">
 <div class="crm-accordion-header">
     {$form.html_message.label}
@@ -116,12 +116,32 @@
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
+<table class="form-layout-compressed">
+  <tr>
+    <td class="label-left">{$form.document_type.label}</td>
+    <td>{$form.document_type.html}</td>
+  </tr>
+</table>
+
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
   var $form = $('form.{/literal}{$form.formClass}{literal}');
+
+  {/literal}{if $form.formName eq 'PDF'}{literal}
+    $('.crm-document-accordion').hide();
+    $('#document_file').on('change', function() {
+      if (this.value) {
+        $('.crm-html_email-accordion, .crm-document-accordion, .crm-pdf-format-accordion').hide();
+        cj('#document_type').closest('tr').hide();
+        $('#template').val('');
+      }
+    });
+  {/literal}{/if}{literal}
+
+
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
   });
@@ -211,15 +231,12 @@ function selectFormat( val, bind ) {
   if (!val) {
     val = 0;
     bind = false;
-    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
-    cj.post( dataUrl, {formatId: val}, function( data ) {
-      fillFormatInfo(data, bind);
-      }, 'json');
   }
-  else {
-    data=JSON.parse(val);
+
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0 }"{literal};
+  cj.post( dataUrl, {formatId: val}, function( data ) {
     fillFormatInfo(data, bind);
-  }
+  }, 'json');
 }
 
 function selectPaper( val )

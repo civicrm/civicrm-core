@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Search form and results for voters *}
@@ -30,9 +14,8 @@
 {if $searchVoterFor}
   {assign var='searchForm' value="search_form_$searchVoterFor"}
 {/if}
-
   <div id="{$searchForm}" class="crm-accordion-wrapper crm-contribution_search_form-accordion {if $rows}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+    <div class="crm-accordion-header {if !$votingTab} crm-master-accordion-header{/if}">
     {ts}Edit Search Criteria{/ts}
     </div><!-- /.crm-accordion-header -->
 
@@ -61,16 +44,25 @@
           <td class="font-size12pt">
             {$form.sort_name.label}
           </td>
-          <td>
+          <td colspan="3">
             {$form.sort_name.html|crmAddClass:'twenty'}
           </td>
-          <td><label>{ts}Contact Type(s){/ts}</label><br />
+        </tr>
+        <tr>
+          <td>
+            <label>{ts}Contact Type(s){/ts}</label>
+          </td>
+          <td>
             {$form.contact_type.html}
           </td>
-          <td><label>{ts}Group(s){/ts}</label>
+          <td>
+            <label>{ts}Group(s){/ts}</label>
+          </td>
+          <td >
             {$form.group.html}
           </td>
         </tr>
+
         <tr>
           <td class="font-size12pt">
             {$form.street_address.label}

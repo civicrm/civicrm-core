@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,7 +20,7 @@
  *
  * FIXME: Add TTL support?
  *
- * @code
+ * ```
  * $signer = new CRM_Utils_Signer('myprivatekey', array('param1','param2'));
  * $params = array(
  *   'param1' => 'hello',
@@ -45,7 +29,7 @@
  * $token = $signer->sign($params);
  * ...
  * assertTrue($signer->validate($token, $params));
- * @endcode
+ * ```
  */
 class CRM_Utils_Signer {
   /**
@@ -64,10 +48,12 @@ class CRM_Utils_Signer {
    *   Array, fields which should be part of the signature.
    */
   public function __construct($secret, $paramNames) {
-    sort($paramNames); // ensure consistent serialization of payloads
+    // ensure consistent serialization of payloads
+    sort($paramNames);
     $this->secret = $secret;
     $this->paramNames = $paramNames;
-    $this->signDelim = "_"; // chosen to be valid in URLs but not in salt or md5
+    // chosen to be valid in URLs but not in salt or md5
+    $this->signDelim = "_";
     $this->defaultSalt = CRM_Utils_String::createRandom(self::SALT_LEN, CRM_Utils_String::ALPHANUMERIC);
   }
 
@@ -81,9 +67,9 @@ class CRM_Utils_Signer {
    * @return string, the full public token representing the signature
    */
   public function sign($params, $salt = NULL) {
-    $message = array();
+    $message = [];
     $message['secret'] = $this->secret;
-    $message['payload'] = array();
+    $message['payload'] = [];
     if (empty($salt)) {
       $message['salt'] = $this->createSalt();
     }

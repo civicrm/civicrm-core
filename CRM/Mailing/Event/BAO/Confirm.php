@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Mail/mime.php';
@@ -91,7 +75,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $ce->save();
 
     CRM_Contact_BAO_GroupContact::addContactsToGroup(
-      array($contact_id),
+      [$contact_id],
       $se->group_id,
       'Email',
       'Added',
@@ -111,14 +95,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $group->id = $se->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->is_default = 1;
     $component->is_active = 1;
     $component->component_type = 'Welcome';
 
     $component->find(TRUE);
-
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
     $html = $component->body_html;
 
@@ -140,17 +122,17 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
     $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
 
-    $mailParams = array(
+    $mailParams = [
       'groupName' => 'Mailing Event ' . $component->component_type,
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'toEmail' => $email,
       'toName' => $display_name,
-      'replyTo' => "do-not-reply@$emailDomain",
-      'returnPath' => "do-not-reply@$emailDomain",
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
-    );
+    ];
     // send - ignore errors because the desired status change has already been successful
     $unused_result = CRM_Utils_Mail::send($mailParams);
 

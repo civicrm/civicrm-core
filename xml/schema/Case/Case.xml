@@ -6,6 +6,7 @@
   <comment>This table stores information about cases grouping activities.</comment>
   <add>1.8</add>
   <log>true</log>
+  <icon>fa-folder-open</icon>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -14,6 +15,9 @@
     <import>true</import>
     <title>Case ID</title>
     <comment>Unique Case ID</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -43,6 +47,7 @@
     <import>true</import>
     <export>false</export>
     <title>Case Type</title>
+    <required>true</required>
     <comment>FK to civicrm_case_type.id</comment>
     <html>
       <type>Select</type>
@@ -64,7 +69,6 @@
     <table>civicrm_case_type</table>
     <key>id</key>
     <add>4.5</add>
-    <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
     <name>casetag1_id</name>
@@ -133,6 +137,7 @@
     <comment>Date on which given case starts.</comment>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>1.8</add>
   </field>
@@ -145,6 +150,7 @@
     <comment>Date on which given case ends.</comment>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>1.8</add>
   </field>
@@ -156,7 +162,7 @@
       <rows>8</rows>
       <cols>60</cols>
     </html>
-    <comment>Details about the meeting (agenda, notes, etc).</comment>
+    <comment>Details populated from Open Case. Only used in the CiviCase extension.</comment>
     <add>1.8</add>
   </field>
   <field>
@@ -184,6 +190,9 @@
     <default>0</default>
     <import>true</import>
     <title>Case Deleted</title>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>2.2</add>
   </field>
   <index>
@@ -191,4 +200,24 @@
     <fieldName>is_deleted</fieldName>
     <add>2.2</add>
   </index>
+  <field>
+    <name>created_date</name>
+    <uniqueName>case_created_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the case was created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>NULL</default>
+    <add>4.7</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <uniqueName>case_modified_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the case (or closely related entity) was created or modified or deleted.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>4.7</add>
+  </field>
 </table>

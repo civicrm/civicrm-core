@@ -31,6 +31,10 @@
     <headerPattern>/(finan(cial)?)?type/i</headerPattern>
     <dataPattern>/donation|member|campaign/i</dataPattern>
     <comment>Financial Type Name.</comment>
+    <html>
+      <type>Text</type>
+      <label>Name</label>
+    </html>
     <add>1.3</add>
   </field>
   <field>
@@ -46,6 +50,12 @@
   <field>
     <name>description</name>
     <type>varchar</type>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+      <label>Description</label>
+    </html>
     <length>255</length>
     <comment>Financial Type Description.</comment>
     <add>1.3</add>
@@ -58,6 +68,10 @@
     <default>1</default>
     <comment>Is this financial type tax-deductible? If true, contributions of this type may be fully OR partially deductible - non-deductible amount is stored in the Contribution record.</comment>
     <add>1.3</add>
+    <html>
+      <type>CheckBox</type>
+      <label>Tax-Deductible?</label>
+    </html>
   </field>
   <field>
     <name>is_reserved</name>
@@ -66,6 +80,10 @@
     <length>4</length>
     <comment>Is this a predefined system object?</comment>
     <add>1.3</add>
+    <html>
+      <type>CheckBox</type>
+      <label>Reserved?</label>
+    </html>
   </field>
   <field>
     <name>is_active</name>
@@ -74,6 +92,10 @@
     <length>4</length>
     <comment>Is this property active?</comment>
     <add>1.3</add>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled?</label>
+    </html>
   </field>
   <index>
     <name>UI_id</name>

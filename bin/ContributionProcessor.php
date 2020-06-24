@@ -1,37 +1,21 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CiviContributeProcessor {
-  static $_paypalParamsMapper = array(
+  public static $_paypalParamsMapper = array(
     //category    => array(paypal_param    => civicrm_field);
     'contact' => array(
       'salutation' => 'prefix_id',
@@ -72,10 +56,13 @@ class CiviContributeProcessor {
     ),
   );
 
-  static $_csvParamsMapper = array(
-    // Note: if csv header is not present in the mapper, header itself
-    // is considered as a civicrm field.
-    //category    => array(csv_header      => civicrm_field);
+  /**
+   * Note: if csv header is not present in the mapper, header itself
+   * is considered as a civicrm field.
+   * category    => array(csv_header      => civicrm_field);
+   * @var array
+   */
+  public static $_csvParamsMapper = array(
     'contact' => array(
       'first_name' => 'first_name',
       'last_name' => 'last_name',
@@ -188,10 +175,15 @@ class CiviContributeProcessor {
             $params['transaction']['is_test'] = 0;
           }
 
-          if (self::processAPIContribution($params)) {
-            CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+          try {
+            if (self::processAPIContribution($params)) {
+              CRM_Core_Error::debug_log_message("Processed - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+            }
+            else {
+              CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
+            }
           }
-          else {
+          catch (CiviCRM_API3_Exception $e) {
             CRM_Core_Error::debug_log_message("Skipped - {$trxnDetails['email']}, {$trxnDetails['amt']}, {$value} ..<p>", TRUE);
           }
         }
@@ -212,7 +204,7 @@ class CiviContributeProcessor {
 
     $handle = fopen($csvFile, "r");
     if (!$handle) {
-      CRM_Core_Error::fatal("Can't locate csv file.");
+      throw new CRM_Core_Exception("Can't locate csv file.");
     }
 
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
@@ -239,7 +231,7 @@ class CiviContributeProcessor {
         CRM_Core_Error::debug_log_message("Considering first row ( line $row ) as HEADER ..<p>", TRUE);
 
         if (empty($header)) {
-          CRM_Core_Error::fatal("Header is empty.");
+          throw new CRM_Core_Exception("Header is empty.");
         }
       }
       $row++;
@@ -262,7 +254,7 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 0, 'REQUEST'
         );
         if ($start < $end) {
-          CRM_Core_Error::fatal("Start offset can't be less than End offset.");
+          throw new CRM_Core_Exception("Start offset can't be less than End offset.");
         }
 
         $start = date('Y-m-d', time() - $start * 24 * 60 * 60) . 'T00:00:00.00Z';
@@ -399,6 +391,10 @@ class CiviContributeProcessor {
   }
 
   /**
+   * @deprecated function.
+   *
+   * This function has probably been defunct for quite a long time.
+   *
    * @param array $params
    *
    * @return bool
@@ -408,33 +404,16 @@ class CiviContributeProcessor {
       return FALSE;
     }
 
-    // add contact using dedupe rule
-    $dedupeParams = CRM_Dedupe_Finder::formatParams($params, 'Individual');
-    $dedupeParams['check_permission'] = FALSE;
-    $dupeIds = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
-    // if we find more than one contact, use the first one
-    if (!empty($dupeIds[0])) {
-      $params['contact_id'] = $dupeIds[0];
-    }
-    $contact = CRM_Contact_BAO_Contact::create($params);
-    if (!$contact->id) {
-      return FALSE;
-    }
+    $params['contact_id'] = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', array(), FALSE);
+
+    $contact = civicrm_api3('Contact', 'create', $params);
 
     // only pass transaction params to contribution::create, if available
     if (array_key_exists('transaction', $params)) {
       $params = $params['transaction'];
-      $params['contact_id'] = $contact->id;
+      $params['contact_id'] = $contact['id'];
     }
 
-    // handle contribution custom data
-    $customFields = CRM_Core_BAO_CustomField::getFields('Contribution',
-      FALSE,
-      FALSE,
-      CRM_Utils_Array::value('financial_type_id',
-        $params
-      )
-    );
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       CRM_Utils_Array::value('id', $params, NULL),
       'Contribution'
@@ -470,9 +449,7 @@ class CiviContributeProcessor {
       }
     }
 
-    $contribution = &CRM_Contribute_BAO_Contribution::create($params,
-      CRM_Core_DAO::$_nullArray
-    );
+    $contribution = CRM_Contribute_BAO_Contribution::create($params);
     if (!$contribution->id) {
       return FALSE;
     }
@@ -486,7 +463,7 @@ class CiviContributeProcessor {
 session_start();
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 CRM_Utils_System::authenticateScript(TRUE);
 

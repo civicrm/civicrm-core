@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Advanced Search Criteria Fieldset *}
@@ -56,14 +40,7 @@ CRM.$(function($) {
     return false;
   });
   // TODO: Why are the modes numeric? If they used the string there would be no need for this map
-  var modes = {
-    '2': 'CiviContribute',
-    '3': 'CiviEvent',
-    '4': 'activity',
-    '5': 'CiviMember',
-    '6': 'CiviCase',
-    '8': 'CiviMail'
-  };
+  var modes = {/literal}{$component_mappings}{literal};
   // Handle change of results mode
   $('#component_mode').change(function() {
     // Reset task dropdown
@@ -73,7 +50,7 @@ CRM.$(function($) {
       $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
       loadPanes(mode);
     }
-    if ($('#component_mode').val() == '7') {
+    if ('related_contact' === modes[$('#component_mode').val()]) {
       $('#crm-display_relationship_type').show();
     }
     else {
@@ -90,7 +67,7 @@ CRM.$(function($) {
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><i class="crm-i fa-times"></i></a>{literal}');
+      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>{literal}');
       header.addClass('active');
       CRM.loadPage(url, {target: body, block: false});
     }
@@ -133,9 +110,8 @@ CRM.$(function($) {
       {include file="CRM/Contact/Form/Search/Criteria/Basic.tpl"}
     </div>
   </div>
-
   {foreach from=$allPanes key=paneName item=paneValue}
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' and $openedPanes.$paneName} {else}collapsed{/if}">
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || $openedPanes.$paneName} {else}collapsed{/if}">
       <div class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
       </div>
@@ -146,7 +122,15 @@ CRM.$(function($) {
 
   <table class="form-layout">
     <tr>
-      <td>{include file="CRM/common/formButtons.tpl" location="botton"}</td>
+      <td>
+        {include file="CRM/common/formButtons.tpl" location="bottom"}
+        <div class="crm-submit-buttons reset-advanced-search">
+          <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
+            <i class="crm-i fa-undo" aria-hidden="true"></i>
+            &nbsp;{ts}Reset Form{/ts}
+          </a>
+        </div>
+      </td>
     </tr>
   </table>
 {/strip}

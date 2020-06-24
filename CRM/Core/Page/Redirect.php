@@ -3,13 +3,13 @@
 /**
  * Placeholder page which generates a redirect
  *
- * @code
+ * ```
  * <item>
  *   <path>civicrm/admin/options/case_type</path>
  *   <page_callback>CRM_Core_Page_Redirect</page_callback>
  *   <page_arguments>url=civicrm/foo/bar?whiz=bang&amp;passthru=%%passthru%%</page_arguments>
  * </item>
- * @endcoe
+ * ```
  */
 class CRM_Core_Page_Redirect extends CRM_Core_Page {
 
@@ -19,7 +19,7 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
    * @param string $path
    * @param array $pageArgs
    */
-  public function run($path = NULL, $pageArgs = array()) {
+  public function run($path = NULL, $pageArgs = []) {
     $url = self::createUrl($path, $_REQUEST, $pageArgs, TRUE);
     CRM_Utils_System::redirect($url);
   }
@@ -38,10 +38,10 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
    */
   public static function createUrl($requestPath, $requestArgs, $pageArgs, $absolute) {
     if (empty($pageArgs['url'])) {
-      CRM_Core_Error::fatal('This page is configured as a redirect, but it does not have a target.');
+      CRM_Core_Error::statusBounce('This page is configured as a redirect, but it does not have a target.');
     }
 
-    $vars = array();
+    $vars = [];
     // note: %% isn't legal in a well-formed URL, so it's not a bad variable-delimiter
     foreach ($requestPath as $pathPos => $pathPart) {
       $vars["%%{$pathPos}%%"] = urlencode($pathPart);

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -70,7 +54,7 @@ class SettingsBag {
    * The result of combining default values, mandatory
    * values, and user values.
    *
-   * @var array|NULL
+   * @var array|null
    *   Array(string $settingName => mixed $value).
    */
   protected $combined;
@@ -83,13 +67,13 @@ class SettingsBag {
   /**
    * @param int $domainId
    *   The domain for which we want settings.
-   * @param int|NULL $contactId
+   * @param int|null $contactId
    *   The contact for which we want settings. Use NULL for domain settings.
    */
   public function __construct($domainId, $contactId) {
     $this->domainId = $domainId;
     $this->contactId = $contactId;
-    $this->values = array();
+    $this->values = [];
     $this->combined = NULL;
   }
 
@@ -98,7 +82,7 @@ class SettingsBag {
    *
    * @param array $defaults
    *   Array(string $settingName => mixed $value).
-   * @return $this
+   * @return SettingsBag
    */
   public function loadDefaults($defaults) {
     $this->defaults = $defaults;
@@ -111,7 +95,7 @@ class SettingsBag {
    *
    * @param array $mandatory
    *   Array(string $settingName => mixed $value).
-   * @return $this
+   * @return SettingsBag
    */
   public function loadMandatory($mandatory) {
     $this->mandatory = $mandatory;
@@ -122,13 +106,13 @@ class SettingsBag {
   /**
    * Load all explicit settings that apply to this domain or contact.
    *
-   * @return $this
+   * @return SettingsBag
    */
   public function loadValues() {
     // Note: Don't use DAO child classes. They require fields() which require
     // translations -- which are keyed off settings!
 
-    $this->values = array();
+    $this->values = [];
     $this->combined = NULL;
 
     // Ordinarily, we just load values from `civicrm_setting`. But upgrades require care.
@@ -139,9 +123,9 @@ class SettingsBag {
 
     $isUpgradeMode = \CRM_Core_Config::isUpgradeMode();
 
-    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_DAO::checkFieldExists('civicrm_domain', 'config_backend', FALSE)) {
+    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend', FALSE)) {
       $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
-        array(1 => array($this->domainId, 'Positive')));
+        [1 => [$this->domainId, 'Positive']]);
       $oldSettings = \CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($this->domainId, $config_backend);
       \CRM_Utils_Array::extend($this->values, $oldSettings);
     }
@@ -150,7 +134,7 @@ class SettingsBag {
     if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
       $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
       while ($dao->fetch()) {
-        $this->values[$dao->name] = ($dao->value !== NULL) ? unserialize($dao->value) : NULL;
+        $this->values[$dao->name] = ($dao->value !== NULL) ? \CRM_Utils_String::unserialize($dao->value) : NULL;
       }
     }
 
@@ -162,7 +146,7 @@ class SettingsBag {
    *
    * @param array $settings
    *   Array(string $settingName => mixed $settingValue).
-   * @return $this
+   * @return SettingsBag
    */
   public function add(array $settings) {
     foreach ($settings as $key => $value) {
@@ -180,7 +164,11 @@ class SettingsBag {
   public function all() {
     if ($this->combined === NULL) {
       $this->combined = $this->combine(
-        array($this->defaults, $this->values, $this->mandatory)
+        [$this->defaults, $this->values, $this->mandatory]
+      );
+      // computeVirtual() depends on completion of preceding pass.
+      $this->combined = $this->combine(
+        [$this->combined, $this->computeVirtual()]
       );
     }
     return $this->combined;
@@ -194,7 +182,7 @@ class SettingsBag {
    */
   public function get($key) {
     $all = $this->all();
-    return isset($all[$key]) ? $all[$key] : NULL;
+    return $all[$key] ?? NULL;
   }
 
   /**
@@ -205,7 +193,7 @@ class SettingsBag {
    * @return mixed|NULL
    */
   public function getDefault($key) {
-    return isset($this->defaults[$key]) ? $this->defaults[$key] : NULL;
+    return $this->defaults[$key] ?? NULL;
   }
 
   /**
@@ -217,7 +205,7 @@ class SettingsBag {
    * @return mixed|NULL
    */
   public function getExplicit($key) {
-    return (isset($this->values[$key]) ? $this->values[$key] : NULL);
+    return ($this->values[$key] ?? NULL);
   }
 
   /**
@@ -228,7 +216,7 @@ class SettingsBag {
    * @return mixed|NULL
    */
   public function getMandatory($key) {
-    return isset($this->mandatory[$key]) ? $this->mandatory[$key] : NULL;
+    return $this->mandatory[$key] ?? NULL;
   }
 
   /**
@@ -251,7 +239,7 @@ class SettingsBag {
    *
    * @param string $key
    *   The simple name of the setting.
-   * @return $this
+   * @return SettingsBag
    */
   public function revert($key) {
     // It might be better to DELETE (to avoid long-term leaks),
@@ -266,13 +254,68 @@ class SettingsBag {
    *   The simple name of the setting.
    * @param mixed $value
    *   The new, explicit value of the setting.
-   * @return $this
+   * @return SettingsBag
    */
   public function set($key, $value) {
+    if ($this->updateVirtual($key, $value)) {
+      return $this;
+    }
     $this->setDb($key, $value);
     $this->values[$key] = $value;
     $this->combined = NULL;
     return $this;
+  }
+
+  /**
+   * Update a virtualized/deprecated setting.
+   *
+   * Temporary handling for phasing out contribution_invoice_settings.
+   *
+   * Until we have transitioned we need to handle setting & retrieving
+   * contribution_invoice_settings.
+   *
+   * Once removed from core we will add deprecation notices & then remove this.
+   *
+   * https://lab.civicrm.org/dev/core/issues/1558
+   *
+   * @param string $key
+   * @param array $value
+   * @return bool
+   *   TRUE if $key is a virtualized setting. FALSE if it is a normal setting.
+   */
+  public function updateVirtual($key, $value) {
+    if ($key === 'contribution_invoice_settings') {
+      foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
+        $keyValue = $value[$possibleKeyName] ?? '';
+        if ($possibleKeyName === 'invoicing' && is_array($keyValue)) {
+          $keyValue = $keyValue['invoicing'];
+        }
+        $this->set($settingName, $keyValue);
+      }
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Determine the values of any virtual/computed settings.
+   *
+   * @return array
+   */
+  public function computeVirtual() {
+    $contributionSettings = [];
+    foreach (SettingsBag::getContributionInvoiceSettingKeys() as $keyName => $settingName) {
+      switch ($keyName) {
+        case 'invoicing':
+          $contributionSettings[$keyName] = $this->get($settingName) ? [$keyName => 1] : 0;
+          break;
+
+        default:
+          $contributionSettings[$keyName] = $this->get($settingName);
+          break;
+      }
+    }
+    return ['contribution_invoice_settings' => $contributionSettings];
   }
 
   /**
@@ -281,16 +324,16 @@ class SettingsBag {
   protected function createQuery() {
     $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
       ->select('id, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
-      ->where('domain_id = #id', array(
+      ->where('domain_id = #id', [
         'id' => $this->domainId,
-      ));
+      ]);
     if ($this->contactId === NULL) {
       $select->where('is_domain = 1');
     }
     else {
-      $select->where('contact_id = #id', array(
+      $select->where('contact_id = #id', [
         'id' => $this->contactId,
-      ));
+      ]);
       $select->where('is_domain = 0');
     }
     return $select;
@@ -306,7 +349,7 @@ class SettingsBag {
    * @return array
    */
   protected function combine($arrays) {
-    $combined = array();
+    $combined = [];
     foreach ($arrays as $array) {
       foreach ($array as $k => $v) {
         if ($v !== NULL) {
@@ -326,13 +369,8 @@ class SettingsBag {
    *   The new value of the setting.
    */
   protected function setDb($name, $value) {
-    if (\CRM_Core_BAO_Setting::isUpgradeFromPreFourOneAlpha1()) {
-      // civicrm_setting table is not going to be present.
-      return;
-    }
-
-    $fields = array();
-    $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput(array($name => $value), $fields);
+    $fields = [];
+    $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput([$name => $value], $fields);
     //We haven't traditionally validated inputs to setItem, so this breaks things.
     //foreach ($fieldsToSet as $settingField => &$settingValue) {
     //  self::validateSetting($settingValue, $fields['values'][$settingField]);
@@ -352,11 +390,15 @@ class SettingsBag {
     }
     $dao->find(TRUE);
 
+    // Call 'on_change' listeners. It would be nice to only fire when there's
+    // a genuine change in the data. However, PHP developers have mixed
+    // expectations about whether 0, '0', '', NULL, and FALSE represent the same
+    // value, so there's no universal way to determine if a change is genuine.
     if (isset($metadata['on_change'])) {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
-          unserialize($dao->value),
+          \CRM_Utils_String::unserialize($dao->value),
           $value,
           $metadata,
           $this->domainId
@@ -364,7 +406,7 @@ class SettingsBag {
       }
     }
 
-    if (\CRM_Utils_System::isNull($value)) {
+    if (!is_array($value) && \CRM_Utils_System::isNull($value)) {
       $dao->value = 'null';
     }
     else {
@@ -374,11 +416,11 @@ class SettingsBag {
     if (!isset(\Civi::$statics[__CLASS__]['upgradeMode'])) {
       \Civi::$statics[__CLASS__]['upgradeMode'] = \CRM_Core_Config::isUpgradeMode();
     }
-    if (\Civi::$statics[__CLASS__]['upgradeMode'] && \CRM_Core_DAO::checkFieldExists('civicrm_setting', 'group_name')) {
+    if (\Civi::$statics[__CLASS__]['upgradeMode'] && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_setting', 'group_name')) {
       $dao->group_name = 'placeholder';
     }
 
-    $dao->created_date = \CRM_Utils_Time::getTime('Ymdhis');
+    $dao->created_date = \CRM_Utils_Time::getTime('YmdHis');
 
     $session = \CRM_Core_Session::singleton();
     if (\CRM_Contact_BAO_Contact_Utils::isContactId($session->get('userID'))) {
@@ -393,7 +435,24 @@ class SettingsBag {
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
     }
-    $dao->free();
+  }
+
+  /**
+   * @return array
+   */
+  public static function getContributionInvoiceSettingKeys(): array {
+    $convertedKeys = [
+      'credit_notes_prefix' => 'credit_notes_prefix',
+      'invoice_prefix' => 'invoice_prefix',
+      'due_date' => 'invoice_due_date',
+      'due_date_period' => 'invoice_due_date_period',
+      'notes' => 'invoice_notes',
+      'is_email_pdf'  => 'invoice_is_email_pdf',
+      'tax_term' => 'tax_term',
+      'tax_display_settings' => 'tax_display_settings',
+      'invoicing' => 'invoicing',
+    ];
+    return $convertedKeys;
   }
 
 }

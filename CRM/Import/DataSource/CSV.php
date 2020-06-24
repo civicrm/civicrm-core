@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   const
@@ -41,7 +25,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo() {
-    return array('title' => ts('Comma-Separated Values (CSV)'));
+    return ['title' => ts('Comma-Separated Values (CSV)')];
   }
 
   /**
@@ -66,14 +50,18 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $config = CRM_Core_Config::singleton();
 
     $uploadFileSize = CRM_Utils_Number::formatUnitSize($config->maxFileSize . 'm', TRUE);
+    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
+    if (empty($uploadFileSize)) {
+      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
+    }
     $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
     $form->assign('uploadSize', $uploadSize);
     $form->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $form->setMaxFileSize($uploadFileSize);
-    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
-          1 => $uploadSize,
-          2 => $uploadFileSize,
-        )), 'maxfilesize', $uploadFileSize);
+    $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
+      1 => $uploadSize,
+      2 => $uploadFileSize,
+    ]), 'maxfilesize', $uploadFileSize);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
 
@@ -127,13 +115,13 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $table = NULL,
     $fieldSeparator = ','
   ) {
-    $result = array();
+    $result = [];
     $fd = fopen($file, 'r');
     if (!$fd) {
-      CRM_Core_Error::fatal("Could not read $file");
+      throw new CRM_Core_Exception("Could not read $file");
     }
     if (filesize($file) == 0) {
-      CRM_Core_Error::fatal("$file is empty. Please upload a valid file.");
+      throw new CRM_Core_Exception("$file is empty. Please upload a valid file.");
     }
 
     $config = CRM_Core_Config::singleton();
@@ -188,7 +176,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
     }
     else {
-      $columns = array();
+      $columns = [];
       foreach ($firstrow as $i => $_) {
         $columns[] = "col_$i";
       }
@@ -229,7 +217,13 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       }
 
       $first = FALSE;
-      $row = array_map('civicrm_mysql_real_escape_string', $row);
+
+      // CRM-17859 Trim non-breaking spaces from columns.
+      $row = array_map(
+        function($string) {
+          return trim($string, chr(0xC2) . chr(0xA0));
+        }, $row);
+      $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;
 
@@ -256,17 +250,4 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     return $result;
   }
 
-}
-
-/**
- * @param $string
- *
- * @return string
- */
-function civicrm_mysql_real_escape_string($string) {
-  static $dao = NULL;
-  if (!$dao) {
-    $dao = new CRM_Core_DAO();
-  }
-  return $dao->escape($string);
 }

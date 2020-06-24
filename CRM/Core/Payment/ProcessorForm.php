@@ -1,35 +1,20 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 use Civi\Payment\System;
+
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -54,6 +39,7 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     if ($form->_type) {
+      // @todo not sure when this would be true. Never passed in.
       $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($form->_type, $form->_mode);
     }
 
@@ -63,14 +49,35 @@ class CRM_Core_Payment_ProcessorForm {
     }
     $form->set('paymentProcessor', $form->_paymentProcessor);
     $form->_paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
+    if ($form->paymentInstrumentID) {
+      $form->_paymentObject->setPaymentInstrumentID($form->paymentInstrumentID);
+    }
+    $form->_paymentObject->setBackOffice($form->isBackOffice);
+    $form->assign('isBackOffice', $form->isBackOffice);
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
-    $form->assign('currency', CRM_Utils_Array::value('currency', $form->_values));
+    CRM_Financial_Form_Payment::addCreditCardJs($form->getPaymentProcessorID());
+    $form->assign('paymentProcessorID', $form->getPaymentProcessorID());
+
+    $form->assign('currency', $form->getCurrency());
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
       $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL(NULL, NULL, 'cancel');
+    }
+
+    if (!empty($form->_values['custom_pre_id'])) {
+      $profileAddressFields = [];
+      $fields = CRM_Core_BAO_UFGroup::getFields($form->_values['custom_pre_id'], FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
+        NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
+
+      foreach ((array) $fields as $key => $value) {
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, ['uf_group_id' => $form->_values['custom_pre_id']]);
+      }
+      if (count($profileAddressFields)) {
+        $form->set('profileAddressFields', $profileAddressFields);
+      }
     }
 
     //checks after setting $form->_paymentProcessor
@@ -79,7 +86,9 @@ class CRM_Core_Payment_ProcessorForm {
     CRM_Core_Payment_Form::setPaymentFieldsByProcessor(
       $form,
       $form->_paymentProcessor,
-      CRM_Utils_Request::retrieve('billing_profile_id', 'String')
+      CRM_Utils_Request::retrieve('billing_profile_id', 'String'),
+      $form->isBackOffice,
+      $form->paymentInstrumentID
     );
 
     $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
@@ -97,7 +106,7 @@ class CRM_Core_Payment_ProcessorForm {
     if (!empty($form->_values['is_monetary']) &&
       !$form->_paymentProcessor['class_name'] && empty($form->_values['is_pay_later'])
     ) {
-      CRM_Core_Error::fatal(ts('Payment processor is not set for this page'));
+      CRM_Core_Error::statusBounce(ts('Payment processor is not set for this page'));
     }
 
     if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
@@ -106,8 +115,8 @@ class CRM_Core_Payment_ProcessorForm {
       )
     ) {
 
-      CRM_Core_Error::fatal(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
-          array(1 => $form->_paymentProcessor['payment_processor_type'])
+      CRM_Core_Error::statusBounce(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
+          [1 => $form->_paymentProcessor['payment_processor_type']]
         )
       );
     }
@@ -118,7 +127,7 @@ class CRM_Core_Payment_ProcessorForm {
    *
    * @param CRM_Core_Form $form
    */
-  public static function buildQuickform(&$form) {
+  public static function buildQuickForm(&$form) {
     //@todo document why this addHidden is here
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
@@ -130,7 +139,7 @@ class CRM_Core_Payment_ProcessorForm {
     if (!empty($processorId)) {
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, FALSE);
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, $form->isBackOffice, $form->paymentInstrumentID ?? NULL);
   }
 
 }

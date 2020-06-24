@@ -1,0 +1,9 @@
+{
+    "civicrm_case": [
+        {
+            "id": 1,
+            "case_type_id": 1,
+            "status_id": 1
+        }
+    ]
+}

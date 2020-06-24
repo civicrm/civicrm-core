@@ -1,44 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
- * $Id$
- *
+ * Class CRM_Grant_BAO_Grant
  */
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
-
-  /**
-   * Static field for all the grant information that we can potentially export.
-   * @var array
-   */
-  static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -61,25 +35,25 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
             SELECT status_id, count(id) as status_total
             FROM civicrm_grant  GROUP BY status_id";
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($query);
 
-    $status = array();
-    $summary = array();
+    $status = [];
+    $summary = [];
     $summary['total_grants'] = NULL;
     $status = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
 
     foreach ($status as $id => $name) {
-      $stats[$id] = array(
+      $stats[$id] = [
         'label' => $name,
         'total' => 0,
-      );
+      ];
     }
 
     while ($dao->fetch()) {
-      $stats[$dao->status_id] = array(
+      $stats[$dao->status_id] = [
         'label' => $status[$dao->status_id],
         'total' => $dao->status_total,
-      );
+      ];
       $summary['total_grants'] += $dao->status_total;
     }
 
@@ -93,17 +67,19 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *
    * @return array
    *   Array of event summary values
+   *
+   * @throws CRM_Core_Exception
    */
   public static function getGrantStatusOptGroup() {
 
-    $params = array();
+    $params = [];
     $params['name'] = CRM_Grant_BAO_Grant::$statusGroupName;
 
-    $defaults = array();
+    $defaults = [];
 
     $og = CRM_Core_BAO_OptionGroup::retrieve($params, $defaults);
     if (!$og) {
-      CRM_Core_Error::fatal('No option group for grant statuses - database discrepancy! Make sure you loaded civicrm_data.mysql');
+      throw new CRM_Core_Exception('No option group for grant statuses - database discrepancy! Make sure you loaded civicrm_data.mysql');
     }
 
     return $og;
@@ -133,40 +109,33 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Add grant.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
-   *
    *
    * @return object
    */
-  public static function add(&$params, &$ids) {
-
-    if (!empty($ids['grant_id'])) {
-      CRM_Utils_Hook::pre('edit', 'Grant', $ids['grant_id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Grant', NULL, $params);
-    }
+  public static function add($params, $ids = []) {
+    $id = $ids['grant_id'] ?? $params['id'] ?? NULL;
+    $hook = $id ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($hook, 'Grant', $id, $params);
 
     // first clean up all the money fields
-    $moneyFields = array(
+    $moneyFields = [
       'amount_total',
       'amount_granted',
       'amount_requested',
-    );
+    ];
     foreach ($moneyFields as $field) {
       if (isset($params[$field])) {
         $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
       }
     }
     // convert dates to mysql format
-    $dates = array(
+    $dates = [
       'application_received_date',
       'decision_date',
       'money_transfer_date',
       'grant_due_date',
-    );
+    ];
 
     foreach ($dates as $d) {
       if (isset($params[$d])) {
@@ -174,7 +143,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       }
     }
     $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = CRM_Utils_Array::value('grant_id', $ids);
+    $grant->id = $id;
 
     $grant->copyValues($params);
 
@@ -197,7 +166,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       }
       $title = CRM_Contact_BAO_Contact::displayName($grant->contact_id) . ' - ' . ts('Grant') . ': ' . $grantTypes[$grant->grant_type_id];
 
-      $recentOther = array();
+      $recentOther = [];
       if (CRM_Core_Permission::checkActionPermission('CiviGrant', CRM_Core_Action::UPDATE)) {
         $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/grant',
           "action=update&reset=1&id={$grant->id}&cid={$grant->contact_id}&context=home"
@@ -220,27 +189,20 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
     }
 
-    if (!empty($ids['grant'])) {
-      CRM_Utils_Hook::post('edit', 'Grant', $grant->id, $grant);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Grant', $grant->id, $grant);
-    }
+    CRM_Utils_Hook::post($hook, 'Grant', $grant->id, $grant);
 
     return $result;
   }
 
   /**
-   * Create the event.
+   * Adds a grant.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
    *
    * @return object
    */
-  public static function create(&$params, &$ids) {
+  public static function create($params, $ids = []) {
     $transaction = new CRM_Core_Transaction();
 
     $grant = self::add($params, $ids);
@@ -253,26 +215,25 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $id = CRM_Utils_Array::value('contact_id', $params);
+      $id = $params['contact_id'] ?? NULL;
     }
     if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note', $ids))) {
-      $noteParams = array(
+      $noteParams = [
         'entity_table' => 'civicrm_grant',
         'note' => $params['note'] = $params['note'] ? $params['note'] : "null",
         'entity_id' => $grant->id,
         'contact_id' => $id,
-        'modified_date' => date('Ymd'),
-      );
+      ];
 
       CRM_Core_BAO_Note::add($noteParams, (array) CRM_Utils_Array::value('note', $ids));
     }
     // Log the information on successful add/edit of Grant
-    $logParams = array(
+    $logParams = [
       'entity_table' => 'civicrm_grant',
       'entity_id' => $grant->id,
       'modified_id' => $id,
       'modified_date' => date('Ymd'),
-    );
+    ];
 
     CRM_Core_BAO_Log::add($logParams);
 
@@ -325,10 +286,10 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     $grant->find();
 
     // delete the recently created Grant
-    $grantRecent = array(
+    $grantRecent = [
       'id' => $id,
       'type' => 'Grant',
-    );
+    ];
     CRM_Utils_Recent::del($grantRecent);
 
     if ($grant->fetch()) {
@@ -346,54 +307,19 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    *   array of exportable Fields
    */
   public static function &exportableFields() {
-    if (!self::$_exportableFields) {
-      if (!self::$_exportableFields) {
-        self::$_exportableFields = array();
-      }
+    $fields = CRM_Grant_DAO_Grant::export();
+    $grantNote = [
+      'grant_note' => [
+        'title' => ts('Grant Note'),
+        'name' => 'grant_note',
+        'data_type' => CRM_Utils_Type::T_TEXT,
+      ],
+    ];
+    $fields = array_merge($fields, $grantNote,
+      CRM_Core_BAO_CustomField::getFieldsForImport('Grant')
+    );
 
-      $grantFields = array(
-        'grant_status' => array(
-          'title' => 'Grant Status',
-          'name' => 'grant_status',
-          'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-        'grant_type' => array(
-          'title' => 'Grant Type',
-          'name' => 'grant_type',
-          'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-        'grant_money_transfer_date' => array(
-          'title' => 'Grant Money Transfer Date',
-          'name' => 'grant_money_transfer_date',
-          'data_type' => CRM_Utils_Type::T_DATE,
-        ),
-        'grant_amount_requested' => array(
-          'title' => 'Grant Amount Requested',
-          'name' => 'grant_amount_requested',
-          'data_type' => CRM_Utils_Type::T_FLOAT,
-        ),
-        'grant_application_received_date' => array(
-          'title' => 'Grant Application Received Date',
-          'name' => 'grant_application_received_date',
-          'data_type' => CRM_Utils_Type::T_DATE,
-        ),
-      );
-
-      $fields = CRM_Grant_DAO_Grant::export();
-      $grantNote = array(
-        'grant_note' => array(
-          'title' => ts('Grant Note'),
-          'name' => 'grant_note',
-          'data_type' => CRM_Utils_Type::T_TEXT,
-        ),
-      );
-      $fields = array_merge($fields, $grantFields, $grantNote,
-        CRM_Core_BAO_CustomField::getFieldsForImport('Grant')
-      );
-      self::$_exportableFields = $fields;
-    }
-
-    return self::$_exportableFields;
+    return $fields;
   }
 
   /**

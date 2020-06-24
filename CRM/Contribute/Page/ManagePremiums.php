@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -43,7 +27,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -52,7 +36,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Contribute_BAO_ManagePremiums';
+    return 'CRM_Contribute_BAO_Product';
   }
 
   /**
@@ -63,36 +47,36 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/contribute/managePremiums',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Premium'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/contribute/managePremiums',
           'qs' => 'action=preview&id=%%id%%',
           'title' => ts('Preview Premium'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Premium'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Premium'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/contribute/managePremiums',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Premium'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -105,28 +89,17 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * Finally it calls the parent's run method.
    */
   public function run() {
-
-    // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      // default to 'browse'
-      $this, FALSE, 'browse'
-    );
-
-    // assign vars to templates
-    $this->assign('action', $action);
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
+    $id = $this->getIdAndAction();
 
     // what action to take ?
-    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::PREVIEW)) {
-      $this->edit($action, $id, TRUE);
+    if (!($this->_action & CRM_Core_Action::BROWSE)) {
+      $this->edit($this->_action, $id, TRUE);
     }
     // finally browse the custom groups
     $this->browse();
 
     // parent run
-    return parent::run();
+    return CRM_Core_Page::run();
   }
 
   /**
@@ -134,13 +107,13 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all custom groups sorted by weight
-    $premiums = array();
+    $premiums = [];
     $dao = new CRM_Contribute_DAO_Product();
     $dao->orderBy('name');
     $dao->find();
 
     while ($dao->fetch()) {
-      $premiums[$dao->id] = array();
+      $premiums[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $premiums[$dao->id]);
       // form all action links
       $action = array_sum(array_keys($this->links()));
@@ -154,17 +127,16 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
       $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'premium.manage.row',
         'Premium',
         $dao->id
       );
-      //Financial Type
+      // Financial Type
       if (!empty($dao->financial_type_id)) {
-        require_once 'CRM/Core/DAO.php';
-        $premiums[$dao->id]['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $dao->financial_type_id, 'name');
+        $premiums[$dao->id]['financial_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Product', 'financial_type_id', $dao->financial_type_id);
       }
     }
     $this->assign('rows', $premiums);

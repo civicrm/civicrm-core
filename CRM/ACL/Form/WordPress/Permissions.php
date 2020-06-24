@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2015                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,21 +25,20 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    */
   public function buildQuickForm() {
 
-    CRM_Utils_System::setTitle('Wordpress Access Control');
+    CRM_Utils_System::setTitle('WordPress Access Control');
 
     // Get the core permissions array
     $permissionsArray = self::getPermissionArray();
     $permissionsDesc = self::getPermissionArray(TRUE);
 
-    // Get the wordpress roles, default capabilities and assign to the form
-    // TODO: Create a new wordpress role (Anonymous user) and define capabilities in Wordpress Access Control
+    // Get the WordPress roles, default capabilities and assign to the form
     global $wp_roles;
     if (!isset($wp_roles)) {
       $wp_roles = new WP_Roles();
     }
     foreach ($wp_roles->role_names as $role => $name) {
-      // Dont show the permissions options for administrator, as they have all permissions
-      if ($role !== 'administrator') {
+      // Unless it's Multisite, don't show the permissions options for administrator, as they have all permissions
+      if (is_multisite() or $role !== 'administrator') {
         $roleObj = $wp_roles->get_role($role);
         if (!empty($roleObj->capabilities)) {
           foreach ($roleObj->capabilities as $ckey => $cname) {
@@ -78,25 +61,54 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $this->setDefaults($defaults);
 
-    $descArray = array();
+    $descArray = [];
     foreach ($permissionsDesc as $perm => $attr) {
       if (count($attr) > 1) {
         $descArray[$perm] = $attr[1];
       }
     }
-    $this->assign('permDesc', $descArray);
+
+    // build table rows by merging role perms
+    $rows = [];
+    foreach ($rolePerms as $role => $perms) {
+      foreach ($perms as $name => $title) {
+        $rows[$name] = $title;
+      }
+    }
+
+    // Build array keyed by permission
+    $table = [];
+    foreach ($rows as $perm => $label) {
+
+      // Init row with permission label
+      $table[$perm] = [
+        'label' => $label,
+        'roles' => [],
+      ];
+
+      // Add permission description and role names
+      foreach ($roles as $key => $label) {
+        if (isset($descArray[$perm])) {
+          $table[$perm]['desc'] = $descArray[$perm];
+        }
+        $table[$perm]['roles'][] = $key;
+      }
+
+    }
+
+    $this->assign('table', $table);
     $this->assign('rolePerms', $rolePerms);
     $this->assign('roles', $roles);
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '',
           'isDefault' => FALSE,
-        ),
-      )
+        ],
+      ]
     );
 
   }
@@ -134,19 +146,19 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
         // Get the permissions into a format that matches what we get from WP
         $allWarningPermissions = CRM_Core_Permission::getAnonymousPermissionsWarnings();
         foreach ($allWarningPermissions as $key => $permission) {
-          $allWarningPermissions[$key] = CRM_utils_String::munge(strtolower($permission));
+          $allWarningPermissions[$key] = CRM_Utils_String::munge(strtolower($permission));
         }
         $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
-        $warningPermissionNames = array();
+        $warningPermissionNames = [];
         foreach ($warningPermissions as $permission) {
           $warningPermissionNames[$permission] = $permissionsArray[$permission];
         }
         if (!empty($warningPermissionNames)) {
           CRM_Core_Session::setStatus(
-            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array(
-                1 => $wp_roles->role_names[$role],
-                2 => implode(', ', $warningPermissionNames),
-              )),
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', [
+              1 => $wp_roles->role_names[$role],
+              2 => implode(', ', $warningPermissionNames),
+            ]),
             ts('Unsafe Permission Settings')
           );
         }
@@ -163,7 +175,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus("", ts('Wordpress Access Control Updated'), "success");
 
-    // rebuild the menus to comply with the new permisssions/capabilites
+    // rebuild the menus to comply with the new permissions/capabilites
     CRM_Core_Invoke::rebuildMenuAndCaches();
 
     CRM_Utils_System::redirect('admin.php?page=CiviCRM&q=civicrm/admin/access&reset=1');
@@ -182,11 +194,10 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    *   civicrm permissions
    */
   public static function getPermissionArray($descriptions = FALSE) {
-    global $civicrm_root;
 
     $permissions = CRM_Core_Permission::basicPermissions(FALSE, $descriptions);
 
-    $perms_array = array();
+    $perms_array = [];
     foreach ($permissions as $perm => $title) {
       //order matters here, but we deal with that later
       $perms_array[CRM_Utils_String::munge(strtolower($perm))] = $title;

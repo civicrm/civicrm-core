@@ -1,17 +1,22 @@
 (function(angular, $, _) {
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp, mailingFields) {
     var APPROVAL_STATUSES = {'Approved': 1, 'Rejected': 2, 'None': 3};
 
     $scope.mailing = selectedMail;
     $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.checkPerm = CRM.checkPerm;
+    $scope.mailingFields = mailingFields;
 
     var ts = $scope.ts = CRM.ts(null);
     $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
     var block = $scope.block = crmBlocker();
     var myAutosave = null;
+
+    var templateTypes = _.where(CRM.crmMailing.templateTypes, {name: selectedMail.template_type});
+    if (!templateTypes[0]) throw 'Unrecognized template type: ' + selectedMail.template_type;
+    $scope.mailingEditorUrl = templateTypes[0].editorUrl;
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size($scope.mailing.jobs) > 0;
@@ -43,7 +48,7 @@
     // @return Promise
     $scope.submit = function submit(options) {
       options = options || {};
-      if (block.check() || $scope.crmMailing.$invalid) {
+      if (block.check()) {
         return;
       }
 

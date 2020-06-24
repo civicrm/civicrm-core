@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -67,6 +51,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param null $reset
    *
    * @return null|CRM_Core_BAO_WordReplacement
+   * @throws CRM_Core_Exception
    */
   public static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
@@ -74,12 +59,11 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
       $wordReplacement = new CRM_Core_BAO_WordReplacement();
       $wordReplacement->id = CRM_Core_Config::wordReplacementID();
       if (!$wordReplacement->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Unable to find word replacement');
       }
     }
     return $wordReplacement;
   }
-
 
   /**
    * Save the values of a WordReplacement.
@@ -153,11 +137,11 @@ SELECT find_word,replace_word,is_active,match_type
 FROM   civicrm_word_replacement
 WHERE  domain_id = %1
 ";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $overrides = array();
+    $overrides = [];
 
     while ($dao->fetch()) {
       if ($dao->is_active == 1) {
@@ -205,8 +189,9 @@ WHERE  domain_id = %1
   /**
    * Get word replacements for the api.
    *
-   * Get all the word-replacements stored in config-arrays
-   * and convert them to params for the WordReplacement.create API.
+   * Get all the word-replacements stored in config-arrays for the
+   * configured language, and convert them to params for the
+   * WordReplacement.create API.
    *
    * Note: This function is duplicated in CRM_Core_BAO_WordReplacement and
    * CRM_Upgrade_Incremental_php_FourFour to ensure that the incremental upgrade
@@ -222,33 +207,40 @@ WHERE  domain_id = %1
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
   public static function getConfigArraysAsAPIParams($rebuildEach) {
-    $wordReplacementCreateParams = array();
+    $settingsResult = civicrm_api3('Setting', 'get', [
+      'return' => 'lcMessages',
+    ]);
+    $returnValues = CRM_Utils_Array::first($settingsResult['values']);
+    $lang = $returnValues['lcMessages'];
+
+    $wordReplacementCreateParams = [];
     // get all domains
-    $result = civicrm_api3('domain', 'get', array(
-      'return' => array('locale_custom_strings'),
-    ));
+    $result = civicrm_api3('domain', 'get', [
+      'return' => ['locale_custom_strings'],
+    ]);
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
-        $params = array();
+        $params = [];
         $params["domain_id"] = $value["id"];
-        $params["options"] = array('wp-rebuild' => $rebuildEach);
+        $params["options"] = ['wp-rebuild' => $rebuildEach];
         // Unserialize word match string.
-        $localeCustomArray = unserialize($value["locale_custom_strings"]);
+        $localeCustomArray = CRM_Utils_String::unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
-          $wordMatchArray = array();
-          // Traverse Language array
-          foreach ($localeCustomArray as $localCustomData) {
-            // Traverse status array "enabled" "disabled"
-            foreach ($localCustomData as $status => $matchTypes) {
-              $params["is_active"] = ($status == "enabled") ? TRUE : FALSE;
-              // Traverse Match Type array "wildcardMatch" "exactMatch"
-              foreach ($matchTypes as $matchType => $words) {
-                $params["match_type"] = $matchType;
-                foreach ($words as $word => $replace) {
-                  $params["find_word"] = $word;
-                  $params["replace_word"] = $replace;
-                  $wordReplacementCreateParams[] = $params;
-                }
+          $wordMatchArray = [];
+          // Only return the replacement strings of the current language,
+          // otherwise some replacements will be duplicated, which will
+          // lead to undesired results, like CRM-19683.
+          $localCustomData = $localeCustomArray[$lang];
+          // Traverse status array "enabled" "disabled"
+          foreach ($localCustomData as $status => $matchTypes) {
+            $params["is_active"] = $status == "enabled";
+            // Traverse Match Type array "wildcardMatch" "exactMatch"
+            foreach ($matchTypes as $matchType => $words) {
+              $params["match_type"] = $matchType;
+              foreach ($words as $word => $replace) {
+                $params["find_word"] = $word;
+                $params["replace_word"] = $replace;
+                $wordReplacementCreateParams[] = $params;
               }
             }
           }
@@ -271,10 +263,10 @@ WHERE  domain_id = %1
    * bug-fix in both places.
    */
   public static function rebuildWordReplacementTable() {
-    civicrm_api3('word_replacement', 'replace', array(
-      'options' => array('match' => array('domain_id', 'find_word')),
+    civicrm_api3('word_replacement', 'replace', [
+      'options' => ['match' => ['domain_id', 'find_word']],
       'values' => self::getConfigArraysAsAPIParams(FALSE),
-    ));
+    ]);
     CRM_Core_BAO_WordReplacement::rebuild();
   }
 
@@ -304,11 +296,11 @@ WHERE  domain_id = %1
    */
   private static function _getLocaleCustomStrings($domainId) {
     // TODO: Would it be worthwhile using memcache here?
-    $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', array(
-      1 => array($domainId, 'Integer'),
-    ));
+    $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', [
+      1 => [$domainId, 'Integer'],
+    ]);
     while ($domain->fetch()) {
-      return empty($domain->locale_custom_strings) ? array() : unserialize($domain->locale_custom_strings);
+      return empty($domain->locale_custom_strings) ? [] : CRM_Utils_String::unserialize($domain->locale_custom_strings);
     }
   }
 
@@ -337,10 +329,10 @@ WHERE  domain_id = %1
    * @param string $lcs
    */
   private static function _setLocaleCustomStrings($domainId, $lcs) {
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = %1 WHERE id = %2", array(
-      1 => array(serialize($lcs), 'String'),
-      2 => array($domainId, 'Integer'),
-    ));
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = %1 WHERE id = %2", [
+      1 => [serialize($lcs), 'String'],
+      2 => [$domainId, 'Integer'],
+    ]);
   }
 
 }

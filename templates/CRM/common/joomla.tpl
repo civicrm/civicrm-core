@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $config->debug}
@@ -28,10 +12,6 @@
 {/if}
 
 <div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
-
-{* Joomla-only container to hold the civicrm menu *}
-<div id="crm-nav-menu-container"></div>
-{crmNavigationMenu is_default=1}
 
 <table border="0" cellpadding="0" cellspacing="0" id="crm-content">
   <tr>
@@ -46,20 +26,12 @@
     <div class="breadcrumb">
       {foreach from=$breadcrumb item=crumb key=key}
         {if $key != 0}
-           &raquo;
+           <i class="crm-i fa-angle-double-right" aria-hidden="true"></i>
         {/if}
         <a href="{$crumb.url}">{$crumb.title}</a>
       {/foreach}
     </div>
     {/if}
-
-{if $browserPrint}
-{* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
-<div id="printer-friendly"><a href="#" onclick="window.print(); return false;" title="{ts}Print this page.{/ts}"><i class="crm-i fa-print"></i></a></div>
-{else}
-{* Printer friendly link/icon. *}
-<div id="printer-friendly"><a href="{$printerFriendly}" target='_blank' title="{ts}Printer-friendly view of this page.{/ts}"><i class="crm-i fa-print"></i></a></div>
-{/if}
 
 {if $pageTitle}
   <div class="crm-title">
@@ -81,7 +53,6 @@
     <div id="crm-main-content-wrapper">
       {include file="CRM/common/status.tpl"}
       {crmRegion name='page-body'}
-        <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
         {if isset($isForm) and $isForm and isset($formTpl)}
           {include file="CRM/Form/$formTpl.tpl"}
         {else}

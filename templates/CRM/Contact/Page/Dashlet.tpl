@@ -1,28 +1,13 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+    <div class="crm-submit-buttons">{crmButton p="civicrm/dashboard" q="reset=1" icon="check"}{ts}Done{/ts}{/crmButton}</div>
     <div id="help" style="padding: 1em;">
         {ts}Available dashboard elements - dashlets - are displayed in the dark gray top bar. Drag and drop dashlets onto the left or right columns below to add them to your dashboard. Changes are automatically saved. Click 'Done' to return to the normal dashboard view.{/ts}
         {help id="id-dash_configure" file="CRM/Contact/Page/Dashboard.hlp" admin=$admin}
@@ -31,7 +16,7 @@
     <div id="available-dashlets" class="dash-column">
         {foreach from=$availableDashlets item=row key=dashID}
       <div class="portlet">
-        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet"></a>{/if}</div>
+        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet" aria-hidden="true"></a>{/if}</div>
       </div>
         {/foreach}
     </div>
@@ -42,7 +27,7 @@
     <div id="existing-dashlets-col-0" class="dash-column">
         {foreach from=$contactDashlets.0 item=row key=dashID}
       <div class="portlet">
-        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet"></a>{/if}</div>
+        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet" aria-hidden="true"></a>{/if}</div>
       </div>
         {/foreach}
     </div>
@@ -50,7 +35,7 @@
     <div id="existing-dashlets-col-1" class="dash-column">
         {foreach from=$contactDashlets.1 item=row key=dashID}
       <div class="portlet">
-        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet"></a>{/if}</div>
+        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet" aria-hidden="true"></a>{/if}</div>
       </div>
         {/foreach}
     </div>
@@ -98,32 +83,32 @@
                 var postUrl = {/literal}"{crmURL p='civicrm/ajax/dashboard' h=0 }"{literal};
                 params['op'] = 'save_columns';
                 params['key'] = {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal};
-                $.post( postUrl, params, function(response, status) {
-                    // TO DO show done / disable escape action
-                });
+                CRM.status({}, $.post(postUrl, params));
             }
         }
 
         $('.delete-dashlet').click( function( ) {
-            var message = {/literal}'{ts escape="js"}Do you want to remove this dashlet as an "Available Dashlet", AND delete it from all user dashboards?{/ts}'{literal};
-            if ( confirm( message) ) {
-                var dashletID = $(this).parent().attr('id');
-                var idState = dashletID.split('-')
+          var $dashlet = $(this).closest('.portlet-header');
+          CRM.confirm({
+            title: {/literal}'{ts escape="js"}Remove Permanently?{/ts}'{literal},
+            message: {/literal}'{ts escape="js"}Do you want to remove this dashlet as an "Available Dashlet", AND delete it from all user dashboards?{/ts}'{literal}
+          })
+            .on('crmConfirm:yes', function() {
+              var dashletID = $dashlet.attr('id');
+              var idState = dashletID.split('-');
 
-                // Build a list of params to post to the server.
-                var params = {};
+              // Build a list of params to post to the server.
+              var params = {dashlet_id: idState[0]};
 
-                params['dashlet_id'] = idState[0];
-
-                // delete dashlet
-                var postUrl = {/literal}"{crmURL p='civicrm/ajax/dashboard' h=0 }"{literal};
-                params['op'] = 'delete_dashlet';
-                params['key'] = {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal};
-                $.post( postUrl, params, function(response, status) {
-                    // delete dom object
-                    $('#' + dashletID ).parent().remove();
-                });
-            }
+              // delete dashlet
+              var postUrl = {/literal}"{crmURL p='civicrm/ajax/dashboard' h=0 }"{literal};
+              params['op'] = 'delete_dashlet';
+              params['key'] = {/literal}"{crmKey name='civicrm/ajax/dashboard'}"{literal};
+              CRM.status({}, $.post(postUrl, params));
+              $dashlet.parent().fadeOut('fast', function() {
+                $(this).remove();
+              });
+            });
         });
   });
 </script>

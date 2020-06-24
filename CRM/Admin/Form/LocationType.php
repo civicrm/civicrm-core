@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -57,7 +41,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $this->addRule('name',
       ts('Name already exists in Database.'),
       'objectExists',
-      array('CRM_Core_DAO_LocationType', $this->_id)
+      ['CRM_Core_DAO_LocationType', $this->_id]
     );
     $this->addRule('name',
       ts('Name can only consist of alpha-numeric characters'),
@@ -74,10 +58,10 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
-        $this->freeze(array('name', 'description', 'is_active'));
+        $this->freeze(['name', 'description', 'is_active']);
       }
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_default')) {
-        $this->freeze(array('is_default'));
+        $this->freeze(['is_default']);
       }
     }
   }
@@ -86,7 +70,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_LocationType');
+    CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_LocationType::del($this->_id);
@@ -110,7 +94,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     if ($params['is_default']) {
       $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -120,7 +104,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $locationType->save();
 
     CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
-      array(1 => $locationType->name)
+      [1 => $locationType->name]
     ), ts('Saved'), 'success');
   }
 

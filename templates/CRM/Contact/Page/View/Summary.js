@@ -17,22 +17,38 @@
       o.animate({height: '+=50px'}, 200);
       data.snippet = 6;
       data.reset = 1;
-      o.addClass('form');
+      var width = o.width();
       $('.crm-edit-ready').removeClass('crm-edit-ready');
-      o.block();
+      o.block().addClass('form').css('width', '' + width + 'px');
       $.getJSON(CRM.url('civicrm/ajax/inline', data))
         .fail(errorHandler)
         .done(function(response) {
           o.unblock();
           o.css('overflow', 'hidden').wrapInner('<div class="inline-edit-hidden-content" style="display:none" />').append(response.content);
+          // Needed to accurately measure box width
+          $('.crm-container-snippet', o).css('display', 'inline-block');
           // Smooth resizing
-          var newHeight = $('.crm-container-snippet', o).height();
-          var diff = newHeight - parseInt(o.css('height'), 10);
-          if (diff < 0) {
-            diff = 0 - diff;
+          var newHeight = $('.crm-container-snippet', o).height(),
+            speed = newHeight - parseInt(o.css('height'), 10),
+            animation = {height: '' + newHeight + 'px'};
+          // Animation speed is set relative to how much the box needs to grow
+          if (speed < 0) {
+            speed = 0 - speed;
           }
-          o.animate({height: '' + newHeight + 'px'}, diff * 2, function() {
-            o.removeAttr('style');
+          // Horizontal growth
+          var newWidth = $('.crm-container-snippet', o).width();
+          if (newWidth > width) {
+            animation.width = '' + newWidth + 'px';
+            // Slow down animation if we have lots of horizontal growth to do
+            if (newWidth - width > speed) {
+              speed = newWidth - width;
+            }
+          } else {
+            newWidth = width;
+          }
+          $('.crm-container-snippet', o).css('display', '');
+          o.animate(animation, speed, function() {
+            o.css({height: '', width: '', minWidth: '' + newWidth + 'px'});
           });
           $('form', o).validate(CRM.validate.params);
           ajaxFormParams.data = data;
@@ -57,7 +73,7 @@
     $('form', o).ajaxFormUnbind();
 
     if (response.status == 'success' || response.status == 'cancel') {
-      o.trigger('crmFormSuccess', [response]);
+      o.trigger('crmFormSuccess', [response]).removeAttr('style');
       $('.crm-inline-edit-container').addClass('crm-edit-ready');
       var data = o.data('edit-params');
       var dependent = $((o.data('dependent-fields') || []).join(','));
@@ -207,7 +223,7 @@
         $('form', container).ajaxFormUnbind();
         $('.inline-edit-hidden-content', container).nextAll().remove();
         $('.inline-edit-hidden-content > *:first-child', container).unwrap();
-        container.removeClass('form');
+        container.removeClass('form').removeAttr('style');
         $('.crm-inline-edit-container').addClass('crm-edit-ready');
         $('a.ui-notify-close', '#crm-notification-container').click();
         return false;
@@ -252,7 +268,7 @@
             CRM.api3('address', 'delete', {id: $block.data('edit-params').aid}, true)
               .done(function(data) {
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
-                $block.remove();
+                $block.closest('.crm-address-block').remove();
                 reloadBlock('.crm-inline-edit.address:not(.add-new)');
               });
             });

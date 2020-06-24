@@ -1,51 +1,36 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  *  Access Control Cache.
  */
-class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
+class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
 
-  static $_cache = NULL;
+  public static $_cache = NULL;
 
   /**
-   * @param int $id
+   * Build an array of ACLs for a specific ACLed user
+   * @param int $id - contact_id of the ACLed user
    *
    * @return mixed
    */
   public static function &build($id) {
     if (!self::$_cache) {
-      self::$_cache = array();
+      self::$_cache = [];
     }
 
     if (array_key_exists($id, self::$_cache)) {
@@ -75,7 +60,7 @@ SELECT acl_id
   FROM civicrm_acl_cache
  WHERE contact_id = %1
 ";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
     if ($id == 0) {
       $query .= " OR contact_id IS NULL";
@@ -83,7 +68,7 @@ SELECT acl_id
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $cache = array();
+    $cache = [];
     while ($dao->fetch()) {
       $cache[$dao->acl_id] = 1;
     }
@@ -91,12 +76,14 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
-   * @param array $cache
+   * Store ACLs for a specific user in the `civicrm_acl_cache` table
+   * @param int $id - contact_id of the ACLed user
+   * @param array $cache - key civicrm_acl.id - values is the details of the ACL.
+   *
    */
   public static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
-      $dao = new CRM_ACL_DAO_Cache();
+      $dao = new CRM_ACL_BAO_Cache();
       if ($id) {
         $dao->contact_id = $id;
       }
@@ -109,7 +96,9 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
+   * Remove entries from civicrm_acl_cache for a specified ACLed user
+   * @param int $id - contact_id of the ACLed user
+   *
    */
   public static function deleteEntry($id) {
     if (self::$_cache &&
@@ -122,43 +111,33 @@ SELECT acl_id
 DELETE FROM civicrm_acl_cache
 WHERE contact_id = %1
 ";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
     CRM_Core_DAO::executeQuery($query, $params);
-  }
-
-  /**
-   * @param int $id
-   */
-  public static function updateEntry($id) {
-    // rebuilds civicrm_acl_cache
-    self::deleteEntry($id);
-    self::build($id);
-
-    // rebuilds civicrm_acl_contact_cache
-    CRM_Contact_BAO_Contact_Permission::cache($id, CRM_Core_Permission::VIEW, TRUE);
   }
 
   /**
    * Deletes all the cache entries.
    */
   public static function resetCache() {
+    if (!CRM_Core_Config::isPermitCacheFlushMode()) {
+      return;
+    }
     // reset any static caching
     self::$_cache = NULL;
-
-    // reset any db caching
-    $config = CRM_Core_Config::singleton();
-    $smartGroupCacheTimeout = CRM_Contact_BAO_GroupContactCache::smartGroupCacheTimeout();
-
-    //make sure to give original timezone settings again.
-    $now = CRM_Utils_Date::getUTCTime();
 
     $query = "
 DELETE
 FROM   civicrm_acl_cache
 WHERE  modified_date IS NULL
-   OR  (TIMESTAMPDIFF(MINUTE, modified_date, $now) >= $smartGroupCacheTimeout)
+   OR  (modified_date <= %1)
 ";
-    CRM_Core_DAO::singleValueQuery($query);
+    $params = [
+      1 => [
+        CRM_Contact_BAO_GroupContactCache::getCacheInvalidDateTime(),
+        'String',
+      ],
+    ];
+    CRM_Core_DAO::singleValueQuery($query, $params);
 
     // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
     // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
@@ -170,6 +149,15 @@ WHERE  modified_date IS NULL
     else {
       CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
     }
+  }
+
+  /**
+   * Remove Entries from `civicrm_acl_contact_cache` for a specific ACLed user
+   * @param int $userID - contact_id of the ACLed user
+   *
+   */
+  public static function deleteContactCacheEntry($userID) {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl_contact_cache WHERE user_id = %1", [1 => [$userID, 'Positive']]);
   }
 
 }

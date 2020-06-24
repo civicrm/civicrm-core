@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * $Id$
  *
  */
@@ -36,151 +20,161 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
 
   protected $_summary = NULL;
   protected $_totalPaid = FALSE;
-  protected $_customGroupExtends = array('Pledge', 'Individual');
+  protected $_customGroupExtends = ['Pledge', 'Individual'];
   protected $_customGroupGroupBy = TRUE;
-  protected $_addressField = FALSE;
-  protected $_emailField = FALSE;
 
   /**
+   * This report has not been optimised for group filtering.
+   *
+   * The functionality for group filtering has been improved but not
+   * all reports have been adjusted to take care of it. This report has not
+   * and will run an inefficient query until fixed.
+   *
+   * CRM-19170
+   *
+   * @var bool
    */
+  protected $groupFilterNotOptimised = TRUE;
+
   /**
+   * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Contact Name'),
             'no_repeat' => TRUE,
-          ),
-          'postal_greeting_display' => array('title' => ts('Postal Greeting')),
-          'id' => array(
+          ],
+          'postal_greeting_display' => ['title' => ts('Postal Greeting')],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-        'group_bys' => array(
-          'id' => array('title' => ts('Contact ID')),
-          'sort_name' => array(
+        'group_bys' => [
+          'id' => ['title' => ts('Contact ID')],
+          'sort_name' => [
             'title' => ts('Contact Name'),
-          ),
-        ),
-      ),
-      'civicrm_email' => array(
+          ],
+        ],
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'no_repeat' => TRUE,
             'title' => ts('email'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_pledge' => array(
+      ],
+      'civicrm_pledge' => [
         'dao' => 'CRM_Pledge_DAO_Pledge',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
             'required' => FALSE,
-          ),
-          'financial_type_id' => array(
+          ],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
-          ),
-          'currency' => array(
+          ],
+          'currency' => [
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'amount' => array(
+          ],
+          'amount' => [
             'title' => ts('Pledge Amount'),
             'required' => TRUE,
             'type' => CRM_Utils_Type::T_MONEY,
-            'statistics' => array(
+            'statistics' => [
               'sum' => ts('Aggregate Amount Pledged'),
               'count' => ts('Pledges'),
               'avg' => ts('Average'),
-            ),
-          ),
-          'frequency_unit' => array(
+            ],
+          ],
+          'frequency_unit' => [
             'title' => ts('Frequency Unit'),
-          ),
-          'installments' => array(
+          ],
+          'installments' => [
             'title' => ts('Installments'),
-          ),
-          'pledge_create_date' => array(
+          ],
+          'pledge_create_date' => [
             'title' => ts('Pledge Made Date'),
-          ),
-          'start_date' => array(
+          ],
+          'start_date' => [
             'title' => ts('Pledge Start Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('Pledge End Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Pledge Status'),
-          ),
-        ),
-        'filters' => array(
-          'pledge_create_date' => array(
-            'title' => 'Pledge Made Date',
+          ],
+        ],
+        'filters' => [
+          'pledge_create_date' => [
+            'title' => ts('Pledge Made Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-          'pledge_amount' => array(
+          ],
+          'pledge_amount' => [
             'title' => ts('Pledged Amount'),
             'operatorType' => CRM_Report_Form::OP_INT,
-          ),
-          'currency' => array(
-            'title' => 'Currency',
+          ],
+          'currency' => [
+            'title' => ts('Currency'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
             'default' => NULL,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-          'sid' => array(
+          ],
+          'sid' => [
             'name' => 'status_id',
             'title' => ts('Pledge Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_OptionGroup::values('contribution_status'),
-          ),
-          'financial_type_id' => array(
+            'options' => CRM_Core_OptionGroup::values('pledge_status'),
+          ],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
-          ),
-        ),
-        'group_bys' => array(
-          'pledge_create_date' => array(
+          ],
+        ],
+        'group_bys' => [
+          'pledge_create_date' => [
             'frequency' => TRUE,
             'default' => TRUE,
             'chart' => TRUE,
-          ),
-          'frequency_unit' => array(
+          ],
+          'frequency_unit' => [
             'title' => ts('Frequency Unit'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Pledge Status'),
-          ),
-          'financial_type_id' => array(
+          ],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
-          ),
-        ),
-      ),
-      'civicrm_pledge_payment' => array(
+          ],
+        ],
+      ],
+      'civicrm_pledge_payment' => [
         'dao' => 'CRM_Pledge_DAO_PledgePayment',
-        'fields' => array(
-          'total_paid' => array(
+        'fields' => [
+          'total_paid' => [
             'title' => ts('Total Amount Paid'),
             'type' => CRM_Utils_Type::T_STRING,
             'dbAlias' => 'sum(pledge_payment_civireport.actual_amount)',
-          ),
-        ),
-      ),
-    ) + $this->addAddressFields();
+          ],
+        ],
+      ],
+    ] + $this->addAddressFields();
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -204,23 +198,8 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
                           {$this->_aliases['civicrm_pledge']}.contact_id )
                  {$this->_aclFrom} ";
 
-    // include address field if address column is to be included
-    if ($this->_addressField) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_address']}.contact_id) AND
-                               {$this->_aliases['civicrm_address']}.is_primary = 1\n";
-    }
-
-    // include email field if email column is to be included
-    if ($this->_emailField) {
-      $this->_from .= "
-                 LEFT JOIN civicrm_email {$this->_aliases['civicrm_email']}
-                           ON ({$this->_aliases['civicrm_contact']}.id =
-                               {$this->_aliases['civicrm_email']}.contact_id) AND
-                               {$this->_aliases['civicrm_email']}.is_primary = 1\n";
-    }
+    $this->joinAddressFromContact();
+    $this->joinEmailFromContact();
 
     if (!empty($this->_params['fields']['total_paid'])) {
       $this->_from .= "
@@ -252,15 +231,15 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
-                  array('year')
+                  ['year']
                 )) {
                   $append = '';
                 }
-                $this->_groupBy[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupByArray[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {
-                $this->_groupBy[] = $field['dbAlias'];
+                $this->_groupByArray[] = $field['dbAlias'];
               }
             }
           }
@@ -268,17 +247,20 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       }
 
       if (!empty($this->_statFields) &&
-        (($append && count($this->_groupBy) <= 1) || (!$append)) &&
+        (($append && count($this->_groupByArray) <= 1) || (!$append)) &&
         !$this->_having
       ) {
         $this->_rollup = " WITH ROLLUP";
       }
-      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupBy) .
-        " {$this->_rollup} ";
+      $groupBy = $this->_groupByArray;
+      $this->_groupBy = "GROUP BY " . implode(', ', $this->_groupByArray);
     }
     else {
-      $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_contact']}.id";
+      $groupBy = "{$this->_aliases['civicrm_contact']}.id";
+      $this->_groupBy = "GROUP BY {$groupBy}";
     }
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, $groupBy);
+    $this->_groupBy .= " {$this->_rollup}";
   }
 
   /**
@@ -301,42 +283,42 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       $dao = CRM_Core_DAO::executeQuery($sql);
 
       if ($dao->fetch()) {
-        $statistics['count']['amount'] = array(
+        $statistics['count']['amount'] = [
           'value' => $dao->amount,
-          'title' => 'Total Pledged',
+          'title' => ts('Total Pledged'),
           'type' => CRM_Utils_Type::T_MONEY,
-        );
-        $statistics['count']['count '] = array(
+        ];
+        $statistics['count']['count '] = [
           'value' => $dao->count,
-          'title' => 'Total No Pledges',
-        );
-        $statistics['count']['avg   '] = array(
+          'title' => ts('Total No Pledges'),
+        ];
+        $statistics['count']['avg   '] = [
           'value' => $dao->avg,
-          'title' => 'Average',
+          'title' => ts('Average'),
           'type' => CRM_Utils_Type::T_MONEY,
-        );
+        ];
       }
     }
     return $statistics;
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
@@ -387,7 +369,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $checkList = array();
+    $checkList = [];
     $display_flag = $prev_cid = $cid = 0;
     foreach ($rows as $rowNum => $row) {
 
@@ -414,7 +396,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       //handle status id
       if (array_key_exists('civicrm_pledge_status_id', $row)) {
         if ($value = $row['civicrm_pledge_status_id']) {
-          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Contribute_PseudoConstant::contributionStatus($value);
+          $rows[$rowNum]['civicrm_pledge_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $value);
         }
         $entryFound = TRUE;
       }

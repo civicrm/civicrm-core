@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $rows}
@@ -32,7 +16,7 @@
 <br />
 <table>
   <tr class="columnheader">
-{if $id}
+{if $id OR $customSearchID}
   {foreach from=$columnHeaders item=header}
      <th>{$header}</th>
   {/foreach}
@@ -55,18 +39,24 @@
     {/if}
     <td>{ts}Email{/ts}</td>
     <td>{ts}Phone{/ts}</td>
+    <td>{ts}Do Not Email{/ts}</td>
+    <td>{ts}Do Not Phone{/ts}</td>
+    <td>{ts}Do Not mail{/ts}</td>
 {/if}
   </tr>
 {foreach from=$rows item=row}
     <tr class="{cycle values="odd-row,even-row"}">
 {if $id}
-        <td>{$row.sort_name}</td>
-         {foreach from=$row item=value key=key}
-           {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "status") and ($key neq "contact_id") and ($key neq "sort_name")}
-              <td>{$value}</td>
-           {/if}
-         {/foreach}
-
+  <td>{$row.sort_name}</td>
+  {foreach from=$row item=value key=key}
+    {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "status") and ($key neq "contact_id") and ($key neq "sort_name")}
+      <td>{$value}</td>
+    {/if}
+  {/foreach}
+{elseif $customSearchID}
+  {foreach from=$columnHeaders item=header key=name}
+    <td>{$row.$name}</td>
+  {/foreach}
 {else}
         <td>{$row.sort_name}</td>
         {if !empty($columnHeaders.street_address)}
@@ -86,6 +76,21 @@
         {/if}
         <td>{$row.email}</td>
         <td>{$row.phone}</td>
+        {if $row.do_not_email == 1}
+          <td>{$row.do_not_email}</td>
+        {else}
+          <td>&nbsp;</td>
+        {/if}
+        {if $row.do_not_phone == 1}
+          <td>{$row.do_not_phone}</td>
+        {else}
+          <td>&nbsp;</td>
+        {/if}
+        {if $row.do_not_mail == 1}
+          <td>{$row.do_not_mail}</td>
+        {else}
+          <td>&nbsp;</td>
+        {/if}
 {/if}
     </tr>
 {/foreach}

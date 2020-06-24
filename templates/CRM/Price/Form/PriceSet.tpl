@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {crmRegion name="price-set-1"}
@@ -37,6 +21,7 @@
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
         {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
+            {if $element.help_pre}<span class="content description">{$element.help_pre}</span><br />{/if}
             <div class="crm-section {$element.name}-section">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
@@ -69,7 +54,8 @@
                 {assign var="element_name" value="price_"|cat:$field_id}
 
                 <div class="label">{$form.$element_name.label}</div>
-                <div class="content {$element.name}-content">{$form.$element_name.html}
+                <div class="content {$element.name}-content">
+                  {$form.$element_name.html}
                   {if $element.html_type eq 'Text'}
                     {if $element.is_display_amounts}
                     <span class="price-field-amount{if $form.$element_name.frozen EQ 1} sold-out-option{/if}">
@@ -80,7 +66,7 @@
                           {$amount|crmMoney}
                         {elseif $displayOpt == 'Inclusive'}
                           {$amount|crmMoney}
-                          <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
+                          <span class='crm-price-amount-label'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney}(includes %1 of %2){/ts}</span>
                         {else}
                           {$option.amount|crmMoney}
                           <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>
@@ -102,17 +88,20 @@
                 </div>
 
             {/if}
-              {if !empty($extends) && $extends eq "Membership" && $element.html_type != 'Text'}
-                <div id="allow_auto_renew">
-                  <div class='crm-section auto-renew'>
-                    <div class='label'></div>
-                    <div class ='content'>
-                      {if isset($form.auto_renew) }
-                        {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
-                      {/if}
+              {if !empty($extends) && $extends eq "Membership"}
+                {if (!empty($priceSet) && $element.id == $priceSet.auto_renew_membership_field) || (empty($priceSet) && $element.name == 'membership_amount')}
+                  <div id="allow_auto_renew">
+                    <div class='crm-section auto-renew'>
+                      <div class='label'></div>
+                      <div class='content' id="auto_renew_section">
+                        {if isset($form.auto_renew) }
+                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
+                        {/if}
+                      </div>
+                      <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
                     </div>
                   </div>
-                </div>
+                {/if}
               {/if}
               <div class="clear"></div>
           </div>

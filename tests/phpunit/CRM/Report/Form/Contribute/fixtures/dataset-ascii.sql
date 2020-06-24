@@ -24,18 +24,18 @@ SET FOREIGN_KEY_CHECKS=0;
 --
 
 INSERT INTO `civicrm_address` (`id`, `contact_id`, `location_type_id`, `is_primary`, `is_billing`, `street_address`, `street_number`, `street_number_suffix`, `street_number_predirectional`, `street_name`, `street_type`, `street_number_postdirectional`, `street_unit`, `supplemental_address_1`, `supplemental_address_2`, `supplemental_address_3`, `city`, `county_id`, `state_province_id`, `postal_code_suffix`, `postal_code`, `usps_adc`, `country_id`, `geo_code_1`, `geo_code_2`, `manual_geo_code`, `timezone`, `name`, `master_id`) VALUES
-(5, 71, 1, 1, 0, '877P Caulder Way S', 877, 'P', NULL, 'Caulder', 'Way', 'S', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(5, 71, 1, 1, 0, '877P Caulder Way S', 877, 'P', NULL, 'Caulder', 'Way', 'S', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'B10 G56', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
 (13, 4, 1, 1, 0, '990G Martin Luther King Dr W', 990, 'G', NULL, 'Martin Luther King', 'Dr', 'W', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(26, 92, 1, 1, 0, '271X Pine Ave N', 271, 'X', NULL, 'Pine', 'Ave', 'N', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(26, 92, 1, 1, 0, '271X Pine Ave N', 271, 'X', NULL, 'Pine', 'Ave', 'N', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'B10 G56', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
 (42, 34, 1, 1, 0, '691V Main Ln W', 691, 'V', NULL, 'Main', 'Ln', 'W', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
 (83, 6, 2, 1, 0, '249S Martin Luther King Way N', 249, 'S', NULL, 'Martin Luther King', 'Way', 'N', NULL, 'Subscriptions Dept', NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(93, 82, 3, 1, 0, '838D Van Ness Blvd E', 838, 'D', NULL, 'Van Ness', 'Blvd', 'E', NULL, 'Urgent', NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(97, 19, 1, 1, 0, '780L Van Ness St S', 780, 'L', NULL, 'Van Ness', 'St', 'S', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(128, 8, 1, 1, 0, '527K Main Pl S', 527, 'K', NULL, 'Main', 'Pl', 'S', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(93, 82, 3, 1, 0, '838D Van Ness Blvd E', 838, 'D', NULL, 'Van Ness', 'Blvd', 'E', NULL, 'Urgent', NULL, NULL, NULL, 1, NULL, NULL, 'B10 G56', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(97, 19, 1, 1, 0, '780L Van Ness St S', 780, 'L', NULL, 'Van Ness', 'St', 'S', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'B10 G56', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(128, 8, 1, 1, 0, '527K Main Pl S', 527, 'K', NULL, 'Main', 'Pl', 'S', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '444567', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
 (151, 6, 1, 0, 0, '996S States Ln W', 996, 'S', NULL, 'States', 'Ln', 'W', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
-(171, 16, 1, 1, 0, '409K El Camino Path NE', 409, 'K', NULL, 'El Camino', 'Path', 'NE', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
+(171, 16, 1, 1, 0, '409K El Camino Path NE', 409, 'K', NULL, 'El Camino', 'Path', 'NE', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '54286', NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL),
 (175, NULL, 1, 1, 1, '14S El Camino Way E', 14, 'S', NULL, 'El Camino', 'Way', NULL, NULL, NULL, NULL, NULL, 'Collinsville', NULL, 1006, NULL, '6022', NULL, 1228, 41.8328, -72.9253, 0, NULL, NULL, NULL),
-(176, NULL, 1, 1, 1, '11B Woodbridge Path SW', 11, 'B', NULL, 'Woodbridge', 'Path', NULL, NULL, NULL, NULL, NULL, 'Dayton', NULL, 1034, NULL, '45417', NULL, 1228, 39.7531, -84.2471, 0, NULL, NULL, NULL),
+(176, NULL, 1, 1, 1, '11B Woodbridge Path SW', 11, 'B', NULL, 'Woodbridge', 'Path', NULL, NULL, NULL, NULL, NULL, 'Dayton', NULL, 1034, NULL, 'B10 G56', NULL, 1228, 39.7531, -84.2471, 0, NULL, NULL, NULL),
 (177, NULL, 1, 1, 1, '581O Lincoln Dr SW', 581, 'O', NULL, 'Lincoln', 'Dr', NULL, NULL, NULL, NULL, NULL, 'Santa Fe', NULL, 1030, NULL, '87594', NULL, 1228, 35.5212, -105.982, 0, NULL, NULL, NULL);
 
 --

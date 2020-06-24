@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   protected $_sortByCharacter;
@@ -100,21 +84,6 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Make sure that the user has permission to access this group.
-   *
-   * @param int $id
-   *   The id of the object.
-   * @param int $title
-   *   Name or title of the object.
-   *
-   * @return string
-   *   the permission that the user has (or null)
-   */
-  public function checkPermission($id, $title) {
-    return CRM_Contact_BAO_Group::checkPermission($id, $title);
-  }
-
-  /**
    * Re-implement browse.
    *
    * We need to do slightly different things for groups vs saved search groups, hence we
@@ -143,8 +112,8 @@ class CRM_Group_Page_Group extends CRM_Core_Page_Basic {
     if (!empty($_GET['update_smart_groups'])) {
       CRM_Contact_BAO_GroupContactCache::loadAll();
     }
-    else {
-      CRM_Contact_BAO_GroupContactCache::fillIfEmpty();
+    elseif (!CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_group_contact_cache LIMIT 1")) {
+      CRM_Core_Session::setStatus(ts('Count data for smart groups is not currently calculated. You may click Update Smart Groups to generate it. Be aware this can cause significant server load'));
     }
 
     $this->search();

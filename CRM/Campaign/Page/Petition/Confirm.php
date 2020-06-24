@@ -1,36 +1,21 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
+
   /**
    * @return string
    * @throws Exception
@@ -38,20 +23,20 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
   public function run() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
 
-    $contact_id = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer', CRM_Core_DAO::$_nullObject);
-    $hash = CRM_Utils_Request::retrieve('h', 'String', CRM_Core_DAO::$_nullObject);
-    $activity_id = CRM_Utils_Request::retrieve('a', 'String', CRM_Core_DAO::$_nullObject);
-    $petition_id = CRM_Utils_Request::retrieve('pid', 'String', CRM_Core_DAO::$_nullObject);
+    $contact_id = CRM_Utils_Request::retrieve('cid', 'Integer');
+    $subscribe_id = CRM_Utils_Request::retrieve('sid', 'Integer');
+    $hash = CRM_Utils_Request::retrieve('h', 'String');
+    $activity_id = CRM_Utils_Request::retrieve('a', 'String');
+    $petition_id = CRM_Utils_Request::retrieve('pid', 'String');
     if (!$petition_id) {
-      $petition_id = CRM_Utils_Request::retrieve('p', 'String', CRM_Core_DAO::$_nullObject);
+      $petition_id = CRM_Utils_Request::retrieve('p', 'String');
     }
 
     if (!$contact_id ||
       !$subscribe_id ||
       !$hash
     ) {
-      CRM_Core_Error::fatal(ts("Missing input parameters"));
+      CRM_Core_Error::statusBounce(ts("Missing input parameters"));
     }
 
     $result = $this->confirm($contact_id, $subscribe_id, $hash, $activity_id, $petition_id);
@@ -71,7 +56,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $this->assign('survey_id', $petition_id);
 
     $pparams['id'] = $petition_id;
-    $this->petition = array();
+    $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($pparams, $this->petition);
     $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->petition));
@@ -119,7 +104,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $ce->save();
 
     CRM_Contact_BAO_GroupContact::addContactsToGroup(
-      array($contact_id),
+      [$contact_id],
       $se->group_id,
       'Email',
       'Added',

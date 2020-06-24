@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Default template custom searches. This template is used automatically if templateFile() function not defined in
@@ -35,13 +19,17 @@
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
            <tr><td class="label">{$form.distance.label}</td><td>{$form.distance.html|crmAddClass:four} {$form.prox_distance_unit.html}</td></tr>
-           <tr><td class="label">FROM...</td><td></td></tr>
+           <tr><td class="label">{ts}FROM...{/ts}</td><td></td></tr>
            <tr><td class="label">{$form.street_address.label}</td><td>{$form.street_address.html}</td></tr>
            <tr><td class="label">{$form.city.label}</td><td>{$form.city.html}</td></tr>
            <tr><td class="label">{$form.postal_code.label}</td><td>{$form.postal_code.html}</td></tr>
            <tr><td class="label">{$form.country_id.label}</td><td>{$form.country_id.html}</td></tr>
            <tr><td class="label" style="white-space: nowrap;">{$form.state_province_id.label}</td><td>{$form.state_province_id.html}</td></tr>
-           <tr><td class="label">AND ...</td><td></td></tr>
+           <tr><td class="label">{ts}OR enter lattitude and longitude if you already know it{/ts}.</td><td></td></tr>
+           <tr><td class="label" style="white-space: nowrap;">{$form.geo_code_1.label}</td><td>{$form.geo_code_1.html}</td></tr>
+           <tr><td class="label" style="white-space: nowrap;">{$form.geo_code_2.label}</td><td>{$form.geo_code_2.html}</td></tr>
+           <tr><td class="label">{ts}AND ...{/ts}</td><td></td></tr>
+           <tr><td class="label">{ts}Restrict results by ...{/ts}</td><td></td></tr>
            <tr><td class="label">{$form.group.label}</td><td>{$form.group.html}</td></tr>
            <tr><td class="label">{$form.tag.label}</td><td>{$form.tag.html}</td></tr>
         </table>

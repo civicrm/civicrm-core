@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -70,7 +54,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
   public function preProcess() {
     $this->_contactId = $this->get('contactId');
     $this->_groupContactId = $this->get('groupContactId');
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
   }
 
   /**
@@ -80,7 +64,17 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     // get the list of all the groups
     if ($this->_context == 'user') {
       $onlyPublicGroups = CRM_Utils_Request::retrieve('onlyPublicGroups', 'Boolean', $this, FALSE);
-      $allGroups = CRM_Core_PseudoConstant::staticGroup($onlyPublicGroups);
+      $ids = CRM_Core_PseudoConstant::allGroup();
+      $heirGroups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids);
+
+      $allGroups = [];
+      foreach ($heirGroups as $id => $group) {
+        // make sure that this group has public visibility
+        if ($onlyPublicGroups && $group['visibility'] == 'User and User Admin Only') {
+          continue;
+        }
+        $allGroups[$id] = $group;
+      }
     }
     else {
       $allGroups = CRM_Core_PseudoConstant::group();
@@ -101,7 +95,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       $groupSelect = $groupHierarchy;
     }
 
-    $groupSelect = array('' => ts('- select group -')) + $groupSelect;
+    $groupSelect = ['' => ts('- select group -')] + $groupSelect;
 
     if (count($groupSelect) > 1) {
       $session = CRM_Core_Session::singleton();
@@ -113,16 +107,15 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
 
-      $this->addField('group_id', array('class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect));
+      $this->addField('group_id', ['class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect]);
 
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Add'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Add'),
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
   }
 
@@ -130,7 +123,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    * Post process form.
    */
   public function postProcess() {
-    $contactID = array($this->_contactId);
+    $contactID = [$this->_contactId];
     $groupId = $this->controller->exportValue('GroupContact', 'group_id');
     $method = ($this->_context == 'user') ? 'Web' : 'Admin';
 
@@ -144,7 +137,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
 
     if ($groupContact && $this->_context != 'user') {
       $groups = CRM_Core_PseudoConstant::group();
-      CRM_Core_Session::setStatus(ts("Contact has been added to '%1'.", array(1 => $groups[$groupId])), ts('Added to Group'), 'success');
+      CRM_Core_Session::setStatus(ts("Contact has been added to '%1'.", [1 => $groups[$groupId]]), ts('Added to Group'), 'success');
     }
   }
 

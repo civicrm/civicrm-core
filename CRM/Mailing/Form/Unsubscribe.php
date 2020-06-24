@@ -1,36 +1,28 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
+
+  /**
+   * Prevent people double-submitting the form (e.g. by double-clicking).
+   * https://lab.civicrm.org/dev/core/-/issues/1773
+   *
+   * @var bool
+   */
+  public $submitOnce = TRUE;
 
   public function preProcess() {
 
@@ -44,13 +36,13 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       !$queue_id ||
       !$hash
     ) {
-      CRM_Core_Error::fatal(ts("Missing Parameters"));
+      throw new CRM_Core_Exception(ts('Missing Parameters'));
     }
 
     // verify that the three numbers above match
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
     if (!$q) {
-      CRM_Core_Error::fatal(ts("There was an error in your request"));
+      throw new CRM_Core_Exception(ts("There was an error in your request"));
     }
 
     list($displayName, $email) = CRM_Mailing_Event_BAO_Queue::getContactInfo($queue_id);
@@ -70,9 +62,9 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     }
     if (!$groupExist) {
       $statusMsg = ts('Email: %1 has been successfully unsubscribed from this Mailing List/Group.',
-        array(1 => $email)
+        [1 => $email]
       );
-      CRM_Core_Session::setStatus($statusMsg, '', 'fail');
+      CRM_Core_Session::setStatus($statusMsg, '', 'error');
     }
     $this->assign('groupExist', $groupExist);
 
@@ -85,17 +77,17 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->add('text', 'email_confirm', ts('Verify email address to unsubscribe:'));
     $this->addRule('email_confirm', ts('Email address is required to unsubscribe.'), 'required');
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'next',
-        'name' => 'Unsubscribe',
+        'name' => ts('Unsubscribe'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    );
+      ],
+    ];
 
     $this->addButtons($buttons);
   }
@@ -116,29 +108,27 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
 
     if ($result == TRUE) {
       // Email address verified
-
       $groups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($job_id, $queue_id, $hash);
+
       if (count($groups)) {
         CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue_id, $groups, FALSE, $job_id);
       }
 
       $statusMsg = ts('Email: %1 has been successfully unsubscribed from this Mailing List/Group.',
-        array(1 => $values['email_confirm'])
+        [1 => $values['email_confirm']]
       );
 
       CRM_Core_Session::setStatus($statusMsg, '', 'success');
     }
     elseif ($result == FALSE) {
       // Email address not verified
-
       $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this unsubscribe request.',
-        array(1 => $values['email_confirm'])
+        [1 => $values['email_confirm']]
       );
 
-      CRM_Core_Session::setStatus($statusMsg, '', 'fail');
+      CRM_Core_Session::setStatus($statusMsg, '', 'error');
 
     }
-
   }
 
 }

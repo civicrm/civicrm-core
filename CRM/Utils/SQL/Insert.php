@@ -36,6 +36,7 @@ class CRM_Utils_SQL_Insert {
 
   /**
    * Array<string> list of column names
+   * @var array
    */
   private $columns;
 
@@ -59,13 +60,14 @@ class CRM_Utils_SQL_Insert {
    */
   public static function dao(CRM_Core_DAO $dao) {
     $table = CRM_Core_DAO::getLocaleTableName($dao->getTableName());
-    $row = array();
+    $row = [];
     foreach ((array) $dao as $key => $value) {
       if ($value === 'null') {
-        $value = NULL; // Blerg!!!
+        // Blerg!!!
+        $value = NULL;
       }
       // Skip '_foobar' and '{\u00}*_options' and 'N'.
-      if (preg_match('/[a-zA-Z]/', $key{0}) && $key !== 'N') {
+      if (preg_match('/[a-zA-Z]/', $key[0]) && $key !== 'N') {
         $row[$key] = $value;
       }
     }
@@ -80,7 +82,7 @@ class CRM_Utils_SQL_Insert {
    */
   public function __construct($table) {
     $this->table = $table;
-    $this->rows = array();
+    $this->rows = [];
   }
 
   /**
@@ -88,7 +90,7 @@ class CRM_Utils_SQL_Insert {
    *
    * @param array $columns
    *
-   * @return $this
+   * @return CRM_Utils_SQL_Insert
    * @throws \CRM_Core_Exception
    */
   public function columns($columns) {
@@ -128,11 +130,11 @@ class CRM_Utils_SQL_Insert {
       sort($columns);
       $this->columns = $columns;
     }
-    elseif (array_diff($this->columns, $columns) !== array()) {
+    elseif (array_diff($this->columns, $columns) !== []) {
       throw new CRM_Core_Exception("Inconsistent column names");
     }
 
-    $escapedRow = array();
+    $escapedRow = [];
     foreach ($this->columns as $column) {
       $escapedRow[$column] = $this->escapeString($row[$column]);
     }

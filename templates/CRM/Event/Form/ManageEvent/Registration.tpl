@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $addProfileBottomAdd OR $addProfileBottom}
@@ -28,8 +12,8 @@
       width="20%">{if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].label}
     {else}{$form.custom_post_id_multiple[$profileBottomNum].label}{/if}</td>
   <td>{if $addProfileBottomAdd }{$form.additional_custom_post_id_multiple[$profileBottomNumAdd].html}{else}{$form.custom_post_id_multiple[$profileBottomNum].html}{/if}
-    <span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile" data-addtlPartc="{$addProfileBottomAdd}"><i class="crm-i fa-trash"></i> {ts}remove profile{/ts}</a></span>
-    <span class='profile_bottom_link'>&nbsp;<a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle"></i> {ts}add another profile (bottom of page){/ts}</a></span>
+    <span class='profile_bottom_link_remove'><a href="#" class="crm-hover-button crm-button-rem-profile" data-addtlPartc="{$addProfileBottomAdd}"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}</a></span>
+    <span class='profile_bottom_link'>&nbsp;<a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile (bottom of page){/ts}</a></span>
     {if $addProfileBottomAdd }
       <div
         class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}</div>
@@ -72,11 +56,11 @@
   {if !$isTemplate}
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
       <td scope="row" class="label" width="20%">{$form.registration_start_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_start_date}</td>
+      <td>{$form.registration_start_date.html}</td>
     </tr>
     <tr class="crm-event-manage-registration-form-block-registration_end_date">
       <td scope="row" class="label" width="20%">{$form.registration_end_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_end_date}</td>
+      <td>{$form.registration_end_date.html}</td>
     </tr>
   {/if}
   <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">
@@ -156,7 +140,7 @@
         <td scope="row" class="label" width="20%">{$form.custom_post_id.label}</td>
         <td>{$form.custom_post_id.html}
           <div class="description">{ts}Include additional fields on this registration form by selecting and configuring a CiviCRM Profile to be included at the bottom of the page.{/ts}</div>
-          <span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle"></i> {ts}add another profile (bottom of page){/ts}</a></span>
+          <span class='profile_bottom_link_main {if $profilePostMultiple}hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile (bottom of page){/ts}</a></span>
           <br/>
         </td>
       </tr>
@@ -170,13 +154,13 @@
               &nbsp;
               <span class='profile_bottom_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
-                  <i class="crm-i fa-trash"></i> {ts}remove profile{/ts}
+                  <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
                 </a>
               </span>
               &nbsp;&nbsp;
               <span class='profile_bottom_link' {if !$smarty.foreach.profilePostIdName.last} style="display: none"{/if}>
                 <a href="#" class="crm-hover-button crm-button-add-profile">
-                  <i class="crm-i fa-plus-circle"></i>
+                  <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
                   {ts}add another profile (bottom of page){/ts}
                 </a>
               </span>
@@ -201,7 +185,7 @@
           <div
             class="description">{ts}Change this if you want to use a different profile for additional participants.{/ts}
           </div>
-          <span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle"></i> {ts}add another profile (bottom of page){/ts}</a></span>
+          <span class='profile_bottom_add_link_main{if $profilePostMultipleAdd} hiddenElement{/if}'><a href="#" class="crm-hover-button crm-button-add-profile"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another profile (bottom of page){/ts}</a></span>
           <br/><span class="profile-links"></span>
         </td>
       </tr>
@@ -215,12 +199,12 @@
               &nbsp;
               <span class='profile_bottom_add_link_remove'>
                 <a href="#" class="crm-hover-button crm-button-rem-profile">
-                  <i class="crm-i fa-trash"></i> {ts}remove profile{/ts}
+                  <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}remove profile{/ts}
                 </a>
               </span>
               <span class='profile_bottom_add_link' {if !$smarty.foreach.profilePostIdAName.last} style="display: none"{/if}>
                 <a href="#" class="crm-hover-button crm-button-add-profile">
-                  <i class="crm-i fa-plus-circle"></i>
+                  <i class="crm-i fa-plus-circle" aria-hidden="true"></i>
                   {ts}add another profile (bottom of page){/ts}
                 </a>
               </span>

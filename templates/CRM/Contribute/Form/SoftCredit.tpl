@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* template for adding form elements for soft credit form*}
@@ -30,20 +14,21 @@
     <tr id="soft-credit-row-{$rowNumber}"
         class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
       <td>
-        {$form.soft_credit_contact_id.$rowNumber.label}&nbsp;{$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:twenty}
+        {$form.soft_credit_contact_id.$rowNumber.label}<br>{$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:twenty}
       </td>
       <td>
-        {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
+        {$form.soft_credit_amount.$rowNumber.label}<br>{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
       </td>
       <td>
-        {$form.soft_credit_type.$rowNumber.label}&nbsp;{$form.soft_credit_type.$rowNumber.html}
+        {$form.soft_credit_type.$rowNumber.label}<br>
+        {$form.soft_credit_type.$rowNumber.html}
         &nbsp;<a class="crm-hover-button soft-credit-delete-link" href="#"><span class="icon delete-icon"></span></a>
       </td>
     </tr>
   {/section}
   <tr>
     <td>
-      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><i class="crm-i fa-plus-circle"></i> {ts}another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>

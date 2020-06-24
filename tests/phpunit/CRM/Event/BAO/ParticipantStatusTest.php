@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -54,13 +38,13 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   public function testCreateAndDelete() {
 
     // create using required params
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
       'weight' => 13,
       'visibility_id' => 1,
-    );
+    ];
 
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
     // Checking for participant status type id in db.
@@ -80,7 +64,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    */
   public function testAddStatusType() {
 
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
@@ -88,7 +72,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'weight' => 13,
       'visibility_id' => 1,
-    );
+    ];
 
     // check for add participant status type
     $statusType = CRM_Event_BAO_ParticipantStatusType::add($params);
@@ -96,7 +80,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       $this->assertEquals($value, $statusType->$param);
     }
 
-    $params = array(
+    $params = [
       'id' => $statusType->id,
       'name' => 'testStatus',
       'label' => 'testAlterParticipant',
@@ -105,7 +89,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 0,
       'weight' => 14,
       'visibility_id' => 2,
-    );
+    ];
 
     // check for add participant status type
     $statusType = CRM_Event_BAO_ParticipantStatusType::add($params);
@@ -119,7 +103,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    */
   public function testRetrieveStatusType() {
 
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
@@ -127,13 +111,13 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'weight' => 13,
       'visibility_id' => 1,
-    );
+    ];
 
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
 
     // retrieve status type
-    $retrieveParams = array('id' => $statusType->id);
-    $default = array();
+    $retrieveParams = ['id' => $statusType->id];
+    $default = [];
     $retrieveStatusType = CRM_Event_BAO_ParticipantStatusType::retrieve($retrieveParams, $default);
 
     // check on retrieve values
@@ -147,7 +131,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    */
   public function testSetIsActiveStatusType() {
 
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
@@ -155,7 +139,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'weight' => 15,
       'visibility_id' => 1,
-    );
+    ];
 
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
     $isActive = 1;

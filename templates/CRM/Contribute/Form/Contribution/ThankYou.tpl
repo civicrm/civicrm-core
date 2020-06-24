@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $action & 1024}
@@ -39,13 +23,13 @@
   {* Show link to Tell a Friend (CRM-2153) *}
   {if $friendText}
     <div id="tell-a-friend" class="crm-section friend_link-section">
-      <a href="{$friendURL}" title="{$friendText}" class="button"><span>&raquo; {$friendText}</span></a>
+      <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$friendText}</span></a>
     </div>{if !$linkText}<br /><br />{/if}
   {/if}
   {* Add button for donor to create their own Personal Campaign page *}
   {if $linkText}
     <div class="crm-section create_pcp_link-section">
-      <a href="{$linkTextUrl}" title="{$linkText}" class="button"><span>&raquo; {$linkText}</span></a>
+      <a href="{$linkTextUrl}" title="{$linkText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$linkText}</span></a>
     </div><br /><br />
   {/if}
 
@@ -62,8 +46,8 @@
           {/if}
         </div>
       {/if}
-    {elseif $contributeMode EQ 'notify' OR ($contributeMode EQ 'direct' && $is_recur) }
-      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing. Please print this page for your records.{/ts}</div>
+    {elseif $isPendingOutcome}
+      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing.{/ts}</div>
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -74,12 +58,12 @@
       </div>
     {/if}
   {else}
-    <div>{ts}Your transaction has been processed successfully. Please print this page for your records.{/ts}</div>
+    <div>{ts}Your transaction has been processed successfully.{/ts}</div>
       {if $is_email_receipt}
         <div>
           {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
             {ts 1=$email 2=$onBehalfEmail}An email receipt has also been sent to %1 and to %2{/ts}
-          {else}
+          {elseif $email}
             {ts 1=$email}An email receipt has also been sent to %1{/ts}
           {/if}
         </div>
@@ -118,7 +102,7 @@
             {if $totalTaxAmount}
               {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
             {/if}
-            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if} : <strong>{$amount|crmMoney} {if $amount_level } - {$amount_level} {/if}</strong>
+            {if $installments}{ts}Installment Amount{/ts}{else}{ts}Amount{/ts}{/if}: <strong>{$amount|crmMoney}{if $amount_level } &ndash; {$amount_level}{/if}</strong>
           {/if}
         {/if}
         {if $receive_date}
@@ -188,13 +172,13 @@
     </div>
   {/if}
 
-  {if $onbehalfProfile|@count && $is_for_organization}
+  {if $onbehalfProfile && $onbehalfProfile|@count}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
       {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
      </div>
   {/if}
 
-  {if $honoreeProfileFields|@count}
+  {if $honoreeProfileFields && $honoreeProfileFields|@count}
     <div class="crm-group honor_block-group">
       <div class="header-dark">
         {$soft_credit_type}
@@ -274,14 +258,12 @@
   {if $contributeMode eq 'direct' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 )}
     {crmRegion name="contribution-thankyou-billing-block"}
       <div class="crm-group credit_card-group">
-        <div class="header-dark">
-          {if $paymentProcessor.payment_type & 2}
-            {ts}Direct Debit Information{/ts}
-          {else}
-            {ts}Credit Card Information{/ts}
-          {/if}
-        </div>
-        {if $paymentProcessor.payment_type & 2}
+        {if $paymentFieldsetLabel}
+          <div class="header-dark">
+            {$paymentFieldsetLabel}
+          </div>
+        {/if}
+        {if $paymentProcessor.payment_type == 2}
           <div class="display-block">
             {ts}Account Holder{/ts}: {$account_holder}<br />
             {ts}Bank Identification Number{/ts}: {$bank_identification_number}<br />
@@ -292,7 +274,7 @@
           <div class="crm-section no-label credit_card_details-section">
             <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
-            <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
+            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         {/if}

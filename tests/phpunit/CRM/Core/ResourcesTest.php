@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,11 +25,20 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    */
   protected $mapper;
 
+  /**
+   * @var string
+   * For testing cache buster generation
+   */
+  protected $cacheBusterString = 'xBkdk3';
+
+  protected $originalRequest;
+  protected $originalGet;
+
   public function setUp() {
     parent::setUp();
 
     list ($this->basedir, $this->container, $this->mapper) = $this->_createMapper();
-    $cache = new CRM_Utils_Cache_Arraycache(array());
+    $cache = new CRM_Utils_Cache_Arraycache([]);
     $this->res = new CRM_Core_Resources($this->mapper, $cache, NULL);
     $this->res->setCacheCode('resTest');
     CRM_Core_Resources::singleton($this->res);
@@ -53,17 +46,30 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
     require_once 'CRM/Core/Smarty/resources/String.php';
     civicrm_smarty_register_string_resource();
+
+    $this->originalRequest = $_REQUEST;
+    $this->originalGet = $_GET;
+  }
+
+  /**
+   * Restore globals so this test doesn't interfere with others.
+   */
+  public function tearDown() {
+    $_REQUEST = $this->originalRequest;
+    $_GET = $this->originalGet;
   }
 
   public function testAddScriptFile() {
     $this->res
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
-      ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')// extra
+      // extra
+      ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
       ->addScriptFile('civicrm', 'foo%20bar.js', 0, 'testAddScriptFile');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptFile}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTest\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n";
     $this->assertEquals($expected, $actual);
@@ -89,12 +95,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddScriptURL() {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
-      ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')// extra
+      // extra
+      ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
       ->addScriptUrl('/whizbang/foo%20bar.js', 0, 'testAddScriptURL');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptURL}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"/whizbang/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
@@ -115,66 +123,77 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
   public function testAddVars() {
     $this->res
-      ->addVars('food', array('fruit' => array('mine' => 'apple', 'ours' => 'banana')))
-      ->addVars('food', array('fruit' => array('mine' => 'new apple', 'yours' => 'orange')));
+      ->addVars('food', ['fruit' => ['mine' => 'apple', 'ours' => 'banana']])
+      ->addVars('food', ['fruit' => ['mine' => 'new apple', 'yours' => 'orange']]);
     $this->assertTreeEquals(
-      array(
-        'vars' => array(
-          'food' => array(
-            'fruit' => array(
+      [
+        'vars' => [
+          'food' => [
+            'fruit' => [
               'yours' => 'orange',
               'mine' => 'new apple',
               'ours' => 'banana',
-            ),
-          ),
-        ),
-      ),
+            ],
+          ],
+        ],
+      ],
       $this->res->getSettings()
     );
   }
 
   public function testAddSetting() {
     $this->res
-      ->addSetting(array('fruit' => array('mine' => 'apple')))
-      ->addSetting(array('fruit' => array('yours' => 'orange')));
+      ->addSetting(['fruit' => ['mine' => 'apple']])
+      ->addSetting(['fruit' => ['yours' => 'orange']]);
     $this->assertTreeEquals(
-      array('fruit' => array('yours' => 'orange', 'mine' => 'apple')),
+      ['fruit' => ['yours' => 'orange', 'mine' => 'apple']],
       $this->res->getSettings()
     );
     $actual = $this->res->renderSetting();
-    $expected = json_encode(array('fruit' => array('yours' => 'orange', 'mine' => 'apple')));
+    $expected = json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]);
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
+  }
+
+  public function testAddSettingHook() {
+    $test = $this;
+    Civi::dispatcher()->addListener('hook_civicrm_alterResourceSettings', function($event) use ($test) {
+      $test->assertEquals('apple', $event->data['fruit']['mine']);
+      $event->data['fruit']['mine'] = 'banana';
+    });
+    $this->res->addSetting(['fruit' => ['mine' => 'apple']]);
+    $settings = $this->res->getSettings();
+    $this->assertTreeEquals(['fruit' => ['mine' => 'banana']], $settings);
   }
 
   public function testAddSettingFactory() {
     $this->res->addSettingsFactory(function () {
-      return array('fruit' => array('yours' => 'orange'));
+      return ['fruit' => ['yours' => 'orange']];
     });
     $this->res->addSettingsFactory(function () {
-      return array('fruit' => array('mine' => 'apple'));
+      return ['fruit' => ['mine' => 'apple']];
     });
 
     $actual = $this->res->getSettings();
-    $expected = array('fruit' => array('yours' => 'orange', 'mine' => 'apple'));
+    $expected = ['fruit' => ['yours' => 'orange', 'mine' => 'apple']];
     $this->assertTreeEquals($expected, $actual);
   }
 
   public function testAddSettingAndSettingFactory() {
-    $this->res->addSetting(array('fruit' => array('mine' => 'apple')));
+    $this->res->addSetting(['fruit' => ['mine' => 'apple']]);
 
-    $muckableValue = array('fruit' => array('yours' => 'orange', 'theirs' => 'apricot'));
+    $muckableValue = ['fruit' => ['yours' => 'orange', 'theirs' => 'apricot']];
     $this->res->addSettingsFactory(function () use (&$muckableValue) {
       return $muckableValue;
     });
     $actual = $this->res->getSettings();
-    $expected = array('fruit' => array('mine' => 'apple', 'yours' => 'orange', 'theirs' => 'apricot'));
+    $expected = ['fruit' => ['mine' => 'apple', 'yours' => 'orange', 'theirs' => 'apricot']];
     $this->assertTreeEquals($expected, $actual);
 
     // note: the setting is not fixed based on what the factory returns when registered; it's based
     // on what the factory returns when getSettings is called
-    $muckableValue = array('fruit' => array('yours' => 'banana'));
+    $muckableValue = ['fruit' => ['yours' => 'banana']];
     $actual = $this->res->getSettings();
-    $expected = array('fruit' => array('mine' => 'apple', 'yours' => 'banana'));
+    $expected = ['fruit' => ['mine' => 'apple', 'yours' => 'banana']];
     $this->assertTreeEquals($expected, $actual);
   }
 
@@ -188,7 +207,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('', $actual);
 
     $actual = $smarty->fetch('string:{crmRegion name=testCrmJS}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
@@ -197,12 +217,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddStyleFile() {
     $this->res
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
-      ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')// extra
+      // extra
+      ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
       ->addStyleFile('civicrm', 'foo%20bar.css', 0, 'testAddStyleFile');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleFile}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<link href=\"http://core-app/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
@@ -211,12 +233,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddStyleURL() {
     $this->res
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
-      ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')// extra
+      // extra
+      ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
       ->addStyleUrl('/whizbang/foo%20bar.css', 0, 'testAddStyleURL');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleURL}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"/whizbang/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
@@ -245,7 +269,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('', $actual);
 
     $actual = $smarty->fetch('string:{crmRegion name=testCrmCSS}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
@@ -281,21 +306,43 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext}');
     $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
+
+    $actual = $smarty->fetch('string:{crmResURL expr="[civicrm.root]/foo"}');
+    $this->assertEquals(Civi::paths()->getUrl('[civicrm.root]/foo'), $actual);
   }
 
   public function testGlob() {
     $this->assertEquals(
-      array('info.xml'),
+      ['info.xml'],
       $this->res->glob('com.example.ext', 'info.xml')
     );
     $this->assertEquals(
-      array('js/example.js'),
+      ['js/example.js'],
       $this->res->glob('com.example.ext', 'js/*.js')
     );
     $this->assertEquals(
-      array('js/example.js'),
-      $this->res->glob('com.example.ext', array('js/*.js'))
+      ['js/example.js'],
+      $this->res->glob('com.example.ext', ['js/*.js'])
     );
+  }
+
+  /**
+   * @dataProvider ajaxModeData
+   */
+  public function testIsAjaxMode($query, $result) {
+    $_REQUEST = $_GET = $query;
+    $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
+  }
+
+  public function ajaxModeData() {
+    return [
+      [['q' => 'civicrm/ajax/foo'], TRUE],
+      [['q' => 'civicrm/angularprofiles/template'], TRUE],
+      [['q' => 'civicrm/asset/builder'], TRUE],
+      [['q' => 'civicrm/test/page'], FALSE],
+      [['q' => 'civicrm/test/page', 'snippet' => 'json'], TRUE],
+      [['q' => 'civicrm/test/page', 'snippet' => 'foo'], FALSE],
+    ];
   }
 
   /**
@@ -314,7 +361,87 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     // not needed for now // file_put_contents("$basedir/weird/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir, 'http://ext-dir', $cache, $cacheKey);
     $mapper = new CRM_Extension_Mapper($c, NULL, NULL, '/pathto/civicrm', 'http://core-app');
-    return array($basedir, $c, $mapper);
+    return [$basedir, $c, $mapper];
+  }
+
+  /**
+   * @param string $url
+   * @param string $expected
+   *
+   * @dataProvider urlForCacheCodeProvider
+   */
+  public function testAddingCacheCode($url, $expected) {
+    $resources = CRM_Core_Resources::singleton();
+    $resources->setCacheCode($this->cacheBusterString);
+    $this->assertEquals($expected, $resources->addCacheCode($url));
+  }
+
+  /**
+   * @return array
+   */
+  public function urlForCacheCodeProvider() {
+    return [
+      [
+        'http://www.civicrm.org',
+        'http://www.civicrm.org?r=' . $this->cacheBusterString,
+      ],
+      [
+        'www.civicrm.org/custom.css?foo=bar',
+        'www.civicrm.org/custom.css?foo=bar&r=' . $this->cacheBusterString,
+      ],
+      [
+        'civicrm.org/custom.css?car=blue&foo=bar',
+        'civicrm.org/custom.css?car=blue&foo=bar&r=' . $this->cacheBusterString,
+      ],
+    ];
+  }
+
+  /**
+   * return array
+   */
+  public function urlsToCheckIfFullyFormed() {
+    return [
+      ['civicrm/test/page', FALSE],
+      ['#', FALSE],
+      ['', FALSE],
+      ['/civicrm/test/page', TRUE],
+      ['http://test.com/civicrm/test/page', TRUE],
+      ['https://test.com/civicrm/test/page', TRUE],
+    ];
+  }
+
+  /**
+   * @param string $url
+   * @param string $expected
+   *
+   * @dataProvider urlsToCheckIfFullyFormed
+   */
+  public function testIsFullyFormedUrl($url, $expected) {
+    $this->assertEquals($expected, CRM_Core_Resources::isFullyFormedUrl($url));
+  }
+
+  /**
+   * Test for hook_civicrm_entityRefFilters().
+   *
+   */
+  public function testEntityRefFiltersHook() {
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_entityRefFilters', [$this, 'entityRefFilters']);
+    $data = CRM_Core_Resources::getEntityRefMetadata();
+    $this->assertEquals(count($data['links']['Contact']), 4);
+    $this->assertEquals(!empty($data['links']['Contact']['new_staff']), TRUE);
+  }
+
+  /**
+   * @param array $filters
+   * @param array $links
+   */
+  public function entityRefFilters(&$filters, &$links) {
+    $links['Contact']['new_staff'] = [
+      'label' => ts('New Staff'),
+      'url' => '/civicrm/profile/create&reset=1&context=dialog&gid=5',
+      'type' => 'Individual',
+      'icon' => 'fa-user',
+    ];
   }
 
 }

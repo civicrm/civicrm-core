@@ -10,9 +10,8 @@
   {$form.mailing_job_status.html}
 </td>
 </tr>
-<tr><td><label>{ts}Mailing Date{/ts}</label></td></tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="mailing_date" from='_low' to='_high'}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="mailing_job_start_date"}
 </tr>
 <tr>
   <td>

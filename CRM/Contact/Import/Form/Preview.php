@@ -1,40 +1,31 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class previews the uploaded file and returns summary statistics.
  */
 class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
+
+  /**
+   * Whether USPS validation should be disabled during import.
+   *
+   * @var bool
+   */
+  protected $_disableUSPS;
 
   /**
    * Set variables up before form is built.
@@ -47,6 +38,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $conflictRowCount = $this->get('conflictRowCount');
     $mismatchCount = $this->get('unMatchCount');
     $columnNames = $this->get('columnNames');
+    $this->_disableUSPS = $this->get('disableUSPS');
 
     //assign column names
     $this->assign('columnNames', $columnNames);
@@ -113,13 +105,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->assign($property, $this->get($property));
     }
 
-    $statusID = $this->get('statusID');
-    if (!$statusID) {
-      $statusID = md5(uniqid(rand(), TRUE));
-      $this->set('statusID', $statusID);
-    }
-    $statusUrl = CRM_Utils_System::url('civicrm/ajax/status', "id={$statusID}", FALSE, NULL, FALSE);
-    $this->assign('statusUrl', $statusUrl);
+    $this->setStatusUrl();
 
     $showColNames = TRUE;
     if ('CRM_Import_DataSource_CSV' == $this->get('dataSource') &&
@@ -136,14 +122,22 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   public function buildQuickForm() {
     $this->addElement('text', 'newGroupName', ts('Name for new group'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'));
     $this->addElement('text', 'newGroupDesc', ts('Description of new group'));
+    $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
+    if (!empty($groupTypes)) {
+      $this->addCheckBox('newGroupType',
+        ts('Group Type'),
+        $groupTypes,
+        NULL, NULL, NULL, NULL, '&nbsp;&nbsp;&nbsp;'
+      );
+    }
 
     $groups = $this->get('groups');
 
     if (!empty($groups)) {
       $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array(
-          'multiple' => "multiple",
-          'class' => 'crm-select2',
-        ));
+        'multiple' => "multiple",
+        'class' => 'crm-select2',
+      ));
     }
 
     //display new tag
@@ -157,38 +151,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
     }
 
-    $path = "_qf_MapField_display=true";
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $path .= "&qfKey=$qfKey";
-    }
-
-    $previousURL = CRM_Utils_System::url('civicrm/import/contact', $path, FALSE, NULL, FALSE);
-    $cancelURL = CRM_Utils_System::url('civicrm/import/contact', 'reset=1');
-
-    $buttons = array(
-      array(
-        'type' => 'back',
-        'name' => ts('Previous'),
-        'js' => array('onclick' => "location.href='{$previousURL}'; return false;"),
-      ),
-      array(
-        'type' => 'next',
-        'name' => ts('Import Now'),
-        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        'isDefault' => TRUE,
-        'js' => array('onclick' => "return verify( );"),
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-        'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-      ),
-    );
-
-    $this->addButtons($buttons);
-
     $this->addFormRule(array('CRM_Contact_Import_Form_Preview', 'formRule'), $this);
+
+    parent::buildQuickForm();
   }
 
   /**
@@ -204,7 +169,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     $invalidTagName = $invalidGroupName = FALSE;
 
     if (!empty($fields['newTagName'])) {
@@ -255,6 +220,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       'dedupe' => $this->get('dedupe'),
       'newGroupName' => $this->controller->exportValue($this->_name, 'newGroupName'),
       'newGroupDesc' => $this->controller->exportValue($this->_name, 'newGroupDesc'),
+      'newGroupType' => $this->controller->exportValue($this->_name, 'newGroupType'),
       'groups' => $this->controller->exportValue($this->_name, 'groups'),
       'allGroups' => $this->get('groups'),
       'newTagName' => $this->controller->exportValue($this->_name, 'newTagName'),
@@ -277,21 +243,19 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     // If ACL applies to the current user, update cache before running the import.
     if (!CRM_Core_Permission::check('view all contacts')) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
-      CRM_ACL_BAO_Cache::updateEntry($userID);
+      $userID = CRM_Core_Session::getLoggedInContactID();
+      CRM_ACL_BAO_Cache::deleteEntry($userID);
+      CRM_ACL_BAO_Cache::deleteContactCacheEntry($userID);
     }
+
+    CRM_Utils_Address_USPS::disable($this->_disableUSPS);
 
     // run the import
     $importJob->runImport($this);
 
-    // update cache after we done with runImport
-    if (!CRM_Core_Permission::check('view all contacts')) {
-      CRM_ACL_BAO_Cache::updateEntry($userID);
-    }
-
-    // clear all caches
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    // Clear all caches, forcing any searches to recheck the ACLs or group membership as the import
+    // may have changed it.
+    CRM_Contact_BAO_Contact_Utils::clearContactCaches(TRUE);
 
     // add all the necessary variables to the form
     $importJob->setFormVariables($this);
@@ -299,7 +263,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     // check if there is any error occurred
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
-    $errorMessage = array();
+    $errorMessage = [];
 
     if (is_array($errors)) {
       foreach ($errors as $key => $value) {
@@ -343,6 +307,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $onDuplicate = $this->get('onDuplicate');
     $newGroupName = $this->controller->exportValue($this->_name, 'newGroupName');
     $newGroupDesc = $this->controller->exportValue($this->_name, 'newGroupDesc');
+    $newGroupType = $this->controller->exportValue($this->_name, 'newGroupType');
     $groups = $this->controller->exportValue($this->_name, 'groups');
     $allGroups = $this->get('groups');
     $newTagName = $this->controller->exportValue($this->_name, 'newTagName');
@@ -352,14 +317,14 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
 
-    $mapperKeys = array();
-    $mapperLocTypes = array();
-    $mapperPhoneTypes = array();
-    $mapperRelated = array();
-    $mapperRelatedContactType = array();
-    $mapperRelatedContactDetails = array();
-    $mapperRelatedContactLocType = array();
-    $mapperRelatedContactPhoneType = array();
+    $mapperKeys = [];
+    $mapperLocTypes = [];
+    $mapperPhoneTypes = [];
+    $mapperRelated = [];
+    $mapperRelatedContactType = [];
+    $mapperRelatedContactDetails = [];
+    $mapperRelatedContactLocType = [];
+    $mapperRelatedContactPhoneType = [];
 
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
@@ -410,7 +375,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
 
     foreach ($mapper as $key => $value) {
-      $header = array();
+      $header = [];
       list($id, $first, $second) = explode('_', $mapper[$key][0]);
       if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
         $relationType = new CRM_Contact_DAO_RelationshipType();
@@ -474,6 +439,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
         'name' => $newGroupName,
         'title' => $newGroupName,
         'description' => $newGroupDesc,
+        'group_type' => $newGroupType,
         'is_active' => TRUE,
       );
       $group = CRM_Contact_BAO_Group::create($gParams);
@@ -481,7 +447,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     }
 
     if (is_array($groups)) {
-      $groupAdditions = array();
+      $groupAdditions = [];
       foreach ($groups as $groupId) {
         $addCount = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $groupId);
         if (!empty($relatedContactIds)) {
@@ -519,15 +485,14 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
         'description' => $newTagDesc,
         'is_active' => TRUE,
       );
-      $id = array();
-      $addedTag = CRM_Core_BAO_Tag::add($tagParams, $id);
+      $addedTag = CRM_Core_BAO_Tag::add($tagParams);
       $tag[$addedTag->id] = 1;
     }
     //add Tag to Import
 
     if (is_array($tag)) {
 
-      $tagAdditions = array();
+      $tagAdditions = [];
       foreach ($tag as $tagId => $val) {
         $addTagCount = CRM_Core_BAO_EntityTag::addContactsToTag($contactIds, $tagId);
         if (!empty($relatedContactIds)) {
@@ -562,7 +527,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
-    $errorMessage = array();
+    $errorMessage = [];
 
     if (is_array($errors)) {
       foreach ($errors as $key => $value) {

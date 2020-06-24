@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This file provides the template for inline editing of phones *}
@@ -47,13 +31,13 @@
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
     <tr id="Phone_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
-        <td>{$form.phone.$blockId.phone.html}&nbsp;&nbsp;{ts}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
+        <td>{$form.phone.$blockId.phone.html} {ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
         <td>{$form.phone.$blockId.location_type_id.html}</td>
         <td>{$form.phone.$blockId.phone_type_id.html}</td>
         <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>
         <td>
           {if $blockId gt 1}
-            <a class="crm-delete-inline crm-hover-button\" href="#" title="{ts}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
+            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
     </tr>

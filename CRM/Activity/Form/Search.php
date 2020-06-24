@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -46,21 +30,22 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
-  protected $_limit = NULL;
+  protected $_limit;
 
   /**
    * Prefix for the controller.
+   * @var string
    */
-  protected $_prefix = "activity_";
+  protected $_prefix = 'activity_';
 
   /**
    * The saved search ID retrieved from the GET vars.
@@ -70,52 +55,33 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Activity';
+  }
+
+  /**
    * Processing needed for buildForm and later.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $this->set('searchFormName', 'Search');
 
     // set the button names
-    $this->_searchButtonName = $this->getButtonName('refresh');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
+    $this->sortNameOnly = TRUE;
 
-    // we allow the controller to set force/reset externally, useful when we are being
-    // driven by the wizard framework
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean', CRM_Core_DAO::$_nullObject);
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
-
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST) && !$this->controller->isModal()) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
+    parent::preProcess();
 
     if (empty($this->_formValues)) {
       if (isset($this->_ssID)) {
         $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
       }
-    }
-
-    if ($this->_force) {
-      $this->postProcess();
-      $this->set('force', 0);
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -136,7 +102,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::TRANSFER,
@@ -150,6 +116,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -163,9 +132,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
         $this->addRowSelectors($rows);
       }
 
-      $permission = CRM_Core_Permission::getPermission();
-
-      $this->addTaskMenu(CRM_Activity_Task::permissionedTaskTitles($permission));
+      $this->addTaskMenu(CRM_Activity_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()));
     }
 
   }
@@ -182,6 +149,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    *
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     if ($this->_done) {
@@ -189,18 +158,18 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-
+    $this->setFormValues();
     if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-      $specialParams = array(
+      $specialParams = [
         'activity_type_id',
-        'status_id',
-        'activity_subject',
-      );
-      $changeNames = array('status_id' => 'activity_status_id');
+        'priority_id',
+      ];
+      $changeNames = [
+        'priority_id' => 'activity_priority_id',
+      ];
+
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }
-
     $this->fixFormValues();
 
     if (isset($this->_ssID) && empty($_POST)) {
@@ -217,7 +186,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
-    $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
@@ -228,13 +196,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $formName = $stateMachine->getTaskFormName();
       $this->controller->resetPage($formName);
       return;
-    }
-
-    $sortID = NULL;
-    if ($this->get(CRM_Utils_Sort::SORT_ID)) {
-      $sortID = CRM_Utils_Sort::sortIDValue($this->get(CRM_Utils_Sort::SORT_ID),
-        $this->get(CRM_Utils_Sort::SORT_DIRECTION)
-      );
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -249,13 +210,13 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $selector->setKey($this->controller->_key);
 
     $prefix = NULL;
-    if ($this->_context == 'basic' || $this->_context == 'user') {
+    if ($this->_context === 'basic' || $this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
     $controller = new CRM_Core_Selector_Controller($selector,
       $this->get(CRM_Utils_Pager::PAGE_ID),
-      $sortID,
+      $this->getSortID(),
       CRM_Core_Action::VIEW,
       $this,
       CRM_Core_Selector_Controller::SESSION,
@@ -264,12 +225,17 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $controller->setEmbedded(TRUE);
     $query = &$selector->getQuery();
 
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $query->setSkipPermission(TRUE);
     }
     $controller->run();
   }
 
+  /**
+   * Probably more hackery than anything else.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function fixFormValues() {
     if (!$this->_force) {
       return;
@@ -281,11 +247,11 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_defaults['activity_status_id'] = $status;
     }
 
-    $survey = CRM_Utils_Request::retrieve('survey', 'Positive', CRM_Core_DAO::$_nullObject);
+    $survey = CRM_Utils_Request::retrieve('survey', 'Positive');
 
     if ($survey) {
       $this->_formValues['activity_survey_id'] = $this->_defaults['activity_survey_id'] = $survey;
-      $sid = CRM_Utils_Array::value('activity_survey_id', $this->_formValues);
+      $sid = $this->_formValues['activity_survey_id'] ?? NULL;
       $activity_type_id = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $sid, 'activity_type_id');
 
       // since checkbox are replaced by multiple select option
@@ -312,66 +278,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    // Added for membership search
-
-    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive',
-      CRM_Core_DAO::$_nullObject
-    );
-
-    if ($signupType) {
-      $this->_formValues['activity_role'] = 1;
-      $this->_defaults['activity_role'] = 1;
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-
-      $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
-      $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
-
-      switch ($signupType) {
-        case 3: // signups and renewals
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-        case 1: // signups only
-          $this->_formValues['activity_type_id'][$signup] = 1;
-          $this->_defaults['activity_type_id'][$signup] = 1;
-          break;
-
-        case 2: // renewals only
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-          break;
-      }
-    }
-
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
-
-    if ($dateLow) {
-      $dateLow = date('m/d/Y', strtotime($dateLow));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_low'] = $dateLow;
-      $this->_defaults['activity_date_low'] = $dateLow;
-    }
-
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String',
-      CRM_Core_DAO::$_nullObject
-    );
-
-    if ($dateHigh) {
-      // Activity date time assumes midnight at the beginning of the date
-      // This sets it to almost midnight at the end of the date
-      /*   if ($dateHigh <= 99999999) {
-      $dateHigh = 1000000 * $dateHigh + 235959;
-      } */
-      $dateHigh = date('m/d/Y', strtotime($dateHigh));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_high'] = $dateHigh;
-      $this->_defaults['activity_date_high'] = $dateHigh;
-    }
-
     // Enable search activity by custom value
+    // @todo this is not good security practice. Instead define entity fields in metadata &
+    // use getEntity Defaults
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
       if (substr($key, 0, 7) != 'custom_') {
@@ -393,19 +302,30 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * @return null
-   */
-  public function getFormValues() {
-    return NULL;
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
    */
   public function getTitle() {
     return ts('Find Activities');
+  }
+
+  /**
+   * Get metadata for the entity  fields.
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getEntityMetadata() {
+    return CRM_Activity_BAO_Query::getSearchFieldMetadata();
+  }
+
+  /**
+   * Set the metadata for the form.
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Activity' => $this->getEntityMetadata()]);
   }
 
 }

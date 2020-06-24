@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* Callback snippet: Load payment processor *}
@@ -68,7 +52,7 @@
       <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
-          {$form.additional_participants.html}{if $contact_id || $contact_id == NULL} &nbsp; ({ts}including yourself{/ts}){/if}
+          {$form.additional_participants.html}{if $contact_id || $contact_id == NULL}{ts}(including yourself){/ts}{/if}
           <br/>
           <span
             class="description">{ts}Fill in your registration information on this page. If you are registering additional people, you will be able to enter their registration information after you complete this page and click &quot;Continue&quot;.{/ts}</span>
@@ -141,9 +125,11 @@
       </fieldset>
     {/if}
 
-    {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {if $priceSet}
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {/if}
 
-    <div class="crm-public-form-item crm-section custom_pre-section">
+    <div class="crm-public-form-item crm-section custom_post-section">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
     </div>
 
@@ -261,3 +247,4 @@
 
 </script>
 {/literal}
+{include file="CRM/Form/validate.tpl"}

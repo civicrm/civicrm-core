@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -52,7 +36,7 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @return object
    *   activity_contact object
    */
-  public static function create(&$params) {
+  public static function create($params) {
     $activityContact = new CRM_Activity_DAO_ActivityContact();
 
     $activityContact->copyValues($params);
@@ -72,11 +56,11 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @return array
    */
   public static function getNames($activityID, $recordTypeID, $alsoIDs = FALSE) {
-    $names = array();
-    $ids = array();
+    $names = [];
+    $ids = [];
 
     if (empty($activityID)) {
-      return $alsoIDs ? array($names, $ids) : $names;
+      return $alsoIDs ? [$names, $ids] : $names;
     }
 
     $query = "
@@ -87,10 +71,10 @@ WHERE      civicrm_activity_contact.activity_id = %1
 AND        civicrm_activity_contact.record_type_id = %2
 AND        contact_a.is_deleted = 0
 ";
-    $params = array(
-      1 => array($activityID, 'Integer'),
-      2 => array($recordTypeID, 'Integer'),
-    );
+    $params = [
+      1 => [$activityID, 'Integer'],
+      2 => [$recordTypeID, 'Integer'],
+    ];
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
@@ -98,7 +82,7 @@ AND        contact_a.is_deleted = 0
       $ids[] = $dao->id;
     }
 
-    return $alsoIDs ? array($names, $ids) : $names;
+    return $alsoIDs ? [$names, $ids] : $names;
   }
 
   /**
@@ -110,7 +94,7 @@ AND        contact_a.is_deleted = 0
    * @return mixed
    */
   public static function retrieveContactIdsByActivityId($activityID, $recordTypeID) {
-    $activityContact = array();
+    $activityContact = [];
     if (!CRM_Utils_Rule::positiveInteger($activityID) ||
       !CRM_Utils_Rule::positiveInteger($recordTypeID)
     ) {
@@ -124,10 +108,10 @@ WHERE      activity_id = %1
 AND        record_type_id = %2
 AND        civicrm_contact.is_deleted = 0
 ";
-    $params = array(
-      1 => array($activityID, 'Integer'),
-      2 => array($recordTypeID, 'Integer'),
-    );
+    $params = [
+      1 => [$activityID, 'Integer'],
+      2 => [$recordTypeID, 'Integer'],
+    ];
 
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
@@ -147,12 +131,12 @@ AND        civicrm_contact.is_deleted = 0
    * @see DB_DataObject::getLink()
    *
    * @return array|null
-   *           array       = if there are links defined for this table.
-   *           empty array - if there is a links.ini file, but no links on this table
-   *           null        - if no links.ini exists for this database (hence try auto_links).
+   *   array if there are links defined for this table.
+   *   empty array - if there is a links.ini file, but no links on this table
+   *   null - if no links.ini exists for this database (hence try auto_links).
    */
   public function links() {
-    $link = array('activity_id' => 'civicrm_activity:id');
+    $link = ['activity_id' => 'civicrm_activity:id'];
     return $link;
   }
 

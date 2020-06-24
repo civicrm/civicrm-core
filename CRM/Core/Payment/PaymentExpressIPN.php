@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,14 +39,6 @@
 class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
-
-  /**
    * Mode of operation: live or test
    *
    * @var object
@@ -62,7 +54,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @return mixed
    */
   public static function retrieve($name, $type, $object, $abort = TRUE) {
-    $value = CRM_Utils_Array::value($name, $object);
+    $value = $object[$name] ?? NULL;
     if ($abort && $value === NULL) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
       echo "Failure: Missing Parameter - " . $name . "<p>";
@@ -109,9 +101,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @param $transactionReference
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function newOrderNotify($success, $privateData, $component, $amount, $transactionReference) {
-    $ids = $input = $params = array();
+    $ids = $input = $params = [];
 
     $input['component'] = strtolower($component);
 
@@ -145,7 +139,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     if ($contribution->invoice_id != $input['invoice']) {
       CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
       echo "Failure: Invoice values dont match between database and IPN request<p>";
-      return;
+      return FALSE;
     }
 
     // lets replace invoice-id with Payment Processor -number because thats what is common and unique
@@ -157,10 +151,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     if ($contribution->total_amount != $input['amount']) {
       CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
       echo "Failure: Amount values dont match between database and IPN request. " . $contribution->total_amount . "/" . $input['amount'] . "<p>";
-      return;
+      return FALSE;
     }
-
-    $transaction = new CRM_Core_Transaction();
 
     // check if contribution is already completed, if so we ignore this ipn
 
@@ -181,7 +173,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
         $contribution->trxn_id = $ids['membership'];
       }
     }
-    $this->completeTransaction($input, $ids, $objects, $transaction);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
     return TRUE;
   }
 
@@ -255,7 +247,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       }
     }
 
-    return array($isTest, $component, $duplicateTransaction);
+    return [$isTest, $component, $duplicateTransaction];
   }
 
   /**
@@ -286,11 +278,11 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if ($dps_method == "pxpay") {
-      $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml(array(
+      $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml([
         'PxPayUserId' => $dps_user,
         'PxPayKey' => $dps_key,
         'Response' => $_GET['result'],
-      ));
+      ]);
       $processResponse = CRM_Core_Payment_PaymentExpressUtils::_valueXml('ProcessResponse', $processResponse);
 
       fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"),
@@ -307,8 +299,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       if ($response = curl_exec($curl)) {
         $info = curl_getinfo($curl);
         if ($info['http_code'] < 200 || $info['http_code'] > 299) {
-          $log_message = "DPS error: HTTP %1 retrieving %2.";
-          CRM_Core_Error::fatal(ts($log_message, array(1 => $info['http_code'], 2 => $info['url'])));
+          $log_message = "DPS error: HTTP {$info['http_code']} retrieving {$info['url']}.";
+          throw new CRM_Core_Exception($log_message);
         }
         else {
           fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"), $response));
@@ -318,7 +310,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
           $valid = CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute($response, 'valid');
           // CRM_Core_Payment_PaymentExpressUtils::_xmlAttribute() returns NULL if preg fails.
           if (is_null($valid)) {
-            CRM_Core_Error::fatal(ts("DPS error: Unable to parse XML response from DPS.", array(1 => $valid)));
+            throw new CRM_Core_Exception(ts("DPS error: Unable to parse XML response from DPS.", [1 => $valid]));
           }
           $success = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'Success');
           $txnId = CRM_Core_Payment_PaymentExpressUtils::_xmlElement($response, 'TxnId');
@@ -334,7 +326,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       }
       else {
         // calling DPS failed
-        CRM_Core_Error::fatal(ts('Unable to establish connection to the payment gateway to verify transaction response.'));
+        throw new CRM_Core_Exception(ts('Unable to establish connection to the payment gateway to verify transaction response.'));
         exit;
       }
     }
@@ -343,8 +335,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       require_once 'PaymentExpress/pxaccess.inc.php';
       global $pxaccess;
       $pxaccess = new PxAccess($dps_url, $dps_user, $dps_key, $mac_key);
-      #getResponse method in PxAccess object returns PxPayResponse object
-      #which encapsulates all the response data
+      // GetResponse method in PxAccess object returns PxPayResponse object
+      // which encapsulates all the response data
       $rsp = $pxaccess->getResponse($rawPostData);
 
       $qfKey = $rsp->getTxnData1();
@@ -439,7 +431,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
    * @return array
    */
   public static function stringToArray($str) {
-    $vars = $labels = array();
+    $vars = $labels = [];
     $labels = explode(',', $str);
     foreach ($labels as $label) {
       $terms = explode('=', $label);
