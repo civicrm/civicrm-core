@@ -159,21 +159,21 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltIn() {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account Is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account is'));
   }
 
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefunded() {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account Is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
   }
 
   /**
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBack() {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account Is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account is'));
   }
 
   /**
