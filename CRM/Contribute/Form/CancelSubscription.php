@@ -55,6 +55,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       'frequency_interval' => $this->getSubscriptionDetails()->frequency_interval,
       'frequency_unit' => $this->getSubscriptionDetails()->frequency_unit,
       'installments' => $this->getSubscriptionDetails()->installments,
+      'selfService' => $this->isSelfService(),
     ];
 
     if ($this->_crid) {

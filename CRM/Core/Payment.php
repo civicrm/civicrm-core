@@ -565,7 +565,12 @@ abstract class CRM_Core_Payment {
    *   Currently supported:
    *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
    *   - contributionPageContinueText (params: amount, is_payment_to_existing)
-   *   - cancelRecurDetailText (params: mode, amount, currency, frequency_interval, frequency_unit, installments, {membershipType|only if mode=auto_renew})
+   *   - cancelRecurDetailText:
+   *     params:
+   *       mode, amount, currency, frequency_interval, frequency_unit,
+   *       installments, {membershipType|only if mode=auto_renew},
+   *       selfService (bool) - TRUE if user doesn't have "edit contributions" permission.
+   *         ie. they are accessing via a "self-service" link from an email receipt or similar.
    *   - cancelRecurNotSupportedText
    *
    * @param array $params
