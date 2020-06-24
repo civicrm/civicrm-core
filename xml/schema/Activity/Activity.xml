@@ -323,6 +323,7 @@
     <name>index_medium_id</name>
     <fieldName>medium_id</fieldName>
     <add>2.2</add>
+    <drop>5.28</drop>
   </index>
   <field>
     <name>is_auto</name>

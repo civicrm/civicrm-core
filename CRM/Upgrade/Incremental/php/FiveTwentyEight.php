@@ -62,6 +62,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
     $this->addTask('Populate missing Contact Type name fields', 'populateMissingContactTypeName');
     $this->addTask('Add icon column to civicrm_custom_group', 'addColumn',
       'civicrm_custom_group', 'icon', "varchar(255) COMMENT 'crm-i icon class' DEFAULT NULL");
+    $this->addTask('Remove index on medium_id from civicrm_activity', 'dropIndex', 'civicrm_activity', 'index_medium_id');
   }
 
   public static function populateMissingContactTypeName() {
