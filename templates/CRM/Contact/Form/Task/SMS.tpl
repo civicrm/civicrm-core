@@ -86,7 +86,7 @@ CRM.$(function($){
       ajax: {
         url: sourceDataUrl,
         data: function(term) {
-          return { name: term,};
+          return { name: term, id: 1};
         },
         results: function(response) {
           return { results: response };
