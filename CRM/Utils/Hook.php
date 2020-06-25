@@ -2666,4 +2666,17 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook allows for extensions to add to the list of report output handlers
+   * @param array $outputHandlers
+   *
+   * @return mixed
+   */
+  public static function outputHandlers(&$outputHandlers) {
+    return self::singleton()->invoke(['outputHandlers'], $outputHandlers,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_outputHandlers'
+    );
+  }
+
 }

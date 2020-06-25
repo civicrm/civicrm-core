@@ -5077,11 +5077,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       unset($this->_params['task']);
     }
 
-    if (!empty($this->_outputMode) && empty($this->_outputHandler)) {
-      $className = 'CRM_Report_Output_' . ucfirst($this->_outputMode);
-      if (class_exists($className)) {
-        $this->_outputHandler = new $className($this);
-      }
+    if (!empty($this->_outputMode) && empty($this->_outputHandler) && !in_array($this->_outputMode, ['save', 'copy', 'group'])) {
+      $outputHandlerFactory = new \Civi\Report\OutputHandlerFactory();
+      $this->_outputHandler = $outputHandlerFactory->getOutputHandler($this->_outputMode, $this);
     }
   }
 

@@ -24,7 +24,7 @@ interface CRM_Report_Output_Interface {
   /**
    * Class constructor.
    *
-   * @param CRM_Report_Form
+   * @param CRM_Report_Form $report
    */
   public function __construct(&$report);
 
@@ -38,7 +38,7 @@ interface CRM_Report_Output_Interface {
   /**
    * Generate the output.
    *
-   * @param array
+   * @param array $rows
    */
   public function generateOutput(&$rows = NULL);
 

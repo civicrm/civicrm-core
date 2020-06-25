@@ -9,10 +9,14 @@
  +--------------------------------------------------------------------+
  */
 
+/**
+ * CSV Report Output handler
+ */
 class CRM_Report_Output_Csv implements CRM_Report_Output_Interface {
 
   /**
    * Reference of the report instance.
+   * @var \CRM_Report_Form
    */
   protected $report;
 
