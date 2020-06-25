@@ -724,7 +724,11 @@ class CRM_Utils_System {
     $session->set('civicrmInitSession', TRUE);
 
     if ($config->userFrameworkDSN) {
-      $dbDrupal = DB::connect($config->userFrameworkDSN);
+      $options = [];
+      if (defined('CIVICRM_DB_USE_SSL')) {
+        $options['ssl'] = TRUE;
+      }
+      $dbDrupal = DB::connect($config->userFrameworkDSN, $options);
     }
     return $config->userSystem->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }

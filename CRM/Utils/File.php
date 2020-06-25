@@ -325,7 +325,11 @@ class CRM_Utils_File {
     }
     else {
       require_once 'DB.php';
-      $db = DB::connect($dsn);
+      $options = [];
+      if (defined('CIVICRM_DB_USE_SSL')) {
+        $options['ssl'] = TRUE;
+      }
+      $db = DB::connect($dsn, $options);
     }
 
     if (PEAR::isError($db)) {

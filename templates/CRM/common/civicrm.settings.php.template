@@ -503,6 +503,13 @@ if (CIVICRM_UF === 'UnitTests') {
 // }
 
 /**
+ * Determine if we should connect to the database over SSL
+ */
+// if (!defined('CIVICRM_DB_USE_SSL')) {
+//   define('CIVICRM_DB_USE_SSL', FALSE);
+// }
+
+/**
  *
  * Do not change anything below this line. Keep as is
  *

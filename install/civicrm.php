@@ -141,7 +141,11 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
     define('DB_DSN_MODE', 'auto');
   }
 
-  $db = DB::connect($dsn);
+  $options = [];
+  if (defined('CIVICRM_DB_USE_SSL')) {
+    $options['ssl'] = TRUE;
+  }
+  $db = DB::connect($dsn, $options);
   if (PEAR::isError($db)) {
     die("Cannot open $dsn: " . $db->getMessage());
   }

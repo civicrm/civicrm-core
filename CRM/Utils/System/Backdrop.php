@@ -291,7 +291,11 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    $dbBackdrop = DB::connect($config->userFrameworkDSN);
+    $options = [];
+    if (defined('CIVICRM_DB_USE_SSL')) {
+      $options['ssl'] = TRUE;
+    }
+    $dbBackdrop = DB::connect($config->userFrameworkDSN, $options);
     if (DB::isError($dbBackdrop)) {
       throw new CRM_Core_Exception("Cannot connect to Backdrop database via $config->userFrameworkDSN, " . $dbBackdrop->getMessage());
     }

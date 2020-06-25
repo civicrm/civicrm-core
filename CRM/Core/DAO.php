@@ -430,6 +430,9 @@ class CRM_Core_DAO extends DB_DataObject {
 
     $conn = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
     $orig_options = $conn->options;
+    if (defined('CIVICRM_DB_USE_SSL')) {
+      $this->setOptions(array_merge($this->_options, ['ssl' => TRUE]));
+    }
     $this->_setDBOptions($this->_options);
 
     if ($i18nRewrite and $dbLocale) {
@@ -472,6 +475,11 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function initialize() {
     $this->_connect();
+    if (defined('CIVICRM_DB_USE_SSL')) {
+      $conn = $this->getConnection();
+      $orig_options = $conn->options;
+      $this->_setDBOptions(array_merge($orig_options, ['ssl' => TRUE]));
+    }
     if (empty(Civi::$statics[__CLASS__]['init'])) {
       // CRM_Core_DAO::init() must be called before CRM_Core_DAO->initialize().
       // This occurs very early in bootstrap - error handlers may not be wired up.

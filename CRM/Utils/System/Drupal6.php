@@ -300,7 +300,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
     $config = CRM_Core_Config::singleton();
 
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
+    $options = [];
+    if (defined('CIVICRM_DB_USE_SSL')) {
+      $options['ssl'] = TRUE;
+    }
+    $dbDrupal = DB::connect($config->userFrameworkDSN, $options);
     if (DB::isError($dbDrupal)) {
       throw new CRM_Core_Exception("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
     }
