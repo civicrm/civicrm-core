@@ -75,6 +75,7 @@
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
           $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');
+          placeholder = null;
         }
         // Set placeholder as calendar icon (`fa-calendar` is Unicode f073)
         $dateField.attr({placeholder: placeholder === undefined ? '\uF073' : placeholder}).change(updateDataField);
