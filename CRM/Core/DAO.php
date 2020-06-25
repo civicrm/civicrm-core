@@ -178,7 +178,10 @@ class CRM_Core_DAO extends DB_DataObject {
       }
       CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", [1 => [implode(',', $currentModes), 'String']]);
     }
-    CRM_Core_DAO::executeQuery('SET NAMES utf8');
+    if (!defined('CIVICRM_CHARSET')) {
+      define('CIVICRM_CHARSET', 'utf8');
+    }
+    CRM_Core_DAO::executeQuery('SET NAMES ' . CIVICRM_CHARSET);
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', [1 => [CRM_Utils_Request::id(), 'String']]);
   }
 

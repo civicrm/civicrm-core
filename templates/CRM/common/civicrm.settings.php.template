@@ -129,6 +129,15 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
 }
 
 /**
+ * utf8mb4 support - see https://lab.civicrm.org/dev/core/-/wikis/utf8mb4
+ * If your database is uses charset utf8mb4 and collation utf8mb4_unicode_ci you can enable this and CiviCRM will
+ * connect to the database in utf8mb4 mode and you can save emojis!
+ */
+// if (!defined('CIVICRM_CHARSET')) {
+//   define('CIVICRM_CHARSET', 'utf8mb4');
+// }
+
+/**
  * File System Paths:
  *
  * $civicrm_root is the file system path on your server where the civicrm
