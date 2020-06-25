@@ -11,7 +11,6 @@
 
 namespace Civi\Api4\Query;
 
-use Civi\API\SelectQuery;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
@@ -30,12 +29,40 @@ use Civi\Api4\Utils\SelectUtil;
  * * "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
  * * 'IS NOT NULL', or 'IS NULL'.
  */
-class Api4SelectQuery extends SelectQuery {
+class Api4SelectQuery {
+
+  const
+    MAIN_TABLE_ALIAS = 'a';
 
   /**
-   * @var int
+   * @var \CRM_Utils_SQL_Select
    */
-  protected $apiVersion = 4;
+  protected $query;
+
+  /**
+   * @var array
+   */
+  protected $joins = [];
+
+  /**
+   * @var array[]
+   */
+  protected $apiFieldSpec;
+
+  /**
+   * @var array
+   */
+  protected $entityFieldNames = [];
+
+  /**
+   * @var array
+   */
+  protected $aclFields = [];
+
+  /**
+   * @var \Civi\Api4\Generic\DAOGetAction
+   */
+  private $api;
 
   /**
    * @var array
@@ -44,56 +71,28 @@ class Api4SelectQuery extends SelectQuery {
   protected $selectAliases = [];
 
   /**
-   * If set to an array, this will start collecting debug info.
-   *
-   * @var null|array
+   * @var bool
    */
-  public $debugOutput = NULL;
-
-  /**
-   * @var array
-   */
-  public $groupBy = [];
-
   public $forceSelectId = TRUE;
-
-  /**
-   * @var array
-   */
-  public $having = [];
 
   /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
-    $this->entity = $apiGet->getEntityName();
-    $this->checkPermissions = $apiGet->getCheckPermissions();
-    $this->select = $apiGet->getSelect();
-    $this->where = $apiGet->getWhere();
-    $this->groupBy = $apiGet->getGroupBy();
-    $this->orderBy = $apiGet->getOrderBy();
-    $this->limit = $apiGet->getLimit();
-    $this->offset = $apiGet->getOffset();
-    $this->having = $apiGet->getHaving();
-    // Always select ID of main table unless grouping is used
-    $this->forceSelectId = !$this->groupBy;
-    if ($apiGet->getDebug()) {
-      $this->debugOutput =& $apiGet->_debugOutput;
-    }
+    $this->api = $apiGet;
+    // Always select ID of main table unless grouping by something else
+    $this->forceSelectId = !$apiGet->getGroupBy() || $apiGet->getGroupBy() === ['id'];
     foreach ($apiGet->entityFields() as $field) {
       $this->entityFieldNames[] = $field['name'];
       $field['sql_name'] = '`' . self::MAIN_TABLE_ALIAS . '`.`' . $field['column_name'] . '`';
       $this->addSpecField($field['name'], $field);
     }
 
-    $baoName = CoreUtil::getBAOFromApiName($this->entity);
+    $baoName = CoreUtil::getBAOFromApiName($this->getEntity());
     $this->constructQueryObject();
 
     // Add ACLs first to avoid redundant subclauses
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
-
-    // Add explicit joins. Other joins implied by dot notation may be added later
-    $this->addExplicitJoins($apiGet->getJoin());
   }
 
   /**
@@ -105,6 +104,8 @@ class Api4SelectQuery extends SelectQuery {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getSql() {
+    // Add explicit joins. Other joins implied by dot notation may be added later
+    $this->addExplicitJoins();
     $this->buildSelectClause();
     $this->buildWhereClause();
     $this->buildOrderBy();
@@ -122,12 +123,10 @@ class Api4SelectQuery extends SelectQuery {
   public function run() {
     $results = [];
     $sql = $this->getSql();
-    if (is_array($this->debugOutput)) {
-      $this->debugOutput['sql'][] = $sql;
-    }
+    $this->debug('sql', $sql);
     $query = \CRM_Core_DAO::executeQuery($sql);
     while ($query->fetch()) {
-      if (in_array('row_count', $this->select)) {
+      if (in_array('row_count', $this->getSelect())) {
         $results[]['row_count'] = (int) $query->c;
         break;
       }
@@ -139,47 +138,49 @@ class Api4SelectQuery extends SelectQuery {
       }
       $results[] = $result;
     }
-    FormattingUtil::formatOutputValues($results, $this->getApiFieldSpec(), $this->getEntity());
+    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, $this->getEntity());
     return $results;
   }
 
+  /**
+   * @throws \API_Exception
+   */
   protected function buildSelectClause() {
+    $select = $this->getSelect();
     // An empty select is the same as *
-    if (empty($this->select)) {
-      $this->select = $this->entityFieldNames;
+    if (empty($select)) {
+      $select = $this->entityFieldNames;
     }
-    elseif (in_array('row_count', $this->select)) {
+    elseif (in_array('row_count', $select)) {
       $this->query->select("COUNT(*) AS `c`");
       return;
     }
     else {
       if ($this->forceSelectId) {
-        $this->select = array_merge(['id'], $this->select);
+        $select = array_merge(['id'], $select);
       }
 
       // Expand wildcards in joins (the api wrapper already expanded non-joined wildcards)
-      $wildFields = array_filter($this->select, function($item) {
+      $wildFields = array_filter($select, function($item) {
         return strpos($item, '*') !== FALSE && strpos($item, '.') !== FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
       });
       foreach ($wildFields as $item) {
-        $pos = array_search($item, array_values($this->select));
+        $pos = array_search($item, array_values($select));
         $this->autoJoinFK($item);
         $matches = SelectUtil::getMatchingFields($item, array_keys($this->apiFieldSpec));
-        array_splice($this->select, $pos, 1, $matches);
+        array_splice($select, $pos, 1, $matches);
       }
-      $this->select = array_unique($this->select);
+      $select = array_unique($select);
     }
-    foreach ($this->select as $item) {
+    foreach ($select as $item) {
       $expr = SqlExpression::convert($item, TRUE);
       $valid = TRUE;
       foreach ($expr->getFields() as $fieldName) {
         $field = $this->getField($fieldName);
         // Remove expressions with unknown fields without raising an error
         if (!$field) {
-          $this->select = array_diff($this->select, [$item]);
-          if (is_array($this->debugOutput)) {
-            $this->debugOutput['undefined_fields'][] = $fieldName;
-          }
+          $select = array_diff($select, [$item]);
+          $this->debug('undefined_fields', $fieldName);
           $valid = FALSE;
         }
       }
@@ -195,10 +196,10 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @inheritDoc
+   * Add WHERE clause to query
    */
   protected function buildWhereClause() {
-    foreach ($this->where as $clause) {
+    foreach ($this->getWhere() as $clause) {
       $sql = $this->treeWalkClauses($clause, 'WHERE');
       if ($sql) {
         $this->query->where($sql);
@@ -207,21 +208,21 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * Build HAVING clause.
+   * Add HAVING clause to query
    *
    * Every expression referenced must also be in the SELECT clause.
    */
   protected function buildHavingClause() {
-    foreach ($this->having as $clause) {
+    foreach ($this->getHaving() as $clause) {
       $this->query->having($this->treeWalkClauses($clause, 'HAVING'));
     }
   }
 
   /**
-   * @inheritDoc
+   * Add ORDER BY to query
    */
   protected function buildOrderBy() {
-    foreach ($this->orderBy as $item => $dir) {
+    foreach ($this->getOrderBy() as $item => $dir) {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
         throw new \API_Exception("Invalid sort direction. Cannot order by $item $dir");
       }
@@ -243,20 +244,22 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
+   * Add LIMIT to query
+   *
    * @throws \CRM_Core_Exception
    */
   protected function buildLimit() {
-    if (!empty($this->limit) || !empty($this->offset)) {
+    if ($this->getLimit() || $this->getOffset()) {
       // If limit is 0, mysql will actually return 0 results. Instead set to maximum possible.
-      $this->query->limit($this->limit ?: '18446744073709551615', $this->offset);
+      $this->query->limit($this->getLimit() ?: '18446744073709551615', $this->getOffset());
     }
   }
 
   /**
-   * Adds GROUP BY clause to query
+   * Add GROUP BY clause to query
    */
   protected function buildGroupBy() {
-    foreach ($this->groupBy as $item) {
+    foreach ($this->getGroupBy() as $item) {
       $this->query->groupBy($this->getExpression($item)->render($this->apiFieldSpec));
     }
   }
@@ -395,10 +398,29 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @inheritDoc
+   * Get acl clause for an entity
+   *
+   * @param string $tableAlias
+   * @param \CRM_Core_DAO|string $baoName
+   * @param array $stack
+   * @return array
    */
-  protected function getFields() {
-    return $this->apiFieldSpec;
+  public function getAclClause($tableAlias, $baoName, $stack = []) {
+    if (!$this->getCheckPermissions()) {
+      return [];
+    }
+    // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
+    // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
+    // and just doing it for the first join takes care of most acl clause deduping.
+    if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
+      return [];
+    }
+    $clauses = $baoName::getSelectWhereClause($tableAlias);
+    if (!$stack) {
+      // Track field clauses added to the main entity
+      $this->aclFields = array_keys($clauses);
+    }
+    return array_filter($clauses);
   }
 
   /**
@@ -408,7 +430,7 @@ class Api4SelectQuery extends SelectQuery {
    * @param bool $strict
    *   In strict mode, this will throw an exception if the field doesn't exist
    *
-   * @return string|null
+   * @return array|null
    * @throws \API_Exception
    */
   public function getField($expr, $strict = FALSE) {
@@ -431,12 +453,11 @@ class Api4SelectQuery extends SelectQuery {
   /**
    * Join onto other entities as specified by the api call.
    *
-   * @param $joins
    * @throws \API_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private function addExplicitJoins($joins) {
-    foreach ($joins as $join) {
+  private function addExplicitJoins() {
+    foreach ($this->getJoin() as $join) {
       // First item in the array is the entity name
       $entity = array_shift($join);
       // Which might contain an alias. Split on the keyword "AS"
@@ -446,10 +467,9 @@ class Api4SelectQuery extends SelectQuery {
       // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
       // The rest are join conditions.
       $side = array_shift($join) ? 'INNER' : 'LEFT';
-      $joinEntityGet = \Civi\API\Request::create($entity, 'get', ['version' => 4, 'checkPermissions' => $this->checkPermissions]);
+      $joinEntityGet = \Civi\API\Request::create($entity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()]);
       foreach ($joinEntityGet->entityFields() as $field) {
         $field['sql_name'] = '`' . $alias . '`.`' . $field['column_name'] . '`';
-        $field['is_join'] = TRUE;
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
       $conditions = $this->getJoinConditions($entity, $alias);
@@ -478,7 +498,7 @@ class Api4SelectQuery extends SelectQuery {
       if ($field['entity'] !== $entity && $field['fk_entity'] === $entity) {
         $conditions[] = $this->treeWalkClauses([$name, '=', "$alias.id"], 'ON');
       }
-      elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 &&  $field['fk_entity'] === $this->entity) {
+      elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 &&  $field['fk_entity'] === $this->getEntity()) {
         $conditions[] = $this->treeWalkClauses([$name, '=', 'id'], 'ON');
         $stack = ['id'];
       }
@@ -531,9 +551,21 @@ class Api4SelectQuery extends SelectQuery {
     foreach ($lastLink->getEntityFields() as $fieldObject) {
       $fieldArray = $fieldObject->toArray();
       $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
-      $fieldArray['is_custom'] = $isCustom;
-      $fieldArray['is_join'] = TRUE;
       $this->addSpecField($prefix . $fieldArray['name'], $fieldArray);
+    }
+  }
+
+  /**
+   * @param string $side
+   * @param string $tableName
+   * @param string $tableAlias
+   * @param array $conditions
+   */
+  public function join($side, $tableName, $tableAlias, $conditions) {
+    // INNER JOINs take precedence over LEFT JOINs
+    if ($side != 'LEFT' || !isset($this->joins[$tableAlias])) {
+      $this->joins[$tableAlias] = $side;
+      $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
     }
   }
 
@@ -541,56 +573,70 @@ class Api4SelectQuery extends SelectQuery {
    * @return FALSE|string
    */
   public function getFrom() {
-    return CoreUtil::getTableName($this->entity);
+    return CoreUtil::getTableName($this->getEntity());
   }
 
   /**
    * @return string
    */
   public function getEntity() {
-    return $this->entity;
+    return $this->api->getEntityName();
   }
 
   /**
    * @return array
    */
   public function getSelect() {
-    return $this->select;
+    return $this->api->getSelect();
   }
 
   /**
    * @return array
    */
   public function getWhere() {
-    return $this->where;
+    return $this->api->getWhere();
+  }
+
+  /**
+   * @return array
+   */
+  public function getHaving() {
+    return $this->api->getHaving();
+  }
+
+  /**
+   * @return array
+   */
+  public function getJoin() {
+    return $this->api->getJoin();
+  }
+
+  /**
+   * @return array
+   */
+  public function getGroupBy() {
+    return $this->api->getGroupBy();
   }
 
   /**
    * @return array
    */
   public function getOrderBy() {
-    return $this->orderBy;
+    return $this->api->getOrderBy();
   }
 
   /**
    * @return mixed
    */
   public function getLimit() {
-    return $this->limit;
+    return $this->api->getLimit();
   }
 
   /**
    * @return mixed
    */
   public function getOffset() {
-    return $this->offset;
-  }
-
-  /**
-   * @return array
-   */
-  public function getSelectFields() {
-    return $this->selectFields;
+    return $this->api->getOffset();
   }
 
   /**
@@ -601,45 +647,10 @@ class Api4SelectQuery extends SelectQuery {
   }
 
   /**
-   * @return array
-   */
-  public function getJoins() {
-    return $this->joins;
-  }
-
-  /**
-   * @return array
-   */
-  public function getApiFieldSpec() {
-    return $this->apiFieldSpec;
-  }
-
-  /**
-   * @return array
-   */
-  public function getEntityFieldNames() {
-    return $this->entityFieldNames;
-  }
-
-  /**
-   * @return array
-   */
-  public function getAclFields() {
-    return $this->aclFields;
-  }
-
-  /**
    * @return bool|string
    */
   public function getCheckPermissions() {
-    return $this->checkPermissions;
-  }
-
-  /**
-   * @return int
-   */
-  public function getApiVersion() {
-    return $this->apiVersion;
+    return $this->api->getCheckPermissions();
   }
 
   /**
@@ -648,24 +659,33 @@ class Api4SelectQuery extends SelectQuery {
    * @return void
    */
   public function constructQueryObject() {
-    $tableName = CoreUtil::getTableName($this->entity);
+    $tableName = CoreUtil::getTableName($this->getEntity());
     $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
   }
 
   /**
-   * @param $path
-   * @param $field
+   * @param string $path
+   * @param array $field
    */
   private function addSpecField($path, $field) {
     // Only add field to spec if we have permission
-    if ($this->checkPermissions && !empty($field['permission']) && !\CRM_Core_Permission::check($field['permission'])) {
+    if ($this->getCheckPermissions() && !empty($field['permission']) && !\CRM_Core_Permission::check($field['permission'])) {
       $this->apiFieldSpec[$path] = FALSE;
       return;
     }
-    $defaults = [];
-    $defaults['is_custom'] = $defaults['is_join'] = FALSE;
-    $field += $defaults;
     $this->apiFieldSpec[$path] = $field;
+  }
+
+  /**
+   * Add something to the api's debug output if debugging is enabled
+   *
+   * @param $key
+   * @param $item
+   */
+  public function debug($key, $item) {
+    if ($this->api->getDebug()) {
+      $this->api->_debugOutput[$key][] = $item;
+    }
   }
 
 }
