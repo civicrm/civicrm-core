@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionCOUNT extends SqlFunction {
 
+  protected static $category = self::CATEGORY_AGGREGATE;
+
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
@@ -24,5 +26,12 @@ class SqlFunctionCOUNT extends SqlFunction {
       'cant_be' => [],
     ],
   ];
+
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Count');
+  }
 
 }

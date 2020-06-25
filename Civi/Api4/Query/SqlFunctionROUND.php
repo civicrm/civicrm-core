@@ -14,15 +14,20 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionMAX extends SqlFunction {
+class SqlFunctionROUND extends SqlFunction {
 
-  protected static $category = self::CATEGORY_AGGREGATE;
+  protected static $category = self::CATEGORY_MATH;
 
   protected static $params = [
     [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
       'expr' => 1,
-      'must_be' => ['SqlField'],
+      'optional' => FALSE,
+      'must_be' => ['SqlField', 'SqlNumber'],
+    ],
+    [
+      'expr' => 1,
+      'optional' => TRUE,
+      'must_be' => ['SqlNumber'],
     ],
   ];
 
@@ -30,7 +35,7 @@ class SqlFunctionMAX extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Max');
+    return ts('Round');
   }
 
 }

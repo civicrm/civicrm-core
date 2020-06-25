@@ -14,15 +14,18 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionMAX extends SqlFunction {
+class SqlFunctionNULLIF extends SqlFunction {
 
-  protected static $category = self::CATEGORY_AGGREGATE;
+  protected static $category = self::CATEGORY_COMPARISON;
 
   protected static $params = [
     [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
       'expr' => 1,
-      'must_be' => ['SqlField'],
+      'optional' => FALSE,
+    ],
+    [
+      'expr' => 1,
+      'optional' => FALSE,
     ],
   ];
 
@@ -30,7 +33,7 @@ class SqlFunctionMAX extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Max');
+    return ts('Null if');
   }
 
 }

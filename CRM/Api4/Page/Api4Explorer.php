@@ -70,7 +70,9 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
         if (is_subclass_of($className, '\Civi\Api4\Query\SqlFunction')) {
           $fns[] = [
             'name' => $className::getName(),
+            'title' => $className::getTitle(),
             'params' => $className::getParams(),
+            'category' => $className::getCategory(),
           ];
         }
       }

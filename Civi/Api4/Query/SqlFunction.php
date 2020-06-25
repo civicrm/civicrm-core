@@ -23,6 +23,19 @@ abstract class SqlFunction extends SqlExpression {
   protected $args = [];
 
   /**
+   * Used for categorizing functions in the UI
+   *
+   * @var string
+   */
+  protected static $category;
+
+  const CATEGORY_AGGREGATE = 'aggregate',
+    CATEGORY_COMPARISON = 'comparison',
+    CATEGORY_DATE = 'date',
+    CATEGORY_MATH = 'math',
+    CATEGORY_STRING = 'string';
+
+  /**
    * Parse the argument string into an array of function arguments
    */
   protected function initialize() {
@@ -185,5 +198,17 @@ abstract class SqlFunction extends SqlExpression {
     }
     return $params;
   }
+
+  /**
+   * @return string
+   */
+  public static function getCategory(): string {
+    return static::$category;
+  }
+
+  /**
+   * @return string
+   */
+  abstract public static function getTitle(): string;
 
 }
