@@ -151,6 +151,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         civicrm_api3('OptionValue', 'create', [
           'option_group_id' => 'mapping_type',
           'label' => $mappingType,
+          'name' => $mappingType,
           'value' => max(array_keys($mappingValues['values'])) + 1,
           'is_reserved' => 1,
         ]);
