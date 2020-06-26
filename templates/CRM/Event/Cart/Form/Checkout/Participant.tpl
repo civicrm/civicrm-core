@@ -10,16 +10,7 @@
           <div class="profile-group">
           {include file="CRM/UF/Form/Block.tpl" fields=$custom.$pre form=$form.field.$participant_id}
           </div>
-
-    <div class="participant-info crm-section form-item">
-      <div class="label">
-              {$form.event.$event_id.participant.$participant_id.email.label}
-      </div>
-      <div class="edit-value content">
-              {$form.event.$event_id.participant.$participant_id.email.html}
-      </div>
-    </div>
-
+          
           {assign var=post value="event[`$event_id`][participant][`$participant_id`][customPost]"}
           <div style="clear:left"></div>
           <div class="profile-group">
