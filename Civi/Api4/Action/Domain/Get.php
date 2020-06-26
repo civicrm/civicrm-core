@@ -19,6 +19,8 @@
 
 namespace Civi\Api4\Action\Domain;
 
+use Civi\Api4\Generic\Result;
+
 /**
  * @inheritDoc
  */
@@ -34,11 +36,11 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   /**
    * @inheritDoc
    */
-  protected function getObjects() {
+  protected function getObjects(Result $result) {
     if ($this->currentDomain) {
       $this->addWhere('id', '=', \CRM_Core_Config::domainID());
     }
-    return parent::getObjects();
+    parent::getObjects($result);
   }
 
 }

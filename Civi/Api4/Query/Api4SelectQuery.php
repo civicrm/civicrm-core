@@ -32,7 +32,8 @@ use Civi\Api4\Utils\SelectUtil;
 class Api4SelectQuery {
 
   const
-    MAIN_TABLE_ALIAS = 'a';
+    MAIN_TABLE_ALIAS = 'a',
+    UNLIMITED = '18446744073709551615';
 
   /**
    * @var \CRM_Utils_SQL_Select
@@ -80,28 +81,31 @@ class Api4SelectQuery {
    */
   public function __construct($apiGet) {
     $this->api = $apiGet;
+
     // Always select ID of main table unless grouping by something else
-    $this->forceSelectId = !$apiGet->getGroupBy() || $apiGet->getGroupBy() === ['id'];
-    foreach ($apiGet->entityFields() as $field) {
+    $this->forceSelectId = !$this->getGroupBy() || $this->getGroupBy() === ['id'];
+
+    // Build field lists
+    foreach ($this->api->entityFields() as $field) {
       $this->entityFieldNames[] = $field['name'];
       $field['sql_name'] = '`' . self::MAIN_TABLE_ALIAS . '`.`' . $field['column_name'] . '`';
       $this->addSpecField($field['name'], $field);
     }
 
-    $baoName = CoreUtil::getBAOFromApiName($this->getEntity());
-    $this->constructQueryObject();
+    $tableName = CoreUtil::getTableName($this->getEntity());
+    $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
 
     // Add ACLs first to avoid redundant subclauses
+    $baoName = CoreUtil::getBAOFromApiName($this->getEntity());
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
   }
 
   /**
-   * Builds final sql statement after all params are set.
+   * Builds main final sql statement after initialization.
    *
    * @return string
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getSql() {
     // Add explicit joins. Other joins implied by dot notation may be added later
@@ -118,7 +122,7 @@ class Api4SelectQuery {
   /**
    * Why walk when you can
    *
-   * @return array|int
+   * @return array
    */
   public function run() {
     $results = [];
@@ -126,10 +130,6 @@ class Api4SelectQuery {
     $this->debug('sql', $sql);
     $query = \CRM_Core_DAO::executeQuery($sql);
     while ($query->fetch()) {
-      if (in_array('row_count', $this->getSelect())) {
-        $results[]['row_count'] = (int) $query->c;
-        break;
-      }
       $result = [];
       foreach ($this->selectAliases as $alias => $expr) {
         $returnName = $alias;
@@ -143,17 +143,44 @@ class Api4SelectQuery {
   }
 
   /**
+   * @return int
    * @throws \API_Exception
    */
-  protected function buildSelectClause() {
-    $select = $this->getSelect();
+  public function getCount() {
+    $this->addExplicitJoins();
+    $this->buildWhereClause();
+    // If no having or groupBy, we only need to select count
+    if (!$this->getHaving() && !$this->getGroupBy()) {
+      $this->query->select('COUNT(*) AS `c`');
+      $sql = $this->query->toSQL();
+    }
+    // Use a subquery to count groups from GROUP BY or results filtered by HAVING
+    else {
+      // With no HAVING, just select the last field grouped by
+      if (!$this->getHaving()) {
+        $select = array_slice($this->getGroupBy(), -1);
+      }
+      $this->buildSelectClause($select ?? NULL);
+      $this->buildHavingClause();
+      $this->buildGroupBy();
+      $subquery = $this->query->toSQL();
+      $sql = "SELECT count(*) AS `c` FROM ( $subquery ) AS rows";
+    }
+    $this->debug('sql', $sql);
+    return (int) \CRM_Core_DAO::singleValueQuery($sql);
+  }
+
+  /**
+   * @param array $select
+   *   Array of select expressions; defaults to $this->getSelect
+   * @throws \API_Exception
+   */
+  protected function buildSelectClause($select = NULL) {
+    // Use default if select not provided, exclude row_count which is handled elsewhere
+    $select = array_diff($select ?? $this->getSelect(), ['row_count']);
     // An empty select is the same as *
     if (empty($select)) {
       $select = $this->entityFieldNames;
-    }
-    elseif (in_array('row_count', $select)) {
-      $this->query->select("COUNT(*) AS `c`");
-      return;
     }
     else {
       if ($this->forceSelectId) {
@@ -251,7 +278,7 @@ class Api4SelectQuery {
   protected function buildLimit() {
     if ($this->getLimit() || $this->getOffset()) {
       // If limit is 0, mysql will actually return 0 results. Instead set to maximum possible.
-      $this->query->limit($this->getLimit() ?: '18446744073709551615', $this->getOffset());
+      $this->query->limit($this->getLimit() ?: self::UNLIMITED, $this->getOffset());
     }
   }
 
@@ -651,16 +678,6 @@ class Api4SelectQuery {
    */
   public function getCheckPermissions() {
     return $this->api->getCheckPermissions();
-  }
-
-  /**
-   * Get table name on basis of entity
-   *
-   * @return void
-   */
-  public function constructQueryObject() {
-    $tableName = CoreUtil::getTableName($this->getEntity());
-    $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
   }
 
   /**

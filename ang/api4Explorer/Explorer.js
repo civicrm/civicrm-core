@@ -287,14 +287,11 @@
     };
 
     $scope.selectRowCount = function() {
-      if ($scope.isSelectRowCount()) {
-        $scope.params.select = [];
+      var index = params.select.indexOf('row_count');
+      if (index < 0) {
+        $scope.params.select.push('row_count');
       } else {
-        $scope.params.select = ['row_count'];
-        $scope.index = '';
-        if ($scope.params.limit == 25) {
-          $scope.params.limit = 0;
-        }
+        $scope.params.select.splice(index, 1);
       }
     };
 
@@ -308,7 +305,7 @@
     };
 
     function isSelectRowCount(params) {
-      return params && params.select && params.select.length === 1 && params.select[0] === 'row_count';
+      return params && params.select && params.select.indexOf('row_count') >= 0;
     }
 
     function getEntity(entityName) {
@@ -566,10 +563,6 @@
           paramCount = _.size(params),
           i = 0;
 
-        if (isSelectRowCount(params)) {
-          results = result + 'Count';
-        }
-
         switch ($scope.selectedTab.code) {
           case 'js':
           case 'ang':
@@ -606,9 +599,7 @@
 
             // Write oop code
             code.oop = '$' + results + " = " + formatOOP(entity, action, params, 2) + "\n  ->execute()";
-            if (isSelectRowCount(params)) {
-              code.oop += "\n  ->count()";
-            } else if (_.isNumber(index)) {
+            if (_.isNumber(index)) {
               code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
             } else if (index) {
               if (_.isString(index) || (_.isPlainObject(index) && !index[0] && !index['0'])) {
@@ -619,7 +610,7 @@
               }
             }
             code.oop += ";\n";
-            if (!_.isNumber(index) && !isSelectRowCount(params)) {
+            if (!_.isNumber(index)) {
               code.oop += "foreach ($" + results + ' as $' + ((_.isString(index) && index) ? index + ' => $' : '') + result + ') {\n  // do something\n}';
             }
             break;
@@ -661,9 +652,15 @@
             }
           });
         } else if (key === 'select') {
-          code += newLine;
-          // addSelect() is a variadic function & can take multiple arguments; selectRowCount() is a shortcut for addSelect('row_count')
-          code += isSelectRowCount(params) ? '->selectRowCount()' : '->addSelect(' + phpFormat(param).slice(1, -1) + ')';
+          // selectRowCount() is a shortcut for addSelect('row_count')
+          if (isSelectRowCount(params)) {
+            code += newLine + '->selectRowCount()';
+            param = _.without(param, 'row_count');
+          }
+          // addSelect() is a variadic function & can take multiple arguments
+          if (param.length) {
+            code += newLine + '->addSelect(' + phpFormat(param).slice(1, -1) + ')';
+          }
         } else if (key === 'chain') {
           _.each(param, function(chain, name) {
             code += newLine + "->addChain('" + name + "', " + formatOOP(chain[0], chain[1], chain[2], 2 + indent);
@@ -711,12 +708,18 @@
           $scope.loading = false;
           $scope.status = resp.data && resp.data.debug && resp.data.debug.log ? 'warning' : 'success';
           $scope.debug = debugFormat(resp.data);
-          $scope.result = [formatMeta(resp.data), prettyPrintOne(_.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)];
+          $scope.result = [
+            formatMeta(resp.data),
+            prettyPrintOne('(' + resp.data.values.length + ') ' + _.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)
+          ];
         }, function(resp) {
           $scope.loading = false;
           $scope.status = 'danger';
           $scope.debug = debugFormat(resp.data);
-          $scope.result = [formatMeta(resp), prettyPrintOne(_.escape(JSON.stringify(resp.data, null, 2)))];
+          $scope.result = [
+            formatMeta(resp),
+            prettyPrintOne(_.escape(JSON.stringify(resp.data, null, 2)))
+          ];
         });
     };
 

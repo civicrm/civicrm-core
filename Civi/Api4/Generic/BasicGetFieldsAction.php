@@ -97,7 +97,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       $values = $this->getRecords();
     }
     $this->formatResults($values);
-    $result->exchangeArray($this->queryArray($values));
+    $this->queryArray($values, $result);
   }
 
   /**

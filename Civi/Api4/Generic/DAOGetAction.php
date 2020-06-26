@@ -71,20 +71,31 @@ class DAOGetAction extends AbstractGetAction {
   public function _run(Result $result) {
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
-    $result->exchangeArray($this->getObjects());
+    $this->getObjects($result);
   }
 
   /**
-   * @return array|int
+   * @param \Civi\Api4\Generic\Result $result
    */
-  protected function getObjects() {
-    $query = new Api4SelectQuery($this);
+  protected function getObjects(Result $result) {
+    $getCount = in_array('row_count', $this->getSelect());
+    $onlyCount = $this->getSelect() === ['row_count'];
 
-    $result = $query->run();
-    if (is_array($result)) {
-      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
+    if (!$onlyCount) {
+      $query = new Api4SelectQuery($this);
+      $rows = $query->run();
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($rows);
+      $result->exchangeArray($rows);
+      // No need to fetch count if we got a result set below the limit
+      if (!$this->getLimit() || count($rows) < $this->getLimit()) {
+        $result->rowCount = count($rows) + $this->getOffset();
+        $getCount = FALSE;
+      }
     }
-    return $result;
+    if ($getCount) {
+      $query = new Api4SelectQuery($this);
+      $result->rowCount = $query->getCount();
+    }
   }
 
   /**
