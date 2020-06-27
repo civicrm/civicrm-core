@@ -240,6 +240,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'Roy, Darric',
     ];
     $sortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    print_r($sortedActualContactNames);
     foreach ($sortedExpectedContactNames as $key => $name) {
       $this->assertContains($name, $sortedActualContactNames[$key]);
     }
