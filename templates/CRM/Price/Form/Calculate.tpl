@@ -157,7 +157,7 @@ function display(totalfee) {
   // totalfee is monetary, round it to 2 decimal points so it can
   // go as a float - CRM-13491
   totalfee = Math.round(totalfee*100)/100;
-  var totalFormattedFee = CRM.formatMoney(totalfee);
+  var totalFormattedFee = symbol + ' ' + CRM.formatMoney(totalfee, true);
   cj('#pricevalue').html(totalFormattedFee);
 
   cj('#total_amount').val( totalfee );
