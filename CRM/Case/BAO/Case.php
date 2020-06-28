@@ -475,7 +475,7 @@ HERESQL;
     }
     $query .= " GROUP BY case_id ";
 
-    $query .= ($order) ?: ' ORDER BY activity_date_time ASC';
+    $query .= ($order) ?: ' ORDER BY activity_date_time ASC, case_id ASC';
 
     if ($limit) {
       $query .= $limit;
@@ -582,6 +582,7 @@ HERESQL;
     $activityTypeLabels = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
     foreach ($result->fetchAll() as $case) {
+      print_r($case);
       $key = $case['case_id'];
       $casesList[$key] = [];
       $casesList[$key]['DT_RowId'] = $case['case_id'];
