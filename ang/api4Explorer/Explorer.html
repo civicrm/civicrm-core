@@ -50,10 +50,10 @@
             </label>
             <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="params[name] !== null"><i class="crm-i fa-times" aria-hidden="true"></i></a>
           </div>
-          <fieldset class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select && !isSelectRowCount()">
+          <fieldset class="api4-input form-inline" ng-mouseenter="help('select', availableParams.select)" ng-mouseleave="help()" ng-if="availableParams.select">
             <legend>select<span class="crm-marker" ng-if="::availableParams.select.required"> *</span></legend>
             <div ng-model="params.select" ui-sortable="{axis: 'y'}">
-              <div class="api4-input form-inline" ng-repeat="item in params.select track by $index">
+              <div class="api4-input form-inline" ng-repeat="item in params.select track by $index" ng-show="item !== 'row_count'">
                 <i class="crm-i fa-arrows" aria-hidden="true"></i>
                 <input class="form-control huge" type="text" ng-model="params.select[$index]" />
                 <a href class="crm-hover-button" title="Clear" ng-click="clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>

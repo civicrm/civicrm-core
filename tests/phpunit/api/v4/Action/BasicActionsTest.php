@@ -45,7 +45,9 @@ class BasicActionsTest extends UnitTestCase {
     MockBasicEntity::update()->addWhere('id', '=', $id2)->addValue('foo', 'new')->execute();
 
     $result = MockBasicEntity::get()->addOrderBy('id', 'DESC')->setLimit(1)->execute();
-    $this->assertCount(1, $result);
+    // The object's count() method will account for all results, ignoring limit, while the array results are limited
+    $this->assertCount(2, $result);
+    $this->assertCount(1, (array) $result);
     $this->assertEquals('new', $result->first()['foo']);
 
     $result = MockBasicEntity::save()

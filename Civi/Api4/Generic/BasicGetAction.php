@@ -59,7 +59,7 @@ class BasicGetAction extends AbstractGetAction {
     $this->expandSelectClauseWildcards();
     $values = $this->getRecords();
     $this->formatRawValues($values);
-    $result->exchangeArray($this->queryArray($values));
+    $this->queryArray($values, $result);
   }
 
   /**

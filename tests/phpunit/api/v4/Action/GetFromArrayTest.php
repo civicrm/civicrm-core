@@ -36,7 +36,10 @@ class GetFromArrayTest extends UnitTestCase {
       ->execute();
     $this->assertEquals(3, $result[0]['field1']);
     $this->assertEquals(4, $result[1]['field1']);
-    $this->assertEquals(2, count($result));
+
+    // The object's count() method will account for all results, ignoring limit, while the array results are limited
+    $this->assertCount(2, (array) $result);
+    $this->assertCount(5, $result);
   }
 
   public function testArrayGetWithSort() {

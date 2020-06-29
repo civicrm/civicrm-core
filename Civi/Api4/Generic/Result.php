@@ -40,6 +40,10 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @var int
    */
   public $version = 4;
+  /**
+   * @var int
+   */
+  public $rowCount;
 
   private $indexedBy;
 
@@ -107,11 +111,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    * @return int
    */
   public function count() {
-    $count = parent::count();
-    if ($count == 1 && is_array($this->first()) && array_keys($this->first()) == ['row_count']) {
-      return $this->first()['row_count'];
-    }
-    return $count;
+    return $this->rowCount ?? parent::count();
   }
 
   /**
