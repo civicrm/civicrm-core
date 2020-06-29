@@ -87,7 +87,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Details of the subscription (recurring contribution) to be altered.
    *
-   * @var array
+   * @var \CRM_Core_DAO
    */
   protected $subscriptionDetails = [];
 
@@ -179,7 +179,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Get details for the recurring contribution being altered.
    *
-   * @return array
+   * @return \CRM_Core_DAO
    */
   public function getSubscriptionDetails() {
     return $this->subscriptionDetails;
