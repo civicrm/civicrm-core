@@ -86,7 +86,7 @@
     <type>int unsigned</type>
     <uniqueName>participant_listing_id</uniqueName>
     <title>Participant Listing</title>
-    <default>0</default>
+    <default>NULL</default>
     <pseudoconstant>
       <optionGroupName>participant_listing</optionGroupName>
     </pseudoconstant>

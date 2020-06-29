@@ -63,7 +63,6 @@ function event_create_expectedresult() {
         'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
         'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
         'event_type_id' => '1',
-        'participant_listing_id' => '',
         'is_public' => '1',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
