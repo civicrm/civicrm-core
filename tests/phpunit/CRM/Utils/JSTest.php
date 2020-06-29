@@ -107,8 +107,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
 
   public function dedupeClosureExamples() {
     // Each example string here is named for its body, eg the body of $a calls "a()".
-    $a = "(function (angular, $, _) {\na();\n})(angular, CRM.$, CRM._);";
-    $b = "(function(angular,$,_){\nb();\n})(angular,CRM.$,CRM._);";
+    $a = "(function (angular, $, _) {\n  'use strict';\n  a();\n})(angular, CRM.$, CRM._);";
+    $b = "(function(angular,$,_){\n  \"use strict\";\n  b();\n})(angular,CRM.$,CRM._);";
     $c = "(function( angular, $,_) {\nc();\n})(angular,CRM.$, CRM._);";
     $d = "(function (angular, $, _, whiz) {\nd();\n})(angular, CRM.$, CRM._, CRM.whizbang);";
     $m = "alert('i is the trickster (function( angular, $,_) {\nm();\n})(angular,CRM.$, CRM._);)'";
@@ -116,9 +116,10 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
 
     // Each example string here is a deduped combination of others,
     // eg "$ab" is the deduping of $a+$b.
-    $ab = "(function (angular, $, _) {\na();\n\nb();\n})(angular,CRM.$,CRM._);";
-    $abc = "(function (angular, $, _) {\na();\n\nb();\n\nc();\n})(angular,CRM.$, CRM._);";
-    $cb = "(function( angular, $,_) {\nc();\n\nb();\n})(angular,CRM.$,CRM._);";
+    $ab = "(function (angular, $, _) {\n  'use strict';\n  a();\n  b();\n})(angular,CRM.$,CRM._);";
+    $ba = "(function(angular,$,_){\n  \"use strict\";\n  b();\n  a();\n})(angular, CRM.$, CRM._);";
+    $abc = "(function (angular, $, _) {\n  'use strict';\n  a();\n  b();\nc();\n})(angular,CRM.$, CRM._);";
+    $cb = "(function( angular, $,_) {\nc();\n  b();\n})(angular,CRM.$,CRM._);";
 
     $cases = [];
     $cases[] = [[$a], "$a"];
@@ -127,6 +128,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $cases[] = [[$d], "$d"];
     $cases[] = [[$m], "$m"];
     $cases[] = [[$a, $b], "$ab"];
+    $cases[] = [[$b, $a], "$ba"];
     $cases[] = [[$a, $m, $b], "$a$m$b"];
     $cases[] = [[$a, $d], "$a$d"];
     $cases[] = [[$a, $d, $b], "$a$d$b"];
