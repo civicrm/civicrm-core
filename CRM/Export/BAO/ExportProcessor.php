@@ -749,7 +749,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   public function getHeaderForRow($field) {
-    if (substr($field, -11) == 'campaign_id') {
+    if (substr($field, -11) === 'campaign_id') {
       // @todo - set this correctly in the xml rather than here.
       // This will require a generalised handling cleanup
       return ts('Campaign ID');

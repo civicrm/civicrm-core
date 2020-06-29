@@ -5047,6 +5047,28 @@ civicrm_relationship.start_date > {$today}
         $this->_skipDeleteClause
       );
 
+      if (isset($this->_tables['civicrm_activity'])) {
+        $bao = new CRM_Activity_BAO_Activity();
+        $clauses = $subclauses = [];
+        foreach ((array) $bao->addSelectWhereClause() as $field => $vals) {
+          if ($vals && $field !== 'id') {
+            $clauses[] = $bao->tableName() . ".$field " . $vals;
+          }
+          elseif ($vals) {
+            $subclauses[] = "$field " . implode(" AND $field ", (array) $vals);
+          }
+        }
+        if ($subclauses) {
+          $clauses[] = $bao->tableName() . '.`id` IN (SELECT `id` FROM `' . $bao->tableName() . '` WHERE ' . implode(' AND ', $subclauses) . ')';
+        }
+        if (!empty($clauses) && $this->_permissionWhereClause) {
+          $this->_permissionWhereClause .= ' AND (' . implode(' AND ', $clauses) . ')';
+        }
+        elseif (!empty($clauses)) {
+          $this->_permissionWhereClause .= '(' . implode(' AND ', $clauses) . ')';
+        }
+      }
+
       // regenerate fromClause since permission might have added tables
       if ($this->_permissionWhereClause) {
         //fix for row count in qill (in contribute/membership find)

@@ -2640,7 +2640,7 @@ SELECT contact_id
    *
    * @param string $context
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    * @return array
    */
   public static function buildOptionsContext($context = NULL) {
@@ -2654,7 +2654,7 @@ SELECT contact_id
     ];
     // Validation: enforce uniformity of this param
     if ($context !== NULL && !isset($contexts[$context])) {
-      throw new Exception("'$context' is not a valid context for buildOptions.");
+      throw new CRM_Core_Exception("'$context' is not a valid context for buildOptions.");
     }
     return $contexts;
   }

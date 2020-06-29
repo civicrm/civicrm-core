@@ -28,22 +28,13 @@ class CRM_Activity_BAO_Query {
       $query->_tables['civicrm_activity'] = $query->_whereTables['civicrm_activity'] = 1;
     }
 
-    if (!empty($query->_returnProperties['activity_type_id'])) {
-      $query->_select['activity_type_id'] = 'activity_type.value as activity_type_id';
+    if (!empty($query->_returnProperties['activity_type_id'])
+      || !empty($query->_returnProperties['activity_type'])
+    ) {
+      $query->_select['activity_type_id'] = 'civicrm_activity.activity_type_id';
       $query->_element['activity_type_id'] = 1;
       $query->_tables['civicrm_activity'] = 1;
-      $query->_tables['activity_type'] = 1;
       $query->_whereTables['civicrm_activity'] = 1;
-      $query->_whereTables['activity_type'] = 1;
-    }
-
-    if (!empty($query->_returnProperties['activity_type'])) {
-      $query->_select['activity_type'] = 'activity_type.label as activity_type';
-      $query->_element['activity_type'] = 1;
-      $query->_tables['civicrm_activity'] = 1;
-      $query->_tables['activity_type'] = 1;
-      $query->_whereTables['civicrm_activity'] = 1;
-      $query->_whereTables['activity_type'] = 1;
     }
 
     if (!empty($query->_returnProperties['activity_subject'])) {
