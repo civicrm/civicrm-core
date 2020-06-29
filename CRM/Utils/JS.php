@@ -54,6 +54,8 @@ class CRM_Utils_JS {
    * Note that you can only dedupe closures if they are directly adjacent and
    * have exactly the same parameters.
    *
+   * Also dedupes the "use strict" directive as it is only meaningful at the beginning of a closure.
+   *
    * @param array $scripts
    *   Javascript source.
    * @param array $localVars
@@ -70,7 +72,7 @@ class CRM_Utils_JS {
       return preg_quote($v, '/');
     }, $localVars));
     $opening .= '\)\s*\{';
-    $opening = '/^' . $opening . '/';
+    $opening = '/^' . $opening . '\s*(?:"use strict";\s|\'use strict\';\s)?/';
 
     // Example closing: })(angular, CRM.$, CRM._);
     $closing = '\}\s*\)\s*\(\s*';
