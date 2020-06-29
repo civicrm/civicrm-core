@@ -21,4 +21,8 @@
 </p><p>
 {ts}"user and user admin" only means that only users that received the mailing or administrators can view the content of this email as a web page; the recipients will have to log in to be able to view the message{/ts}
 <p></p>
+{htxt id="mailing-sync-interval-title"}
+  {ts}Sync Interval{/ts}
+{ts}"civimail_sync_interval" specifies how frequently CiviMail records which emails it has sent.  A value of 1 means that it updates the database with every email sent, but this may have a performance hit.{/ts}:
+<p></p>
 {/htxt}

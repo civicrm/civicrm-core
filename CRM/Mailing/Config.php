@@ -27,6 +27,8 @@ class CRM_Mailing_Config {
   // special value for mail bulk inserts to avoid
   // potential duplication, assuming a smaller number reduces number of queries
   // by some factor, so some tradeoff. CRM-8678
+  // dev/core#1768 Remove this after Dec 2020.
+  // Replaced with civimail_sync_interval.
   const BULK_MAIL_INSERT_COUNT = 10;
 
 }
