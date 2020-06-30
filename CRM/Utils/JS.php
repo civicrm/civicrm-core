@@ -109,7 +109,7 @@ class CRM_Utils_JS {
    * @return string
    */
   public static function stripComments($script) {
-    return preg_replace(":^\\s*//[^\n]+$:m", "", $script);
+    return preg_replace("#^\\s*//[^\n]*$(?:\r\n|\n)?#m", "", $script);
   }
 
   /**

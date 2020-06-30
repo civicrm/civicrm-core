@@ -155,11 +155,15 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $cases = [];
     $cases[] = [
       "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
-      "a();\n\nb();",
+      "a();\nb();",
     ];
     $cases[] = [
       "// foo\na();",
-      "\na();",
+      "a();",
+    ];
+    $cases[] = [
+      "// foo\n //\na();",
+      "a();",
     ];
     $cases[] = [
       "b();\n  // foo",
@@ -167,11 +171,11 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     ];
     $cases[] = [
       "/// foo\na();\n\t \t//bar\nb();\n// whiz",
-      "\na();\n\nb();\n",
+      "a();\nb();\n",
     ];
     $cases[] = [
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
-      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n\na();",
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\na();",
     ];
     return $cases;
   }
