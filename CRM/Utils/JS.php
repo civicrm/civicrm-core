@@ -62,7 +62,7 @@ class CRM_Utils_JS {
    *   Ordered list of JS vars to identify the start of a closure.
    * @param array $inputVals
    *   Ordered list of input values passed into the closure.
-   * @return string
+   * @return string[]
    *   Javascript source.
    */
   public static function dedupeClosures($scripts, $localVars, $inputVals) {
@@ -126,6 +126,7 @@ class CRM_Utils_JS {
    *
    * @param string $js
    * @return mixed
+   * @throws Exception
    */
   public static function decode($js) {
     $js = trim($js);
@@ -189,7 +190,7 @@ class CRM_Utils_JS {
    *
    * @param $js
    * @return array
-   * @throws \Exception
+   * @throws Exception
    */
   public static function getRawProps($js) {
     $js = trim($js);
