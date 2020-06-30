@@ -36,14 +36,8 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     $messages = [];
 
     $slug = $config->wpBasePage;
-    $pageArgs = [
-      'name' => $slug,
-      'post_type' => 'page',
-      'post_status' => 'publish',
-      'numberposts' => 1,
-    ];
-    $basePage = get_posts($pageArgs);
-    if (!$basePage) {
+    $basePage = get_page_by_path($slug);
+    if (!$basePage || $basePage->post_status != 'publish') {
       $cmsSettings = CRM_Utils_System::url(
         'civicrm/admin/setting',
         $query = ['reset' => 1],
@@ -53,43 +47,56 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
         FALSE,
         TRUE
       );
-      $messageText = [
-        ts(
-          'CiviCRM relies upon a base page in WordPress at %1%2, but it is missing.',
-          [
-            1 => $config->userFrameworkBaseURL,
-            2 => $slug,
-          ]
-        ),
-      ];
-      if ($slug == 'civicrm') {
-        $messageText[] = ts(
-          'If you have an alternative base page, it can be set in the <a href="%2">WordPress integration settings</a>.',
-          [
-            1 => $config->userFrameworkBaseURL,
-            2 => $cmsSettings,
-          ]
-        );
+      if ($basePage) {
+        $messageText = [
+          ts(
+            'CiviCRM relies upon a <a href="%1%2">base page in WordPress</a>, but it is not published.',
+            [
+              1 => $config->userFrameworkBaseURL,
+              2 => $slug,
+            ]
+          ),
+        ];
       }
       else {
-        $pageArgs['name'] = 'civicrm';
-        $defaultBasePage = get_posts($pageArgs);
-        if ($defaultBasePage) {
+        $messageText = [
+          ts(
+            'CiviCRM relies upon a base page in WordPress at %1%2, but it is missing.',
+            [
+              1 => $config->userFrameworkBaseURL,
+              2 => $slug,
+            ]
+          ),
+        ];
+        if ($slug == 'civicrm') {
           $messageText[] = ts(
-            'The default is %1civicrm, which <a href="%1civicrm">does exist on this site</a>.',
-            [1 => $config->userFrameworkBaseURL]
+            'If you have an alternative base page, it can be set in the <a href="%2">WordPress integration settings</a>.',
+            [
+              1 => $config->userFrameworkBaseURL,
+              2 => $cmsSettings,
+            ]
           );
         }
         else {
+          $pageArgs['name'] = 'civicrm';
+          $defaultBasePage = get_posts($pageArgs);
+          if ($defaultBasePage) {
+            $messageText[] = ts(
+              'The default is %1civicrm, which <a href="%1civicrm">does exist on this site</a>.',
+              [1 => $config->userFrameworkBaseURL]
+            );
+          }
+          else {
+            $messageText[] = ts(
+              'The default is %1civicrm, but that does not exist on this site either.',
+              [1 => $config->userFrameworkBaseURL]
+            );
+          }
           $messageText[] = ts(
-            'The default is %1civicrm, but that does not exist on this site either.',
-            [1 => $config->userFrameworkBaseURL]
+            'You can set the correct base page in the <a href="%1">WordPress integration settings</a>.',
+            [1 => $cmsSettings]
           );
         }
-        $messageText[] = ts(
-          'You can set the correct base page in the <a href="%1">WordPress integration settings</a>.',
-          [1 => $cmsSettings]
-        );
       }
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
