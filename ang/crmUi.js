@@ -484,7 +484,6 @@
     //         $scope.myOrder.setDir('field2', '');
     //   HTML: <tr ng-repeat="... | order:myOrder.get()">...</tr>
     .service('CrmUiOrderCtrl', function(){
-      //
       function CrmUiOrderCtrl(defaults){
         this.values = defaults;
       }
