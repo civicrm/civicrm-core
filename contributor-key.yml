@@ -379,6 +379,9 @@
 
 - github      : don-alejandro-z
 
+- github      : jmdh
+  name        : Dominic Hargreaves
+
 - name        : Samuel Haskell
   jira        : dotsam
 
@@ -993,6 +996,10 @@
 
 - github      : mecachisenros
   name        : Andrei Mondoc
+
+- github      : megaphonetech-dennis
+  name        : Dennis P. Osorio
+  organization: Megaphone Technology Consulting
 
 - github      : mepps
   name        : Maggie Epps
