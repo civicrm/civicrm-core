@@ -27,6 +27,12 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     if ($config->userFramework != 'WordPress') {
       return [];
     }
+    if (is_multisite()) {
+      // There are a lot potential configurations in a multisite context where
+      // this could show a false positive.  This completely skips multisite for
+      // now.
+      return [];
+    }
     $messages = [];
 
     $slug = $config->wpBasePage;
