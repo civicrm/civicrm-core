@@ -396,7 +396,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         // Temporary hack - in 5.27 a new field is added to civicrm_custom_field. There is a high
         // risk this function is called before the upgrade page can be reached and if
         // so it will potentially result in fatal error.
-        $serializeField = CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1') ? '' : "$cfTable.serialize,";
+        $serializeField = CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1') ? "$cfTable.serialize," : '';
 
         $query = "SELECT $cfTable.id, $cfTable.label,
                             $cgTable.title,
