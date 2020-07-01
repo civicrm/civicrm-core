@@ -118,7 +118,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Timestamps reported by MySQL (eg "%2") and PHP (eg "%3" ) are mismatched.<br /><a href="%1">Read more about this warning</a>', [
-          1 => CRM_Utils_System::getWikiBaseURL() . 'checkMysqlTime',
+          1 => CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-time', TRUE),
           2 => $sqlNow,
           3 => $phpNow,
         ]),

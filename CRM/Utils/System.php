@@ -1066,28 +1066,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Format wiki url.
-   *
-   * @param string $string
-   * @param bool $encode
-   *
-   * @return string
-   */
-  public static function formatWikiURL($string, $encode = FALSE) {
-    $items = explode(' ', trim($string), 2);
-    if (count($items) == 2) {
-      $title = $items[1];
-    }
-    else {
-      $title = $items[0];
-    }
-
-    // fix for CRM-4044
-    $url = $encode ? self::urlEncode($items[0]) : $items[0];
-    return "<a href=\"$url\">$title</a>";
-  }
-
-  /**
    * Encode url.
    *
    * @param string $url
@@ -1095,6 +1073,7 @@ class CRM_Utils_System {
    * @return null|string
    */
   public static function urlEncode($url) {
+    CRM_Core_Error::deprecatedFunctionWarning('urlEncode');
     $items = parse_url($url);
     if ($items === FALSE) {
       return NULL;
@@ -1600,6 +1579,7 @@ class CRM_Utils_System {
    * @return string
    */
   public static function relativeURL($url) {
+    CRM_Core_Error::deprecatedFunctionWarning('url');
     // check if url is relative, if so return immediately
     if (substr($url, 0, 4) != 'http') {
       return $url;
@@ -1627,6 +1607,7 @@ class CRM_Utils_System {
    * @return string
    */
   public static function absoluteURL($url, $removeLanguagePart = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('url');
     // check if url is already absolute, if so return immediately
     if (substr($url, 0, 4) == 'http') {
       return $url;
