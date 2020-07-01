@@ -538,9 +538,6 @@ WHERE      a.id = %1
             ) {
               $value = $this->redact($value);
             }
-            elseif (CRM_Utils_Array::value('type', $typeValue) == 'Link') {
-              $value = CRM_Utils_System::formatWikiURL($value);
-            }
           }
           //$typeValue
           $customGroup[] = array(

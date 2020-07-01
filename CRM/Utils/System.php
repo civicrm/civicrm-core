@@ -1066,28 +1066,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Format wiki url.
-   *
-   * @param string $string
-   * @param bool $encode
-   *
-   * @return string
-   */
-  public static function formatWikiURL($string, $encode = FALSE) {
-    $items = explode(' ', trim($string), 2);
-    if (count($items) == 2) {
-      $title = $items[1];
-    }
-    else {
-      $title = $items[0];
-    }
-
-    // fix for CRM-4044
-    $url = $encode ? self::urlEncode($items[0]) : $items[0];
-    return "<a href=\"$url\">$title</a>";
-  }
-
-  /**
    * Encode url.
    *
    * @param string $url
