@@ -46,27 +46,71 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
    */
+  public function upgrade_5_29_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+    list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      FROM civicrm_relationship ")->getDatabaseResult()->fetchRow();
+    for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts("Upgrade DB to %1: Fill civicrm_relationship_vtx (%2 => %3)", [
+        1 => $rev,
+        2 => $startId,
+        3 => $endId,
+      ]);
+      $this->addTask($title, 'populateRelationshipVortex', $startId, $endId);
+    }
+  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param int $startId
+   *   The lowest relationship ID that should be updated.
+   * @param int $endId
+   *   The highest relationship ID that should be updated.
+   * @return bool
+   *   TRUE on success
+   */
+  public static function populateRelationshipVortex(CRM_Queue_TaskContext $ctx, $startId, $endId) {
+    // NOTE: We duplicate CRM_Contact_BAO_RelationshipVortex::$mappings in case
+    // the schema evolves over multiple releases.
+    $mappings = [
+      'a_b' => [
+        'relationship_id' => 'rel.id',
+        'relationship_type_id' => 'rel.relationship_type_id',
+        'orientation' => '"a_b"',
+        'near_contact_id' => 'rel.contact_id_a',
+        'relation' => 'reltype.name_a_b',
+        'far_contact_id' => 'rel.contact_id_b',
+      ],
+      'b_a' => [
+        'relationship_id' => 'rel.id',
+        'relationship_type_id' => 'rel.relationship_type_id',
+        'orientation' => '"b_a"',
+        'near_contact_id' => 'rel.contact_id_b',
+        'relation' => 'reltype.name_b_a',
+        'far_contact_id' => 'rel.contact_id_a',
+      ],
+    ];
+    $keyFields = ['relationship_id', 'orientation'];
+
+    foreach ($mappings as $mapping) {
+      $query = CRM_Utils_SQL_Select::from('civicrm_relationship rel')
+        ->join('reltype', 'INNER JOIN civicrm_relationship_type reltype ON rel.relationship_type_id = reltype.id')
+        ->syncInto('civicrm_relationship_vtx', $keyFields, $mapping)
+        ->where('rel.id >= #START AND rel.id <= #END', [
+          '#START' => $startId,
+          '#END' => $endId,
+        ]);
+      $query->execute();
+    }
+
+    return TRUE;
+  }
 
 }
