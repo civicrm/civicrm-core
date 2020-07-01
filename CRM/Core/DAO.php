@@ -513,6 +513,43 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Returns all usable fields, indexed by name.
+   *
+   * This function differs from fields() in that it indexes by name rather than unique_name.
+   *
+   * It excludes fields not added yet by pending upgrades.
+   * This avoids problems with trying to SELECT a field that exists in code but has not yet been added to the db.
+   *
+   * @param bool $checkPermissions
+   *   Filter by field permissions.
+   * @return array
+   */
+  public static function getSupportedFields($checkPermissions = FALSE) {
+    $fields = array_column((array) static::fields(), NULL, 'name');
+
+    // Exclude fields yet not added by pending upgrades
+    $dbVer = \CRM_Core_BAO_Domain::version();
+    if ($fields && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
+      $fields = array_filter($fields, function($field) use ($dbVer) {
+        $add = $field['add'] ?? '1.0.0';
+        if (substr_count($add, '.') < 2) {
+          $add .= '.alpha1';
+        }
+        return version_compare($dbVer, $add, '>=');
+      });
+    }
+
+    // Exclude fields the user does not have permission for
+    if ($checkPermissions) {
+      $fields = array_filter($fields, function($field) {
+        return empty($field['permission']) || CRM_Core_Permission::check($field['permission']);
+      });
+    }
+
+    return $fields;
+  }
+
+  /**
    * Get/set an associative array of table columns
    *
    * @return array

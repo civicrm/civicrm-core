@@ -294,7 +294,7 @@ function _civicrm_api3_load_DAO($entity) {
  *   return the DAO name to manipulate this function
  *   eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
  *
- * @return mixed|string
+ * @return CRM_Core_DAO|string
  */
 function _civicrm_api3_get_DAO($name) {
   if (strpos($name, 'civicrm_api3') !== FALSE) {
@@ -1878,15 +1878,19 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = []) {
   if (empty($dao)) {
     return [];
   }
-  $d = new $dao();
-  $fields = $d->fields();
+  $fields = $dao::fields();
+  $supportedFields = $dao::getSupportedFields();
 
-  foreach ($fields as $name => &$field) {
+  foreach ($fields as $name => $field) {
     // Denote as core field
-    $field['is_core_field'] = TRUE;
+    $fields[$name]['is_core_field'] = TRUE;
     // Set html attributes for text fields
     if (isset($field['html'])) {
-      $field['html'] += (array) $d::makeAttribute($field);
+      $fields[$name]['html'] += (array) $dao::makeAttribute($field);
+    }
+    // Delete field if not supported by current db schema (prevents errors when there are pending db updates)
+    if (!isset($supportedFields[$field['name']])) {
+      unset($fields[$name]);
     }
   }
 
