@@ -567,6 +567,11 @@ return [
     'class' => 'CRM_Contact_DAO_Relationship',
     'table' => 'civicrm_relationship',
   ],
+  'CRM_Contact_DAO_RelationshipVortex' => [
+    'name' => 'RelationshipVortex',
+    'class' => 'CRM_Contact_DAO_RelationshipVortex',
+    'table' => 'civicrm_relationship_vtx',
+  ],
   'CRM_Mailing_DAO_Mailing' => [
     'name' => 'Mailing',
     'class' => 'CRM_Mailing_DAO_Mailing',
