@@ -418,6 +418,7 @@ class CRM_Core_CodeGen_Specification {
     if (isset($fieldXML->localize_context)) {
       $field['localize_context'] = $fieldXML->localize_context;
     }
+    $field['add'] = $this->value('add', $fieldXML);
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach

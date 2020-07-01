@@ -160,7 +160,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if}
 {if $field.pseudoconstant}
   'pseudoconstant' => {$field.pseudoconstant|@print_array},
-{/if} {* field.pseudoconstant *}                                                                    ),
+{/if}
+  'add' => {if $field.add}'{$field.add}'{else}NULL{/if},
+),
 {/foreach} {* table.fields *}
                                       );
             CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
