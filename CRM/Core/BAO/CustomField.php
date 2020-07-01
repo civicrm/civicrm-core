@@ -278,6 +278,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array
    *   an array of active custom fields.
+   * @throws \CRM_Core_Exception
    */
   public static function &getFields(
     $customDataType = 'Individual',
@@ -392,6 +393,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($onlyParent) {
           $extends .= " AND $cgTable.extends_entity_column_value IS NULL AND $cgTable.extends_entity_column_id IS NULL ";
         }
+        // Temporary hack - in 5.27 a new field is added to civicrm_custom_field. There is a high
+        // risk this function is called before the upgrade page can be reached and if
+        // so it will potentially result in fatal error.
+        $serializeField = CRM_Core_BAO_Domain::isDBUpdateRequired() ? '' : "$cfTable.serialize,";
 
         $query = "SELECT $cfTable.id, $cfTable.label,
                             $cgTable.title,
@@ -410,7 +415,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.date_format,
                             $cfTable.time_format,
                             $cgTable.is_multiple,
-                            $cfTable.serialize,
+                            $serializeField
                             $cgTable.table_name,
                             og.name as option_group_name
                      FROM $cfTable

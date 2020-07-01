@@ -122,7 +122,7 @@ function civicrm_api3_custom_field_delete($params) {
  * @return array
  */
 function civicrm_api3_custom_field_get($params) {
-  if (($params['legacy_html_type'] ?? TRUE) && !empty($params['return'])) {
+  if (!CRM_Core_BAO_Domain::isDBUpdateRequired() && ($params['legacy_html_type'] ?? TRUE) && !empty($params['return'])) {
     if (is_array($params['return'])) {
       $params['return'][] = 'serialize';
     }

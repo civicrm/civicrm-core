@@ -739,10 +739,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
     else {
-      $codeVersion = CRM_Utils_System::version();
-
       // if db.ver < code.ver, time to upgrade
-      if (version_compare($dbVersion, $codeVersion) < 0) {
+      if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
           ts('New codebase version detected. You must visit <a href=\'%1\'>upgrade screen</a> to upgrade the database.', [1 => $upgradeUrl]),
