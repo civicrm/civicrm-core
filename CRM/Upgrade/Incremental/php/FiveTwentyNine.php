@@ -60,6 +60,18 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
   public function upgrade_5_29_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install eventcart extension', 'installEventCart');
+
+    list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      FROM civicrm_relationship ")->getDatabaseResult()->fetchRow();
+    for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
+      $endId = $startId + self::BATCH_SIZE - 1;
+      $title = ts("Upgrade DB to %1: Fill civicrm_relationship_vtx (%2 => %3)", [
+        1 => $rev,
+        2 => $startId,
+        3 => $endId,
+      ]);
+      $this->addTask($title, 'populateRelationshipVortex', $startId, $endId);
+    }
   }
 
   /**
@@ -90,6 +102,63 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
       'is_active' => 1,
     ]);
     CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+
+    return TRUE;
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param int $startId
+   *   The lowest relationship ID that should be updated.
+   * @param int $endId
+   *   The highest relationship ID that should be updated.
+   * @return bool
+   *   TRUE on success
+   */
+  public static function populateRelationshipVortex(CRM_Queue_TaskContext $ctx, $startId, $endId) {
+    // NOTE: We duplicate CRM_Contact_BAO_RelationshipVortex::$mappings in case
+    // the schema evolves over multiple releases.
+    $mappings = [
+      'a_b' => [
+        'relationship_id' => 'rel.id',
+        'relationship_type_id' => 'rel.relationship_type_id',
+        'orientation' => '"a_b"',
+        'near_contact_id' => 'rel.contact_id_a',
+        'near_relation' => 'reltype.name_a_b',
+        'far_contact_id' => 'rel.contact_id_b',
+        'far_relation' => 'reltype.name_b_a',
+        'start_date' => 'rel.start_date',
+        'end_date' => 'rel.end_date',
+        'is_active' => 'rel.is_active',
+        'case_id' => 'rel.case_id',
+      ],
+      'b_a' => [
+        'relationship_id' => 'rel.id',
+        'relationship_type_id' => 'rel.relationship_type_id',
+        'orientation' => '"b_a"',
+        'near_contact_id' => 'rel.contact_id_b',
+        'near_relation' => 'reltype.name_b_a',
+        'far_contact_id' => 'rel.contact_id_a',
+        'far_relation' => 'reltype.name_a_b',
+        'start_date' => 'rel.start_date',
+        'end_date' => 'rel.end_date',
+        'is_active' => 'rel.is_active',
+        'case_id' => 'rel.case_id',
+      ],
+    ];
+    $keyFields = ['relationship_id', 'orientation'];
+
+    foreach ($mappings as $mapping) {
+      $query = CRM_Utils_SQL_Select::from('civicrm_relationship rel')
+        ->join('reltype', 'INNER JOIN civicrm_relationship_type reltype ON rel.relationship_type_id = reltype.id')
+        ->syncInto('civicrm_relationship_vtx', $keyFields, $mapping)
+        ->where('rel.id >= #START AND rel.id <= #END', [
+          '#START' => $startId,
+          '#END' => $endId,
+        ]);
+      $query->execute();
+    }
+
     return TRUE;
   }
 
