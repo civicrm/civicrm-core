@@ -2437,7 +2437,7 @@ SELECT count(*)
     return $membershipValues;
   }
 
-  /*
+  /**
    * Get Relationship Contacts array for checking if contact can be modified.
    *
    * @param array $params
