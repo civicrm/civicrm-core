@@ -29,6 +29,10 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     // if ($rev == '5.12.34') {
     //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
+    $preUpgradeMessage .= '<p>' . ts('Starting with version 5.28.0, CiviCRM will
+      require the PHP Internationalization extension (PHP-Intl).  In preparation
+      for this, the system check will show a warning beginning in 5.27.0 if your
+      site lacks this extension.') . '</p>';
   }
 
   /**
@@ -74,10 +78,12 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       foreach ($locales as $locale) {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_price_field_value SET label_{$locale} = '' WHERE label_{$locale} IS NULL", [], TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label_{$locale}` `label_{$locale}` varchar(255) NOT NULL   COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
       }
     }
     else {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_price_field_value SET label = '' WHERE label IS NULL");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label` `label` varchar(255) NOT NULL   COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;
@@ -89,10 +95,12 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
       foreach ($locales as $locale) {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_membership_type SET name_{$locale} = '' WHERE name_{$locale} IS NULL", [], TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_membership_type CHANGE `name_{$locale}` `name_{$locale}` varchar(128) NOT NULL   COMMENT 'Name of Membership Type'", [], TRUE, NULL, FALSE, FALSE);
       }
     }
     else {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_membership_type SET name = '' WHERE name IS NULL");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_membership_type CHANGE `name` `name` varchar(128) NOT NULL   COMMENT 'Name of Membership Type'", [], TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;

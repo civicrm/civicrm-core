@@ -83,6 +83,29 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
+   * Is a database update required to apply latest schema changes.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function isDBUpdateRequired() {
+    $dbVersion = CRM_Core_BAO_Domain::version();
+    $codeVersion = CRM_Utils_System::version();
+    return version_compare($dbVersion, $codeVersion) < 0;
+  }
+
+  /**
+   * Checks that the current DB schema is at least $min version
+   *
+   * @param string|number $min
+   * @return bool
+   */
+  public static function isDBVersionAtLeast($min) {
+    return version_compare(self::version(), $min, '>=');
+  }
+
+  /**
    * Get the location values of a domain.
    *
    * @return array
