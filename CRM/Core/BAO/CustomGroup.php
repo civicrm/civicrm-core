@@ -1361,6 +1361,7 @@ ORDER BY civicrm_custom_group.weight,
                 }
               }
               else {
+                // Values may be "array strings" or actual arrays. Handle both.
                 if (is_array($value) && count($value)) {
                   CRM_Utils_Array::formatArrayKeys($value);
                   $checkedValue = $value;
@@ -1383,7 +1384,14 @@ ORDER BY civicrm_custom_group.weight,
           }
           else {
             if (isset($value)) {
-              $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
+              // Values may be "array strings" or actual arrays. Handle both.
+              if (is_array($value) && count($value)) {
+                CRM_Utils_Array::formatArrayKeys($value);
+                $checkedValue = $value;
+              }
+              else {
+                $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($value, 1, -1));
+              }
               foreach ($checkedValue as $val) {
                 if ($val) {
                   $defaults[$elementName][$val] = $val;
