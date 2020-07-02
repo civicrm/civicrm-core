@@ -1,3 +1,4 @@
+  SELECT @domainVersion := version FROM civicrm_domain LIMIT 1;
   SET @domainName := 'Second Domain';
   INSERT INTO civicrm_contact(sort_name, display_name, contact_type, organization_name)
   VALUES (@domainName, @domainName, 'Organization', @domainName);
@@ -27,7 +28,7 @@ INSERT INTO civicrm_loc_block ( address_id, email_id, phone_id, address_2_id, em
 SELECT @locBlockId := id from civicrm_loc_block where phone_id = @phoneId AND email_id = @emailId AND address_id = @addId;
 
   INSERT INTO civicrm_domain
-  (name, version,contact_id) VALUES (@domainName, '4.2', @contactID);
+  (name, version,contact_id) VALUES (@domainName, @domainVersion, @contactID);
   SELECT @domainID := id FROM civicrm_domain where name = 'Second Domain';
   INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `domain_id`, `visibility_id`)
@@ -963,4 +964,3 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Mailing Detail Report', 'Mailing Detail Report', 'administer CiviMail', 'OR', @reportlastID, '1', NULL, @instanceID+2 );
 UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
-UPDATE civicrm_domain SET version = '5.28.alpha1';
