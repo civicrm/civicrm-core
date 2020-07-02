@@ -56,6 +56,7 @@
     return result;
   }
 
+  // https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
   CRM.api4 = function(entity, action, params, index) {
     return new Promise(function(resolve, reject) {
       if (typeof entity === 'string') {
@@ -88,7 +89,7 @@
 
   /**
    * AJAX api
-   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
+   * @link https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
    */
   CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
