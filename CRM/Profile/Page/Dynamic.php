@@ -316,9 +316,12 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       foreach ($values as $title => $value) {
-        $profileFields[$labels[$title]] = [
+        $fieldName = $labels[$title];
+        $fieldValue = $this->getProfileFieldValue($fieldName, $value);
+
+        $profileFields[$fieldName] = [
           'label' => $title,
-          'value' => $value,
+          'value' => $fieldValue,
         ];
       }
 
@@ -414,6 +417,36 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+  }
+
+  /**
+   * Returns the profile expected value according to their type:
+   *
+   * - For emails we return a link to the email composer form.
+   *
+   * For all other types we return the same same value passed to this function.
+   *
+   * @param string $fieldName
+   *   the name of the profile field.
+   * @param string $rawValue
+   *   the value for the profile field.
+   * @return string
+   */
+  private function getProfileFieldValue($fieldName, $rawValue) {
+    $fieldType = [];
+    preg_match('/email|address|phone/', $fieldName, $fieldType);
+
+    if ($fieldType[0] === 'email') {
+      $emailPopupUrl = CRM_Utils_System::url('civicrm/activity/email/add', [
+        'action' => 'add',
+        'reset' => '1',
+        'email' => $rawValue,
+      ], TRUE);
+
+      return '<a class="crm-popup" href="' . $emailPopupUrl . '">' . $rawValue . '</a>';
+    }
+
+    return $rawValue;
   }
 
 }
