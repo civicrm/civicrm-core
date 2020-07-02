@@ -98,7 +98,9 @@
               <td>
                 {if $row.email}
                     <span title="{$row.email|escape}">
-                        {$row.email|mb_truncate:17:"...":true}
+                        <a class="crm-popup" href="{crmURL p='civicrm/activity/email/add' q="reset=1&action=add&email=`$row.email`"}">
+                          {$row.email|mb_truncate:17:"...":true}
+                        </a>
                         {privacyFlag field=do_not_email condition=$row.do_not_email}
                         {privacyFlag field=on_hold condition=$row.on_hold}
                     </span>
@@ -113,8 +115,14 @@
               </td>
            {else}
               {foreach from=$row item=value key=key}
-                {if ($key neq "checkbox") and ($key neq "action") and ($key neq "contact_type") and ($key neq "status") and ($key neq "sort_name") and ($key neq "contact_id") and ($key neq "contact_type_orig")}
+                {if !in_array($key, ['checkbox', 'action', 'contact_type', 'status', 'sort_name', 'contact_id', 'contact_type_orig', 'email'])}
                  <td>{$value}&nbsp;</td>
+                {elseif $key eq 'email'}
+                  <td>
+                    <a class="crm-popup" href="{crmURL p='civicrm/activity/email/add' q="reset=1&action=add&email=`$value`"}">
+                      {$value}
+                    </a>
+                  </td>
                 {/if}
               {/foreach}
             {/if}
