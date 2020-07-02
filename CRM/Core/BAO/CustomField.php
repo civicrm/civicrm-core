@@ -278,6 +278,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @return array
    *   an array of active custom fields.
+   * @throws \CRM_Core_Exception
    */
   public static function &getFields(
     $customDataType = 'Individual',
@@ -392,6 +393,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if ($onlyParent) {
           $extends .= " AND $cgTable.extends_entity_column_value IS NULL AND $cgTable.extends_entity_column_id IS NULL ";
         }
+        // Temporary hack - in 5.27 a new field is added to civicrm_custom_field. There is a high
+        // risk this function is called before the upgrade page can be reached and if
+        // so it will potentially result in fatal error.
+        $serializeField = CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1') ? "$cfTable.serialize," : '';
 
         $query = "SELECT $cfTable.id, $cfTable.label,
                             $cgTable.title,
@@ -410,7 +415,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
                             $cfTable.date_format,
                             $cfTable.time_format,
                             $cgTable.is_multiple,
-                            $cfTable.serialize,
+                            $serializeField
                             $cgTable.table_name,
                             og.name as option_group_name
                      FROM $cfTable
@@ -493,7 +498,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['is_required'] = $dao->is_required;
           $fields[$dao->id]['table_name'] = $dao->table_name;
           $fields[$dao->id]['column_name'] = $dao->column_name;
-          $fields[$dao->id]['serialize'] = $dao->serialize;
+          $fields[$dao->id]['serialize'] = $serializeField ? $dao->serialize : (int) self::isSerialized($dao);
           $fields[$dao->id]['where'] = $dao->table_name . '.' . $dao->column_name;
           // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
           $fields[$dao->id]['extends_table'] = array_key_exists($dao->extends, CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$dao->extends] : '';
@@ -2543,7 +2548,7 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     if ($html_type === 'CheckBox' || strpos($html_type, 'Multi') !== FALSE) {
       return TRUE;
     }
-    // Otherwise this is the new standard as of 5.26
+    // Otherwise this is the new standard as of 5.27
     return is_object($field) ? !empty($field->serialize) : !empty($field['serialize']);
   }
 

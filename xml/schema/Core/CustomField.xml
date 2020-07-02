@@ -290,7 +290,7 @@
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::fieldSerialization</callback>
     </pseudoconstant>
-    <add>5.26</add>
+    <add>5.27</add>
   </field>
   <field>
     <name>filter</name>

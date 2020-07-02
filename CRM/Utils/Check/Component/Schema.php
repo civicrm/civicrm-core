@@ -94,6 +94,10 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    * @return array
    */
   public function checkSmartGroupCustomFieldCriteria() {
+    if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
+      // Do not run this check when the db has not been updated as it might fail on non-updated schema issues.
+      return [];
+    }
     $messages = $problematicSG = [];
     $customFieldIds = array_keys(CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE));
     try {
