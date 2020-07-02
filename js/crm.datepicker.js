@@ -2,7 +2,7 @@
   "use strict";
 
   /**
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#date-picker
    */
   $.fn.crmDatepicker = function(options) {
     return $(this).each(function() {

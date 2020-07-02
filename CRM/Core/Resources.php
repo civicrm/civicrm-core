@@ -258,7 +258,7 @@ class CRM_Core_Resources {
    * Access var from javascript:
    * CRM.vars.myNamespace.foo // "bar"
    *
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Javascript+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/standards/javascript/
    *
    * @param string $nameSpace
    *   Usually the name of your extension.

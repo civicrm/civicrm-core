@@ -235,7 +235,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
 }
 
 /**
- * Define any CiviCRM Settings Overrides per http://wiki.civicrm.org/confluence/display/CRMDOC/Override+CiviCRM+Settings
+ * Define any CiviCRM Settings Overrides per https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
  *
  * Uncomment and edit the below as appropriate.
  */

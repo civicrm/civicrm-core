@@ -385,7 +385,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($attributes['multiple']);
       $extra = NULL;
     }
-    // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
+    // @see https://docs.civicrm.org/dev/en/latest/framework/ui/#date-picker
     if ($type == 'datepicker') {
       // Support minDate/maxDate properties
       if (isset($extra['minDate'])) {
