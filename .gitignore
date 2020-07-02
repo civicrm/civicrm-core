@@ -4,6 +4,7 @@
 /ext/*
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
+!/ext/eventcart
 backdrop/
 bower_components
 CRM/Case/xml/configuration
