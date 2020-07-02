@@ -18,3 +18,7 @@ UPDATE civicrm_contact_type SET is_reserved = 0 WHERE is_reserved IS NULL;
 -- https://lab.civicrm.org/dev/core/-/issues/1833
 ALTER TABLE civicrm_event CHANGE participant_listing_id participant_listing_id int unsigned   DEFAULT NULL COMMENT 'Should we expose the participant list? Implicit FK to civicrm_option_value where option_group = participant_listing.';
 UPDATE civicrm_event SET participant_listing_id = NULL WHERE participant_listing_id = 0;
+
+-- https://lab.civicrm.org/dev/core/-/issues/1852
+-- Ensure all domains have the same value for locales
+UPDATE civicrm_domain SET locales = (SELECT locales FROM (SELECT locales FROM civicrm_domain ORDER BY id LIMIT 1) d);
