@@ -855,6 +855,7 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <permission>access deleted contacts</permission>
   </field>
   <index>
     <name>index_is_deleted</name>
