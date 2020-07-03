@@ -13,11 +13,11 @@
       <tr class="crm-report crm-report-criteria-groupby">
         {foreach from=$groupByElements item=gbElem key=dnc}
         {assign var="count" value=`$count+1`}
-        <td width="25%" {if $form.fields.$gbElem}"{/if}>
-        {$form.group_bys[$gbElem].html}
-        {if $form.group_bys_freq[$gbElem].html}:<br>
-          &nbsp;&nbsp;{$form.group_bys_freq[$gbElem].label}&nbsp;{$form.group_bys_freq[$gbElem].html}
-        {/if}
+        <td width="25%">
+          {$form.group_bys[$gbElem].html}
+          {if $form.group_bys_freq[$gbElem].html}:<br>
+            &nbsp;&nbsp;{$form.group_bys_freq[$gbElem].label}&nbsp;{$form.group_bys_freq[$gbElem].html}
+          {/if}
         </td>
         {if $count is div by 4}
       </tr><tr class="crm-report crm-report-criteria-groupby">
