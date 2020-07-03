@@ -195,7 +195,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * Revert settings to defaults.
  *
  * @param array $params
- *
+ * @deprecated
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -238,6 +238,15 @@ function _civicrm_api3_setting_fill_spec(&$params) {
     'description' => 'Defaults may differ by domain - if you do not pass in a domain id this will default to the '
     . 'current domain, an array or "all" are acceptable values for multiple domains',
   ];
+}
+
+/**
+ * Declare deprecated api functions.
+ *
+ * @return array
+ */
+function _civicrm_api3_setting_deprecation() {
+  return ['fill' => 'Setting "fill" is no longer necessary.'];
 }
 
 /**
