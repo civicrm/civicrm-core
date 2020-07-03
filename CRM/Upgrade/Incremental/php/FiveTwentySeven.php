@@ -29,10 +29,12 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     // if ($rev == '5.12.34') {
     //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
-    $preUpgradeMessage .= '<p>' . ts('Starting with version 5.28.0, CiviCRM will
-      require the PHP Internationalization extension (PHP-Intl).  In preparation
-      for this, the system check will show a warning beginning in 5.27.0 if your
-      site lacks this extension.') . '</p>';
+    if ($rev == '5.27.alpha1') {
+      $preUpgradeMessage .= '<p>' . ts('Starting with version 5.28.0, CiviCRM will
+        require the PHP Internationalization extension (PHP-Intl).  In preparation
+        for this, the system check will show a warning beginning in 5.27.0 if your
+        site lacks this extension.') . '</p>';
+    }
   }
 
   /**
