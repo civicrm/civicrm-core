@@ -312,6 +312,22 @@
       return _.findWhere(schema, {name: entityName || $scope.entity});
     }
 
+    // Get name of entity given join alias
+    function entityNameFromAlias(alias) {
+      var joins = getExplicitJoins(),
+        entity = $scope.entity,
+        path = alias.split('.');
+      // First check explicit joins
+      if (joins[alias]) {
+        return joins[alias];
+      }
+      // Then lookup implicit links
+      _.each(path, function(node) {
+        entity = _.find(links[entity], {alias: node}).entity;
+      });
+      return entity;
+    }
+
     // Get all params that have been set
     function getParams() {
       var params = {};
@@ -466,12 +482,29 @@
             }, true);
           }
           if (name === 'select' && actionInfo.params.having) {
-            $scope.$watchCollection('params.select', function(values) {
+            $scope.$watchCollection('params.select', function(newSelect) {
+              // Ignore row_count, it can't be used in HAVING clause
+              var select = _.without(newSelect, 'row_count');
               $scope.havingOptions.length = 0;
-              _.each(values, function(item) {
-                var pieces = item.split(' AS '),
+              // An empty select is an implicit *
+              if (!select.length) {
+                select.push('*');
+              }
+              _.each(select, function(item) {
+                var joinEntity,
+                  pieces = item.split(' AS '),
                   alias = _.trim(pieces[pieces.length - 1]).replace(':label', ':name');
-                $scope.havingOptions.push({id: alias, text: alias});
+                // Expand wildcards
+                if (alias[alias.length - 1] === '*') {
+                  if (alias.length > 1) {
+                    joinEntity = entityNameFromAlias(alias.slice(0, -2));
+                  }
+                  var fieldList = _.filter(getEntity(joinEntity).fields, {custom_field_id: null});
+                  formatForSelect2(fieldList, $scope.havingOptions, 'name', ['description', 'required', 'default_value'], alias.slice(0, -1));
+                }
+                else {
+                  $scope.havingOptions.push({id: alias, text: alias});
+                }
               });
             });
           }
