@@ -1429,9 +1429,14 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $relMembership = new CRM_Member_DAO_Membership();
         $relMembership->contact_id = $contactId;
         $relMembership->owner_membership_id = $membership->id;
+
         if ($relMembership->find(TRUE)) {
           $params['id'] = $relMembership->id;
         }
+        else {
+          unset($params['id']);
+        }
+
         $params['contact_id'] = $contactId;
         $params['owner_membership_id'] = $membership->id;
 
