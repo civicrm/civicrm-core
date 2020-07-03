@@ -141,6 +141,14 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
         defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1,
         // e.g. one codebase, multi database
         parse_url(CIVICRM_DSN, PHP_URL_PATH),
+
+        // e.g. when you load a new version of the codebase, use different caches
+        // Note: in principle, the version number is just a proxy for a dozen other signals (new versions of file A, B, C).
+        // Proper caches should reset whenever the underlying signal (file A, B, or C) changes. However, bugs in this
+        // behavior often go un-detected during dev/test. Including the software-version basically mitigates the problem
+        // for sysadmin-workflows - so that such bugs should only impact developer-workflows.
+        \CRM_Utils_System::version(),
+
         // e.g. CMS vs extern vs installer
         \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''),
         // e.g. name-based vhosts
