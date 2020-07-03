@@ -109,7 +109,8 @@
       .on('change', '.config-param', function(e) {
         changedWhileOpen = true;
         if (!selectorOpen) {
-          $('#CKEditorConfig').submit().block();
+          $('#_qf_CKEditorConfig_submit-bottom').click();
+          $('#CKEditorConfig').block();
         }
       })
       .on('change', 'input.crm-config-option-name', changeOptionName)
