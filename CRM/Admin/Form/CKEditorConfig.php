@@ -48,6 +48,25 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
   public function preProcess() {
     CRM_Utils_Request::retrieve('preset', 'String', $this, FALSE, 'default', 'GET');
 
+    CRM_Utils_System::appendBreadCrumb([
+      [
+        'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
+        'title' => ts('Display Preferences'),
+      ],
+    ]);
+
+    // Initial build
+    if (empty($_POST['qfKey'])) {
+      $this->addResources();
+    }
+  }
+
+  /**
+   * Add resources during initial build or rebuild
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function addResources() {
     $settings = $this->getConfigSettings();
 
     CRM_Core_Resources::singleton()
@@ -72,13 +91,6 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
     $this->assign('skin', CRM_Utils_Array::value('skin', $settings));
     $this->assign('extraPlugins', CRM_Utils_Array::value('extraPlugins', $settings));
     $this->assign('configUrl', $configUrl);
-
-    CRM_Utils_System::appendBreadCrumb([
-      [
-        'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
-        'title' => ts('Display Preferences'),
-      ],
-    ]);
   }
 
   /**
@@ -89,6 +101,12 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
     $this->addButtons([
       [
         'type' => 'next',
+        'name' => ts('Save'),
+      ],
+      // Hidden button used to refresh form
+      [
+        'type' => 'submit',
+        'class' => 'hiddenElement',
         'name' => ts('Save'),
       ],
       [
@@ -115,8 +133,16 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
     else {
       if (!empty($_POST[$this->getButtonName('next')])) {
         $this->save($_POST);
+        CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
       }
-      CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/setting/preferences/display', ['reset' => 1]));
+      // The "submit" hidden button saves but does not redirect
+      if (!empty($_POST[$this->getButtonName('submit')])) {
+        $this->save($_POST);
+        $this->addResources();
+      }
+      else {
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/ckeditor', ['reset' => 1]));
+      }
     }
   }
 
@@ -157,7 +183,6 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
       }
     }
     self::saveConfigFile($this->get('preset'), $config);
-    CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
   }
 
   /**
