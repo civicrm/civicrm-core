@@ -835,7 +835,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   public static function updateOnNewPayment($recurringContributionID, $paymentStatus, $effectiveDate) {
 
-    $effectiveDate = $effectiveDate ? date('Y-m-d', strtotime($effectiveDate)) : date('Y-m-d');
     if (!in_array($paymentStatus, ['Completed', 'Failed'])) {
       return;
     }
@@ -864,12 +863,18 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     if (!empty($existing['installments']) && self::isComplete($recurringContributionID, $existing['installments'])) {
       $params['contribution_status_id'] = 'Completed';
+      $params['next_sched_contribution_date'] = 'null';
     }
     else {
-      // Only update next sched date if it's empty or 'just now' because payment processors may be managing
-      // the scheduled date themselves as core did not previously provide any help.
-      if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) ==
-        strtotime($effectiveDate)) {
+      // Only update next sched date if it's empty or up to 48 hours away because payment processors may be managing
+      // the scheduled date themselves as core did not previously provide any help. This check can possibly be removed
+      // as it's unclear if it actually is helpful...
+      // We should allow payment processors to pass this value into repeattransaction in future.
+      // Note 48 hours is a bit aribtrary but means that we can hopefully ignore the time being potentially
+      // rounded down to midnight.
+      $upperDateToConsiderProcessed = strtotime('+ 48 hours', ($effectiveDate ? strtotime($effectiveDate) : time()));
+      if (empty($existing['next_sched_contribution_date']) || strtotime($existing['next_sched_contribution_date']) <=
+        $upperDateToConsiderProcessed) {
         $params['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existing['frequency_interval'] . ' ' . $existing['frequency_unit'], strtotime($effectiveDate)));
       }
     }
