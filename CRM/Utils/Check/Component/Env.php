@@ -847,36 +847,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Check that the resource URL points to the correct location.
-   * @return array
-   */
-  public function checkResourceUrl() {
-    $messages = [];
-    // Skip when run during unit tests, you can't check without a CMS.
-    if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
-      return $messages;
-    }
-    // CRM-21629 Set User Agent to avoid being blocked by filters
-    stream_context_set_default([
-      'http' => ['user_agent' => 'CiviCRM'],
-    ]);
-
-    // Does arrow.png exist where we expect it?
-    $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
-    if ($this->fileExists($arrowUrl) === FALSE) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',
-          [1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')]),
-        ts('Incorrect Resource URL'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-server'
-      );
-    }
-    return $messages;
-  }
-
-  /**
    * Check for utf8mb4 support by MySQL.
    *
    * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
