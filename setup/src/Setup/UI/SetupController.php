@@ -137,13 +137,26 @@ class SetupController implements SetupControllerInterface {
    * Partially bootstrap Civi services (such as localization).
    */
   protected function boot($method, $fields) {
+    /** @var \Civi\Setup\Model $model */
     $model = $this->setup->getModel();
 
     define('CIVICRM_UF', $model->cms);
+    define('CIVICRM_TEMPLATE_COMPILEDIR', $model->templateCompilePath);
+    define('CIVICRM_UF_BASEURL', $model->cmsBaseUrl);
+
+    global $civicrm_root;
+    $civicrm_root = $model->srcPath;
 
     // Set the Locale (required by CRM_Core_Config)
     global $tsLocale;
     $tsLocale = 'en_US';
+
+    global $civicrm_paths;
+    foreach ($model->paths as $pathVar => $pathValues) {
+      foreach (['url', 'path'] as $aspectName => $aspectValue) {
+        $civicrm_paths[$pathVar][$aspectName] = $aspectValue;
+      }
+    }
 
     // CRM-16801 This validates that lang is valid by looking in $langs.
     // NB: the variable is initial a $_REQUEST for the initial page reload,
