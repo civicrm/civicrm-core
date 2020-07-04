@@ -16,6 +16,13 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Flush CMS metadata', basename(__FILE__)));
 
+    // If the admin activated the module first, and then ran web-based installer,
+    // then some hooks (eg hook_menu) may not fire until we fix this flag.
+    $initialized = &backdrop_static('civicrm_initialize', FALSE);
+    $failure = &backdrop_static('civicrm_initialize_failure', FALSE);
+    $initialized = TRUE;
+    $failure = FALSE;
+
     system_rebuild_module_data();
     module_enable(array('civicrm', 'civicrmtheme'));
     backdrop_flush_all_caches();
