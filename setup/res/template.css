@@ -84,7 +84,7 @@ body {
   padding-bottom: 1.5em;
 }
 
-.civicrm-setup-body label span {
+.civicrm-setup-block-components label span {
   float: left;
   width: 120px;
 }
