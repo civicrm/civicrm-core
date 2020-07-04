@@ -77,22 +77,4 @@ class CRM_Core_CodeGen_Util_File {
     return $matches[1];
   }
 
-  /**
-   * Find files in several directories using several filename patterns.
-   *
-   * @param array $pairs
-   *   Each item is an array(0 => $searchBaseDir, 1 => $filePattern).
-   * @return array
-   *   Array of file paths
-   */
-  public static function findManyFiles($pairs) {
-    $files = [];
-    foreach ($pairs as $pair) {
-      list ($dir, $pattern) = $pair;
-      $files = array_merge($files, CRM_Utils_File::findFiles($dir, $pattern));
-    }
-    sort($files);
-    return $files;
-  }
-
 }
