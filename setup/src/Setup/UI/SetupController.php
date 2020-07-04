@@ -81,7 +81,7 @@ class SetupController implements SetupControllerInterface {
   public function runStart($method, $fields) {
     $checkInstalled = $this->setup->checkInstalled();
     if ($checkInstalled->isDatabaseInstalled() || $checkInstalled->isSettingInstalled()) {
-      return $this->createError("CiviCRM is already installed");
+      return $this->renderAlreadyInstalled();
     }
 
     /**
@@ -120,7 +120,7 @@ class SetupController implements SetupControllerInterface {
   public function runInstall($method, $fields) {
     $checkInstalled = $this->setup->checkInstalled();
     if ($checkInstalled->isDatabaseInstalled() || $checkInstalled->isSettingInstalled()) {
-      return $this->createError("CiviCRM is already installed");
+      return $this->renderAlreadyInstalled();
     }
 
     $reqs = $this->setup->checkRequirements();
@@ -130,16 +130,7 @@ class SetupController implements SetupControllerInterface {
 
     $this->setup->installFiles();
     $this->setup->installDatabase();
-
-    $m = $this->setup->getModel();
-    $tplFile = $this->getResourcePath('finished.' . $m->cms . '.php');
-    if (file_exists($tplFile)) {
-      $tplVars = array();
-      return array(array(), $this->render($tplFile, $tplVars));
-    }
-    else {
-      return $this->createError("Installation succeeded. However, the final page ($tplFile) was not available.");
-    }
+    return $this->renderFinished();
   }
 
   /**
@@ -288,6 +279,26 @@ class SetupController implements SetupControllerInterface {
    */
   public function getSetup() {
     return $this->setup;
+  }
+
+  private function renderAlreadyInstalled() {
+    // return $this->createError("CiviCRM is already installed");
+    return $this->renderFinished();
+  }
+
+  /**
+   * @return array
+   */
+  private function renderFinished() {
+    $m = $this->setup->getModel();
+    $tplFile = $this->getResourcePath('finished.' . $m->cms . '.php');
+    if (file_exists($tplFile)) {
+      $tplVars = array();
+      return array(array(), $this->render($tplFile, $tplVars));
+    }
+    else {
+      return $this->createError("Installation succeeded. However, the final page ($tplFile) was not available.");
+    }
   }
 
 }
