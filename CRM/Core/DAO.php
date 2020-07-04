@@ -927,6 +927,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *   true if exists, else false
    */
   public static function checkFieldExists($tableName, $columnName, $i18nRewrite = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_SchemaHandler::checkIfFieldExists');
     return CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName, $i18nRewrite);
   }
 
