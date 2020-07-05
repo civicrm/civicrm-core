@@ -1615,7 +1615,11 @@ if (!CRM.vars) CRM.vars = {};
     return Math.round(n / scale) * scale;
   };
 
-  // Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+  /**
+   * Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+   * @param input
+   * @returns {Date}
+   */
   CRM.utils.makeDate = function(input) {
     switch (typeof input) {
       case 'object':
@@ -1624,10 +1628,16 @@ if (!CRM.vars) CRM.vars = {};
 
       case 'string':
         // convert iso format with or without dashes
-        if (input.indexOf('-') > 0) {
-          return $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        input = input.replace(/[- :]/g, '');
+        var output = $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+        if (input.length === 14) {
+          output.setHours(
+            parseInt(input.substr(8, 2), 10),
+            parseInt(input.substr(10, 2), 10),
+            parseInt(input.substr(12, 2), 10)
+          );
         }
-        return $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+        return output;
 
       case 'number':
         // convert unix timestamp
@@ -1636,10 +1646,39 @@ if (!CRM.vars) CRM.vars = {};
     throw 'Invalid input passed to CRM.utils.makeDate';
   };
 
-  // Format a date for output to the user
-  // Input may be a js Date object, a unix timestamp or a yyyy-mm-dd string
-  CRM.utils.formatDate = function(input, outputFormat) {
-    return input ? $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, CRM.utils.makeDate(input)) : '';
+  /**
+   * Format a date (and optionally time) for output to the user
+   *
+   * @param {string|int|Date} input
+   *   Input may be a js Date object, a unix timestamp or a 'yyyy-mm-dd' string
+   * @param {string|null} dateFormat
+   *   A string like 'yy-mm-dd' or null to use the system default
+   * @param {int|bool} timeFormat
+   *   Leave empty to omit time from the output (default)
+   *   Or pass 12, 24, or true to use the system default for 12/24hr format
+   * @returns {string}
+   */
+  CRM.utils.formatDate = function(input, dateFormat, timeFormat) {
+    if (!input) {
+      return '';
+    }
+    var date = CRM.utils.makeDate(input),
+      output = $.datepicker.formatDate(dateFormat || CRM.config.dateInputFormat, date);
+    if (timeFormat) {
+      var hour = date.getHours(),
+        min = date.getMinutes(),
+        suf = '';
+      if (timeFormat === 12 || (timeFormat === true && !CRM.config.timeIs24Hr)) {
+        suf = ' ' + (hour < 12 ? ts('AM') : ts('PM'));
+        if (hour === 0 || hour > 12) {
+          hour = Math.abs(hour - 12);
+        }
+      } else if (hour < 10) {
+        hour = '0' + hour;
+      }
+      output += ' ' + hour + ':' + (min < 10 ? '0' : '') + min + suf;
+    }
+    return output;
   };
 
   // Used to set appropriate text color for a given background
