@@ -272,7 +272,7 @@ class CRM_Activity_BAO_Query {
             $val = explode(',', $val);
             foreach ($val as $tId) {
               if (is_numeric($tId)) {
-                $value[$tId] = 1;
+                $value[] = $tId;
               }
             }
           }
