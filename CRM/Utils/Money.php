@@ -136,12 +136,37 @@ class CRM_Utils_Money {
    *
    * @return float
    *   Result of subtracting $rightOp from $leftOp to the precision of $currency
+   * @throws \Brick\Money\Exception\MoneyMismatchException
    */
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
+      $check = new CRM_Utils_Check_Component_Env();
+      if (!$check->checkPHPIntlExists()) {
+        self::legacySubtractCurrencySupport($leftOp, $rightOp, $currency);
+      }
       $money = Money::of($leftOp, $currency, new DefaultContext(), RoundingMode::CEILING);
       return $money->minus($rightOp)->getAmount()->toFloat();
     }
+    CRM_Core_Error::deprecatedFunctionWarning('This function should not be called with non-numeric values');
+  }
+
+  /**
+   * Legacy version of subtractCurrencies.
+   *
+   * We are moving towards using brickmoney, which requires php-intl.
+   *
+   * However, in the medium term we provide a fall back if php-intl is not installed.
+   *
+   * @param string|float $leftOp
+   * @param string|float $rightOp
+   * @param string $currency
+   *
+   * @return float
+   *   Result of subtracting $rightOp from $leftOp to the precision of $currency
+   */
+  private static function legacySubtractCurrencySupport($leftOp, $rightOp, $currency) {
+    $precision = pow(10, self::getCurrencyPrecision($currency));
+    return (($leftOp * $precision) - ($rightOp * $precision)) / $precision;
   }
 
   /**
