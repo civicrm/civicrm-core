@@ -135,7 +135,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
       }
 
       //Add the selected wordpress capabilities for the role
-      $rolePermissions = $params[$role];
+      $rolePermissions = $params[$role] ?? [];
       if (!empty($rolePermissions)) {
         foreach ($rolePermissions as $key => $capability) {
           $roleObj->add_cap($key);
