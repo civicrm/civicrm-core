@@ -133,25 +133,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   /**
-   * Compute a digest based on the GenCode logic (PHP/tpl).
-   *
-   * @return string
-   */
-  public function getSourceDigest() {
-    if ($this->sourceDigest === NULL) {
-      $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
-      $files = CRM_Core_CodeGen_Util_File::findManyFiles([
-        ["$srcDir/CRM/Core/CodeGen", '*.php'],
-        ["$srcDir/xml", "*.php"],
-        ["$srcDir/xml", "*.tpl"],
-      ]);
-
-      $this->sourceDigest = CRM_Core_CodeGen_Util_File::digestAll($files);
-    }
-    return $this->sourceDigest;
-  }
-
-  /**
    * @return static
    */
   public function init() {
