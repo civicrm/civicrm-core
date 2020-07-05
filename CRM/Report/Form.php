@@ -1114,6 +1114,28 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Getter for _outputMode
+   *
+   * Note you can implement hook_civicrm_alterReportVar('actions', ...)
+   * which indirectly allows setting _outputMode if the user chooses
+   * your action.
+   *
+   * @return string
+   */
+  public function getOutputMode():string {
+    return $this->_outputMode;
+  }
+
+  /**
+   * Getter for _formValues
+   *
+   * @return array
+   */
+  public function getFormValues() {
+    return $this->_formValues;
+  }
+
+  /**
    * Setter for $_force.
    *
    * @param bool $isForce
@@ -1680,6 +1702,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!$this->_csvSupported) {
       unset($actions['report_instance.csv']);
     }
+
+    // @todo for documenting: the hook can use $form->getID() to get the instanceId
+    CRM_Utils_Hook::alterReportVar('actions', $actions, $this);
 
     return $actions;
   }
@@ -3399,108 +3424,40 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function endPostProcess(&$rows = NULL) {
     $this->assign('report_class', get_class($this));
+
+    // This is used by unit tests, and _outputMode is usually blank.
+    // But other than RAM, is there a reason it couldn't always do this? It assigns it to the template separately already anyway (doTemplateAssignment()).
     if ($this->_storeResultSet) {
       $this->_resultSet = $rows;
     }
 
-    if ($this->_outputMode == 'print' ||
-      $this->_outputMode == 'pdf' ||
-      $this->_sendmail
-    ) {
-
-      $content = $this->compileContent();
-      $url = CRM_Utils_System::url("civicrm/report/instance/{$this->_id}",
-        "reset=1", TRUE
-      );
-
-      if ($this->_sendmail) {
-        $config = CRM_Core_Config::singleton();
-        $attachments = [];
-
-        if ($this->_outputMode == 'csv') {
-          $content
-            = $this->_formValues['report_header'] . '<p>' . ts('Report URL') .
-            ": {$url}</p>" . '<p>' .
-            ts('The report is attached as a CSV file.') . '</p>' .
-            $this->_formValues['report_footer'];
-
-          $csvFullFilename = $config->templateCompileDir .
-            CRM_Utils_File::makeFileName('CiviReport.csv');
-          $csvContent = CRM_Report_Utils_Report::makeCsv($this, $rows);
-          file_put_contents($csvFullFilename, $csvContent);
-          $attachments[] = [
-            'fullPath' => $csvFullFilename,
-            'mime_type' => 'text/csv',
-            'cleanName' => 'CiviReport.csv',
-          ];
-        }
-        if ($this->_outputMode == 'pdf') {
-          // generate PDF content
-          $pdfFullFilename = $config->templateCompileDir .
-            CRM_Utils_File::makeFileName('CiviReport.pdf');
-          file_put_contents($pdfFullFilename,
-            CRM_Utils_PDF_Utils::html2pdf($content, "CiviReport.pdf",
-              TRUE, ['orientation' => 'landscape']
-            )
-          );
-          // generate Email Content
-          $content
-            = $this->_formValues['report_header'] . '<p>' . ts('Report URL') .
-            ": {$url}</p>" . '<p>' .
-            ts('The report is attached as a PDF file.') . '</p>' .
-            $this->_formValues['report_footer'];
-
-          $attachments[] = [
-            'fullPath' => $pdfFullFilename,
-            'mime_type' => 'application/pdf',
-            'cleanName' => 'CiviReport.pdf',
-          ];
-        }
-
-        if (CRM_Report_Utils_Report::mailReport($content, $this->_id,
-          $this->_outputMode, $attachments
-        )
-        ) {
-          CRM_Core_Session::setStatus(ts("Report mail has been sent."), ts('Sent'), 'success');
-        }
-        else {
-          CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
-        }
-        return;
-      }
-      elseif ($this->_outputMode == 'print') {
-        echo $content;
-      }
-      else {
-        // Nb. Once upon a time we used a package called Open Flash Charts to
-        // draw charts, and we had a feature whereby a browser could send the
-        // server a PNG version of the chart, which could then be included in a
-        // PDF by including <img> tags in the HTML for the conversion below.
-        //
-        // This feature stopped working when browsers stopped supporting Flash,
-        // and although we have a different client-side charting library in
-        // place, we decided not to reimplement the (rather convoluted)
-        // browser-sending-rendered-chart-to-server process.
-        //
-        // If this feature is required in future we should find a better way to
-        // render charts on the server side, e.g. server-created SVG.
-        CRM_Utils_PDF_Utils::html2pdf($content, "CiviReport.pdf", FALSE, ['orientation' => 'landscape']);
-      }
-      CRM_Utils_System::civiExit();
-    }
-    elseif ($this->_outputMode == 'csv') {
-      CRM_Report_Utils_Report::export2csv($this, $rows);
-    }
-    elseif ($this->_outputMode == 'group') {
+    // Add contacts to group
+    if ($this->_outputMode == 'group') {
       $group = $this->_params['groups'];
       $this->add2group($group);
+    }
+    else {
+      // Either the outputMode is one that has some actual output, or else
+      // it's something like save or copy, in which case this won't set
+      // anything.
+      $this->setOutputHandler();
+
+      if ($this->_sendmail) {
+        $this->sendEmail();
+      }
+      elseif (!empty($this->outputHandler)) {
+        $this->outputHandler->download();
+        CRM_Utils_System::civiExit();
+      }
+      // else we don't need to do anything here since it must have been
+      // outputMode=save or something like that
     }
   }
 
   /**
    * Set store result set indicator to TRUE.
    *
-   * @todo explain what this does
+   * This is used by unit tests, along with getResultSet().
    */
   public function storeResultSet() {
     $this->_storeResultSet = TRUE;
@@ -5976,6 +5933,58 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       }
     }
     return '';
+  }
+
+  /**
+   * Retrieve a suitable object from the factory depending on the report
+   * parameters, which typically might just be dependent on outputMode.
+   *
+   * If there is no suitable output handler, e.g. if outputMode is "copy",
+   * then this sets it to NULL.
+   */
+  public function setOutputHandler() {
+    $this->outputHandler = \Civi\Report\OutputHandlerFactory::singleton()->create($this);
+  }
+
+  /**
+   * Send report by email
+   */
+  public function sendEmail() {
+    if (empty($this->outputHandler)) {
+      // It's possible to end up here with outputMode unset, so we use
+      // the "print" handler which was the default before, i.e. include
+      // it as html in the body.
+      $oldOutputMode = $this->_outputMode ?? NULL;
+      $this->_outputMode = 'print';
+      $this->setOutputHandler();
+      $this->_outputMode = $oldOutputMode;
+    }
+
+    $mailBody = $this->outputHandler->getMailBody();
+
+    $attachments = [];
+    $attachmentFileName = $this->outputHandler->getFileName();
+    // It's not always in the form of an attachment, e.g. for 'print' the
+    // output ends up in $mailBody above.
+    if ($attachmentFileName) {
+      $fullFilename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($attachmentFileName);
+      file_put_contents($fullFilename, $this->outputHandler->getOutputString());
+      $attachments[] = [
+        'fullPath' => $fullFilename,
+        'mime_type' => $this->outputHandler->getMimeType(),
+        'cleanName' => $attachmentFileName,
+      ];
+    }
+
+    // Send the email
+    // @todo outputMode doesn't seem to get used, which is good since there
+    // shouldn't be outputMode-related `if` statements in there.
+    if (CRM_Report_Utils_Report::mailReport($mailBody, $this->_id, $this->_outputMode, $attachments)) {
+      CRM_Core_Session::setStatus(ts("Report mail has been sent."), ts('Sent'), 'success');
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
+    }
   }
 
 }
