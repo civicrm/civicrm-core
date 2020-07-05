@@ -324,6 +324,37 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that location type is ignored when deduping by postal address.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMatchesIgnoreLocationType() {
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate();
+    $this->callAPISuccess('address', 'create', [
+      'contact_id' => $contact1,
+      'state_province_id' => 1049,
+      'location_type_id' => 1,
+    ]);
+    $this->callAPISuccess('address', 'create', [
+      'contact_id' => $contact2,
+      'state_province_id' => 1049,
+      'location_type_id' => 2,
+    ]);
+    $ruleGroup = $this->createRuleGroup();
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => 'civicrm_address',
+      'rule_field' => 'state_province_id',
+      'rule_weight' => 8,
+    ]);
+    $dupeCount = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => $ruleGroup['id'],
+    ])['count'];
+    $this->assertEquals($dupeCount, 1);
+  }
+
+  /**
    * Test results are returned when criteria are passed in.
    *
    * @throws \CRM_Core_Exception
