@@ -106,6 +106,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    * @param $component
    */
   public function doTransferCheckout(&$params, $component) {
+    // This is broken - in 2015 this commit broke it... https://github.com/civicrm/civicrm-core/commit/204c86d59f0cfc4c4d917cc245fb41633d36916e#diff-b00e65c9829c27da8b34e35f2e64d9b6L114
     $component = strtolower($component);
     $config = CRM_Core_Config::singleton();
     if ($component != 'contribute' && $component != 'event') {
