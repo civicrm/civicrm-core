@@ -29,39 +29,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   public static $_fieldKeys = NULL;
 
   /**
-   * Get ACL entity table.
-   * @deprecated
-   * @return array|null
-   */
-  public static function entityTable() {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    if (!self::$_entityTable) {
-      self::$_entityTable = [
-        'civicrm_contact' => ts('Contact'),
-        'civicrm_acl_role' => ts('ACL Role'),
-      ];
-    }
-    return self::$_entityTable;
-  }
-
-  /**
-   * @return array|null
-   * @deprecated
-   */
-  public static function objectTable() {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    if (!self::$_objectTable) {
-      self::$_objectTable = [
-        'civicrm_contact' => ts('Contact'),
-        'civicrm_group' => ts('Group'),
-        'civicrm_saved_search' => ts('Contact Group'),
-        'civicrm_admin' => ts('Import'),
-      ];
-    }
-    return self::$_objectTable;
-  }
-
-  /**
    * Available operations for  pseudoconstant.
    *
    * @return array
@@ -78,44 +45,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
       ];
     }
     return self::$_operation;
-  }
-
-  /**
-   * Given a table and id pair, return the filter clause
-   *
-   * @param string $table
-   *   The table owning the object.
-   * @param int $id
-   *   The ID of the object.
-   * @param array $tables
-   *   Tables that will be needed in the FROM.
-   * @deprecated
-   *
-   * @return string|null
-   *   WHERE-style clause to filter results,
-   *   or null if $table or $id is null
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function getClause($table, $id, &$tables) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    $table = CRM_Utils_Type::escape($table, 'String');
-    $id = CRM_Utils_Type::escape($id, 'Integer');
-    $whereTables = [];
-
-    $ssTable = CRM_Contact_BAO_SavedSearch::getTableName();
-
-    if (empty($table)) {
-      return NULL;
-    }
-    elseif ($table == $ssTable) {
-      return CRM_Contact_BAO_SavedSearch::whereClause($id, $tables, $whereTables);
-    }
-    elseif (!empty($id)) {
-      $tables[$table] = TRUE;
-      return "$table.id = $id";
-    }
-    return NULL;
   }
 
   /**
