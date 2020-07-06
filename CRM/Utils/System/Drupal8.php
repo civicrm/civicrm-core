@@ -280,7 +280,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $query = html_entity_decode($query);
 

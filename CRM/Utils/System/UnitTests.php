@@ -75,9 +75,9 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $config = CRM_Core_Config::singleton();
     static $script = 'index.php';

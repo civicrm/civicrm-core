@@ -272,7 +272,7 @@ class CRM_Utils_System {
     }
 
     $config = CRM_Core_Config::singleton();
-    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend);
+    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend, $htmlize);
 
     if ($htmlize) {
       $url = htmlentities($url);
