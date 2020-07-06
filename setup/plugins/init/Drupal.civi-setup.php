@@ -59,7 +59,7 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute default locale.
     global $language;
-    $model->lang = \Civi\Setup\LocaleUtil::pickClosest($language->langcode, $model->getField('lang', 'options'));
+    $model->lang = \Civi\Setup\LocaleUtil::pickClosest($language->langcode ?? NULL, $model->getField('lang', 'options'));
   });
 
 function _drupal_civisetup_getPublicFiles() {
