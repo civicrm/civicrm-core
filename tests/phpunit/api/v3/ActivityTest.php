@@ -370,9 +370,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test get returns target and assignee contacts.
+   * @dataProvider versionThreeAndFour
+   * @var int $version
    */
-  public function testActivityReturnTargetAssignee() {
-
+  public function testActivityReturnTargetAssignee($version) {
+    $this->_apiversion = $version;
     $description = "Demonstrates setting & retrieving activity target & source.";
     $subfile = "GetTargetandAssignee";
     $params = [
@@ -390,9 +392,18 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPIAndDocument('activity', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+
+    $actContacts = $this->callAPISuccess('ActivityContact', 'get', [
+      'activity_id' => $result['id'],
+    ]);
+    $this->assertCount(3, $actContacts['values']);
+
+    if ($version === 4) {
+      $this->markTestIncomplete("APIv4 doesn't retrieve activity contacts directly.");
+    }
+
     $result = $this->callAPISuccess('activity', 'get', [
       'id' => $result['id'],
-      'version' => $this->_apiversion,
       'return.assignee_contact_id' => 1,
       'return.target_contact_id' => 1,
     ]);
