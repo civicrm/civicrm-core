@@ -503,6 +503,27 @@ if (CIVICRM_UF === 'UnitTests') {
 // }
 
 /**
+ * Which directories should we exclude when scanning the codebase for things
+ * like extension .info files, or .html partials or .xml files etc. This needs
+ * to be a valid preg_match() pattern.
+ *
+ * If you do not define it, a pattern that excludes dirs starting with a dot is
+ * used, e.g. to exclude .git/). Adding suitable patterns here can vastly speed
+ * up your container rebuilds and cache flushes. The pattern is matched against
+ * the absolute path. Remember to use your system's DIRECTORY_SEPARATOR the
+ * examples below assume /
+ *
+ * Example: This excludes node_modules (can be huge), various CiviCRM dirs that
+ * are unlikely to have anything we need to scan inside, and (what could be
+ * your) Drupal's private file storage area.
+ *
+ * '@/(\.|node_modules|js/|css/|bower_components|packages/|vendor/|sites/default/files/private)@'
+ */
+// if (!defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
+//   define('CIVICRM_EXCLUDE_DIRS_PATTERN', '@/\.@');
+// }
+
+/**
  *
  * Do not change anything below this line. Keep as is
  *
