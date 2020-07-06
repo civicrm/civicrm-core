@@ -1,6 +1,5 @@
 <?php \Civi\Setup::assertRunning(); ?>
 <?php
-throw new \Exception("A draft copy of this file is available but has not been tested. Please edit " . __FILE__);
 
 $drupalPermissionsURL = url('admin/people/permissions');
 $drupalURL = url('civicrm/admin/configtask', array(
