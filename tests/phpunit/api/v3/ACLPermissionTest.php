@@ -1006,6 +1006,106 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertFalse(isset($result['values'][$tag2][$createdFirstName]));
   }
 
+  /**
+   * Test GroupContact create/update functionality on basis of CRM_Core_Permission::EDIT permission
+   */
+  public function testGroupContactCreateUpdateUsingACL() {
+    // 1. Create contacts
+    $this->createLoggedInUser();
+    $c1 = $this->individualCreate(['first_name' => 'C1']);
+    $c2 = $this->individualCreate(['first_name' => 'C2']);
+    $this->allowedContactId = $c1;
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
+
+    // 2. create group
+    $groupName = substr(sha1(rand()), 0, 4) . 'testGroup';
+    $group = $this->callAPISuccess('Group', 'create', [
+      'title' => $groupName,
+      'is_active' => TRUE,
+    ]);
+
+    // CASE 1: Check if a contact which has EDIT permission can be successfully added to a group
+    // 3. Create add contact which has Edit permission to group
+    $result = $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $c1,
+      'check_permissions' => 1,
+      'group_id' => $group['id'],
+    ]);
+    $groupContactID = $this->callAPISuccess('GroupContact', 'get', [
+      'contact_id' => $c1,
+      'check_permissions' => 1,
+      'group_id' => $group['id'],
+    ])['id'];
+    $this->assertEquals(0, $result['is_error']);
+    $result = $this->callAPIFailure('GroupContact', 'create', [
+      'contact_id' => $c2,
+      'check_permissions' => 1,
+      'group_id' => $group['id'],
+    ]);
+    // 4. Check that contact was sucessfully added to the regular group
+    $this->assertEquals(1, $result['is_error']);
+    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+
+    // CASE 2: Check if a contact which dont has EDIT permission cannot be added to a group
+    // 5. Assign the EDIT permission via ACL to second contact
+    $this->allowedContactId = $c2;
+    // 6. Create another group
+    $grouoName1 = substr(sha1(rand()), 0, 4) . 'testGroup';
+    $group1 = $this->callAPISuccess('Group', 'create', [
+      'title' => $grouoName1,
+      'is_active' => TRUE,
+    ]);
+    // 7. Assign Contact1 to group
+    $result = $this->callAPIFailure('GroupContact', 'create', [
+      'id' => $groupContactID,
+      'contact_id' => $c1,
+      'group_id' => $group1['id'],
+      'check_permissions' => 1,
+    ]);
+    // 4. Check that contact wasnt added to the regular group for not having EDIT contact permission
+    $this->assertEquals(1, $result['is_error']);
+    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+  }
+
+  /**
+   * Test Relationship create/update functionality on basis of CRM_Core_Permission::EDIT permission
+   */
+  public function testRelationshipCreateUpdateUsingACL() {
+    // CASE 1: Check if a contacts which has EDIT permission can be successfully added to a relations
+    // 1. Create contacts
+    $id = $this->createLoggedInUser();
+    $c1 = $this->individualCreate(['first_name' => 'C1']);
+    $c2 = $this->individualCreate(['first_name' => 'C2']);
+    // 2. Allow permission to loggedincontact and $c1
+    $this->allowedContacts = [$id, $c1];
+    $this->hookClass->setHook('civicrm_aclWhereClause', [
+      $this,
+      'aclWhereMultipleContacts',
+    ]);
+    // 3. Create a relationship
+    $result = $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $c1,
+      'contact_id_b' => $id,
+      'check_permissions' => 1,
+      'relationship_type_id' => 1,
+    ]);
+    // 4. Check that relationship was sucessfully created
+    $this->assertEquals(0, $result['is_error']);
+
+    // CASE 2: Check if a contact (as $c2) which dont has EDIT permission cannot be added to a relationship
+    // 3. Create a relationship with $c2 which don't have permission
+    $result = $this->callAPIFailure('Relationship', 'create', [
+      'contact_id_a' => $c1,
+      'contact_id_b' => $c2,
+      'check_permissions' => 1,
+      'relationship_type_id' => 1,
+    ]);
+
+    // 5. Check that relationship was not created for not having EDIT contact permission
+    $this->assertEquals(1, $result['is_error']);
+    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+  }
+
   public function testApi4CustomEntityACL() {
     $group = uniqid('mg');
     $textField = uniqid('tx');
