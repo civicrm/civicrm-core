@@ -89,19 +89,14 @@ class SetupController implements SetupControllerInterface {
      */
     $model = $this->setup->getModel();
 
-    $tplFile = $this->getResourcePath('template.php');
+    $tplFile = $this->getResourcePath('installer.tpl.php');
     $tplVars = [
-      'ctrl' => $this,
-      'civicrm_version' => \CRM_Utils_System::version(),
-      'installURLPath' => $this->urls['res'],
-      'short_lang_code' => \CRM_Core_I18n_PseudoConstant::shortForLong($GLOBALS['tsLocale']),
-      'text_direction' => (\CRM_Core_I18n::isLanguageRTL($GLOBALS['tsLocale']) ? 'rtl' : 'ltr'),
       'model' => $model,
       'reqs' => $this->setup->checkRequirements(),
     ];
 
     // $body = "<pre>" . htmlentities(print_r(['method' => $method, 'urls' => $this->urls, 'data' => $fields], 1)) . "</pre>";
-    $body = $this->render($tplFile, $tplVars);
+    $body = $this->renderPage(ts('CiviCRM Installer'), $this->render($tplFile, $tplVars));
 
     return array(array(), $body);
   }
@@ -181,12 +176,37 @@ class SetupController implements SetupControllerInterface {
   public function createError($message, $title = 'Error') {
     return [
       [],
-      $this->render($this->getResourcePath('error.html'), [
-        'errorTitle' => htmlentities($title),
-        'errorMsg' => htmlentities($message),
-        'installURLPath' => $this->urls['res'],
-      ]),
+      $this->renderPage($title, sprintf('<h1>%s</h1>\n%s', htmlentities($title), htmlentities($message))),
     ];
+  }
+
+  /**
+   * @param string $title
+   * @param string $body
+   * @return string
+   */
+  public function renderPage($title, $body) {
+    /** @var \Civi\Setup\Model $model */
+    $model = $this->setup->getModel();
+
+    $pageAssets = [
+      ['type' => 'script-url', 'url' => $this->getUrl('jquery.js')],
+      ['type' => 'script-code', 'code' => 'window.csj$ = jQuery.noConflict();'],
+      ['type' => 'style-url', 'url' => $this->urls['res'] . "template.css"],
+      ['type' => 'style-url', 'url' => $this->getUrl('font-awesome.css')],
+    ];
+    if (\CRM_Core_I18n::isLanguageRTL($model->lang)) {
+      $pageAssets[] = ['type' => 'style-url', 'url' => $this->urls['res'] . "template-rtl.css"];
+    }
+
+    $pageVars = [
+      'pageAssets' => $pageAssets,
+      'pageTitle' => $title,
+      'pageBody' => $body,
+      'shortLangCode' => \CRM_Core_I18n_PseudoConstant::shortForLong($model->lang),
+      'textDirection' => (\CRM_Core_I18n::isLanguageRTL($model->lang) ? 'rtl' : 'ltr'),
+    ];
+    return $this->render($this->getResourcePath('page.tpl.php'), $pageVars);
   }
 
   /**
@@ -199,6 +219,7 @@ class SetupController implements SetupControllerInterface {
    * @return string
    */
   public function render($_tpl_file, $_tpl_params = array()) {
+    $_tpl_params = array_merge($this->getCommonTplVars(), $_tpl_params);
     extract($_tpl_params);
     ob_start();
     require $_tpl_file;
@@ -306,12 +327,22 @@ class SetupController implements SetupControllerInterface {
     $m = $this->setup->getModel();
     $tplFile = $this->getResourcePath('finished.' . $m->cms . '.php');
     if (file_exists($tplFile)) {
-      $tplVars = array();
-      return array(array(), $this->render($tplFile, $tplVars));
+      return [[], $this->renderPage(ts('CiviCRM Installed'), $this->render($tplFile))];
     }
     else {
       return $this->createError("Installation succeeded. However, the final page ($tplFile) was not available.");
     }
+  }
+
+  /**
+   * @return array
+   */
+  private function getCommonTplVars() {
+    return [
+      'ctrl' => $this,
+      'civicrm_version' => \CRM_Utils_System::version(),
+      'installURLPath' => $this->urls['res'],
+    ];
   }
 
 }
