@@ -238,7 +238,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => [0 => ts('None'), -1 => ts('Ended')] + CRM_Contribute_BAO_ContributionRecur::buildOptions('contribution_status_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
-            'pseudofield' => TRUE,
           ],
         ],
         'grouping' => 'member-fields',
@@ -314,68 +313,67 @@ HERESQL;
   /**
    * Override to add handling for autorenew status.
    */
-  public function storeWhereHavingClauseArray() {
-    parent::storeWhereHavingClauseArray();
-
-    // Handle autorenew status
-    $op = $this->_params['autorenew_status_id_op'] ?? NULL;
-    $value = $this->_params['autorenew_status_id_value'] ?? NULL;
-    $clauseParts = [];
-    switch ($op) {
-      case 'in':
-        if ($value !== NULL && is_array($value) && count($value) > 0) {
-          $regularOptions = implode(', ', array_diff($value, [0, -1]));
-          // None: is null
-          if (in_array(0, $value)) {
-            $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
-          }
-          // Ended: not null, end_date in past
-          if (in_array(-1, $value)) {
-            $clauseParts[] = <<<HERESQL
-              {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL
-                AND {$this->_aliases['civicrm_contribution_recur']}.end_date < NOW()
+  public function whereClause(&$field, $op, $value, $min, $max) {
+    if ($field['dbAlias'] == "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id") {
+      $clauseParts = [];
+      switch ($op) {
+        case 'in':
+          if ($value !== NULL && is_array($value) && count($value) > 0) {
+            $regularOptions = implode(', ', array_diff($value, [0, -1]));
+            // None: is null
+            if (in_array(0, $value)) {
+              $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
+            }
+            // Ended: not null, end_date in past
+            if (in_array(-1, $value)) {
+              $clauseParts[] = <<<HERESQL
+                {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL
+                  AND {$this->_aliases['civicrm_contribution_recur']}.end_date < NOW()
 HERESQL;
+            }
+            // Normal statuses: IN()
+            if (!empty($regularOptions)) {
+              $clauseParts[] = "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id IN ($regularOptions)";
+            }
+            return '(' . implode(') OR (', $clauseParts) . ')';
           }
-          // Normal statuses: IN()
-          if (!empty($regularOptions)) {
-            $clauseParts[] = "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id IN ($regularOptions)";
-          }
-          $this->_whereClauses[] = '(' . implode(') OR (', $clauseParts) . ')';
-        }
-        break;
+          return;
 
-      case 'notin':
-        if ($value !== NULL && is_array($value) && count($value) > 0) {
-          $regularOptions = implode(', ', array_diff($value, [0, -1]));
-          // None: is not null
-          if (in_array(0, $value)) {
-            $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
-          }
-          // Ended: null or end_date in future
-          if (in_array(-1, $value)) {
-            $clauseParts[] = <<<HERESQL
-              {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
-                OR {$this->_aliases['civicrm_contribution_recur']}.end_date >= NOW()
-                OR {$this->_aliases['civicrm_contribution_recur']}.end_date IS NULL
+        case 'notin':
+          if ($value !== NULL && is_array($value) && count($value) > 0) {
+            $regularOptions = implode(', ', array_diff($value, [0, -1]));
+            // None: is not null
+            if (in_array(0, $value)) {
+              $clauseParts[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
+            }
+            // Ended: null or end_date in future
+            if (in_array(-1, $value)) {
+              $clauseParts[] = <<<HERESQL
+                {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
+                  OR {$this->_aliases['civicrm_contribution_recur']}.end_date >= NOW()
+                  OR {$this->_aliases['civicrm_contribution_recur']}.end_date IS NULL
 HERESQL;
-          }
-          // Normal statuses: null or NOT IN()
-          if (!empty($regularOptions)) {
-            $clauseParts[] = <<<HERESQL
-              {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
-                OR {$this->_aliases['civicrm_contribution_recur']}.contribution_status_id NOT IN ($regularOptions)
+            }
+            // Normal statuses: null or NOT IN()
+            if (!empty($regularOptions)) {
+              $clauseParts[] = <<<HERESQL
+                {$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL
+                  OR {$this->_aliases['civicrm_contribution_recur']}.contribution_status_id NOT IN ($regularOptions)
 HERESQL;
+            }
+            return '(' . implode(') AND (', $clauseParts) . ')';
           }
-          $this->_whereClauses[] = '(' . implode(') AND (', $clauseParts) . ')';
-        }
-        break;
+          return;
 
-      case 'nll':
-        $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
-        break;
+        case 'nll':
+          return "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NULL";
 
-      case 'nnll':
-        $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
+        case 'nnll':
+          return "{$this->_aliases['civicrm_membership']}.contribution_recur_id IS NOT NULL";
+      }
+    }
+    else {
+      return parent::whereClause($field, $op, $value, $min, $max);
     }
   }
 
