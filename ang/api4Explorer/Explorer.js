@@ -96,7 +96,7 @@
     function pluralize(str) {
       var lastLetter = str[str.length - 1],
         lastTwo = str[str.length - 2] + lastLetter;
-      if (lastLetter === 's' || lastTwo === 'ch') {
+      if (lastLetter === 's' || lastLetter === 'x' || lastTwo === 'ch') {
         return str + 'es';
       }
       if (lastLetter === 'y' && lastTwo !== 'ey') {

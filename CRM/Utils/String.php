@@ -941,7 +941,7 @@ class CRM_Utils_String {
   public static function pluralize($str) {
     $lastLetter = substr($str, -1);
     $lastTwo = substr($str, -2);
-    if ($lastLetter == 's' || $lastTwo == 'ch') {
+    if ($lastLetter == 's' || $lastLetter == 'x' || $lastTwo == 'ch') {
       return $str . 'es';
     }
     if ($lastLetter == 'y' && $lastTwo != 'ey') {
