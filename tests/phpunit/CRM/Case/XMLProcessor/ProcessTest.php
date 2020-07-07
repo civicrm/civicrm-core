@@ -178,6 +178,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->activityTypeXml = new SimpleXMLElement($activityTypeXml);
     $this->activityParams = [
       'activity_date_time' => date('Ymd'),
+      // @todo This seems wrong, it just happens to work out because both caseId and caseTypeId equal 1 in the stock setup here.
       'caseID' => $this->caseTypeId,
       'clientID' => $this->contacts['ana'],
       'creatorID' => $this->_loggedInUser,
@@ -195,6 +196,126 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
     $this->process->createActivity($this->activityTypeXml, $this->activityParams);
     $this->assertActivityAssignedToContactExists($this->contacts['beto']);
+  }
+
+  /**
+   * Test the creation of activities where the default assignee should not
+   * end up being a contact from another case where it has the same client
+   * and relationship.
+   */
+  public function testCreateActivityWithDefaultContactByRelationshipTwoCases() {
+    /*
+    At this point the stock setup looks like this:
+    Case 1: no roles assigned
+    Non-case relationship with ana as pupil of beto
+    Non-case relationship with ana as spouse of carlos
+
+    So we want to:
+    Make another case for the same client ana.
+    Add a pupil role on that new case with some other person.
+    Make an activity on the first case.
+
+    Since there is a non-case relationship of that type for the
+    right person we do want it to take that one even though there is no role
+    on the first case, i.e. it SHOULD fall back to non-case relationships.
+    So this is test 1.
+
+    Then we want to get rid of the non-case relationship and try again. In
+    this situation it should not make any assignment, i.e. it should not
+    take the other person from the other case. The original bug was that it
+    would assign the activity to that other person from the other case. This
+    is test 2.
+     */
+
+    $relationship = $this->relationships['ana_is_pupil_of_beto'];
+
+    // Make another case and add a case role with the same relationship we
+    // want, but a different person.
+    $caseObj = $this->createCase($this->contacts['ana'], $this->_loggedInUser);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contacts['ana'],
+      'contact_id_b' => $this->contacts['carlos'],
+      'relationship_type_id' => $relationship['type_id'],
+      'case_id' => $caseObj->id,
+    ]);
+
+    $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
+    $this->activityTypeXml->default_assignee_relationship = "{$relationship['type_id']}_b_a";
+
+    $this->process->createActivity($this->activityTypeXml, $this->activityParams);
+
+    // We can't use assertActivityAssignedToContactExists because it assumes
+    // there's only one activity in the database, but we have several from the
+    // second case. We want the one we just created on the first case.
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $this->activityParams['caseID'],
+      'return' => ['assignee_contact_id'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      // Note the first parameter is turned into an array to match the second.
+      $this->assertEquals([$this->contacts['beto']], $activity['assignee_contact_id']);
+    }
+
+    // Now remove the non-case relationship.
+    $result = $this->callAPISuccess('Relationship', 'get', [
+      'case_id' => ['IS NULL' => 1],
+      'relationship_type_id' => $relationship['type_id'],
+      'contact_id_a' => $this->contacts['ana'],
+      'contact_id_b' => $this->contacts['beto'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      $result = $this->callAPISuccess('Relationship', 'delete', ['id' => $activity['id']]);
+    }
+
+    // Create another activity on the first case. Make it a different activity
+    // type so we can find it better.
+    $activityXml = '<activity-type><name>Follow up</name></activity-type>';
+    $activityXmlElement = new SimpleXMLElement($activityXml);
+    $activityXmlElement->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
+    $activityXmlElement->default_assignee_relationship = "{$relationship['type_id']}_b_a";
+    $this->process->createActivity($activityXmlElement, $this->activityParams);
+
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $this->activityParams['caseID'],
+      'activity_type_id' => 'Follow up',
+      'return' => ['assignee_contact_id'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      // It should be empty, not the contact from the second case.
+      $this->assertEmpty($activity['assignee_contact_id']);
+    }
+  }
+
+  /**
+   * Create and return case object of given Client ID.
+   * @todo This is copy/paste from Case/BAO/CaseTest - should put into base class?
+   * @param $clientId
+   * @param $loggedInUser
+   * @return CRM_Case_BAO_Case
+   */
+  private function createCase($clientId, $loggedInUser = NULL) {
+    if (empty($loggedInUser)) {
+      // backwards compatibility - but it's more typical that the creator is a different person than the client
+      $loggedInUser = $clientId;
+    }
+    $caseParams = [
+      'activity_subject' => 'Case Subject',
+      'client_id'        => $clientId,
+      'case_type_id'     => 1,
+      'status_id'        => 1,
+      'case_type'        => 'housing_support',
+      'subject'          => 'Case Subject',
+      'start_date'       => date("Y-m-d"),
+      'start_date_time'  => date("YmdHis"),
+      'medium_id'        => 2,
+      'activity_details' => '',
+    ];
+    $form = new CRM_Case_Form_Case();
+    $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
+    return $caseObj;
   }
 
   /**
