@@ -92,7 +92,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = ($htmlize && $frontend) ? '&amp;' : '&';
 
     if (!$config->cleanURL) {
       if (isset($path)) {
