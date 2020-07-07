@@ -284,11 +284,25 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * The goal of this function is to test that all required tables are returned.
    */
   public function testGetCidRefs() {
+    $sortRefs = function($a) {
+      ksort($a);
+      foreach ($a as &$fields) {
+        sort($fields);
+      }
+      return $a;
+    };
+
     $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'Contacts');
+
     // These are deliberately unset.
     $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache'], 1);
-    $this->assertEquals(array_diff_key($this->getStaticCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
-    $this->assertEquals(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
+    $this->assertEquals($sortRefs(array_diff_key($this->getStaticCIDRefs(), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
+    $this->assertEquals($sortRefs(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
+
+    // These are deliberately unset.
+    // $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache', 'civicrm_relationship_vtx'], 1);
+    // $this->assertEquals(array_diff_key($this->getStaticCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
+    // $this->assertEquals(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
   }
 
   /**
@@ -1328,6 +1342,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_relationship' => [
         0 => 'contact_id_a',
         1 => 'contact_id_b',
+      ],
+      'civicrm_relationship_vtx' => [
+        0 => 'near_contact_id',
+        1 => 'far_contact_id',
       ],
       'civicrm_report_instance' => [
         0 => 'created_id',
