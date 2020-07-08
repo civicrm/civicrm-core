@@ -107,6 +107,7 @@ function dm_install_coreext() {
 ## reldirs=$(dm_core_exts)
 function dm_core_exts() {
   echo ext/sequentialcreditnotes
+  echo ext/flexmailer
 }
 
 ## Copy all packages
