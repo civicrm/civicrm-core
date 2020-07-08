@@ -48,9 +48,7 @@ class SetupController implements SetupControllerInterface {
    *   Ex: 'GET' or 'POST'.
    * @param array $fields
    *   List of any HTTP GET/POST fields.
-   * @return array
-   *   The HTTP headers and response text.
-   *   [0 => array $headers, 1 => string $body].
+   * @return SetupResponse
    */
   public function run($method, $fields = array()) {
     $this->setup->getDispatcher()->dispatch('civi.setupui.run', new UIBootEvent($this, $method, $fields));
@@ -74,9 +72,7 @@ class SetupController implements SetupControllerInterface {
    *   Ex: 'GET' or 'POST'.
    * @param array $fields
    *   List of any HTTP GET/POST fields.
-   * @return array
-   *   The HTTP headers and response text.
-   *   [0 => array $headers, 1 => string $body].
+   * @return SetupResponse
    */
   public function runStart($method, $fields) {
     $checkInstalled = $this->setup->checkInstalled();
@@ -96,9 +92,7 @@ class SetupController implements SetupControllerInterface {
     ];
 
     // $body = "<pre>" . htmlentities(print_r(['method' => $method, 'urls' => $this->urls, 'data' => $fields], 1)) . "</pre>";
-    $body = $this->renderPage(ts('CiviCRM Installer'), $this->render($tplFile, $tplVars));
-
-    return array(array(), $body);
+    return $this->createPage(ts('CiviCRM Installer'), $this->render($tplFile, $tplVars));
   }
 
   /**
@@ -108,9 +102,7 @@ class SetupController implements SetupControllerInterface {
    *   Ex: 'GET' or 'POST'.
    * @param array $fields
    *   List of any HTTP GET/POST fields.
-   * @return array
-   *   The HTTP headers and response text.
-   *   [0 => array $headers, 1 => string $body].
+   * @return SetupResponse
    */
   public function runInstall($method, $fields) {
     $checkInstalled = $this->setup->checkInstalled();
@@ -173,40 +165,42 @@ class SetupController implements SetupControllerInterface {
     $this->setup->getDispatcher()->dispatch('civi.setupui.boot', new UIBootEvent($this, $method, $fields));
   }
 
+  /**
+   * @param string $message
+   * @param string $title
+   * @return SetupResponse
+   */
   public function createError($message, $title = 'Error') {
-    return [
-      [],
-      $this->renderPage($title, sprintf('<h1>%s</h1>\n%s', htmlentities($title), htmlentities($message))),
-    ];
+    return $this->createPage($title, sprintf('<h1>%s</h1>\n%s', htmlentities($title), htmlentities($message)));
   }
 
   /**
    * @param string $title
    * @param string $body
-   * @return string
+   * @return SetupResponse
    */
-  public function renderPage($title, $body) {
+  public function createPage($title, $body) {
     /** @var \Civi\Setup\Model $model */
     $model = $this->setup->getModel();
 
-    $pageAssets = [
+    $r = new SetupResponse();
+    $r->code = 200;
+    $r->headers = [];
+    $r->isComplete = FALSE;
+    $r->title = $title;
+    $r->body = $body;
+    $r->assets = [
       ['type' => 'script-url', 'url' => $this->getUrl('jquery.js')],
       ['type' => 'script-code', 'code' => 'window.csj$ = jQuery.noConflict();'],
       ['type' => 'style-url', 'url' => $this->urls['res'] . "template.css"],
       ['type' => 'style-url', 'url' => $this->getUrl('font-awesome.css')],
     ];
+
     if (\CRM_Core_I18n::isLanguageRTL($model->lang)) {
-      $pageAssets[] = ['type' => 'style-url', 'url' => $this->urls['res'] . "template-rtl.css"];
+      $r->assets[] = ['type' => 'style-url', 'url' => $this->urls['res'] . "template-rtl.css"];
     }
 
-    $pageVars = [
-      'pageAssets' => $pageAssets,
-      'pageTitle' => $title,
-      'pageBody' => $body,
-      'shortLangCode' => \CRM_Core_I18n_PseudoConstant::shortForLong($model->lang),
-      'textDirection' => (\CRM_Core_I18n::isLanguageRTL($model->lang) ? 'rtl' : 'ltr'),
-    ];
-    return $this->render($this->getResourcePath('page.tpl.php'), $pageVars);
+    return $r;
   }
 
   /**
@@ -321,13 +315,13 @@ class SetupController implements SetupControllerInterface {
   }
 
   /**
-   * @return array
+   * @return SetupResponse
    */
   private function renderFinished() {
     $m = $this->setup->getModel();
     $tplFile = $this->getResourcePath('finished.' . $m->cms . '.php');
     if (file_exists($tplFile)) {
-      return [[], $this->renderPage(ts('CiviCRM Installed'), $this->render($tplFile))];
+      return $this->createPage(ts('CiviCRM Installed'), $this->render($tplFile));
     }
     else {
       return $this->createError("Installation succeeded. However, the final page ($tplFile) was not available.");
