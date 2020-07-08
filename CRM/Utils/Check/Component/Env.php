@@ -218,7 +218,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $msg,
-        ts('Complete Setup'),
+        ts('Organization Setup'),
         \Psr\Log\LogLevel::WARNING,
         'fa-check-square-o'
       );
