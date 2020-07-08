@@ -272,7 +272,7 @@ class CRM_Utils_System {
     }
 
     $config = CRM_Core_Config::singleton();
-    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend);
+    $url = $config->userSystem->url($path, $query, $absolute, $fragment, $frontend, $forceBackend, $htmlize);
 
     if ($htmlize) {
       $url = htmlentities($url);
@@ -333,7 +333,7 @@ class CRM_Utils_System {
      * @return \Psr\Http\Message\UriInterface
      */
     $mkRouteUri = function ($path, $query) use ($e) {
-      $urlTxt = CRM_Utils_System::url($path, $query, $e->absolute, $e->fragment, FALSE);
+      $urlTxt = CRM_Utils_System::url($path, $query, $e->absolute, $e->fragment, FALSE, TRUE);
       if ($e->isSSL || ($e->isSSL === NULL && \CRM_Utils_System::isSSL())) {
         $urlTxt = str_replace('http://', 'https://', $urlTxt);
       }
