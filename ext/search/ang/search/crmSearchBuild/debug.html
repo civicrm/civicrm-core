@@ -1,0 +1,7 @@
+<fieldset class="crm-collapsible collapsed">
+  <legend class="collapsible-title">{{:: ts('Query Info') }}</legend>
+  <div>
+    <pre ng-if="$ctrl.debug.timeIndex">{{ ts('Request took %1 seconds.', {1: $ctrl.debug.timeIndex}) }}</pre>
+    <pre ng-repeat="query in $ctrl.debug.sql">{{ query }}</pre>
+  </div>
+</fieldset>
