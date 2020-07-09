@@ -47,7 +47,7 @@ class RequiredFields extends BaseListener {
 
     foreach ($this->fields as $field) {
       // Parentheses indicate multiple options. Ex: '(body_html|body_text)'
-      if ($field{0} === '(') {
+      if ($field[0] === '(') {
         $alternatives = explode('|', substr($field, 1, -1));
         $fieldTitle = implode(' or ', array_map(function ($x) {
           return "\"$x\"";

@@ -163,7 +163,7 @@ class DefaultSender extends BaseListener {
     }
 
     // Register 5xx SMTP response code (permanent failure) as bounce.
-    if (isset($code{0}) && $code{0} === '5') {
+    if (isset($code[0]) && $code[0] === '5') {
       return FALSE;
     }
 
