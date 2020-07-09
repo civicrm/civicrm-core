@@ -191,6 +191,7 @@ class SetupController implements SetupControllerInterface {
     $r->body = $body;
     $r->assets = [
       ['type' => 'script-url', 'url' => $this->getUrl('jquery.js')],
+      ['type' => 'script-url', 'url' => $this->urls['res'] . "installer.js"],
       ['type' => 'script-code', 'code' => 'window.csj$ = jQuery.noConflict();'],
       ['type' => 'style-url', 'url' => $this->urls['res'] . "template.css"],
       ['type' => 'style-url', 'url' => $this->getUrl('font-awesome.css')],
