@@ -376,7 +376,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
     // ensure that oid is not the current user, if so refuse to do the merge
-    if (CRM_Core_Session::singleton()->getLoggedInContactID() == $oid) {
+    if (CRM_Core_Session::getLoggedInContactID() == $oid) {
       $message = ts('The contact record which is linked to the currently logged in user account - \'%1\' - cannot be deleted.',
         [1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName()]
       );

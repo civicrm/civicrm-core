@@ -305,7 +305,7 @@ AND    reset_date IS NULL
 
     $contactFromEmails = [];
     // add logged in user's active email ids
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $contactID = CRM_Core_Session::getLoggedInContactID();
     if ($contactID) {
       $contactEmails = self::allEmails($contactID);
       $fromDisplayName  = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();

@@ -169,7 +169,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
       $noteActions = FALSE;
 
-      $loggedInContactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
       if ($loggedInContactID) {
         if ($loggedInContactID == $note->entity_id) {
           $noteActions = TRUE;
