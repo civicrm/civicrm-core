@@ -2905,7 +2905,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'completetransaction', ['id' => $contribution['id'], 'trxn_date' => date('Y-m-d')]);
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id'], 'sequential' => 1]);
     $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
-    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
+    // Make sure receive_date is original date and make sure payment date is today
+    $this->assertEquals('2012-05-11', date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
+    $payment = $this->callAPISuccess('payment', 'get', ['contribution_id' => $contribution['id'], 'sequential' => 1]);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($payment['values'][0]['trxn_date'])));
     $mut->checkMailLog([
       'Receipt - Contribution',
       'receipt_date:::' . date('Ymd'),
@@ -3184,7 +3187,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $status);
     $mut->checkMailLog([
       'amount:::500.00',
-      'receive_date:::20130201000000',
+      // The `receive_date` should remain as it was created.
+      // TODO: the latest payment transaction date (and maybe other details,
+      // such as amount and payment instrument) would be a useful token to make
+      // available.
+      'receive_date:::20120511000000',
       "receipt_date:::\n",
     ]);
     $mut->stop();
@@ -4736,6 +4743,32 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ],
     ];
     return $result;
+  }
+
+  /**
+   * Make sure that recording a payment doesn't alter the receive_date of a
+   * pending contribution.
+   */
+  public function testPaymentDontChangeReceiveDate() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'total_amount' => 100,
+      'receive_date' => '2020-02-02',
+      'contribution_status_id' => 'Pending',
+    ];
+    $contributionID = $this->contributionCreate($params);
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 100,
+      'trxn_date' => '2020-03-04',
+    ];
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    //check if contribution status is set to "Completed".
+    $contribution = $this->callAPISuccess('Contribution', 'getSingle', [
+      'id' => $contributionID,
+    ]);
+    $this->assertEquals('2020-02-02 00:00:00', $contribution['receive_date']);
   }
 
 }

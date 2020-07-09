@@ -1124,9 +1124,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals($trxnID, $contribution['trxn_id'],
       "Contribution trxn_id should have been set to that of the payment.");
 
-    // change $trxnDate for $receiveDate if we agree that transactions should NOT
-    // update contributions.
-    $this->assertEquals($trxnDate, $contribution['receive_date'],
+    $this->assertEquals($originalReceiveDate, $contribution['receive_date'],
       "Contribution receive date was changed, but should not have been.");
 
     $this->validateAllPayments();
