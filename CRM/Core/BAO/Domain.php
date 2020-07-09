@@ -328,7 +328,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       return [$userName, $userEmail];
     }
 
-    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userID = CRM_Core_Session::getLoggedInContactID();
     if (!empty($userID)) {
       list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }

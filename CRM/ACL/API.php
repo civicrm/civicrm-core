@@ -189,7 +189,7 @@ class CRM_ACL_API {
     }
 
     if (!$contactID) {
-      $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
     $key = "{$tableName}_{$type}_{$contactID}";

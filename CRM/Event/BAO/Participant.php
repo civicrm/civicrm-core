@@ -1810,7 +1810,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     ];
 
     // create activity with target contacts
-    $id = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $id = CRM_Core_Session::getLoggedInContactID();
     if ($id) {
       $activityParams['source_contact_id'] = $id;
       $activityParams['target_contact_id'][] = $contactId;
