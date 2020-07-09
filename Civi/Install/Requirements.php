@@ -28,10 +28,13 @@ class Requirements {
    */
   protected $system_checks = [
     'checkMemory',
-    'checkServerVariables',
     'checkMysqlConnectExists',
     'checkJsonEncodeExists',
     'checkMultibyteExists',
+  ];
+
+  protected $system_checks_web = [
+    'checkServerVariables',
   ];
 
   protected $database_checks = [
@@ -81,6 +84,12 @@ class Requirements {
     $errors[] = $this->checkFilepathIsWritable($file_paths);
     foreach ($this->system_checks as $check) {
       $errors[] = $this->$check();
+    }
+
+    if (PHP_SAPI !== 'cli') {
+      foreach ($this->system_checks_web as $check) {
+        $errors[] = $this->$check();
+      }
     }
 
     return $errors;
