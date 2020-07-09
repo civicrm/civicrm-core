@@ -334,6 +334,31 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('INSERT INTO bar (first, second, third) SELECT foo.one, foo.two, foo.three FROM foo ON DUPLICATE KEY UPDATE second = twiddle(foo.two), third = twiddle(foo.three)', $select->toSQL());
   }
 
+  public function testSyncInto_EarlyInterpolate() {
+    $select = CRM_Utils_SQL_Select::from('foo')
+      ->where('foo.whiz = 100')
+      ->syncInto('bar', ['name'], [
+        'name' => 'foo.name',
+        'first' => 'concat(foo.one, @suffix)',
+        'second' => 'foo.two',
+      ], [
+        '@suffix' => ' and more',
+      ]);
+    $this->assertLike('INSERT INTO bar (name, first, second) SELECT foo.name, concat(foo.one, " and more"), foo.two FROM foo WHERE (foo.whiz = 100) ON DUPLICATE KEY UPDATE first = concat(foo.one, " and more"), second = foo.two', $select->toSQL());
+  }
+
+  public function testSyncInto_LateInterpolate() {
+    $select = CRM_Utils_SQL_Select::from('foo')
+      ->where('foo.whiz = 100')
+      ->syncInto('bar', ['name'], [
+        'name' => 'foo.name',
+        'first' => 'concat(foo.one, @suffix)',
+        'second' => 'foo.two',
+      ])
+      ->param(['@suffix' => ' and on and on']);
+    $this->assertLike('INSERT INTO bar (name, first, second) SELECT foo.name, concat(foo.one, " and on and on"), foo.two FROM foo WHERE (foo.whiz = 100) ON DUPLICATE KEY UPDATE first = concat(foo.one, " and on and on"), second = foo.two', $select->toSQL());
+  }
+
   /**
    * @param $expected
    * @param $actual
