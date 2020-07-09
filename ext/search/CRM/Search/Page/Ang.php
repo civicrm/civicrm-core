@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Search_Page_Build extends CRM_Core_Page {
+class CRM_Search_Page_Ang extends CRM_Core_Page {
   /**
    * @var string[]
    */
