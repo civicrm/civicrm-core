@@ -19,6 +19,10 @@ class LocaleUtil {
    *   Ex: 'en_US'.
    */
   public static function pickClosest($preferredLang, $availLangs, $default = 'en_US') {
+    if ($preferredLang === NULL || $preferredLang === '') {
+      return $default;
+    }
+
     // Perhaps we have this exact language?
     if (isset($availLangs[$preferredLang])) {
       return $preferredLang;
