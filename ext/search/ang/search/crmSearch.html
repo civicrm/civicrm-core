@@ -1,5 +1,5 @@
 <div id="bootstrap-theme" class="crm-search">
-  <h1 crm-page-title>{{:: ts('Build Search for %1', {1: $ctrl.getEntity($ctrl.entity).title}) }}</h1>
+  <h1 crm-page-title>{{:: ts('Create Search for %1', {1: $ctrl.getEntity($ctrl.entity).title}) }}</h1>
 
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
   <div class="messages warning no-popup collapse">
@@ -11,10 +11,10 @@
   </div>
 
   <form>
-    <div ng-include="'~/search/crmSearchBuild/build.html'"></div>
-    <div ng-include="'~/search/crmSearchBuild/controls.html'"></div>
-    <div ng-include="'~/search/crmSearchBuild/debug.html'" ng-if="$ctrl.debug"></div>
-    <div ng-include="'~/search/crmSearchBuild/results.html'" class="crm-search-results"></div>
-    <div ng-include="'~/search/crmSearchBuild/pager.html'"></div>
+    <div ng-include="'~/search/crmSearch/criteria.html'"></div>
+    <div ng-include="'~/search/crmSearch/controls.html'"></div>
+    <div ng-include="'~/search/crmSearch/debug.html'" ng-if="$ctrl.debug"></div>
+    <div ng-include="'~/search/crmSearch/results.html'" class="crm-search-results"></div>
+    <div ng-include="'~/search/crmSearch/pager.html'"></div>
   </form>
 </div>

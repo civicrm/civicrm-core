@@ -1,11 +1,11 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').component('crmSearchBuild', {
+  angular.module('search').component('crmSearch', {
     bindings: {
       entity: '='
     },
-    templateUrl: '~/search/crmSearchBuild.html',
+    templateUrl: '~/search/crmSearch.html',
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;

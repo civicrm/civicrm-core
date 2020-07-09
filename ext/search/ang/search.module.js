@@ -10,7 +10,7 @@
     .config(function($routeProvider) {
       $routeProvider.when('/:entity', {
         controller: 'searchRoute',
-        template: '<div id="bootstrap-theme" class="crm-search"><crm-search-build entity="entity"></crm-search-build></div>',
+        template: '<div id="bootstrap-theme" class="crm-search"><crm-search entity="entity"></crm-search></div>',
         reloadOnSearch: false
       });
     })
