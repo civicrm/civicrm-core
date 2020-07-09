@@ -7,7 +7,7 @@
       ids: '<'
     },
     require: {
-      search: '^crmSearchBuild'
+      search: '^crmSearch'
     },
     templateUrl: '~/search/crmSearchActions.html',
     controller: function($scope, crmApi4, dialogService, searchMeta) {

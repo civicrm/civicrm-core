@@ -1,7 +1,7 @@
 # org.civicrm.search
 
-A core extension to build advanced searches.
+A core extension to create advanced searches.
 
 ## Usage
 
-Once enabled, navigate to **Search > Build Search for...** in the menu.
+Once enabled, navigate to **Search > Create Search...** in the menu.
