@@ -1069,8 +1069,14 @@ class InstallRequirements {
         return TRUE;
       }
       else {
-        $testDetails[2] .= "{$majorHas}.{$minorHas}.";
-        $this->error($testDetails);
+        $versionDetails = mysqli_query($this->conn, 'SELECT version() as version')->fetch_assoc();
+        if (version_compare($versionDetails['version'], $min) == -1) {
+          $testDetails[2] .= "{$majorHas}.{$minorHas}.";
+          $this->error($testDetails);
+        }
+        else {
+          return TRUE;
+        }
       }
     }
   }
