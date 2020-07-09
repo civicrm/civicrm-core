@@ -375,6 +375,45 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Take the results of the SELECT query and copy them into another
+   * table.
+   *
+   * If the same record already exists in the other table (based on
+   * primary-key or unique-key), then update the corresponding record.
+   *
+   * @param string $table
+   *   The table to write data into.
+   * @param array|string $keys
+   *   List of PK/unique fields
+   *   NOTE: This must match the unique-key that was declared in the schema.
+   * @param array $mapping
+   *   List of values to select and where to send them.
+   *
+   *   For example, consider:
+   *     ['relationship_id' => 'rel.id']
+   *
+   *   This would select the value of 'rel.id' and write to 'relationship_id'.
+   *
+   * @param null|array $args
+   *   Use NULL to skip interpolation; use an array of variables to enable.
+   * @return $this
+   */
+  public function syncInto($table, $keys, $mapping, $args = NULL) {
+    $keys = (array) $keys;
+
+    $this->select(array_values($mapping), $args);
+    $this->insertInto($table, array_keys($mapping));
+
+    foreach ($mapping as $intoColumn => $fromValue) {
+      if (!in_array($intoColumn, $keys)) {
+        $this->onDuplicate("$intoColumn = $fromValue", $args);
+      }
+    }
+
+    return $this;
+  }
+
+  /**
    * @param array $fields
    *   The fields to fill in the other table (in order).
    * @return CRM_Utils_SQL_Select
