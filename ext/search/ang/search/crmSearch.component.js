@@ -215,6 +215,7 @@
         if (ctrl.autoSearch && ctrl.stale) {
           ctrl.refreshAll();
         }
+        $('.crm-search-auto-toggle').blur();
       };
 
       $scope.onChangeLimit = function() {
