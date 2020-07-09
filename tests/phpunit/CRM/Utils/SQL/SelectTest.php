@@ -325,6 +325,15 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('INSERT INTO bar (first, second, third, fourth) SELECT fid, 1, fid, 1 FROM foo WHERE (zoo = 3) AND (aviary = 3) GROUP BY noodle, sauce', $select->toSQL());
   }
 
+  public function testInsertInto_OnDuplicateUpdate() {
+    $select = CRM_Utils_SQL_Select::from('foo')
+      ->insertInto('bar', ['first', 'second', 'third'])
+      ->select(['foo.one', 'foo.two', 'foo.three'])
+      ->onDuplicate('second = twiddle(foo.two)')
+      ->onDuplicate('third = twiddle(foo.three)');
+    $this->assertLike('INSERT INTO bar (first, second, third) SELECT foo.one, foo.two, foo.three FROM foo ON DUPLICATE KEY UPDATE second = twiddle(foo.two), third = twiddle(foo.three)', $select->toSQL());
+  }
+
   /**
    * @param $expected
    * @param $actual

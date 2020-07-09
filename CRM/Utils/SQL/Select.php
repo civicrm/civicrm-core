@@ -69,6 +69,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   private $insertInto = NULL;
   private $insertVerb = 'INSERT INTO ';
   private $insertIntoFields = [];
+  private $onDuplicates = [];
   private $selects = [];
   private $from;
   private $joins = [];
@@ -387,6 +388,22 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * For INSERT INTO...SELECT...' queries, you may give an "ON DUPLICATE UPDATE" clause.
+   *
+   * @param string|array $exprs list of SQL expressions
+   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
+   * @return CRM_Utils_SQL_Select
+   */
+  public function onDuplicate($exprs, $args = NULL) {
+    $exprs = (array) $exprs;
+    foreach ($exprs as $expr) {
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->onDuplicates[$evaluatedExpr] = $evaluatedExpr;
+    }
+    return $this;
+  }
+
+  /**
    * @param array|NULL $parts
    *   List of fields to check (e.g. 'selects', 'joins').
    *   Defaults to all.
@@ -463,6 +480,15 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
         $sql .= 'OFFSET ' . $this->offset . "\n";
       }
     }
+    if ($this->onDuplicates) {
+      if ($this->insertVerb === 'INSERT INTO ') {
+        $sql .= ' ON DUPLICATE KEY UPDATE ' . implode(", ", $this->onDuplicates) . "\n";
+      }
+      else {
+        throw new \Exception("The ON DUPLICATE clause and only be used with INSERT INTO queries.");
+      }
+    }
+
     if ($this->mode === self::INTERPOLATE_OUTPUT) {
       $sql = $this->interpolate($sql, $this->params, self::INTERPOLATE_OUTPUT);
     }
