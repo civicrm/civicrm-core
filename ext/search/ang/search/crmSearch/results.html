@@ -16,7 +16,7 @@
   </thead>
   <tbody>
     <tr ng-repeat="row in $ctrl.results[$ctrl.page]">
-      <td class="crm-search-result-select">
+      <td>
         <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(loading === false && !loadingAllRows && row.id)">
       </td>
       <td ng-repeat="col in $ctrl.params.select">
