@@ -222,7 +222,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->_emailExists = $this->get('emailExists');
 
     // this was used prior to the cleverer this_>getContactID - unsure now
-    $this->_userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $this->_userID = CRM_Core_Session::getLoggedInContactID();
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;

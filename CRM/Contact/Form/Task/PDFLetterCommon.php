@@ -235,7 +235,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $activityParams = [
       'subject' => $subject,
       'campaign_id' => $campaign_id,
-      'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter'),
       'activity_date_time' => date('YmdHis'),
       'details' => $html_message,

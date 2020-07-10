@@ -47,7 +47,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     }
 
     $this->_contactId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $userID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $userID = CRM_Core_Session::getLoggedInContactID();
 
     $userChecksum = $this->getUserChecksum();
     $validUser = FALSE;
