@@ -250,6 +250,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ],
           'is_active' => [
             'title' => ts('Is active?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ],
           'relationship_id' => [
             'title' => ts('Rel ID'),
@@ -771,8 +772,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
         $entryFound = TRUE;
       }
-
-      $rows[$rowNum]['civicrm_relationship_is_active'] = $row['civicrm_relationship_is_active'] ? ts('Yes') : '';
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
