@@ -147,3 +147,7 @@
 #bootstrap-theme.crm-search .btn.form-control {
   height: 36px;
 }
+
+#bootstrap-theme.crm-search th.crm-search-result-select {
+  padding-right: 10px;
+}

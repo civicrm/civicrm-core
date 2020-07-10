@@ -318,6 +318,9 @@
         if (info.fn && info.fn.name === 'GROUP_CONCAT' && value) {
           return formatGroupConcatValues(info, value);
         }
+        else if (info.fn && info.fn.name === 'COUNT') {
+          return value;
+        }
         return formatFieldValue(info.field, value);
       };
 
@@ -328,6 +331,9 @@
         }
         else if (type === 'Boolean' && typeof value === 'boolean') {
           return value ? ts('Yes') : ts('No');
+        }
+        else if (type === 'Money') {
+          return CRM.formatMoney(value);
         }
         return value;
       }
