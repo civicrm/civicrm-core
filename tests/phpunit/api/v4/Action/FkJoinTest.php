@@ -25,7 +25,9 @@ use api\v4\UnitTestCase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Api4\EntityTag;
 use Civi\Api4\Phone;
+use Civi\Api4\Tag;
 
 /**
  * @group headless
@@ -126,8 +128,10 @@ class FkJoinTest extends UnitTestCase {
     $contacts = Contact::get()
       ->setCheckPermissions(FALSE)
       ->addSelect('id', 'first_name', 'any_email.email', 'any_email.location_type_id:name', 'any_email.is_primary', 'primary_email.email')
-      ->addJoin('Email AS any_email', TRUE)
-      ->addJoin('Email AS primary_email', FALSE, ['primary_email.is_primary', '=', TRUE])
+      ->setJoin([
+        ['Email AS any_email', TRUE, NULL],
+        ['Email AS primary_email', FALSE, ['primary_email.is_primary', '=', TRUE]],
+      ])
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->addOrderBy('any_email.id')
       ->setDebug(TRUE)
@@ -138,6 +142,71 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals('1@test.test', $contacts[2]['primary_email.email']);
     $this->assertEquals('1@test.test', $contacts[3]['primary_email.email']);
     $this->assertEquals('1@test.test', $contacts[4]['primary_email.email']);
+  }
+
+  public function testBridgeJoinTags() {
+    $tag1 = Tag::create()->setCheckPermissions(FALSE)
+      ->addValue('name', uniqid('join1'))
+      ->execute()
+      ->first()['name'];
+    $tag2 = Tag::create()->setCheckPermissions(FALSE)
+      ->addValue('name', uniqid('join2'))
+      ->execute()
+      ->first()['name'];
+    $tag3 = Tag::create()->setCheckPermissions(FALSE)
+      ->addValue('name', uniqid('join3'))
+      ->execute()
+      ->first()['name'];
+
+    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Aaa')
+      ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
+      ->addChain('tag2', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag2]))
+      ->execute()
+      ->first()['id'];
+    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Bbb')
+      ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
+      ->addChain('tag3', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag3]))
+      ->execute()
+      ->first()['id'];
+    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Ccc')
+      ->execute()
+      ->first()['id'];
+
+    $required = Contact::get()->setCheckPermissions(FALSE)
+      ->addJoin('Tag', TRUE, 'EntityTag')
+      ->addSelect('first_name', 'tag.name')
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(4, $required);
+
+    $optional = Contact::get()->setCheckPermissions(FALSE)
+      ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag2, $tag3]])
+      ->addSelect('first_name', 'tag.name')
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(5, $optional);
+
+    $grouped = Contact::get()->setCheckPermissions(FALSE)
+      ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag3]])
+      ->addSelect('first_name', 'COUNT(tag.name) AS tags')
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->addGroupBy('id')
+      ->execute()->indexBy('id');
+    $this->assertEquals(1, (int) $grouped[$cid1]['tags']);
+    $this->assertEquals(2, (int) $grouped[$cid2]['tags']);
+    $this->assertEquals(0, (int) $grouped[$cid3]['tags']);
+
+    $reverse = Tag::get()->setCheckPermissions(FALSE)
+      ->addJoin('Contact', FALSE, 'EntityTag', ['contact.id', 'IN', [$cid1, $cid2, $cid3]])
+      ->addGroupBy('id')
+      ->addSelect('name', 'COUNT(contact.id) AS contacts')
+      ->execute()->indexBy('name');
+    $this->assertEquals(2, (int) $reverse[$tag1]['contacts']);
+    $this->assertEquals(1, (int) $reverse[$tag2]['contacts']);
+    $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
   }
 
 }

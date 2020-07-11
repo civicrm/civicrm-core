@@ -56,7 +56,8 @@
     $scope.loading = false;
     $scope.controls = {};
     $scope.langs = ['php', 'js', 'ang', 'cli'];
-    $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
+    $scope.joinTypes = [{k: false, v: 'FALSE (LEFT JOIN)'}, {k: true, v: 'TRUE (INNER JOIN)'}];
+    $scope.bridgeEntities = _.filter(schema, {type: 'BridgeEntity'});
     $scope.code = {
       php: [
         {name: 'oop', label: ts('OOP Style'), code: ''},

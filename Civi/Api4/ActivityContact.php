@@ -29,6 +29,6 @@ namespace Civi\Api4;
  * @see \Civi\Api4\Activity
  * @package Civi\Api4
  */
-class ActivityContact extends Generic\DAOEntity {
+class ActivityContact extends Generic\BridgeEntity {
 
 }

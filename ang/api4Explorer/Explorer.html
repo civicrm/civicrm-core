@@ -70,10 +70,15 @@
                 <div class="api4-input form-inline">
                   <i class="crm-i fa-arrows"></i>
                   <input class="form-control twenty" type="text" ng-model="params.join[$index][0]" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.buildFieldList()"/>
+                  <label>{{:: ts('Required:') }}</label>
                   <select class="form-control" ng-model="params.join[$index][1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+                  <label>{{:: ts('Using:') }}</label>
+                  <select class="form-control" ng-model="params.join[$index][2]" ng-options="e.name as e.name for e in ::bridgeEntities" ng-change="$ctrl.buildFieldList()">
+                    <option value="">{{:: ts('- none -') }}</option>
+                  </select>
                   <a href class="crm-hover-button" title="Clear" ng-click="clearParam('join', $index)"><i class="crm-i fa-times"></i></a>
                 </div>
-                <fieldset class="api4-clause-fieldset" crm-api4-clause="{skip: 2, clauses: params.join[$index], op: 'AND', label: 'On', fields: fieldsAndJoins, format: 'plain'}">
+                <fieldset class="api4-clause-fieldset" crm-api4-clause="{skip: 3, clauses: params.join[$index], op: 'AND', label: 'On', fields: fieldsAndJoins, format: 'plain'}">
                 </fieldset>
               </fieldset>
             </div>

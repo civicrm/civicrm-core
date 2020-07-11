@@ -26,6 +26,6 @@ namespace Civi\Api4;
  *
  * @package Civi\Api4
  */
-class UFMatch extends Generic\DAOEntity {
+class UFMatch extends Generic\BridgeEntity {
 
 }

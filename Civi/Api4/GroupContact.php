@@ -30,7 +30,7 @@ namespace Civi\Api4;
  *
  * @package Civi\Api4
  */
-class GroupContact extends Generic\DAOEntity {
+class GroupContact extends Generic\BridgeEntity {
 
   /**
    * @return Action\GroupContact\Create

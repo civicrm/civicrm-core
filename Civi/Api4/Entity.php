@@ -52,6 +52,11 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Localized title',
         ],
         [
+          'name' => 'type',
+          'description' => 'Base class for this entity',
+          'options' => ['DAOEntity' => 'DAOEntity', 'BasicEntity' => 'BasicEntity', 'BridgeEntity' => 'BridgeEntity', 'AbstractEntity' => 'AbstractEntity'],
+        ],
+        [
           'name' => 'description',
           'description' => 'Description from docblock',
         ],
