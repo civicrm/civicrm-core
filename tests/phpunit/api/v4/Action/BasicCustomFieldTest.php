@@ -90,27 +90,38 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
   public function testWithTwoFields() {
 
-    $customGroup = CustomGroup::create()
+    // First custom set
+    CustomGroup::create()
       ->setCheckPermissions(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('extends', 'Contact')
-      ->execute()
-      ->first();
-
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
-      ->addValue('label', 'FavColor')
-      ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Text')
-      ->addValue('data_type', 'String')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'FavColor')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'FavFood')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
       ->execute();
 
-    CustomField::create()
+    // Second custom set
+    CustomGroup::create()
       ->setCheckPermissions(FALSE)
-      ->addValue('label', 'FavFood')
-      ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Text')
-      ->addValue('data_type', 'String')
+      ->addValue('name', 'MyContactFields2')
+      ->addValue('extends', 'Contact')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'FavColor')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'FavFood')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
       ->execute();
 
     $contactId1 = Contact::create()
@@ -145,19 +156,38 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertArrayHasKey('MyContactFields.FavColor', $contact);
     $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
 
+    // Update 2nd set and ensure 1st hasn't changed
+    Contact::update()
+      ->addWhere('id', '=', $contactId1)
+      ->addValue('MyContactFields2.FavColor', 'Orange')
+      ->addValue('MyContactFields2.FavFood', 'Tangerine')
+      ->execute();
+    $contact = Contact::get()
+      ->setCheckPermissions(FALSE)
+      ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
+      ->addWhere('id', '=', $contactId1)
+      ->execute()
+      ->first();
+    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Orange', $contact['MyContactFields2.FavColor']);
+    $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
+    $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
+
+    // Update 1st set and ensure 2st hasn't changed
     Contact::update()
       ->addWhere('id', '=', $contactId1)
       ->addValue('MyContactFields.FavColor', 'Blue')
       ->execute();
-
     $contact = Contact::get()
       ->setCheckPermissions(FALSE)
-      ->addSelect('MyContactFields.FavColor')
+      ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
-
     $this->assertEquals('Blue', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Orange', $contact['MyContactFields2.FavColor']);
+    $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
+    $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
 
     $search = Contact::get()
       ->setCheckPermissions(FALSE)
