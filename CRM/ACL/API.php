@@ -88,13 +88,14 @@ class CRM_ACL_API {
     // the default value which is valid for the final AND
     $deleteClause = ' ( 1 ) ';
     if (!$skipDeleteClause) {
-      if (CRM_Core_Permission::check('access deleted contacts')) {
-        if ($onlyDeleted) {
-          $deleteClause = '(contact_a.is_deleted)';
-        }
+      // dev/core#1864 We get only deleted if $only deleted is set and you have
+      // permission to see deleted contacts.
+      if (CRM_Core_Permission::check('access deleted contacts') && $onlyDeleted) {
+        $deleteClause = '(contact_a.is_deleted)';
       }
       else {
-        // Exclude deleted contacts due to permissions
+        // Exclude deleted contacts due to permissions or because we do not
+        // want to search in trash.
         $deleteClause = '(contact_a.is_deleted = 0)';
       }
     }
