@@ -39,15 +39,10 @@ class CiviReportTestCase extends CiviUnitTestCase {
   public function getReportOutputAsCsv($reportClass, $inputParams) {
 
     $reportObj = $this->getReportObject($reportClass, $inputParams);
-    try {
-      $rows = $reportObj->getResultSet();
-      $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
-      $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
-      file_put_contents($tmpFile, $csvContent);
-    }
-    catch (Exception $e) {
-      throw $e;
-    }
+    $rows = $reportObj->getResultSet();
+    $tmpFile = $this->createTempDir() . CRM_Utils_File::makeFileName('CiviReport.csv');
+    $csvContent = CRM_Report_Utils_Report::makeCsv($reportObj, $rows);
+    file_put_contents($tmpFile, $csvContent);
     return $tmpFile;
   }
 
