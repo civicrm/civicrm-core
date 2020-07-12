@@ -3399,6 +3399,11 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function endPostProcess(&$rows = NULL) {
     $this->assign('report_class', get_class($this));
+
+    // This is used by unit tests, where _outputMode is intentionally blank.
+    // Is there a reason it couldn't just always do this? It effectively does
+    // the same thing anyway by assigning it to the template (in
+    // doTemplateAssignment()).
     if ($this->_storeResultSet) {
       $this->_resultSet = $rows;
     }
@@ -3500,7 +3505,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /**
    * Set store result set indicator to TRUE.
    *
-   * @todo explain what this does
+   * This is used by unit tests, along with getResultSet(), to get just
+   * the output rows unformatted.
    */
   public function storeResultSet() {
     $this->_storeResultSet = TRUE;
