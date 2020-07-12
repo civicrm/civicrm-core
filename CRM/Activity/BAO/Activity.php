@@ -2455,6 +2455,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
       foreach ($types as $type) {
         $permittedActivityTypes[$type['activity_type_id']] = (int) $type['activity_type_id'];
       }
+      asort($permittedActivityTypes);
       Civi::$statics[__CLASS__]['permitted_activity_types'][$userID] = $permittedActivityTypes;
     }
     return Civi::$statics[__CLASS__]['permitted_activity_types'][$userID];
