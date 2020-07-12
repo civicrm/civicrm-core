@@ -73,6 +73,7 @@ class CRM_Core_JobManager {
     $statusPref = [
       'name' => 'checkLastCron',
       'check_info' => gmdate('U'),
+      'prefs' => '',
     ];
     CRM_Core_BAO_StatusPreference::create($statusPref);
   }

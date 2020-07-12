@@ -258,49 +258,63 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Checks if cron has run in a reasonable amount of time
+   * Checks if cron has run in the past hour (3600 seconds)
    * @return array
+   * @throws CRM_Core_Exception
    */
   public function checkLastCron() {
     $messages = [];
 
     $statusPreference = new CRM_Core_DAO_StatusPreference();
     $statusPreference->domain_id = CRM_Core_Config::domainID();
-    $statusPreference->name = 'checkLastCron';
+    $statusPreference->name = __FUNCTION__;
 
+    $level = \Psr\Log\LogLevel::INFO;
+    $now = gmdate('U');
+
+    // Get timestamp of last cron run
     if ($statusPreference->find(TRUE) && !empty($statusPreference->check_info)) {
-      $lastCron = $statusPreference->check_info;
-      $msg = ts('Last cron run at %1.', [1 => CRM_Utils_Date::customFormat(date('c', $lastCron))]);
+      $msg = ts('Last cron run at %1.', [1 => CRM_Utils_Date::customFormat(date('c', $statusPreference->check_info))]);
     }
+    // If cron record doesn't exist, this is a new install. Make a placeholder record (prefs='new').
     else {
-      $lastCron = 0;
-      $msg = ts('No cron runs have been recorded.');
+      $statusPreference = CRM_Core_BAO_StatusPreference::create([
+        'name' => __FUNCTION__,
+        'check_info' => $now,
+        'prefs' => 'new',
+      ]);
     }
+    $lastCron = $statusPreference->check_info;
 
-    if ($lastCron > gmdate('U') - 3600) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Running OK'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-clock-o'
-      );
+    if ($statusPreference->prefs !== 'new' && $lastCron > $now - 3600) {
+      $title = ts('Cron Running OK');
     }
     else {
+      // If placeholder record found, give one day "grace period" for admin to set-up cron
+      if ($statusPreference->prefs === 'new') {
+        $title = ts('Set-up Cron');
+        $msg = ts('No cron runs have been recorded.');
+        // After 1 day (86400 seconds) increase the error level
+        $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::NOTICE : \Psr\Log\LogLevel::WARNING;
+      }
+      else {
+        $title = ts('Cron Not Running');
+        // After 1 day (86400 seconds) increase the error level
+        $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR;
+      }
       $cronLink = 'target="_blank" href="' . htmlentities(CRM_Utils_System::docURL2('sysadmin/setup/jobs/', TRUE)) . '""';
       $msg .= '<p>' . ts('To enable scheduling support, please <a %1>set up the cron job</a>.', [
         1 => $cronLink,
       ]) . '</p>';
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Not Running'),
-        ($lastCron > gmdate('U') - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR,
-        'fa-clock-o'
-      );
-      $messages[] = $message;
     }
 
+    $messages[] = new CRM_Utils_Check_Message(
+      __FUNCTION__,
+      $msg,
+      $title,
+      $level,
+      'fa-clock-o'
+    );
     return $messages;
   }
 
