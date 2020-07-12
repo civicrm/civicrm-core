@@ -10,11 +10,8 @@
  */
 
 /**
- *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -27,16 +24,15 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
    *
    * @param array $params
    *
-   * @return array
+   * @return CRM_Core_DAO_StatusPreference
    * @throws CRM_Core_Exception
    */
   public static function create($params) {
-    $statusPreference = new CRM_Core_BAO_StatusPreference();
+    $statusPreference = new CRM_Core_DAO_StatusPreference();
 
     // Default severity level to ignore is 0 (DEBUG).
-    if (!isset($params['ignore_severity'])) {
-      $params['ignore_severity'] = 0;
-    }
+    $params['ignore_severity'] = $params['ignore_severity'] ?? 0;
+
     // Severity can be either text ('critical') or an integer <= 7.
     // It's a magic number, but based on PSR-3 standards.
     if (!CRM_Utils_Rule::integer($params['ignore_severity'])) {
@@ -50,32 +46,25 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
       throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
     }
 
-    // Check if this StatusPreference already exists.
-    if (empty($params['id']) && !empty($params['name'])) {
-      $statusPreference->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
-      $statusPreference->name = $params['name'];
+    // Set default domain when creating (or updating by name)
+    if (empty($params['id']) && empty($params['domain_id'])) {
+      $params['domain_id'] = CRM_Core_Config::domainID();
+    }
 
+    // Enforce unique status pref names. Update if a duplicate name is found in the same domain.
+    if (empty($params['id']) && !empty($params['name'])) {
+      $statusPreference->domain_id = $params['domain_id'];
+      $statusPreference->name = $params['name'];
       $statusPreference->find(TRUE);
     }
 
+    $op = $statusPreference->id ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($op, 'StatusPreference', $statusPreference->id, $params);
+
     $statusPreference->copyValues($params);
-
-    $edit = (bool) $statusPreference->id;
-    if ($edit) {
-      CRM_Utils_Hook::pre('edit', 'StatusPreference', $statusPreference->id, $statusPreference);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'StatusPreference', NULL, $statusPreference);
-    }
-
     $statusPreference->save();
 
-    if ($edit) {
-      CRM_Utils_Hook::post('edit', 'StatusPreference', $statusPreference->id, $statusPreference);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'StatusPreference', NULL, $statusPreference);
-    }
+    CRM_Utils_Hook::post($op, 'StatusPreference', $statusPreference->id, $statusPreference);
 
     return $statusPreference;
   }
