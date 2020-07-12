@@ -91,10 +91,16 @@ class CRM_Mailing_Page_Url extends CRM_Core_Page {
     unset($query_param['qid']);
     unset($query_param['u']);
     unset($query_param[$config->userFrameworkURLVar]);
+
+    // @see dev/core#1865 for some additional query strings we need to remove as well.
     if ($config->userFramework === 'WordPress') {
       // Ugh
       unset($query_param['page']);
       unset($query_param['noheader']);
+      unset($query_param['civiwp']);
+    }
+    elseif ($config->userFramework === 'Joomla') {
+      unset($query_param['option']);
     }
 
     $query_string = http_build_query($query_param);
