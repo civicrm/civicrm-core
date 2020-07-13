@@ -595,6 +595,16 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we handle cache entries without clashes.
+   */
+  public function testMergeSharedActivity() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $activityID = $this->activityCreate(['target_contact_id' => [$contactID, $contact2ID]]);
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+  }
+
+  /**
    * Test the decisions made for addresses when merging.
    *
    * @dataProvider getMergeLocationData
