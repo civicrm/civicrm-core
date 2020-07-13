@@ -212,7 +212,7 @@ class CRM_Utils_REST {
     // interface can be disabled in more change to the configuration file.
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
-      $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
+      $docLink = CRM_Utils_System::docURL2('sysadmin/setup/jobs', TRUE);
       $key = $requestParams['key'] ?? NULL;
       if (empty($key)) {
         return self::error("FATAL: mandatory param 'key' missing. More info at: " . $docLink);
