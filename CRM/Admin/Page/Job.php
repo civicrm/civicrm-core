@@ -138,8 +138,37 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
    * Browse all jobs.
    */
   public function browse() {
-    // check if non-prod mode is enabled.
-    if (CRM_Core_Config::environment() != 'Production') {
+    // Check if cron is actually running.
+    if (CRM_Core_Config::environment() == 'Production') {
+      $statusPreference = new CRM_Core_DAO_StatusPreference();
+      $statusPreference->domain_id = CRM_Core_Config::domainID();
+      $statusPreference->name = 'checkLastCron';
+      if (!$statusPreference->find(TRUE)
+        || empty($statusPreference->check_info)
+        || $statusPreference->prefs === 'new') {
+        // Cron has never run.
+        CRM_Core_Session::setStatus(
+          ts('A cron job is required to execute scheduled jobs automatically.  It appears that this has never happened on this site. <a href="%1" target="_blank">Learn how to set up the cron job.</a>', [
+            1 => CRM_Utils_System::docURL2('sysadmin/setup/jobs', TRUE),
+          ]),
+          ts('Cron not running'),
+          'warning',
+          ['expires' => 0]
+        );
+      }
+      elseif ($statusPreference->check_info < $now - 3600) {
+        CRM_Core_Session::setStatus(
+          ts('A cron job is required to execute scheduled jobs automatically.  It appears that there may be a problem with cron execution: it last ran at %1. <a href="%2" target="_blank">Learn how to set up the cron job.</a>', [
+            1 => CRM_Utils_Date::customFormat(date('c', $statusPreference->check_info)),
+            2 => CRM_Utils_System::docURL2('sysadmin/setup/jobs', TRUE),
+          ]),
+          ts('Cron not running'),
+          'warning',
+          ['expires' => 0]
+        );
+      }
+    }
+    else {
       CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter.'), ts("Non-production Environment"), "warning", array('expires' => 0));
     }
 
