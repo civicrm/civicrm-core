@@ -532,7 +532,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     elseif ($params['field_name'][2] == 0) {
       // 0 is Primary location type
-      $apiFormattedParams['location_type_id'] = NULL;
+      $apiFormattedParams['location_type_id'] = '';
     }
     if (!empty($params['field_name'][3])) {
       $apiFormattedParams['phone_type_id'] = $params['field_name'][3];
