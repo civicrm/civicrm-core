@@ -573,9 +573,35 @@ class api_v3_JobTest extends CiviUnitTestCase {
     foreach ($groupResult['values'] as $groupValues) {
       $this->assertEquals($contactID, $groupValues['contact_id']);
       $this->assertEquals('Added', $groupValues['status']);
-      $this->assertTrue(in_array($groupValues['group_id'], $expectedGroups));
+      $this->assertContains($groupValues['group_id'], $expectedGroups);
 
     }
+  }
+
+  /**
+   * Test that we handle cache entries without clashes.
+   */
+  public function testMergeCaches() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $groupID = $this->groupCreate();
+    $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $contactID]);
+    $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $contact2ID]);
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_group_contact_cache(group_id, contact_id) VALUES
+      ($groupID, $contactID),
+      ($groupID, $contact2ID)
+    ");
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+  }
+
+  /**
+   * Test that we handle cache entries without clashes.
+   */
+  public function testMergeSharedActivity() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $activityID = $this->activityCreate(['target_contact_id' => [$contactID, $contact2ID]]);
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
   }
 
   /**

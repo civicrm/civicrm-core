@@ -222,6 +222,11 @@ class CRM_Dedupe_Merger {
     }
 
     $contactReferences = $coreReferences = CRM_Core_DAO::getReferencesToContactTable();
+    foreach (['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache'] as $tableName) {
+      // Don't merge cache tables. These should be otherwise cleared at some point in the dedupe
+      // but they are prone to locking to let's not touch during the dedupe.
+      unset($contactReferences[$tableName], $coreReferences[$tableName]);
+    }
 
     CRM_Utils_Hook::merge('cidRefs', $contactReferences);
     if ($contactReferences !== $coreReferences) {
@@ -524,6 +529,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $className::$fnName($mainId, $otherId, $sqls, $tables, $tableOperations);
         }
         // Skip normal processing
+        continue;
+      }
+
+      if ($table === 'civicrm_activity_contact') {
+        $sqls[] = "UPDATE IGNORE civicrm_activity_contact SET contact_id = $mainId WHERE contact_id = $otherId";
+        $sqls[] = "DELETE FROM civicrm_activity_contact WHERE contact_id = $otherId";
         continue;
       }
 

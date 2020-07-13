@@ -285,8 +285,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetCidRefs() {
     $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'Contacts');
-    $this->assertEquals($this->getStaticCIDRefs(), CRM_Dedupe_Merger::cidRefs());
-    $this->assertEquals($this->getCalculatedCIDRefs(), CRM_Dedupe_Merger::cidRefs());
+    // These are deliberately unset.
+    $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache'], 1);
+    $this->assertEquals(array_diff_key($this->getStaticCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
+    $this->assertEquals(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
   }
 
   /**

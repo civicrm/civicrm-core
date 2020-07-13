@@ -2185,6 +2185,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
+    if (strlen($to) === 10) {
+      // If we just have the date we assume the end of that day.
+      $to .= ' 23:59:59';
+    }
 
     if ($relative) {
       list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
