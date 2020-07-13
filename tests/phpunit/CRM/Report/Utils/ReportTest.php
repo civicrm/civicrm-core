@@ -47,7 +47,7 @@ class CRM_Report_Utils_ReportTest extends CiviUnitTestCase {
 ENDDETAILS;
 
     $expectedOutput = <<<ENDOUTPUT
-"Activity Type","Subject","Activity Details"\r
+\xEF\xBB\xBF"Activity Type","Subject","Activity Details"\r
 "Meeting","Meeting with the apostrophe's and that person who does ""air quotes"". Some non-ascii characters: дè","Here's some typical data from an activity details field.
   
 дè some non-ascii and html styling and these ̋“weird” quotes’s.

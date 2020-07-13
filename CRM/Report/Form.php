@@ -3442,6 +3442,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             'fullPath' => $csvFullFilename,
             'mime_type' => 'text/csv',
             'cleanName' => 'CiviReport.csv',
+            'charset' => 'utf-8',
           ];
         }
         if ($this->_outputMode == 'pdf') {
