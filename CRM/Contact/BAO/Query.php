@@ -5047,6 +5047,10 @@ civicrm_relationship.start_date > {$today}
         $this->_skipDeleteClause
       );
 
+      if (!$onlyDeleted && CRM_Core_Permission::check('access deleted contacts')) {
+        $this->_permissionWhereClause = str_replace(' ( 1 ) ', '(contact_a.is_deleted = 0)', $this->_permissionWhereClause);
+      }
+
       if (isset($this->_tables['civicrm_activity'])) {
         $bao = new CRM_Activity_BAO_Activity();
         $clauses = $subclauses = [];
