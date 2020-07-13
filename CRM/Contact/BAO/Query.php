@@ -5053,6 +5053,10 @@ civicrm_relationship.start_date > {$today}
         $this->_skipDeleteClause
       );
 
+      if (!$onlyDeleted && CRM_Core_Permission::check('access deleted contacts')) {
+        $this->_permissionWhereClause = str_replace(' ( 1 ) ', '(contact_a.is_deleted = 0)', $this->_permissionWhereClause);
+      }
+
       // regenerate fromClause since permission might have added tables
       if ($this->_permissionWhereClause) {
         //fix for row count in qill (in contribute/membership find)

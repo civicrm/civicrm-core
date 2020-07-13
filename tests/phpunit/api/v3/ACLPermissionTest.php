@@ -1045,26 +1045,25 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->cleanupCachedPermissions();
 
     $vals = CustomValue::get($group)->execute();
-    //This is dependent on PR 17379 which is being reverted just for 5.28/5.27, so commenting this out for same.
-    //$this->assertCount(2, $vals);
+    $this->assertCount(2, $vals);
 
     $this->allowedContactId = $c2;
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
     $this->cleanupCachedPermissions();
 
     $vals = CustomValue::get($group)->addSelect('*', 'contact.first_name')->execute();
-    //$this->assertCount(1, $vals);
-    //$this->assertEquals($c2, $vals[0]['entity_id']);
-    //$this->assertEquals('C2', $vals[0]['contact.first_name']);
+    $this->assertCount(1, $vals);
+    $this->assertEquals($c2, $vals[0]['entity_id']);
+    $this->assertEquals('C2', $vals[0]['contact.first_name']);
 
     $vals = Contact::get()
       ->addJoin('Custom_' . $group . ' AS cf')
       ->addSelect('first_name', 'cf.' . $textField)
       ->addWhere('is_deleted', '=', TRUE)
       ->execute();
-    //$this->assertCount(1, $vals);
-    //$this->assertEquals('C2', $vals[0]['first_name']);
-    //$this->assertEquals('2', $vals[0]['cf.' . $textField]);
+    $this->assertCount(1, $vals);
+    $this->assertEquals('C2', $vals[0]['first_name']);
+    $this->assertEquals('2', $vals[0]['cf.' . $textField]);
   }
 
 }
