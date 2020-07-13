@@ -411,6 +411,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
    * @param $rows
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
