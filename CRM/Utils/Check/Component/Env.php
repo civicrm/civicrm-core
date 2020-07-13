@@ -142,7 +142,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')]),
         ts('Debug Mode Enabled'),
-        \Psr\Log\LogLevel::WARNING,
+        CRM_Core_Config::environment() == 'Production' ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::INFO,
         'fa-bug'
       );
       $message->addAction(
@@ -162,6 +162,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkOutboundMail() {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
@@ -188,6 +193,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkDomainNameEmail() {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
@@ -233,6 +243,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkDefaultMailbox() {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
+
     $config = CRM_Core_Config::singleton();
 
     if (in_array('CiviMail', $config->enableComponents) &&
@@ -263,6 +279,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkLastCron() {
     $messages = [];
+
+    // Cron doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     $statusPreference = new CRM_Core_DAO_StatusPreference();
     $statusPreference->domain_id = CRM_Core_Config::domainID();
@@ -796,6 +817,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkReplyIdForMailing() {
     $messages = [];
 
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
+
     if (!CRM_Mailing_PseudoConstant::defaultComponent('Reply', '')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -840,7 +866,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         __FUNCTION__,
         ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', [1 => $environment]),
         ts('Non-Production Environment'),
-        \Psr\Log\LogLevel::ALERT,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-bug'
       );
     }
