@@ -31,10 +31,14 @@
         <td>
           {$form.logging.html}<br />
         {if $validTriggerPermission}
-          <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
+          {if $isMultilingual}
+            <p class="description">{ts}Logging is not supported in multilingual environments.{/ts}</p>
+          {else}
+            <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
+          {/if}
         {else}
           <p class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts}&nbsp;{ts}This functionality cannot be enabled on multilingual installations.{/ts}</p>
-         {/if}
+        {/if}
         </td>
       </tr>
       <tr class="crm-miscellaneous-form-block-doNotAttachPDFReceipt">
