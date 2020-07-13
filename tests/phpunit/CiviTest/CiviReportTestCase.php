@@ -47,10 +47,10 @@ class CiviReportTestCase extends CiviUnitTestCase {
   }
 
   /**
-   * @param $reportClass
+   * @param string $reportClass
    * @param array $inputParams
    *
-   * @return array
+   * @return CRM_Report_Form
    * @throws Exception
    */
   public function getReportObject($reportClass, $inputParams) {

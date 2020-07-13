@@ -176,10 +176,10 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $this->callAPISuccess('ContributionSoft', 'create', $softParams);
 
     $input = [
-      'filters' => [
-        'contribution_or_soft_op' => 'eq',
-        'contribution_or_soft_value' => 'contributions_only',
-      ],
+      'contribution_or_soft_op' => 'eq',
+      'contribution_or_soft_value' => 'contributions_only',
+      'soft_credit_type_id_op' => 'nnll',
+      'soft_credit_type_id_value' => [],
       'fields' => [
         'sort_name',
         'email',
@@ -190,10 +190,67 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
         'soft_credits',
       ],
     ];
-    $obj = $this->getReportObject('CRM_Report_Form_Contribute_Detail', $input);
-    $rows = $obj->getResultSet();
-    $this->assertEquals(1, count($rows));
+    $params = array_merge([
+      'report_id' => 'contribute/detail',
+    ], $input);
+    $rows = $this->callAPISuccess('ReportTemplate', 'getrows', $params)['values'];
+    $this->assertCount(1, $rows);
     $this->assertEquals('$ 150.00', $rows[0]['civicrm_contribution_total_amount']);
+
+    $statistics = $this->callAPISuccess('ReportTemplate', 'getstatistics', $params)['values'];
+    $this->assertEquals([
+      'counts' => [
+        'rowCount' => [
+          'title' => 'Row(s) Listed',
+          'value' => 1,
+        ],
+        'amount' => [
+          'title' => 'Total Amount (Contributions)',
+          'value' => '$ 150.00 (1)',
+          'type' => 2,
+        ],
+        'count' => [
+          'title' => 'Total Contributions',
+          'value' => 1,
+        ],
+        'fees' => [
+          'title' => 'Fees',
+          'value' => '$ 5.00',
+          'type' => 2,
+        ],
+        'net' => [
+          'title' => 'Net',
+          'value' => '$ 145.00',
+          'type' => 2,
+        ],
+        'avg' => [
+          'title' => 'Average',
+          'value' => '$ 150.00',
+          'type' => 2,
+        ],
+      ],
+      'groups' => [
+        [
+          'title' => 'Grouping(s)',
+          'value' => 'Contribution',
+        ],
+      ],
+      'filters' => [
+        [
+          'title' => 'Contribution OR Soft Credit?',
+          'value' => 'Is equal to Contributions Only',
+        ],
+        [
+          'title' => 'Contribution Status',
+          'value' => 'Is Completed',
+        ],
+        [
+          'title' => 'Soft Credit Type',
+          'value' => 'Is not empty (Null)',
+        ],
+      ],
+    ], $statistics);
+
   }
 
 }

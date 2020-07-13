@@ -4324,13 +4324,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         }
         if (array_key_exists('filters', $table)) {
           foreach ($table['filters'] as $filterName => $filter) {
+            $filterOp = $this->_params["{$filterName}_op"] ?? '';
             if ((isset($this->_params["{$filterName}_value"])
                 && !CRM_Utils_System::isNull($this->_params["{$filterName}_value"]))
               || !empty($this->_params["{$filterName}_relative"])
-              || CRM_Utils_Array::value("{$filterName}_op", $this->_params) ==
-              'nll'
-              || CRM_Utils_Array::value("{$filterName}_op", $this->_params) ==
-              'nnll'
+              || $filterOp === 'nll'
+              || $filterOp === 'nnll'
             ) {
               $this->_selectedTables[] = $tableName;
               $this->filteredTables[] = $tableName;
