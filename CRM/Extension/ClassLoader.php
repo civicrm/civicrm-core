@@ -67,8 +67,16 @@ class CRM_Extension_ClassLoader {
     else {
       $loader = $this->buildClassLoader();
       $ser = serialize($loader);
+
+      $shimMapper = new CRM_Extension_ShimMapper($this->mapper, $this->manager);
+      $shimMap = $shimMapper->build();
+      // Before writing the map to disk, give a chance to run any `shimApi->define()`s.
+      $shimMap = CRM_Extension_ShimApi::loadMap($shimMap);
+
       file_put_contents($file,
-        sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
+        sprintf("<?php\n%s\nreturn unserialize(%s);",
+          $shimMapper->dump($shimMap),
+          var_export($ser, 1))
       );
     }
     return $loader->register();
@@ -124,7 +132,8 @@ class CRM_Extension_ClassLoader {
    * @return string
    */
   protected function getCacheFile() {
-    $envId = \CRM_Core_Config_Runtime::getId();
+    $formatRev = '_1';
+    $envId = \CRM_Core_Config_Runtime::getId() . $formatRev;
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
     return $file;
   }
