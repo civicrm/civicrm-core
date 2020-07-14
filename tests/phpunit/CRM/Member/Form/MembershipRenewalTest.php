@@ -379,8 +379,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->_mode = 'test';
 
     $form->testSubmit($params);
+    $month = str_pad((date('m') -2), 2, 0, STR_PAD_LEFT);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $this->assertEquals('2020-04-13', $membership['join_date']);
+    $this->assertEquals('2020-'. $month . '-13', $membership['join_date']);
     $this->assertEquals(date('Y-01-01'), $membership['start_date']);
     $nextYear = date('Y') + 1;
     $this->assertEquals(date($nextYear . '-01-31'), $membership['end_date']);
