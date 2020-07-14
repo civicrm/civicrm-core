@@ -24,7 +24,10 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
    */
   public function __construct() {
     parent::__construct(TRUE);
-    $this->groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
+  }
+
+  public function getGroupId() {
+    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
       self::CUSTOM_SEARCH_GROUP_NAME, 'id', 'name'
     );
   }
@@ -42,11 +45,11 @@ class CRM_Extension_Manager_Search extends CRM_Extension_Manager_Base {
     }
 
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-      ['option_group_id' => $this->groupId]
+      ['option_group_id' => $this->getGroupId()]
     );
 
     $params = [
-      'option_group_id' => $this->groupId,
+      'option_group_id' => $this->getGroupId(),
       'weight' => $weight,
       'description' => $info->label . ' (' . $info->key . ')',
       'name' => $info->key,
