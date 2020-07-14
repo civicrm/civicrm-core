@@ -129,6 +129,7 @@
     <add>4.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>mailing</formatType>
     </html>
   </field>
 </table>

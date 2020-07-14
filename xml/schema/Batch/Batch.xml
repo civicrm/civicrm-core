@@ -91,6 +91,7 @@
     <add>3.3</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>

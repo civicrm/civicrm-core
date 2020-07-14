@@ -1666,7 +1666,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         else {
           $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
-          $attributes = ['format' => $fieldSpec['date_format']];
+          $attributes = ['format' => $fieldSpec['html']['formatType']];
           return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
         }
 

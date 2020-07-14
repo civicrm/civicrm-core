@@ -181,6 +181,7 @@
     <add>4.7</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
