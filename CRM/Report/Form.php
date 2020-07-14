@@ -3310,7 +3310,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             if (!empty($this->_params["{$fieldName}_relative"])) {
               list($from, $to) = CRM_Utils_Date::getFromTo($this->_params["{$fieldName}_relative"], NULL, NULL);
             }
-
+            if (strlen($to) === 10) {
+              // If we just have the date we assume the end of that day.
+              $to .= ' 23:59:59';
+            }
             if ($from || $to) {
               if ($from) {
                 $from = date('l j F Y, g:iA', strtotime($from));
