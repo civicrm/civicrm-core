@@ -663,11 +663,12 @@
     // Format oop params
     function formatOOP(entity, action, params, indent) {
       var code = '',
-        newLine = "\n" + _.repeat(' ', indent);
+        newLine = "\n" + _.repeat(' ', indent),
+        perm = params.checkPermissions === false ? 'FALSE' : '';
       if (entity.substr(0, 7) !== 'Custom_') {
-        code = "\\Civi\\Api4\\" + entity + '::' + action + '()';
+        code = "\\Civi\\Api4\\" + entity + '::' + action + '(' + perm + ')';
       } else {
-        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
+        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
       }
       _.each(params, function(param, key) {
         var val = '';
@@ -700,7 +701,7 @@
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
           });
         }
-        else {
+        else if (key !== 'checkPermissions') {
           code += newLine + "->set" + ucfirst(key) + '(' + phpFormat(param, 2 + indent) + ')';
         }
       });

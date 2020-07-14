@@ -267,13 +267,13 @@ class ConformanceTest extends UnitTestCase {
     $exceptionThrown = '';
     try {
       $entityClass::get()
-        ->setCheckPermissions('nada')
+        ->setDebug('not a bool')
         ->execute();
     }
     catch (\API_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
-    $this->assertContains('checkPermissions', $exceptionThrown);
+    $this->assertContains('debug', $exceptionThrown);
     $this->assertContains('type', $exceptionThrown);
   }
 

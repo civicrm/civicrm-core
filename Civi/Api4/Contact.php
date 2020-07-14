@@ -33,17 +33,21 @@ namespace Civi\Api4;
 class Contact extends Generic\DAOEntity {
 
   /**
-   * @return \Civi\Api4\Action\Contact\GetChecksum
+   * @param bool $checkPermissions
+   * @return Action\Contact\GetChecksum
    */
-  public static function getChecksum() {
-    return new Action\Contact\GetChecksum(__CLASS__, __FUNCTION__);
+  public static function getChecksum($checkPermissions = TRUE) {
+    return (new Action\Contact\GetChecksum(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Action\Contact\ValidateChecksum
+   * @param bool $checkPermissions
+   * @return Action\Contact\ValidateChecksum
    */
-  public static function validateChecksum() {
-    return new Action\Contact\ValidateChecksum(__CLASS__, __FUNCTION__);
+  public static function validateChecksum($checkPermissions = TRUE) {
+    return (new Action\Contact\ValidateChecksum(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

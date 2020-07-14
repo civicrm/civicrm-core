@@ -31,10 +31,12 @@ namespace Civi\Api4;
 class Event extends Generic\DAOEntity {
 
   /**
-   * @return \Civi\Api4\Action\Event\Get
+   * @param bool $checkPermissions
+   * @return Action\Event\Get
    */
-  public static function get() {
-    return new \Civi\Api4\Action\Event\Get(__CLASS__, __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Event\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

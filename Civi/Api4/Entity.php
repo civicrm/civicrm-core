@@ -31,17 +31,20 @@ namespace Civi\Api4;
 class Entity extends Generic\AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return Action\Entity\Get
    */
-  public static function get() {
-    return new Action\Entity\Get('Entity', __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Entity\Get('Entity', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Generic\BasicGetFieldsAction
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
    */
-  public static function getFields() {
-    return new \Civi\Api4\Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function() {
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction('Entity', __FUNCTION__, function() {
       return [
         [
           'name' => 'name',
@@ -73,14 +76,16 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Any @see annotations from docblock',
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return Action\Entity\GetLinks
    */
-  public static function getLinks() {
-    return new Action\Entity\GetLinks('Entity', __FUNCTION__);
+  public static function getLinks($checkPermissions = TRUE) {
+    return (new Action\Entity\GetLinks('Entity', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
