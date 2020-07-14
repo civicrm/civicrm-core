@@ -157,13 +157,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkOutboundMail() {
+  public function checkOutboundMail($force = FALSE) {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
       return $messages;
     }
 
@@ -188,13 +189,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check that domain email and org name are set
+   * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkDomainNameEmail() {
+  public function checkDomainNameEmail($force = FALSE) {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
       return $messages;
     }
 
@@ -238,13 +240,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if a default bounce handling mailbox is set up
+   * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkDefaultMailbox() {
+  public function checkDefaultMailbox($force = FALSE) {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
       return $messages;
     }
 
@@ -273,14 +276,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if cron has run in the past hour (3600 seconds)
+   * @param bool $force
    * @return CRM_Utils_Check_Message[]
    * @throws CRM_Core_Exception
    */
-  public function checkLastCron() {
+  public function checkLastCron($force = FALSE) {
     $messages = [];
 
     // Cron doesn't work in non-production environments; skip.
-    if (CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
       return $messages;
     }
 
@@ -655,7 +659,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if (!$okextensions && !$updates && !$errors) {
       $messages[] = new CRM_Utils_Check_Message(
-        'extensionsOk',
+        __FUNCTION__ . 'Ok',
         ts('No extensions installed. <a %1>Browse available extensions</a>.', [
           1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
         ]),
@@ -677,7 +681,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if ($updates) {
       $messages[] = new CRM_Utils_Check_Message(
-        'extensionUpdates',
+        __FUNCTION__ . 'Updates',
         '<ul><li>' . implode('</li><li>', $updates) . '</li></ul>',
         ts('Extension Update Available', ['plural' => '%count Extension Updates Available', 'count' => count($updates)]),
         \Psr\Log\LogLevel::WARNING,
@@ -693,7 +697,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         $message = ts('All extensions are up-to-date:');
       }
       $messages[] = new CRM_Utils_Check_Message(
-        'extensionsOk',
+        __FUNCTION__ . 'Ok',
         $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
@@ -820,13 +824,14 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Ensure reply id is set to any default value
+   * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkReplyIdForMailing() {
+  public function checkReplyIdForMailing($force = FALSE) {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
       return $messages;
     }
 
