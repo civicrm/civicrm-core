@@ -58,7 +58,9 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $tag7 = $this->ids['Tag'][7] = $this->tagCreate(['name' => 'Test Tag 7', 'description' => 'Test Tag 7'])['id'];
     $tag9 = $this->ids['Tag'][9] = $this->tagCreate(['name' => 'Test Tag 9', 'description' => 'Test Tag 9'])['id'];
-    $this->tagCreate(['name' => 'Test Tag 10']);
+    $tag10 = $this->ids['Tag'][10] = $this->tagCreate(['name' => 'Test Tag 10', 'description' => 'Test Tag 10', 'parent_id' => $tag9])['id'];
+    $tag11 = $this->ids['Tag'][11] = $this->tagCreate(['name' => 'Test Tag 11', 'description' => 'Test Tag 11', 'parent_id' => $tag10])['id'];
+
     $groups = [
       3 => ['name' => 'Test Group 3'],
       4 => ['name' => 'Test Smart Group 4', 'saved_search_id' => 1],
@@ -118,6 +120,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         'api.entity_tag.create' => ['tag_id' => $tag9],
         'api.entity_tag.create.2' => ['tag_id' => $tag7],
       ],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 25', 'api.entity_tag.create' => ['tag_id' => $tag10]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 26', 'api.entity_tag.create' => ['tag_id' => $tag11]],
     ];
     foreach ($individuals as $individual) {
       $this->ids['Contact'][$individual['last_name']] = $this->individualCreate($individual);
@@ -189,6 +193,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     foreach ($ids as $id) {
       $expectedIDs[] = $this->ids['Contact']['Test Contact ' . $id];
     }
+
     $this->assertEquals($expectedIDs, $contacts);
   }
 

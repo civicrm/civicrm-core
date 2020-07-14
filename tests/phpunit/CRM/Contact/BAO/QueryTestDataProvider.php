@@ -141,6 +141,8 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '20',
         '22',
         '24',
+        '25',
+        '26',
       ],
     ],
     //  Include tags 7 and 9
@@ -159,6 +161,32 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '22',
         '23',
         '24',
+        '25',
+        '26',
+      ],
+    ],
+    //  Include tags 7 and 10
+    [
+      'fv' => ['tag' => ['7', '10']],
+      'id' => [
+        '11',
+        '12',
+        '15',
+        '16',
+        '19',
+        '20',
+        '23',
+        '24',
+        '25',
+        '26',
+      ],
+    ],
+    //  Include tags 10 and 11
+    [
+      'fv' => ['tag' => ['10', '11']],
+      'id' => [
+        '25',
+        '26',
       ],
     ],
     // gender_id 1 = 'Female'
