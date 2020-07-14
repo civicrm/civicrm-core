@@ -1055,7 +1055,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $groups = [];
     $args = [1 => [$groupIdString, 'String']];
     $query = "
-SELECT id, title, description, visibility, parents
+SELECT id, title, description, visibility, parents, saved_search_id
 FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
@@ -1081,7 +1081,7 @@ WHERE  id IN $groupIdString
         $parent = self::filterActiveGroups($parentArray);
         $tree[$parent][] = [
           'id' => $dao->id,
-          'title' => $dao->title,
+          'title' => empty($dao->saved_search_id) ? $dao->title : '* ' . $dao->title,
           'visibility' => $dao->visibility,
           'description' => $dao->description,
         ];
@@ -1089,7 +1089,7 @@ WHERE  id IN $groupIdString
       else {
         $roots[] = [
           'id' => $dao->id,
-          'title' => $dao->title,
+          'title' => empty($dao->saved_search_id) ? $dao->title : '* ' . $dao->title,
           'visibility' => $dao->visibility,
           'description' => $dao->description,
         ];
@@ -1100,6 +1100,7 @@ WHERE  id IN $groupIdString
     for ($i = 0; $i < count($roots); $i++) {
       self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
     }
+
     return $hierarchy;
   }
 
@@ -1122,11 +1123,12 @@ WHERE  id IN $groupIdString
       $hierarchy[$group['id']] = $spaces . $group['title'];
     }
     else {
-      $hierarchy[$group['id']] = [
-        'title' => $spaces . $group['title'],
+      $hierarchy[] = array(
+        'id' => $group['id'],
+        'text' => $spaces . $group['title'],
         'description' => $group['description'],
         'visibility' => $group['visibility'],
-      ];
+      );
     }
 
     // For performance reasons we use a for loop rather than a foreach.

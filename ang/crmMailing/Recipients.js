@@ -95,11 +95,12 @@
           }
           var option = convertValueToObj(item.id);
           var icon = (option.entity_type === 'civicrm_mailing') ? 'fa-envelope' : 'fa-users';
+          var smartGroupMarker = item.is_smart ? '* ' : '';
           var spanClass = (option.mode == 'exclude') ? 'crmMailing-exclude' : 'crmMailing-include';
           if (option.entity_type != 'civicrm_mailing' && isMandatory(option.entity_id)) {
             spanClass = 'crmMailing-mandatory';
           }
-          return '<i class="crm-i '+icon+'" aria-hidden="true"></i> <span class="' + spanClass + '">' + item.text + '</span>';
+          return '<i class="crm-i '+icon+'"></i> <span class="' + spanClass + '">' + smartGroupMarker + item.text + '</span>';
         }
 
         function validate() {
@@ -154,7 +155,7 @@
               mids.push(0);
             }
 
-            CRM.api3('Group', 'getlist', { params: { id: { IN: gids }, options: { limit: 0 } }, extra: ["is_hidden"] } ).then(
+            CRM.api3('Group', 'getlist', { params: { id: { IN: gids }, options: { limit: 0 } }, extra: ["is_hidden"] }).then(
               function(glist) {
                 CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids }, options: { limit: 0 } } }).then(
                   function(mlist) {
@@ -165,8 +166,8 @@
 
                     $(glist.values).each(function (idx, group) {
                       var key = group.id + ' civicrm_group include';
-                      groupNames.push({id: parseInt(group.id), title: group.label, is_hidden: group.extra.is_hidden});
 
+                      groupNames.push({id: parseInt(group.id), title: group.label, is_hidden: group.extra.is_hidden});
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
                       }
@@ -233,6 +234,9 @@
               if('civicrm_mailing' === rcpAjaxState.entity) {
                 params["api.MailingRecipients.getcount"] = {};
               }
+              else if ('civicrm_group' === rcpAjaxState.entity) {
+                params.extra = ["saved_search_id"];
+              }
 
               return params;
             },
@@ -256,8 +260,8 @@
                                text: obj.label } : '';
                   }
                   else {
-                    return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
-                               text: obj.label };
+                    return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type, text: obj.label,
+                              is_smart: (!_.isEmpty(obj.extra.saved_search_id)) };
                   }
                 })
               };

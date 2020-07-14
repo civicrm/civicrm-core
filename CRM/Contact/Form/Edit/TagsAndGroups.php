@@ -102,7 +102,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           }
 
           if ($groupElementType == 'select') {
-            $groupsOptions[$id] = $group['title'];
+            $groupsOptions[$id] = $group;
           }
           else {
             $form->_tagGroup[$fName][$id]['description'] = $group['description'];
@@ -111,8 +111,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         }
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
-          $form->add('select', $fName, $groupName, $groupsOptions, FALSE,
-            ['id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2 twenty']
+          $form->add('select2', $fName, $groupName, $groupsOptions, FALSE,
+            ['placeholder' => '- select -', 'multiple' => TRUE, 'class' => 'twenty']
           );
           $form->assign('groupCount', count($groupsOptions));
         }
