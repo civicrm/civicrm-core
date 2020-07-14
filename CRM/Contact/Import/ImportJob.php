@@ -60,13 +60,13 @@ class CRM_Contact_Import_ImportJob {
       if (!$createSql) {
         throw new CRM_Core_Exception(ts('Either an existing table name or an SQL query to build one are required'));
       }
-
-      // FIXME: we should regen this table's name if it exists rather than drop it
-      if (!$tableName) {
-        $tableName = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
+      if ($tableName) {
+        // Drop previous table if passed in and create new one.
+        $db->query("DROP TABLE IF EXISTS $tableName");
       }
-      $db->query("DROP TABLE IF EXISTS $tableName");
-      $db->query("CREATE TABLE $tableName ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci $createSql");
+      $table = CRM_Utils_SQL_TempTable::build()->setDurable();
+      $tableName = $table->getName();
+      $table->createWithQuery($createSql);
     }
 
     if (!$tableName) {

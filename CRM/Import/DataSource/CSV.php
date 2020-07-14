@@ -43,6 +43,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * uploaded to the temporary table in the DB.
    *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
