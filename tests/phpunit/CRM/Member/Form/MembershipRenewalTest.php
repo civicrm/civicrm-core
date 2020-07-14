@@ -384,7 +384,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-01-01'), $membership['start_date']);
     $nextYear = date('Y') + 1;
     $this->assertEquals(date($nextYear . '-01-31'), $membership['end_date']);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+    $expectedStatus = (strtotime(date('Y-07-14')) > time()) ? 'New' : 'Current';
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $expectedStatus), $membership['status_id']);
     $this->assertNotEmpty($membership['contribution_recur_id']);
     $this->assertNotEmpty('original_source', $membership['source']);
 
@@ -676,7 +677,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     return [
       'cid' => $this->_individualId,
       'price_set_id' => 0,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       'campaign_id' => '',
