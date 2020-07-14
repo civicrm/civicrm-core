@@ -141,7 +141,7 @@ class CRM_Contact_Import_ImportJob {
       //need to differentiate non location elements.
       // @todo merge this with duplicate code on MapField class.
       if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
-        if ($fldName == 'url') {
+        if ($fldName === 'url') {
           $header[] = $websiteTypes[$selOne];
           $parserParameters['mapperWebsiteType'][$key] = $selOne;
         }
@@ -149,11 +149,11 @@ class CRM_Contact_Import_ImportJob {
           $header[] = $locationTypes[$selOne];
           $parserParameters['mapperLocType'][$key] = $selOne;
           if ($selTwo && is_numeric($selTwo)) {
-            if ($fldName == 'phone') {
+            if ($fldName === 'phone') {
               $header[] = $phoneTypes[$selTwo];
               $parserParameters['mapperPhoneType'][$key] = $selTwo;
             }
-            elseif ($fldName == 'im') {
+            elseif ($fldName === 'im') {
               $header[] = $imProviders[$selTwo];
               $parserParameters['mapperImProvider'][$key] = $selTwo;
             }
@@ -337,6 +337,7 @@ class CRM_Contact_Import_ImportJob {
    * @param $newTagDesc
    *
    * @return array|bool
+   * @throws \CRM_Core_Exception
    */
   private function _tagImportedContactsWithNewTag(
     $contactIds,
