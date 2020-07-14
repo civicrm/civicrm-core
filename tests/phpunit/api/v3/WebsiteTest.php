@@ -69,10 +69,15 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   public function testDeleteWebsite($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+
+    $beforeCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_website');
+    $this->assertGreaterThanOrEqual(1, $beforeCount);
+
     $deleteParams = ['id' => $result['id']];
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+
+    $afterCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_website');
+    $this->assertEquals($beforeCount - 1, $afterCount);
   }
 
   /**
@@ -82,10 +87,15 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   public function testDeleteWebsiteInvalid($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+
+    $beforeCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_website');
+    $this->assertGreaterThanOrEqual(1, $beforeCount);
+
     $deleteParams = ['id' => 600];
     $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(1, $checkDeleted['count']);
+
+    $afterCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_website');
+    $this->assertEquals($beforeCount, $afterCount);
   }
 
   /**
