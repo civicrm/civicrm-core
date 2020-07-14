@@ -125,7 +125,7 @@ class Container {
 
     $container->setDefinition('dispatcher', new Definition(
       'Civi\Core\CiviEventDispatcher',
-      [new Reference('service_container')]
+      []
     ))
       ->setFactory([new Reference(self::SELF), 'createEventDispatcher'])->setPublic(TRUE);
 
@@ -324,14 +324,11 @@ class Container {
   }
 
   /**
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @return \Symfony\Component\EventDispatcher\EventDispatcher
    */
-  public function createEventDispatcher($container) {
-    $dispatcher = new CiviEventDispatcher();
-    if (\CRM_Core_Config::isUpgradeMode()) {
-      $dispatcher->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
-    }
+  public function createEventDispatcher() {
+    // Continue building on the original dispatcher created during bootstrap.
+    $dispatcher = static::getBootService('dispatcher.boot');
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
@@ -501,6 +498,12 @@ class Container {
 
     $bootServices['paths'] = new \Civi\Core\Paths();
 
+    $bootServices['dispatcher.boot'] = new CiviEventDispatcher();
+    $bootServices['dispatcher.boot']->setDispatchPolicy([
+      // Quality control: during pre-boot, we can register hook listeners - but not dispatch them.
+      '/./' => 'not-ready',
+    ]);
+
     $class = $runtime->userFrameworkClass;
     $bootServices['userSystem'] = $userSystem = new $class();
     $userSystem->initialize();
@@ -516,6 +519,8 @@ class Container {
     $bootServices['settings_manager'] = new \Civi\Core\SettingsManager($bootServices['cache.settings']);
 
     $bootServices['lockManager'] = self::createLockManager();
+
+    $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL);
 
     if ($loadFromDB && $runtime->dsn) {
       \CRM_Core_DAO::init($runtime->dsn);

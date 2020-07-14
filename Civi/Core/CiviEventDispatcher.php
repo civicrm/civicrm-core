@@ -117,6 +117,9 @@ class CiviEventDispatcher extends EventDispatcher {
         case 'fail':
           throw new \RuntimeException("The dispatch policy prohibits event \"$eventName\".");
 
+        case 'not-ready':
+          throw new \RuntimeException("CiviCRM has not bootstrapped sufficiently to fire event \"$eventName\".");
+
         default:
           throw new \RuntimeException("The dispatch policy for \"$eventName\" is unrecognized ($mode).");
 
