@@ -26,7 +26,6 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
     $form->controller->_actions['display']->perform($form, 'display');
     $contents = ob_get_contents();
     ob_end_clean();
-    print_r($contents);
 
     // There's a bunch of other stuff we could check for in $contents, but then
     // it's tied to the html output and has the same maintenance problems
