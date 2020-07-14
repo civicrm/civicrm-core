@@ -1,30 +1,30 @@
 <?xml version="1.0"?>
 <extension key="eventcart" type="module">
   <file>eventcart</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
+  <name>Event Cart</name>
+  <description>This feature allows users to register for more than one event at a time. When enabled, users will add event(s) to a "cart" and then pay for them all at once. Enabling this setting will affect online registration for all active events.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>
     <email>info@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/tree/master/ext/eventcart</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2020-07-03</releaseDate>
+  <releaseDate>2020-08-03</releaseDate>
   <version>1.0</version>
-  <develStage>alpha</develStage>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.29</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
-    <namespace>CRM/Eventcart</namespace>
+    <namespace>CRM/Event/Cart</namespace>
   </civix>
 </extension>

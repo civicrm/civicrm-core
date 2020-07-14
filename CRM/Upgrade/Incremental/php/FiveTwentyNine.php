@@ -52,21 +52,45 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_29_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Install eventcart extension', 'installEventCart');
+  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Install sequentialCreditNotes extension.
+   *
+   * This feature is restructured as a core extension - which is primarily a code cleanup step.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function installEventCart(CRM_Queue_TaskContext $ctx) {
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic.
+    // (2) On new installs, the extension is activated purely via default SQL INSERT.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'eventcart',
+      'name' => 'eventcart',
+      'label' => 'Event Cart',
+      'file' => 'eventcart',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+    return TRUE;
+  }
 
 }

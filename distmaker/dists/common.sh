@@ -108,6 +108,7 @@ function dm_install_coreext() {
 function dm_core_exts() {
   echo ext/sequentialcreditnotes
   echo ext/flexmailer
+  echo ext/eventcart
 }
 
 ## Copy all packages
