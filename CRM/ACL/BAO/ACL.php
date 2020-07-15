@@ -522,10 +522,10 @@ ORDER BY a.object_id
       }
     }
 
-    if (empty($ids) && !empty($includedGroups) &&
+    if (!empty($includedGroups) &&
       is_array($includedGroups)
     ) {
-      $ids = $includedGroups;
+      $ids = array_unique(array_merge($includedGroups, $ids));
     }
     if ($contactID) {
       $groupWhere = '';
