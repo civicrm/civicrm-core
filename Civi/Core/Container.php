@@ -499,10 +499,15 @@ class Container {
     $bootServices['paths'] = new \Civi\Core\Paths();
 
     $bootServices['dispatcher.boot'] = new CiviEventDispatcher();
-    $bootServices['dispatcher.boot']->setDispatchPolicy([
-      // Quality control: during pre-boot, we can register hook listeners - but not dispatch them.
-      '/./' => 'not-ready',
-    ]);
+
+    // Quality control: There should be no pre-boot hooks because they make it harder to understand/support/refactor.
+    // If a pre-boot hook sneaks in, we'll raise an error.
+    $bootDispatchPolicy = [
+      '/^hook_/' => 'not-ready',
+      '/^civi\./' => 'run',
+    ];
+    $mainDispatchPolicy = \CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL;
+    $bootServices['dispatcher.boot']->setDispatchPolicy($bootDispatchPolicy);
 
     $class = $runtime->userFrameworkClass;
     $bootServices['userSystem'] = $userSystem = new $class();
@@ -520,13 +525,12 @@ class Container {
 
     $bootServices['lockManager'] = self::createLockManager();
 
-    $bootServices['dispatcher.boot']->setDispatchPolicy(\CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL);
-
     if ($loadFromDB && $runtime->dsn) {
       \CRM_Core_DAO::init($runtime->dsn);
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
+      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();
 
@@ -536,6 +540,9 @@ class Container {
         $container->set($name, $obj);
       }
       \Civi::$statics[__CLASS__]['container'] = $container;
+    }
+    else {
+      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
     }
   }
 
