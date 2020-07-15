@@ -195,32 +195,33 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @return array of messages
    */
   public function checkFilesAreNotPresent() {
-    global $civicrm_root;
+    $packages_path = rtrim(\Civi::paths()->getPath('[civicrm.packages]/'), '/' . DIRECTORY_SEPARATOR);
+    $vendor_path = rtrim(\Civi::paths()->getPath('[civicrm.vendor]/'), '/' . DIRECTORY_SEPARATOR);
 
     $messages = [];
     $files = [
       [
         // CRM-16005, upgraded from Civi <= 4.5.6
-        "{$civicrm_root}/packages/dompdf/dompdf.php",
+        "{$packages_path}/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
         // CRM-16005, Civi >= 4.5.7
-        "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php",
+        "{$packages_path}/vendor/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
         // CRM-16005, Civi >= 4.6.0
-        "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php",
+        "{$vendor_path}/dompdf/dompdf/dompdf.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
         // CIVI-SA-2013-001
-        "{$civicrm_root}/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
+        "{$packages_path}/OpenFlashChart/php-ofc-library/ofc_upload_image.php",
         \Psr\Log\LogLevel::CRITICAL,
       ],
       [
-        "{$civicrm_root}/packages/html2text/class.html2text.inc",
+        "{$packages_path}/html2text/class.html2text.inc",
         \Psr\Log\LogLevel::CRITICAL,
       ],
     ];
