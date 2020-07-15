@@ -495,6 +495,12 @@ function _civicrm_api3_job_process_membership_spec(&$params) {
   $params['only_active_membership_types']['type'] = CRM_Utils_Type::T_BOOLEAN;
   $params['exclude_membership_status_ids']['title'] = 'Exclude membership status IDs from calculations';
   $params['exclude_membership_status_ids']['description'] = 'Default: Exclude Pending, Cancelled, Expired. Deceased will always be excluded';
+  $params['exclude_membership_status_ids']['type'] = CRM_Utils_Type::T_INT;
+  $params['exclude_membership_status_ids']['pseudoconstant'] = [
+    'table' => 'civicrm_membership_status',
+    'keyColumn' => 'id',
+    'labelColumn' => 'label',
+  ];
 }
 
 /**
