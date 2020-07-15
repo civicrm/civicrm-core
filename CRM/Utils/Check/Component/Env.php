@@ -751,7 +751,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       }
 
       // if db.ver > code.ver, sth really wrong
-      if (version_compare($dbVersion, CRM_Utils_System::version()) > 0) {
+      $codeVersion = CRM_Utils_System::version();
+      if (version_compare($dbVersion, $codeVersion) > 0) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
           ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state.
