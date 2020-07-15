@@ -238,7 +238,7 @@ class CRM_Core_BAO_CustomValueTable {
         if (!empty($set)) {
           $setClause = [];
           foreach ($set as $n => $v) {
-            $setClause[] = "$n = $v";
+            $setClause[] = "`$n` = $v";
           }
           $setClause = implode(',', $setClause);
           if (!$where) {
