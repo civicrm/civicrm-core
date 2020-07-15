@@ -225,6 +225,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
+      'source' => 'Template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -237,6 +238,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
+      'source' => 'Non-template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -246,6 +248,12 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     // Fetched template should be the is_template, not the latest contrib
     $this->assertEquals($fetchedTemplate['id'], $templateContrib['id']);
+
+    $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_status_id' => "Completed",
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+    $this->assertEquals($repeatContribution['values'][$repeatContribution['id']]['source'], $templateContrib['values'][$templateContrib['id']]['source']);
   }
 
   /**
