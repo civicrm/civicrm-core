@@ -2839,8 +2839,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         CRM_Core_DAO::$_nullObject
       );
 
-    $this->assign('printOnly', $this->printOnly);
-
     if ($this->_outputMode == 'print' ||
       ($this->_sendmail && !$this->_outputMode)
     ) {
