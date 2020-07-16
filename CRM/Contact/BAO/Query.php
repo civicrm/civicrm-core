@@ -5061,8 +5061,18 @@ civicrm_relationship.start_date > {$today}
       $this->_permissionWhereClause = $permissionClauses[1];
       $this->_permissionFromClause = $permissionClauses[0];
 
-      if (!$onlyDeleted && CRM_Core_Permission::check('access deleted contacts')) {
-        $this->_permissionWhereClause = str_replace(' ( 1 ) ', '(contact_a.is_deleted = 0)', $this->_permissionWhereClause);
+      if (CRM_Core_Permission::check('access deleted contacts')) {
+        if (!$onlyDeleted) {
+          $this->_permissionWhereClause = str_replace('( 1 )', '(contact_a.is_deleted = 0)', $this->_permissionWhereClause);
+        }
+        else {
+          if ($this->_permissionWhereClause === '( 1 )') {
+            $this->_permissionWhereClause = str_replace('( 1 )', '(contact_a.is_deleted)', $this->_permissionWhereClause);
+          }
+          else {
+            $this->_permissionWhereClause .= " AND (contact_a.is_deleted) ";
+          }
+        }
       }
 
       if (isset($this->_tables['civicrm_activity'])) {
