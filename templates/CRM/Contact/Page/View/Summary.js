@@ -196,7 +196,7 @@
       document.title = $('title').html().replace(oldName, contactName);
       oldName = contactName;
     }
-    $('#contactname-block').load(refreshTitle);
+    $('#contactname-block').on('load', refreshTitle);
     refreshTitle();
 
     var clicking;
