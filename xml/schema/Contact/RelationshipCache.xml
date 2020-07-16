@@ -2,9 +2,9 @@
 
 <table>
   <base>CRM/Contact</base>
-  <class>RelationshipVortex</class>
-  <name>civicrm_relationship_vtx</name>
-  <comment>The vortex permutes information from the relationship table to facilitate querying. Every relationship is mapped to multiple records in the vortex. Joins should begin on the near side and extract info from the far side.</comment>
+  <class>RelationshipCache</class>
+  <name>civicrm_relationship_cache</name>
+  <comment>The cache permutes information from the relationship table to facilitate querying. Every relationship is mapped to multiple records in the cache. Joins should begin on the near side and extract info from the far side.</comment>
   <add>5.29</add>
   <log>false</log>
   <icon>fa-handshake-o</icon>
@@ -12,9 +12,9 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
-    <title>Relationship Vortex ID</title>
+    <title>Relationship Cache ID</title>
     <required>true</required>
-    <comment>Relationship Vortex ID</comment>
+    <comment>Relationship Cache ID</comment>
     <add>5.29</add>
   </field>
   <primaryKey>
@@ -61,7 +61,7 @@
     <title>Orientation (a_b or b_a)</title>
     <required>true</required>
     <default></default>
-    <comment>The vortex record is a permutation of the original relationship record. The orientation indicates whether it is forward (a_b) or reverse (b_a) relationship.</comment>
+    <comment>The cache record is a permutation of the original relationship record. The orientation indicates whether it is forward (a_b) or reverse (b_a) relationship.</comment>
     <add>5.29</add>
   </field>
 
@@ -126,21 +126,21 @@
     <add>5.29</add>
   </index>
   <index>
-    <!-- Ex: select ... from contact inner join vtx on contact.id=vtx.near_contact_id and near_relation = 'Parent of' -->
+    <!-- Ex: select ... from contact inner join relcache on contact.id=relcache.near_contact_id and near_relation = 'Parent of' -->
     <name>index_nearid_nearrelation</name>
     <fieldName>near_contact_id</fieldName>
     <fieldName>near_relation</fieldName>
     <add>5.29</add>
   </index>
   <index>
-    <!-- Ex: select ... from contact inner join vtx on contact.id=vtx.near_contact_id and far_relation = 'Child of' -->
+    <!-- Ex: select ... from contact inner join relcache on contact.id=relcache.near_contact_id and far_relation = 'Child of' -->
     <name>index_nearid_farrelation</name>
     <fieldName>near_contact_id</fieldName>
     <fieldName>far_relation</fieldName>
     <add>5.29</add>
   </index>
   <index>
-    <!-- Ex: select relation, count(*) from vtx group by relation -->
+    <!-- Ex: select relation, count(*) from relcache group by near_relation -->
     <name>index_near_relation</name>
     <fieldName>near_relation</fieldName>
     <add>5.29</add>

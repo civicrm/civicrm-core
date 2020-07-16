@@ -300,7 +300,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertEquals($sortRefs(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
 
     // These are deliberately unset.
-    // $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache', 'civicrm_relationship_vtx'], 1);
+    // $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache', 'civicrm_relationship_cache'], 1);
     // $this->assertEquals(array_diff_key($this->getStaticCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
     // $this->assertEquals(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs), CRM_Dedupe_Merger::cidRefs());
   }
@@ -1343,7 +1343,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'contact_id_a',
         1 => 'contact_id_b',
       ],
-      'civicrm_relationship_vtx' => [
+      'civicrm_relationship_cache' => [
         0 => 'near_contact_id',
         1 => 'far_contact_id',
       ],

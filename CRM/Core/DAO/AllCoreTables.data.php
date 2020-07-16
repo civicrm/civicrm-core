@@ -567,10 +567,10 @@ return [
     'class' => 'CRM_Contact_DAO_Relationship',
     'table' => 'civicrm_relationship',
   ],
-  'CRM_Contact_DAO_RelationshipVortex' => [
-    'name' => 'RelationshipVortex',
-    'class' => 'CRM_Contact_DAO_RelationshipVortex',
-    'table' => 'civicrm_relationship_vtx',
+  'CRM_Contact_DAO_RelationshipCache' => [
+    'name' => 'RelationshipCache',
+    'class' => 'CRM_Contact_DAO_RelationshipCache',
+    'table' => 'civicrm_relationship_cache',
   ],
   'CRM_Mailing_DAO_Mailing' => [
     'name' => 'Mailing',

@@ -65,12 +65,12 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
       FROM civicrm_relationship ")->getDatabaseResult()->fetchRow();
     for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
       $endId = $startId + self::BATCH_SIZE - 1;
-      $title = ts("Upgrade DB to %1: Fill civicrm_relationship_vtx (%2 => %3)", [
+      $title = ts("Upgrade DB to %1: Fill civicrm_relationship_cache (%2 => %3)", [
         1 => $rev,
         2 => $startId,
         3 => $endId,
       ]);
-      $this->addTask($title, 'populateRelationshipVortex', $startId, $endId);
+      $this->addTask($title, 'populateRelationshipCache', $startId, $endId);
     }
   }
 
@@ -115,8 +115,8 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    * @return bool
    *   TRUE on success
    */
-  public static function populateRelationshipVortex(CRM_Queue_TaskContext $ctx, $startId, $endId) {
-    // NOTE: We duplicate CRM_Contact_BAO_RelationshipVortex::$mappings in case
+  public static function populateRelationshipCache(CRM_Queue_TaskContext $ctx, $startId, $endId) {
+    // NOTE: We duplicate CRM_Contact_BAO_RelationshipCache::$mappings in case
     // the schema evolves over multiple releases.
     $mappings = [
       'a_b' => [
@@ -151,7 +151,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
     foreach ($mappings as $mapping) {
       $query = CRM_Utils_SQL_Select::from('civicrm_relationship rel')
         ->join('reltype', 'INNER JOIN civicrm_relationship_type reltype ON rel.relationship_type_id = reltype.id')
-        ->syncInto('civicrm_relationship_vtx', $keyFields, $mapping)
+        ->syncInto('civicrm_relationship_cache', $keyFields, $mapping)
         ->where('rel.id >= #START AND rel.id <= #END', [
           '#START' => $startId,
           '#END' => $endId,

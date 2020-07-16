@@ -10,12 +10,12 @@
  */
 
 /**
- * Test class for CRM_Contact_BAO_RelationshipVortex
+ * Test class for CRM_Contact_BAO_RelationshipCache
  *
  * @package CiviCRM
  * @group headless
  */
-class RelationshipVortexTest extends CiviUnitTestCase {
+class RelationshipCacheTest extends CiviUnitTestCase {
 
   protected function setUp() {
     $this->useTransaction(TRUE);
@@ -24,9 +24,9 @@ class RelationshipVortexTest extends CiviUnitTestCase {
 
   /**
    * Whenever one `Relationship` is created, there should be two corresponding
-   * `RelationshipVortex` records.
+   * `RelationshipCache` records.
    */
-  public function testRelationshipVortex() {
+  public function testRelationshipCache() {
     // add a new type
     $relationship_type_id_1 = $this->relationshipTypeCreate([
       'name_a_b' => 'Praegustator is',
@@ -47,14 +47,14 @@ class RelationshipVortexTest extends CiviUnitTestCase {
     ];
     $relationshipObj = CRM_Contact_BAO_Relationship::add($params);
 
-    // Let's make sure the vortex records were created!
-    $vtxs = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_relationship_vtx WHERE relationship_id = %1', [
+    // Let's make sure the cache records were created!
+    $caches = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_relationship_cache WHERE relationship_id = %1', [
       1 => [$relationshipObj->id, 'Positive'],
     ])->fetchAll();
 
     // There should be two records - the a_b record and the b_a record.
-    $this->assertCount(2, $vtxs);
-    $idx = CRM_Utils_Array::index(['orientation'], $vtxs);
+    $this->assertCount(2, $caches);
+    $idx = CRM_Utils_Array::index(['orientation'], $caches);
 
     $this->assertEquals($relationship_type_id_1, $idx['a_b']['relationship_type_id']);
     $this->assertEquals($contact_id_1, $idx['a_b']['near_contact_id']);
