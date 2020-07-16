@@ -458,8 +458,6 @@
       }
 
       this.$onInit = function() {
-        loadFieldOptions();
-
         $scope.$bindToRoute({
           expr: '$ctrl.params.select',
           param: 'select',
@@ -516,6 +514,8 @@
           });
         }
         $scope.$watch('$ctrl.params.having', onChangeFilters, true);
+
+        loadFieldOptions();
       };
 
       $scope.saveGroup = function() {
