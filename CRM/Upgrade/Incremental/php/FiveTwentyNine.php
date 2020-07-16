@@ -130,7 +130,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
         'start_date' => 'rel.start_date',
         'end_date' => 'rel.end_date',
         'is_active' => 'rel.is_active',
-        'case_id' => 'rel.case_id',
       ],
       'b_a' => [
         'relationship_id' => 'rel.id',
@@ -143,7 +142,6 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
         'start_date' => 'rel.start_date',
         'end_date' => 'rel.end_date',
         'is_active' => 'rel.is_active',
-        'case_id' => 'rel.case_id',
       ],
     ];
     $keyFields = ['relationship_id', 'orientation'];
