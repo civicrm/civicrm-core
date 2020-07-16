@@ -14,7 +14,6 @@ CREATE TABLE `civicrm_relationship_cache` (
      `is_active` tinyint   DEFAULT 1 COMMENT 'is the relationship active ?',
      `start_date` date    COMMENT 'date when the relationship started',
      `end_date` date    COMMENT 'date when the relationship ended',
-     `case_id` int unsigned   DEFAULT NULL COMMENT 'FK to civicrm_case',
      PRIMARY KEY (`id`),
      UNIQUE INDEX `UI_relationship`(relationship_id, orientation),
      INDEX `index_nearid_nearrelation`(near_contact_id, near_relation),
@@ -23,6 +22,5 @@ CREATE TABLE `civicrm_relationship_cache` (
      CONSTRAINT FK_civicrm_relationship_cache_relationship_id FOREIGN KEY (`relationship_id`) REFERENCES `civicrm_relationship`(`id`) ON DELETE CASCADE,
      CONSTRAINT FK_civicrm_relationship_cache_relationship_type_id FOREIGN KEY (`relationship_type_id`) REFERENCES `civicrm_relationship_type`(`id`) ON DELETE CASCADE,
      CONSTRAINT FK_civicrm_relationship_cache_near_contact_id FOREIGN KEY (`near_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
-     CONSTRAINT FK_civicrm_relationship_cache_far_contact_id FOREIGN KEY (`far_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
-     CONSTRAINT FK_civicrm_relationship_cache_case_id FOREIGN KEY (`case_id`) REFERENCES `civicrm_case`(`id`) ON DELETE CASCADE
+     CONSTRAINT FK_civicrm_relationship_cache_far_contact_id FOREIGN KEY (`far_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;

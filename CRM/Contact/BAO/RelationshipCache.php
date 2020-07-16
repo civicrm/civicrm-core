@@ -33,7 +33,6 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
       'start_date' => 'rel.start_date',
       'end_date' => 'rel.end_date',
       'is_active' => 'rel.is_active',
-      'case_id' => 'rel.case_id',
     ],
     'b_a' => [
       'relationship_id' => 'rel.id',
@@ -46,7 +45,6 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
       'start_date' => 'rel.start_date',
       'end_date' => 'rel.end_date',
       'is_active' => 'rel.is_active',
-      'case_id' => 'rel.case_id',
     ],
   ];
 

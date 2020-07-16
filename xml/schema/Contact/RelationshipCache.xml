@@ -183,20 +183,4 @@
       <formatType>activityDate</formatType>
     </html>
   </field>
-
-  <field>
-    <name>case_id</name>
-    <type>int unsigned</type>
-    <title>Relationship Case</title>
-    <default>NULL</default>
-    <comment>FK to civicrm_case</comment>
-    <add>5.29</add>
-  </field>
-  <foreignKey>
-    <name>case_id</name>
-    <table>civicrm_case</table>
-    <key>id</key>
-    <add>5.29</add>
-    <onDelete>CASCADE</onDelete>
-  </foreignKey>
 </table>
