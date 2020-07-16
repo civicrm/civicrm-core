@@ -1,3 +1,6 @@
+/**
+ * This is a jQuery plugin which adds some helpers for the setup UI.
+ */
 (function($){
   /**
    * Enable or disable an error message.
@@ -28,4 +31,4 @@
     this.on('change', cb);
     return this;
   };
-})($);
+})(jQuery);
