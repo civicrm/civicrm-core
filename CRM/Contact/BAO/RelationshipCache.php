@@ -10,12 +10,12 @@
  */
 
 /**
- * Class CRM_Contact_BAO_RelationshipVortex.
+ * Class CRM_Contact_BAO_RelationshipCache.
  */
-class CRM_Contact_BAO_RelationshipVortex extends CRM_Contact_DAO_RelationshipVortex {
+class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache {
 
   /**
-   * The "mappings" array defines the values to put into `civicrm_relationship_vtx`
+   * The "mappings" array defines the values to put into `civicrm_relationship_cache`
    * using data from `civicrm_relationship rel` and `civicrm_relationship_type reltype`.
    *
    * @var array
@@ -59,7 +59,7 @@ class CRM_Contact_BAO_RelationshipVortex extends CRM_Contact_DAO_RelationshipVor
 
   /**
    * A list of of fields in `civicrm_relationship_type` which (if changed)
-   * will necessitate an update to the vortex.
+   * will necessitate an update to the cache.
    *
    * @var array
    */
@@ -78,7 +78,7 @@ class CRM_Contact_BAO_RelationshipVortex extends CRM_Contact_DAO_RelationshipVor
        * This trigger runs whenever a "civicrm_relationship" record is inserted or updated.
        *
        * Goal: Ensure that every relationship record has two corresponding entries in the
-       * vortex, the forward relationship (A=>B) and reverse relationship (B=>A).
+       * cache, the forward relationship (A=>B) and reverse relationship (B=>A).
        */
       $triggers[] = [
         'table' => 'civicrm_relationship',
@@ -109,27 +109,27 @@ class CRM_Contact_BAO_RelationshipVortex extends CRM_Contact_DAO_RelationshipVor
       ];
     }
 
-    // Note: We do not need a DELETE trigger to maintain `civicrm_relationship_vtx` because it uses `<onDelete>CASCADE</onDelete>`.
+    // Note: We do not need a DELETE trigger to maintain `civicrm_relationship_cache` because it uses `<onDelete>CASCADE</onDelete>`.
 
     $st = new \Civi\Core\SqlTrigger\StaticTriggers($triggers);
     $st->onTriggerInfo($e);
   }
 
   /**
-   * Read all records from civicrm_relationship and populate the vortex.
+   * Read all records from civicrm_relationship and populate the cache.
    * Each ordinary relationship in `civicrm_relationship` becomes two
-   * distinct records in the vortex (one for A=>B relations; and one for B=>A).
+   * distinct records in the cache (one for A=>B relations; and one for B=>A).
    *
    * This method is primarily written (a) for manual testing and (b) in case
    * a broken DBMS, screwy import, buggy code, etc causes a corruption.
    *
-   * NOTE: This is closely related to FiveTwentyNine::populateRelationshipVortex(),
+   * NOTE: This is closely related to FiveTwentyNine::populateRelationshipCache(),
    * except that the upgrader users pagination.
    */
   public static function rebuild() {
     $relUpdates = self::createInsertUpdateQueries();
 
-    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_relationship_vtx');
+    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_relationship_cache');
     foreach ($relUpdates as $relUpdate) {
       $relUpdate->execute();
     }
@@ -137,7 +137,7 @@ class CRM_Contact_BAO_RelationshipVortex extends CRM_Contact_DAO_RelationshipVor
 
   /**
    * Prepare a list of SQL queries that map data from civicrm_relationship
-   * to civicrm_relationship_vtx.
+   * to civicrm_relationship_cache.
    *
    * @return CRM_Utils_SQL_Select[]
    *   A list of SQL queries - one for each mapping.
@@ -147,7 +147,7 @@ class CRM_Contact_BAO_RelationshipVortex extends CRM_Contact_DAO_RelationshipVor
     foreach (self::$mappings as $name => $mapping) {
       $queries[$name] = CRM_Utils_SQL_Select::from('civicrm_relationship rel')
         ->join('reltype', 'INNER JOIN civicrm_relationship_type reltype ON rel.relationship_type_id = reltype.id')
-        ->syncInto('civicrm_relationship_vtx', self::$keyFields, $mapping);
+        ->syncInto('civicrm_relationship_cache', self::$keyFields, $mapping);
     }
     return $queries;
   }
