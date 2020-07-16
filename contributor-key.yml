@@ -379,6 +379,10 @@
 
 - github      : don-alejandro-z
 
+- github      : Erioldoesdesign
+  organization: Third Sector Design
+  name        : Eriol Fox;
+
 - github      : jmdh
   name        : Dominic Hargreaves
 
@@ -982,6 +986,9 @@
   organization: MJW Consulting
   jira        : mattwire
 
+- github      : marcineqpol
+  name        : Marcin Lewandowski
+
 - github      : martinh-pw
   name        : Martin Hansen
   organization: PeaceWorks Technology Solutions
@@ -1384,7 +1391,7 @@
   name        : Sean Madsen
   organization: Left Join Labs
   jira        : seanmadsen
-  
+
 - github      : semseysandor
   name        : Sandor Semsey
   organization: ES-Progress
@@ -1508,7 +1515,6 @@
   organization: Registered Nurses' Association of Ontario
   jira        : tom.m
 
-
 - name        : Torrance Hodgson
   jira        : torrance123
 
@@ -1545,6 +1551,10 @@
 - name        : Tunbola Ogunwande
   organization: CompuCorp
   jira        : tunbola@compucorp.co.uk
+
+- github      : twocs
+  name        : Tom Anderson
+  organization: Flinders University of South Australia
 
 - github      : twomice
   name        : Allen Shaw
