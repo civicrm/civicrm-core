@@ -192,6 +192,7 @@ class CRM_Core_CodeGen_Specification {
     $sourceFile = "xml/schema/{$base}/{$klass}.xml";
     $daoPath = "{$base}/DAO/";
     $baoPath = __DIR__ . '/../../../' . str_replace(' ', '', "{$base}/BAO/");
+    $useBao = $this->value('useBao', $tableXML, file_exists($baoPath . $klass . '.php'));
     $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
 
@@ -213,7 +214,7 @@ class CRM_Core_CodeGen_Specification {
       'icon' => $tableXML->icon ?? NULL,
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
-      'bao' => (file_exists($baoPath . $klass . '.php') ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
+      'bao' => ($useBao ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
       'entity' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
