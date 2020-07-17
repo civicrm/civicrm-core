@@ -2,21 +2,18 @@
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\AbstractEntity;
-use Civi\Api4\Generic\BasicGetAction;
-use Civi\Api4\Generic\BasicGetFieldsAction;
-
 /**
  * Class AfformPalette
  * @package Civi\Api4
  */
-class AfformPalette extends AbstractEntity {
+class AfformPalette extends Generic\AbstractEntity {
 
   /**
-   * @return BasicGetAction
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetAction
    */
-  public static function get() {
-    return new BasicGetAction('AfformPalette', __FUNCTION__, function (BasicGetAction $action) {
+  public static function get($checkPermissions = TRUE) {
+    return (new Generic\BasicGetAction('AfformPalette', __FUNCTION__, function() {
       return [
         [
           'id' => 'Parent:afl-name',
@@ -31,11 +28,15 @@ class AfformPalette extends AbstractEntity {
           'template' => '<afl-address contact-id="entities.parent.id" afl-label="Address"/>',
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
-  public static function getFields() {
-    return new BasicGetFieldsAction('Afform', __FUNCTION__, function() {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction('AfformPalette', __FUNCTION__, function() {
       return [
         [
           'name' => 'id',
@@ -50,7 +51,7 @@ class AfformPalette extends AbstractEntity {
           'name' => 'template',
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**

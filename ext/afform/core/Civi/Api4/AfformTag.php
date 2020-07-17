@@ -1,21 +1,18 @@
 <?php
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\AbstractEntity;
-use Civi\Api4\Generic\BasicGetAction;
-use Civi\Api4\Generic\BasicGetFieldsAction;
-
 /**
  * Class AfformTag
  * @package Civi\Api4
  */
-class AfformTag extends AbstractEntity {
+class AfformTag extends Generic\AbstractEntity {
 
   /**
-   * @return BasicGetAction
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetAction
    */
-  public static function get() {
-    return new BasicGetAction('AfformTag', __FUNCTION__, function (BasicGetAction $action) {
+  public static function get($checkPermissions = TRUE) {
+    return (new Generic\BasicGetAction('AfformTag', __FUNCTION__, function() {
       return [
         [
           'name' => 'afl-entity',
@@ -30,11 +27,15 @@ class AfformTag extends AbstractEntity {
           'attrs' => ['contact-id', 'afl-label'],
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
-  public static function getFields() {
-    return new BasicGetFieldsAction('Afform', __FUNCTION__, function() {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction('AfformTag', __FUNCTION__, function() {
       return [
         [
           'name' => 'name',
@@ -43,7 +44,7 @@ class AfformTag extends AbstractEntity {
           'name' => 'attrs',
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**

@@ -2,9 +2,7 @@
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\AbstractEntity;
 use Civi\Api4\Generic\BasicBatchAction;
-use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * User-configurable forms.
@@ -20,55 +18,68 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
  * @see https://lab.civicrm.org/extensions/afform
  * @package Civi\Api4
  */
-class Afform extends AbstractEntity {
+class Afform extends Generic\AbstractEntity {
 
   /**
-   * @return \Civi\Api4\Action\Afform\Get
+   * @param bool $checkPermissions
+   * @return Action\Afform\Get
    */
-  public static function get() {
-    return new \Civi\Api4\Action\Afform\Get('Afform', __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Afform\Get('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Action\Afform\Create
+   * @param bool $checkPermissions
+   * @return Action\Afform\Create
    */
-  public static function create() {
-    return new \Civi\Api4\Action\Afform\Create('Afform', __FUNCTION__);
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\Afform\Create('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Action\Afform\Update
+   * @param bool $checkPermissions
+   * @return Action\Afform\Update
    */
-  public static function update() {
-    return new \Civi\Api4\Action\Afform\Update('Afform', __FUNCTION__, 'name');
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\Afform\Update('Afform', __FUNCTION__, 'name'))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Action\Afform\Save
+   * @param bool $checkPermissions
+   * @return Action\Afform\Save
    */
-  public static function save() {
-    return new \Civi\Api4\Action\Afform\Save('Afform', __FUNCTION__, 'name');
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\Afform\Save('Afform', __FUNCTION__, 'name'))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Action\Afform\Prefill
+   * @param bool $checkPermissions
+   * @return Action\Afform\Prefill
    */
-  public static function prefill() {
-    return new \Civi\Api4\Action\Afform\Prefill('Afform', __FUNCTION__);
+  public static function prefill($checkPermissions = TRUE) {
+    return (new Action\Afform\Prefill('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Action\Afform\Submit
+   * @param bool $checkPermissions
+   * @return Action\Afform\Submit
    */
-  public static function submit() {
-    return new \Civi\Api4\Action\Afform\Submit('Afform', __FUNCTION__);
+  public static function submit($checkPermissions = TRUE) {
+    return (new Action\Afform\Submit('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return \Civi\Api4\Generic\BasicBatchAction
+   * @param bool $checkPermissions
+   * @return Generic\BasicBatchAction
    */
-  public static function revert() {
-    return new BasicBatchAction('Afform', __FUNCTION__, ['name'], function($item, BasicBatchAction $action) {
+  public static function revert($checkPermissions = TRUE) {
+    return (new BasicBatchAction('Afform', __FUNCTION__, ['name'], function($item, BasicBatchAction $action) {
       $scanner = \Civi::service('afform_scanner');
       $files = [
         \CRM_Afform_AfformScanner::METADATA_FILE,
@@ -91,11 +102,15 @@ class Afform extends AbstractEntity {
       // FIXME if asset-caching is enabled, then flush the asset cache
 
       return $item;
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
-  public static function getFields() {
-    return new BasicGetFieldsAction('Afform', __FUNCTION__, function($self) {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__, function($self) {
       $fields = [
         [
           'name' => 'name',
@@ -151,7 +166,7 @@ class Afform extends AbstractEntity {
       }
 
       return $fields;
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**
