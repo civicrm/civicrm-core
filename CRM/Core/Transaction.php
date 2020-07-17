@@ -14,7 +14,6 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
- * $Id$
  *
  * (Note: This has been considerably rewritten; the interface is preserved
  * for backward compatibility.)
