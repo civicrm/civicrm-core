@@ -49,8 +49,7 @@ class FkJoinTest extends UnitTestCase {
    * loaded from the data set.
    */
   public function testThreeLevelJoin() {
-    $results = Activity::get()
-      ->setCheckPermissions(FALSE)
+    $results = Activity::get(FALSE)
       ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
 
@@ -60,11 +59,10 @@ class FkJoinTest extends UnitTestCase {
   public function testOptionalJoin() {
     // DefaultDataSet includes 2 phones for contact 1, 0 for contact 2.
     // We'll add one for contact 2 as a red herring to make sure we only get back the correct ones.
-    Phone::create()->setCheckPermissions(FALSE)
+    Phone::create(FALSE)
       ->setValues(['contact_id' => $this->getReference('test_contact_2')['id'], 'phone' => '123456'])
       ->execute();
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addJoin('Phone', FALSE)
       ->addSelect('id', 'phone.phone')
       ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id']])
@@ -77,8 +75,7 @@ class FkJoinTest extends UnitTestCase {
 
   public function testRequiredJoin() {
     // Joining with no condition
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone')
       ->addJoin('Phone', TRUE)
       ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
@@ -89,8 +86,7 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[1]['id']);
 
     // Add is_primary condition, should result in only one record
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addSelect('id', 'phone.phone', 'phone.location_type_id')
       ->addJoin('Phone', TRUE, ['phone.is_primary', '=', TRUE])
       ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
@@ -103,14 +99,14 @@ class FkJoinTest extends UnitTestCase {
   }
 
   public function testJoinToTheSameTableTwice() {
-    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+    $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('email1', Email::create()->setValues(['email' => 'yoohoo@yahoo.test', 'contact_id' => '$id', 'location_type_id:name' => 'Home']))
       ->addChain('email2', Email::create()->setValues(['email' => 'yahoo@yoohoo.test', 'contact_id' => '$id', 'location_type_id:name' => 'Work']))
       ->execute()
       ->first()['id'];
 
-    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+    $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'Bbb')
       ->addChain('email1', Email::create()->setValues(['email' => '1@test.test', 'contact_id' => '$id', 'location_type_id:name' => 'Home']))
       ->addChain('email2', Email::create()->setValues(['email' => '2@test.test', 'contact_id' => '$id', 'location_type_id:name' => 'Work']))
@@ -118,13 +114,12 @@ class FkJoinTest extends UnitTestCase {
       ->execute()
       ->first()['id'];
 
-    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+    $cid3 = Contact::create(FALSE)
       ->addValue('first_name', 'Ccc')
       ->execute()
       ->first()['id'];
 
-    $contacts = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contacts = Contact::get(FALSE)
       ->addSelect('id', 'first_name', 'any_email.email', 'any_email.location_type_id:name', 'any_email.is_primary', 'primary_email.email')
       ->addJoin('Email AS any_email', TRUE)
       ->addJoin('Email AS primary_email', FALSE, ['primary_email.is_primary', '=', TRUE])

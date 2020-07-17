@@ -31,7 +31,7 @@ use Civi\Api4\Contact;
 class GetExtraFieldsTest extends UnitTestCase {
 
   public function testGetFieldsByContactType() {
-    $getFields = Contact::getFields()->setCheckPermissions(FALSE)->addSelect('name')->setIncludeCustom(FALSE);
+    $getFields = Contact::getFields(FALSE)->addSelect('name')->setIncludeCustom(FALSE);
 
     $baseFields = array_column(\CRM_Contact_BAO_Contact::fields(), 'name');
     $returnedFields = $getFields->execute()->column('name');
@@ -53,7 +53,7 @@ class GetExtraFieldsTest extends UnitTestCase {
   }
 
   public function testGetOptionsAddress() {
-    $getFields = Address::getFields()->setCheckPermissions(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
+    $getFields = Address::getFields(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
 
     $usOptions = $getFields->setValues(['country_id' => 1228])->execute()->first();
 

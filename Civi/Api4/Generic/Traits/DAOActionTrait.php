@@ -221,8 +221,7 @@ trait DAOActionTrait {
     list($groupName, $fieldName) = explode('.', $name);
     list($fieldName, $suffix) = array_pad(explode(':', $fieldName), 2, NULL);
     if (empty(\Civi::$statics['APIv4_Custom_Fields'][$groupName])) {
-      \Civi::$statics['APIv4_Custom_Fields'][$groupName] = (array) CustomField::get()
-        ->setCheckPermissions(FALSE)
+      \Civi::$statics['APIv4_Custom_Fields'][$groupName] = (array) CustomField::get(FALSE)
         ->addSelect('id', 'name', 'html_type', 'custom_group.extends')
         ->addWhere('custom_group.name', '=', $groupName)
         ->execute()->indexBy('name');

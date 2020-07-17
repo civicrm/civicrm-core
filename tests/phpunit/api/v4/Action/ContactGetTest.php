@@ -73,21 +73,21 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       ->setValues(['first_name' => 'Dan', 'last_name' => $last_name])
       ->execute()->first();
 
-    $num = Contact::get()->setCheckPermissions(FALSE)->selectRowCount()->execute()->count();
+    $num = Contact::get(FALSE)->selectRowCount()->execute()->count();
 
     // The object's count() method will account for all results, ignoring limit & offset, while the array results are limited
-    $offset1 = Contact::get()->setCheckPermissions(FALSE)->setOffset(1)->execute();
+    $offset1 = Contact::get(FALSE)->setOffset(1)->execute();
     $this->assertCount($num, $offset1);
     $this->assertCount($num - 1, (array) $offset1);
-    $offset2 = Contact::get()->setCheckPermissions(FALSE)->setOffset(2)->execute();
+    $offset2 = Contact::get(FALSE)->setOffset(2)->execute();
     $this->assertCount($num - 2, (array) $offset2);
     $this->assertCount($num, $offset2);
     // With limit, it doesn't fetch total count by default
-    $limit2 = Contact::get()->setCheckPermissions(FALSE)->setLimit(2)->execute();
+    $limit2 = Contact::get(FALSE)->setLimit(2)->execute();
     $this->assertCount(2, (array) $limit2);
     $this->assertCount(2, $limit2);
     // With limit, you have to trigger the full row count manually
-    $limit2 = Contact::get()->setCheckPermissions(FALSE)->setLimit(2)->addSelect('sort_name', 'row_count')->execute();
+    $limit2 = Contact::get(FALSE)->setLimit(2)->addSelect('sort_name', 'row_count')->execute();
     $this->assertCount(2, (array) $limit2);
     $this->assertCount($num, $limit2);
   }

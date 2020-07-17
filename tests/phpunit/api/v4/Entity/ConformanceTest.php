@@ -70,7 +70,7 @@ class ConformanceTest extends UnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getEntitiesHitech() {
-    return $this->toDataProviderArray(Entity::get()->setCheckPermissions(FALSE)->execute()->column('name'));
+    return $this->toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
   }
 
   /**
@@ -140,8 +140,7 @@ class ConformanceTest extends UnitTestCase {
    * @param string $entity
    */
   protected function checkFields($entityClass, $entity) {
-    $fields = $entityClass::getFields()
-      ->setCheckPermissions(FALSE)
+    $fields = $entityClass::getFields(FALSE)
       ->setIncludeCustom(FALSE)
       ->execute()
       ->indexBy('name');
@@ -158,8 +157,7 @@ class ConformanceTest extends UnitTestCase {
    * @return array
    */
   protected function checkActions($entityClass) {
-    $actions = $entityClass::getActions()
-      ->setCheckPermissions(FALSE)
+    $actions = $entityClass::getActions(FALSE)
       ->execute()
       ->indexBy('name');
 
@@ -196,8 +194,7 @@ class ConformanceTest extends UnitTestCase {
   protected function checkUpdateFailsFromCreate($entityClass, $id) {
     $exceptionThrown = '';
     try {
-      $entityClass::create()
-        ->setCheckPermissions(FALSE)
+      $entityClass::create(FALSE)
         ->addValue('id', $id)
         ->execute();
     }
@@ -213,8 +210,7 @@ class ConformanceTest extends UnitTestCase {
    * @param string $entity
    */
   protected function checkGet($entityClass, $id, $entity) {
-    $getResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 
@@ -229,16 +225,14 @@ class ConformanceTest extends UnitTestCase {
    * @param string $entity
    */
   protected function checkGetCount($entityClass, $id, $entity) {
-    $getResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->selectRowCount()
       ->execute();
     $errMsg = sprintf('%s getCount failed', $entity);
     $this->assertEquals(1, $getResult->count(), $errMsg);
 
-    $getResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getResult = $entityClass::get(FALSE)
       ->selectRowCount()
       ->execute();
     $errMsg = sprintf('%s getCount failed', $entity);
@@ -282,8 +276,7 @@ class ConformanceTest extends UnitTestCase {
    * @param int $id
    */
   protected function checkDeletion($entityClass, $id) {
-    $deleteResult = $entityClass::delete()
-      ->setCheckPermissions(FALSE)
+    $deleteResult = $entityClass::delete(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 
@@ -297,8 +290,7 @@ class ConformanceTest extends UnitTestCase {
    * @param string $entity
    */
   protected function checkPostDelete($entityClass, $id, $entity) {
-    $getDeletedResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getDeletedResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 

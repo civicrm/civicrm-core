@@ -50,7 +50,7 @@ trait CRMTraits_Custom_CustomDataTrait {
       'max_multiple' => 0,
     ], $params);
     $identifier = $params['name'] ?? $params['title'];
-    $this->ids['CustomGroup'][$identifier] = CustomGroup::create()->setCheckPermissions(FALSE)->setValues($params)->execute()->first()['id'];
+    $this->ids['CustomGroup'][$identifier] = CustomGroup::create(FALSE)->setValues($params)->execute()->first()['id'];
     return $this->ids['CustomGroup'][$identifier];
   }
 
