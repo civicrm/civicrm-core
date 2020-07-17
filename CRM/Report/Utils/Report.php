@@ -209,10 +209,6 @@ WHERE  inst.report_id = %1";
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
     CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
-    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
-    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
-    // and it continues to work on Libre Office, Numbers, Notes etc.
-    echo "\xEF\xBB\xBF";
     echo self::makeCsv($form, $rows);
     CRM_Utils_System::civiExit();
   }
@@ -228,7 +224,11 @@ WHERE  inst.report_id = %1";
    */
   public static function makeCsv(&$form, &$rows) {
     $config = CRM_Core_Config::singleton();
-    $csv = '';
+
+    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
+    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
+    // and it continues to work on Libre Office, Numbers, Notes etc.
+    $csv = "\xEF\xBB\xBF";
 
     // Add headers if this is the first row.
     $columnHeaders = array_keys($form->_columnHeaders);

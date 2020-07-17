@@ -155,6 +155,12 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
     try {
       $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+      // @todo But...doesn't this mean this test can't ever notify you of a
+      // fail? I think what you could do instead is right here in the try
+      // section throw something that doesn't get caught, since then that means
+      // the previous line passed and so the arrays ARE equal, which means
+      // something is wrong. Or just don't use assertCsvArraysEqual and
+      // explicity compare that they are NOT equal.
     }
     catch (PHPUnit\Framework\AssertionFailedError $e) {
       /* OK */

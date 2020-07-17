@@ -261,7 +261,11 @@ class CRM_Utils_Mail {
         $msg->addAttachment(
           $attach['fullPath'],
           $attach['mime_type'],
-          $attach['cleanName']
+          $attach['cleanName'],
+          TRUE,
+          'base64',
+          'attachment',
+          (isset($attach['charset']) ? $attach['charset'] : '')
         );
       }
     }
