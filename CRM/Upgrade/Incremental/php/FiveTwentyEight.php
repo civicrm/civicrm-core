@@ -66,8 +66,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
   }
 
   public static function populateMissingContactTypeName() {
-    $contactTypes = \Civi\Api4\ContactType::get()
-      ->setCheckPermissions(FALSE)
+    $contactTypes = \Civi\Api4\ContactType::get(FALSE)
       ->execute();
     foreach ($contactTypes as $contactType) {
       if (empty($contactType['name'])) {

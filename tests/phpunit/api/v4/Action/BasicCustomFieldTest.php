@@ -32,15 +32,13 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
   public function testWithSingleField() {
 
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('name', 'MyIndividualFields')
       ->addValue('extends', 'Individual')
       ->execute()
       ->first();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
@@ -48,13 +46,12 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute();
 
     // Individual fields should show up when contact_type = null|Individual but not other contact types
-    $getFields = Contact::getFields()->setCheckPermissions(FALSE);
+    $getFields = Contact::getFields(FALSE);
     $this->assertContains('MyIndividualFields.FavColor', $getFields->execute()->column('name'));
     $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
     $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Household'])->execute()->column('name'));
 
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -62,8 +59,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
@@ -78,8 +74,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addValue('MyIndividualFields.FavColor', 'Blue')
       ->execute();
 
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
       ->execute()
@@ -91,8 +86,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
   public function testWithTwoFields() {
 
     // First custom set
-    CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
@@ -108,8 +102,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute();
 
     // Second custom set
-    CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields2')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
@@ -124,8 +117,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
         ->addValue('data_type', 'String'))
       ->execute();
 
-    $contactId1 = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId1 = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('MyContactFields.FavColor', 'Red')
@@ -133,8 +125,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    $contactId2 = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId2 = Contact::create(FALSE)
       ->addValue('first_name', 'MaryLou')
       ->addValue('last_name', 'Tester')
       ->addValue('MyContactFields.FavColor', 'Purple')
@@ -142,8 +133,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('MyContactFields.FavColor')
       ->addSelect('MyContactFields.FavFood')
@@ -162,8 +152,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addValue('MyContactFields2.FavColor', 'Orange')
       ->addValue('MyContactFields2.FavFood', 'Tangerine')
       ->execute();
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
       ->addWhere('id', '=', $contactId1)
       ->execute()
@@ -178,8 +167,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addWhere('id', '=', $contactId1)
       ->addValue('MyContactFields.FavColor', 'Blue')
       ->execute();
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
       ->addWhere('id', '=', $contactId1)
       ->execute()
@@ -189,8 +177,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
     $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->addClause('OR', ['MyContactFields.FavColor', '=', 'Blue'], ['MyContactFields.FavFood', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
@@ -199,8 +186,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertEquals([$contactId1, $contactId2], array_keys((array) $search));
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->addClause('NOT', ['MyContactFields.FavColor', '=', 'Purple'], ['MyContactFields.FavFood', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
@@ -209,8 +195,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertNotContains($contactId2, array_keys((array) $search));
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->addClause('NOT', ['MyContactFields.FavColor', '=', 'Purple'], ['MyContactFields.FavFood', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
@@ -220,8 +205,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertContains($contactId1, array_keys((array) $search));
     $this->assertNotContains($contactId2, array_keys((array) $search));
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->setWhere([['NOT', ['OR', [['MyContactFields.FavColor', '=', 'Blue'], ['MyContactFields.FavFood', '=', 'Grapes']]]]])
       ->addSelect('id')
       ->addOrderBy('id')

@@ -349,8 +349,7 @@ AND        v.name = %1
     }
 
     foreach ($fields_indexed_by_group_id as $group_id => $fields) {
-      \Civi\Api4\CustomField::save()
-        ->setCheckPermissions(FALSE)
+      \Civi\Api4\CustomField::save(FALSE)
         ->setDefaults(['custom_group_id' => $group_id])
         ->setRecords(json_decode(json_encode($fields), TRUE))
         ->execute();

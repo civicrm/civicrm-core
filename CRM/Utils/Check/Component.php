@@ -35,7 +35,7 @@ abstract class CRM_Utils_Check_Component {
     if (empty($this->checksConfig)) {
       $this->checksConfig = Civi::cache('checks')->get('checksConfig', []);
       if (empty($this->checksConfig)) {
-        $this->checksConfig = StatusPreference::get()->setCheckPermissions(FALSE)->execute()->indexBy('name');
+        $this->checksConfig = StatusPreference::get(FALSE)->execute()->indexBy('name');
       }
     }
     return $this->checksConfig;

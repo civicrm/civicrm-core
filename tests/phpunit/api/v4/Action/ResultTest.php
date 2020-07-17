@@ -30,7 +30,7 @@ use api\v4\UnitTestCase;
 class ResultTest extends UnitTestCase {
 
   public function testJsonSerialize() {
-    $result = Contact::getFields()->setCheckPermissions(FALSE)->setIncludeCustom(FALSE)->execute();
+    $result = Contact::getFields(FALSE)->setIncludeCustom(FALSE)->execute();
     $json = json_encode($result);
     $this->assertStringStartsWith('[{"', $json);
     $this->assertTrue(is_array(json_decode($json)));

@@ -208,8 +208,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchParams($id) {
-    $savedSearch = \Civi\Api4\SavedSearch::get()
-      ->setCheckPermissions(FALSE)
+    $savedSearch = \Civi\Api4\SavedSearch::get(FALSE)
       ->addWhere('id', '=', $id)
       ->execute()
       ->first();

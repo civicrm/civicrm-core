@@ -44,7 +44,7 @@ class SchemaMapBuilder {
    */
   public function __construct(EventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->apiEntities = array_keys((array) Entity::get()->setCheckPermissions(FALSE)->addSelect('name')->execute()->indexBy('name'));
+    $this->apiEntities = array_keys((array) Entity::get(FALSE)->addSelect('name')->execute()->indexBy('name'));
   }
 
   /**

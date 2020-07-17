@@ -36,7 +36,7 @@ use Civi\Api4\Tag;
 class PseudoconstantTest extends BaseCustomValueTest {
 
   public function testOptionValue() {
-    $cid = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
+    $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
     $subject = uniqid('subject');
     OptionValue::create()
       ->addValue('option_group_id:name', 'activity_type')
@@ -99,7 +99,7 @@ class PseudoconstantTest extends BaseCustomValueTest {
   }
 
   public function testAddressOptions() {
-    $cid = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'addr')->execute()->first()['id'];
+    $cid = Contact::create(FALSE)->addValue('first_name', 'addr')->execute()->first()['id'];
     Address::save()
       ->addRecord([
         'contact_id' => $cid,
@@ -153,8 +153,7 @@ class PseudoconstantTest extends BaseCustomValueTest {
       ['id' => 'b', 'name' => 'blue', 'label' => 'BLUE', 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
     ];
 
-    CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', 'myPseudoconstantTest')
       ->addValue('extends', 'Individual')
       ->addChain('field1', CustomField::create()
@@ -181,14 +180,12 @@ class PseudoconstantTest extends BaseCustomValueTest {
       }
     }
 
-    $cid = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $cid = Contact::create(FALSE)
       ->addValue('first_name', 'col')
       ->addValue('myPseudoconstantTest.Color:label', 'blü')
       ->execute()->first()['id'];
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addWhere('id', '=', $cid)
       ->addSelect('myPseudoconstantTest.Color:name', 'myPseudoconstantTest.Color:label', 'myPseudoconstantTest.Color')
       ->execute()->first();
@@ -197,27 +194,23 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $this->assertEquals('bl_', $result['myPseudoconstantTest.Color:name']);
     $this->assertEquals('b', $result['myPseudoconstantTest.Color']);
 
-    $cid1 = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'two')
       ->addValue('myPseudoconstantTest.Technicolor:label', 'RED')
       ->execute()->first()['id'];
-    $cid2 = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'two')
       ->addValue('myPseudoconstantTest.Technicolor:label', 'GREEN')
       ->execute()->first()['id'];
 
     // Test ordering by label
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addWhere('id', 'IN', [$cid1, $cid2])
       ->addSelect('id')
       ->addOrderBy('myPseudoconstantTest.Technicolor:label')
       ->execute()->first()['id'];
     $this->assertEquals($cid2, $result);
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addWhere('id', 'IN', [$cid1, $cid2])
       ->addSelect('id')
       ->addOrderBy('myPseudoconstantTest.Technicolor:label', 'DESC')
@@ -226,17 +219,17 @@ class PseudoconstantTest extends BaseCustomValueTest {
   }
 
   public function testJoinOptions() {
-    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+    $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Tom')
       ->addValue('gender_id:label', 'Male')
       ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'tom@example.com', 'location_type_id:name' => 'Work']))
       ->execute()->first()['id'];
-    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+    $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'Sue')
       ->addValue('gender_id:name', 'Female')
       ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'sue@example.com', 'location_type_id:name' => 'Home']))
       ->execute()->first()['id'];
-    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+    $cid3 = Contact::create(FALSE)
       ->addValue('first_name', 'Pat')
       ->addChain('email', Email::create()->setValues(['contact_id' => '$id', 'email' => 'pat@example.com', 'location_type_id:name' => 'Home']))
       ->execute()->first()['id'];
@@ -266,7 +259,7 @@ class PseudoconstantTest extends BaseCustomValueTest {
 
   public function testTagOptions() {
     $tag = uniqid('tag');
-    Tag::create()->setCheckPermissions(FALSE)
+    Tag::create(FALSE)
       ->addValue('name', $tag)
       ->addValue('description', 'colorful')
       ->addValue('color', '#aabbcc')

@@ -73,11 +73,11 @@ abstract class AbstractSettingAction extends \Civi\Api4\Generic\AbstractAction {
 
   protected function findDomains() {
     if ($this->domainId == 'all') {
-      $this->domainId = Domain::get()->setCheckPermissions(FALSE)->addSelect('id')->execute()->column('id');
+      $this->domainId = Domain::get(FALSE)->addSelect('id')->execute()->column('id');
     }
     elseif ($this->domainId) {
       $this->domainId = (array) $this->domainId;
-      $domains = Domain::get()->setCheckPermissions(FALSE)->addSelect('id')->execute()->column('id');
+      $domains = Domain::get(FALSE)->addSelect('id')->execute()->column('id');
       $invalid = array_diff($this->domainId, $domains);
       if ($invalid) {
         throw new \API_Exception('Invalid domain id: ' . implode(', ', $invalid));
