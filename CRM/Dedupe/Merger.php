@@ -598,8 +598,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function filterRowBasedCustomDataFromCustomTables(array &$cidRefs) {
-    $customTables = (array) CustomGroup::get()
-      ->setCheckPermissions(FALSE)
+    $customTables = (array) CustomGroup::get(FALSE)
       ->setSelect(['table_name'])
       ->addWhere('is_multiple', '=', 0)
       ->addWhere('extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::contactTypes()))

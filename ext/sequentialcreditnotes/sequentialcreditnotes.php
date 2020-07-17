@@ -32,7 +32,7 @@ function sequentialcreditnotes_civicrm_pre($op, $objectName, $id, &$params) {
     $reversalStatuses = ['Cancelled', 'Chargeback', 'Refunded'];
     if (empty($params['creditnote_id']) && in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']), $reversalStatuses, TRUE)) {
       if ($id) {
-        $existing = Contribution::get()->setCheckPermissions(FALSE)->addWhere('id', '=', (int) $id)->setSelect(['creditnote_id'])->execute()->first();
+        $existing = Contribution::get(FALSE)->addWhere('id', '=', (int) $id)->setSelect(['creditnote_id'])->execute()->first();
         if ($existing['creditnote_id']) {
           // Since we have it adding it makes is clearer.
           $params['creditnote_id'] = $existing['creditnote_id'];

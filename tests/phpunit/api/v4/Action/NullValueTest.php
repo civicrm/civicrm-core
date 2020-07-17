@@ -35,8 +35,7 @@ class NullValueTest extends UnitTestCase {
   }
 
   public function testStringNull() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Joseph')
       ->addValue('last_name', 'null')
       ->addValue('contact_type', 'Individual')
@@ -48,8 +47,7 @@ class NullValueTest extends UnitTestCase {
   }
 
   public function testSettingToNull() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'ILoveMy')
       ->addValue('last_name', 'LastName')
       ->addValue('contact_type', 'Individual')
@@ -59,8 +57,7 @@ class NullValueTest extends UnitTestCase {
     $this->assertSame('ILoveMy LastName', $contact['display_name']);
     $contactId = $contact['id'];
 
-    $contact = Contact::update()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::update(FALSE)
       ->addWhere('id', '=', $contactId)
       ->addValue('last_name', NULL)
       ->execute()
@@ -71,15 +68,13 @@ class NullValueTest extends UnitTestCase {
   }
 
   public function testSaveWithReload() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Firsty')
       ->addValue('last_name', 'Lasty')
       ->execute()
       ->first();
 
-    $activity = Activity::create()
-      ->setCheckPermissions(FALSE)
+    $activity = Activity::create(FALSE)
       ->addValue('source_contact_id', $contact['id'])
       ->addValue('activity_type_id', 1)
       ->addValue('subject', 'hello')
@@ -88,8 +83,7 @@ class NullValueTest extends UnitTestCase {
 
     $this->assertEquals('hello', $activity['subject']);
 
-    $saved = Activity::save()
-      ->setCheckPermissions(FALSE)
+    $saved = Activity::save(FALSE)
       ->addRecord(['id' => $activity['id'], 'subject' => NULL])
       ->execute()
       ->first();
@@ -97,8 +91,7 @@ class NullValueTest extends UnitTestCase {
     $this->assertNull($saved['subject']);
     $this->assertArrayNotHasKey('activity_date_time', $saved);
 
-    $saved = Activity::save()
-      ->setCheckPermissions(FALSE)
+    $saved = Activity::save(FALSE)
       ->addRecord(['id' => $activity['id'], 'subject' => NULL])
       ->setReload(TRUE)
       ->execute()

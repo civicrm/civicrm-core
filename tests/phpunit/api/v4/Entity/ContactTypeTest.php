@@ -49,8 +49,7 @@ class ContactTypeTest extends UnitTestCase {
       ->setCheckPermissions(FALSE)
       ->execute()->first()['id'];
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addSelect('*', 'prefix_id:label')
       ->addWhere('id', 'IN', [$indiv, $org, $hh])
       ->execute()
@@ -76,8 +75,7 @@ class ContactTypeTest extends UnitTestCase {
     $this->assertArrayNotHasKey('household_name', $result[$org]);
     $this->assertArrayNotHasKey('household_name', $result[$indiv]);
 
-    $emails = Email::get()
-      ->setCheckPermissions(FALSE)
+    $emails = Email::get(FALSE)
       ->addWhere('contact_id', 'IN', [$indiv, $org, $hh])
       ->addSelect('id', 'contact_id', 'contact.*', 'contact.prefix_id:label')
       ->execute()
