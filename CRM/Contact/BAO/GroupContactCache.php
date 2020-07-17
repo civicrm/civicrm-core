@@ -314,36 +314,19 @@ WHERE  id IN ( $groupIDs )
       return;
     }
     $params = [1 => [self::getCacheInvalidDateTime(), 'String']];
-    // @todo this is consistent with previous behaviour but as the first query could take several seconds the second
-    // could become inaccurate. It seems to make more sense to fetch them first & delete from an array (which would
-    // also reduce joins). If we do this we should also consider how best to iterate the groups. If we do them one at
-    // a time we could call a hook, allowing people to manage the frequency on their groups, or possibly custom searches
-    // might do that too. However, for 2000 groups that's 2000 iterations. If we do all once we potentially create a
-    // slow query. It's worth noting the speed issue generally relates to the size of the group but if one slow group
-    // is in a query with 500 fast ones all 500 get locked. One approach might be to calculate group size or the
-    // number of groups & then process all at once or many query runs depending on what is found. Of course those
-    // preliminary queries would need speed testing.
-    CRM_Core_DAO::executeQuery(
-      "
-        DELETE gc
-        FROM civicrm_group_contact_cache gc
-        INNER JOIN civicrm_group g ON g.id = gc.group_id
-        WHERE g.cache_date <= %1
-      ",
-      $params
-    );
+    $groupsDAO = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_group WHERE cache_date <= %1", $params);
+    $expiredGroups = [];
+    while ($groupsDAO->fetch()) {
+      $expiredGroups[] = $groupsDAO->id;
+    }
+    if (!empty($expiredGroups)) {
+      $expiredGroups = implode(',', $expiredGroups);
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_group_contact_cache WHERE group_id IN ({$expiredGroups})");
 
-    // Clear these out without resetting them because we are not building caches here, only clearing them,
-    // so the state is 'as if they had never been built'.
-    CRM_Core_DAO::executeQuery(
-      "
-        UPDATE civicrm_group g
-        SET    cache_date = NULL,
-        refresh_date = NULL
-        WHERE  g.cache_date <= %1
-      ",
-      $params
-    );
+      // Clear these out without resetting them because we are not building caches here, only clearing them,
+      // so the state is 'as if they had never been built'.
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL, refresh_date = NULL WHERE id IN ({$expiredGroups})");
+    }
     $lock->release();
   }
 
@@ -396,9 +379,7 @@ WHERE  id IN ( $groupIDs )
   public static function deterministicCacheFlush() {
     if (self::smartGroupCacheTimeout() == 0) {
       CRM_Core_DAO::executeQuery("TRUNCATE civicrm_group_contact_cache");
-      CRM_Core_DAO::executeQuery("
-        UPDATE civicrm_group g
-        SET cache_date = null, refresh_date = null");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL, refresh_date = NULL");
     }
     else {
       self::flushCaches();
