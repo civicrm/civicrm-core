@@ -385,42 +385,48 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     self::createRelatedMemberships($params, $membership);
 
-    // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
-      $url = CRM_Utils_System::url('civicrm/contact/view/membership',
-        "action=view&reset=1&id={$membership->id}&cid={$membership->contact_id}&context=home"
-      );
-      if (empty($membership->membership_type_id)) {
-        // ie in an update situation.
-        $membership->find(TRUE);
-      }
-      $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-      $title = CRM_Contact_BAO_Contact::displayName($membership->contact_id) . ' - ' . ts('Membership Type:') . ' ' . $membershipTypes[$membership->membership_type_id];
-
-      $recentOther = [];
-      if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::UPDATE)) {
-        $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
-          "action=update&reset=1&id={$membership->id}&cid={$membership->contact_id}&context=home"
-        );
-      }
-      if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::DELETE)) {
-        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
-          "action=delete&reset=1&id={$membership->id}&cid={$membership->contact_id}&context=home"
-        );
-      }
-
-      // add the recently created Membership
-      CRM_Utils_Recent::add($title,
-        $url,
-        $membership->id,
-        'Membership',
-        $membership->contact_id,
-        NULL,
-        $recentOther
-      );
+      self::addToRecentItems($membership);
     }
 
     return $membership;
+  }
+
+  /**
+   * @param \CRM_Member_DAO_Membership $membership
+   */
+  private static function addToRecentItems($membership) {
+    $url = CRM_Utils_System::url('civicrm/contact/view/membership',
+      "action=view&reset=1&id={$membership->id}&cid={$membership->contact_id}&context=home"
+    );
+    if (empty($membership->membership_type_id)) {
+      // ie in an update situation.
+      $membership->find(TRUE);
+    }
+    $membershipTypes = CRM_Member_PseudoConstant::membershipType();
+    $title = CRM_Contact_BAO_Contact::displayName($membership->contact_id) . ' - ' . ts('Membership Type:') . ' ' . $membershipTypes[$membership->membership_type_id];
+
+    $recentOther = [];
+    if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::UPDATE)) {
+      $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+        "action=update&reset=1&id={$membership->id}&cid={$membership->contact_id}&context=home"
+      );
+    }
+    if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::DELETE)) {
+      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
+        "action=delete&reset=1&id={$membership->id}&cid={$membership->contact_id}&context=home"
+      );
+    }
+
+    // add the recently created Membership
+    CRM_Utils_Recent::add($title,
+      $url,
+      $membership->id,
+      'Membership',
+      $membership->contact_id,
+      NULL,
+      $recentOther
+    );
   }
 
   /**
