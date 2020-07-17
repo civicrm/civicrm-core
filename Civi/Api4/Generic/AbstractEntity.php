@@ -47,10 +47,12 @@ use Civi\Api4\Utils\ReflectionUtils;
 abstract class AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return \Civi\Api4\Action\GetActions
    */
-  public static function getActions() {
-    return new \Civi\Api4\Action\GetActions(self::getEntityName(), __FUNCTION__);
+  public static function getActions($checkPermissions = TRUE) {
+    return (new \Civi\Api4\Action\GetActions(self::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
@@ -94,7 +96,7 @@ abstract class AbstractEntity {
    * Magic method to return the action object for an api.
    *
    * @param string $action
-   * @param null $args
+   * @param array $args
    * @return AbstractAction
    * @throws NotImplementedException
    */
@@ -104,6 +106,9 @@ abstract class AbstractEntity {
     $entityAction = "\\Civi\\Api4\\Action\\$entity\\" . ucfirst($action);
     if (class_exists($entityAction)) {
       $actionObject = new $entityAction($entity, $action);
+      if (isset($args[0]) && $args[0] === FALSE) {
+        $actionObject->setCheckPermissions(FALSE);
+      }
     }
     else {
       throw new NotImplementedException("Api $entity $action version 4 does not exist.");

@@ -14,13 +14,9 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 namespace Civi\Api4;
-
-use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * CiviCRM menu route.
@@ -36,10 +32,11 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
 class Route extends \Civi\Api4\Generic\AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return \Civi\Api4\Generic\BasicGetAction
    */
-  public static function get() {
-    return new \Civi\Api4\Generic\BasicGetAction(__CLASS__, __FUNCTION__, function ($get) {
+  public static function get($checkPermissions = TRUE) {
+    return (new \Civi\Api4\Generic\BasicGetAction(__CLASS__, __FUNCTION__, function ($get) {
       // Pulling from ::items() rather than DB -- because it provides the final/live/altered data.
       $items = \CRM_Core_Menu::items();
       $result = [];
@@ -47,11 +44,15 @@ class Route extends \Civi\Api4\Generic\AbstractEntity {
         $result[] = ['path' => $path] + $item;
       }
       return $result;
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
-  public static function getFields() {
-    return new BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
       return [
         [
           'name' => 'path',
@@ -90,7 +91,7 @@ class Route extends \Civi\Api4\Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**

@@ -33,7 +33,6 @@ use Civi\Api4\Utils\ReflectionUtils;
  *  - Expose the param in the Api Explorer (be sure to add a doc-block as it displays in the help panel).
  *  - Require a value for the param if you add the "@required" annotation.
  *
- * @method $this setCheckPermissions(bool $value) Enable/disable permission checks
  * @method bool getCheckPermissions()
  * @method $this setDebug(bool $value) Enable/disable debug output
  * @method bool getDebug()
@@ -171,6 +170,15 @@ abstract class AbstractAction implements \ArrayAccess {
     if ($val !== 4 && $val !== '4') {
       throw new \API_Exception('Cannot modify api version');
     }
+    return $this;
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return $this
+   */
+  public function setCheckPermissions(bool $checkPermissions) {
+    $this->checkPermissions = $checkPermissions;
     return $this;
   }
 

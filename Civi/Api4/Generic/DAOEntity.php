@@ -18,56 +18,66 @@ namespace Civi\Api4\Generic;
 abstract class DAOEntity extends AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return DAOGetAction
-   *
-   * @throws \API_Exception
    */
-  public static function get() {
-    return new DAOGetAction(static::class, __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new DAOGetAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOSaveAction
    */
-  public static function save() {
-    return new DAOSaveAction(static::class, __FUNCTION__);
+  public static function save($checkPermissions = TRUE) {
+    return (new DAOSaveAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOGetFieldsAction
    */
-  public static function getFields() {
-    return new DAOGetFieldsAction(static::class, __FUNCTION__);
+  public static function getFields($checkPermissions = TRUE) {
+    return (new DAOGetFieldsAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOCreateAction
-   *
-   * @throws \API_Exception
    */
-  public static function create() {
-    return new DAOCreateAction(static::class, __FUNCTION__);
+  public static function create($checkPermissions = TRUE) {
+    return (new DAOCreateAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOUpdateAction
    */
-  public static function update() {
-    return new DAOUpdateAction(static::class, __FUNCTION__);
+  public static function update($checkPermissions = TRUE) {
+    return (new DAOUpdateAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAODeleteAction
    */
-  public static function delete() {
-    return new DAODeleteAction(static::class, __FUNCTION__);
+  public static function delete($checkPermissions = TRUE) {
+    return (new DAODeleteAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return BasicReplaceAction
    */
-  public static function replace() {
-    return new BasicReplaceAction(static::class, __FUNCTION__);
+  public static function replace($checkPermissions = TRUE) {
+    return (new BasicReplaceAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
