@@ -152,20 +152,6 @@ abstract class CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
-    if (!\Civi\Core\Container::isContainerBooted()) {
-      $prebootHooks = ['civicrm_container', 'civicrm_entityTypes'];
-      // 'civicrm_config' ?
-      if (in_array($fnSuffix, $prebootHooks)) {
-        $count = is_array($names) ? count($names) : $names;
-        return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
-      }
-      else {
-        // TODO: Emit a warning, eg
-        // error_log("Warning: hook_$fnSuffix fired prematurely. Dropped.");
-        return;
-      }
-    }
-
     if (!is_array($names)) {
       // We were called with the old contract wherein $names is actually an int.
       // Symfony dispatcher requires some kind of name.
