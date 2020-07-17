@@ -149,10 +149,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $this->assign('emailTask', TRUE);
 
     $toArray = [];
-    $suppressedEmails = 0;
+    $submittedToEmails = $this->_submitValues['to'] ?? [];
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $this->get('cid');
-    if ($cid) {
+    if ($cid && empty($submittedToEmails)) {
       $this->_contactIds = explode(',', $cid);
     }
     if (count($this->_contactIds) > 1) {
@@ -163,7 +163,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $emailAttributes = [
       'class' => 'huge',
     ];
-    $to = $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
+    $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
 
     $this->addEntityRef('cc_id', ts('CC'), [
       'entity' => 'Email',
@@ -175,9 +175,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
       'multiple' => TRUE,
     ]);
 
-    if ($to->getValue()) {
-      $this->_toContactIds = $this->_contactIds = [];
-    }
     $setDefaults = TRUE;
     if (property_exists($this, '_context') && $this->_context === 'standalone') {
       $setDefaults = FALSE;
@@ -185,8 +182,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
 
-    if ($to->getValue()) {
-      foreach ($this->getEmails($to) as $value) {
+    if (!empty($submittedToEmails)) {
+      foreach ($this->getEmails($submittedToEmails) as $value) {
         $contactId = $value['contact_id'];
         $email = $value['email'];
         if ($contactId) {
@@ -505,12 +502,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
   /**
    * Get the emails from the added element.
    *
-   * @param HTML_QuickForm_Element $element
+   * @param array $allEmails
    *
    * @return array
    */
-  protected function getEmails($element): array {
-    $allEmails = explode(',', $element->getValue());
+  protected function getEmails($allEmails): array {
     $return = [];
     foreach ($allEmails as $value) {
       $values = explode('::', $value);
