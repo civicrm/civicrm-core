@@ -1,44 +1,11 @@
 # eventcart
 
-![Screenshot](/images/screenshot.png)
-
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+This extracts most of the event cart functionality into an extension.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
-## Requirements
+## Remaining work
 
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
-
-## Installation (Web UI)
-
-This extension has not yet been published for installation via the web UI.
-
-## Installation (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl eventcart@https://github.com/FIXME/eventcart/archive/master.zip
-```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://github.com/FIXME/eventcart.git
-cv en eventcart
-```
-
-## Usage
-
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
-
-## Known Issues
-
-(* FIXME *)
+1. Move CRM_Event_Cart_DAO_Cart and CRM_Event_Cart_DAO_EventInCart from CiviCRM core (see https://github.com/civicrm/civicrm-core/pull/17339 for details).
+1. There are various places in CiviCRM which still check the setting `enable_cart`. These should be moved to this extension.
+1. The "Conference Slots" functionality is only enabled if Event Cart is enabled so that should be moved into this extension too.
