@@ -73,7 +73,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         if ($onlyPublicGroups && $group['visibility'] == 'User and User Admin Only') {
           continue;
         }
-        $allGroups[$group['id']] = $group;
+        $allGroups[$id] = $group;
       }
     }
     else {
