@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
 
@@ -291,20 +289,20 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         AND entity_financial_trxn_item.entity_table = 'civicrm_financial_item'
       INNER JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn_1']}
         ON {$this->_aliases['civicrm_financial_trxn_1']}.to_financial_account_id = {$this->_aliases['civicrm_financial_account']}.id
-        AND {$this->_aliases['civicrm_financial_trxn_1']}.id =  entity_financial_trxn_item.financial_trxn_id 
+        AND {$this->_aliases['civicrm_financial_trxn_1']}.id =  entity_financial_trxn_item.financial_trxn_id
       INNER JOIN civicrm_entity_financial_trxn financial_trxn_contribution
         ON financial_trxn_contribution.financial_trxn_id = {$this->_aliases['civicrm_financial_trxn_1']}.id
         AND financial_trxn_contribution.entity_table = 'civicrm_contribution'
       INNER JOIN civicrm_entity_financial_trxn entity_financial_trxn_contribution
         ON entity_financial_trxn_contribution.entity_id = {$this->_aliases['civicrm_financial_item']}.id
-        AND entity_financial_trxn_contribution.entity_table = 'civicrm_financial_item'  
+        AND entity_financial_trxn_contribution.entity_table = 'civicrm_financial_item'
       INNER JOIN civicrm_financial_trxn {$this->_aliases['civicrm_financial_trxn']}
         ON {$this->_aliases['civicrm_financial_trxn']}.id = entity_financial_trxn_contribution.financial_trxn_id
         AND ({$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id NOT IN (" . implode(',', array_keys($this->_deferredFinancialAccount)) . ")
         OR {$this->_aliases['civicrm_financial_trxn']}.from_financial_account_id IS NULL)
       INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
         ON {$this->_aliases['civicrm_contribution']}.id = financial_trxn_contribution.entity_id
-      INNER JOIN civicrm_line_item line_item 
+      INNER JOIN civicrm_line_item line_item
         ON line_item.contribution_id = {$this->_aliases['civicrm_contribution']}.id
         AND line_item.financial_type_id = entity_financial_account_deferred.entity_id
       LEFT JOIN civicrm_participant {$this->_aliases['civicrm_participant']}

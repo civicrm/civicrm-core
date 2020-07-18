@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
  *   - All temp tables start with "civicrm_tmp".

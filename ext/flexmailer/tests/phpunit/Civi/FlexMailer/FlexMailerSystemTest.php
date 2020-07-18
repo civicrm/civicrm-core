@@ -13,7 +13,7 @@ namespace Civi\FlexMailer;
 /**
  * Test that content produced by CiviMail looks the way it's expected.
  *
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */

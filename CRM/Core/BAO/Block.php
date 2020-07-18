@@ -10,11 +10,10 @@
  */
 
 /**
+ * Add static functions to include some common functionality used across location sub object BAO classes.
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
- * Add static functions to include some common functionality used across location sub object BAO classes.
  */
 class CRM_Core_BAO_Block {
 

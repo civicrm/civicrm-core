@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
 

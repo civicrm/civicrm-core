@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Page_ParticipantListing_NameAndEmail extends CRM_Event_Page_ParticipantListing_Simple {
 
