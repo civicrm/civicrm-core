@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Activity;
+
 /**
  *
  * @package CRM
@@ -461,6 +463,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return CRM_Contribute_BAO_Contribution
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -512,26 +515,33 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     $transaction->commit();
 
-    $activity = civicrm_api3('Activity', 'get', [
-      'source_record_id' => $contribution->id,
-      'options' => ['limit' => 1],
-      'sequential' => 1,
-      'activity_type_id' => 'Contribution',
-      'return' => ['id', 'campaign'],
-    ]);
-
-    //CRM-18406: Update activity when edit contribution.
-    if ($activity['count']) {
-      // CRM-13237 : if activity record found, update it with campaign id of contribution
-      // @todo compare campaign ids first.
-      CRM_Core_DAO::setFieldValue('CRM_Activity_BAO_Activity', $activity['id'], 'campaign_id', $contribution->campaign_id);
-      $contribution->activity_id = $activity['id'];
-    }
-
     if (empty($contribution->contact_id)) {
       $contribution->find(TRUE);
     }
-    CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution');
+
+    $isCompleted = ('Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id));
+    if (!empty($params['on_behalf'])
+      ||  $isCompleted
+    ) {
+      $existingActivity = Activity::get(FALSE)->setWhere([
+        ['source_record_id', '=', $contribution->id],
+        ['activity_type_id:name', '=', 'Contribution'],
+      ])->execute()->first();
+
+      $campaignParams = isset($params['campaign_id']) ? ['campaign_id' => ($params['campaign_id'] ?? NULL)] : [];
+      Activity::save(FALSE)->addRecord(array_merge([
+        'activity_type_id:name' => 'Contribution',
+        'source_record_id' => $contribution->id,
+        'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ?: $contribution->contact_id,
+        'target_contact_id' => CRM_Core_Session::getLoggedInContactID() ? [$contribution->contact_id] : [],
+        'activity_date_time' => $contribution->receive_date,
+        'is_test' => (bool) $contribution->is_test,
+        'status_id:name' => $isCompleted ? 'Completed' : 'Scheduled',
+        'skipRecentView' => TRUE,
+        'subject' => CRM_Activity_BAO_Activity::getActivitySubject($contribution),
+        'id' => $existingActivity['id'] ?? NULL,
+      ], $campaignParams))->execute();
+    }
 
     // do not add to recent items for import, CRM-4399
     if (empty($params['skipRecentView'])) {
@@ -4549,7 +4559,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
 
-    CRM_Core_Error::debug_log_message("Contribution record updated successfully");
+    CRM_Core_Error::debug_log_message('Contribution record updated successfully');
     $transaction->commit();
 
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
