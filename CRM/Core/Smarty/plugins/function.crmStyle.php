@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC
- * $Id$
  *
  */
 
