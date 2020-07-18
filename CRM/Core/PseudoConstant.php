@@ -953,6 +953,23 @@ WHERE  id = %1";
   }
 
   /**
+   * Name => Label pairs for all relationship types
+   *
+   * @return array
+   */
+  public static function relationshipTypeOptions() {
+    $relationshipTypes = [];
+    $relationshipLabels = self::relationshipType();
+    foreach (self::relationshipType('name') as $id => $type) {
+      $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
+      if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
+        $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];
+      }
+    }
+    return $relationshipTypes;
+  }
+
+  /**
    * Get all the ISO 4217 currency codes
    *
    * so far, we use this for validation only, so there's no point of putting this into the database
