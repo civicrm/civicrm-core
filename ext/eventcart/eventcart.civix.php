@@ -6,10 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_Eventcart_ExtensionUtil {
+class CRM_Event_Cart_ExtensionUtil {
   const SHORT_NAME = "eventcart";
   const LONG_NAME = "eventcart";
-  const CLASS_PREFIX = "CRM_Eventcart";
+  const CLASS_PREFIX = "CRM_Event_Cart";
 
   /**
    * Translate a string using the extension's domain.
@@ -77,7 +77,7 @@ class CRM_Eventcart_ExtensionUtil {
 
 }
 
-use CRM_Eventcart_ExtensionUtil as E;
+use CRM_Event_Cart_ExtensionUtil as E;
 
 /**
  * (Delegated) Implements hook_civicrm_config().
@@ -206,14 +206,14 @@ function _eventcart_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 }
 
 /**
- * @return CRM_Eventcart_Upgrader
+ * @return CRM_Event_Cart_Upgrader
  */
 function _eventcart_civix_upgrader() {
-  if (!file_exists(__DIR__ . '/CRM/Eventcart/Upgrader.php')) {
+  if (!file_exists(__DIR__ . '/CRM/Event/Cart/Upgrader.php')) {
     return NULL;
   }
   else {
-    return CRM_Eventcart_Upgrader_Base::instance();
+    return CRM_Event_Cart_Upgrader_Base::instance();
   }
 }
 
