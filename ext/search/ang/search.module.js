@@ -69,7 +69,7 @@
           }
           result.field = getField(fieldName);
           var split = fieldName.split(':'),
-            prefixPos = split[0].indexOf(result.field.name);
+            prefixPos = split[0].lastIndexOf(result.field.name);
           result.path = split[0];
           result.prefix = prefixPos > 0 ? result.path.substring(0, prefixPos) : '';
           result.suffix = !split[1] ? '' : ':' + split[1];

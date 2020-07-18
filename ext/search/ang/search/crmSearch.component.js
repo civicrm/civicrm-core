@@ -166,7 +166,12 @@
           ctrl.stale = true;
           ctrl.debug = error.debug;
           $scope.error = errorMsg(error);
-        });
+        })
+          .finally(function() {
+            if (ctrl.debug) {
+              ctrl.debug.params = JSON.stringify(ctrl.params, null, 2);
+            }
+          });
       }
 
       var _loadResults = _.debounce(_loadResultsCallback, 250);
