@@ -12,7 +12,6 @@
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 
 if (defined('PANTHEON_ENVIRONMENT')) {

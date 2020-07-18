@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
 

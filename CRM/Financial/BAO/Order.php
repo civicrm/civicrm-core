@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Order class.
  *
  * This class is intended to become the object to manage orders, including via Order.api.

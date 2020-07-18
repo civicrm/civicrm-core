@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  * Utilities for rendering numbers as English.
  *
  * Note: This file may be used in a standalone environment. Please ensure it

@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 // vim: set si ai expandtab tabstop=4 shiftwidth=4 softtabstop=4:
