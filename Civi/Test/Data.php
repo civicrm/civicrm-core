@@ -32,6 +32,7 @@ class Data {
       if (\Civi\Test::execute($query2) === FALSE) {
         throw new RuntimeException("Cannot load civicrm_data.mysql. Aborting.");
       }
+      print_r(\Civi\Test::pdo()->query("SELECT id, version FROM civicrm_domain")->fetchAll());
       if (\Civi\Test::execute($query3) === FALSE) {
         throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
       }
