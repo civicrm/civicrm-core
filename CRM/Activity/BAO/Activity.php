@@ -2132,93 +2132,90 @@ AND cl.modified_id  = c.id
     self::$_exportableFields[$name] = [];
 
     // TODO: ideally we should retrieve all fields from xml, in this case since activity processing is done
-    // my case hence we have defined fields as case_*
-    if ($name === 'Activity') {
-      $exportableFields = CRM_Activity_DAO_Activity::export();
-      $exportableFields['source_contact_id'] = [
-        'title' => ts('Source Contact ID'),
-        'type' => CRM_Utils_Type::T_INT,
-      ];
-      $exportableFields['source_contact'] = [
-        'title' => ts('Source Contact'),
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
+    $exportableFields = CRM_Activity_DAO_Activity::export();
+    $exportableFields['source_contact_id'] = [
+      'title' => ts('Source Contact ID'),
+      'type' => CRM_Utils_Type::T_INT,
+    ];
+    $exportableFields['source_contact'] = [
+      'title' => ts('Source Contact'),
+      'type' => CRM_Utils_Type::T_STRING,
+    ];
 
-      // @todo - remove these - they are added by CRM_Core_DAO::appendPseudoConstantsToFields
-      // below. That search label stuff is referenced in search builder but is likely just
-      // a hack that duplicates, maybe differently, other functionality.
-      $activityFields = [
-        'activity_type' => [
-          'title' => ts('Activity Type'),
-          'name' => 'activity_type',
-          'type' => CRM_Utils_Type::T_STRING,
-          'searchByLabel' => TRUE,
-        ],
-        'activity_status' => [
-          'title' => ts('Activity Status'),
-          'name' => 'activity_status',
-          'type' => CRM_Utils_Type::T_STRING,
-          'searchByLabel' => TRUE,
-        ],
-        'activity_priority' => [
-          'title' => ts('Activity Priority'),
-          'name' => 'activity_priority',
-          'type' => CRM_Utils_Type::T_STRING,
-          'searchByLabel' => TRUE,
-        ],
-      ];
-      $fields = array_merge($activityFields, $exportableFields);
-      $fields['activity_type_id']['title'] = ts('Activity Type ID');
-      $fields['activity_priority_id'] = $fields['priority_id'];
-    }
-    else {
-      // Set title to activity fields.
-      $fields = [
-        'case_activity_subject' => [
-          'title' => ts('Activity Subject'),
-          'type' => CRM_Utils_Type::T_STRING,
-        ],
-        'case_source_contact_id' => [
-          'title' => ts('Activity Reporter'),
-          'type' => CRM_Utils_Type::T_STRING,
-        ],
-        'case_recent_activity_date' => [
-          'title' => ts('Activity Actual Date'),
-          'type' => CRM_Utils_Type::T_DATE,
-        ],
-        'case_scheduled_activity_date' => [
-          'title' => ts('Activity Scheduled Date'),
-          'type' => CRM_Utils_Type::T_DATE,
-        ],
-        'case_recent_activity_type' => [
-          'title' => ts('Activity Type'),
-          'type' => CRM_Utils_Type::T_STRING,
-        ],
-        'case_activity_status' => [
-          'title' => ts('Activity Status'),
-          'type' => CRM_Utils_Type::T_STRING,
-        ],
-        'case_activity_duration' => [
-          'title' => ts('Activity Duration'),
-          'type' => CRM_Utils_Type::T_INT,
-        ],
-        'case_activity_medium_id' => [
-          'title' => ts('Activity Medium'),
-          'type' => CRM_Utils_Type::T_INT,
-        ],
-        'case_activity_details' => [
-          'title' => ts('Activity Details'),
-          'type' => CRM_Utils_Type::T_LONGTEXT,
-        ],
-        'case_activity_is_auto' => [
-          'title' => ts('Activity Auto-generated?'),
-          'type' => CRM_Utils_Type::T_BOOLEAN,
-        ],
-      ];
-    }
+    // @todo - remove these - they are added by CRM_Core_DAO::appendPseudoConstantsToFields
+    // below. That search label stuff is referenced in search builder but is likely just
+    // a hack that duplicates, maybe differently, other functionality.
+    $activityFields = [
+      'activity_type' => [
+        'title' => ts('Activity Type'),
+        'name' => 'activity_type',
+        'type' => CRM_Utils_Type::T_STRING,
+        'searchByLabel' => TRUE,
+      ],
+      'activity_status' => [
+        'title' => ts('Activity Status'),
+        'name' => 'activity_status',
+        'type' => CRM_Utils_Type::T_STRING,
+        'searchByLabel' => TRUE,
+      ],
+      'activity_priority' => [
+        'title' => ts('Activity Priority'),
+        'name' => 'activity_priority',
+        'type' => CRM_Utils_Type::T_STRING,
+        'searchByLabel' => TRUE,
+      ],
+    ];
+    $fields = array_merge($activityFields, $exportableFields);
+    $fields['activity_type_id']['title'] = ts('Activity Type ID');
+    $fields['activity_priority_id'] = $fields['priority_id'];
+
+    // Now add "case_activity" fields
+    // Set title to activity fields.
+    $caseActivityFields = [
+      'case_activity_subject' => [
+        'title' => ts('Activity Subject'),
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'case_source_contact_id' => [
+        'title' => ts('Activity Reporter'),
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'case_recent_activity_date' => [
+        'title' => ts('Activity Actual Date'),
+        'type' => CRM_Utils_Type::T_DATE,
+      ],
+      'case_scheduled_activity_date' => [
+        'title' => ts('Activity Scheduled Date'),
+        'type' => CRM_Utils_Type::T_DATE,
+      ],
+      'case_recent_activity_type' => [
+        'title' => ts('Activity Type'),
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'case_activity_status' => [
+        'title' => ts('Activity Status'),
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'case_activity_duration' => [
+        'title' => ts('Activity Duration'),
+        'type' => CRM_Utils_Type::T_INT,
+      ],
+      'case_activity_medium_id' => [
+        'title' => ts('Activity Medium'),
+        'type' => CRM_Utils_Type::T_INT,
+      ],
+      'case_activity_details' => [
+        'title' => ts('Activity Details'),
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+      ],
+      'case_activity_is_auto' => [
+        'title' => ts('Activity Auto-generated?'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ],
+    ];
 
     // add custom data for case activities
-    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
+    $fields = array_merge($fields, $caseActivityFields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
     CRM_Core_DAO::appendPseudoConstantsToFields($fields);
     self::$_exportableFields[$name] = $fields;
     return self::$_exportableFields[$name];
