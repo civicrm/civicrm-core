@@ -56,11 +56,6 @@ class CRM_Utils_Money {
     }
 
     $config = CRM_Core_Config::singleton();
-
-    if (!$format) {
-      $format = $config->moneyformat;
-    }
-
     if (!$valueFormat) {
       $valueFormat = $config->moneyvalueformat;
     }
@@ -69,14 +64,29 @@ class CRM_Utils_Money {
       CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than !%i is deprecated, please report this on the GitLab Issue https://lab.civicrm.org/dev/core/-/issues/1494 with the relevant moneyValueFormat you use.');
     }
 
+    $currency = self::getCurrency($currency);
+    $moneyAmount = Money::of($amount, $currency);
+
     if ($onlyNumber) {
-      // money_format() exists only in certain PHP install (CRM-650)
-      if (is_numeric($amount) and function_exists('money_format')) {
-        $amount = money_format($valueFormat, $amount);
-      }
-      return $amount;
+      $formatter = new \NumberFormatter(CRM_Core_I18n::getLocale(), \NumberFormatter::CURRENCY);
+      $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, '');
+      $formatter->setSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, $config->monetaryThousandSeparator);
+      $formatter->setSymbol(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, $config->monetaryDecimalPoint);
+      $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, self::getCurrencyPrecision($currency));
+      return $moneyAmount->formatWith($formatter);
     }
 
+    return $moneyAmount->formatTo(CRM_Core_I18n::getLocale());
+  }
+
+  /**
+   * @param string|NULL $currency
+   *
+   * @return string
+   *   The currency (eg. USD)
+   * @throws \CRM_Core_Exception
+   */
+  private static function getCurrency($currency) {
     if (!self::$_currencySymbols) {
       self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
         'keyColumn' => 'name',
@@ -85,30 +95,20 @@ class CRM_Utils_Money {
     }
 
     if (!$currency) {
-      $currency = $config->defaultCurrency;
+      $currency = CRM_Core_Config::singleton()->defaultCurrency;
+      // for backwards-compatibility, also accept one space instead of a currency
+      if ($currency === ' ') {
+        // defaultCurrency setting default is 'USD'
+        $currency = 'USD';
+      }
     }
 
     // ensure $currency is a valid currency code
-    // for backwards-compatibility, also accept one space instead of a currency
-    if ($currency != ' ' && !array_key_exists($currency, self::$_currencySymbols)) {
+    if (!array_key_exists($currency, self::$_currencySymbols)) {
       throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
     }
 
-    $amount = self::formatNumericByFormat($amount, $valueFormat);
-    // If it contains tags, means that HTML was passed and the
-    // amount is already converted properly,
-    // so don't mess with it again.
-    // @todo deprecate handling for the html tags because .... WTF
-    if (strpos($amount, '<') === FALSE) {
-      $amount = self::replaceCurrencySeparators($amount);
-    }
-
-    $replacements = [
-      '%a' => $amount,
-      '%C' => $currency,
-      '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
-    ];
-    return strtr($format, $replacements);
+    return $currency;
   }
 
   /**
