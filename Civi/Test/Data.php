@@ -36,8 +36,12 @@ class Data {
         throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
       }
       if (\Civi\Test::execute($query4) === FALSE) {
-        throw new RuntimeException("Cannot load test_data.mysql. Aborting.");
+        throw new RuntimeException("Cannot load test_data_second_domain.mysql. Aborting.");
       }
+
+      // Set current domain version
+      $version = \CRM_Utils_System::version();
+      \Civi\Test::execute("UPDATE civicrm_domain SET version = '$version';");
 
       unset($query, $query2, $query3);
 
