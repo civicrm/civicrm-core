@@ -1016,4 +1016,36 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     CRM_Utils_System::civiExit();
   }
 
+  /**
+   * Start a new session if there's no existing session ID.
+   *
+   * Checks are needed to prevent sessions being started when not necessary.
+   */
+  public function sessionStart() {
+    $session_id = session_id();
+
+    // Check WordPress pseudo-cron.
+    $wp_cron = FALSE;
+    if (function_exists('wp_doing_cron') && wp_doing_cron()) {
+      $wp_cron = TRUE;
+    }
+
+    // Check WP-CLI.
+    $wp_cli = FALSE;
+    if (defined('WP_CLI') && WP_CLI) {
+      $wp_cli = TRUE;
+    }
+
+    // Check PHP on the command line - e.g. `cv`.
+    $php_cli = TRUE;
+    if (PHP_SAPI !== 'cli') {
+      $php_cli = FALSE;
+    }
+
+    // Maybe start session.
+    if (empty($session_id) && !$wp_cron && !$wp_cli && !$php_cli) {
+      session_start();
+    }
+  }
+
 }
