@@ -2147,7 +2147,7 @@ AND cl.modified_id  = c.id
       // @todo - remove these - they are added by CRM_Core_DAO::appendPseudoConstantsToFields
       // below. That search label stuff is referenced in search builder but is likely just
       // a hack that duplicates, maybe differently, other functionality.
-      $Activityfields = [
+      $activityFields = [
         'activity_type' => [
           'title' => ts('Activity Type'),
           'name' => 'activity_type',
@@ -2167,8 +2167,9 @@ AND cl.modified_id  = c.id
           'searchByLabel' => TRUE,
         ],
       ];
-      $fields = array_merge($Activityfields, $exportableFields);
+      $fields = array_merge($activityFields, $exportableFields);
       $fields['activity_type_id']['title'] = ts('Activity Type ID');
+      $fields['activity_priority_id'] = $fields['priority_id'];
     }
     else {
       // Set title to activity fields.

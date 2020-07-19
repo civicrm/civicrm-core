@@ -520,8 +520,6 @@ class CRM_Contact_BAO_Query {
         $this->_fields,
         CRM_Activity_BAO_Activity::exportableFields(CRM_Contact_Form_Search::getModeValue($this->_mode)['entity'])
       );
-      // Add hack as no unique name is defined for the field but the search form is in denial.
-      $this->_fields['activity_priority_id'] = $this->_fields['priority_id'];
 
       // add any fields provided by hook implementers
       $extFields = CRM_Contact_BAO_Query_Hook::singleton()->getFields();
