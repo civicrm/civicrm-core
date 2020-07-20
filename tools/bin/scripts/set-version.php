@@ -71,8 +71,12 @@ updateFile("sql/civicrm_generated.mysql", function ($content) use ($newVersion, 
   return str_replace($oldVersion, $newVersion, $content);
 });
 
+updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVersion, $oldVersion) {
+  return str_replace($oldVersion, $newVersion, $content);
+});
+
 if ($doCommit) {
-  $files = "xml/version.xml sql/civicrm_generated.mysql " . escapeshellarg($phpFile) . ' ' . escapeshellarg($sqlFile);
+  $files = "xml/version.xml sql/civicrm_generated.mysql sql/test_data_second_domain.mysql " . escapeshellarg($phpFile) . ' ' . escapeshellarg($sqlFile);
   passthru("git add $files");
   passthru("git commit $files -m " . escapeshellarg("Set version to $newVersion"));
 }
