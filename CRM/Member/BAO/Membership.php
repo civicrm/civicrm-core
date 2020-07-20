@@ -897,13 +897,11 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @return array
    *   array of importable Fields
+   * @throws \CRM_Core_Exception
    */
-  public static function &importableFields($contactType = 'Individual', $status = TRUE) {
-    if (!self::$_importableFields) {
-      if (!self::$_importableFields) {
-        self::$_importableFields = [];
-      }
-
+  public static function importableFields($contactType = 'Individual', $status = TRUE) {
+    $fields = Civi::cache('fields')->get('membership_importable_fields' . $contactType . $status);
+    if (!$fields) {
       if (!$status) {
         $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
       }
@@ -941,16 +939,16 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
         }
       }
       $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
-      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . " " . ts('(match to contact)');
+      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
 
-      $tmpFields['membership_contact_id']['title'] = $tmpFields['membership_contact_id']['title'] . " " . ts('(match to contact)');
+      $tmpFields['membership_contact_id']['title'] .= ' ' . ts('(match to contact)');
 
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
-      self::$_importableFields = $fields;
+      Civi::cache('fields')->set('membership_importable_fields' . $contactType . $status, $fields);
     }
-    return self::$_importableFields;
+    return $fields;
   }
 
   /**

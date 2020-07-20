@@ -1217,6 +1217,7 @@ Expires: ',
    * @param int $contactId Id of contact on which the memberships will be created.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function createTwoMembershipsViaPriceSetInBackEnd($contactId) {
     $form = $this->getForm();
