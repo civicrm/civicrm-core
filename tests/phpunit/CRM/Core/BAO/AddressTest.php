@@ -15,6 +15,8 @@
  */
 class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   public function setUp() {
     parent::setUp();
 
@@ -592,6 +594,54 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     // CRM-21214 - AdressA shouldn't be master of itself.
     $this->assertEmpty($updatedAddressA->master_id);
+  }
+
+  /**
+   * dev/core#1670 - Ensure that the custom fields on adresses are copied
+   * to inherited address
+   * 1. test the creation of the shared address with custom field
+   * 2. test the update of the custom field in the master
+   */
+  public function testSharedAddressCustomField() {
+
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'text');
+    $customField = $this->getCustomFieldName('text');
+
+    $contactIdA = $this->individualCreate([], 0);
+    $contactIdB = $this->individualCreate([], 1);
+
+    $addressParamsA = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+      $customField => 'this is a custom text field',
+    ];
+
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    // without having the custom field, we should still copy the values from master
+    $addressParamsB = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addAddressA->id,
+      'contact_id' => $contactIdB,
+    ];
+    $addAddressB = CRM_Core_BAO_Address::add($addressParamsB, FALSE);
+
+    // 1. check if the custom fields values have been copied from master to shared address
+    $address = $this->callAPISuccessGetSingle('Address', ['id' => $addAddressB->id, 'return' => $this->getCustomFieldName('text')]);
+    $this->assertEquals($addressParamsA[$customField], $address[$customField]);
+
+    // 2. now, we update addressA custom field to see if it goes into addressB
+    $addressParamsA['id'] = $addAddressA->id;
+    $addressParamsA[$customField] = 'updated custom text field';
+    $addAddressA = CRM_Core_BAO_Address::add($addressParamsA, FALSE);
+
+    $address = $this->callAPISuccessGetSingle('Address', ['id' => $addAddressB->id, 'return' => $this->getCustomFieldName('text')]);
+    $this->assertEquals($addressParamsA[$customField], $address[$customField]);
+
   }
 
 }
