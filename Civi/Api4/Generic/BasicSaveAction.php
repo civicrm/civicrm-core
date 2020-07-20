@@ -32,8 +32,7 @@ class BasicSaveAction extends AbstractSaveAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicCreateAction $thisAction) => array
+   *   Function(array $item, BasicCreateAction $thisAction): array
    */
   private $setter;
 
@@ -44,7 +43,6 @@ class BasicSaveAction extends AbstractSaveAction {
    * @param string $actionName
    * @param string $idField
    * @param callable $setter
-   *   Function(array $item, BasicCreateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $idField = 'id', $setter = NULL) {
     parent::__construct($entityName, $actionName, $idField);

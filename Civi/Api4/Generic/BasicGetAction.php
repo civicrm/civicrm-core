@@ -32,8 +32,7 @@ class BasicGetAction extends AbstractGetAction {
 
   /**
    * @var callable
-   *
-   * Function(BasicGetAction $thisAction) => array<array>
+   *   Function(BasicGetAction $thisAction): array[]
    */
   private $getter;
 
@@ -63,14 +62,15 @@ class BasicGetAction extends AbstractGetAction {
   }
 
   /**
-   * This Basic Get class is a general-purpose api for non-DAO-based entities.
+   * BasicGet is a general-purpose get action for non-DAO-based entities.
    *
    * Useful for fetching records from files or other places.
-   * You can specify any php function to retrieve the records, and this class will
-   * automatically filter, sort, select & limit the raw data from your callback.
+   * Specify any php function to retrieve the records, and this class will
+   * automatically filter, sort, select & limit the raw data from the callback.
    *
-   * You can implement this action in one of two ways:
-   * 1. Use this class directly by passing a callable ($getter) to the constructor.
+   * This action is implemented in one of two ways:
+   * 1. Invoke this class directly by passing a callable ($getter) to the constructor. BasicEntity does this by default.
+   *    The function is passed a copy of $this action as it's first argument.
    * 2. Extend this class and override this function.
    *
    * Either way, this function should return an array of arrays, each representing one retrieved object.

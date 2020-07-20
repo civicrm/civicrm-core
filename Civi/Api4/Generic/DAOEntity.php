@@ -13,7 +13,17 @@
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for DAO-based entities.
+ * Base class for DAO entities (sql tables).
+ *
+ * This is one of 3 possible base classes for an APIv4 Entity
+ * (the others are `BasicEntity` and `AbstractEntity`).
+ *
+ * This base class is used for entities that have an associated DAO and support CRUD operations.
+ *
+ * Entities that extend this class can override actions and add others on an ad-hoc basis.
+ *
+ * DAO entities which do not support all CRUD operations should instead extend AbstractEntity
+ * in order to implement just the actions appropriate to that entity.
  */
 abstract class DAOEntity extends AbstractEntity {
 
