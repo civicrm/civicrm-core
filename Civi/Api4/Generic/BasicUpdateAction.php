@@ -30,8 +30,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicUpdateAction $thisAction) => array
+   *   Function(array $item, BasicUpdateAction $thisAction): array
    */
   private $setter;
 
@@ -43,7 +42,6 @@ class BasicUpdateAction extends AbstractUpdateAction {
    * @param string|array $select
    *   One or more fields to select from each matching item.
    * @param callable $setter
-   *   Function(array $item, BasicUpdateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $select = 'id', $setter = NULL) {
     parent::__construct($entityName, $actionName, $select);
