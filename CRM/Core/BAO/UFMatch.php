@@ -171,12 +171,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    */
   public static function &synchronizeUFMatch(&$user, $userKey, $uniqId, $uf, $status = NULL, $ctype = NULL, $isLogin = FALSE) {
     $config = CRM_Core_Config::singleton();
-
-    if (!CRM_Utils_Rule::email($uniqId)) {
-      $retVal = $status ? NULL : FALSE;
-      return $retVal;
-    }
-
     $newContact = FALSE;
 
     // make sure that a contact id exists for this user id
