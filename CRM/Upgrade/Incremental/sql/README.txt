@@ -80,4 +80,4 @@ VALUES
     (@option_group_id_activity_type, {localize}'{ts escape="sql"}Change Custom Data{/ts}'{/localize},{localize}''{/localize}, (SELECT @max_val := @max_val+1), 'Change Custom Data', (SELECT @max_wt := @max_wt+1), 0, @caseCompId);
 
 ------------------------------------------------------------------------------
-More details on the wiki: http://wiki.civicrm.org/confluence/display/CRMDOC/Internationalisation+for+Developers#InternationalisationforDevelopers-Localisedfieldsschemachanges
+More details: https://docs.civicrm.org/dev/en/latest/translation/database/#localised-fields-schema-changes

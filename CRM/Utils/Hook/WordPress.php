@@ -80,13 +80,13 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
     // are incompatible with the WordPress Plugin API:
     //
     // civicrm_upgrade
-    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_upgrade
+    // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade/
     //
     // civicrm_caseSummary
-    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_caseSummary
+    // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseSummary/
     //
     // civicrm_dashboard
-    // http://wiki.civicrm.org/confluence/display/CRMDOC43/hook_civicrm_dashboard
+    // https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_dashboard/
 
     // distinguish between types of hook
     if (!in_array($fnSuffix, $this->hooksThatReturn)) {
