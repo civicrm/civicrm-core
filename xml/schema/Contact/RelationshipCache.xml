@@ -60,7 +60,9 @@
     <length>3</length>
     <title>Orientation (a_b or b_a)</title>
     <required>true</required>
-    <default></default>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::relationshipOrientation</callback>
+    </pseudoconstant>
     <comment>The cache record is a permutation of the original relationship record. The orientation indicates whether it is forward (a_b) or reverse (b_a) relationship.</comment>
     <add>5.29</add>
   </field>
@@ -72,6 +74,9 @@
     <required>true</required>
     <comment>id of the first contact</comment>
     <add>5.29</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
   </field>
   <foreignKey>
     <name>near_contact_id</name>
@@ -88,6 +93,9 @@
     <length>64</length>
     <comment>name for relationship of near_contact to far_contact.</comment>
     <add>5.29</add>
+    <pseudoconstant>
+      <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
+    </pseudoconstant>
   </field>
 
   <field>
@@ -116,6 +124,9 @@
     <length>64</length>
     <comment>name for relationship of far_contact to near_contact.</comment>
     <add>5.29</add>
+    <pseudoconstant>
+      <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
+    </pseudoconstant>
   </field>
 
   <index>

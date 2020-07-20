@@ -1194,4 +1194,14 @@ class CRM_Core_SelectValues {
     ];
   }
 
+  /**
+   * @return array
+   */
+  public static function relationshipOrientation() {
+    return [
+      'a_b' => ts('A to B'),
+      'b_a' => ts('B to A'),
+    ];
+  }
+
 }
