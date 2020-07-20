@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -10,22 +9,13 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-namespace Civi\Api4;
+namespace Civi\Api4\Generic;
 
 /**
- * DashboardContact entity.
+ * A bridge is a small table that provides an intermediary link between two other tables.
  *
- * This places a dashboard item on a user's home screen.
- *
- * @see \Civi\Api4\Dashboard
- * @package Civi\Api4
+ * The API can automatically incorporate a bridgeEntity into a join expression.
  */
-class DashboardContact extends Generic\BridgeEntity {
+class BridgeEntity extends DAOEntity {
 
 }

@@ -80,7 +80,7 @@ abstract class AbstractEntity {
    * @return string
    */
   protected static function getEntityName() {
-    return substr(static::class, strrpos(static::class, '\\') + 1);
+    return self::stripNamespace(static::class);
   }
 
   /**
@@ -126,11 +126,22 @@ abstract class AbstractEntity {
     $info = [
       'name' => static::getEntityName(),
       'title' => static::getEntityTitle(),
+      'type' => self::stripNamespace(get_parent_class(static::class)),
     ];
     $reflection = new \ReflectionClass(static::class);
     $info += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
     unset($info['package'], $info['method']);
     return $info;
+  }
+
+  /**
+   * Remove namespace prefix from a class name
+   *
+   * @param string $className
+   * @return string
+   */
+  private static function stripNamespace($className) {
+    return substr($className, strrpos($className, '\\') + 1);
   }
 
 }
