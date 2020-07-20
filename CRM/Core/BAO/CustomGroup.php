@@ -399,7 +399,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'time_format',
         'option_group_id',
         'in_selector',
-        'serialize',
       ],
       'custom_group' => [
         'id',
@@ -419,8 +418,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     ];
     $current_db_version = CRM_Core_DAO::singleValueQuery("SELECT version FROM civicrm_domain WHERE id = " . CRM_Core_Config::domainID());
     $is_public_version = $current_db_version >= '4.7.19' ? 1 : 0;
+    $serialize_version = version_compare($current_db_version, '5.27.alpha1', '>=');
     if ($is_public_version) {
       $tableData['custom_group'][] = 'is_public';
+    }
+    if ($serialize_version) {
+      $tableData['custom_field'][] = 'serialize';
     }
     if (!$toReturn || !is_array($toReturn)) {
       $toReturn = $tableData;
