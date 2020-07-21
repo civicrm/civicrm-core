@@ -26,8 +26,7 @@
             </div>
         {/if}
         <p><strong>{ts}Back up your database before continuing.{/ts}</strong>
-            {capture assign=docLink}{docURL page="Installation and Upgrades" text="Upgrade Documentation" style="text-decoration: underline;" resource="wiki"}{/capture}
-            {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
+            {ts}This process may change your database structure and values. In case of emergency you may need to revert to a backup.{/ts} {docURL page="sysadmin/upgrade"}</p>
         <input type="hidden" name="action" value="begin" />
         <button type="submit" class="crm-button" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" >
           <i class="crm-i fa-rocket" aria-hidden="true"></i>

@@ -56,7 +56,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
-      $this->assign('jobName', self::getJobName($this->_id)); 
+      $this->assign('jobName', self::getJobName($this->_id));
       $this->addButtons([
         [
           'type' => 'submit',
@@ -70,7 +70,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       ]);
       return;
     }
-        
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Job');
 
@@ -242,8 +241,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     // CRM-11143 - Give warning message if update_greetings is Enabled (is_active) since it generally should not be run automatically via execute action or runjobs url.
     if ($values['api_action'] == 'update_greeting' && CRM_Utils_Array::value('is_active', $values) == 1) {
-      // pass "wiki" as 6th param to docURL2 if you are linking to a page in wiki.civicrm.org
-      $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", NULL, NULL, NULL, NULL, "wiki");
+      $docLink = CRM_Utils_System::docURL2("user/initial-set-up/scheduled-jobs/#job_update_greeting");
       $msg = ts('The update greeting job can be very resource intensive and is typically not necessary to run on a regular basis. If you do choose to enable the job, we recommend you do not run it with the force=1 option, which would rebuild greetings on all records. Leaving that option absent, or setting it to force=0, will only rebuild greetings for contacts that do not currently have a value stored. %1', [1 => $docLink]);
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }

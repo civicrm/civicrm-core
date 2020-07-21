@@ -175,7 +175,7 @@ class CRM_Utils_Check {
    * This functon is wrapped by the System.check api.
    *
    * Calls hook_civicrm_check() for extensions to add or modify messages.
-   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_check
+   * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_check/
    *
    * @param bool $max
    *   Whether to return just the maximum non-hushed severity
