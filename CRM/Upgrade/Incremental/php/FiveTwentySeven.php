@@ -75,10 +75,8 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
   }
 
   public function priceFieldValueLabelRequired($ctx) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if ($domain->locales) {
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
       foreach ($locales as $locale) {
         CRM_Core_DAO::executeQuery("UPDATE civicrm_price_field_value SET label_{$locale} = '' WHERE label_{$locale} IS NULL", [], TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label_{$locale}` `label_{$locale}` varchar(255) NOT NULL   COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
@@ -92,10 +90,8 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
   }
 
   public function nameMembershipTypeRequired($ctx) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if ($domain->locales) {
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
       foreach ($locales as $locale) {
         CRM_Core_DAO::executeQuery("UPDATE civicrm_membership_type SET name_{$locale} = '' WHERE name_{$locale} IS NULL", [], TRUE, NULL, FALSE, FALSE);
         CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_membership_type CHANGE `name_{$locale}` `name_{$locale}` varchar(128) NOT NULL   COMMENT 'Name of Membership Type'", [], TRUE, NULL, FALSE, FALSE);
