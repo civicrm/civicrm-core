@@ -94,6 +94,13 @@ class CRM_Utils_Money {
       throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
     }
 
+    if ($currency === ' ') {
+      Civi::log()->warning(
+        'Specifying currency as a space is deprecated as a parameter for CRM_Utils_Money::format',
+        ['civi.tag' => 'deprecated']
+      );
+    }
+
     $amount = self::formatNumericByFormat($amount, $valueFormat);
     // If it contains tags, means that HTML was passed and the
     // amount is already converted properly,
