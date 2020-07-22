@@ -1,0 +1,33 @@
+{
+    "name": "civicrm/greenwich",
+    "authors": [
+      {
+        "name": "CiviCRM",
+        "homepage": "https://civicrm.org"
+      }
+    ],
+    "require": {
+        "civicrm/composer-downloads-plugin": "^2.1"
+    },
+    "extra": {
+        "downloads": {
+            "bootstrap3": {
+                "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
+                "path": "extern/bootstrap3",
+                "version": "3.4.1",
+                "ignore": ["test", "tasks", "lib"]
+            },
+            "bootstrap4": {
+                "url": "https://github.com/twbs/bootstrap/archive/v{$version}.zip",
+                "path": "extern/bootstrap4",
+                "version": "4.0.0",
+                "ignore": ["tests", "docs", "dist/css"]
+            }
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "7.1"
+        }
+    }
+}
