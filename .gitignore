@@ -3,6 +3,7 @@
 .use-civicrm-setup
 /ext/*
 !/ext/sequentialcreditnotes
+!/ext/csslib
 !/ext/flexmailer
 !/ext/eventcart
 !/ext/greenwich
