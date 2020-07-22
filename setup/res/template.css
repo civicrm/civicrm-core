@@ -130,6 +130,13 @@ body {
   font-size: 80%;
 }
 
+.civicrm-setup-body .install-validate-ok {
+  display: none;
+}
+
+.civicrm-setup-body .install-validate-bad {
+}
+
 .civicrm-setup-body .reqTable {
   border-collapse: collapse;
   width: 100%;
@@ -222,6 +229,10 @@ body {
 }
 .civicrm-setup-body input[type=submit]:hover {
   background: #60A237;
+}
+.civicrm-setup-body input[type=submit]:disabled {
+  background: #888;
+  cursor: not-allowed;
 }
 
 .civicrm-setup-body .settingsTable input[type=text] { width: 80%; }
