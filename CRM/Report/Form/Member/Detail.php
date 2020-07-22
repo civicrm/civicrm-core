@@ -335,7 +335,8 @@ HERESQL;
             if (!empty($regularOptions)) {
               $clauseParts[] = "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id IN ($regularOptions)";
             }
-            return '(' . implode(') OR (', $clauseParts) . ')';
+            // Double parentheses b/c ORs should be treated as a group
+            return '((' . implode(') OR (', $clauseParts) . '))';
           }
           return;
 
