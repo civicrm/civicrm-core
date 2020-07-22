@@ -5,6 +5,8 @@
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart
+!/ext/greenwich
+/ext/greenwich/extern
 !/ext/search
 !/ext/financialacls
 backdrop/
