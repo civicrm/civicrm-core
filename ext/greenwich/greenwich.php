@@ -5,6 +5,13 @@ require_once 'greenwich.civix.php';
 use CRM_Greenwich_ExtensionUtil as E;
 // phpcs:enable
 
+// REVERT ME - need better activation protocol
+//function greenwich_civicrm_coreResourceList(&$items, $region) {
+//  if ($region == 'html-header') {
+//    CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/bootstrap.css', -50, 'html-header');
+//  }
+//}
+
 /**
  * Implements hook_civicrm_config().
  *
@@ -97,8 +104,8 @@ function greenwich_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     $mimeType = 'text/css';
     $content = Civi::service('csslib.scss_compiler')->compile(
       // Apply prefix to all Bootstrap styles so that Greenwich plays nice with CMS themes.
-      '#bootstrap-theme { @import "bootstrap"; }',
-      [E::path('extern/bootstrap3/assets/stylesheets')]
+      '#bootstrap-theme { @import "greenwich"; @import "bootstrap"; }',
+      [E::path('extern/bootstrap3/assets/stylesheets'), E::path('scss')]
     );
   }
 }
