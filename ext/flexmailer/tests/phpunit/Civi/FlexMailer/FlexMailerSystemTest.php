@@ -8,19 +8,16 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
 namespace Civi\FlexMailer;
 
 /**
  * Test that content produced by CiviMail looks the way it's expected.
  *
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
- *
  */
-use Symfony\Component\EventDispatcher\Event;
 
-// For compat w/v4.6 phpunit
-require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class FlexMailerSystemTest
@@ -31,6 +28,7 @@ require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
  * checks that certain internal events/hooks fire.
  *
  * FlexMailerSystemTest is the counterpart to MailingSystemTest.
+ *
  * @group headless
  * @group civimail
  * @see CRM_Mailing_MailingSystemTest
@@ -43,7 +41,7 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
-      $manager->install(array('org.civicrm.flexmailer'));
+      $manager->install(['org.civicrm.flexmailer']);
     }
 
     parent::setUp();
@@ -51,15 +49,18 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
 
     $dispatcher = \Civi::service('dispatcher');
     foreach (FlexMailer::getEventTypes() as $event => $class) {
-      $dispatcher->addListener($event, array($this, 'handleEvent'));
+      $dispatcher->addListener($event, [$this, 'handleEvent']);
     }
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
-    $this->counts = array();
+      [$this, 'hook_alterMailParams']);
+    $this->counts = [];
   }
 
+  /**
+   * @param \Symfony\Component\EventDispatcher\Event $e
+   */
   public function handleEvent(Event $e) {
     // We keep track of the events that fire during mail delivery.
     // At the end, we'll ensure that the correct events fired.
@@ -100,6 +101,13 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
    * Generate a fully-formatted mailing (with body_html content).
    *
    * @dataProvider urlTrackingExamples
+   *
+   * @param string $inputHtml
+   * @param string $htmlUrlRegex
+   * @param string $textUrlRegex
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testUrlTracking(
     $inputHtml,
