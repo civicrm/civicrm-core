@@ -1,44 +1,38 @@
 # csslib
 
-![Screenshot](/images/screenshot.png)
+The `csslib` provides APIs for use by themes/extensions to manage (S)CSS content.
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+## Example (PHP)
 
-The extension is licensed under [AGPL-3.0](LICENSE.txt).
-
-## Requirements
-
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
-
-## Installation (Web UI)
-
-This extension has not yet been published for installation via the web UI.
-
-## Installation (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl csslib@https://github.com/FIXME/csslib/archive/master.zip
+```php
+$cssContent = Civi::service('csslib.scss_compiler')->compile(
+  '#bootstrap-theme { @import "bootstrap"; }', 
+  [ E::path('extern/bootstrap3/assets/stylesheets')]
+);
 ```
 
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
+## Example (CLI)
 
 ```bash
-git clone https://github.com/FIXME/csslib.git
-cv en csslib
+cv ev 'return Civi::service("csslib.scss_compiler")->compile(".foo { .bar::placeholder { color: blue; } }");'
 ```
 
-## Usage
+## Toolchain
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+By default, `csslib` compiles SCSS using:
 
-## Known Issues
+* [scssphp](https://scssphp.github.io/scssphp/)
+* [padaliyajay/php-autoprefixer](https://github.com/padaliyajay/php-autoprefixer)
 
-(* FIXME *)
+This combination is excellent because it works automatically on most PHP environments. However, there are some
+trade-offs in using this toolchain.
+
+To configure csslib, use these settings:
+
+* `csslib_srcmap`:
+    * `none`: CSS file will not include source-mapping. (Note: This may add a few seconds to the generation time.)
+    * `inline`: Source mappings will be generated and bundled directly into the CSS file.
+* `csslib_autoprefixer`: This determines how newer/standardized CSS elements (e.g. `::placeholder`) are mapped to older/backward-compatible CSS elements (e.g. `::-webkit-input-placeholder`).
+    * `none`: CSS elements are not mapped for compatibility. May limit support for older browsers.
+    * `php-autoprefixer` (*default*): CSS elements mapped via [padaliyajay/php-autoprefixer](https://github.com/padaliyajay/php-autoprefixer) (Note: If there is a source-map, this may interfere with it.)
+    * `autoprefixer-cli`: CSS elements mapped via [autoprefixer-cli](https://www.npmjs.com/package/autoprefixer-cli)). (Note: Requires manual/global installation.)
