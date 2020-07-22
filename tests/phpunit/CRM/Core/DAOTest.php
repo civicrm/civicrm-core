@@ -520,9 +520,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     // Hack a different db version which will trigger getSupportedFields to filter out newer fields
     \CRM_Core_DAO::$_dbColumnValueCache['CRM_Core_DAO_Domain']['id'][1]['version'] = '5.26.0';
 
-    $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
-    // 'icon' was added in 5.28
-    $this->assertArrayNotHasKey('icon', $customGroupFields);
+    $customFieldFields = CRM_Core_DAO_CustomField::getSupportedFields();
+    // 'serialize' was added in 5.27
+    $this->assertArrayNotHasKey('serialize', $customFieldFields);
 
     // Remove domain version override:
     \CRM_Core_DAO::$_dbColumnValueCache = NULL;
@@ -531,8 +531,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     // Fields should be indexed by name not unique_name (which is "activity_id")
     $this->assertEquals('id', $activityFields['id']['name']);
 
-    $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
-    $this->assertArrayHasKey('icon', $customGroupFields);
+    $customFieldFields = CRM_Core_DAO_CustomField::getSupportedFields();
+    $this->assertArrayHasKey('serialize', $customFieldFields);
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
     $contactFields = CRM_Contact_DAO_Contact::getSupportedFields();
