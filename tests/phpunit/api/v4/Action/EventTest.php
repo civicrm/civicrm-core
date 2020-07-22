@@ -29,9 +29,11 @@ class EventTest extends \api\v4\UnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testTemplateFilterByDefault() {
-    Event::create()->setValues(['template_title' => 'Big Event', 'is_template' => 1, 'start_date' => 'now', 'event_type_id' => 'Meeting'])->execute();
-    Event::create()->setValues(['title' => 'Bigger Event', 'start_date' => 'now', 'event_type_id' => 'Meeting'])->execute();
-    $this->assertEquals(1, Event::get()->selectRowCount()->execute()->count());
+    $t = Event::create()->setValues(['template_title' => 'Big Event', 'is_template' => 1, 'start_date' => 'now', 'event_type_id:name' => 'Meeting'])->execute()->first();
+    $e = Event::create()->setValues(['title' => 'Bigger Event', 'start_date' => 'now', 'event_type_id:name' => 'Meeting'])->execute()->first();
+    $result = (array) Event::get()->execute()->column('id');
+    $this->assertContains($e['id'], $result);
+    $this->assertNotContains($t['id'], $result);
   }
 
 }

@@ -15,8 +15,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_ScheduledJob {
 
@@ -61,23 +59,22 @@ class CRM_Core_ScheduledJob {
   }
 
   /**
-   * @param null $date
+   * Update the last_run date of this job
    */
-  public function saveLastRun($date = NULL) {
+  public function saveLastRun() {
     $dao = new CRM_Core_DAO_Job();
     $dao->id = $this->id;
-    $dao->last_run = ($date == NULL) ? CRM_Utils_Date::currentDBDate() : CRM_Utils_Date::currentDBDate($date);
+    $dao->last_run = CRM_Utils_Date::currentDBDate();
     $dao->save();
   }
 
   /**
-   * @return void
+   * Delete the scheduled_run_date from this job
    */
   public function clearScheduledRunDate() {
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET scheduled_run_date = NULL WHERE id = %1',
-      [
-        '1' => [$this->id, 'Integer'],
-      ]);
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_job SET scheduled_run_date = NULL WHERE id = %1', [
+      '1' => [$this->id, 'Integer'],
+    ]);
   }
 
   /**

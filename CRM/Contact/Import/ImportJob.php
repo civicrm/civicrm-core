@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -62,13 +60,13 @@ class CRM_Contact_Import_ImportJob {
       if (!$createSql) {
         throw new CRM_Core_Exception(ts('Either an existing table name or an SQL query to build one are required'));
       }
-
-      // FIXME: we should regen this table's name if it exists rather than drop it
-      if (!$tableName) {
-        $tableName = 'civicrm_import_job_' . md5(uniqid(rand(), TRUE));
+      if ($tableName) {
+        // Drop previous table if passed in and create new one.
+        $db->query("DROP TABLE IF EXISTS $tableName");
       }
-      $db->query("DROP TABLE IF EXISTS $tableName");
-      $db->query("CREATE TABLE $tableName ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci $createSql");
+      $table = CRM_Utils_SQL_TempTable::build()->setDurable();
+      $tableName = $table->getName();
+      $table->createWithQuery($createSql);
     }
 
     if (!$tableName) {
@@ -143,7 +141,7 @@ class CRM_Contact_Import_ImportJob {
       //need to differentiate non location elements.
       // @todo merge this with duplicate code on MapField class.
       if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
-        if ($fldName == 'url') {
+        if ($fldName === 'url') {
           $header[] = $websiteTypes[$selOne];
           $parserParameters['mapperWebsiteType'][$key] = $selOne;
         }
@@ -151,11 +149,11 @@ class CRM_Contact_Import_ImportJob {
           $header[] = $locationTypes[$selOne];
           $parserParameters['mapperLocType'][$key] = $selOne;
           if ($selTwo && is_numeric($selTwo)) {
-            if ($fldName == 'phone') {
+            if ($fldName === 'phone') {
               $header[] = $phoneTypes[$selTwo];
               $parserParameters['mapperPhoneType'][$key] = $selTwo;
             }
-            elseif ($fldName == 'im') {
+            elseif ($fldName === 'im') {
               $header[] = $imProviders[$selTwo];
               $parserParameters['mapperImProvider'][$key] = $selTwo;
             }
@@ -339,6 +337,7 @@ class CRM_Contact_Import_ImportJob {
    * @param $newTagDesc
    *
    * @return array|bool
+   * @throws \CRM_Core_Exception
    */
   private function _tagImportedContactsWithNewTag(
     $contactIds,

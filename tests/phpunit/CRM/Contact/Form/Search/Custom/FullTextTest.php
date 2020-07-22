@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Contact_Form_Search_Custom_FullTextTest extends CiviUnitTestCase {
 

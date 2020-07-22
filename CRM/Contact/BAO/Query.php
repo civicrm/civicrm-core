@@ -1587,6 +1587,7 @@ class CRM_Contact_BAO_Query {
     }
 
     self::filterCountryFromValuesIfStateExists($formValues);
+    CRM_Core_BAO_CustomValue::fixCustomFieldValue($formValues);
 
     foreach ($formValues as $id => $values) {
       if (self::isAlreadyProcessedForQueryFormat($values)) {
@@ -3265,7 +3266,6 @@ WHERE  $smartGroupClause
   public function tag(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
-    list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_EntityTag', "tag_id", $value, $op, ['onlyActive' => FALSE]);
     // API/Search Builder format array(operator => array(values))
     if (is_array($value)) {
       if (in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
@@ -3276,6 +3276,19 @@ WHERE  $smartGroupClause
         $this->_useDistinct = TRUE;
       }
     }
+
+    if (strpos($op, 'NULL') || strpos($op, 'EMPTY')) {
+      $value = NULL;
+    }
+
+    $tagTree = CRM_Core_BAO_Tag::getChildTags();
+    foreach ((array) $value as $tagID) {
+      if (!empty($tagTree[$tagID])) {
+        $value = array_unique(array_merge($value, $tagTree[$tagID]));
+      }
+    }
+
+    list($qillop, $qillVal) = self::buildQillForFieldValue('CRM_Core_DAO_EntityTag', "tag_id", $value, $op, ['onlyActive' => FALSE]);
 
     // implode array, then remove all spaces
     $value = str_replace(' ', '', implode(',', (array) $value));

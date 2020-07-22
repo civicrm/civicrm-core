@@ -1100,6 +1100,7 @@ WHERE  id IN $groupIdString
     for ($i = 0; $i < count($roots); $i++) {
       self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
     }
+
     return $hierarchy;
   }
 

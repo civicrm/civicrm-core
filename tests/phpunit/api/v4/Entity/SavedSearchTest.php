@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -31,8 +29,8 @@ use Civi\Api4\Email;
 class SavedSearchTest extends UnitTestCase {
 
   public function testContactSmartGroup() {
-    $in = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'yes')->addValue('do_not_phone', TRUE)->execute()->first();
-    $out = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'no')->addValue('do_not_phone', FALSE)->execute()->first();
+    $in = Contact::create(FALSE)->addValue('first_name', 'yes')->addValue('do_not_phone', TRUE)->execute()->first();
+    $out = Contact::create(FALSE)->addValue('first_name', 'no')->addValue('do_not_phone', FALSE)->execute()->first();
 
     $savedSearch = civicrm_api4('SavedSearch', 'create', [
       'values' => [
@@ -57,10 +55,10 @@ class SavedSearchTest extends UnitTestCase {
   }
 
   public function testEmailSmartGroup() {
-    $in = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'yep')->execute()->first();
-    $out = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'nope')->execute()->first();
+    $in = Contact::create(FALSE)->addValue('first_name', 'yep')->execute()->first();
+    $out = Contact::create(FALSE)->addValue('first_name', 'nope')->execute()->first();
     $email = uniqid() . '@' . uniqid();
-    Email::create()->setCheckPermissions(FALSE)->addValue('email', $email)->addValue('contact_id', $in['id'])->execute();
+    Email::create(FALSE)->addValue('email', $email)->addValue('contact_id', $in['id'])->execute();
 
     $savedSearch = civicrm_api4('SavedSearch', 'create', [
       'values' => [

@@ -586,12 +586,27 @@ class CRM_Core_I18n {
   /**
    * Is the current CiviCRM domain in multilingual mode.
    *
-   * @return Bool
+   * @return bool
    *   True if CiviCRM is in multilingual mode.
    */
   public static function isMultilingual() {
-    $domainId = CRM_Core_Config::domainID();
-    return (bool) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'locales');
+    return (bool) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
+      CRM_Core_Config::domainID(),
+      'locales'
+    );
+  }
+
+  /**
+   * Returns languages if domain is in multilingual mode.
+   *
+   * @return array|bool
+   */
+  public static function getMultilingual() {
+    $locales = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
+      CRM_Core_Config::domainID(),
+      'locales'
+    );
+    return $locales ? CRM_Core_DAO::unSerializeField($locales, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED) : FALSE;
   }
 
   /**
@@ -600,7 +615,7 @@ class CRM_Core_I18n {
    * @param $language
    *   Language (for example 'en_US', or 'fr_CA').
    *
-   * @return Bool
+   * @return bool
    *   True if it is an RTL language.
    */
   public static function isLanguageRTL($language) {

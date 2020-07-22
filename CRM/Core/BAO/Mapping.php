@@ -871,6 +871,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @return array
    */
   protected static function loadSavedMapping($mappingLocation, int $x, int $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, array $specialFields, $mappingPhoneType, array $defaults, array $noneArray, $mappingImProvider, $mappingOperator, $mappingValue) {
+    $jsSet = FALSE;
     $locationId = $mappingLocation[$x][$i] ?? 0;
     if (isset($mappingName[$x][$i])) {
       if (is_array($mapperFields[$mappingContactType[$x][$i]])) {

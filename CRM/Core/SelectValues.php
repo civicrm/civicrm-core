@@ -16,8 +16,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_SelectValues {
 
@@ -1193,6 +1191,16 @@ class CRM_Core_SelectValues {
       ts('None'),
       ts('After menu element'),
       ts('Before menu element'),
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public static function relationshipOrientation() {
+    return [
+      'a_b' => ts('A to B'),
+      'b_a' => ts('B to A'),
     ];
   }
 

@@ -14,7 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 
@@ -38,9 +37,8 @@ class SqlFunctionTest extends UnitTestCase {
   }
 
   public function testGroupAggregates() {
-    $cid = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
-    Contribution::save()
-      ->setCheckPermissions(FALSE)
+    $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
+    Contribution::save(FALSE)
       ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
       ->setRecords([
         ['total_amount' => 100, 'receive_date' => '2020-01-01'],
@@ -49,8 +47,7 @@ class SqlFunctionTest extends UnitTestCase {
         ['total_amount' => 400, 'receive_date' => '2020-01-01'],
       ])
       ->execute();
-    $agg = Contribution::get()
-      ->setCheckPermissions(FALSE)
+    $agg = Contribution::get(FALSE)
       ->addGroupBy('contact_id')
       ->addWhere('contact_id', '=', $cid)
       ->addSelect('AVG(total_amount) AS average')
@@ -68,9 +65,8 @@ class SqlFunctionTest extends UnitTestCase {
   }
 
   public function testGroupHaving() {
-    $cid = Contact::create()->setCheckPermissions(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
-    Contribution::save()
-      ->setCheckPermissions(FALSE)
+    $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
+    Contribution::save(FALSE)
       ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
       ->setRecords([
         ['total_amount' => 100, 'receive_date' => '2020-02-02'],
@@ -79,8 +75,7 @@ class SqlFunctionTest extends UnitTestCase {
         ['total_amount' => 400, 'receive_date' => '2020-04-04'],
       ])
       ->execute();
-    $result = Contribution::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contribution::get(FALSE)
       ->addGroupBy('contact_id')
       ->addGroupBy('receive_date')
       ->addSelect('contact_id')

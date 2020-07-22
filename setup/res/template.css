@@ -84,7 +84,7 @@ body {
   padding-bottom: 1.5em;
 }
 
-.civicrm-setup-body label span {
+.civicrm-setup-block-components label span {
   float: left;
   width: 120px;
 }
@@ -156,7 +156,7 @@ body {
 
 .civicrm-setup-body .comp-box {
   height: 3.5em;
-  width: 31%;
+  width: 30%;
   display: inline-block;
   padding: 0.5em;
   padding-top: 15px;

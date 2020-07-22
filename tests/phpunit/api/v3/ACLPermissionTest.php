@@ -1010,8 +1010,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $group = uniqid('mg');
     $textField = uniqid('tx');
 
-    CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)

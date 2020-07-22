@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';

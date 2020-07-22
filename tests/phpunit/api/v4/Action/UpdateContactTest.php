@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -32,16 +30,14 @@ use api\v4\UnitTestCase;
 class UpdateContactTest extends UnitTestCase {
 
   public function testUpdateWithIdInWhere() {
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::update()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::update(FALSE)
       ->addWhere('id', '=', $contactId)
       ->addValue('first_name', 'Testy')
       ->execute()
@@ -51,16 +47,14 @@ class UpdateContactTest extends UnitTestCase {
   }
 
   public function testUpdateWithIdInValues() {
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Bobby')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::update()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::update(FALSE)
       ->addValue('id', $contactId)
       ->addValue('first_name', 'Billy')
       ->execute();

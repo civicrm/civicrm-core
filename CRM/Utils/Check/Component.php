@@ -35,7 +35,7 @@ abstract class CRM_Utils_Check_Component {
     if (empty($this->checksConfig)) {
       $this->checksConfig = Civi::cache('checks')->get('checksConfig', []);
       if (empty($this->checksConfig)) {
-        $this->checksConfig = StatusPreference::get()->setCheckPermissions(FALSE)->execute()->indexBy('name');
+        $this->checksConfig = StatusPreference::get(FALSE)->execute()->indexBy('name');
       }
     }
     return $this->checksConfig;
@@ -88,19 +88,10 @@ abstract class CRM_Utils_Check_Component {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function isDisabled($method) {
-    try {
-      $checks = $this->getChecksConfig();
-      if (!empty($checks[$method])) {
-        return (bool) empty($checks[$method]['is_active']);
-      }
+    $checks = $this->getChecksConfig();
+    if (isset($checks[$method]['is_active'])) {
+      return !$checks[$method]['is_active'];
     }
-    catch (PEAR_Exception $e) {
-      // if we're hitting this, DB migration to 5.19 probably hasn't run yet, so
-      // is_active doesn't exist. Ignore this error so the status check (which
-      // might warn about missing migrations!) still renders.
-      // TODO: remove at some point after 5.19
-    }
-
     return FALSE;
   }
 

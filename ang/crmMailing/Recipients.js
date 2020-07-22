@@ -166,7 +166,6 @@
                     $(glist.values).each(function (idx, group) {
                       var key = group.id + ' civicrm_group include';
                       groupNames.push({id: parseInt(group.id), title: group.label, is_hidden: group.extra.is_hidden});
-
                       if (values.indexOf(key) >= 0) {
                         datamap.push({id: key, text: group.label});
                       }

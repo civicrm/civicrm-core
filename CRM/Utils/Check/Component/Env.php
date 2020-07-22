@@ -117,11 +117,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (!CRM_Utils_Time::isEqual($phpNow, $sqlNow, 2.5 * 60)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Timestamps reported by MySQL (eg "%2") and PHP (eg "%3" ) are mismatched.<br /><a href="%1">Read more about this warning</a>', [
-          1 => CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-time', TRUE),
-          2 => $sqlNow,
-          3 => $phpNow,
-        ]),
+        ts('Timestamps reported by MySQL (eg "%1") and PHP (eg "%2" ) are mismatched.', [
+          1 => $sqlNow,
+          2 => $phpNow,
+        ]) . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-time'),
         ts('Timestamp Mismatch'),
         \Psr\Log\LogLevel::ERROR,
         'fa-server'
@@ -142,7 +141,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')]),
         ts('Debug Mode Enabled'),
-        \Psr\Log\LogLevel::WARNING,
+        CRM_Core_Config::environment() == 'Production' ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::INFO,
         'fa-bug'
       );
       $message->addAction(
@@ -162,6 +161,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkOutboundMail() {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
@@ -188,6 +192,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkDomainNameEmail() {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
@@ -218,7 +227,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $msg,
-        ts('Complete Setup'),
+        ts('Organization Setup'),
         \Psr\Log\LogLevel::WARNING,
         'fa-check-square-o'
       );
@@ -233,6 +242,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    */
   public function checkDefaultMailbox() {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
+
     $config = CRM_Core_Config::singleton();
 
     if (in_array('CiviMail', $config->enableComponents) &&
@@ -246,10 +261,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         \Psr\Log\LogLevel::WARNING,
         'fa-envelope'
       );
-      $docUrl = 'target="_blank" href="' . CRM_Utils_System::docURL(['page' => 'user/advanced-configuration/email-system-configuration/', 'URLonly' => TRUE]) . '""';
       $message->addHelp(
         ts('A default mailbox must be configured for email bounce processing.') . '<br />' .
-        ts("Learn more in the <a %1>online documentation</a>.", [1 => $docUrl])
+          CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration/')
       );
       $messages[] = $message;
     }
@@ -258,49 +272,66 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Checks if cron has run in a reasonable amount of time
+   * Checks if cron has run in the past hour (3600 seconds)
    * @return array
+   * @throws CRM_Core_Exception
    */
   public function checkLastCron() {
     $messages = [];
 
+    // Cron doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
+
     $statusPreference = new CRM_Core_DAO_StatusPreference();
     $statusPreference->domain_id = CRM_Core_Config::domainID();
-    $statusPreference->name = 'checkLastCron';
+    $statusPreference->name = __FUNCTION__;
 
+    $level = \Psr\Log\LogLevel::INFO;
+    $now = gmdate('U');
+
+    // Get timestamp of last cron run
     if ($statusPreference->find(TRUE) && !empty($statusPreference->check_info)) {
-      $lastCron = $statusPreference->check_info;
-      $msg = ts('Last cron run at %1.', [1 => CRM_Utils_Date::customFormat(date('c', $lastCron))]);
+      $msg = ts('Last cron run at %1.', [1 => CRM_Utils_Date::customFormat(date('c', $statusPreference->check_info))]);
+    }
+    // If cron record doesn't exist, this is a new install. Make a placeholder record (prefs='new').
+    else {
+      $statusPreference = CRM_Core_BAO_StatusPreference::create([
+        'name' => __FUNCTION__,
+        'check_info' => $now,
+        'prefs' => 'new',
+      ]);
+    }
+    $lastCron = $statusPreference->check_info;
+
+    if ($statusPreference->prefs !== 'new' && $lastCron > $now - 3600) {
+      $title = ts('Cron Running OK');
     }
     else {
-      $lastCron = 0;
-      $msg = ts('No cron runs have been recorded.');
+      // If placeholder record found, give one day "grace period" for admin to set-up cron
+      if ($statusPreference->prefs === 'new') {
+        $title = ts('Set-up Cron');
+        $msg = ts('No cron runs have been recorded.');
+        // After 1 day (86400 seconds) increase the error level
+        $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::NOTICE : \Psr\Log\LogLevel::WARNING;
+      }
+      else {
+        $title = ts('Cron Not Running');
+        // After 1 day (86400 seconds) increase the error level
+        $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR;
+      }
+      $msg .= '<p>' . ts('To enable scheduling support, please set up the cron job.') .
+       '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/jobs/') . '</p>';
     }
 
-    if ($lastCron > gmdate('U') - 3600) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Running OK'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-clock-o'
-      );
-    }
-    else {
-      $cronLink = 'target="_blank" href="' . htmlentities(CRM_Utils_System::docURL2('sysadmin/setup/jobs/', TRUE)) . '""';
-      $msg .= '<p>' . ts('To enable scheduling support, please <a %1>set up the cron job</a>.', [
-        1 => $cronLink,
-      ]) . '</p>';
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Not Running'),
-        ($lastCron > gmdate('U') - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR,
-        'fa-clock-o'
-      );
-      $messages[] = $message;
-    }
-
+    $messages[] = new CRM_Utils_Check_Message(
+      __FUNCTION__,
+      $msg,
+      $title,
+      $level,
+      'fa-clock-o'
+    );
     return $messages;
   }
 
@@ -569,10 +600,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notice.
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %1. If you want to install an extension which is not marked as compatible, you may be able to <a %2>download and install extensions manually</a> (depending on access to your web server).', [
+        ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %1. If you want to install an extension which is not marked as compatible, you may be able to download and install extensions manually (depending on access to your web server).', [
           1 => CRM_Utils_System::majorVersion(),
-          2 => 'href="http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions"',
-        ]),
+        ]) . '<br />' . CRM_Utils_System::docURL2('sysadmin/customize/extensions/#installing-a-new-extension'),
         ts('No Extensions Available for this Version'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-plug'
@@ -796,6 +826,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkReplyIdForMailing() {
     $messages = [];
 
+    // CiviMail doesn't work in non-production environments; skip.
+    if (CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
+
     if (!CRM_Mailing_PseudoConstant::defaultComponent('Reply', '')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -840,38 +875,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         __FUNCTION__,
         ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', [1 => $environment]),
         ts('Non-Production Environment'),
-        \Psr\Log\LogLevel::ALERT,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-bug'
-      );
-    }
-    return $messages;
-  }
-
-  /**
-   * Check that the resource URL points to the correct location.
-   * @return array
-   */
-  public function checkResourceUrl() {
-    $messages = [];
-    // Skip when run during unit tests, you can't check without a CMS.
-    if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
-      return $messages;
-    }
-    // CRM-21629 Set User Agent to avoid being blocked by filters
-    stream_context_set_default([
-      'http' => ['user_agent' => 'CiviCRM'],
-    ]);
-
-    // Does arrow.png exist where we expect it?
-    $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
-    if ($this->fileExists($arrowUrl) === FALSE) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',
-          [1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')]),
-        ts('Incorrect Resource URL'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-server'
       );
     }
     return $messages;
@@ -897,7 +902,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the <a href='%1' title='System Administrator Guide'>System Administrator Guide</a>", [1 => CRM_Utils_System::docURL2("sysadmin/requirements/#mysql-configuration", TRUE)]),
+        ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the System Administrator Guide") . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-configuration'),
         ts('MySQL Emoji Support (utf8mb4)'),
         \Psr\Log\LogLevel::WARNING,
         'fa-database'

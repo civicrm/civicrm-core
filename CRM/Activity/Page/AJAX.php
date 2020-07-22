@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -379,7 +378,7 @@ class CRM_Activity_Page_AJAX {
   /**
    * Get activities for the contact.
    *
-   * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getContactActivity() {
     $requiredParameters = [
@@ -420,10 +419,10 @@ class CRM_Activity_Page_AJAX {
       unset($optionalParameters['context']);
       foreach ($optionalParameters as $searchField => $dataType) {
         $formSearchField = $searchField;
-        if ($searchField == 'activity_type_id') {
+        if ($searchField === 'activity_type_id') {
           $formSearchField = 'activity_type_filter_id';
         }
-        elseif ($searchField == 'activity_type_exclude_id') {
+        elseif ($searchField === 'activity_type_exclude_id') {
           $formSearchField = 'activity_type_exclude_filter_id';
         }
         if (!empty($params[$searchField])) {
@@ -431,16 +430,13 @@ class CRM_Activity_Page_AJAX {
           if (in_array($searchField, ['activity_date_time_low', 'activity_date_time_high'])) {
             $activityFilter['activity_date_time_relative'] = 0;
           }
-          elseif ($searchField == 'activity_status_id') {
+          elseif ($searchField === 'activity_status_id') {
             $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
           }
         }
       }
 
       Civi::contactSettings()->set('activity_tab_filter', $activityFilter);
-    }
-    if (!empty($_GET['is_unit_test'])) {
-      return [$activities, $activityFilter];
     }
 
     CRM_Utils_JSON::output($activities);

@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -44,15 +42,13 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $colorField = uniqid('colora');
     $foodField = uniqid('fooda');
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $colorField)
       ->addValue('name', $colorField)
       ->addValue('option_values', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -61,8 +57,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $foodField)
       ->addValue('name', $foodField)
       ->addValue('option_values', ['1' => 'Corn', '2' => 'Potatoes', '3' => 'Cheese'])
@@ -71,23 +66,20 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Salary')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Number')
       ->addValue('data_type', 'Money')
       ->execute();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Jerome')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -96,8 +88,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('FinancialStuff.Salary', 50000)
       ->execute();
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect("$group.$colorField:label")
       ->addSelect("$group.$foodField:label")
@@ -117,15 +108,13 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $colorField = uniqid('colorb');
     $foodField = uniqid('foodb');
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $colorField)
       ->addValue('name', $colorField)
       ->addValue('option_values', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -134,8 +123,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $foodField)
       ->addValue('name', $foodField)
       ->addValue('option_values', ['1' => 'Corn', '2' => 'Potatoes', '3' => 'Cheese'])
@@ -144,23 +132,20 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Salary')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Number')
       ->addValue('data_type', 'Money')
       ->execute();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Red')
       ->addValue('last_name', 'Corn')
       ->addValue('contact_type', 'Individual')
@@ -169,8 +154,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('FinancialStuff.Salary', 10000)
       ->execute();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Blue')
       ->addValue('last_name', 'Cheese')
       ->addValue('contact_type', 'Individual')
@@ -179,8 +163,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('FinancialStuff.Salary', 500000)
       ->execute();
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('last_name')
       ->addSelect("$group.$colorField:label")

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
 
@@ -82,6 +80,8 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * @param array $params
    * @param string $db
    * @param \CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess(&$params, &$db, &$form) {
     $importJob = new CRM_Contact_Import_ImportJob(

@@ -14,7 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 
@@ -128,8 +127,7 @@ class SpecGatherer {
     if ($entity === 'Participant') {
       $extends = ['Participant', 'ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'];
     }
-    $customFields = CustomField::get()
-      ->setCheckPermissions(FALSE)
+    $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group.extends', 'IN', $extends)
       ->addWhere('custom_group.is_multiple', '=', '0')
       ->setSelect(['custom_group.name', '*'])
@@ -146,8 +144,7 @@ class SpecGatherer {
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
    */
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
-    $customFields = CustomField::get()
-      ->setCheckPermissions(FALSE)
+    $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group.name', '=', $customGroup)
       ->setSelect(['custom_group.name', 'custom_group.table_name', '*'])
       ->execute();

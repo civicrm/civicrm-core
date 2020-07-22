@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
@@ -68,7 +66,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
    * Takes an associative array and creates a membership Status object.
-   * See http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.

@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Generic\Traits;
 
+use Civi\Api4\CustomField;
 use Civi\Api4\Utils\FormattingUtil;
 
 /**
@@ -168,50 +169,29 @@ trait DAOActionTrait {
     // $customValueID is the ID of the custom value in the custom table for this
     // entity (i guess this assumes it's not a multi value entity)
     foreach ($params as $name => $value) {
-      if (strpos($name, '.') === FALSE) {
+      $field = $this->getCustomFieldInfo($name);
+      if (!$field) {
         continue;
       }
 
-      list($customGroup, $customField) = explode('.', $name);
-      list($customField, $option) = array_pad(explode(':', $customField), 2, NULL);
-
-      $customFieldId = \CRM_Core_BAO_CustomField::getFieldValue(
-        \CRM_Core_DAO_CustomField::class,
-        $customField,
-        'id',
-        'name'
-      );
-      $customFieldType = \CRM_Core_BAO_CustomField::getFieldValue(
-        \CRM_Core_DAO_CustomField::class,
-        $customField,
-        'html_type',
-        'name'
-      );
-      $customFieldExtends = \CRM_Core_BAO_CustomGroup::getFieldValue(
-        \CRM_Core_DAO_CustomGroup::class,
-        $customGroup,
-        'extends',
-        'name'
-      );
-
       // todo are we sure we don't want to allow setting to NULL? need to test
-      if ($customFieldId && NULL !== $value) {
+      if (NULL !== $value) {
 
-        if ($option) {
-          $options = FormattingUtil::getPseudoconstantList($this->getEntityName(), 'custom_' . $customFieldId, $option, $params, $this->getActionName());
+        if ($field['suffix']) {
+          $options = FormattingUtil::getPseudoconstantList($this->getEntityName(), 'custom_' . $field['id'], $field['suffix'], $params, $this->getActionName());
           $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
         }
 
-        if ($customFieldType === 'CheckBox') {
+        if ($field['html_type'] === 'CheckBox') {
           // this function should be part of a class
-          formatCheckBoxField($value, 'custom_' . $customFieldId, $this->getEntityName());
+          formatCheckBoxField($value, 'custom_' . $field['id'], $this->getEntityName());
         }
 
         \CRM_Core_BAO_CustomField::formatCustomField(
-          $customFieldId,
+          $field['id'],
           $customParams,
           $value,
-          $customFieldExtends,
+          $field['custom_group.extends'],
           // todo check when this is needed
           NULL,
           $entityId,
@@ -225,6 +205,29 @@ trait DAOActionTrait {
     if ($customParams) {
       $params['custom'] = $customParams;
     }
+  }
+
+  /**
+   * Gets field info needed to save custom data
+   *
+   * @param string $name
+   *   Field identifier with possible suffix, e.g. MyCustomGroup.MyField1:label
+   * @return array|NULL
+   */
+  protected function getCustomFieldInfo($name) {
+    if (strpos($name, '.') === FALSE) {
+      return NULL;
+    }
+    list($groupName, $fieldName) = explode('.', $name);
+    list($fieldName, $suffix) = array_pad(explode(':', $fieldName), 2, NULL);
+    if (empty(\Civi::$statics['APIv4_Custom_Fields'][$groupName])) {
+      \Civi::$statics['APIv4_Custom_Fields'][$groupName] = (array) CustomField::get(FALSE)
+        ->addSelect('id', 'name', 'html_type', 'custom_group.extends')
+        ->addWhere('custom_group.name', '=', $groupName)
+        ->execute()->indexBy('name');
+    }
+    $info = \Civi::$statics['APIv4_Custom_Fields'][$groupName][$fieldName] ?? NULL;
+    return $info ? ['suffix' => $suffix] + $info : NULL;
   }
 
   /**

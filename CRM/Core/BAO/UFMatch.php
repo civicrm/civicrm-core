@@ -93,7 +93,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $userIds = self::getUFValues();
         $session->set('ufID', CRM_Utils_Array::value('uf_id', $userIds, ''));
         $session->set('userID', CRM_Utils_Array::value('contact_id', $userIds, ''));
-        $session->set('ufUniqID', CRM_Utils_Array::value('uf_name', $userIds, ''));
       }
     }
 
@@ -110,7 +109,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     //make sure we have session w/ consistent ids.
     $ufID = $ufmatch->uf_id;
     $userID = $ufmatch->contact_id;
-    $ufUniqID = '';
     if ($isUserLoggedIn) {
       $loggedInUserUfID = CRM_Utils_System::getLoggedInUfID();
       //are we processing logged in user.
@@ -118,14 +116,12 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $userIds = self::getUFValues($loggedInUserUfID);
         $ufID = CRM_Utils_Array::value('uf_id', $userIds, '');
         $userID = CRM_Utils_Array::value('contact_id', $userIds, '');
-        $ufUniqID = CRM_Utils_Array::value('uf_name', $userIds, '');
       }
     }
 
     //set user ids to session.
     $session->set('ufID', $ufID);
     $session->set('userID', $userID);
-    $session->set('ufUniqID', $ufUniqID);
 
     // add current contact to recently viewed
     if ($ufmatch->contact_id) {
@@ -171,12 +167,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    */
   public static function &synchronizeUFMatch(&$user, $userKey, $uniqId, $uf, $status = NULL, $ctype = NULL, $isLogin = FALSE) {
     $config = CRM_Core_Config::singleton();
-
-    if (!CRM_Utils_Rule::email($uniqId)) {
-      $retVal = $status ? NULL : FALSE;
-      return $retVal;
-    }
-
     $newContact = FALSE;
 
     // make sure that a contact id exists for this user id
@@ -191,6 +181,12 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       if (!empty($_POST) && !$isLogin) {
         $params = $_POST;
         $params['email'] = $uniqId;
+        // dev/core#1858 Ensure that if we have a contactID parameter which is set in the Create user Record contact task form
+        // That this contacID value is passed through as the contact_id to the get duplicate contacts function. This is necessary because for Drupal 8 this function gets invoked
+        // Before the civicrm_uf_match record is added where as in D7 it isn't called until the user tries to actually login.
+        if (!empty($params['contactID'])) {
+          $params['contact_id'] = $params['contactID'];
+        }
 
         $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual', 'Unsupervised', [], FALSE);
 

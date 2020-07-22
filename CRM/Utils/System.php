@@ -1390,7 +1390,7 @@ class CRM_Utils_System {
     }
 
     if (!isset($params['text']) or $params['text'] === NULL) {
-      $params['text'] = ts('(learn more...)');
+      $params['text'] = ts('(Learn more...)');
     }
 
     if (!isset($params['style']) || $params['style'] === NULL) {
@@ -1419,7 +1419,7 @@ class CRM_Utils_System {
    * @return mixed
    */
   public static function formatDocUrl($url) {
-    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/stable/', $url);
+    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/latest/', $url);
   }
 
   /**

@@ -43,7 +43,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
     if ($rev == '5.21.alpha1') {
       // Find any option groups that were not converted during the upgrade.
       $notConverted = [];
-      $optionGroups = \Civi\Api4\OptionGroup::get()->setCheckPermissions(FALSE)->execute();
+      $optionGroups = \Civi\Api4\OptionGroup::get(FALSE)->execute();
       foreach ($optionGroups as $optionGroup) {
         $trimmedName = trim($optionGroup['name']);
         if (strpos($trimmedName, ' ') !== FALSE) {
@@ -86,8 +86,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyOne extends CRM_Upgrade_Incremental_
   }
 
   public static function fixOptionGroupName() {
-    $optionGroups = \Civi\Api4\OptionGroup::get()
-      ->setCheckPermissions(FALSE)
+    $optionGroups = \Civi\Api4\OptionGroup::get(FALSE)
       ->execute();
     foreach ($optionGroups as $optionGroup) {
       $name = trim($optionGroup['name']);

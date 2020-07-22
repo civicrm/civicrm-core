@@ -1,0 +1,20 @@
+<div id="bootstrap-theme" class="crm-search">
+  <h1 crm-page-title>{{:: ts('Create Search for %1', {1: $ctrl.getEntity($ctrl.entity).title}) }}</h1>
+
+  <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
+  <div class="messages warning no-popup collapse">
+    <p>
+      <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+      <strong>{{:: ts('Bootstrap theme not found.') }}</strong>
+    </p>
+    <p>{{:: ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') }}</p>
+  </div>
+
+  <form>
+    <div ng-include="'~/search/crmSearch/criteria.html'"></div>
+    <div ng-include="'~/search/crmSearch/controls.html'"></div>
+    <div ng-include="'~/search/crmSearch/debug.html'" ng-if="$ctrl.debug"></div>
+    <div ng-include="'~/search/crmSearch/results.html'" class="crm-search-results"></div>
+    <div ng-include="'~/search/crmSearch/pager.html'"></div>
+  </form>
+</div>

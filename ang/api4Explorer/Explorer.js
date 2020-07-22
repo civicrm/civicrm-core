@@ -56,7 +56,8 @@
     $scope.loading = false;
     $scope.controls = {};
     $scope.langs = ['php', 'js', 'ang', 'cli'];
-    $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
+    $scope.joinTypes = [{k: false, v: 'FALSE (LEFT JOIN)'}, {k: true, v: 'TRUE (INNER JOIN)'}];
+    $scope.bridgeEntities = _.filter(schema, {type: 'BridgeEntity'});
     $scope.code = {
       php: [
         {name: 'oop', label: ts('OOP Style'), code: ''},
@@ -96,7 +97,7 @@
     function pluralize(str) {
       var lastLetter = str[str.length - 1],
         lastTwo = str[str.length - 2] + lastLetter;
-      if (lastLetter === 's' || lastTwo === 'ch') {
+      if (lastLetter === 's' || lastLetter === 'x' || lastTwo === 'ch') {
         return str + 'es';
       }
       if (lastLetter === 'y' && lastTwo !== 'ey') {
@@ -312,6 +313,22 @@
       return _.findWhere(schema, {name: entityName || $scope.entity});
     }
 
+    // Get name of entity given join alias
+    function entityNameFromAlias(alias) {
+      var joins = getExplicitJoins(),
+        entity = $scope.entity,
+        path = alias.split('.');
+      // First check explicit joins
+      if (joins[alias]) {
+        return joins[alias];
+      }
+      // Then lookup implicit links
+      _.each(path, function(node) {
+        entity = _.find(links[entity], {alias: node}).entity;
+      });
+      return entity;
+    }
+
     // Get all params that have been set
     function getParams() {
       var params = {};
@@ -466,12 +483,29 @@
             }, true);
           }
           if (name === 'select' && actionInfo.params.having) {
-            $scope.$watchCollection('params.select', function(values) {
+            $scope.$watchCollection('params.select', function(newSelect) {
+              // Ignore row_count, it can't be used in HAVING clause
+              var select = _.without(newSelect, 'row_count');
               $scope.havingOptions.length = 0;
-              _.each(values, function(item) {
-                var pieces = item.split(' AS '),
+              // An empty select is an implicit *
+              if (!select.length) {
+                select.push('*');
+              }
+              _.each(select, function(item) {
+                var joinEntity,
+                  pieces = item.split(' AS '),
                   alias = _.trim(pieces[pieces.length - 1]).replace(':label', ':name');
-                $scope.havingOptions.push({id: alias, text: alias});
+                // Expand wildcards
+                if (alias[alias.length - 1] === '*') {
+                  if (alias.length > 1) {
+                    joinEntity = entityNameFromAlias(alias.slice(0, -2));
+                  }
+                  var fieldList = _.filter(getEntity(joinEntity).fields, {custom_field_id: null});
+                  formatForSelect2(fieldList, $scope.havingOptions, 'name', ['description', 'required', 'default_value'], alias.slice(0, -1));
+                }
+                else {
+                  $scope.havingOptions.push({id: alias, text: alias});
+                }
               });
             });
           }
@@ -630,11 +664,12 @@
     // Format oop params
     function formatOOP(entity, action, params, indent) {
       var code = '',
-        newLine = "\n" + _.repeat(' ', indent);
+        newLine = "\n" + _.repeat(' ', indent),
+        perm = params.checkPermissions === false ? 'FALSE' : '';
       if (entity.substr(0, 7) !== 'Custom_') {
-        code = "\\Civi\\Api4\\" + entity + '::' + action + '()';
+        code = "\\Civi\\Api4\\" + entity + '::' + action + '(' + perm + ')';
       } else {
-        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
+        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
       }
       _.each(params, function(param, key) {
         var val = '';
@@ -667,7 +702,7 @@
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
           });
         }
-        else {
+        else if (key !== 'checkPermissions') {
           code += newLine + "->set" + ucfirst(key) + '(' + phpFormat(param, 2 + indent) + ')';
         }
       });

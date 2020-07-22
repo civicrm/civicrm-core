@@ -1,0 +1,25 @@
+<hr>
+<div class="form-inline">
+  <div class="btn-group" role="group">
+    <button class="btn btn-primary{{ $ctrl.autoSearch ? '-outline' : '' }}" ng-click="onClickSearch()" ng-disabled="loading || (!$ctrl.autoSearch && !$ctrl.stale)">
+      <i class="crm-i {{ loading ? 'fa-spin fa-spinner' : 'fa-search' }}"></i>
+      {{:: ts('Search') }}
+    </button>
+    <button class="btn crm-search-auto-toggle btn-primary{{ $ctrl.autoSearch ? '' : '-outline' }}" ng-click="onClickAuto()">
+      <i class="crm-i fa-toggle-{{ $ctrl.autoSearch ? 'on' : 'off' }}"></i>
+      {{:: ts('Auto') }}
+    </button>
+  </div>
+  <crm-search-actions entity="$ctrl.entity" ids="$ctrl.selectedRows"></crm-search-actions>
+  <div class="btn-group pull-right">
+    <button type="button" class="btn form-control dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="crm-i fa-save"></i> {{:: ts('Create')}}
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+      <li ng-if=":: $ctrl.perm.editGroups">
+        <a href ng-click="saveGroup()">{{:: ts('Smart Group') }}</a>
+      </li>
+    </ul>
+  </div>
+</div>

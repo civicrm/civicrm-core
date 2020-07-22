@@ -16,7 +16,6 @@
  * @author Piotr Szotkowski <shot@caltha.pl>
  * @author Michal Mach <mover@artnet.org>
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 
 /**

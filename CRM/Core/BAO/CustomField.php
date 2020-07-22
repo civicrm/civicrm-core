@@ -1814,9 +1814,9 @@ WHERE  id IN ( %1, %2 )
     $add->custom_group_id = $newGroup->id;
     self::createField($add, 'add');
 
-    $sql = "INSERT INTO {$newGroup->table_name} (entity_id, {$field->column_name})
-            SELECT entity_id, {$field->column_name} FROM {$oldGroup->table_name}
-            ON DUPLICATE KEY UPDATE {$field->column_name} = {$oldGroup->table_name}.{$field->column_name}
+    $sql = "INSERT INTO {$newGroup->table_name} (entity_id, `{$field->column_name}`)
+            SELECT entity_id, `{$field->column_name}` FROM {$oldGroup->table_name}
+            ON DUPLICATE KEY UPDATE `{$field->column_name}` = {$oldGroup->table_name}.`{$field->column_name}`
             ";
     CRM_Core_DAO::executeQuery($sql);
 
@@ -2066,10 +2066,10 @@ WHERE  id IN ( %1, %2 )
       }
       if (in_array($field['data_type'], $fieldTypesNotHandledInMergeAttempt) && !$isMultiple) {
         CRM_Core_DAO::executeQuery(
-          "INSERT INTO {$field['custom_group_id.table_name']} (entity_id, {$field['column_name']})
+          "INSERT INTO {$field['custom_group_id.table_name']} (entity_id, `{$field['column_name']}`)
           VALUES ($newContactID, {$oldContact['custom_' . $field['id']]})
           ON DUPLICATE KEY UPDATE
-          {$field['column_name']} = {$oldContact['custom_' . $field['id']]}
+          `{$field['column_name']}` = {$oldContact['custom_' . $field['id']]}
         ");
       }
     }

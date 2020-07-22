@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -41,8 +39,7 @@ class ParticipantTest extends UnitTestCase {
   }
 
   public function testGetActions() {
-    $result = Participant::getActions()
-      ->setCheckPermissions(FALSE)
+    $result = Participant::getActions(FALSE)
       ->execute()
       ->indexBy('name');
 
@@ -60,7 +57,7 @@ class ParticipantTest extends UnitTestCase {
     }
 
     // With no records:
-    $result = Participant::get()->setCheckPermissions(FALSE)->execute();
+    $result = Participant::get(FALSE)->execute();
     $this->assertEquals(0, $result->count(), "count of empty get is not 0");
 
     // Check that the $result knows what the inputs were
@@ -115,8 +112,7 @@ class ParticipantTest extends UnitTestCase {
     $secondEventId = $dummy['events'][1]['id'];
     $firstContactId = $dummy['contacts'][0]['id'];
 
-    $firstOnlyResult = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $firstOnlyResult = Participant::get(FALSE)
       ->addClause('AND', ['event_id', '=', $firstEventId])
       ->execute();
 
@@ -124,8 +120,7 @@ class ParticipantTest extends UnitTestCase {
       "count of first event is not $expectedFirstEventCount");
 
     // get first two events using different methods
-    $firstTwo = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $firstTwo = Participant::get(FALSE)
       ->addWhere('event_id', 'IN', [$firstEventId, $secondEventId])
       ->execute();
 
@@ -145,8 +140,7 @@ class ParticipantTest extends UnitTestCase {
       "count is too low"
     );
 
-    $firstParticipantResult = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $firstParticipantResult = Participant::get(FALSE)
       ->addWhere('event_id', '=', $firstEventId)
       ->addWhere('contact_id', '=', $firstContactId)
       ->execute();
@@ -156,8 +150,7 @@ class ParticipantTest extends UnitTestCase {
     $firstParticipantId = $firstParticipantResult->first()['id'];
 
     // get a result which excludes $first_participant
-    $otherParticipantResult = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $otherParticipantResult = Participant::get(FALSE)
       ->setSelect(['id'])
       ->addClause('NOT', [
         ['event_id', '=', $firstEventId],
@@ -167,8 +160,7 @@ class ParticipantTest extends UnitTestCase {
       ->indexBy('id');
 
     // check alternate syntax for NOT
-    $otherParticipantResult2 = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $otherParticipantResult2 = Participant::get(FALSE)
       ->setSelect(['id'])
       ->addClause('NOT', 'AND', [
         ['event_id', '=', $firstEventId],

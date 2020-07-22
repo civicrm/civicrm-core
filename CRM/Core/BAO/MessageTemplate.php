@@ -416,8 +416,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       throw new CRM_Core_Exception(ts("Message template's option value or ID missing."));
     }
 
-    $apiCall = MessageTemplate::get()
-      ->setCheckPermissions(FALSE)
+    $apiCall = MessageTemplate::get(FALSE)
       ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id')
       ->addWhere('is_default', '=', 1);
 

@@ -175,6 +175,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       ) {
         $formValues[$key] = ['LIKE' => $formValues[$key]];
       }
+      elseif ($htmlType == 'Autocomplete-Select' && !empty($formValues[$key]) && is_string($formValues[$key]) && (strpos($formValues[$key], ',') != FALSE)) {
+        $formValues[$key] = ['IN' => explode(',', $formValues[$key])];
+      }
     }
   }
 

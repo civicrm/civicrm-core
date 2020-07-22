@@ -125,7 +125,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    */
   public function summary(&$values) {
     $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values, $erroneousField);
 
     $errorRequired = FALSE;
 
@@ -268,7 +268,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       }
 
       $session = CRM_Core_Session::singleton();
-      $dateType = $session->get('dateTypes');
+      $dateType = CRM_Core_Session::singleton()->get('dateTypes');
       $formatted = [];
       $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
       $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);

@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -59,8 +57,7 @@ class CustomGroupJoinable extends Joinable {
    */
   public function getEntityFields() {
     if (!$this->entityFields) {
-      $fields = CustomField::get()
-        ->setCheckPermissions(FALSE)
+      $fields = CustomField::get(FALSE)
         ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', '*'])
         ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
         ->execute();

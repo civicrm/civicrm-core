@@ -27,12 +27,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   const DROP_STRIP_FUNCTION_43 = "DROP FUNCTION IF EXISTS civicrm_strip_non_numeric";
 
   const CREATE_STRIP_FUNCTION_43 = "
-    CREATE FUNCTION civicrm_strip_non_numeric(input VARCHAR(255) CHARACTER SET utf8)
-      RETURNS VARCHAR(255) CHARACTER SET utf8
+    CREATE FUNCTION civicrm_strip_non_numeric(input VARCHAR(255))
+      RETURNS VARCHAR(255)
       DETERMINISTIC
       NO SQL
     BEGIN
-      DECLARE output   VARCHAR(255) CHARACTER SET utf8 DEFAULT '';
+      DECLARE output   VARCHAR(255) DEFAULT '';
       DECLARE iterator INT          DEFAULT 1;
       WHILE iterator < (LENGTH(input) + 1) DO
         IF SUBSTRING(input, iterator, 1) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') THEN
@@ -3401,15 +3401,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @see CRM_Core_DAO::triggerRebuild
    */
   public static function triggerInfo(&$info, $tableName = NULL) {
-    //during upgrade, first check for valid version and then create triggers
-    //i.e the columns created_date and modified_date are introduced in 4.3.alpha1 so dont create triggers for older version
-    if (CRM_Core_Config::isUpgradeMode()) {
-      $currentVer = CRM_Core_BAO_Domain::version(TRUE);
-      //if current version is less than 4.3.alpha1 dont create below triggers
-      if (version_compare($currentVer, '4.3.alpha1') < 0) {
-        return;
-      }
-    }
 
     // Modifications to these records should update the contact timestamps.
     \Civi\Core\SqlTrigger\TimestampTriggers::create('civicrm_contact', 'Contact')
