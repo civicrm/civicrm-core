@@ -2021,7 +2021,7 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     // Process group and tag
-    if (!empty($fields['group'])) {
+    if (isset($params['group'])) {
       $method = 'Admin';
       // this for sure means we are coming in via profile since i added it to fix
       // removing contacts from user groups -- lobo
