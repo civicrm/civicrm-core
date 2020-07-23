@@ -190,7 +190,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     if (!$dao->N) {
       $params = [
         'name' => $financialType->name,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
+        'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'financial_account_type_id' => array_search('Revenue', $financialAccountTypeID),
         'description' => $financialType->description,
         'account_type_code' => 'INC',

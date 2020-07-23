@@ -21,16 +21,20 @@
 class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
-   * Cache for the current domain object.
-   * @var object
-   */
-  public static $_domain = NULL;
-
-  /**
    * Cache for a domain's location array
    * @var array
    */
   private $_location = NULL;
+
+  /**
+   * Flushes the cache set by getDomain.
+   *
+   * @see CRM_Core_BAO_Domain::getDomain()
+   * @param CRM_Core_DAO_Domain $domain
+   */
+  public static function onPostSave($domain) {
+    Civi::$statics[__CLASS__]['current'] = NULL;
+  }
 
   /**
    * Fetch object based on array of properties.
@@ -47,21 +51,20 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Get the domain BAO.
-   *
-   * @param bool $reset
+   * Get the current domain.
    *
    * @return \CRM_Core_BAO_Domain
    * @throws \CRM_Core_Exception
    */
-  public static function getDomain($reset = NULL) {
-    static $domain = NULL;
-    if (!$domain || $reset) {
+  public static function getDomain() {
+    $domain = Civi::$statics[__CLASS__]['current'] ?? NULL;
+    if (!$domain) {
       $domain = new CRM_Core_BAO_Domain();
       $domain->id = CRM_Core_Config::domainID();
       if (!$domain->find(TRUE)) {
         throw new CRM_Core_Exception('No domain in DB');
       }
+      Civi::$statics[__CLASS__]['current'] = $domain;
     }
     return $domain;
   }
@@ -69,17 +72,16 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipUsingCache
    *
-   * @return null|string
+   * @return string
    *
    * @throws \CRM_Core_Exception
    */
   public static function version($skipUsingCache = FALSE) {
-    return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-      CRM_Core_Config::domainID(),
-      'version',
-      'id',
-      $skipUsingCache
-    );
+    if ($skipUsingCache) {
+      Civi::$statics[__CLASS__]['current'] = NULL;
+    }
+
+    return self::getDomain()->version;
   }
 
   /**
@@ -90,7 +92,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function isDBUpdateRequired() {
-    $dbVersion = CRM_Core_BAO_Domain::version();
+    $dbVersion = self::version();
     $codeVersion = CRM_Utils_System::version();
     return version_compare($dbVersion, $codeVersion) < 0;
   }
@@ -108,16 +110,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * Get the location values of a domain.
    *
-   * @return array
-   *   Location::getValues
-   *
-   * @throws \CRM_Core_Exception
+   * @return CRM_Core_BAO_Location[]|NULL
    */
-  public function &getLocationValues() {
+  public function getLocationValues() {
     if ($this->_location == NULL) {
-      $domain = self::getDomain(NULL);
       $params = [
-        'contact_id' => $domain->contact_id,
+        'contact_id' => $this->contact_id,
       ];
       $this->_location = CRM_Core_BAO_Location::getValues($params, TRUE);
 
@@ -242,9 +240,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
     }
     elseif ($multisite) {
       // create a group with that of domain name
-      $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-        CRM_Core_Config::domainID(), 'name'
-      );
+      $title = self::getDomain()->name;
       $groupID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
         $title, 'id', 'title', TRUE
       );

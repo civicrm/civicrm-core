@@ -28,17 +28,23 @@ function civicrm_api3_domain_get($params) {
   $params['version'] = $params['domain_version'] ?? NULL;
   unset($params['version']);
 
-  $bao = new CRM_Core_BAO_Domain();
   if (!empty($params['current_domain'])) {
-    $domainBAO = CRM_Core_Config::domainID();
-    $params['id'] = $domainBAO;
+    $params['id'] = CRM_Core_Config::domainID();
   }
   if (!empty($params['options']) && !empty($params['options']['is_count'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
-  $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Domain');
+  // If requesting current domain, read from cache
+  if (!empty($params['id']) && $params['id'] == CRM_Core_Config::domainID()) {
+    $bao = CRM_Core_BAO_Domain::getDomain();
+    $domains = [$params['id'] => $bao->toArray()];
+  }
+  else {
+    $bao = new CRM_Core_BAO_Domain();
+    _civicrm_api3_dao_set_filter($bao, $params, TRUE);
+    $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Domain');
+  }
 
   foreach ($domains as $domain) {
     if (!empty($domain['contact_id'])) {

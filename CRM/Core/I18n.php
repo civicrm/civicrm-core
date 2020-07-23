@@ -590,10 +590,8 @@ class CRM_Core_I18n {
    *   True if CiviCRM is in multilingual mode.
    */
   public static function isMultilingual() {
-    return (bool) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-      CRM_Core_Config::domainID(),
-      'locales'
-    );
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    return (bool) $domain->locales;
   }
 
   /**
@@ -602,11 +600,8 @@ class CRM_Core_I18n {
    * @return array|bool
    */
   public static function getMultilingual() {
-    $locales = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-      CRM_Core_Config::domainID(),
-      'locales'
-    );
-    return $locales ? CRM_Core_DAO::unSerializeField($locales, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED) : FALSE;
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    return $domain->locales ? CRM_Core_DAO::unSerializeField($domain->locales, CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED) : FALSE;
   }
 
   /**

@@ -226,10 +226,9 @@ WHERE e.id = %1";
    * @param array $entityBlock
    * @param bool $microformat
    *
-   * @return array
-   *   array of objects(CRM_Core_BAO_Location)
+   * @return CRM_Core_BAO_Location[]|NULL
    */
-  public static function &getValues($entityBlock, $microformat = FALSE) {
+  public static function getValues($entityBlock, $microformat = FALSE) {
     if (empty($entityBlock)) {
       return NULL;
     }

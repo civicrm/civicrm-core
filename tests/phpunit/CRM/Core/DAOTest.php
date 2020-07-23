@@ -518,14 +518,14 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   public function testSupportedFields() {
     // Hack a different db version which will trigger getSupportedFields to filter out newer fields
-    \CRM_Core_DAO::$_dbColumnValueCache['CRM_Core_DAO_Domain']['id'][1]['version'] = '5.26.0';
+    CRM_Core_BAO_Domain::getDomain()->version = '5.26.0';
 
     $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
     // 'icon' was added in 5.28
     $this->assertArrayNotHasKey('icon', $customGroupFields);
 
     // Remove domain version override:
-    \CRM_Core_DAO::$_dbColumnValueCache = NULL;
+    CRM_Core_BAO_Domain::version(TRUE);
 
     $activityFields = CRM_Activity_DAO_Activity::getSupportedFields();
     // Fields should be indexed by name not unique_name (which is "activity_id")
