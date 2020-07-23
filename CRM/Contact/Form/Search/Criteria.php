@@ -45,7 +45,7 @@ class CRM_Contact_Form_Search_Criteria {
         $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($form->_group, NULL, '&nbsp;&nbsp;', TRUE);
 
         $form->add('select', 'group', ts('Groups'), $groupHierarchy, FALSE,
-          ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
+         ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
         );
         $groupOptions = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('group_type');
         $form->add('select', 'group_type', ts('Group Types'), $groupOptions, FALSE,
