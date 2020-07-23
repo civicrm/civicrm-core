@@ -1116,7 +1116,7 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.status = function(options, deferred) {
     // For simple usage without async operations you can pass in a string. 2nd param is optional string 'error' if this is not a success msg.
@@ -1180,7 +1180,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.alert = function (text, title, type, options) {
     type = type || 'alert';
@@ -1228,7 +1228,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.confirm = function (options) {
     var dialog, url, msg, buttons = [], settings = {
@@ -1306,7 +1306,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   $.fn.crmError = function (text, title, options) {
     title = title || '';

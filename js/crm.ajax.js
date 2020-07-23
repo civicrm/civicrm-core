@@ -1,7 +1,7 @@
 // https://civicrm.org/licensing
 /**
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+ * @see https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
+ * @see https://docs.civicrm.org/dev/en/latest/framework/ajax/
  */
 (function($, CRM, _, undefined) {
   /**
