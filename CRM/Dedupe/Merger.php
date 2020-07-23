@@ -911,7 +911,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           unset($dupePairs[$index]);
           continue;
         }
-        if (($result = self::dedupePair($dupes, $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
+        CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
+        if (($result = self::dedupePair((int) $dupes['dstID'], (int) $dupes['srcID'], $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
           unset($dupePairs[$index]);
           continue;
         }
@@ -1844,26 +1845,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Dedupe a pair of contacts.
    *
-   * @param array $dupes
+   * @param int $mainId Id of contact to keep.
+   * @param int $otherId Id of contact to delete.
    * @param string $mode
    * @param bool $checkPermissions
    * @param string $cacheKeyString
    *
    * @return bool|array
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception_ResourceConflictException
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected static function dedupePair($dupes, $mode = 'safe', $checkPermissions = TRUE, $cacheKeyString = NULL) {
-    CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
-    $mainId = $dupes['dstID'];
-    $otherId = $dupes['srcID'];
+  protected static function dedupePair(int $mainId, int $otherId, $mode = 'safe', $checkPermissions = TRUE, $cacheKeyString = NULL) {
     $resultStats = [];
 
-    if (!$mainId || !$otherId) {
-      // return error
-      return FALSE;
-    }
     $migrationInfo = [];
     $conflicts = [];
     // Try to lock the contacts before we load the data as we don't want it changing under us.
