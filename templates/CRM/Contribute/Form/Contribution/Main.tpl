@@ -56,6 +56,11 @@
     </div>
   {/if}
 
+  {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+    {capture assign="configureURL"}{crmURL p="civicrm/admin/contribute/settings" q="reset=1&action=update&id=`$contributionPageID`"}{/capture}
+    {ts 1=$configureURL}<a class="button " target="_blank" href=%1><i aria-hidden="true" title="Configure Contribution Page" class="crm-i fa-wrench"></i> Configure</a>{/ts}
+    <div class='clear'></div>
+  {/if}
   {include file="CRM/common/TrackingFields.tpl"}
 
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
