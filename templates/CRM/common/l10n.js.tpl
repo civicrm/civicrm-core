@@ -96,7 +96,15 @@
     errorClass: 'crm-inline-error alert-danger',
     messages: {},
     ignore: '.select2-offscreen, [readonly], :hidden:not(.crm-select2), .crm-no-validate',
-    ignoreTitle: true
+    ignoreTitle: true,
+    errorPlacement: function(error, element) {
+      if (element.prop('type') === 'radio') {
+        error.appendTo(element.parent('div.content'));
+      }
+      else {
+        error.insertAfter(element);
+      }
+    }
   };
 
   // use civicrm notifications when there are errors
