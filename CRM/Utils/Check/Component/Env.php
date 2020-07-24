@@ -17,7 +17,7 @@
 class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkPhpVersion() {
     $messages = [];
@@ -82,7 +82,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkPhpMysqli() {
     $messages = [];
@@ -107,7 +107,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Check that the MySQL time settings match the PHP time settings.
    *
-   * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMysqlTime() {
     $messages = [];
@@ -131,7 +131,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDebug() {
     $config = CRM_Core_Config::singleton();
@@ -157,7 +157,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkOutboundMail() {
     $messages = [];
@@ -188,7 +188,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check that domain email and org name are set
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDomainNameEmail() {
     $messages = [];
@@ -238,7 +238,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if a default bounce handling mailbox is set up
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDefaultMailbox() {
     $messages = [];
@@ -273,7 +273,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if cron has run in the past hour (3600 seconds)
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    * @throws CRM_Core_Exception
    */
   public function checkLastCron() {
@@ -337,7 +337,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Recommend that sites use path-variables for their directories and URLs.
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkUrlVariables() {
     $messages = [];
@@ -374,7 +374,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Recommend that sites use path-variables for their directories and URLs.
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDirVariables() {
     $messages = [];
@@ -414,8 +414,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Check that important directories are writable.
    *
-   * @return array
-   *   Any CRM_Utils_Check_Message instances that need to be generated.
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDirsWritable() {
     $notWritable = [];
@@ -463,7 +462,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if new versions are available
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkVersion() {
     $messages = [];
@@ -513,7 +512,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if extensions are set up properly
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkExtensions() {
     $messages = [];
@@ -708,7 +707,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Checks if there are pending extension upgrades.
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkExtensionUpgrades() {
     if (CRM_Extension_Upgrades::hasPending()) {
@@ -732,7 +731,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if CiviCRM database version is up-to-date
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDbVersion() {
     $messages = [];
@@ -801,8 +800,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * ensure that all CiviCRM tables are InnoDB
-   * @return array
+   * Ensure that all CiviCRM tables are InnoDB
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDbEngine() {
     $messages = [];
@@ -820,8 +819,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * ensure reply id is set to any default value
-   * @return array
+   * Ensure reply id is set to any default value
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkReplyIdForMailing() {
     $messages = [];
@@ -845,7 +844,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check for required mbstring extension
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMbstring() {
     $messages = [];
@@ -864,7 +863,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check if environment is Production.
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkEnvironment() {
     $messages = [];
@@ -885,7 +884,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Check for utf8mb4 support by MySQL.
    *
-   * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMysqlUtf8mb4() {
     $messages = [];

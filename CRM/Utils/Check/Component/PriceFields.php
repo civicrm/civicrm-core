@@ -19,7 +19,7 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
 
   /**
    * Display warning about invalid priceFields
-   *
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkPriceFields() {
     $sql = "SELECT DISTINCT ps.title as ps_title, ps.id as ps_id, psf.label as psf_label

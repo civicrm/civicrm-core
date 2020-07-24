@@ -19,7 +19,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   /**
    * Check defined indices exist.
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    * @throws \CiviCRM_API3_Exception
    */
   public function checkIndices() {
@@ -62,7 +62,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMissingLogTables() {
     $messages = [];
@@ -91,7 +91,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   /**
    * Check that no smart groups exist that contain deleted custom fields.
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkSmartGroupCustomFieldCriteria() {
     if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
@@ -182,6 +182,9 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * @return CRM_Utils_Check_Message[]
+   */
   public function checkMoneyValueFormatConfig() {
     $messages = [];
     if (CRM_Core_Config::singleton()->moneyvalueformat !== '%!i') {
