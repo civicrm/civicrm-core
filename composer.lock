@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0a0679ca623418ab9273d71dee6f5cd",
+    "content-hash": "1ff9c045fb03756148c0c66562aa61fd",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -1113,6 +1113,57 @@
             "description": "Class that provides multiple interfaces for sending emails.",
             "homepage": "http://pear.php.net/package/Mail",
             "time": "2017-04-11T17:27:29+00:00"
+        },
+        {
+            "name": "pear/mail_mime",
+            "version": "1.10.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear/Mail_Mime.git",
+                "reference": "1e7ae4e5258b6c0d385a8e76add567934245d38d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/1e7ae4e5258b6c0d385a8e76add567934245d38d",
+                "reference": "1e7ae4e5258b6c0d385a8e76add567934245d38d",
+                "shasum": ""
+            },
+            "require": {
+                "pear/pear-core-minimal": "*"
+            },
+            "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://raw.githubusercontent.com/civicrm/civicrm-core/74e25f27bb3be32519657539afe8a285c6c99a08/tools/scripts/composer/patches/mail_mime_crm_3133.patch"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Mail": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "./"
+            ],
+            "license": [
+                "BSD-3-clause"
+            ],
+            "authors": [
+                {
+                    "name": "Cipriano Groenendal",
+                    "email": "cipri@php.net",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Aleksander Machniak",
+                    "email": "alec@php.net",
+                    "role": "Lead"
+                }
+            ],
+            "description": "Mail_Mime provides classes to create MIME messages",
+            "homepage": "http://pear.php.net/package/Mail_Mime",
+            "time": "2020-06-27T08:35:27+00:00"
         },
         {
             "name": "pear/net_smtp",
