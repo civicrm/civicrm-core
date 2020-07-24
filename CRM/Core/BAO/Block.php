@@ -439,7 +439,7 @@ class CRM_Core_BAO_Block {
       /*
        * If the only existing email is the one we are editing then we must set
        * is_primary to 1
-       * CRM-10451
+       * @see https://issues.civicrm.org/jira/browse/CRM-10451
        */
       if ($existingEntities->N == 1 && $existingEntities->id == CRM_Utils_Array::value('id', $params)) {
         $params['is_primary'] = 1;

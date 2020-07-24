@@ -109,7 +109,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   /**
    * Trim job table on a regular basis to keep it at a good size.
    *
-   * CRM-10513
+   * @see https://issues.civicrm.org/jira/browse/CRM-10513
    *
    * @param int $maxEntriesToKeep
    * @param int $minDaysToKeep

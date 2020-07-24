@@ -1737,7 +1737,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Calculate non deductible amount.
    *
-   * CRM-11956
+   * @see https://issues.civicrm.org/jira/browse/CRM-11956
    * if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
    * if non_deductible_amount does NOT exist - then calculate it depending on:
    * $financialType->is_deductible and whether there is a product (premium).

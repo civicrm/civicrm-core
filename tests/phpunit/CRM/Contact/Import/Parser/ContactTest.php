@@ -158,7 +158,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
    *
-   * CRM-17275
+   * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @throws \Exception
    */
@@ -183,7 +183,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
    *
-   * CRM-17275
+   * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @throws \Exception
    */

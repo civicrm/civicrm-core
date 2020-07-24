@@ -3939,7 +3939,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   /**
    * Delete contribution of contact.
    *
-   * CRM-12155
+   * @see https://issues.civicrm.org/jira/browse/CRM-12155
    *
    * @param int $contactId
    *   Contact id.
@@ -4004,7 +4004,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   /**
    * Validate financial type.
    *
-   * CRM-13231
+   * @see https://issues.civicrm.org/jira/browse/CRM-13231
    *
    * @param int $financialTypeId
    *   Financial Type id.

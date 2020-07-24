@@ -2319,7 +2319,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Test that the various repetition units work correctly.
-   * CRM-17028
+   * @see https://issues.civicrm.org/jira/browse/CRM-17028
    */
   public function testRepetitionFrequencyUnit() {
     $membershipTypeParams = [

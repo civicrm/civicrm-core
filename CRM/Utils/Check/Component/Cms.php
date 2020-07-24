@@ -19,8 +19,7 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
   /**
    * For sites running in WordPress, make sure the configured base page exists.
    *
-   * @return array
-   *   Instances of CRM_Utils_Check_Message
+   * @return CRM_Utils_Check_Message[]
    */
   public static function checkWpBasePage() {
     $config = CRM_Core_Config::singleton();

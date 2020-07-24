@@ -20,6 +20,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * CMS have a different pattern to their default file path and URL.
    *
    * @todo Use Civi::paths instead?
+   * @return string
    */
   public function getFilePathMarker() {
     $config = CRM_Core_Config::singleton();
@@ -47,8 +48,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * is browseable or visible to search engines; it means it can be
    * requested directly.
    *
-   * @return array
-   *   Array of messages
+   * @return CRM_Utils_Check_Message[]
    * @see CRM-14091
    */
   public function checkLogFileIsNotAccessible() {
@@ -100,8 +100,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * Being retrievable doesn't mean the files are browseable or visible
    * to search engines; it only means they can be requested directly.
    *
-   * @return array
-   *   Array of messages
+   * @return CRM_Utils_Check_Message[]
    * @see CRM-14091
    *
    * @todo Test with WordPress, Joomla.
@@ -148,8 +147,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * MAY trigger false positives (if you have files named 'a', 'e'
    * we'll probably match that).
    *
-   * @return array
-   *   Array of messages
+   * @return CRM_Utils_Check_Message[]
    * @see CRM-14091
    *
    * @todo Test with WordPress, Joomla.
@@ -192,7 +190,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * These files have generally been deleted but Civi source tree but could be
    * left online if one does a faulty upgrade.
    *
-   * @return array of messages
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkFilesAreNotPresent() {
     $packages_path = rtrim(\Civi::paths()->getPath('[civicrm.packages]/'), '/' . DIRECTORY_SEPARATOR);
@@ -241,6 +239,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
   /**
    * Discourage use of remote profile forms.
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkRemoteProfile() {
     $messages = [];
@@ -261,8 +260,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Check that the sysadmin has not modified the Cxn
-   * security setup.
+   * Check that the sysadmin has not modified the Cxn security setup.
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkCxnOverrides() {
     $list = [];

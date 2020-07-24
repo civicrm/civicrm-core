@@ -62,7 +62,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-20989
+   * @see https://issues.civicrm.org/jira/browse/CRM-20989
    * Add unit test to ensure that filtering by domain works in get Active Providers
    */
   public function testActiveProviderCount() {

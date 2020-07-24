@@ -485,7 +485,7 @@ LIMIT 1
 
   /**
    * Format monetary amount: round and return to desired decimal place
-   * CRM-20145
+   * @see https://issues.civicrm.org/jira/browse/CRM-20145
    *
    * @param float $amount
    *   Monetary amount

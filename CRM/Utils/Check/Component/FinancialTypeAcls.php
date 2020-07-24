@@ -16,6 +16,10 @@
  */
 class CRM_Utils_Check_Component_FinancialTypeAcls extends CRM_Utils_Check_Component {
 
+  /**
+   * @return CRM_Utils_Check_Message[]
+   * @throws CiviCRM_API3_Exception
+   */
   public static function checkFinancialAclReport() {
     $messages = [];
     $ftAclSetting = Civi::settings()->get('acl_financial_type');

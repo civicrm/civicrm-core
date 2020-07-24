@@ -271,7 +271,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * Do general cleanup of caches, temp directories and temp tables
-   * CRM-8739
+   * @see https://issues.civicrm.org/jira/browse/CRM-8739
    *
    * @param bool $sessionReset
    */
