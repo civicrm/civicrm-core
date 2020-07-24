@@ -1885,7 +1885,7 @@ order by cc.id; ";
    * @param null $financialAccountId
    */
   private function addFinancialItem($result, $financialAccountId) {
-    $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
+    $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = 1");
     while ($result->fetch()) {
       $trxnParams = array(
         'trxn_date' => CRM_Utils_Date::processDate($result->receive_date),
