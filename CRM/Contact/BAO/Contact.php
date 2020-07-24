@@ -2053,8 +2053,6 @@ ORDER BY civicrm_email.is_primary DESC";
       CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $addToGroupID);
     }
 
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
-
     if ($editHook) {
       CRM_Utils_Hook::post('edit', 'Profile', $contactID, $params);
     }
