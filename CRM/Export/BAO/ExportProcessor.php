@@ -1560,12 +1560,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   protected function getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel) {
-    if ($entityLabel || $key === 'im') {
-      // Just cos that's the history...
-      if ($key !== 'master_id') {
-        $key = $this->getHeaderForRow($key);
-      }
-    }
     if (!$relationshipType || $key !== 'id') {
       $key = $this->getMungedFieldName($key);
     }
@@ -1613,12 +1607,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   protected function getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel) {
-    if ($entityLabel || $key === 'im') {
-      if ($key !== 'state_province' && $key !== 'id') {
-        // @todo - test removing this - indexing by $key should be fine...
-        $key = $this->getHeaderForRow($key);
-      }
-    }
     if (!$relationshipType || $key !== 'id') {
       $key = $this->getMungedFieldName($key);
     }
