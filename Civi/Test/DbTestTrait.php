@@ -184,7 +184,7 @@ trait DbTestTrait {
     $actual = \CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
       sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
-        $message, $expected, $actual, \CRM_Core_DAO::composeQuery($query, $params, FALSE)
+        $message, $expected, $actual, \CRM_Core_DAO::composeQuery($query, $params)
       )
     );
   }
