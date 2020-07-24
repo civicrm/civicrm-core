@@ -342,7 +342,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       + array_column($relationshipTypes, 'id', 'label_b_a');
     $missing = [];
     foreach ($caseTypes as $caseType) {
-      foreach ($caseType['definition']['caseRoles'] as $role) {
+      foreach ($caseType['definition']['caseRoles'] ?? [] as $role) {
         if (!isset($allConfigured[$role['name']])) {
           $missing[$role['name']] = $role['name'];
         }
