@@ -2841,7 +2841,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Test long display names.
    *
-   * CRM-21258
+   * @see https://issues.civicrm.org/jira/browse/CRM-21258
    *
    * @param int $version
    *
@@ -4120,7 +4120,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * We are checking that there is no error due to attempting to add an activity for the
    * deleted contact.
    *
-   * CRM-18307
+   * @see https://issues.civicrm.org/jira/browse/CRM-18307
    */
   public function testMergeNoTrash() {
     $this->createLoggedInUser();
@@ -4138,7 +4138,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Ensure format with return=group shows comma-separated group IDs.
    *
-   * CRM-19426
+   * @see https://issues.civicrm.org/jira/browse/CRM-19426
    *
    * @throws \CRM_Core_Exception
    */

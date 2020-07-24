@@ -164,7 +164,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Create default entity financial accounts
    * for financial type
-   * CRM-12470
+   * @see https://issues.civicrm.org/jira/browse/CRM-12470
    *
    * @param $financialType
    *

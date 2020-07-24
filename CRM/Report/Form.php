@@ -153,9 +153,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    * separately marked every class with a groupFilter in the hope that will trigger
    * people to fix them as they touch them.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 

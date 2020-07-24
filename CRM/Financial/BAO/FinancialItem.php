@@ -221,7 +221,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Check if contact is present in financial_item table.
    *
-   * CRM-12929
+   * @see https://issues.civicrm.org/jira/browse/CRM-12929
    *
    * @param array $contactIds
    *   An array contact id's.

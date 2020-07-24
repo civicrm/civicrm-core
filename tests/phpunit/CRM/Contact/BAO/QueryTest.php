@@ -511,7 +511,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Test smart groups with non-numeric don't fail on range queries.
    *
-   * CRM-14720
+   * @see https://issues.civicrm.org/jira/browse/CRM-14720
    *
    * @throws \CRM_Core_Exception
    */
@@ -586,7 +586,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   /**
    * Test smart groups with non-numeric don't fail on equal queries.
    *
-   * CRM-14720
+   * @see https://issues.civicrm.org/jira/browse/CRM-14720
    *
    * @throws \CRM_Core_Exception
    */

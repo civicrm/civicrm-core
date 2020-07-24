@@ -612,7 +612,7 @@ class CRM_Contact_BAO_Query {
    *
    * this code is primarily for search builder use case where different clauses can specify if they want deleted.
    *
-   * CRM-11971
+   * @see https://issues.civicrm.org/jira/browse/CRM-11971
    */
   public function buildParamsLookup() {
     $trashParamExists = FALSE;
@@ -4789,7 +4789,7 @@ civicrm_relationship.start_date > {$today}
    * Country is implicit from the state, but including both results in
    * a poor query as there is no combined index on state AND country.
    *
-   * CRM-18125
+   * @see https://issues.civicrm.org/jira/browse/CRM-18125
    *
    * @param array $formValues
    */
