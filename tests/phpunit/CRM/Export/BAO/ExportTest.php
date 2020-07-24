@@ -279,7 +279,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Phone Extension' => '',
       'Phone Type' => '',
       'Email' => 'home@example.com',
-      'On Hold' => '',
+      'On Hold' => 'No',
       'Use for Bulk Mail' => '',
       'Signature Text' => '',
       'Signature Html' => '',
@@ -1089,7 +1089,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Phone Extension' => '',
       'Phone Type' => '',
       'Email' => 'home@example.com',
-      'On Hold' => '',
+      'On Hold' => 'No',
       'Use for Bulk Mail' => '',
       'Signature Text' => '',
       'Signature Html' => '',
@@ -2896,7 +2896,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         $this->assertContains($row[$key], $alternatives[$key]);
       }
       else {
-        $this->assertEquals($value, $row[$key]);
+        $this->assertEquals($value, $row[$key], 'mismatch on ' . $key);
       }
     }
   }
