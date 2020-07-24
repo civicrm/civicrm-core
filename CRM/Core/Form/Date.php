@@ -38,14 +38,14 @@ class CRM_Core_Form_Date {
       $dateText = ts('yyyy-mm-dd OR yyyymmdd (1998-12-25 OR 19981225) OR (2008-9-1 OR 20080901)');
     }
 
-    $dateOptions[] = $form->createElement('radio', NULL, NULL, $dateText, self::DATE_yyyy_mm_dd);
-
-    $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('mm/dd/yy OR mm-dd-yy (12/25/98 OR 12-25-98) OR (9/1/08 OR 9-1-08)'), self::DATE_mm_dd_yy);
-    $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('mm/dd/yyyy OR mm-dd-yyyy (12/25/1998 OR 12-25-1998) OR (9/1/2008 OR 9-1-2008)'), self::DATE_mm_dd_yyyy);
-    $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('Month dd, yyyy (December 12, 1998)'), self::DATE_Month_dd_yyyy);
-    $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('dd-mon-yy OR dd/mm/yy (25-Dec-98 OR 25/12/98)'), self::DATE_dd_mon_yy);
-    $dateOptions[] = $form->createElement('radio', NULL, NULL, ts('dd/mm/yyyy (25/12/1998) OR (1/9/2008)'), self::DATE_dd_mm_yyyy);
-    $form->addGroup($dateOptions, 'dateFormats', ts('Date Format'), '<br/>');
+    $form->addRadio('dateFormats', ts('Date Format'), [
+      self::DATE_yyyy_mm_dd => $dateText,
+      self::DATE_mm_dd_yy => ts('mm/dd/yy OR mm-dd-yy (12/25/98 OR 12-25-98) OR (9/1/08 OR 9-1-08)'),
+      self::DATE_mm_dd_yyyy => ts('mm/dd/yyyy OR mm-dd-yyyy (12/25/1998 OR 12-25-1998) OR (9/1/2008 OR 9-1-2008)'),
+      self::DATE_Month_dd_yyyy => ts('Month dd, yyyy (December 12, 1998)'),
+      self::DATE_dd_mon_yy => ts('dd-mon-yy OR dd/mm/yy (25-Dec-98 OR 25/12/98)'),
+      self::DATE_dd_mm_yyyy => ts('dd/mm/yyyy (25/12/1998) OR (1/9/2008)'),
+    ], [], '<br/>');
     $form->setDefaults(['dateFormats' => self::DATE_yyyy_mm_dd]);
   }
 

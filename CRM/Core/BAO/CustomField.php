@@ -822,12 +822,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
           // Add and/or option for fields that store multiple values
           if ($search && self::isSerialized($field)) {
-
-            $operators = [
-              $qf->createElement('radio', NULL, '', ts('Any'), 'or', ['title' => ts('Results may contain any of the selected options')]),
-              $qf->createElement('radio', NULL, '', ts('All'), 'and', ['title' => ts('Results must have all of the selected options')]),
-            ];
-            $qf->addGroup($operators, $elementName . '_operator');
+            $qf->addRadio($elementName . '_operator', '', [
+              'or' => ts('Any'),
+              'and' => ts('All'),
+            ], [], NULL, FALSE, [
+              'or' => ['title' => ts('Results may contain any of the selected options')],
+              'and' => ['title' => ts('Results must have all of the selected options')],
+            ]);
             $qf->setDefaults([$elementName . '_operator' => 'or']);
           }
         }
