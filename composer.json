@@ -77,7 +77,8 @@
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^2 || ^3.0",
     "brick/money": "~0.4",
-    "ext-intl": "*"
+    "ext-intl": "*",
+    "pear/mail_mime": "~1.10"
   },
   "scripts": {
     "post-install-cmd": [
@@ -252,6 +253,9 @@
       },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+      },
+      "pear/mail_mime": {
+        "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://raw.githubusercontent.com/civicrm/civicrm-core/74e25f27bb3be32519657539afe8a285c6c99a08/tools/scripts/composer/patches/mail_mime_crm_3133.patch"
       },
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
