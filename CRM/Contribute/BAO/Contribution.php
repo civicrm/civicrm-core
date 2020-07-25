@@ -1321,7 +1321,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           FALSE,
           'Payment.edit.action',
           'Payment',
-          $resultDAO->id
+          $resultDAO->id,
+          'icon'
         );
       }
 
