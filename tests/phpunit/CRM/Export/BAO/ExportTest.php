@@ -717,7 +717,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportIMData() {
     // Use default providers.
-    $providers = ['AIM', 'GTalk', 'Jabber', 'MSN', 'Skype', 'Yahoo'];
+    $providers = ['Aim', 'Gtalk', 'Jabber', 'Msn', 'Skype', 'Yahoo'];
     // Main sure labels are not all anglo chars.
     $this->diversifyLocationTypes();
 
@@ -757,47 +757,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
     }
 
-    $fields = [['Individual', 'contact_id']];
+    $fields = [['name' => 'contact_id']];
     // ' ' denotes primary location type.
     foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
-      $fields[] = [
-        'Individual',
-        'im_provider',
-        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-      ];
+      $locationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType);
+      $fields[] = ['name' => 'im_provider', 'location_type_id' => $locationTypeID];
       foreach ($relationships as $contactID => $relationship) {
-        $fields[] = [
-          'Individual',
-          $relationship['relationship_type_id'] . '_a_b',
-          'im_provider',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-        ];
+        $fields[] = ['name' => 'im_provider', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
       }
       foreach ($providers as $provider) {
-        $fields[] = [
-          'Individual',
-          'im',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', $provider),
-        ];
+        $providerID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', $provider);
+        $fields[] = ['name' => 'im', 'location_type_id' => $locationTypeID, 'im_provider_id' => $providerID];
         foreach ($relationships as $contactID => $relationship) {
-          $fields[] = [
-            'Individual',
-            $relationship['relationship_type_id'] . '_a_b',
-            'im',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', $provider),
-          ];
+          $fields[] = ['name' => 'im', 'location_type_id' => $locationTypeID, 'im_provider_id' => $providerID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b'];
         }
       }
     }
 
-    // @todo switch to just declaring the new format....
-    $mappedFields = [];
-    foreach ($fields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
 
     foreach ($this->csv->getRecords() as $row) {
       $id = $row['Contact ID'];
@@ -857,51 +834,25 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
     }
 
-    $fields = [['Individual', 'contact_id']];
+    $fields = [];
     // ' ' denotes primary location type.
     foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
-      $fields[] = [
-        'Individual',
-        'phone',
-        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-      ];
-      $fields[] = [
-        'Individual',
-        'phone_type_id',
-        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-      ];
+      $locationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType);
+      $fields[] = ['name' => 'phone', 'location_type_id' => $locationTypeID];
+      $fields[] = ['name' => 'phone_type_id', 'location_type_id' => $locationTypeID];
       foreach ($relationships as $contactID => $relationship) {
-        $fields[] = [
-          'Individual',
-          $relationship['relationship_type_id'] . '_a_b',
-          'phone_type_id',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-        ];
+        $fields[] = ['name' => 'phone_type_id', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
       }
       foreach ($phoneTypes as $phoneType) {
-        $fields[] = [
-          'Individual',
-          'phone',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType),
-        ];
+        $phoneTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType);
+        $fields[] = ['name' => 'phone', 'phone_type_id' => $phoneTypeID, 'location_type_id' => $locationTypeID];
         foreach ($relationships as $contactID => $relationship) {
-          $fields[] = [
-            'Individual',
-            $relationship['relationship_type_id'] . '_a_b',
-            'phone_type_id',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType),
-          ];
+          $fields[] = ['name' => 'phone_type_id', 'phone_type_id' => $phoneTypeID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
         }
       }
     }
-    // @todo switch to just declaring the new format....
-    $mappedFields = [];
-    foreach ($fields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
+
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
     foreach ($this->csv->getRecords() as $row) {
       $this->assertEquals('BillingMobile3', $row['Billing-Phone-Mobile']);
       $this->assertEquals('', $row['Billing-Phone-Phone']);
@@ -2895,17 +2846,22 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @throws \League\Csv\Exception
    */
   protected function doExportTest($params) {
+    $fields = $params['fields'] ?? [];
+    $fieldDefaults = ['contact_type' => 'Individual', 'phone_type_id' => NULL, 'location_type_id' => NULL];
+    foreach ($fields as $key => $field) {
+      $fields[$key] = array_merge($fieldDefaults, $field);
+    }
     $this->startCapturingOutput();
     try {
       $exportMode = CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT);
       $ids = CRM_Utils_Array::value('ids', $params, ($exportMode === CRM_Export_Form_Select::CONTACT_EXPORT ? $this->contactIDs : []));
-      $defaultClause = (empty($ids) ? NULL : "contact_a.id IN (" . implode(',', $ids) . ")");
+      $defaultClause = (empty($ids) ? NULL : 'contact_a.id IN (' . implode(',', $ids) . ')');
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
         $ids,
         CRM_Utils_Array::value('params', $params, []),
         CRM_Utils_Array::value('order', $params),
-        CRM_Utils_Array::value('fields', $params, []),
+        $fields,
         CRM_Utils_Array::value('moreReturnProperties', $params),
         $exportMode,
         CRM_Utils_Array::value('componentClause', $params, $defaultClause),
@@ -2953,18 +2909,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportGetPreview() {
     $this->setUpContactExportData();
     $fields = [
-      ['Individual', 'first_name'],
-      ['Individual', 'last_name'],
-      ['Individual', 'street_address', 1],
-      ['Individual', 'city', 1],
-      ['Individual', 'country', 1],
-      ['Individual', 'email', 1],
+      ['contact_type' => 'Individual', 'name' => 'first_name'],
+      ['contact_type' => 'Individual', 'name' => 'last_name'],
+      ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'country', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => 1],
     ];
-    $mappedFields = [];
-    foreach ($fields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    $processor = new CRM_Export_BAO_ExportProcessor(FALSE, $mappedFields,
+    $processor = new CRM_Export_BAO_ExportProcessor(FALSE, $fields,
     'AND');
     $processor->setComponentClause('contact_a.id IN (' . implode(',', $this->contactIDs) . ')');
     $result = $processor->getPreview(2);
