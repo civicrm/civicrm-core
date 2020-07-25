@@ -416,6 +416,10 @@
         addJoins($scope.fieldsAndJoinsAndFunctionsWithSuffixes, false, ['name', 'label']);
         addJoins($scope.fieldsAndJoinsAndFunctionsAndWildcards, true, ['name', 'label']);
       }
+      // Custom fields are supported if HAVING is
+      if (actionInfo.params.having) {
+        $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: 'custom.*', text: 'custom.*', 'description': 'All custom fields'});
+      }
       $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
     };
 

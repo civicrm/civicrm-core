@@ -187,10 +187,25 @@ class Api4SelectQuery {
         $select = array_merge(['id'], $select);
       }
 
+      // Expand the superstar 'custom.*' to select all fields in all custom groups
+      $customStar = array_search('custom.*', array_values($select), TRUE);
+      if ($customStar !== FALSE) {
+        $customGroups = civicrm_api4($this->getEntity(), 'getFields', [
+          'checkPermissions' => FALSE,
+          'where' => [['custom_group', 'IS NOT NULL']],
+        ], ['custom_group' => 'custom_group']);
+        $customSelect = [];
+        foreach ($customGroups as $groupName) {
+          $customSelect[] = "$groupName.*";
+        }
+        array_splice($select, $customStar, 1, $customSelect);
+      }
+
       // Expand wildcards in joins (the api wrapper already expanded non-joined wildcards)
       $wildFields = array_filter($select, function($item) {
         return strpos($item, '*') !== FALSE && strpos($item, '.') !== FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
       });
+
       foreach ($wildFields as $item) {
         $pos = array_search($item, array_values($select));
         $this->autoJoinFK($item);
