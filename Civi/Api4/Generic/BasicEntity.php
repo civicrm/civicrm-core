@@ -129,6 +129,15 @@ abstract class BasicEntity extends AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return BasicCopyAction
+   */
+  public static function copy($checkPermissions = TRUE) {
+    return (new BasicCopyAction(static::class, __FUNCTION__, static::$idField))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return BasicReplaceAction
    */
   public static function replace($checkPermissions = TRUE) {

@@ -83,6 +83,15 @@ abstract class DAOEntity extends AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return BasicCopyAction
+   */
+  public static function copy($checkPermissions = TRUE) {
+    return (new BasicCopyAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return BasicReplaceAction
    */
   public static function replace($checkPermissions = TRUE) {
