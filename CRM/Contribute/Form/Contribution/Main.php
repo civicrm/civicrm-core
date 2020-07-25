@@ -444,10 +444,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           ['onclick' => "showHideByValue('pcp_display_in_roll','','nameID|nickID|personalNoteID','block','radio',false); pcpAnonymous( );"]
         );
         $extraOption = ['onclick' => "return pcpAnonymous( );"];
-        $elements = [];
-        $elements[] = &$this->createElement('radio', NULL, '', ts('Include my name and message'), 0, $extraOption);
-        $elements[] = &$this->createElement('radio', NULL, '', ts('List my contribution anonymously'), 1, $extraOption);
-        $this->addGroup($elements, 'pcp_is_anonymous', NULL, '&nbsp;&nbsp;&nbsp;');
+        $this->addRadio('pcp_is_anonymous', NULL, [ts('Include my name and message'), ts('List my contribution anonymously')], [], '&nbsp;&nbsp;&nbsp;', FALSE, [$extraOption, $extraOption]);
 
         $this->add('text', 'pcp_roll_nickname', ts('Name'), ['maxlength' => 30]);
         $this->addField('pcp_personal_note', ['entity' => 'ContributionSoft', 'context' => 'create', 'style' => 'height: 3em; width: 40em;']);

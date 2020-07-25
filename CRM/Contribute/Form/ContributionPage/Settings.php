@@ -157,10 +157,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
 
-    $options = [];
-    $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
-    $options[] = $this->createElement('radio', NULL, NULL, ts('Required'), 2);
-    $this->addGroup($options, 'is_for_organization', '');
+    $this->addRadio('is_for_organization', '', [1 => ts('Optional'), 2 => ts('Required')]);
     $this->add('textarea', 'for_organization', ts('On behalf of Label'), ['rows' => 2, 'cols' => 50]);
 
     // collect goal amount

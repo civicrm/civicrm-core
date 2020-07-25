@@ -556,15 +556,12 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('demographic')]);
     $form->addFormFieldsFromMetadata();
     // radio button for gender
-    $genderOptions = [];
+    $genderOptionsAttributes = [];
     $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($gender as $key => $var) {
-      $genderOptions[$key] = $form->createElement('radio', NULL,
-        ts('Gender'), $var, $key,
-        ['id' => "civicrm_gender_{$var}_{$key}"]
-      );
+      $genderOptionsAttributes[$key] = ['id' => "civicrm_gender_{$var}_{$key}"];
     }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
+    $form->addRadio('gender_id', ts('Gender'), $gender, ['allowClear' => TRUE], NULL, FALSE, $genderOptionsAttributes);
 
     $form->add('number', 'age_low', ts('Min Age'), ['class' => 'four', 'min' => 0]);
     $form->addRule('age_low', ts('Please enter a positive integer'), 'positiveInteger');
