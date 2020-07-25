@@ -121,7 +121,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $siteKey = mt_rand();
     $apiKey = mt_rand();
     $restUrl = CRM_Utils_System::externUrl('extern/rest', "entity=Contact&action=get&key=$siteKey&api_key=$apiKey");
-    $this->assertContains('extern/rest.php', $restUrl);
+    $this->assertContains('api/3/rest', $restUrl);
     $this->assertContains('?', $restUrl);
     $this->assertContains('entity=Contact', $restUrl);
     $this->assertContains('action=get', $restUrl);

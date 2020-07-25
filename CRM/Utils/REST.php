@@ -227,14 +227,24 @@ class CRM_Utils_REST {
     if (!$api_key || strtolower($api_key) == 'null') {
       return self::error("FATAL: mandatory param 'api_key' (user key) missing");
     }
-    $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
-
-    // If we didn't find a valid user, die
-    if (empty($valid_user)) {
-      return self::error("User API key invalid");
+    $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+    if ($contact_id) {
+      $uid = CRM_Core_BAO_UFMatch::getUFId($contact_id);
     }
 
-    return self::process($args, self::buildParamList());
+    if ($uid && $contact_id) {
+      CRM_Utils_System::loadBootStrap(['uid' => $uid], TRUE, FALSE);
+      $session = CRM_Core_Session::singleton();
+      $session->set('ufID', $uid);
+      $session->set('userID', $contact_id);
+      CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
+        [1 => [$contact_id, 'Integer']]
+      );
+      return self::process($args, self::buildParamList());
+    }
+    else {
+      return self::error('ERROR: No CMS user associated with given api-key');
+    }
   }
 
   /**
@@ -589,7 +599,7 @@ class CRM_Utils_REST {
         // this is pretty wonky but maybe there's some reason I can't see
         return NULL;
       }
-      if (count($args) != 3) {
+      if (count($args) != 3 && count($args) !== 4 && !($args[1] == 'api' && $args[2] == '3' && $args[4] === 'rest')) {
         return self::error('ERROR: Malformed REST path');
       }
       if ($args[0] != 'civicrm') {

@@ -349,6 +349,10 @@ class CRM_Utils_System {
         $e->url = $mkRouteUri('civicrm/mailing/url', $e->query);
         break;
 
+      case 'router:extern/rest':
+        $e->url = $mkRouteUri('civicrm/api/3/rest', $e->query);
+        break;
+
       // Otherwise, keep the default.
     }
   }

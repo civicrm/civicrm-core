@@ -47,8 +47,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   }
 
   protected function getRestUrl() {
-    return CRM_Core_Resources::singleton()
-      ->getUrl('civicrm', 'extern/rest.php');
+    return CRM_Utils_System::url('civicrm/api/3/rest', NULL, TRUE, NULL, TRUE, TRUE);
   }
 
   protected function tearDown() {
