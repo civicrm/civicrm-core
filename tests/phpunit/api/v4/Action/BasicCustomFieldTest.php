@@ -140,9 +140,17 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addWhere('MyContactFields.FavFood', '=', 'Cherry')
       ->execute()
       ->first();
-
     $this->assertArrayHasKey('MyContactFields.FavColor', $contact);
     $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+
+    // By default custom fields are not returned
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $contactId1)
+      ->addWhere('MyContactFields.FavColor', '=', 'Red')
+      ->addWhere('MyContactFields.FavFood', '=', 'Cherry')
+      ->execute()
+      ->first();
+    $this->assertArrayNotHasKey('MyContactFields.FavColor', $contact);
 
     // Update 2nd set and ensure 1st hasn't changed
     Contact::update()
@@ -166,7 +174,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addValue('MyContactFields.FavColor', 'Blue')
       ->execute();
     $contact = Contact::get(FALSE)
-      ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
+      ->addSelect('custom.*')
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
