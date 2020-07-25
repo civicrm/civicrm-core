@@ -28,6 +28,9 @@ class CRM_Contact_Form_Search_Criteria {
     self::setBasicSearchFields($form);
     $form->addElement('hidden', 'hidden_basic', 1);
 
+    $form->add('text', 'first_name', ts('First Name'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'first_name'));
+    $form->add('text', 'last_name', ts('Last Name'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'last_name'));
+
     if ($form->_searchOptions['contactType']) {
       $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
 
@@ -249,8 +252,6 @@ class CRM_Contact_Form_Search_Criteria {
         'template_grouping' => 'basic',
         'template' => 'CRM/Contact/Form/Search/Criteria/Fields/sort_name.tpl',
       ],
-      'first_name' => ['template_grouping' => 'basic'],
-      'last_name' => ['template_grouping' => 'basic'],
       'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
       'created_date' => ['name' => 'created_date', 'template_grouping' => 'changeLog'],

@@ -1742,7 +1742,7 @@ class CRM_Contact_BAO_Query {
     }
 
     if (!$likeNames) {
-      $likeNames = ['sort_name', 'email', 'note', 'display_name'];
+      $likeNames = ['sort_name', 'first_name', 'last_name', 'email', 'note', 'display_name'];
     }
 
     // email comes in via advanced search
