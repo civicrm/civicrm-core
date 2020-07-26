@@ -217,4 +217,17 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $this->callAPIFailure($this->_entity, 'create', $params);
   }
 
+  /**
+   * This is the same as testCreatePriceFieldValue but where is_default = 1.
+   */
+  public function testCreatePriceFieldValueAsDefault() {
+    $params = $this->_params;
+    $params['is_default'] = 1;
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+    $this->assertAPISuccess($result);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
+    $this->getAndCheck($params, $result['id'], $this->_entity);
+  }
+
 }
