@@ -29,14 +29,14 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @return CRM_Price_DAO_PriceFieldValue
    */
   public static function add($params) {
-    $fieldValueBAO = self::writeRecord($params);
-
     if (!empty($params['is_default'])) {
       $priceFieldID = $params['price_field_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $fieldValueBAO->id, 'price_field_id');
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
       $p = [1 => [$priceFieldID, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $p);
     }
+
+    $fieldValueBAO = self::writeRecord($params);
 
     // Reset the cached values in this function.
     CRM_Price_BAO_PriceField::getOptions(CRM_Utils_Array::value('price_field_id', $params), FALSE, TRUE);
