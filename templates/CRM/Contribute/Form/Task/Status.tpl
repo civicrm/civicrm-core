@@ -8,18 +8,13 @@
  +--------------------------------------------------------------------+
 *}
 <div class="form-item crm-block crm-form-block crm-contribution-form-block">
-  <h3>{ts}Update Contribution Status{/ts}</h3>
+  <h3>{ts}Record payments for contributions{/ts}</h3>
   <div class="help">
-    {ts}Use this form to record received payments for 'pay later' online contributions, membership signups and event registrations. You can use the Transaction ID field to record account+check number, bank transfer identifier, or other unique payment identifier.{/ts}
+    <p>{ts}Use this form to record received payments for "pay later" online contributions, membership signups and event registrations. You can use the Transaction ID field to record account+check number, bank transfer identifier, or other unique payment identifier.{/ts}</p>
+    <p>{ts}The contribution status will be updated as appropriate.  To update contribution statuses directly, return to the search results and select "Update multiple contributions".{/ts}</p>
   </div>
 
   <table class="form-layout-compressed">
-    <tr class="crm-contribution-form-block-contribution_status_id">
-      <td class="label">{$form.contribution_status_id.label}</td>
-      <td class="html-adjust">{$form.contribution_status_id.html}<br />
-        <span class="description">{ts}Assign the selected status to all contributions listed below.{/ts}</span>
-      </td>
-    </tr>
     <tr class="crm-contribution-form-block-is_email_receipt">
       <td class="label">{$form.is_email_receipt.label}</td>
       <td class="html-adjust">{$form.is_email_receipt.html}<br />
