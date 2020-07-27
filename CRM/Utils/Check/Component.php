@@ -19,11 +19,6 @@ use Civi\Api4\StatusPreference;
 abstract class CRM_Utils_Check_Component {
 
   /**
-   * @var array
-   */
-  public $checksConfig = [];
-
-  /**
    * Get the configured status checks.
    *
    * @return array
@@ -32,20 +27,12 @@ abstract class CRM_Utils_Check_Component {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getChecksConfig() {
-    if (empty($this->checksConfig)) {
-      $this->checksConfig = Civi::cache('checks')->get('checksConfig', []);
-      if (empty($this->checksConfig)) {
-        $this->checksConfig = StatusPreference::get(FALSE)->execute()->indexBy('name');
-      }
+    if (empty(Civi::$statics[__FUNCTION__])) {
+      Civi::$statics[__FUNCTION__] = (array) StatusPreference::get(FALSE)
+        ->addWhere('domain_id', '=', 'current_domain')
+        ->execute()->indexBy('name');
     }
-    return $this->checksConfig;
-  }
-
-  /**
-   * @param array $checksConfig
-   */
-  public function setChecksConfig(array $checksConfig) {
-    $this->checksConfig = $checksConfig;
+    return Civi::$statics[__FUNCTION__];
   }
 
   /**
