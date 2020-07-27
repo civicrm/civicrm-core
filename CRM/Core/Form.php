@@ -391,8 +391,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // @see https://docs.civicrm.org/dev/en/latest/framework/ui/#date-picker
     if ($type === 'datepicker') {
       $attributes = $attributes ?: [];
-      if (!empty($attributes['format'])) {
-        $dateAttributes = CRM_Core_SelectValues::date($attributes['format'], NULL, NULL, NULL, 'Input');
+      if (!empty($attributes['formatType'])) {
+        $dateAttributes = CRM_Core_SelectValues::date($attributes['formatType'], NULL, NULL, NULL, 'Input');
         if (empty($extra['minDate']) && !empty($dateAttributes['minYear'])) {
           $extra['minDate'] = $dateAttributes['minYear'] . '-01-01';
         }
@@ -1394,7 +1394,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $required,
       ['class' => 'crm-select2']
     );
-    $attributes = ['format' => 'searchDate'];
+    $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
     $this->add('datepicker', $fieldName . $from, ts($fromLabel), $attributes, $required, $extra);
     $this->add('datepicker', $fieldName . $to, ts($toLabel), $attributes, $required, $extra);
@@ -1649,7 +1649,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         else {
           $fieldSpec = CRM_Utils_Date::addDateMetadataToField($fieldSpec, $fieldSpec);
-          $attributes = ['format' => $fieldSpec['html']['formatType']];
+          $attributes = ['format' => $fieldSpec['date_format']];
           return $this->add('datepicker', $name, $label, $attributes, $required, $fieldSpec['datepicker']['extra']);
         }
 
