@@ -4489,9 +4489,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionParams['financial_type_id'] = $contribution->financial_type_id;
 
     $values = [];
-    if (isset($input['is_email_receipt'])) {
-      $values['is_email_receipt'] = $input['is_email_receipt'];
-    }
 
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
@@ -4505,11 +4502,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['title'] = $source = ts('Offline Recurring Contribution');
       }
 
-      if (isset($input['is_email_receipt'])) {
-        // CRM-19601 - we may have overwritten this above.
-        $values['is_email_receipt'] = $input['is_email_receipt'];
-      }
-      elseif ($recurContrib && $recurringContributionID) {
+      if ($recurContrib && $recurringContributionID) {
         //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
         // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
         // dev/core#1245 this maybe not the desired effect because the default value for is_email_receipt is set to 0 rather than 1 in
@@ -4577,11 +4570,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
     }
 
+    $isEmailReceipt = !array_key_exists('is_email_receipt', $values) || $values['is_email_receipt'] == 1;
+    if (isset($input['is_email_receipt'])) {
+      $isEmailReceipt = $input['is_email_receipt'];
+    }
     // CRM-9132 legacy behaviour was that receipts were sent out in all instances. Still sending
     // when array_key 'is_email_receipt doesn't exist in case some instances where is needs setting haven't been set
-    if (!array_key_exists('is_email_receipt', $values) ||
-      $values['is_email_receipt'] == 1
-    ) {
+    if ($isEmailReceipt) {
       civicrm_api3('Contribution', 'sendconfirmation', [
         'id' => $contribution->id,
         'payment_processor_id' => $paymentProcessorId,
