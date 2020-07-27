@@ -615,6 +615,30 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
+   * Update the contact with the new parameters.
+   *
+   * This function is intended as an interim function, with the intent being
+   * an apiv4 call.
+   *
+   * The function was calling the rather-terrifying createProfileContact. I copied all
+   * that code into this function and then removed all the parts that have no effect in this scenario.
+   *
+   * @param int $contactID
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function createContact($contactID, $params) {
+    // This parameter causes blank fields to be be emptied out.
+    // We can probably remove.
+    $params['updateBlankLocInfo'] = TRUE;
+    list($data) = CRM_Contact_BAO_Contact::formatProfileContactParams($params, [], $contactID);
+    CRM_Contact_BAO_Contact::create($data);
+  }
+
+  /**
    * Given a contact ID, will check if a record exists in given table.
    *
    * @param int $contactID
@@ -1450,8 +1474,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (!isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id'])) {
         $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
-      $null = [];
-      CRM_Contact_BAO_Contact::createProfileContact($submitted, $null, $mainId);
+      self::createContact($mainId, $submitted);
     }
     $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
