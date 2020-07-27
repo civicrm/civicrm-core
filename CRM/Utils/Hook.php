@@ -2652,4 +2652,20 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is called to alter the profile schemas sent to the backbone marionette editor.
+   *
+   * @param array $civiSchema
+   * @param string $entityType
+   * @param array $availableFields
+   *
+   * @return mixed
+   */
+  public static function profileSchemas(&$civiSchema, $entityType, $availableFields) {
+    return self::singleton()->invoke(
+      ['civiSchema', 'entityType', 'availableFields'], $civiSchema, $entityType, $availableFields,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_profileSchemas'
+    );
+  }
+
 }

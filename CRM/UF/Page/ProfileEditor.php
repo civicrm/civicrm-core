@@ -192,7 +192,10 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           break;
 
         default:
-          throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
+          CRM_Utils_Hook::profileSchemas($civiSchema, $entityType, $availableFields);
+          if (!isset($civiSchema[$entityType])) {
+            throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
+          }
       }
     }
 

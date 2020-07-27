@@ -45,4 +45,36 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
 
   }
 
+  public function testGetSchemaWithHooks() {
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterUFFields', [$this, 'hook_civicrm_alterUFFIelds']);
+    CRM_Utils_Hook::singleton()->setHook('civicrm_profileSchemas', [$this, 'hook_civicrm_profileSchemas']);
+    $schema = CRM_UF_Page_ProfileEditor::getSchema(['IndividualModel', 'GrantModel']);
+    $this->assertEquals('Grant', $schema['GrantModel']['schema']['grant_decision_date']['civiFieldType']);
+  }
+
+  /**
+   * Tries to load up the profile schema with a modal that is unknown
+   *
+   * @expectedException \CRM_Core_Exception
+   */
+  public function testGetSchemaWithHooksWithInvalidModel() {
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterUFFields', [$this, 'hook_civicrm_alterUFFIelds']);
+    CRM_Utils_Hook::singleton()->setHook('civicrm_profileSchemas', [$this, 'hook_civicrm_profileSchemas']);
+    $schema = CRM_UF_Page_ProfileEditor::getSchema(['IndividualModel', 'GrantModel', 'PledgeModel']);
+  }
+
+  public function hook_civicrm_alterUFFIelds(&$fields) {
+    $fields['Grant'] = CRM_Grant_BAO_Grant::exportableFields();
+  }
+
+  public function hook_civicrm_profileSchemas(&$civiSchema, $entityType, $availableFields) {
+    if ($entityType === 'GrantModel') {
+      $civiSchema[$entityType] = CRM_UF_Page_ProfileEditor::convertCiviModelToBackboneModel(
+        'Grant',
+        ts('Grant'),
+        $availableFields
+      );
+    }
+  }
+
 }
