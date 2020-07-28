@@ -4424,6 +4424,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->copyValues(CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($recurringContributionID));
       $primaryContributionID = $contribution->id;
+      unset($contribution->id, $contribution->invoice_id);
+      isset($input['receive_date']) ? $contribution->receive_date = $input['receive_date'] : NULL;
     }
     else {
       $primaryContributionID = $contribution->id ?? $objects['first_contribution']->id;
