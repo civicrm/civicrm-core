@@ -4492,14 +4492,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if ($input['component'] == 'contribute') {
       if ($contribution->contribution_page_id) {
-        // Figure out what we gain from this.
-        // Note that we may have overwritten the is_email_receipt input, fix that below.
         CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
-      }
-      elseif ($recurContrib && $recurringContributionID) {
-        $values['amount'] = $recurContrib->amount;
-        $values['financial_type_id'] = $objects['contributionType']->id;
-        $values['title'] = $source = ts('Offline Recurring Contribution');
+        // The only thing we use from this is is_email_receipt so this makes it explicit.
+        $values = array_key_exists('is_email_receipt', $values) ? ['is_email_receipt' => $values['is_email_receipt']] : [];
       }
 
       if ($recurContrib && $recurringContributionID) {
@@ -4556,10 +4551,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     CRM_Core_Error::debug_log_message('Contribution record updated successfully');
     $transaction->commit();
 
+    // @todo - check if Contribution::create does this, test, remove.
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
       $contributionParams['contribution_status_id'], $input['amount']);
 
     // create an activity record
+    // @todo - check if Contribution::create does this, test, remove.
     if ($input['component'] == 'contribute') {
       //CRM-4027
       $targetContactID = NULL;
