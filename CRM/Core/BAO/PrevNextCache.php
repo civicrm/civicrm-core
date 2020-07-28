@@ -122,32 +122,6 @@ WHERE  cachekey     = %3 AND
   }
 
   /**
-   * Delete pair from the previous next cache table to remove it from further merge consideration.
-   *
-   * The pair may have been flipped, so make sure we delete using both orders
-   *
-   * @param int $id1
-   * @param int $id2
-   * @param string $cacheKey
-   */
-  public static function deletePair($id1, $id2, $cacheKey = NULL) {
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = 'civicrm_contact'";
-
-    $pair = "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
-    $sql .= " AND ( {$pair} )";
-    $params[2] = [$id1, 'Integer'];
-    $params[3] = [$id2, 'Integer'];
-
-    if (isset($cacheKey)) {
-      $sql .= " AND cachekey LIKE %4";
-      // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
-      $params[4] = ["{$cacheKey}%", 'String'];
-    }
-
-    CRM_Core_DAO::executeQuery($sql, $params);
-  }
-
-  /**
    * Mark contacts as being in conflict.
    *
    * @param int $id1
