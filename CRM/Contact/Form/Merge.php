@@ -229,8 +229,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       }
 
       // add related table elements
-      foreach ($rowsElementsAndInfo['rel_table_elements'] as $relTableElement) {
-        $element = $this->addElement($relTableElement[0], $relTableElement[1]);
+      foreach (array_keys($rowsElementsAndInfo['rel_tables']) as $relTableElement) {
+        $element = $this->addElement('checkbox', $relTableElement);
         $element->setChecked(TRUE);
       }
 
