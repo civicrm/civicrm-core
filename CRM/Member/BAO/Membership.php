@@ -2288,7 +2288,6 @@ WHERE {$whereClause}";
         // values. This avoids race condition in which these values may have
         // been changed by other processes.
         unset(
-          $memParams['contact_id'],
           $memParams['membership_type_id'],
           $memParams['membership_type'],
           $memParams['join_date'],
