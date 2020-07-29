@@ -1487,6 +1487,9 @@ class CRM_Contact_BAO_Query {
     }
 
     if (!empty($this->_permissionWhereClause) && empty($this->_displayRelationshipType)) {
+      if (!empty($this->_permissionFromClause)) {
+        $from .= " $this->_permissionFromClause";
+      }
       if (empty($where)) {
         $where = "WHERE $this->_permissionWhereClause";
       }
@@ -4603,6 +4606,9 @@ civicrm_relationship.start_date > {$today}
 
     $options = $query->_options;
     if (!empty($query->_permissionWhereClause)) {
+      if (!empty($query->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
+        $from .= " $query->_permissionFromClause";
+      }
       if (empty($where)) {
         $where = "WHERE $query->_permissionWhereClause";
       }
@@ -5051,17 +5057,22 @@ civicrm_relationship.start_date > {$today}
    */
   public function generatePermissionClause($onlyDeleted = FALSE, $count = FALSE) {
     if (!$this->_skipPermission) {
-      $this->_permissionWhereClause = CRM_ACL_API::whereClause(
-        CRM_Core_Permission::VIEW,
-        $this->_tables,
-        $this->_whereTables,
-        NULL,
-        $onlyDeleted,
-        $this->_skipDeleteClause
-      );
+      $permissionClauses = CRM_Contact_BAO_Contact_Permission::cacheClause();
+      $this->_permissionWhereClause = $permissionClauses[1];
+      $this->_permissionFromClause = $permissionClauses[0];
 
-      if (!$onlyDeleted && CRM_Core_Permission::check('access deleted contacts')) {
-        $this->_permissionWhereClause = str_replace(' ( 1 ) ', '(contact_a.is_deleted = 0)', $this->_permissionWhereClause);
+      if (CRM_Core_Permission::check('access deleted contacts')) {
+        if (!$onlyDeleted) {
+          $this->_permissionWhereClause = str_replace('( 1 )', '(contact_a.is_deleted = 0)', $this->_permissionWhereClause);
+        }
+        else {
+          if ($this->_permissionWhereClause === '( 1 )') {
+            $this->_permissionWhereClause = str_replace('( 1 )', '(contact_a.is_deleted)', $this->_permissionWhereClause);
+          }
+          else {
+            $this->_permissionWhereClause .= " AND (contact_a.is_deleted) ";
+          }
+        }
       }
 
       if (isset($this->_tables['civicrm_activity'])) {
@@ -5084,19 +5095,6 @@ civicrm_relationship.start_date > {$today}
         elseif (!empty($clauses)) {
           $this->_permissionWhereClause .= '(' . implode(' AND ', $clauses) . ')';
         }
-      }
-
-      // regenerate fromClause since permission might have added tables
-      if ($this->_permissionWhereClause) {
-        //fix for row count in qill (in contribute/membership find)
-        if (!$count) {
-          $this->_useDistinct = TRUE;
-        }
-        //CRM-15231
-        $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-        // note : this modifies _fromClause and _simpleFromClause
-        $this->includePseudoFieldsJoin($this->_sort);
       }
     }
     else {
@@ -5129,6 +5127,9 @@ civicrm_relationship.start_date > {$today}
    */
   public function summaryContribution($context = NULL) {
     list($innerselect, $from, $where, $having) = $this->query(TRUE);
+    if (!empty($this->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
+      $from .= " $this->_permissionFromClause";
+    }
     if ($this->_permissionWhereClause) {
       $where .= " AND " . $this->_permissionWhereClause;
     }
@@ -5832,6 +5833,9 @@ AND   displayRelType.is_active = 1
       $from = str_replace("INNER JOIN", "LEFT JOIN", $from);
       $from .= $qcache['from'];
       $where = $qcache['where'];
+      if (!empty($this->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
+        $from .= " $this->_permissionFromClause";
+      }
       if (!empty($this->_permissionWhereClause)) {
         $where .= "AND $this->_permissionWhereClause";
       }

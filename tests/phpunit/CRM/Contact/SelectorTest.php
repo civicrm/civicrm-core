@@ -32,6 +32,12 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSelectorQuery($dataSet) {
+    if (!empty($dataSet['limitedPermissions'])) {
+      CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+        'access CiviCRM',
+        'access deleted contacts',
+      ];
+    }
     $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
     $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params);
     foreach ($dataSet['settings'] as $setting) {
@@ -89,6 +95,9 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
         CRM_Core_DAO::reenableFullGroupByMode();
         $selector->getQueryObject()->getCachedContacts([$contactID], FALSE);
       }
+    }
+    if (!empty($dataSet['limitedPermissions'])) {
+      $this->cleanUpAfterACLs();
     }
   }
 
@@ -314,6 +323,28 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND (contact_a.is_deleted)",
           ],
         ],
+      ],
+      [
+        [
+          'description' => 'Ensure that the Join to the acl contact cache is correct and that if we are searching in deleted contacts appropriate where clause is added',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => [['name' => 'includeWildCardInName', 'value' => FALSE]],
+          'form_values' => ['email' => 'mickey@mouseville.com', 'sort_name' => 'Mouse', 'deleted_contacts' => 1],
+          'params' => [],
+          'return_properties' => NULL,
+          'context' => 'advanced',
+          'action' => CRM_Core_Action::ADVANCED,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+          'limitedPermissions' => TRUE,
+          'expected_query' => [
+            0 => 'default',
+            1 => 'FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id INNER JOIN civicrm_acl_contact_cache aclContactCache ON contact_a.id = aclContactCache.contact_id',
+            2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND  aclContactCache.user_id = 0 AND (contact_a.is_deleted)",
+          ],
+        ],
+      ],
+      [
         [
           'description' => 'Use of quotes for exact string',
           'use_case_comments' => 'This is something that was in the code but seemingly not working. No UI info on it though!',
