@@ -379,6 +379,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
       throw new CRM_Core_Exception('validation error');
     }
+    // @todo This replaces usage of $objects['first_contribution']->id - is it required here?
+    if (isset($objects['contributionRecur'])) {
+      $input['original_contribution_id'] = $objects['contribution']->id ?? NULL;
+    }
 
     $contribution = &$objects['contribution'];
 

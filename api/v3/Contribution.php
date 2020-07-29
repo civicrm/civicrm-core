@@ -578,6 +578,8 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
 function civicrm_api3_contribution_repeattransaction($params) {
   $input = $ids = [];
   civicrm_api3_verify_one_mandatory($params, NULL, ['contribution_recur_id', 'original_contribution_id']);
+  // @todo Clean this up - we should pass through either original_contribution_id or contribution_recur_id
+  //   With a contribution_recur_id the template contribution will be calculated automatically.
   if (empty($params['original_contribution_id'])) {
     //  CRM-19873 call with test mode.
     $params['original_contribution_id'] = civicrm_api3('contribution', 'getvalue', [
@@ -588,6 +590,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
       'options' => ['limit' => 1, 'sort' => 'id DESC'],
     ]);
   }
+  $originalContributionID = $params['original_contribution_id'];
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['original_contribution_id'];
   if (!$contribution->find(TRUE)) {
@@ -602,7 +605,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
     );
   }
 
-  $original_contribution = clone $contribution;
   $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
     'id' => $contribution->contribution_recur_id,
@@ -625,8 +627,9 @@ function civicrm_api3_contribution_repeattransaction($params) {
       'membership_id',
     ];
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+    $input['original_contribution_id'] = $originalContributionID ?? NULL;
 
-    return _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
+    return _ipn_process_transaction($params, $contribution, $input, $ids);
   }
   catch (Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -645,19 +648,14 @@ function civicrm_api3_contribution_repeattransaction($params) {
  *
  * @param array $ids
  *
- * @param CRM_Contribute_BAO_Contribution $firstContribution
- *
  * @return mixed
  * @throws \CRM_Core_Exception
  * @throws \CiviCRM_API3_Exception
  */
-function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstContribution = NULL) {
+function _ipn_process_transaction(&$params, $contribution, $input, $ids) {
   $objects = $contribution->_relatedObjects;
   $objects['contribution'] = &$contribution;
 
-  if ($firstContribution) {
-    $objects['first_contribution'] = $firstContribution;
-  }
   $input['component'] = $contribution->_component;
   $input['is_test'] = $contribution->is_test;
   $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];

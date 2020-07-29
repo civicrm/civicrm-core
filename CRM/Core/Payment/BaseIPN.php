@@ -135,12 +135,6 @@ class CRM_Core_Payment_BaseIPN {
     if (!$this->loadObjects($input, $ids, $objects, $required, $paymentProcessorID)) {
       return FALSE;
     }
-    //the process is that the loadObjects is kind of hacked by loading the objects for the original contribution and then somewhat inconsistently using them for the
-    //current contribution. Here we ensure that the original contribution is available to the complete transaction function
-    //we don't want to fix this in the payment processor classes because we would have to fix all of them - so better to fix somewhere central
-    if (isset($objects['contributionRecur'])) {
-      $objects['first_contribution'] = $objects['contribution'];
-    }
     return TRUE;
   }
 
@@ -474,6 +468,14 @@ class CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction(&$input, &$ids, &$objects) {
+    // @todo This replaces usage of $objects['first_contribution']->id - is it required here?
+    if (isset($objects['contributionRecur'])) {
+      $input['original_contribution_id'] = $objects['contribution']->id ?? $ids['contribution'] ?? NULL;
+      if (!$input['original_contribution_id']) {
+        throw new CRM_Core_Exception('Deprecated baseIPN::completeTransaction could not find original_contribution_id');
+      }
+    }
+
     CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
   }
 
