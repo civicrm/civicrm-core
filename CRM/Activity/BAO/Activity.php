@@ -1783,16 +1783,14 @@ WHERE      activity.id IN ($activityIds)";
    *   particular component object.
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public static function getActivitySubject($entityObj) {
+    // @todo determine the subject on the appropriate entity rather than from the activity.
     switch ($entityObj->__table) {
       case 'civicrm_membership':
-        $membershipType = CRM_Member_PseudoConstant::membershipType($entityObj->membership_type_id);
-        $subject = $membershipType ? $membershipType : ts('Membership');
-
-        if (is_array($subject)) {
-          $subject = implode(", ", $subject);
-        }
+        $membershipType = CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'membership_type_id', $entityObj->membership_type_id);
+        $subject = $membershipType ?: ts('Membership');
 
         if (!CRM_Utils_System::isNull($entityObj->source)) {
           $subject .= " - {$entityObj->source}";
@@ -1803,7 +1801,7 @@ WHERE      activity.id IN ($activityIds)";
           $subject .= sprintf(' (by %s)', $displayName);
         }
 
-        $subject .= " - Status: " . CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $entityObj->status_id, 'label');
+        $subject .= ' - Status: ' . CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $entityObj->status_id);
         return $subject;
 
       case 'civicrm_participant':
