@@ -132,7 +132,7 @@ abstract class CRM_Utils_Hook {
    * but also accepts enough information to support Symfony Event
    * dispatching.
    *
-   * @param array|int $names
+   * @param array $names
    *   (Recommended) Array of parameter names, in order.
    *   Using an array is recommended because it enables full
    *   event-broadcasting behaviors.
@@ -155,15 +155,14 @@ abstract class CRM_Utils_Hook {
     if (!is_array($names)) {
       // We were called with the old contract wherein $names is actually an int.
       // Symfony dispatcher requires some kind of name.
-      // TODO: Emit a warning, eg
-      // error_log("Warning: hook_$fnSuffix does not give names for its parameters. It will present odd names to any Symfony event listeners.");
+      Civi::log()->warning("hook_$fnSuffix should be updated to pass an array of parameter names to CRM_Utils_Hook::invoke().", ['civi.tag' => 'deprecated']);
       $compatNames = ['arg1', 'arg2', 'arg3', 'arg4', 'arg5', 'arg6'];
       $names = array_slice($compatNames, 0, (int) $names);
     }
 
     $event = \Civi\Core\Event\GenericHookEvent::createOrdered(
       $names,
-      array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6)
+      [&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6]
     );
     \Civi::dispatcher()->dispatch('hook_' . $fnSuffix, $event);
     return $event->getReturnValues();
@@ -678,7 +677,7 @@ abstract class CRM_Utils_Hook {
    *   the return value is ignored
    */
   public static function activeTheme(&$theme, $context) {
-    return self::singleton()->invoke(array('theme', 'context'), $theme, $context,
+    return self::singleton()->invoke(['theme', 'context'], $theme, $context,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_activeTheme'
     );
@@ -869,7 +868,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function alterAdminPanel(&$panels) {
-    return self::singleton()->invoke(array('panels'), $panels,
+    return self::singleton()->invoke(['panels'], $panels,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterAdminPanel'
     );
