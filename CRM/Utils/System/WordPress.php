@@ -56,13 +56,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       };
       Civi::paths()->register('cms', $cmsRoot);
       Civi::paths()->register('cms.root', $cmsRoot);
-      Civi::paths()->register('civicrm.files', function () {
-        $upload_dir = wp_get_upload_dir();
-        return [
-          'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR,
-          'url' => $upload_dir['baseurl'] . '/civicrm/',
-        ];
-      });
       Civi::paths()->register('civicrm.root', function () {
         return [
           'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
