@@ -1006,7 +1006,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Compare 2 addresses to see if they are the same.
+   * Compare 2 addresses to see if they are the effectively the same.
+   *
+   * Being the same would mean same location type and any populated fields that describe the locationn match.
+   *
+   * Metadata fields such as is_primary, on_hold, manual_geocode may differ.
    *
    * @param array $mainAddress
    * @param array $comparisonAddress
@@ -1024,6 +1028,39 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
     return TRUE;
+  }
+
+  /**
+   * Does the location array have valid data.
+   *
+   * While not UI-creatable some sites wind up with email or address rows with no actual email or address
+   * through non core-UI processes.
+   *
+   * @param array $location
+   *
+   * @return bool
+   */
+  public static function locationHasData($location) {
+    return !empty(self::getLocationDataFields($location));
+  }
+
+  /**
+   * Get the location data from a location array, filtering out metadata.
+   *
+   * This returns data like street_address but not metadata like is_primary, on_hold etc.
+   *
+   * @param array $location
+   *
+   * @return mixed
+   */
+  public static function getLocationDataFields($location) {
+    $keysToIgnore = array_merge(self::ignoredFields(), ['display', 'location_type_id']);
+    foreach ($location as $field => $value) {
+      if (in_array($field, $keysToIgnore, TRUE)) {
+        unset($location[$field]);
+      }
+    }
+    return $location;
   }
 
   /**
@@ -2146,13 +2183,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // If it exists on the 'main' contact already, skip it. Otherwise
           // if the location type exists already, log a conflict.
           foreach ($migrationInfo['main_details']['location_blocks'][$fieldName] as $mainAddressKey => $mainAddressRecord) {
+            if (!self::locationHasData($mainAddressRecord)) {
+              // Go ahead & overwrite the main address - it has no data in it.
+              // if it is the primary address then pass that honour to the address that actually has data.
+              $migrationInfo['location_blocks'][$fieldName][$mainAddressKey]['set_other_primary'] = $mainAddressRecord['is_primary'];
+              continue;
+            }
             if (self::locationIsSame($addressRecord, $mainAddressRecord)) {
               unset($migrationInfo[$key]);
-              break;
+              continue;
             }
-            elseif ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
+            if ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
               $conflicts[$key] = NULL;
-              break;
+              continue;
             }
           }
         }
