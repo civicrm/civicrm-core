@@ -253,7 +253,7 @@ AND    {$this->_componentClause}";
 
     $pdfElements['contribIDs'] = implode(',', $contribIds);
 
-    $pdfElements['details'] = CRM_Contribute_Form_Task_Status::getDetails($pdfElements['contribIDs']);
+    $pdfElements['details'] = self::getDetails($pdfElements['contribIDs']);
 
     $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
 
@@ -293,6 +293,49 @@ AND    {$this->_componentClause}";
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;
+  }
+
+  /**
+   * @param string $contributionIDs
+   *
+   * @return array
+   */
+  private static function getDetails($contributionIDs) {
+    if (empty($contributionIDs)) {
+      return [];
+    }
+    $query = "
+SELECT    c.id              as contribution_id,
+          c.contact_id      as contact_id     ,
+          mp.membership_id  as membership_id  ,
+          pp.participant_id as participant_id ,
+          p.event_id        as event_id
+FROM      civicrm_contribution c
+LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
+LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
+LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
+WHERE     c.id IN ( $contributionIDs )";
+
+    $rows = [];
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    while ($dao->fetch()) {
+      $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
+      $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
+      if ($dao->membership_id) {
+        if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
+          $rows[$dao->contribution_id]['membership'] = [];
+        }
+        $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
+      }
+      if ($dao->participant_id) {
+        $rows[$dao->contribution_id]['participant'] = $dao->participant_id;
+      }
+      if ($dao->event_id) {
+        $rows[$dao->contribution_id]['event'] = $dao->event_id;
+      }
+    }
+    return $rows;
   }
 
 }

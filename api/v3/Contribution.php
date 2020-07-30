@@ -488,7 +488,8 @@ function civicrm_api3_contribution_completetransaction($params) {
   elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
-  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  $input['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
+
   if (!empty($params['fee_amount'])) {
     $input['fee_amount'] = $params['fee_amount'];
   }
