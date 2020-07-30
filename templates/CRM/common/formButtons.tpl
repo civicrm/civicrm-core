@@ -41,7 +41,6 @@
     {crmGetAttribute html=$html attr='crm-icon' assign='icon'}
     {capture assign=iconPrefix}{$icon|truncate:3:"":true}{/capture}
     {if $icon && $iconPrefix eq 'fa-'}
-      {assign var='buttonClass' value=' crm-i-button'}
       {capture assign=iconDisp}<i class="crm-i {$icon}" aria-hidden="true"></i>{/capture}
     {elseif $icon}
       {assign var='buttonClass' value=' crm-icon-button'}
