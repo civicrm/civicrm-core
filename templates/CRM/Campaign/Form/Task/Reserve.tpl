@@ -16,7 +16,7 @@
   <tr class="crm-campaign-task-reserve-form-block-surveytitle">
     <td colspan=2>
       <div class="status">
-        <div class="icon inform-icon"></div>&nbsp;{ts 1=$surveyTitle}Do you want to reserve respondents for '%1' ?{/ts}
+        {icon icon="fa-info-circle"}{/icon}{ts 1=$surveyTitle}Do you want to reserve respondents for '%1' ?{/ts}
       </div>
     </td>
   </tr>

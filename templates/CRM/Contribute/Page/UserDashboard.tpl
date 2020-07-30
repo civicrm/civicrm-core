@@ -71,7 +71,7 @@
         {/if}
     {else}
         <div class="messages status no-popup">
-            <div class="icon inform-icon"></div>
+            {icon icon="fa-info-circle"}{/icon}
             {ts}There are no contributions on record for you.{/ts}
         </div>
     {/if}

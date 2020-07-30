@@ -25,7 +25,7 @@
 
 {if $action eq 8 or $action eq 64}
     <div class="messages status no-popup">
-           <div class="icon inform-icon"></div>
+           {icon icon="fa-info-circle"}{/icon}
            {$message}
     </div>
 {else}

@@ -11,7 +11,7 @@
 <div class="crm-block crm-form-block crm-acl-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;
+    {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: Delete will remove this permission from the specified ACL Role.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}

@@ -10,7 +10,7 @@
 {* Confirmation of Export Batch(s)  *}
 <h3>{ts}Export Batch{/ts}</h3>
 <div class="messages status">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   {ts}Warning: You will not be able to reopen or change the batch after it is exported. Are you sure you want to export?{/ts}
 </div>
 <div class="crm-block crm-form-block crm-export_batch-form-block">

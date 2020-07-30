@@ -240,7 +240,7 @@
 </div>
 {elseif ($action eq 16)}
    <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}There are no Notes for this contact.{/ts}
    </div>
 {/if}

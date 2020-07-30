@@ -14,7 +14,7 @@
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
 {if $deleteRecord}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>&nbsp;
+  {icon icon="fa-info-circle"}{/icon}
         {ts}Are you sure you want to delete this record?{/ts}
   </div>
 
@@ -250,7 +250,7 @@ invert              = 0
 }
 {elseif $statusMessage}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   {$statusMessage}
 </div>
 {/if}

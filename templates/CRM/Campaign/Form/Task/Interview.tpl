@@ -9,7 +9,7 @@
 *}
 {if $votingTab and $errorMessages}
   <div class='messages status'>
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <ul>
       {foreach from=$errorMessages item=errorMsg}
         <li>{ts}{$errorMsg}{/ts}</li>

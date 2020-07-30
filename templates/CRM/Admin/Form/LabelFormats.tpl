@@ -28,12 +28,12 @@
 <div class="crm-block crm-form-block crm-labelFormat-form-block">
   {if $action eq 8}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts 1=$formatName}WARNING: You are about to delete the Label Format titled <strong>%1</strong>.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {elseif $action eq 16384}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts 1=$formatName}Are you sure you would like to make a copy of the Label Format titled <strong>%1</strong>?{/ts}
     </div>
   {else}

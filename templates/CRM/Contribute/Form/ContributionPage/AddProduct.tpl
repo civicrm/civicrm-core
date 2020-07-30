@@ -21,7 +21,7 @@
 
   {if $action eq 8}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}Are you sure you want to remove this premium product from this Contribution page?{/ts}
     </div>
   {elseif $action eq 1024}
