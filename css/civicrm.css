@@ -1868,11 +1868,19 @@ input.crm-form-entityref {
   border: 1px solid #3e3e3e;
 }
 
+.crm-container a.button,
+.crm-container a.button:link,
+.crm-container a.button:visited,
 .crm-container span.crm-button {
   display: block;
-  float: left !important;
+  float: left;
   overflow: hidden;
-  padding: 1px;
+  line-height: 135%;
+}
+
+/* Preserving the important but not sure why */
+.crm-container span.crm-button {
+  float: left !important;
 }
 
 .crm-container button.crm-button {
@@ -1890,18 +1898,10 @@ input.crm-form-entityref {
 
 .crm-container .crm-button input[type=button],
 .crm-container .crm-button input.crm-form-submit {
-  padding: 3px 5px 2px;
+  padding: 0;
   margin: 0;
   background: none;
   border: none;
-}
-
-.crm-container a.button,
-.crm-container a.button:link,
-.crm-container a.button:visited {
-  display: block;
-  float: left;
-  line-height: 135%;
 }
 
 .crm-container .crm-button:hover,
@@ -2086,15 +2086,6 @@ a.crm-i:hover {
 
 .crm-i.crm-i-green {
   color: #86c661;
-}
-
-.crm-button>.crm-i {
-  padding-left: 5px;
-}
-
-.crm-container .crm-button .crm-i + input[type="button"],
-.crm-container .crm-button .crm-i + input.crm-form-submit {
-  padding-left: 0;
 }
 
 .crm-container a.helpicon {
