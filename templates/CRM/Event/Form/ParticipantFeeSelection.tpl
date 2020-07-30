@@ -87,7 +87,7 @@ CRM.$(function($) {
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if !$email}
   <div class="messages status no-popup">
-    <i class="crm-i fa-info-circle" aria-hidden="true"></i>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    <i class="crm-i fa-info-circle" aria-hidden="true"></i> {ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
   <table class="form-layout">
