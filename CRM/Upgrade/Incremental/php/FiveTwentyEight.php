@@ -26,9 +26,9 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev == '5.28.alpha1') {
+      $preUpgradeMessage .= CRM_Upgrade_Incremental_php_FiveTwentyEight::createWpFilesMessage();
+    }
   }
 
   /**
@@ -40,10 +40,32 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    // Example: Generate a pre-upgrade message.
+    if ($rev == '5.28.alpha1') {
+      $postUpgradeMessage .= CRM_Upgrade_Incremental_php_FiveTwentyEight::createWpFilesMessage();
+    }
+  }
+
+  public static function createWpFilesMessage() {
+    if (!function_exists('civi_wp')) {
+      return '';
+    }
+
+    if (isset($GLOBALS['civicrm_paths']['civicrm.files']['path'])) {
+      // They've explicitly chosen to use a non-default path.
+      return '';
+    }
+
+    return '<p>' . ts('Starting with version 5.29.0, CiviCRM on WP will
+         automate the determination of the civicrm files directory. Please
+         <a href=\'%1\' target=\'_blank\'>read the upgrade documentation related to this change before starting the upgrade process </a>
+         If you have a legacy (wp-content/plugins/files/civicrm) or non-standard directory
+         structure you will need to either override the settings in civicrm.settings.php
+         or by specifying the locations in System Settings Directories and System
+         Settings Resource URLs. . Starting with version 4.7.0, wp-content/uploads/civicrm/
+         is the standard WordPress CiviCRM Files directory.', [
+           1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#civicrm-5.29',
+         ]) . '</p>';
   }
 
   /*
