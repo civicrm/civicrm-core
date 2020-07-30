@@ -403,8 +403,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       // ie in an update situation.
       $membership->find(TRUE);
     }
-    $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-    $title = CRM_Contact_BAO_Contact::displayName($membership->contact_id) . ' - ' . ts('Membership Type:') . ' ' . $membershipTypes[$membership->membership_type_id];
+    $title = CRM_Contact_BAO_Contact::displayName($membership->contact_id) . ' - ' . ts('Membership Type:')
+      . ' ' . CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'membership_type_id', $membership->membership_type_id);
 
     $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::UPDATE)) {
