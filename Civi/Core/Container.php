@@ -210,7 +210,7 @@ class Container {
       ->setFactory('CRM_Utils_Mail::createMailer');
 
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
-      throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
+      throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
       $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE)->setPublic(TRUE);
@@ -461,20 +461,19 @@ class Container {
    */
   public static function createPrevNextCache($container) {
     $setting = \Civi::settings()->get('prevNextBackend');
-    if ($setting === 'default') {
-      // For initial release (5.8.x), continue defaulting to SQL.
-      $isTransitional = version_compare(\CRM_Utils_System::version(), '5.9.alpha1', '<');
+    if (!$setting || $setting === 'default') {
       $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
       $service = 'prevnext.driver.' . strtolower($cacheDriver);
-      return $container->has($service) && !$isTransitional
+      return $container->has($service)
         ? $container->get($service)
         : $container->get('prevnext.driver.sql');
     }
-    else {
-      return $container->get('prevnext.driver.' . $setting);
-    }
+    return $container->get('prevnext.driver.' . $setting);
   }
 
+  /**
+   * @return \ArrayObject
+   */
   public static function createCacheConfig() {
     $driver = \CRM_Utils_Cache::getCacheDriver();
     $settings = \CRM_Utils_Cache::getCacheSettings($driver);
@@ -548,6 +547,11 @@ class Container {
     }
   }
 
+  /**
+   * @param string $name
+   *
+   * @return mixed
+   */
   public static function getBootService($name) {
     return \Civi::$statics[__CLASS__]['boot'][$name];
   }
