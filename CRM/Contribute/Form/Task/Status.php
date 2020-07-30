@@ -91,7 +91,7 @@ AND    co.id IN ( $contribIDs )";
     $this->_rows = [];
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
     $defaults = [];
-    $now = date("Y-m-d");
+    $now = date('Y-m-d');
     $paidByOptions = ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument();
 
     while ($dao->fetch()) {
@@ -116,10 +116,10 @@ AND    co.id IN ( $contribIDs )";
       $row['trxn_date'] = $this->add('datepicker', "trxn_date_{$row['contribution_id']}", ts('Transaction Date'), [], FALSE, ['time' => FALSE]);
       $defaults["trxn_date_{$row['contribution_id']}"] = $now;
 
-      $this->add("text", "check_number_{$row['contribution_id']}", ts('Check Number'));
+      $this->add('text', "check_number_{$row['contribution_id']}", ts('Check Number'));
       $defaults["check_number_{$row['contribution_id']}"] = $dao->check_no;
 
-      $this->add("select", "payment_instrument_id_{$row['contribution_id']}", ts('Payment Method'), $paidByOptions);
+      $this->add('select', "payment_instrument_id_{$row['contribution_id']}", ts('Payment Method'), $paidByOptions);
       $defaults["payment_instrument_id_{$row['contribution_id']}"] = $dao->paid_by;
 
       $this->_rows[] = $row;
@@ -130,7 +130,7 @@ AND    co.id IN ( $contribIDs )";
     $this->addButtons([
       [
         'type' => 'next',
-        'name' => ts('Update Pending Status'),
+        'name' => ts('Record Payments'),
         'isDefault' => TRUE,
       ],
       [
@@ -167,7 +167,7 @@ AND    co.id IN ( $contribIDs )";
         $contribID = substr($name, 13);
 
         if ($fields["payment_instrument_id_{$contribID}"] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
-          $errors["payment_instrument_id_{$contribID}"] = ts("Payment Method should be Check when a check number is entered for a contribution.");
+          $errors["payment_instrument_id_{$contribID}"] = ts('Payment Method should be Check when a check number is entered for a contribution.');
         }
       }
     }
