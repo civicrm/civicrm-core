@@ -1462,7 +1462,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals("Contribution Amount: $ 100.00", $contributionDetails[$contactId1]['text'], "The text does not match");
     $this->assertEquals("<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
-      <p>Contribution Receive Date: May 11th, 2015</p></br>
+      <p>Contribution Receive Date: May 11th, 2015 12:00 AM</p></br>
       <p>Contribution Custom Field: Label2</p></br>", $contributionDetails[$contactId2]['html'], "The html does not match");
   }
 
