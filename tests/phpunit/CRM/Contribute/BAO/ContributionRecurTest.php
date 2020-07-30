@@ -331,8 +331,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
           'contact_id' => $contactId,
           'membership_type_id' => $priceField['membership_type_id'],
           'source' => 'Payment',
-          'join_date' => '2020-04-28',
-          'start_date' => '2020-04-28',
+          'join_date' => date('Y-m') . '-28',
+          'start_date' => date('Y-m') . '-28',
           'contribution_recur_id' => $contributionRecurId,
           'status_id' => 'Pending',
           'is_override' => 1,
@@ -378,7 +378,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
         'id' => $mId,
         'return' => 'end_date',
       ]);
-      $this->assertEquals($endDate, '2020-08-27', ts('End date incorrect.'));
+      $this->assertEquals(date('Y-m', strtotime('+4 months')) . '-27', $endDate, ts('End date incorrect.'));
     }
 
     // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
@@ -445,7 +445,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'id' => $membershipId1,
       'return' => 'end_date',
     ]);
-    $this->assertEquals($endDate, '2020-10-27', ts('End date incorrect.'));
+    $this->assertEquals(date('Y-m', strtotime('+6 months')) . '-27', $endDate, ts('End date incorrect.'));
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 6);
     $this->validateAllCounts($membershipId2, 4);
