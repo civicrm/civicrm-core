@@ -545,6 +545,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   /**
    * Copy custom data of the initial contribution into its recurring contributions.
    *
+   * @deprecated
+   *
    * @param int $recurId
    * @param int $targetContributionId
    */

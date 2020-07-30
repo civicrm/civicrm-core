@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -107,7 +109,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_uf_match']);
+    $this->quickCleanup(['civicrm_uf_match'], TRUE);
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', []);
     foreach ($financialAccounts['values'] as $financialAccount) {
       if ($financialAccount['name'] === 'Test Tax financial account ' || $financialAccount['name'] === 'Test taxable financial Type') {
@@ -2327,6 +2329,46 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test custom data is copied over from the template transaction.
+   *
+   * (Over time various discussions have deemed this to be the most recent one, allowing
+   * users to alter custom data going forwards. This is implemented for line items already.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testRepeatTransactionWithCustomData() {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contribution', 'name' => 'Repeat'], 'text');
+    $originalContribution = $this->setUpRepeatTransaction([], 'single', [$this->getCustomFieldName('text') => 'first']);
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'contribution_recur_id' => $originalContribution['contribution_recur_id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'my_trxn',
+    ]);
+
+    $contribution = Contribution::get()
+      ->addWhere('trxn_id', '=', 'my_trxn')
+      ->addSelect('Custom_Group.Enter_text_here')
+      ->addSelect('id')
+      ->execute()->first();
+    $this->assertEquals('first', $contribution['Custom_Group.Enter_text_here']);
+
+    Contribution::update()->setValues(['Custom_Group.Enter_text_here' => 'second'])->addWhere('id', '=', $contribution['id'])->execute();
+
+    $this->callAPISuccess('contribution', 'repeattransaction', [
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'number_3',
+    ]);
+
+    $contribution = Contribution::get()
+      ->addWhere('trxn_id', '=', 'number_3')
+      ->setSelect(['id', 'Custom_Group.Enter_text_here'])
+      ->execute()->first();
+    $this->assertEquals('second', $contribution['Custom_Group.Enter_text_here']);
+  }
+
+  /**
    * Test repeat contribution successfully creates line items (plural).
    *
    * @throws \CRM_Core_Exception
@@ -4177,6 +4219,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       $params = array_merge($params, $contributionParams);
       $originalContribution = $this->callAPISuccess('contribution', 'create', $params);
     }
+    $originalContribution['contribution_recur_id'] = $contributionRecur['id'];
     $originalContribution['payment_processor_id'] = $paymentProcessorID;
     return $originalContribution;
   }
