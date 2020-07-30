@@ -2062,15 +2062,6 @@ input.crm-form-entityref {
   padding-left: 0;
 }
 
-.crm-container .crm-button-icon {
-  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
-  height: 16px;
-  width: 16px;
-  display: block;
-  position: absolute;
-  pointer-events: none;
-}
-
 .crm-container .delete-icon {
   background-position: -176px -96px;
 }

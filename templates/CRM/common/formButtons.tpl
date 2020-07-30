@@ -42,12 +42,9 @@
     {capture assign=iconPrefix}{$icon|truncate:3:"":true}{/capture}
     {if $icon && $iconPrefix eq 'fa-'}
       {capture assign=iconDisp}<i class="crm-i {$icon}" aria-hidden="true"></i>{/capture}
-    {elseif $icon}
-      {assign var='buttonClass' value=' crm-icon-button'}
-      {capture assign=iconDisp}<span class="crm-button-icon ui-icon-{$icon}"> </span>{/capture}
     {/if}
     {crmGetAttribute html=$html attr='disabled' assign='disabled'}
-    <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{$buttonClass}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
+    <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
       {$iconDisp}
       {$html}
     </span>
