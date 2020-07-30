@@ -2046,14 +2046,6 @@ input.crm-form-entityref {
   margin-left: 3px;
 }
 
-.crm-container .crm-button.button-crm-i {
-  padding: 2px 0 1px 5px;
-}
-
-.crm-container .crm-button.button-crm-i input {
-  padding-left: 0;
-}
-
 .crm-container .delete-icon {
   background-position: -176px -96px;
 }
