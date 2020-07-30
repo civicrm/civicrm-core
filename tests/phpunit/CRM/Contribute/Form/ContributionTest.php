@@ -1696,4 +1696,29 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->membershipDelete($membership['id']);
   }
 
+  /**
+   * Test no warnings or errors during preProcess when editing.
+   */
+  public function testPreProcessContributionEdit() {
+    // Simulate a contribution in pending status
+    $contribution = $this->callAPISuccess(
+      'Contribution',
+      'create',
+      array_merge($this->_params, ['contribution_status_id' => 'Pending'])
+    );
+
+    // set up the form to edit the contribution and call preProcess
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution');
+    $_REQUEST['cid'] = $this->_individualId;
+    $_REQUEST['id'] = $contribution['id'];
+    $form->_action = CRM_Core_Action::UPDATE;
+    $form->preProcess();
+
+    // Check something while we're here
+    $this->assertEquals($contribution['id'], $form->_values['contribution_id']);
+
+    unset($_REQUEST['cid']);
+    unset($_REQUEST['id']);
+  }
+
 }
