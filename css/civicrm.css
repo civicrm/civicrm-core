@@ -2121,12 +2121,12 @@ a.crm-i:hover {
   color: #86c661;
 }
 
-.crm-i-button>.crm-i {
+.crm-button>.crm-i {
   padding-left: 5px;
 }
 
-.crm-container .crm-button.crm-i-button input[type="button"],
-.crm-container .crm-button.crm-i-button input.crm-form-submit {
+.crm-container .crm-button .crm-i + input[type="button"],
+.crm-container .crm-button .crm-i + input.crm-form-submit {
   padding-left: 0;
 }
 
