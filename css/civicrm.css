@@ -1849,6 +1849,12 @@ input.crm-form-entityref {
   margin-left: 20px;
 }
 
+/* Reset WP backend min-height for buttons */
+
+.wp-core-ui .crm-container .button {
+  min-height: 0;
+}
+
 .crm-container a.button,
 .crm-container a.button:link,
 .crm-container a.button:visited,
