@@ -286,7 +286,7 @@
       </div>
       <div class="crm-submit-buttons">
         <span class="crm-button">
-          <i class="crm-i fa-bolt" aria-hidden="true"></i><input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}"/>
+          <i class="crm-i fa-bolt" aria-hidden="true"></i> <input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}"/>
         </span>
       </div>
 

@@ -47,7 +47,7 @@ function smarty_block_crmButton($params, $text, &$smarty) {
     if (strpos($icon, 'fa-') !== 0) {
       $icon = "fa-$icon";
     }
-    $iconMarkup = "<i class='crm-i $icon' aria-hidden=\"true\"></i>&nbsp; ";
+    $iconMarkup = "<i class='crm-i $icon' aria-hidden=\"true\"></i> ";
   }
   // All other params are treated as html attributes
   CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');

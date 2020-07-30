@@ -20,7 +20,7 @@
               <tr>
                 {include file="CRM/common/tasks.tpl" location="botton"}
                 {if $instanceUrl}
-                  <td>&nbsp;&nbsp;<i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;<a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a></td>
+                  <td>&nbsp;&nbsp;<i class="crm-i fa-chevron-right" aria-hidden="true"></i> <a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a></td>
                 {/if}
               </tr>
             </table>
