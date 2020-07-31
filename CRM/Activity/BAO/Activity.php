@@ -2175,15 +2175,11 @@ AND cl.modified_id  = c.id
           'title' => ts('Activity Reporter'),
           'type' => CRM_Utils_Type::T_STRING,
         ],
-        'case_recent_activity_date' => [
-          'title' => ts('Activity Actual Date'),
+        'case_activity_date_time' => [
+          'title' => ts('Activity Date'),
           'type' => CRM_Utils_Type::T_DATE,
         ],
-        'case_scheduled_activity_date' => [
-          'title' => ts('Activity Scheduled Date'),
-          'type' => CRM_Utils_Type::T_DATE,
-        ],
-        'case_recent_activity_type' => [
+        'case_activity_type' => [
           'title' => ts('Activity Type'),
           'type' => CRM_Utils_Type::T_STRING,
         ],

@@ -1725,9 +1725,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'case_type' => 1,
       'case_role' => 1,
       'case_deleted' => 1,
-      'case_recent_activity_date' => 1,
-      'case_recent_activity_type' => 1,
-      'case_scheduled_activity_date' => 1,
+      'case_activity_date_time' => 1,
+      'case_activity_type' => 1,
     ];
   }
 
@@ -2294,9 +2293,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       87 => 'Case Type',
       88 => 'Role in Case',
       89 => 'Case is in the Trash',
-      90 => 'Activity Actual Date',
+      90 => 'Activity Date',
       91 => 'Activity Type',
-      92 => 'Activity Scheduled Date',
       93 => 'Case Start Date',
       94 => 'Case End Date',
       95 => 'Activity Reporter',
@@ -2566,9 +2564,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'case_type' => '`case_type` text',
       'case_role' => '`case_role` text',
       'case_deleted' => '`case_deleted` varchar(16)',
-      'case_recent_activity_date' => '`case_recent_activity_date` varchar(32)',
-      'case_recent_activity_type' => '`case_recent_activity_type` varchar(255)',
-      'case_scheduled_activity_date' => '`case_scheduled_activity_date` varchar(32)',
+      'case_activity_date_time' => '`case_activity_date_time` varchar(32)',
+      'case_activity_type' => '`case_activity_type` varchar(255)',
     ];
   }
 
