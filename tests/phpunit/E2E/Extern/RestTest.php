@@ -47,7 +47,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   }
 
   protected function getRestUrl() {
-    return CRM_Utils_System::url('civicrm/api/3/rest', NULL, TRUE, NULL, TRUE, TRUE);
+    return CRM_Utils_System::url('civicrm/api/3/rest', NULL, TRUE, NULL, FALSE, TRUE);
   }
 
   protected function tearDown() {
@@ -211,6 +211,12 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     $this->updateAdminApiKey();
 
     $client = CRM_Utils_HttpClient::singleton();
+    if (CRM_Core_Config::singleton()->userFramework === 'WordPress') {
+      if (!empty($query['q'])) {
+        $query['rq'] = $query['q'];
+        unset($query['q']);
+      }
+    }
     list($status, $data) = $client->post($this->getRestUrl(), $query);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);
@@ -306,6 +312,10 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       "json" => "1",
       "api_key" => $test_key,
     );
+    if (CRM_Core_Config::singleton()->userFramework == 'WordPress') {
+      $params['rq'] = $params['q'];
+      unset($params['q']);
+    }
     list($status, $data) = $client->post($this->getRestUrl(), $params);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
     $result = json_decode($data, TRUE);

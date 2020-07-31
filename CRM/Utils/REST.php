@@ -176,6 +176,10 @@ class CRM_Utils_REST {
 
     // Get the function name being called from the q parameter in the query string
     $q = $requestParams['q'] ?? NULL;
+    // On some user framworks e.g. WordPress the front end has its own query string so we use rq instead.
+    if (!empty($requestParams['rq'])) {
+      $q = $requestParams['rq'];
+    }
     // or for the rest interface, from fnName
     $r = $requestParams['fnName'] ?? NULL;
     if (!empty($r)) {
@@ -599,7 +603,7 @@ class CRM_Utils_REST {
         // this is pretty wonky but maybe there's some reason I can't see
         return NULL;
       }
-      if (count($args) != 3 && count($args) !== 4 && !($args[1] == 'api' && $args[2] == '3' && $args[4] === 'rest')) {
+      if (count($args) != 3) {
         return self::error('ERROR: Malformed REST path');
       }
       if ($args[0] != 'civicrm') {
