@@ -135,6 +135,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Moved from CRM_Utils_System_Base
    */
   public function getDefaultFileStorage() {
+    // NOTE: On WordPress, this will be circumvented in the future. However,
+    // should retain it to allow transitional/upgrade code determine the old value.
+
     $config = CRM_Core_Config::singleton();
     $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
     $cmsPath = $this->cmsRootPath();
