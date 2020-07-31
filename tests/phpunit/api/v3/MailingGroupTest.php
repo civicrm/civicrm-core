@@ -118,6 +118,18 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
    * Test civicrm_mailing_group_event_subscribe and civicrm_mailing_event_confirm functions - success expected.
    */
   public function testMailerProcess() {
+    $this->callAPISuccess('MailSettings', 'create', [
+      'domain_id' => 1,
+      'name' => "my mail setting",
+      'domain' => 'setting.com',
+      'localpart' => 'civicrm+',
+      'server' => "localhost",
+      'username' => 'sue',
+      'password' => 'pass',
+      'is_default' => 1,
+    ]);
+    $mut = new CiviMailUtils($this, TRUE);
+    Civi::settings()->set('include_message_id', 1);
     $params = [
       'first_name' => 'Test',
       'last_name' => 'Test',
@@ -134,6 +146,13 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
       'time_stamp' => '20101212121212',
     ];
     $result = $this->callAPISuccess('mailing_event_subscribe', 'create', $params);
+    // Check that subscription email has been sent.
+    $msgs = $mut->getAllMessages();
+    $this->assertCount(1, $msgs, 'Subscription email failed to send');
+    $mut->checkMailLog([
+      'Message-ID: <civicrm+s',
+      'To confirm this subscription, reply to this email or click',
+    ]);
 
     $this->assertEquals($result['values'][$result['id']]['contact_id'], $contactID);
 
@@ -147,6 +166,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('mailing_event_confirm', 'create', $params);
     $this->contactDelete($contactID);
+    Civi::settings()->set('include_message_id', 0);
   }
 
 }
