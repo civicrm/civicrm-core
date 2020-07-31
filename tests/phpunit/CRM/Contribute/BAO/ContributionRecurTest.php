@@ -372,13 +372,14 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->validateAllCounts($membershipId1, 4);
     $this->validateAllCounts($membershipId2, 4);
 
+    $expectedMonth = date('m') + 4;
     // check membership end date.
     foreach ([$membershipId1, $membershipId2] as $mId) {
       $endDate = $this->callAPISuccessGetValue('Membership', [
         'id' => $mId,
         'return' => 'end_date',
       ]);
-      $this->assertEquals(date('Y-m', strtotime('+4 months')) . '-27', $endDate, ts('End date incorrect.'));
+      $this->assertEquals(date('Y-' . $expectedMonth . '-27'), $endDate, ts('End date incorrect.'));
     }
 
     // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
