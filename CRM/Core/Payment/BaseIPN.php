@@ -518,21 +518,14 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $ids
    *   Related object IDs.
    * @param array $objects
-   * @param array $values
-   *   Values related to objects that have already been loaded.
-   * @param bool $recur
-   *   Is it part of a recurring contribution.
-   * @param bool $returnMessageText
-   *   Should text be returned instead of sent. This.
-   *   is because the function is also used to generate pdfs
    *
-   * @return array
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
-    return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,
-      $returnMessageText);
+  public function sendMail($input, $ids, $objects) {
+    CRM_Core_Error::deprecatedFunctionWarning('this should be done via completetransaction api');
+    civicrm_api3('Contribution', 'sendconfirmation', [
+      'id' => $objects['contribution']->id,
+    ]);
   }
 
 }
