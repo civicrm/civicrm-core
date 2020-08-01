@@ -13,13 +13,13 @@
   </div>
 
   <div class="message status">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong>
   </div>
 
   {if $user}
     <div class="message status">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       <strong>{ts 1=$config->userFramework}WARNING: There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the %1 user you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
   The user record associated with the duplicate contact will not be deleted, but will be unlinked from the associated contact record (which will be deleted).
   You will need to manually delete that user (click on the link to open the %1 user account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong>

@@ -49,7 +49,7 @@
   </div>
 {elseif $action ne 1}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
+      {icon icon="fa-info-circle"}{/icon}
       {if $jobId}
         {ts}This scheduled job does not have any log entries.{/ts}
       {else}

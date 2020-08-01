@@ -58,7 +58,7 @@
 </div>
 {elseif $action ne 1}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}There are no Payment Processors entered.{/ts}
      </div>
      <div class="action-link">

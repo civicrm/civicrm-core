@@ -16,7 +16,7 @@
     <div class="view-content">
         {if $groupCount eq 0 }
             <div class="messages status no-popup">
-                    <div class="icon inform-icon"></div>
+                    {icon icon="fa-info-circle"}{/icon}
                     {ts}You are not currently subscribed to any Groups.{/ts}
             </div>
         {/if}

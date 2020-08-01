@@ -9,7 +9,7 @@
 *}
 <div class="crm-block crm-form-block crm-custom-field-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-    <div class='status'><div class="icon inform-icon"></div>
+    <div class='status'>{icon icon="fa-info-circle"}{/icon}
         &nbsp;{ts}Warning: This functionality is currently in beta stage. Consider backing up your database before using it. Click "Cancel" to return to the "edit custom field" form without making changes.{/ts}
     </div>
     <table class="form-layout">

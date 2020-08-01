@@ -12,7 +12,7 @@
 <div class="crm-block crm-form-block crm-contact-type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: {ts}This action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}{/ts}
     </div>
 {else}

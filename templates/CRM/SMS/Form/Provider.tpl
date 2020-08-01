@@ -13,12 +13,12 @@
 
 {if $action eq 8}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}Do you want to continue?{/ts}
   </div>
 {elseif $action eq 128}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}Are you sure you would like to execute this job?{/ts}
   </div>
 {else}

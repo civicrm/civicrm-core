@@ -70,7 +70,7 @@
         {if $action eq 16}
         {capture assign=crmURL}{crmURL p="civicrm/admin/uf/group/field/add" q="reset=1&action=add&gid=$gid"}{/capture}
         <div class="messages status no-popup crm-empty-table">
-          <div class="icon inform-icon"></div>
+          {icon icon="fa-info-circle"}{/icon}
           {ts}None found.{/ts}
         </div>
         <div class="action-link">

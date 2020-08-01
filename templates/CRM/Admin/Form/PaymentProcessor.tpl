@@ -14,7 +14,7 @@
 
 {if $action eq 8}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {$deleteMessage|escape}
   </div>
 {else}

@@ -9,7 +9,7 @@
 *}
 {* Confirmation of contact deletes  *}
 <div class="messages status no-popup">
-<div class="icon inform-icon"></div>
+{icon icon="fa-info-circle"}{/icon}
         <p>{ts  1=$displayName}Are you sure you want to delete the contact record and all related information for <strong>%1</strong>?{/ts}</p>
         <p>{ts}This action cannot be undone.{/ts}</p>
 </div>

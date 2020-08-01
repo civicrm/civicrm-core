@@ -64,7 +64,7 @@
   {else}
     <div class="crm-content-block">
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp;
+        {icon icon="fa-info-circle"}{/icon}
         {if $myReports}
           {ts}You do not have any private reports. To add a report to this section, edit the Report Settings for a report and set 'Add to My Reports' to Yes.{/ts} &nbsp;
         {else}

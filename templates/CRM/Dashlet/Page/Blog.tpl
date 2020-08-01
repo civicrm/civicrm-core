@@ -60,7 +60,7 @@
   {/foreach}
   {if !$feeds}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}Sorry but we are not able to provide this at the moment.{/ts}
     </div>
   {/if}
