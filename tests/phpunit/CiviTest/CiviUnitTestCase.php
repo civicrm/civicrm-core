@@ -2780,13 +2780,10 @@ VALUES
   protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
     $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_' . $type . '.tpl');
     CRM_Core_DAO::executeQuery(
-      "UPDATE civicrm_option_group og
-      LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
-      LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
-      SET m.msg_{$type} = %1
-      WHERE og.name LIKE 'msg_tpl_workflow_%'
-      AND ov.name = '{$templateName}'
-      AND m.is_default = 1", [1 => [$testTemplate, 'String']]
+      "UPDATE civicrm_msg_template
+      SET msg_{$type} = %1
+      WHERE workflow_name = '{$templateName}'
+      AND is_default = 1", [1 => [$testTemplate, 'String']]
     );
   }
 

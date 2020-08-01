@@ -442,8 +442,15 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     }
     if ($templateContributions->count()) {
       $templateContribution = $templateContributions->first();
-      $result = array_merge($templateContribution, $overrides);
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($templateContribution['id']);
+      // We only permit the financial type to be overridden for single line items.
+      // Otherwise we need to figure out a whole lot of extra complexity.
+      // It's not UI-possible to alter financial_type_id for recurring contributions
+      // with more than one line item.
+      if (count($lineItems) > 1 && isset($overrides['financial_type_id'])) {
+        unset($overrides['financial_type_id']);
+      }
+      $result = array_merge($templateContribution, $overrides);
       $result['line_item'] = self::reformatLineItemsForRepeatContribution($result['total_amount'], $result['financial_type_id'], $lineItems, (array) $templateContribution);
       return $result;
     }

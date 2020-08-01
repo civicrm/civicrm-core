@@ -2610,10 +2610,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         ])
       );
       $input['line_item'] = $contributionParams['line_item'] = $templateContribution['line_item'];
-
       $contributionParams['status_id'] = 'Pending';
-      if (isset($contributionParams['financial_type_id'])) {
-        // Give precedence to passed in type.
+
+      if (isset($contributionParams['financial_type_id']) && count($input['line_item']) === 1) {
+        // We permit the financial type to be overridden for single line items.
+        // More comments on this are in getTemplateTransaction.
         $contribution->financial_type_id = $contributionParams['financial_type_id'];
       }
       else {
@@ -4439,10 +4440,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'contribution_status_id',
       'card_type_id',
       'pan_truncation',
+      'financial_type_id',
     ];
-    if (self::isSingleLineItem($primaryContributionID)) {
-      $inputContributionWhiteList[] = 'financial_type_id';
-    }
 
     $participant = $objects['participant'] ?? NULL;
     $recurContrib = $objects['contributionRecur'] ?? NULL;
@@ -4486,7 +4485,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
     $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
-    $contributionParams['financial_type_id'] = $contribution->financial_type_id;
 
     $values = [];
 
@@ -4530,9 +4528,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionParams['id'] = $contribution->id;
     $contributionParams['is_post_payment_create'] = $isPostPaymentCreate;
 
-    // CRM-19309 - if you update the contribution here with financial_type_id it can/will mess with $lineItem
-    // unsetting it here does NOT cause any other contribution test to fail!
-    unset($contributionParams['financial_type_id']);
     if (!$contributionResult) {
       $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
     }
