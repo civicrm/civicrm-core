@@ -5272,7 +5272,7 @@ LIMIT 1;";
          * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
          * when Contribution mode is notify and membership is for renewal )
          */
-        CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
+        //CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeDate);
 
         // @todo - we should pass membership_type_id instead of null here but not
         // adding as not sure of testing
