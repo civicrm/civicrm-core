@@ -260,7 +260,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $status = $input['paymentStatus'];
     if ($status == 'Denied' || $status == 'Failed' || $status == 'Voided') {
-      return $this->failed($objects, $transaction);
+      return $this->failed($objects);
     }
     if ($status === 'Pending') {
       Civi::log()->debug('Returning since contribution status is Pending');

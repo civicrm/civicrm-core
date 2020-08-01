@@ -394,8 +394,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       return $statusId;
     }
     elseif ($statusId == $contributionStatuses['Failed']) {
-      $transaction = new CRM_Core_Transaction();
-      $baseIPN->failed($objects, $transaction, $input);
+      $baseIPN->failed($objects, $input);
       $transaction->commit();
       return $statusId;
     }

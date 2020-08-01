@@ -214,7 +214,8 @@ class CRM_Core_Payment_BaseIPN {
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  public function failed(&$objects, &$transaction, $input = []) {
+  public function failed(&$objects, $input = []) {
+    $transaction = new CRM_Core_Transaction();
     $contribution = &$objects['contribution'];
     $memberships = [];
     if (!empty($objects['membership'])) {

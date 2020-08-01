@@ -348,7 +348,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
     $status = $input['paymentStatus'];
     if ($status == 'Denied' || $status == 'Failed' || $status == 'Voided') {
-      $this->failed($objects, $transaction);
+      $this->failed($objects);
       return;
     }
     if ($status === 'Pending') {
