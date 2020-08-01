@@ -423,7 +423,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $ids['contact'] = self::getValue('c', TRUE);
     $ids['contribution'] = self::getValue('b', TRUE);
 
-    $this->getInput($input, $ids);
+    $this->getInput($input);
 
     if ($this->_component == 'event') {
       $ids['event'] = self::getValue('e', TRUE);
@@ -487,13 +487,12 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
   /**
    * @param array $input
-   * @param array $ids
    *
    * @return void
    * @throws CRM_Core_Exception
    */
-  public function getInput(&$input, &$ids) {
-    $billingID = $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
+  public function getInput(&$input) {
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
 
     $input['txnType'] = self::retrieve('txn_type', 'String', 'POST', FALSE);
     $input['paymentStatus'] = self::retrieve('payment_status', 'String', 'POST', FALSE);
