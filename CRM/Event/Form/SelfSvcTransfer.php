@@ -137,7 +137,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $this->_userContext = $session->readUserContext();
     $this->_from_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
-    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST');
+    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST') ?? FALSE;
     $params = ['id' => $this->_from_participant_id];
     $participant = $values = [];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
@@ -165,6 +165,9 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
 
     $details = CRM_Event_BAO_Participant::participantDetails($this->_from_participant_id);
     $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_from_participant_id, $url, $this->isBackoffice);
+    if (!$selfServiceDetails['eligible']) {
+      CRM_Core_Error::statusBounce($selfServiceDetails['ineligible_message'], $url, ts('Sorry'));
+    }
     $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
     //This participant row will be cancelled.  Get line item(s) to cancel
