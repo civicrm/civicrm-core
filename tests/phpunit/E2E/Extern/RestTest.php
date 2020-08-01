@@ -22,6 +22,15 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   protected $old_api_keys;
   protected $adminContactId;
 
+  public function testEndPoints() {
+    $endpoints = [];
+    $endpoints[] = CRM_Utils_System::url('civicrm/api/3/rest', NULL, TRUE, NULL, FALSE, TRUE);
+    if (CRM_Core_Config::singleton()->userFramework !== "Drupal8") {
+      $entpoints[] = CRM_Core_Resources::singleton()->getUrl('civicrm', 'extern/rest.php');
+    }
+    return $endpoints;
+  }
+
   /**
    * @param $apiResult
    * @param $cmpvar
@@ -44,10 +53,6 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     }
 
     $this->old_api_keys = [];
-  }
-
-  protected function getRestUrl() {
-    return CRM_Utils_System::url('civicrm/api/3/rest', NULL, TRUE, NULL, FALSE, TRUE);
   }
 
   protected function tearDown() {
@@ -198,7 +203,6 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       // is_error
       0,
     );
-
     return $cases;
   }
 
@@ -211,24 +215,26 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     $this->updateAdminApiKey();
 
     $client = CRM_Utils_HttpClient::singleton();
-    if (CRM_Core_Config::singleton()->userFramework === 'WordPress') {
-      if (!empty($query['q'])) {
-        $query['rq'] = $query['q'];
-        unset($query['q']);
+    foreach ($this->testEndPoints() as $key => $endpoint) {
+      if (CRM_Core_Config::singleton()->userFramework === 'WordPress' && $key === 0) {
+        if (!empty($query['q'])) {
+          $query['rq'] = $query['q'];
+          unset($query['q']);
+        }
       }
+      list($status, $data) = $client->post($endpoint, $query);
+      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+      $result = json_decode($data, TRUE);
+      if ($result === NULL) {
+        $msg = print_r(array(
+          'restUrl' => $endpoint,
+          'query' => $query,
+          'response data' => $data,
+        ), TRUE);
+        $this->assertNotNull($result, $msg);
+      }
+      $this->assertAPIErrorCode($result, $is_error);
     }
-    list($status, $data) = $client->post($this->getRestUrl(), $query);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    if ($result === NULL) {
-      $msg = print_r(array(
-        'restUrl' => $this->getRestUrl(),
-        'query' => $query,
-        'response data' => $data,
-      ), TRUE);
-      $this->assertNotNull($result, $msg);
-    }
-    $this->assertAPIErrorCode($result, $is_error);
   }
 
   /**
@@ -256,11 +262,13 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       "json" => "1",
       "api_key" => $test_key,
     );
-    list($status, $data) = $client->post($this->getRestUrl(), $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 1);
+    foreach ($this->testEndPoints() as $endpoint) {
+      list($status, $data) = $client->post($endpoint, $params);
+      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+      $result = json_decode($data, TRUE);
+      $this->assertNotNull($result);
+      $this->assertAPIErrorCode($result, 1);
+    }
   }
 
   /**
@@ -281,11 +289,13 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       "api_key" => self::getApiKey(),
       "id" => "user_contact_id",
     );
-    list($status, $data) = $client->post($this->getRestUrl(), $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertEquals($result['id'], $this->adminContactId);
+    foreach ($this->testEndPoints() as $endpoint) {
+      list($status, $data) = $client->post($endpoint, $params);
+      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+      $result = json_decode($data, TRUE);
+      $this->assertNotNull($result);
+      $this->assertEquals($result['id'], $this->adminContactId);
+    }
   }
 
   /**
@@ -316,11 +326,13 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       $params['rq'] = $params['q'];
       unset($params['q']);
     }
-    list($status, $data) = $client->post($this->getRestUrl(), $params);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
-    $result = json_decode($data, TRUE);
-    $this->assertNotNull($result);
-    $this->assertAPIErrorCode($result, 1);
+    foreach ($this->testEndPoints() as $endpoint) {
+      list($status, $data) = $client->post($endpoint, $params);
+      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+      $result = json_decode($data, TRUE);
+      $this->assertNotNull($result);
+      $this->assertAPIErrorCode($result, 1);
+    }
   }
 
   protected function updateAdminApiKey() {
