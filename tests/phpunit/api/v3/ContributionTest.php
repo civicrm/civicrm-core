@@ -3460,6 +3460,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test membership is renewed when transaction completed.
+   *
+   * In this case the pending contribution has the qty = 2 in the relevant line item.
    */
   public function testCompleteTransactionMembershipPriceSetTwoTerms() {
     $this->createPriceSetWithPage('membership');
