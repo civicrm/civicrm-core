@@ -56,16 +56,23 @@ class CRM_Upgrade_Incremental_php_FiveTwentyEight extends CRM_Upgrade_Incrementa
       return '';
     }
 
-    return '<p>' . ts('Starting with version 5.29.0, CiviCRM on WP will
-         automate the determination of the civicrm files directory. Please
-         <a href=\'%1\' target=\'_blank\'>read the upgrade documentation related to this change before starting the upgrade process </a>
-         If you have a legacy (wp-content/plugins/files/civicrm) or non-standard directory
-         structure you will need to either override the settings in civicrm.settings.php
-         or by specifying the locations in System Settings Directories and System
-         Settings Resource URLs. . Starting with version 4.7.0, wp-content/uploads/civicrm/
-         is the standard WordPress CiviCRM Files directory.', [
+    $table = '<table><tbody>'
+      . sprintf('<tr><th colspan="2">%s</th></tr>', ts('<b>[civicrm.files]</b> Path'))
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.29 Default:'), wp_upload_dir()['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR)
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.28 Default:'), CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage()['path'])
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('Active Value:'), Civi::paths()->getVariable('civicrm.files', 'path'))
+      . sprintf('<tr><th colspan="2">%s</th></tr>', ts('<b>[civicrm.files]</b> URL'))
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.29 Default:'), wp_upload_dir()['baseurl'] . '/civicrm/')
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('5.28 Default:'), CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage()['url'])
+      . sprintf('<tr><td>%s</td><td><code>%s</code></td></tr>', ts('Active Value:'), Civi::paths()->getVariable('civicrm.files', 'url'))
+      . '</tbody></table>';
+
+    return '<p>' . ts('Starting with version 5.29.0, CiviCRM on WordPress may make a subtle change in the calculation of <code>[civicrm.files]</code>.
+         To ensure a smooth upgrade, please review the following table. All paths and URLs should appear the same. If there is <strong><em>any</em></strong> discrepancy,
+         then consult <a href=\'%1\' target=\'_blank\'>the upgrade documentation</a>.', [
            1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#civicrm-5.29',
-         ]) . '</p>';
+           2 => '...wp-content/uploads/civicrm',
+         ]) . '</p>' . $table;
   }
 
   /*
