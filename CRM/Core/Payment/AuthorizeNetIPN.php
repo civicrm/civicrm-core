@@ -114,8 +114,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
-    $transaction = new CRM_Core_Transaction();
-
     $now = date('YmdHis');
 
     //load new contribution object if required.
@@ -148,18 +146,17 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         $recur->trxn_id = $recur->processor_id;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
       }
-      $statusName = 'In Progress';
+
       if (($recur->installments > 0) &&
         ($input['subscription_paynum'] >= $recur->installments)
       ) {
         // this is the last payment
-        $statusName = 'Completed';
         $recur->end_date = $now;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
+        // This end date update should occur in ContributionRecur::updateOnNewPayment
+        // testIPNPaymentRecurNoReceipt has test cover.
+        $recur->save();
       }
-      $recur->modified_date = $now;
-      $recur->contribution_status_id = array_search($statusName, $contributionStatus);
-      $recur->save();
     }
     else {
       // Declined
@@ -168,7 +165,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $recur->cancel_date = $now;
       $recur->save();
 
-      $message = ts("Subscription payment failed - %1", [1 => htmlspecialchars($input['response_reason_text'])]);
+      $message = ts('Subscription payment failed - %1', [1 => htmlspecialchars($input['response_reason_text'])]);
       CRM_Core_Error::debug_log_message($message);
 
       // the recurring contribution has declined a payment or has failed
@@ -180,13 +177,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     // check if contribution is already completed, if so we ignore this ipn
     if ($objects['contribution']->contribution_status_id == 1) {
-      $transaction->commit();
       CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
       echo "Success: Contribution has already been handled<p>";
       return TRUE;
     }
 
-    $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
+    $this->completeTransaction($input, $ids, $objects);
 
     // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
     // to do this we should make it available via the api, e.g as a parameter, changing the nuance
