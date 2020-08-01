@@ -4511,7 +4511,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
         self::updateMembershipBasedOnCompletionOfContribution(
           $contribution,
-          $primaryContributionID,
           $changeDate
         );
       }
@@ -5211,13 +5210,12 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * load them in this function. Code clean up would compensate for any minor performance implication.
    *
    * @param \CRM_Contribute_BAO_Contribution $contribution
-   * @param int $primaryContributionID
    * @param string $changeDate
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function updateMembershipBasedOnCompletionOfContribution($contribution, $primaryContributionID, $changeDate) {
+  public static function updateMembershipBasedOnCompletionOfContribution($contribution, $changeDate) {
     $memberships = self::getRelatedMemberships($contribution->id);
     foreach ($memberships as $membership) {
       $membershipParams = [
@@ -5254,10 +5252,11 @@ LIMIT 1;";
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
+        // ... except testCompleteTransactionMembershipPriceSetTwoTerms hits this line so the above is obviously not true....
         // @todo once apiv4 ships with core switch to that & find sanity.
         $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
           $membershipParams['membership_type_id'],
-          $primaryContributionID
+          $contribution->id
         );
       }
       // @todo remove all this stuff in favour of letting the api call further down handle in
