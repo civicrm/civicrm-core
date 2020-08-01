@@ -74,9 +74,9 @@ function civicrm_api3_order_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['line_items', 'total_amount']);
   $entity = NULL;
   $entityIds = [];
-  $contributionStatus = $params['contribution_status_id'] ?? NULL;
-  if ($contributionStatus !== 'Pending' && 'Pending' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatus)) {
-    CRM_Core_Error::deprecatedFunctionWarning("Creating a Order with a status other than pending is deprecated. Currently empty defaults to 'Completed' so as a transition not passing in 'Pending' is deprecated. You can chain payment creation e.g civicrm_api3('Order', 'create', ['blah' => 'blah', 'contribution_status_id' => 'Pending', 'api.Payment.create => ['total_amount' => 5]]");
+  $params['contribution_status_id'] = $params['contribution_status_id'] ?? 'Pending';
+  if ($params['contribution_status_id'] !== 'Pending' && 'Pending' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
+    CRM_Core_Error::deprecatedFunctionWarning("Creating a Order with a status other than pending is deprecated. Please do not set contribution_status_id, it will default to Pending. You can chain payment creation e.g civicrm_api3('Order', 'create', ['blah' => 'blah', 'contribution_status_id' => 'Pending', 'api.Payment.create => ['total_amount' => 5]]");
   }
 
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
@@ -91,9 +91,7 @@ function civicrm_api3_order_create($params) {
       if ($entityParams) {
         if (in_array($entity, ['participant', 'membership'])) {
           $entityParams['skipLineItem'] = TRUE;
-          if ($contributionStatus === 'Pending') {
-            $entityParams['status_id'] = ($entity === 'participant' ? 'Pending from incomplete transaction' : 'Pending');
-          }
+          $entityParams['status_id'] = ($entity === 'participant' ? 'Pending from incomplete transaction' : 'Pending');
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
           $entityIds[] = $params[$entity . '_id'] = $entityResult['id'];

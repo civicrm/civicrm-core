@@ -136,7 +136,6 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
         return $total;
       }),
       'financial_type_id' => $priceFieldValues['values'][0]['financial_type_id'],
-      'contribution_status_id' => 'Pending',
       'currency' => 'USD',
       'line_items' => $lineItemParams,
     ];

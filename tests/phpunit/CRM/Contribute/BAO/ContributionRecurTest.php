@@ -304,7 +304,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contact_id' => $contactId1,
       'receive_date' => '2010-01-20',
       'financial_type_id' => 'Member Dues',
-      'contribution_status_id' => 'Pending',
       'contribution_recur_id' => $contributionRecurId,
       'total_amount' => 150,
       'api.Payment.create' => ['total_amount' => 150],
