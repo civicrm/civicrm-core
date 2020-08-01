@@ -572,18 +572,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     $file_log->close();
 
-    // Use the custom fatalErrorHandler if defined
-    if (in_array($priority, [PEAR_LOG_EMERG, PEAR_LOG_ALERT, PEAR_LOG_CRIT, PEAR_LOG_ERR])) {
-      if ($config->fatalErrorHandler && function_exists($config->fatalErrorHandler)) {
-        $name = $config->fatalErrorHandler;
-        $vars = [
-          'debugLogMessage' => $message,
-          'priority' => $priority,
-        ];
-        $name($vars);
-      }
-    }
-
     if (!isset(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // Set it to FALSE first & then try to set it. This is to prevent a loop as calling
       // $config->userFrameworkLogging can trigger DB queries & under log mode this
