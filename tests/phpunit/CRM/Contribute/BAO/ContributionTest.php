@@ -685,7 +685,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Add participant with contribution
    *
-   * @return array
+   * @return CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -695,7 +695,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreatePaid([]);
     $this->_eventId = $event['id'];
-    $priceSetId = $this->priceSetID;
+    $priceSetID = $this->ids['PriceSet']['event'];
     $paramsField = [
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
@@ -709,7 +709,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $this->priceSetID,
+      'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
       'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
     ];
@@ -720,7 +720,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'is_monetary' => 1,
     ];
     CRM_Event_BAO_Event::create($eventParams);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetID);
 
     $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
     $participantParams = [
