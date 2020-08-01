@@ -4598,8 +4598,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $ids
    *   Related object IDs.
    * @param int $contributionID
-   * @param array $values
-   *   Values related to objects that have already been loaded.
    * @param bool $returnMessageText
    *   Should text be returned instead of sent. This.
    *   is because the function is also used to generate pdfs
@@ -4609,9 +4607,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
    */
-  public static function sendMail(&$input, &$ids, $contributionID, &$values,
-                                  $returnMessageText = FALSE) {
-
+  public static function sendMail($input, $ids, $contributionID, $returnMessageText = FALSE) {
+    $values = [];
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $contributionID;
     if (!$contribution->find(TRUE)) {
