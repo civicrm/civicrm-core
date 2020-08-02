@@ -45,23 +45,57 @@ abstract class CRM_Utils_Check_Component {
   }
 
   /**
+   * Get the names of all check functions in this class
+   *
+   * @return string[]
+   */
+  public function getAllChecks() {
+    return array_filter(get_class_methods($this), function($method) {
+      return $method !== 'checkAll' && strpos($method, 'check') === 0;
+    });
+  }
+
+  /**
    * Run all checks in this class.
    *
-   * @return array
-   *   [CRM_Utils_Check_Message]
+   * @param array $requestedChecks
+   *   Optionally specify the names of specific checks requested, or leave empty to run all
+   * @param bool $includeDisabled
+   *   Run checks that have been explicitly disabled (default false)
    *
-   * @throws \API_Exception
+   * @return CRM_Utils_Check_Message[]
+   *
+   * @throws API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function checkAll() {
+  public function checkAll($requestedChecks = [], $includeDisabled = FALSE) {
     $messages = [];
-    foreach (get_class_methods($this) as $method) {
+    foreach ($this->getAllChecks() as $method) {
       // Note that we should check if the test is disabled BEFORE running it in case it's disabled for performance.
-      if ($method !== 'checkAll' && strpos($method, 'check') === 0 && !$this->isDisabled($method)) {
-        $messages = array_merge($messages, $this->$method());
+      if ($this->isRequested($method, $requestedChecks) && ($includeDisabled || !$this->isDisabled($method))) {
+        $messages = array_merge($messages, $this->$method($includeDisabled));
       }
     }
     return $messages;
+  }
+
+  /**
+   * Is this check one of those requested
+   *
+   * @param string $method
+   * @param array $requestedChecks
+   * @return bool
+   */
+  private function isRequested($method, $requestedChecks) {
+    if (!$requestedChecks) {
+      return TRUE;
+    }
+    foreach ($requestedChecks as $name) {
+      if (strpos($name, $method) === 0) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**

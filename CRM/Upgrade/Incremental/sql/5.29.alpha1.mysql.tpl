@@ -1,5 +1,9 @@
 {* file to handle db changes in 5.29.alpha1 during upgrade *}
 
+{* https://github.com/civicrm/civicrm-core/pull/17824 *}
+UPDATE civicrm_status_pref SET name = 'checkExtensionsOk' WHERE name = 'extensionsOk';
+UPDATE civicrm_status_pref SET name = 'checkExtensionsUpdates' WHERE name = 'extensionUpdates';
+
 -- The RelationshipCache is a high-level index/cache for querying relationships.
 DROP TABLE IF EXISTS `civicrm_relationship_cache`;
 CREATE TABLE `civicrm_relationship_cache` (

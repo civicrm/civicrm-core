@@ -2411,13 +2411,20 @@ abstract class CRM_Utils_Hook {
   /**
    * Check system status.
    *
-   * @param array $messages
-   *   Array<CRM_Utils_Check_Message>. A list of messages regarding system status.
+   * @param CRM_Utils_Check_Message[] $messages
+   *   A list of messages regarding system status
+   * @param array $statusNames
+   *   If specified, only these checks are being requested and others should be skipped
+   * @param bool $includeDisabled
+   *   Run checks that have been explicitly disabled (default false)
    * @return mixed
    */
-  public static function check(&$messages) {
-    return self::singleton()
-      ->invoke(['messages'], $messages, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_check');
+  public static function check(&$messages, $statusNames = [], $includeDisabled = FALSE) {
+    return self::singleton()->invoke(['messages'],
+      $messages, $statusNames, $includeDisabled,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_check'
+    );
   }
 
   /**
