@@ -1164,6 +1164,7 @@ AND civicrm_membership.is_test = %2";
     $currentMembership['today_date'] = $today;
 
     if ($status['id'] !== $currentMembership['status_id']) {
+      throw new CRM_Core_Exception('just checking what tests cover here');
       $oldStatus = $currentMembership['status_id'];
       $memberDAO = new CRM_Member_DAO_Membership();
       $memberDAO->id = $currentMembership['id'];
