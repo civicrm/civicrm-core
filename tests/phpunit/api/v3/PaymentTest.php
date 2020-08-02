@@ -899,6 +899,129 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create payment api for failed contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreatePaymentOnFailedContribution() {
+    $this->createLoggedInUser();
+    //Create a direct Failed Contribution (no ft record inserted).
+    $contributionParams = [
+      'total_amount' => 50,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 'Failed',
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+
+    //Complete the payment in a single call.
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+    ];
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+
+    //Verify 2 rows are added to the financial trxn as payment is moved from
+    //Failed -> Pending -> Completed, i.e, 0 -> 7(Account receivable) -> 6 (Deposit Bank).
+    $params = [
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+    ];
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['count'], 2);
+
+    //Test 2
+    //Create a Pending Contribution so an FT record is inserted.
+    $contributionParams = [
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 'Pending',
+      'is_pay_later' => 1,
+    ];
+    $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
+
+    //Mark it as failed. No FT record inserted on this update
+    //so the payment is still in the account receivable account id 7.
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contribution['id'],
+      'contribution_status_id' => 'Failed',
+    ]);
+    $this->createPartialPaymentOnContribution($contribution['id'], 60, 100.00);
+
+    //Call payment create on the failed contribution.
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 40,
+    ];
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = [
+      $payment['id'] => [
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 40,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ],
+    ];
+    $this->checkPaymentResult($payment, $expectedResult);
+
+    //Check total ft rows are 4: 2 from initial pending + partial payment
+    //+ 2 for failed -> completed transition.
+    $params = [
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+    ];
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['count'], 4);
+
+    $this->validateAllPayments();
+  }
+
+  /**
+   * Create partial payment for contribution
+   *
+   * @param $contributionID
+   * @param $partialAmount
+   * @param $totalAmount
+   */
+  public function createPartialPaymentOnContribution($contributionID, $partialAmount, $totalAmount) {
+    //Create partial payment
+    $params = [
+      'contribution_id' => $contributionID,
+      'total_amount' => $partialAmount,
+    ];
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
+    $expectedResult = [
+      $payment['id'] => [
+        'total_amount' => $partialAmount,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ],
+    ];
+    $this->checkPaymentResult($payment, $expectedResult);
+    // Check entity financial trxn created properly
+    $params = [
+      'entity_id' => $contributionID,
+      'entity_table' => 'civicrm_contribution',
+      'financial_trxn_id' => $payment['id'],
+    ];
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], $partialAmount);
+    $params = [
+      'entity_table' => 'civicrm_financial_item',
+      'financial_trxn_id' => $payment['id'],
+    ];
+    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
+    $this->assertEquals($eft['values'][$eft['id']]['amount'], $partialAmount);
+    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contributionID]);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Partially paid');
+    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], $totalAmount);
+  }
+
+  /**
    * Test create payment api for pay later contribution with partial payment.
    *
    * @throws \CRM_Core_Exception
@@ -914,37 +1037,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'is_pay_later' => 1,
     ];
     $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
-    //Create partial payment
-    $params = [
-      'contribution_id' => $contribution['id'],
-      'total_amount' => 60,
-    ];
-    $payment = $this->callAPISuccess('Payment', 'create', $params);
-    $expectedResult = [
-      $payment['id'] => [
-        'total_amount' => 60,
-        'status_id' => 1,
-        'is_payment' => 1,
-      ],
-    ];
-    $this->checkPaymentResult($payment, $expectedResult);
-    // Check entity financial trxn created properly
-    $params = [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals($eft['values'][$eft['id']]['amount'], 60);
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals($eft['values'][$eft['id']]['amount'], 60);
-    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Partially paid');
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
+    $this->createPartialPaymentOnContribution($contribution['id'], 60, 100.00);
+
     //Create full payment
     $params = [
       'contribution_id' => $contribution['id'],
