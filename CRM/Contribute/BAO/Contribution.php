@@ -2575,12 +2575,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param CRM_Contribute_BAO_Contribution $contribution
    * @param array $input
    * @param array $contributionParams
-   * @param int $paymentProcessorID
    *
-   * @return bool
+   * @return bool|array
    * @throws CiviCRM_API3_Exception
    */
-  protected static function repeatTransaction(&$contribution, &$input, $contributionParams, $paymentProcessorID) {
+  protected static function repeatTransaction(&$contribution, &$input, $contributionParams) {
     if (!empty($contribution->id)) {
       return FALSE;
     }
@@ -2638,7 +2637,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $contribution->id = $createContribution['id'];
       $contribution->copyCustomFields($templateContribution['id'], $contribution->id);
       self::handleMembershipIDOverride($contribution->id, $input);
-      return TRUE;
+      return $createContribution;
     }
   }
 
@@ -4486,7 +4485,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
-    self::repeatTransaction($contribution, $input, $contributionParams, $paymentProcessorId);
+    $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
     $contributionParams['financial_type_id'] = $contribution->financial_type_id;
 
     $values = [];
@@ -4534,7 +4533,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // CRM-19309 - if you update the contribution here with financial_type_id it can/will mess with $lineItem
     // unsetting it here does NOT cause any other contribution test to fail!
     unset($contributionParams['financial_type_id']);
-    $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
+    if (!$contributionResult) {
+      $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
+    }
 
     // Add new soft credit against current $contribution.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
