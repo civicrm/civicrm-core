@@ -24,3 +24,20 @@ CREATE TABLE `civicrm_relationship_cache` (
      CONSTRAINT FK_civicrm_relationship_cache_near_contact_id FOREIGN KEY (`near_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE,
      CONSTRAINT FK_civicrm_relationship_cache_far_contact_id FOREIGN KEY (`far_contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+-- Fix missing resubscribeUrl token. There doesn't seem to be any precedent
+-- for doing an upgrade for these, since the last update was in 2009 when
+-- the token went missing and it had no upgrade script for it. Also unlike
+-- message templates, there doesn't seem to be a way to tell whether it's
+-- been changed. Using ts is a bit unreliable if the translation has changed
+-- but it would be no worse than now and just end up not updating it.
+-- Also, I'm drawing a blank on why the %3 is replaced differently during
+-- install than during upgrade, hence the OR clause.
+{capture assign=unsubgroup}{ldelim}unsubscribe.group{rdelim}{/capture}
+{capture assign=actresub}{ldelim}action.resubscribe{rdelim}{/capture}
+{capture assign=actresuburl}{ldelim}action.resubscribeUrl{rdelim}{/capture}
+UPDATE civicrm_mailing_component
+SET body_text = '{ts escape="sql" 1=$unsubgroup 2=$actresub 3=$actresuburl}You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking %3{/ts}'
+WHERE component_type  = 'Unsubscribe'
+AND (body_text = '{ts escape="sql" 1=$unsubgroup 2=$actresub}You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking %3{/ts}'
+  OR body_text = '{ts escape="sql" 1=$unsubgroup 2=$actresub}You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking {/ts}');
