@@ -331,7 +331,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
           'contact_id' => $contactId,
           'membership_type_id' => $priceField['membership_type_id'],
           'source' => 'Payment',
-          'join_date' => date('Y-m') . '-28',
+          'join_date' => date('Y-m', strtotime('1 month ago')) . '-28',
           'start_date' => date('Y-m') . '-28',
           'contribution_recur_id' => $contributionRecurId,
           'status_id' => 'Pending',
