@@ -229,8 +229,10 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param bool $first
    *
    * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function single(&$input, &$ids, &$objects, $recur = FALSE, $first = FALSE) {
+  public function single($input, $ids, $objects, $recur = FALSE, $first = FALSE) {
     $contribution = &$objects['contribution'];
 
     // make sure the invoice is valid and matches what we have in the contribution record
@@ -257,7 +259,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $status = $input['paymentStatus'];
-    if ($status == 'Denied' || $status == 'Failed' || $status == 'Voided') {
+    if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
       $this->failed($objects);
       return;
     }
@@ -265,7 +267,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       Civi::log()->debug('Returning since contribution status is Pending');
       return;
     }
-    elseif ($status == 'Refunded' || $status == 'Reversed') {
+    elseif ($status === 'Refunded' || $status === 'Reversed') {
       $this->cancelled($objects);
       return;
     }
@@ -369,7 +371,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
     }
-    $this->single($input, $ids, $objects, FALSE, FALSE);
+    $this->single($input, $ids, $objects);
   }
 
   /**
