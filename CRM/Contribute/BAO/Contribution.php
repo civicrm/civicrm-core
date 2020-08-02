@@ -2927,7 +2927,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($input, $values, $ids), $values);
-    $values['is_email_receipt'] = $this->isEmailReceipt($input, $values);
+    $values['is_email_receipt'] = !$returnMessageText;
     if (!empty($input['receipt_date'])) {
       $values['receipt_date'] = $input['receipt_date'];
     }
@@ -5705,23 +5705,6 @@ LIMIT 1;";
         }
       }
     }
-  }
-
-  /**
-   * Should an email receipt be sent for this contribution when complete.
-   *
-   * @param array $input
-   *
-   * @return mixed
-   */
-  protected function isEmailReceipt($input) {
-    if (isset($input['is_email_receipt'])) {
-      return $input['is_email_receipt'];
-    }
-    if (!empty($this->_relatedObjects['contribution_page_id'])) {
-      return $this->_relatedObjects['contribution_page_id']->is_email_receipt;
-    }
-    return TRUE;
   }
 
   /**
