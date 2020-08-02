@@ -1054,12 +1054,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   protected function eventCreatePaid($params, $options = [['name' => 'hundy', 'amount' => 100]], $key = 'event') {
+    $params['is_monetary'] = TRUE;
     $event = $this->eventCreate($params);
-    $this->ids['event'][$key] = (int) $event['id'];
-    $this->priceSetID = $this->ids['PriceSet'][] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->priceSetID);
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->priceSetID, TRUE, FALSE);
-    $priceSet = $priceSet[$this->priceSetID] ?? NULL;
+    $this->ids['Event'][$key] = (int) $event['id'];
+    $this->ids['PriceSet'][$key] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->ids['PriceSet'][$key]);
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->ids['PriceSet'][$key], TRUE, FALSE);
+    $priceSet = $priceSet[$this->ids['PriceSet'][$key]] ?? NULL;
     $this->eventFeeBlock = $priceSet['fields'] ?? NULL;
     return $event;
   }
