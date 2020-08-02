@@ -22,9 +22,6 @@ class CRM_Case_BAO_QueryTest extends CiviUnitTestCase {
    * CRM-17120 check the qill is still calculated after changing function used
    * to retrieve function.
    *
-   * Note that the Qill doesn't actually appear to have the correct labels to
-   * start with. I didn't attempt to fix that. I just prevented regression.
-   *
    * I could not find anyway to actually do this search with the relevant fields
    * as parameters & don't know if they exist as legitimate code or code cruft so
    * this test was the only way I could verify the change.
@@ -61,7 +58,7 @@ class CRM_Case_BAO_QueryTest extends CiviUnitTestCase {
     $this->assertEquals(
       [
         0 => 'Activity Type = Contribution',
-        1 => 'Activity Type = Scheduled',
+        1 => 'Activity Status = Scheduled',
         2 => 'Activity Medium = In Person',
       ],
       $queryObj->_qill[1]

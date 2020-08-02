@@ -376,7 +376,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_activity.status_id", $op, $value, 'Int');
-        $query->_qill[$grouping][] = ts("Activity Type %1 %2", [1 => $op, 2 => $names]);
+        $query->_qill[$grouping][] = ts("Activity Status %1 %2", [1 => $op, 2 => $names]);
         $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         $query->_tables['case_activity_status'] = 1;
