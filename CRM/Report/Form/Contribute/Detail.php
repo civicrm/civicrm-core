@@ -59,9 +59,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   /**
    * This report has been optimised for group filtering.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
 
@@ -411,6 +410,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
    * @param $rows
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);

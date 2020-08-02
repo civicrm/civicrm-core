@@ -54,10 +54,6 @@
   margin-bottom: 10px;
 }
 
-#bootstrap-theme.api4-explorer-page .api4-input.form-inline > label {
-  margin-right: 12px;
-}
-
 #bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body {
   word-break: break-word;
 }

@@ -137,7 +137,7 @@
 {else}
   {if $isSearch eq 1}
   <div class="status messages">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {capture assign=browseURL}{crmURL p='civicrm/event/manage' q="reset=1"}{/capture}
     {ts}No available Events match your search criteria. Suggestions:{/ts}
     <div class="spacer"></div>
@@ -151,7 +151,7 @@
   </div>
     {else}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {ts 1=$newEventURL}There are no events scheduled for the date range. You can <a href='%1'>add one</a>.{/ts}
   </div>
   {/if}

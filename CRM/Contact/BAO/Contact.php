@@ -27,12 +27,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
   const DROP_STRIP_FUNCTION_43 = "DROP FUNCTION IF EXISTS civicrm_strip_non_numeric";
 
   const CREATE_STRIP_FUNCTION_43 = "
-    CREATE FUNCTION civicrm_strip_non_numeric(input VARCHAR(255) CHARACTER SET utf8)
-      RETURNS VARCHAR(255) CHARACTER SET utf8
+    CREATE FUNCTION civicrm_strip_non_numeric(input VARCHAR(255))
+      RETURNS VARCHAR(255)
       DETERMINISTIC
       NO SQL
     BEGIN
-      DECLARE output   VARCHAR(255) CHARACTER SET utf8 DEFAULT '';
+      DECLARE output   VARCHAR(255) DEFAULT '';
       DECLARE iterator INT          DEFAULT 1;
       WHILE iterator < (LENGTH(input) + 1) DO
         IF SUBSTRING(input, iterator, 1) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') THEN
@@ -304,7 +304,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-    if (array_key_exists('group', $params)) {
+    if (!empty($params['group'])) {
       $contactIds = [$params['contact_id']];
       foreach ($params['group'] as $groupId => $flag) {
         if ($flag == 1) {
@@ -1958,10 +1958,14 @@ ORDER BY civicrm_email.is_primary DESC";
    *
    * @return int
    *   contact id created/edited
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function createProfileContact(
     &$params,
-    &$fields = [],
+    $fields = [],
     $contactID = NULL,
     $addToGroupID = NULL,
     $ufGroupId = NULL,
@@ -2021,7 +2025,7 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     // Process group and tag
-    if (!empty($fields['group'])) {
+    if (isset($params['group'])) {
       $method = 'Admin';
       // this for sure means we are coming in via profile since i added it to fix
       // removing contacts from user groups -- lobo
@@ -2048,8 +2052,6 @@ ORDER BY civicrm_email.is_primary DESC";
       $contactIds = [$contactID];
       CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $addToGroupID);
     }
-
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if ($editHook) {
       CRM_Utils_Hook::post('edit', 'Profile', $contactID, $params);

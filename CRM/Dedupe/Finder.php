@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -252,7 +250,7 @@ class CRM_Dedupe_Finder {
     // the -digit to civicrm_address.location_type_id and -Primary to civicrm_address.is_primary
     foreach ($flat as $key => $value) {
       $matches = [];
-      if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+|Primary)$/', $key, $matches)) {
+      if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+-\d+)$|(.*)-(\d+|Primary)$/', $key, $matches)) {
         $return = array_values(array_filter($matches));
         // make sure the first occurrence is kept, not the last
         $flat[$return[1]] = empty($flat[$return[1]]) ? $value : $flat[$return[1]];

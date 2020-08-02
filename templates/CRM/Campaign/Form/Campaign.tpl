@@ -14,7 +14,7 @@
   <table class="form-layout">
     <tr>
       <td colspan="2">
-        <div class="status"><div class="icon inform-icon"></div>&nbsp;{ts}Are you sure you want to delete this Campaign?{/ts}</div>
+        <div class="status">{icon icon="fa-info-circle"}{/icon}{ts}Are you sure you want to delete this Campaign?{/ts}</div>
       </td>
     </tr>
   </table>

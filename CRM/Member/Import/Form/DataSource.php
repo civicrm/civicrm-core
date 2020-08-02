@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -34,17 +32,10 @@ class CRM_Member_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $duplicateOptions = [];
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Insert new Membership'), CRM_Import_Parser::DUPLICATE_SKIP
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update existing Membership'), CRM_Import_Parser::DUPLICATE_UPDATE
-    );
-
-    $this->addGroup($duplicateOptions, 'onDuplicate',
-      ts('Import mode')
-    );
+    $this->addRadio('onDuplicate', ts('Import mode'), [
+      CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new Membership'),
+      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing Membership'),
+    ]);
     $this->setDefaults([
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
     ]);

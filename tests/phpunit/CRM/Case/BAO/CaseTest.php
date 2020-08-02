@@ -70,34 +70,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create and return case object of given Client ID.
-   * @param $clientId
-   * @param $loggedInUser
-   * @return CRM_Case_BAO_Case
-   */
-  private function createCase($clientId, $loggedInUser = NULL) {
-    if (empty($loggedInUser)) {
-      // backwards compatibility - but it's more typical that the creator is a different person than the client
-      $loggedInUser = $clientId;
-    }
-    $caseParams = [
-      'activity_subject' => 'Case Subject',
-      'client_id'        => $clientId,
-      'case_type_id'     => 1,
-      'status_id'        => 1,
-      'case_type'        => 'housing_support',
-      'subject'          => 'Case Subject',
-      'start_date'       => date("Y-m-d"),
-      'start_date_time'  => date("YmdHis"),
-      'medium_id'        => 2,
-      'activity_details' => '',
-    ];
-    $form = new CRM_Case_Form_Case();
-    $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
-    return $caseObj;
-  }
-
-  /**
    * Create case role relationship between given contacts for provided case ID.
    *
    * @param $contactIdA

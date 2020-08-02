@@ -225,6 +225,11 @@ class CRM_Dedupe_Merger {
     }
 
     $contactReferences = $coreReferences = CRM_Core_DAO::getReferencesToContactTable();
+    foreach (['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache'] as $tableName) {
+      // Don't merge cache tables. These should be otherwise cleared at some point in the dedupe
+      // but they are prone to locking to let's not touch during the dedupe.
+      unset($contactReferences[$tableName], $coreReferences[$tableName]);
+    }
 
     CRM_Utils_Hook::merge('cidRefs', $contactReferences);
     if ($contactReferences !== $coreReferences) {
@@ -530,6 +535,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
 
+      if ($table === 'civicrm_activity_contact') {
+        $sqls[] = "UPDATE IGNORE civicrm_activity_contact SET contact_id = $mainId WHERE contact_id = $otherId";
+        $sqls[] = "DELETE FROM civicrm_activity_contact WHERE contact_id = $otherId";
+        continue;
+      }
+
       // use UPDATE IGNORE + DELETE query pair to skip on situations when
       // there's a UNIQUE restriction on ($field, some_other_field) pair
       if (isset($cidRefs[$table])) {
@@ -587,8 +598,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected static function filterRowBasedCustomDataFromCustomTables(array &$cidRefs) {
-    $customTables = (array) CustomGroup::get()
-      ->setCheckPermissions(FALSE)
+    $customTables = (array) CustomGroup::get(FALSE)
       ->setSelect(['table_name'])
       ->addWhere('is_multiple', '=', 0)
       ->addWhere('extends', 'IN', array_merge(['Contact'], CRM_Contact_BAO_ContactType::contactTypes()))
@@ -602,6 +612,30 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         unset($cidRefs[$tableName]);
       }
     }
+  }
+
+  /**
+   * Update the contact with the new parameters.
+   *
+   * This function is intended as an interim function, with the intent being
+   * an apiv4 call.
+   *
+   * The function was calling the rather-terrifying createProfileContact. I copied all
+   * that code into this function and then removed all the parts that have no effect in this scenario.
+   *
+   * @param int $contactID
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function createContact($contactID, $params) {
+    // This parameter causes blank fields to be be emptied out.
+    // We can probably remove.
+    $params['updateBlankLocInfo'] = TRUE;
+    list($data) = CRM_Contact_BAO_Contact::formatProfileContactParams($params, [], $contactID);
+    CRM_Contact_BAO_Contact::create($data);
   }
 
   /**
@@ -901,7 +935,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           unset($dupePairs[$index]);
           continue;
         }
-        if (($result = self::dedupePair($dupes, $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
+        CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
+        if (($result = self::dedupePair((int) $dupes['dstID'], (int) $dupes['srcID'], $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
           unset($dupePairs[$index]);
           continue;
         }
@@ -1440,8 +1475,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (!isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id'])) {
         $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
-      $null = [];
-      CRM_Contact_BAO_Contact::createProfileContact($submitted, $null, $mainId);
+      self::createContact($mainId, $submitted);
     }
     $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
@@ -1834,26 +1868,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Dedupe a pair of contacts.
    *
-   * @param array $dupes
+   * @param int $mainId Id of contact to keep.
+   * @param int $otherId Id of contact to delete.
    * @param string $mode
    * @param bool $checkPermissions
    * @param string $cacheKeyString
    *
    * @return bool|array
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception_ResourceConflictException
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected static function dedupePair($dupes, $mode = 'safe', $checkPermissions = TRUE, $cacheKeyString = NULL) {
-    CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
-    $mainId = $dupes['dstID'];
-    $otherId = $dupes['srcID'];
+  protected static function dedupePair(int $mainId, int $otherId, $mode = 'safe', $checkPermissions = TRUE, $cacheKeyString = NULL) {
     $resultStats = [];
 
-    if (!$mainId || !$otherId) {
-      // return error
-      return FALSE;
-    }
     $migrationInfo = [];
     $conflicts = [];
     // Try to lock the contacts before we load the data as we don't want it changing under us.

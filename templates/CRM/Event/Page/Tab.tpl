@@ -43,7 +43,7 @@
     {else}
        <div class="messages status no-popup">
            <table class="form-layout">
-             <tr><div class="icon inform-icon"></div>
+             <tr>{icon icon="fa-info-circle"}{/icon}
                    {ts}No event registrations have been recorded for this contact.{/ts}
              </tr>
            </table>

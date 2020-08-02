@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -29,8 +27,7 @@ use Civi\Api4\Contact;
 class ContactChecksumTest extends \api\v4\UnitTestCase {
 
   public function testGetChecksum() {
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Check')
       ->addValue('last_name', 'Sum')
       ->addChain('cs', Contact::getChecksum()->setContactId('$id')->setTtl(500), 0)
@@ -47,8 +44,7 @@ class ContactChecksumTest extends \api\v4\UnitTestCase {
   }
 
   public function testValidateChecksum() {
-    $cid = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $cid = Contact::create(FALSE)
       ->addValue('first_name', 'Checker')
       ->addValue('last_name', 'Sum')
       ->execute()

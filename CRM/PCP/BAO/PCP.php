@@ -464,10 +464,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
         ['onclick' => "showHideByValue('pcp_display_in_roll','','nameID|nickID|personalNoteID','block','radio',false); pcpAnonymous( );"]
       );
       $extraOption = ['onclick' => "return pcpAnonymous( );"];
-      $elements = [];
-      $elements[] = &$page->createElement('radio', NULL, '', ts('Include my name and message'), 0, $extraOption);
-      $elements[] = &$page->createElement('radio', NULL, '', ts('List my support anonymously'), 1, $extraOption);
-      $page->addGroup($elements, 'pcp_is_anonymous', NULL, '&nbsp;&nbsp;&nbsp;');
+      $page->addRadio('pcp_is_anonymous', '', [ts('Include my name and message'), ts('List my support anonymously')], [], '&nbsp;&nbsp;&nbsp;', FALSE, [$extraOption, $extraOption]);
       $page->_defaults['pcp_is_anonymous'] = 0;
 
       $page->add('text', 'pcp_roll_nickname', ts('Name'), ['maxlength' => 30]);
@@ -664,7 +661,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-      $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
+      $fixUrl = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'reset=1');
       throw new CRM_Core_Exception(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 

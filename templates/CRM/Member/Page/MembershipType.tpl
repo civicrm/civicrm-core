@@ -10,7 +10,7 @@
 
 {capture assign=reminderLink}{crmURL p='civicrm/admin/scheduleReminders' q='reset=1'}{/capture}
 <div class="help">
-  <p><div class="icon inform-icon"></div>&nbsp;{ts}Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.{/ts} {docURL page="user/membership/defining-memberships/"}</p>
+  <p>{icon icon="fa-info-circle"}{/icon}{ts}Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.{/ts} {docURL page="user/membership/defining-memberships/"}</p>
   <p>{ts 1=$reminderLink}Configure membership renewal reminders using <a href="%1">Schedule Reminders</a>.{/ts} {docURL page="user/email/scheduled-reminders"}</p>
 </div>
 

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
 

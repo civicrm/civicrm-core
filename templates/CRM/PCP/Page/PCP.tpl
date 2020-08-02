@@ -53,7 +53,7 @@
 </div>
 {else}
 <div class="messages status no-popup">
-<div class="icon inform-icon"></div>
+{icon icon="fa-info-circle"}{/icon}
     {if $isSearch}
         {ts}There are no Personal Campaign Pages which match your search criteria.{/ts}
     {else}

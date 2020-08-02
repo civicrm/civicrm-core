@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -30,8 +28,7 @@ use api\v4\UnitTestCase;
 class EntityTest extends UnitTestCase {
 
   public function testEntityGet() {
-    $result = Entity::get()
-      ->setCheckPermissions(FALSE)
+    $result = Entity::get(FALSE)
       ->execute()
       ->indexBy('name');
     $this->assertArrayHasKey('Entity', $result,
@@ -41,8 +38,7 @@ class EntityTest extends UnitTestCase {
   }
 
   public function testEntity() {
-    $result = Entity::getActions()
-      ->setCheckPermissions(FALSE)
+    $result = Entity::getActions(FALSE)
       ->execute()
       ->indexBy('name');
     $this->assertNotContains(

@@ -33,9 +33,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   /**
    * This report has been optimised for group filtering.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
 

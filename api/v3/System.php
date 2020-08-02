@@ -514,11 +514,8 @@ function civicrm_api3_system_createmissinglogtables() {
  *
  */
 function civicrm_api3_system_rebuildmultilingualschema() {
-  $domain = new CRM_Core_DAO_Domain();
-  $domain->find(TRUE);
-
-  if ($domain->locales) {
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+  $locales = CRM_Core_I18n::getMultilingual();
+  if ($locales) {
     CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales);
     return civicrm_api3_create_success(1);
   }

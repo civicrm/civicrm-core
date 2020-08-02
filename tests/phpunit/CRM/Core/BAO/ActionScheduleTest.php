@@ -920,7 +920,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
     $activity->save();
 
-    ActivityContact::create()->setCheckPermissions(FALSE)->setValues([
+    ActivityContact::create(FALSE)->setValues([
       'contact_id' => $contact['id'],
       'activity_id' => $activity->id,
       'record_type_id:name' => 'Activity Source',
@@ -2319,7 +2319,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Test that the various repetition units work correctly.
-   * CRM-17028
+   * @see https://issues.civicrm.org/jira/browse/CRM-17028
    */
   public function testRepetitionFrequencyUnit() {
     $membershipTypeParams = [
@@ -2583,7 +2583,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     );
     $this->assertInternalType('numeric', $membership->id);
     if ($emailParams) {
-      Civi\Api4\Email::create()->setCheckPermissions(FALSE)->setValues(array_merge([
+      Civi\Api4\Email::create(FALSE)->setValues(array_merge([
         'contact_id' => $membership->contact_id,
         'location_type_id' => 1,
       ], $emailParams))->execute();

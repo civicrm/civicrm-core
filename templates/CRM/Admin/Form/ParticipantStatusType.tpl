@@ -15,7 +15,7 @@
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $action eq 8}
       <div class="messages status no-popup">
-       <div class="icon inform-icon"></div>
+       {icon icon="fa-info-circle"}{/icon}
              {ts}WARNING: Deleting this Participant Status will remove all of its settings.{/ts} {ts}Do you want to continue?{/ts}
        </div>
       <div>{include file="CRM/common/formButtons.tpl"}

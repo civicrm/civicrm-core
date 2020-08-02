@@ -114,8 +114,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
-    $transaction = new CRM_Core_Transaction();
-
     $now = date('YmdHis');
 
     //load new contribution object if required.
@@ -148,18 +146,17 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         $recur->trxn_id = $recur->processor_id;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_START;
       }
-      $statusName = 'In Progress';
+
       if (($recur->installments > 0) &&
         ($input['subscription_paynum'] >= $recur->installments)
       ) {
         // this is the last payment
-        $statusName = 'Completed';
         $recur->end_date = $now;
         $isFirstOrLastRecurringPayment = CRM_Core_Payment::RECURRING_PAYMENT_END;
+        // This end date update should occur in ContributionRecur::updateOnNewPayment
+        // testIPNPaymentRecurNoReceipt has test cover.
+        $recur->save();
       }
-      $recur->modified_date = $now;
-      $recur->contribution_status_id = array_search($statusName, $contributionStatus);
-      $recur->save();
     }
     else {
       // Declined
@@ -168,7 +165,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $recur->cancel_date = $now;
       $recur->save();
 
-      $message = ts("Subscription payment failed - %1", [1 => htmlspecialchars($input['response_reason_text'])]);
+      $message = ts('Subscription payment failed - %1', [1 => htmlspecialchars($input['response_reason_text'])]);
       CRM_Core_Error::debug_log_message($message);
 
       // the recurring contribution has declined a payment or has failed
@@ -180,13 +177,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     // check if contribution is already completed, if so we ignore this ipn
     if ($objects['contribution']->contribution_status_id == 1) {
-      $transaction->commit();
       CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
       echo "Success: Contribution has already been handled<p>";
       return TRUE;
     }
 
-    $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
+    $this->completeTransaction($input, $ids, $objects);
 
     // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
     // to do this we should make it available via the api, e.g as a parameter, changing the nuance
@@ -203,11 +199,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * Get the input from passed in fields.
    *
    * @param array $input
-   * @param array $ids
    *
    * @throws \CRM_Core_Exception
    */
-  public function getInput(&$input, &$ids) {
+  public function getInput(&$input) {
     $input['amount'] = $this->retrieve('x_amount', 'String');
     $input['subscription_id'] = $this->retrieve('x_subscription_id', 'Integer');
     $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
@@ -215,7 +210,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
     $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
-    $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
     $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
     $input['receive_date'] = $this->retrieve('receive_date', 'String', FALSE, date('YmdHis', strtotime('now')));
 
@@ -229,7 +223,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $input['trxn_id'] = md5(uniqid(rand(), TRUE));
     }
 
-    $billingID = $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
     $params = [
       'first_name' => 'x_first_name',
       'last_name' => 'x_last_name',

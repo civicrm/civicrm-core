@@ -14,7 +14,7 @@
 {if $action eq 8}
   <div class="messages status no-popup">
     <dl>
-      <dt><div class="icon inform-icon"></div></dt>
+      <dt>{icon icon="fa-info-circle"}{/icon}</dt>
       <dd>
         {ts}WARNING: Delete will remove this permission from the specified ACL Role.{/ts} {ts}Do you want to continue?{/ts}
       </dd>

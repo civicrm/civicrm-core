@@ -125,7 +125,7 @@ class Container {
 
     $container->setDefinition('dispatcher', new Definition(
       'Civi\Core\CiviEventDispatcher',
-      [new Reference('service_container')]
+      []
     ))
       ->setFactory([new Reference(self::SELF), 'createEventDispatcher'])->setPublic(TRUE);
 
@@ -210,7 +210,7 @@ class Container {
       ->setFactory('CRM_Utils_Mail::createMailer');
 
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
-      throw new \RuntimeException("Cannot initialize container. Boot services are undefined.");
+      throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
     }
     foreach (\Civi::$statics[__CLASS__]['boot'] as $bootService => $def) {
       $container->setDefinition($bootService, new Definition())->setSynthetic(TRUE)->setPublic(TRUE);
@@ -324,14 +324,11 @@ class Container {
   }
 
   /**
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @return \Symfony\Component\EventDispatcher\EventDispatcher
    */
-  public function createEventDispatcher($container) {
-    $dispatcher = new CiviEventDispatcher();
-    if (\CRM_Core_Config::isUpgradeMode()) {
-      $dispatcher->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.main'));
-    }
+  public function createEventDispatcher() {
+    // Continue building on the original dispatcher created during bootstrap.
+    $dispatcher = static::getBootService('dispatcher.boot');
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
@@ -355,9 +352,11 @@ class Container {
     $dispatcher->addListener('hook_civicrm_coreResourceList', ['\CRM_Utils_System', 'appendCoreResources']);
     $dispatcher->addListener('hook_civicrm_getAssetUrl', ['\CRM_Utils_System', 'alterAssetUrl']);
     $dispatcher->addListener('hook_civicrm_alterExternUrl', ['\CRM_Utils_System', 'migrateExternUrl'], 1000);
+    $dispatcher->addListener('hook_civicrm_triggerInfo', ['\CRM_Contact_BAO_RelationshipCache', 'onHookTriggerInfo']);
     $dispatcher->addListener('civi.dao.postInsert', ['\CRM_Core_BAO_RecurringEntity', 'triggerInsert']);
     $dispatcher->addListener('civi.dao.postUpdate', ['\CRM_Core_BAO_RecurringEntity', 'triggerUpdate']);
     $dispatcher->addListener('civi.dao.postDelete', ['\CRM_Core_BAO_RecurringEntity', 'triggerDelete']);
+    $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
     $dispatcher->addListener('hook_civicrm_unhandled_exception', [
       'CRM_Core_LegacyErrorHandler',
       'handleException',
@@ -462,20 +461,19 @@ class Container {
    */
   public static function createPrevNextCache($container) {
     $setting = \Civi::settings()->get('prevNextBackend');
-    if ($setting === 'default') {
-      // For initial release (5.8.x), continue defaulting to SQL.
-      $isTransitional = version_compare(\CRM_Utils_System::version(), '5.9.alpha1', '<');
+    if (!$setting || $setting === 'default') {
       $cacheDriver = \CRM_Utils_Cache::getCacheDriver();
       $service = 'prevnext.driver.' . strtolower($cacheDriver);
-      return $container->has($service) && !$isTransitional
+      return $container->has($service)
         ? $container->get($service)
         : $container->get('prevnext.driver.sql');
     }
-    else {
-      return $container->get('prevnext.driver.' . $setting);
-    }
+    return $container->get('prevnext.driver.' . $setting);
   }
 
+  /**
+   * @return \ArrayObject
+   */
   public static function createCacheConfig() {
     $driver = \CRM_Utils_Cache::getCacheDriver();
     $settings = \CRM_Utils_Cache::getCacheSettings($driver);
@@ -501,6 +499,17 @@ class Container {
 
     $bootServices['paths'] = new \Civi\Core\Paths();
 
+    $bootServices['dispatcher.boot'] = new CiviEventDispatcher();
+
+    // Quality control: There should be no pre-boot hooks because they make it harder to understand/support/refactor.
+    // If a pre-boot hook sneaks in, we'll raise an error.
+    $bootDispatchPolicy = [
+      '/^hook_/' => 'not-ready',
+      '/^civi\./' => 'run',
+    ];
+    $mainDispatchPolicy = \CRM_Core_Config::isUpgradeMode() ? \CRM_Upgrade_DispatchPolicy::get('upgrade.main') : NULL;
+    $bootServices['dispatcher.boot']->setDispatchPolicy($bootDispatchPolicy);
+
     $class = $runtime->userFrameworkClass;
     $bootServices['userSystem'] = $userSystem = new $class();
     $userSystem->initialize();
@@ -522,6 +531,7 @@ class Container {
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE)->getClassLoader()->register();
+      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
 
       $runtime->includeCustomPath();
 
@@ -532,8 +542,16 @@ class Container {
       }
       \Civi::$statics[__CLASS__]['container'] = $container;
     }
+    else {
+      $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
+    }
   }
 
+  /**
+   * @param string $name
+   *
+   * @return mixed
+   */
   public static function getBootService($name) {
     return \Civi::$statics[__CLASS__]['boot'][$name];
   }

@@ -9,7 +9,7 @@
 *}
 {if $confirm}
 <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
+      {icon icon="fa-info-circle"}{/icon}
       <label>{$display_name} ({$email})</label> {ts}has been successfully resubscribed.{/ts}
 </div>
 {else}

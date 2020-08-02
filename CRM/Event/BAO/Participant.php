@@ -1769,7 +1769,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   /**
    * Delete participants of contact.
    *
-   * CRM-12155
+   * @see https://issues.civicrm.org/jira/browse/CRM-12155
    *
    * @param int $contactId
    *   Contact id.

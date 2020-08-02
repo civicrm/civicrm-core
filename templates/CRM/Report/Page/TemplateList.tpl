@@ -46,7 +46,7 @@
       {/foreach}
     {else}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp; {ts}There are currently no Report Templates.{/ts}
+        {icon icon="fa-info-circle"}{/icon} {ts}There are currently no Report Templates.{/ts}
       </div>
     {/if}
   {/strip}

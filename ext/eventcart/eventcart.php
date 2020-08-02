@@ -11,6 +11,12 @@ use CRM_Eventcart_ExtensionUtil as E;
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function eventcart_civicrm_config(&$config) {
+  if (isset(Civi::$statics[__FUNCTION__])) {
+    return;
+  }
+  Civi::$statics[__FUNCTION__] = 1;
+  Civi::dispatcher()->addListener('hook_civicrm_pageRun', 'CRM_Event_Cart_PageCallback::run');
+
   _eventcart_civix_civicrm_config($config);
 }
 
@@ -90,19 +96,6 @@ function eventcart_civicrm_managed(&$entities) {
 }
 
 /**
- * Implements hook_civicrm_caseTypes().
- *
- * Generate a list of case-types.
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
- */
-function eventcart_civicrm_caseTypes(&$caseTypes) {
-  _eventcart_civix_civicrm_caseTypes($caseTypes);
-}
-
-/**
  * Implements hook_civicrm_angularModules().
  *
  * Generate a list of Angular modules.
@@ -135,38 +128,3 @@ function eventcart_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 function eventcart_civicrm_entityTypes(&$entityTypes) {
   _eventcart_civix_civicrm_entityTypes($entityTypes);
 }
-
-/**
- * Implements hook_civicrm_thems().
- */
-function eventcart_civicrm_themes(&$themes) {
-  _eventcart_civix_civicrm_themes($themes);
-}
-
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
- */
-//function eventcart_civicrm_preProcess($formName, &$form) {
-//
-//}
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
- */
-//function eventcart_civicrm_navigationMenu(&$menu) {
-//  _eventcart_civix_insert_navigation_menu($menu, 'Mailings', array(
-//    'label' => E::ts('New subliminal message'),
-//    'name' => 'mailing_subliminal_message',
-//    'url' => 'civicrm/mailing/subliminal',
-//    'permission' => 'access CiviMail',
-//    'operator' => 'OR',
-//    'separator' => 0,
-//  ));
-//  _eventcart_civix_navigationMenu($menu);
-//}

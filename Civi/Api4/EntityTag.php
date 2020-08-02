@@ -25,6 +25,6 @@ namespace Civi\Api4;
  *
  * @package Civi\Api4
  */
-class EntityTag extends Generic\DAOEntity {
+class EntityTag extends Generic\BridgeEntity {
 
 }

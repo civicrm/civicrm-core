@@ -33,13 +33,13 @@
 
     {if !$email and $action neq 8 and $context neq 'standalone'}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
+        {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
       </div>
     {/if}
 
     {if $action eq 8}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
+        {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: Deleting this contribution will result in the loss of the associated financial transactions (if any).{/ts} {ts}Do you want to continue?{/ts}
       </div>
     {else}

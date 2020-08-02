@@ -14,12 +14,12 @@
 
 {if $action eq 8}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: Deleting this Scheduled Job will cause some important site functionality to stop working.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {elseif $action eq 4}
   <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts 1=$jobName}Are you sure you would like to execute %1 job?{/ts}
   </div>
 {else}

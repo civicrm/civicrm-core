@@ -70,7 +70,7 @@
                <span class="description">
                 {ts}This option is not recommended for large imports. Use the command-line geocoding script instead.{/ts}
                </span>
-               {docURL page="Managing Scheduled Jobs" resource="wiki"}
+               {docURL page="user/initial-set-up/scheduled-jobs"}
             </td>
          </tr>
         {/if}

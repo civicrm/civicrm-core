@@ -16,6 +16,9 @@
  */
 class CRM_Utils_Check_Component_AddressParsing extends CRM_Utils_Check_Component {
 
+  /**
+   * @return CRM_Utils_Check_Message[]
+   */
   public static function checkLocaleSupportsAddressParsing() {
 
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(

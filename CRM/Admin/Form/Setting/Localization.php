@@ -181,9 +181,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // add a new db locale if the requested language is not yet supported by the db
     if (empty($values['makeSinglelingual']) && !empty($values['addLanguage'])) {
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if (!substr_count($domain->locales, $values['addLanguage'])) {
+      $locales = CRM_Core_I18n::getMultilingual();
+      if (!in_array($values['addLanguage'], $locales)) {
         CRM_Core_I18n_Schema::addLocale($values['addLanguage'], $values['lcMessages']);
       }
       $values['languageLimit'][$values['addLanguage']] = 1;
@@ -276,22 +275,15 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getDefaultLocaleOptions() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = CRM_Core_I18n::languages();
-    if ($domain->locales) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    $languages = CRM_Core_I18n::languages();
+    if ($locales) {
       // for multi-lingual sites, populate default language drop-down with available languages
-      $defaultLocaleOptions = [];
-      foreach ($locales as $loc => $lang) {
-        if (substr_count($domain->locales, $loc)) {
-          $defaultLocaleOptions[$loc] = $lang;
-        }
-      }
+      return array_intersect_key($languages, array_flip($locales));
     }
     else {
-      $defaultLocaleOptions = $locales;
+      return $languages;
     }
-    return $defaultLocaleOptions;
   }
 
   /**

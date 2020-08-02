@@ -60,7 +60,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
     $params = ['id' => $this->_activityId];
 
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
-    $defaults['file_on_case_activity_subject'] = $defaults['subject'];
+    $defaults['file_on_case_activity_subject'] = $defaults['subject'] ?? '';
     $defaults['file_on_case_target_contact_id'] = $defaults['target_contact'];
 
     // If this contact has an open case, supply it as a default

@@ -334,7 +334,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   /**
    * Replace ids of household members in $this->_contactIds with the id of their household.
    *
-   * CRM-8338
+   * @see https://issues.civicrm.org/jira/browse/CRM-8338
    */
   public function mergeContactIdsByHousehold() {
     if (empty($this->_contactIds)) {

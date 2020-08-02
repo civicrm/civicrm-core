@@ -859,7 +859,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getEventID(): int {
-    return $this->ids['event']['event'];
+    return $this->ids['Event']['event'];
   }
 
   /**

@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -35,8 +33,7 @@ class ActivityPreCreationSubscriber extends Generic\PreCreationSubscriber {
     $activityType = $request->getValue('activity_type');
     if ($activityType) {
       \CRM_Core_Error::deprecatedFunctionWarning('Use activity_type_id:name instead of activity_type in APIv4');
-      $result = OptionValue::get()
-        ->setCheckPermissions(FALSE)
+      $result = OptionValue::get(FALSE)
         ->addWhere('name', '=', $activityType)
         ->addWhere('option_group.name', '=', 'activity_type')
         ->execute();

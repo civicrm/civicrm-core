@@ -393,7 +393,7 @@ function _civicrm_api3_contribute_format_params($params, &$values) {
  * @throws Exception
  */
 function civicrm_api3_contribution_sendconfirmation($params) {
-  $ids = $values = [];
+  $ids = [];
   $allowedParams = [
     'receipt_from_email',
     'receipt_from_name',
@@ -404,8 +404,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
-  $input['is_email_receipt'] = TRUE;
-  CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id'], $values);
+  CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id']);
 }
 
 /**
@@ -488,7 +487,8 @@ function civicrm_api3_contribution_completetransaction($params) {
   elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
-  $input['trxn_id'] = !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
+  $input['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
+
   if (!empty($params['fee_amount'])) {
     $input['fee_amount'] = $params['fee_amount'];
   }

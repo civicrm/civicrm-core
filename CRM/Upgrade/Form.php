@@ -68,11 +68,10 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   ) {
     $this->_config = CRM_Core_Config::singleton();
 
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
+    $locales = CRM_Core_I18n::getMultilingual();
 
-    $this->multilingual = (bool) $domain->locales;
-    $this->locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $this->multilingual = (bool) $locales;
+    $this->locales = $locales;
 
     $smarty = CRM_Core_Smarty::singleton();
     //$smarty->compile_dir = $this->_config->templateCompileDir;

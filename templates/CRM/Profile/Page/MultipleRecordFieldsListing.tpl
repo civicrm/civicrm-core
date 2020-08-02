@@ -91,7 +91,7 @@
     <div id='{$dialogId}' class="hiddenElement"></div>
   {elseif !$records}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       &nbsp;
       {ts 1=$customGroupTitle}No records of type '%1' found.{/ts}
     </div>

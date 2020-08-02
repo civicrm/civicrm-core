@@ -147,7 +147,7 @@
 
             {if empty( $template_row) }
                 <div class="messages status no-popup">
-                    <div class="icon inform-icon"></div>&nbsp;
+                    {icon icon="fa-info-circle"}{/icon}
                     {ts 1=$crmURL}There are no User-driven Message Templates entered. You can <a href='%1'>add one</a>.{/ts}
                 </div>
             {/if}

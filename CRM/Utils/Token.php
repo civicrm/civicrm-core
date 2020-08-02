@@ -250,7 +250,7 @@ class CRM_Utils_Token {
 
   /**
    * @param $token
-   * @param $domain
+   * @param CRM_Core_BAO_Domain $domain
    * @param bool $html
    * @param bool $escapeSmarty
    *
@@ -261,7 +261,7 @@ class CRM_Utils_Token {
     // we have to do this because this function is
     // called only when we find a token in the string
 
-    $loc = &$domain->getLocationValues();
+    $loc = $domain->getLocationValues();
 
     if (!in_array($token, self::$_tokens['domain'])) {
       $value = "{domain.$token}";

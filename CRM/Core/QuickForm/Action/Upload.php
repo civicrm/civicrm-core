@@ -14,7 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
 

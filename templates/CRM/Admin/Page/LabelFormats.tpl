@@ -68,7 +68,7 @@
     </div>
   {else}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {capture assign=crmURL}{crmURL p='civicrm/admin/labelFormats' q="action=add&reset=1"}{/capture}
       {ts 1=$crmURL}There are no Label Formats configured. You can<a href='%1'>add one</a>.{/ts}
     </div>

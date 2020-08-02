@@ -10,7 +10,7 @@
 {* Confirmation of Grant delete  *}
 <div class="crm-block crm-form-block crm-grant-task-delete-form-block">
   <div class="messages status no-popup">
-          <div class="icon inform-icon"></div>&nbsp;
+          {icon icon="fa-info-circle"}{/icon}
           {ts}Are you sure you want to delete the selected Grants? This delete operation cannot be undone and will delete all transactions associated with these grants.{/ts}
           <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
   </div>

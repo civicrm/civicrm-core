@@ -44,6 +44,8 @@ class Data {
       \Civi\Test::schema()->setStrict(TRUE);
     });
 
+    civicrm_api('setting', 'create', ['installed' => 1, 'domain_id' => 'all', 'version' => 3]);
+
     // Rebuild triggers
     civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
 

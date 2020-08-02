@@ -11,7 +11,7 @@
 <div class="crm-block crm-form-block crm-contribution-manage_premiums-form-block">
    {if $action eq 8}
       <div class="messages status no-popup">
-          <div class="icon inform-icon"></div>
+          {icon icon="fa-info-circle"}{/icon}
           {ts}Are you sure you want to delete this premium?{/ts} {ts}This action cannot be undone.{/ts} {ts}This will also remove the premium from any contribution pages that currently include it.{/ts}
       </div>
   {elseif $action eq 1024}

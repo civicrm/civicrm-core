@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -123,8 +121,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       return strpos(json_encode($mixed), $key) === FALSE;
     };
 
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Api')
       ->addValue('last_name', 'Key0')
       ->addValue('api_key', $key)
@@ -132,14 +129,12 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       ->first();
     $this->assertFalse($isSafe($contact), "Should reveal secret details ($key): " . var_export($contact, 1));
 
-    Email::create()
-      ->setCheckPermissions(FALSE)
+    Email::create(FALSE)
       ->addValue('email', 'foo@example.org')
       ->addValue('contact_id', $contact['id'])
       ->execute();
 
-    $result = Email::get()
-      ->setCheckPermissions(FALSE)
+    $result = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->addSelect('email')
       ->addSelect('contact.api_key')
@@ -147,8 +142,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       ->first();
     $this->assertFalse($isSafe($result), "Should reveal secret details ($key): " . var_export($result, 1));
 
-    $result = Email::get()
-      ->setCheckPermissions(TRUE)
+    $result = Email::get(TRUE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->addSelect('contact.api_key')
       ->execute()
@@ -160,8 +154,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
     $key = uniqid();
 
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Api')
       ->addValue('last_name', 'Key2')
       ->addValue('api_key', $key)
@@ -180,8 +173,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       $error = $e->getMessage();
     }
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
       ->execute()
@@ -214,8 +206,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit own api keys', 'edit all contacts'];
     $key = uniqid();
 
-    $contact = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Api')
       ->addValue('last_name', 'Key3')
       ->addValue('api_key', $key)
@@ -236,8 +227,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
 
     $this->assertContains('key', $error);
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
       ->execute()
@@ -254,8 +244,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       ->addValue('api_key', "MyId!")
       ->execute();
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
       ->execute()

@@ -359,6 +359,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return HTML_QuickForm_Element
    *   Could be an error object
+   *
+   * @throws \CRM_Core_Exception
    */
   public function &add(
     $type, $name, $label = '',
@@ -385,8 +387,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($attributes['multiple']);
       $extra = NULL;
     }
+
     // @see https://docs.civicrm.org/dev/en/latest/framework/ui/#date-picker
-    if ($type == 'datepicker') {
+    if ($type === 'datepicker') {
+      $attributes = $attributes ?: [];
+      if (!empty($attributes['formatType'])) {
+        $dateAttributes = CRM_Core_SelectValues::date($attributes['formatType'], NULL, NULL, NULL, 'Input');
+        if (empty($extra['minDate']) && !empty($dateAttributes['minYear'])) {
+          $extra['minDate'] = $dateAttributes['minYear'] . '-01-01';
+        }
+        if (empty($extra['maxDate']) && !empty($dateAttributes['minYear'])) {
+          $extra['maxDate'] = $dateAttributes['maxYear'] . '-12-31';
+        }
+      }
       // Support minDate/maxDate properties
       if (isset($extra['minDate'])) {
         $extra['minDate'] = date('Y-m-d', strtotime($extra['minDate']));
@@ -395,14 +408,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $extra['maxDate'] = date('Y-m-d', strtotime($extra['maxDate']));
       }
 
-      $attributes = ($attributes ? $attributes : []);
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       if (!empty($attributes['aria-label']) || $label) {
         $attributes['aria-label'] = CRM_Utils_Array::value('aria-label', $attributes, $label);
       }
       $type = "text";
     }
-    if ($type == 'select' && is_array($extra)) {
+    if ($type === 'select' && is_array($extra)) {
       // Normalize this property
       if (!empty($extra['multiple'])) {
         $extra['multiple'] = 'multiple';
@@ -427,7 +439,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($extra['option_context']);
     }
 
-    $this->addRequiredAttribute($required, $extra);
     $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
@@ -1163,20 +1174,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * jQuery validate prefers to see a validation rule as a class (eg. "required").
-   * We can't add a class at the quickform level but jQuery validate also works with HTML5:
-   * HTML5 validation requires a separate attribute "required".
-   *
-   * @param $required
-   * @param $attributes
-   */
-  private function addRequiredAttribute($required, $attributes) {
-    // Ideally we do this by adding "required" as a class on the radio but we can't
-    // But adding the attribute "required" directly to the element also works.
-    $required ? $attributes['required'] = 1 : NULL;
-  }
-
-  /**
    * @param string $name
    * @param $title
    * @param $values
@@ -1193,8 +1190,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $allowClear = !empty($attributes['allowClear']);
     unset($attributes['allowClear']);
     $attributes['id_suffix'] = $name;
-    // For jquery validate we need to flag the actual radio as required.
-    $this->addRequiredAttribute($required, $attributes);
     foreach ($values as $key => $var) {
       $optAttributes = $attributes;
       if (!empty($optionAttributes[$key])) {
@@ -1399,7 +1394,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $required,
       ['class' => 'crm-select2']
     );
-    $attributes = ['format' => 'searchDate'];
+    $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
     $this->add('datepicker', $fieldName . $from, ts($fromLabel), $attributes, $required, $extra);
     $this->add('datepicker', $fieldName . $to, ts($toLabel), $attributes, $required, $extra);

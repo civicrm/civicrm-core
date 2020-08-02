@@ -20,7 +20,7 @@
 
   {if !$email}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+      {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
     </div>
   {/if}
   {if $newCredit AND $contributionMode EQ null}

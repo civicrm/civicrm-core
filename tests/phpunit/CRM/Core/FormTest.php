@@ -65,6 +65,13 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
           $form->_action = CRM_Core_Action::BASIC;
         },
       ],
+      'New Price Field' => [
+        'CRM_Price_Form_Field',
+        function(CRM_Core_Form $form) {
+          $form->set('sid', 1);
+          $form->_action = CRM_Core_Action::ADD;
+        },
+      ],
     ];
   }
 

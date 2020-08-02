@@ -10,7 +10,7 @@
 {* this template is used for adding/editing/deleting memberships for a contact  *}
 {if $isRecur}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <p>{ts}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. Please be aware that any changes that you make here may not be reflected in the payment processor. Please ensure that you alter the related subscription at the payment processor.{/ts}</p>
     {if $cancelAutoRenew}<p>{ts 1=$cancelAutoRenew}To stop the automatic renewal:
       <a href="%1">Cancel auto-renew</a>
@@ -42,7 +42,7 @@
   {/if}
   {if !$emailExists and $action neq 8 and $context neq 'standalone'}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <p>{ts}You will not be able to send an automatic email receipt for this Membership because there is no email address recorded for this contact. If you want a receipt to be sent when this Membership is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the Membership.{/ts}</p>
   </div>
   {/if}
@@ -65,7 +65,7 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $action eq 8}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
+      {icon icon="fa-info-circle"}{/icon}
       {$deleteMessage}
     </div>
     {else}

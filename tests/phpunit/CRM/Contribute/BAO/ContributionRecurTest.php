@@ -225,6 +225,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
+      'source' => 'Template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -237,6 +238,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
+      'source' => 'Non-template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -246,6 +248,12 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     // Fetched template should be the is_template, not the latest contrib
     $this->assertEquals($fetchedTemplate['id'], $templateContrib['id']);
+
+    $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'contribution_status_id' => 'Completed',
+      'contribution_recur_id' => $contributionRecur['id'],
+    ]);
+    $this->assertEquals('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
   }
 
   /**
@@ -331,8 +339,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
           'contact_id' => $contactId,
           'membership_type_id' => $priceField['membership_type_id'],
           'source' => 'Payment',
-          'join_date' => '2020-04-28',
-          'start_date' => '2020-04-28',
+          'join_date' => date('Y-m', strtotime('1 month ago')) . '-28',
+          'start_date' => date('Y-m') . '-28',
           'contribution_recur_id' => $contributionRecurId,
           'status_id' => 'Pending',
           'is_override' => 1,
@@ -372,13 +380,14 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->validateAllCounts($membershipId1, 4);
     $this->validateAllCounts($membershipId2, 4);
 
+    $expectedDate = $this->getYearAndMonthFromOffset(4);
     // check membership end date.
     foreach ([$membershipId1, $membershipId2] as $mId) {
       $endDate = $this->callAPISuccessGetValue('Membership', [
         'id' => $mId,
         'return' => 'end_date',
       ]);
-      $this->assertEquals($endDate, '2020-08-27', ts('End date incorrect.'));
+      $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     }
 
     // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
@@ -445,7 +454,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'id' => $membershipId1,
       'return' => 'end_date',
     ]);
-    $this->assertEquals($endDate, '2020-10-27', ts('End date incorrect.'));
+    $expectedDate = $this->getYearAndMonthFromOffset(6);
+    $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 6);
     $this->validateAllCounts($membershipId2, 4);
@@ -476,6 +486,82 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccessGetCount('LineItem', $lineItemParams, $count);
     $this->callAPISuccessGetCount('MembershipPayment', $memPayParams, $count);
+  }
+
+  /**
+   * Given a number of months offset, get the year and month.
+   * Note the way php arithmetic works, using strtotime('+x months') doesn't
+   * work because it will roll over the day accounting for different number
+   * of days in the month, but we want the same day of the month, x months
+   * from now.
+   * e.g. July 31 + 4 months will return Dec 1 if using php functions, but
+   * we want Nov 31.
+   *
+   * @param int $offset
+   * @param int $year Optional input year to start
+   * @param int $month Optional input month to start
+   *
+   * @return array
+   *   ['year' => int, 'month' => int]
+   */
+  private function getYearAndMonthFromOffset(int $offset, int $year = NULL, int $month = NULL) {
+    $dateInfo = [
+      'year' => $year ?? date('Y'),
+      'month' => ($month ?? date('m')) + $offset,
+    ];
+    if ($dateInfo['month'] > 12) {
+      $dateInfo['year']++;
+      $dateInfo['month'] -= 12;
+    }
+    if ($dateInfo['month'] < 10) {
+      $dateInfo['month'] = "0{$dateInfo['month']}";
+    }
+
+    return $dateInfo;
+  }
+
+  /**
+   * Test getYearAndMonthFromOffset
+   * @dataProvider yearMonthProvider
+   *
+   * @param array $input
+   * @param array $expected
+   */
+  public function testGetYearAndMonthFromOffset($input, $expected) {
+    $this->assertEquals($expected, $this->getYearAndMonthFromOffset($input[0], $input[1], $input[2]));
+  }
+
+  /**
+   * data provider for testGetYearAndMonthFromOffset
+   */
+  public function yearMonthProvider() {
+    return [
+      // input = offset, year, current month
+      ['input' => [4, 2020, 1], 'output' => ['year' => '2020', 'month' => '05']],
+      ['input' => [6, 2020, 1], 'output' => ['year' => '2020', 'month' => '07']],
+      ['input' => [4, 2020, 2], 'output' => ['year' => '2020', 'month' => '06']],
+      ['input' => [6, 2020, 2], 'output' => ['year' => '2020', 'month' => '08']],
+      ['input' => [4, 2020, 3], 'output' => ['year' => '2020', 'month' => '07']],
+      ['input' => [6, 2020, 3], 'output' => ['year' => '2020', 'month' => '09']],
+      ['input' => [4, 2020, 4], 'output' => ['year' => '2020', 'month' => '08']],
+      ['input' => [6, 2020, 4], 'output' => ['year' => '2020', 'month' => '10']],
+      ['input' => [4, 2020, 5], 'output' => ['year' => '2020', 'month' => '09']],
+      ['input' => [6, 2020, 5], 'output' => ['year' => '2020', 'month' => '11']],
+      ['input' => [4, 2020, 6], 'output' => ['year' => '2020', 'month' => '10']],
+      ['input' => [6, 2020, 6], 'output' => ['year' => '2020', 'month' => '12']],
+      ['input' => [4, 2020, 7], 'output' => ['year' => '2020', 'month' => '11']],
+      ['input' => [6, 2020, 7], 'output' => ['year' => '2021', 'month' => '01']],
+      ['input' => [4, 2020, 8], 'output' => ['year' => '2020', 'month' => '12']],
+      ['input' => [6, 2020, 8], 'output' => ['year' => '2021', 'month' => '02']],
+      ['input' => [4, 2020, 9], 'output' => ['year' => '2021', 'month' => '01']],
+      ['input' => [6, 2020, 9], 'output' => ['year' => '2021', 'month' => '03']],
+      ['input' => [4, 2020, 10], 'output' => ['year' => '2021', 'month' => '02']],
+      ['input' => [6, 2020, 10], 'output' => ['year' => '2021', 'month' => '04']],
+      ['input' => [4, 2020, 11], 'output' => ['year' => '2021', 'month' => '03']],
+      ['input' => [6, 2020, 11], 'output' => ['year' => '2021', 'month' => '05']],
+      ['input' => [4, 2020, 12], 'output' => ['year' => '2021', 'month' => '04']],
+      ['input' => [6, 2020, 12], 'output' => ['year' => '2021', 'month' => '06']],
+    ];
   }
 
 }

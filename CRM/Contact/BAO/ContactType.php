@@ -67,7 +67,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   public static function basicTypeInfo($includeInactive = FALSE) {
     $cacheKey = 'CRM_CT_BTI_' . (int) $includeInactive;
     if (!Civi::cache('contactTypes')->has($cacheKey)) {
-      $contactType = ContactType::get()->setCheckPermissions(FALSE)->setSelect(['*'])->addWhere('parent_id', 'IS NULL');
+      $contactType = ContactType::get(FALSE)->setSelect(['*'])->addWhere('parent_id', 'IS NULL');
       if ($includeInactive === FALSE) {
         $contactType->addWhere('is_active', '=', 1);
       }
@@ -887,7 +887,7 @@ WHERE ($subtypeClause)";
    */
   protected static function getAllContactTypes() {
     if (!Civi::cache('contactTypes')->has('all')) {
-      $contactTypes = (array) ContactType::get()->setCheckPermissions(FALSE)
+      $contactTypes = (array) ContactType::get(FALSE)
         ->setSelect(['id', 'name', 'label', 'description', 'is_active', 'is_reserved', 'image_URL', 'parent_id', 'parent_id:name', 'parent_id:label'])
         ->execute()->indexBy('name');
 

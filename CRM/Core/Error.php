@@ -358,7 +358,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
       $out = [
         'status' => 'fatal',
-        'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
+        'content' => '<div class="messages status no-popup">' . CRM_Core_Page::crmIcon('fa-info-circle') . ' ' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
       ];
       if ($config->backtrace && CRM_Core_Permission::check('view debug output')) {
         $out['backtrace'] = self::parseBacktrace(debug_backtrace());
@@ -572,18 +572,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       echo $str;
     }
     $file_log->close();
-
-    // Use the custom fatalErrorHandler if defined
-    if (in_array($priority, [PEAR_LOG_EMERG, PEAR_LOG_ALERT, PEAR_LOG_CRIT, PEAR_LOG_ERR])) {
-      if ($config->fatalErrorHandler && function_exists($config->fatalErrorHandler)) {
-        $name = $config->fatalErrorHandler;
-        $vars = [
-          'debugLogMessage' => $message,
-          'priority' => $priority,
-        ];
-        $name($vars);
-      }
-    }
 
     if (!isset(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // Set it to FALSE first & then try to set it. This is to prevent a loop as calling

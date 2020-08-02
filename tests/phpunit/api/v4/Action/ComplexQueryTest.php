@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -49,8 +47,7 @@ class ComplexQueryTest extends UnitTestCase {
    * Expects at least one activity loaded from the data set.
    */
   public function testGetAllHousingSupportActivities() {
-    $results = Activity::get()
-      ->setCheckPermissions(FALSE)
+    $results = Activity::get(FALSE)
       ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
 

@@ -50,7 +50,7 @@
         {/strip}
     {else}
         <div class="messages status no-popup">
-           <div class="icon inform-icon"></div>
+           {icon icon="fa-info-circle"}{/icon}
            {ts}You are not registered for any current or upcoming Events.{/ts}
         </div>
     {/if}

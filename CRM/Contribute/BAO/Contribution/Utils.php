@@ -83,6 +83,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values['amount'] = $form->_params['amount'];
     }
 
+    if (isset($paymentParams['contribution_source'])) {
+      $paymentParams['source'] = $paymentParams['contribution_source'];
+    }
     if ($isPaymentTransaction) {
       $contributionParams = [
         'id' => $paymentParams['contribution_id'] ?? NULL,
@@ -142,9 +145,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       $paymentParams['contributionID'] = $contribution->id;
       $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
-      if (isset($paymentParams['contribution_source'])) {
-        $paymentParams['source'] = $paymentParams['contribution_source'];
-      }
 
       if (!empty($form->_params['is_recur']) && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
@@ -485,7 +485,7 @@ LIMIT 1
 
   /**
    * Format monetary amount: round and return to desired decimal place
-   * CRM-20145
+   * @see https://issues.civicrm.org/jira/browse/CRM-20145
    *
    * @param float $amount
    *   Monetary amount

@@ -205,12 +205,12 @@ SELECT     civicrm_email.id as email_id
 
     $component->find(TRUE);
 
-    $headers = [
-      'Subject' => $component->subject,
-      'From' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
-      'To' => $email,
-      'Reply-To' => $confirm,
-      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+    $params = [
+      'subject' => $component->subject,
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
+      'toEmail' => $email,
+      'replyTo' => $confirm,
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',
@@ -246,24 +246,17 @@ SELECT     civicrm_email.id as email_id
     // render the &amp; entities in text mode, so that the links work
     $text = str_replace('&amp;', '&', $text);
 
-    $message = new Mail_mime("\n");
-
-    $message->setHTMLBody($html);
-    $message->setTxtBody($text);
-    $b = CRM_Utils_Mail::setMimeParams($message);
-    $h = $message->headers($headers);
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 's',
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 's',
       $this->contact_id,
       $this->id,
       $this->hash
     );
-    $mailer = \Civi::service('pear_mail');
-
-    if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($email, $h, $b);
-      unset($errorScope);
+    $params['html'] = $html;
+    $params['text'] = $text;
+    if (CRM_Core_BAO_MailSettings::includeMessageId()) {
+      $params['messageId'] = $params['Message-ID'];
     }
+    CRM_Utils_Mail::send($params);
   }
 
   /**

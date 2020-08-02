@@ -14,7 +14,7 @@
 <p>
   {ts}These are developed and contributed by members of the CiviCRM community. Consider adding any custom searches which you use often to your Search menu (from Administer > Customize Data and Screens > Navigation Menu). As new custom searches become available they can be viewed (and installed if useful) from Administer > System Settings > Manage Extensions.{/ts}
 </p>
-<p>{docURL page="Create a Custom-Search Extension" resource="wiki"}</p>
+<p>{docURL page="dev/extensions/civix/#generate-search"}</p>
 </p>
 <p>
   {ts}NOTE: Some of these searches may rely on specific site configurations - and may not work as expected on your site.{/ts}

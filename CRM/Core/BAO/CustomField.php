@@ -822,12 +822,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
           // Add and/or option for fields that store multiple values
           if ($search && self::isSerialized($field)) {
-
-            $operators = [
-              $qf->createElement('radio', NULL, '', ts('Any'), 'or', ['title' => ts('Results may contain any of the selected options')]),
-              $qf->createElement('radio', NULL, '', ts('All'), 'and', ['title' => ts('Results must have all of the selected options')]),
-            ];
-            $qf->addGroup($operators, $elementName . '_operator');
+            $qf->addRadio($elementName . '_operator', '', [
+              'or' => ts('Any'),
+              'and' => ts('All'),
+            ], [], NULL, FALSE, [
+              'or' => ['title' => ts('Results may contain any of the selected options')],
+              'and' => ['title' => ts('Results must have all of the selected options')],
+            ]);
             $qf->setDefaults([$elementName . '_operator' => 'or']);
           }
         }
@@ -1814,9 +1815,9 @@ WHERE  id IN ( %1, %2 )
     $add->custom_group_id = $newGroup->id;
     self::createField($add, 'add');
 
-    $sql = "INSERT INTO {$newGroup->table_name} (entity_id, {$field->column_name})
-            SELECT entity_id, {$field->column_name} FROM {$oldGroup->table_name}
-            ON DUPLICATE KEY UPDATE {$field->column_name} = {$oldGroup->table_name}.{$field->column_name}
+    $sql = "INSERT INTO {$newGroup->table_name} (entity_id, `{$field->column_name}`)
+            SELECT entity_id, `{$field->column_name}` FROM {$oldGroup->table_name}
+            ON DUPLICATE KEY UPDATE `{$field->column_name}` = {$oldGroup->table_name}.`{$field->column_name}`
             ";
     CRM_Core_DAO::executeQuery($sql);
 
@@ -2066,10 +2067,10 @@ WHERE  id IN ( %1, %2 )
       }
       if (in_array($field['data_type'], $fieldTypesNotHandledInMergeAttempt) && !$isMultiple) {
         CRM_Core_DAO::executeQuery(
-          "INSERT INTO {$field['custom_group_id.table_name']} (entity_id, {$field['column_name']})
+          "INSERT INTO {$field['custom_group_id.table_name']} (entity_id, `{$field['column_name']}`)
           VALUES ($newContactID, {$oldContact['custom_' . $field['id']]})
           ON DUPLICATE KEY UPDATE
-          {$field['column_name']} = {$oldContact['custom_' . $field['id']]}
+          `{$field['column_name']}` = {$oldContact['custom_' . $field['id']]}
         ");
       }
     }

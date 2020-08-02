@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
  *   - All temp tables start with "civicrm_tmp".
@@ -149,8 +148,7 @@ class CRM_Utils_SQL_TempTable {
       return '';
     }
     $dbUTF = CRM_Core_BAO_SchemaHandler::getDBCollation();
-    if (in_array($dbUTF, ['utf8_unicode_ci', 'utf8mb4_unicode_ci'])
-      && in_array($dbUTF, ['utf8', 'utf8mb4'])) {
+    if (strpos($dbUTF, 'utf8') !== FALSE) {
       return '';
     }
     return self::UTF8;
@@ -169,7 +167,7 @@ class CRM_Utils_SQL_TempTable {
       $this->toSQL('CREATE'),
       $columns,
       $this->memory ? self::MEMORY : self::INNODB,
-      $this->utf8 ? self::UTF8 : ''
+      $this->getUtf8String()
     );
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;

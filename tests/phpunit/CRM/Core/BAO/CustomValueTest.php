@@ -97,28 +97,60 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function fixCustomFieldValue() {
+  public function testFixCustomFieldValue() {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
-
-    $fields = [
-      'custom_group_id' => $customGroup['id'],
-      'data_type' => 'Memo',
-      'html_type' => 'TextArea',
-      'default_value' => '',
-    ];
-
-    $customField = $this->customFieldCreate($fields);
-
-    $custom = 'custom_' . $customField['id'];
     $params = [
-      'email' => 'abc@webaccess.co.in',
-      $custom => 'note',
+      'email' => 'abc@example.com',
     ];
 
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
-    $this->assertEquals($params[$custom], '%note%', 'Checking the returned value of type Memo.');
+    foreach ([
+      [
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => 'Memo',
+        'html_type' => 'TextArea',
+        'default_value' => '',
+        'search_value' => '%note%',
+        'expected_value' => ['LIKE' => '%note%'],
+      ],
+      [
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => 'String',
+        'html_type' => 'Autocomplete-Select',
+        'default_value' => '',
+        'search_value' => 'R,Y',
+        'expected_value' => ['IN' => ['R', 'Y']],
+        'option_values' => [
+          [
+            'label' => 'Red',
+            'value' => 'R',
+            'weight' => 1,
+            'is_active' => 1,
+          ],
+          [
+            'label' => 'Yellow',
+            'value' => 'Y',
+            'weight' => 2,
+            'is_active' => 1,
+          ],
+          [
+            'label' => 'Green',
+            'value' => 'G',
+            'weight' => 3,
+            'is_active' => 1,
+          ],
+        ],
+      ],
+    ] as $field) {
+      $id = $this->customFieldCreate($field)['id'];
+      $customKey = 'custom_' . $id;
+      $params[$customKey] = $field['search_value'];
+      CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
+      $this->assertEquals($params[$customKey], $field['expected_value'], 'Checking the returned value of type ' . $field['data_type']);
 
-    $this->customFieldDelete($customField['id']);
+      // delete created custom field
+      $this->customFieldDelete($id);
+    }
+
     $this->customGroupDelete($customGroup['id']);
   }
 

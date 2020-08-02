@@ -31,6 +31,6 @@
 
 {else}
    <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;{ts}There are no records selected.{/ts}
+      {icon icon="fa-info-circle"}{/icon}{ts}There are no records selected.{/ts}
    </div>
 {/if}

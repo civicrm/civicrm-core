@@ -20,6 +20,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @param string $fileName
    *
    * @dataProvider getCsvFiles
+   * @throws \CRM_Core_Exception
    */
   public function testToCsv($fileName) {
     $dataSource = new CRM_Import_DataSource_CSV();

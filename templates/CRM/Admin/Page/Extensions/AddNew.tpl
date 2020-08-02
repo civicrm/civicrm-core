@@ -41,7 +41,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
   </div>
 {else}
   <div class="messages status no-popup">
-       <div class="icon inform-icon"></div>
+       {icon icon="fa-info-circle"}{/icon}
       {ts}There are no extensions to display. Please click "Refresh" to update information about available extensions.{/ts}
   </div>
 {/if}

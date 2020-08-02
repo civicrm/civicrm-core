@@ -102,17 +102,17 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           }
 
           if ($groupElementType == 'select') {
-            $groupsOptions[$id] = $group['title'];
+            $groupsOptions[$id] = $group;
           }
           else {
             $form->_tagGroup[$fName][$id]['description'] = $group['description'];
-            $elements[] = &$form->addElement('advcheckbox', $id, NULL, $group['title'], $attributes);
+            $elements[] = &$form->addElement('advcheckbox', $id, NULL, $group['text'], $attributes);
           }
         }
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
-          $form->add('select', $fName, $groupName, $groupsOptions, FALSE,
-            ['id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2 twenty']
+          $form->add('select2', $fName, $groupName, $groupsOptions, FALSE,
+            ['placeholder' => '- select -', 'multiple' => TRUE, 'class' => 'twenty']
           );
           $form->assign('groupCount', count($groupsOptions));
         }
@@ -166,11 +166,11 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 
       $contactGroup = CRM_Contact_BAO_GroupContact::getContactGroup($id, 'Added', NULL, FALSE, TRUE);
       if ($contactGroup) {
-        foreach ($contactGroup as $group) {
-          if ($groupElementType == 'select') {
-            $defaults[$fName][] = $group['group_id'];
-          }
-          else {
+        if ($groupElementType == 'select') {
+          $defaults[$fName] = implode(',', CRM_Utils_Array::collect('group_id', $contactGroup));
+        }
+        else {
+          foreach ($contactGroup as $group) {
             $defaults[$fName . '[' . $group['group_id'] . ']'] = 1;
           }
         }

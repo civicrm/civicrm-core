@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -540,11 +538,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
 
     // is searchable by range?
-    $searchRange = [];
-    $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
-    $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
-
-    $this->addGroup($searchRange, 'is_search_range', ts('Search by Range?'));
+    $this->addRadio('is_search_range', ts('Search by Range?'), [ts('No'), ts('Yes')]);
 
     // add buttons
     $this->addButtons([

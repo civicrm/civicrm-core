@@ -294,7 +294,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  * If you are using any CiviCRM script in the bin directory that
  * requires authentication, then you also need to set this key.
  * We recommend using a 16-32 bit alphanumeric/punctuation key.
- * More info at http://wiki.civicrm.org/confluence/display/CRMDOC/Command-line+Script+Configuration
+ * More info at https://docs.civicrm.org/sysadmin/en/latest/setup/site-key/
  */
 if (!defined('CIVICRM_SITE_KEY')) {
   define( 'CIVICRM_SITE_KEY', '%%siteKey%%');
@@ -449,7 +449,7 @@ if (!defined('CIVICRM_PSR16_STRICT')) {
  * # dpkg-reconfigure locales
  *
  * For more information:
- * http://wiki.civicrm.org/confluence/x/YABFBQ
+ * https://lab.civicrm.org/dev/translation/-/wikis/Administrator-Guide#native-gettext
  */
 // if (!defined('CIVICRM_GETTEXT_NATIVE')) {
 // define('CIVICRM_GETTEXT_NATIVE', 1);
@@ -471,12 +471,6 @@ define('CIVICRM_DEADLOCK_RETRIES', 3);
 // if (!defined('CIVICRM_MYSQL_STRICT')) {
 // define('CIVICRM_MYSQL_STRICT', TRUE );
 // }
-
-/**
- * Specify whether the CRM_Core_BAO_Cache should use the legacy
- * direct-to-SQL-mode or the interim PSR-16 adapter.
- */
-// define('CIVICRM_BAO_CACHE_ADAPTER', 'CRM_Core_BAO_Cache_Psr16');
 
 if (CIVICRM_UF === 'UnitTests') {
   if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');

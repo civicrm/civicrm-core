@@ -29,6 +29,7 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
 
     $indContactID1 = $this->individualCreate();
     $indContactID2 = $this->individualCreate();
+    $indContactID3 = $this->individualCreate();
     $recurStatus = array_search(
       'In Progress',
       CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
@@ -61,6 +62,9 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
     $memParams['contact_id'] = $indContactID2;
     $memParams['contribution_recur_id'] = $recur2['id'];
     $mem2 = civicrm_api3('Membership', 'create', $memParams);
+    $memParams['contact_id'] = $indContactID3;
+    unset($memParams['contribution_recur_id']);
+    $mem3 = civicrm_api3('Membership', 'create', $memParams);
 
     $input = [
       'fields' => ['autorenew_status_id'],
@@ -83,16 +87,21 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
       }
     }
 
+    $input['filters']['autorenew_status_id_value'] = "0,$recurStatus";
+    $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
+    $results = $obj->getResultSet();
+    $this->assertCount(3, $results);
+
     $input['filters']['autorenew_status_id_op'] = 'nll';
     $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
     $results = $obj->getResultSet();
-    $this->assertCount(0, $results);
+    $this->assertCount(1, $results);
 
     $input['filters']['autorenew_status_id_op'] = 'in';
     $input['filters']['autorenew_status_id_value'] = 0;
     $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
     $results = $obj->getResultSet();
-    $this->assertCount(0, $results);
+    $this->assertCount(1, $results);
 
     $input['filters']['autorenew_status_id_op'] = 'in';
     $input['filters']['autorenew_status_id_value'] = 1000;
@@ -102,6 +111,11 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
 
     $input['filters']['autorenew_status_id_op'] = 'notin';
     $input['filters']['autorenew_status_id_value'] = 1000;
+    $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
+    $results = $obj->getResultSet();
+    $this->assertCount(3, $results);
+
+    $input['filters']['autorenew_status_id_value'] = '0,1000';
     $obj = $this->getReportObject('CRM_Report_Form_Member_Detail', $input);
     $results = $obj->getResultSet();
     $this->assertCount(2, $results);

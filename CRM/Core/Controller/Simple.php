@@ -17,7 +17,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  */
 class CRM_Core_Controller_Simple extends CRM_Core_Controller {
 

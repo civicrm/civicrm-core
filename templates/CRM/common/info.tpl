@@ -8,9 +8,9 @@
  +--------------------------------------------------------------------+
 *}
 {* Handles display of passed $infoMessage. *}
-{if $infoMessage}
+{if $infoMessage or $infoTitle}
   <div class="messages status {$infoType}"{if $infoOptions} data-options='{$infoOptions}'{/if}>
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <span class="msg-title">{$infoTitle}</span>
     <span class="msg-text">{$infoMessage}</span>
   </div>

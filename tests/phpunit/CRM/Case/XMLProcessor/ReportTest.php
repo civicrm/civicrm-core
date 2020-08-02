@@ -35,7 +35,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser);
+    $caseObj = $this->createCase($client_id, $this->_loggedInUser, ['start_date' => '2019-11-14', 'start_date_time' => '20191114000000']);
     $case_id = $caseObj->id;
 
     // Add an additional meeting activity not in the timeline to the case.
@@ -83,7 +83,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'prefix_id' => NULL,
       'suffix_id' => NULL,
     ]);
-    $caseObj = $this->createCase($client_id, $this->_loggedInUser);
+    $caseObj = $this->createCase($client_id, $this->_loggedInUser, ['start_date' => '2019-11-14', 'start_date_time' => '20191114000000']);
     $case_id = $caseObj->id;
 
     // Now update the timeline so it has Meeting in it.
@@ -552,30 +552,6 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       ]);
       $expected['activities'][$idx]['editURL'] = CRM_Utils_System::url('civicrm/case/activity', "reset=1&cid={$client_id}&caseid={$case_id}&action=update&atype={$activityTypeId['value']}&id=" . ($idx + 1));
     }
-  }
-
-  /**
-   * Create and return a new case object.
-   * @param $clientId
-   * @param $loggedInUser
-   * @return CRM_Case_BAO_Case
-   */
-  private function createCase($clientId, $loggedInUser) {
-    $caseParams = [
-      'activity_subject' => 'Case Subject',
-      'client_id'        => $clientId,
-      'case_type_id'     => $this->caseTypeId,
-      'status_id'        => 1,
-      'case_type'        => $this->caseType,
-      'subject'          => 'Case Subject',
-      'start_date'       => '2019-11-14',
-      'start_date_time'  => '20191114000000',
-      'medium_id'        => 2,
-      'activity_details' => '',
-    ];
-    $form = new CRM_Case_Form_Case();
-    $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
-    return $caseObj;
   }
 
   /**

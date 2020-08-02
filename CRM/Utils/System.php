@@ -1390,7 +1390,7 @@ class CRM_Utils_System {
     }
 
     if (!isset($params['text']) or $params['text'] === NULL) {
-      $params['text'] = ts('(learn more...)');
+      $params['text'] = ts('(Learn more...)');
     }
 
     if (!isset($params['style']) || $params['style'] === NULL) {
@@ -1419,7 +1419,7 @@ class CRM_Utils_System {
    * @return mixed
    */
   public static function formatDocUrl($url) {
-    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/stable/', $url);
+    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/latest/', $url);
   }
 
   /**
@@ -1497,7 +1497,7 @@ class CRM_Utils_System {
         = CRM_Contribute_BAO_Contribution::$_exportableFields
           = CRM_Pledge_BAO_Pledge::$_exportableFields
             = CRM_Core_BAO_CustomField::$_importFields
-              = CRM_Core_BAO_Cache::$_cache = CRM_Core_DAO::$_dbColumnValueCache = NULL;
+              = CRM_Core_DAO::$_dbColumnValueCache = NULL;
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();

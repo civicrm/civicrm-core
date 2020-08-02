@@ -85,4 +85,26 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $message->toContactID = $testSourceContact;
   }
 
+  /**
+   * Some providers, like the mock one for these tests at the time of writing,
+   * or the dummy SMS provider extension, might not provide a default url,
+   * but the form shouldn't fail because of that.
+   */
+  public function testMissingUrl() {
+    $form = $this->getFormObject('CRM_SMS_Form_Provider');
+    $_REQUEST['key'] = 'CiviTestSMSProvider';
+
+    // This shouldn't give a notice
+    $defaults = $form->setDefaultValues();
+
+    $this->assertEquals([
+      'name' => 'CiviTestSMSProvider',
+      'api_url' => '',
+      'is_default' => 1,
+      'is_active' => 1,
+    ], $defaults);
+
+    unset($_REQUEST['key']);
+  }
+
 }

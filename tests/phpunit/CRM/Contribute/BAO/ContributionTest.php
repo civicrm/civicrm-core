@@ -8,6 +8,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+use Civi\Api4\Activity;
 
 /**
  * Class CRM_Contribute_BAO_ContributionTest
@@ -684,7 +685,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Add participant with contribution
    *
-   * @return array
+   * @return CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -694,7 +695,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreatePaid([]);
     $this->_eventId = $event['id'];
-    $priceSetId = $this->priceSetID;
+    $priceSetID = $this->ids['PriceSet']['event'];
     $paramsField = [
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
@@ -708,7 +709,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $this->priceSetID,
+      'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
       'financial_type_id' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Event Fee', 'id', 'name'),
     ];
@@ -719,7 +720,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'is_monetary' => 1,
     ];
     CRM_Event_BAO_Event::create($eventParams);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetId);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $this->_eventId, $priceSetID);
 
     $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
     $participantParams = [
@@ -886,11 +887,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test activity amount updation.
+   * Test activity amount updates activity subject.
    */
   public function testActivityCreate() {
     $contactId = $this->individualCreate();
-    $defaults = [];
 
     $params = [
       'contact_id' => $contactId,
@@ -903,7 +903,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receipt_date' => '20080522000000',
       'non_deductible_amount' => 0.00,
       'total_amount' => 100.00,
-      'trxn_id' => '22ereerwww444444',
       'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
       'thankyou_date' => '20160519',
       'sequential' => 1,
@@ -913,20 +912,18 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     $this->assertEquals($params['total_amount'], $contribution['total_amount'], 'Check for total amount in contribution.');
     $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
-
-    // Check amount in activity.
-    $activityParams = [
-      'source_record_id' => $contribution['id'],
-      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
+    $activityWhere = [
+      ['source_record_id', '=', $contribution['id']],
+      ['activity_type_id:name', '=', 'Contribution'],
     ];
-    // @todo use api instead.
-    $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
+    $activity = Activity::get()->setWhere($activityWhere)->setSelect(['source_record_id', 'subject'])->execute()->first();
 
-    $this->assertEquals($contribution['id'], $activity->source_record_id, 'Check for activity associated with contribution.');
-    $this->assertEquals("$ 100.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
+    $this->assertEquals($contribution['id'], $activity['source_record_id'], 'Check for activity associated with contribution.');
+    $this->assertEquals('$ 100.00 - STUDENT', $activity['subject'], 'Check for total amount in activity.');
 
     $params['id'] = $contribution['id'];
     $params['total_amount'] = 200;
+    $params['campaign_id'] = $this->campaignCreate();
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
 
@@ -934,10 +931,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals($contactId, $contribution['contact_id'], 'Check for contact id  creation.');
 
     // Retrieve activity again.
-    $activity = CRM_Activity_BAO_Activity::retrieve($activityParams, $defaults);
+    $activity = Activity::get()->setWhere($activityWhere)->setSelect(['source_record_id', 'subject', 'campaign_id'])->execute()->first();
 
-    $this->assertEquals($contribution['id'], $activity->source_record_id, 'Check for activity associated with contribution.');
-    $this->assertEquals("$ 200.00 - STUDENT", $activity->subject, 'Check for total amount in activity.');
+    $this->assertEquals($contribution['id'], $activity['source_record_id'], 'Check for activity associated with contribution.');
+    $this->assertEquals('$ 200.00 - STUDENT', $activity['subject'], 'Check for total amount in activity.');
+    $this->assertEquals($params['campaign_id'], $activity['campaign_id']);
   }
 
   /**

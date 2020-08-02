@@ -152,8 +152,6 @@ WHERE  domain_id = %1
       }
     }
     $config = CRM_Core_Config::singleton();
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
 
     // So. Weird. Some bizarre/probably-broken multi-lingual thing where
     // data isn't really stored in civicrm_word_replacements. Probably

@@ -56,7 +56,8 @@
     $scope.loading = false;
     $scope.controls = {};
     $scope.langs = ['php', 'js', 'ang', 'cli'];
-    $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
+    $scope.joinTypes = [{k: false, v: 'FALSE (LEFT JOIN)'}, {k: true, v: 'TRUE (INNER JOIN)'}];
+    $scope.bridgeEntities = _.filter(schema, {type: 'BridgeEntity'});
     $scope.code = {
       php: [
         {name: 'oop', label: ts('OOP Style'), code: ''},
@@ -96,7 +97,7 @@
     function pluralize(str) {
       var lastLetter = str[str.length - 1],
         lastTwo = str[str.length - 2] + lastLetter;
-      if (lastLetter === 's' || lastTwo === 'ch') {
+      if (lastLetter === 's' || lastLetter === 'x' || lastTwo === 'ch') {
         return str + 'es';
       }
       if (lastLetter === 'y' && lastTwo !== 'ey') {
@@ -415,6 +416,10 @@
         addJoins($scope.fieldsAndJoinsAndFunctionsWithSuffixes, false, ['name', 'label']);
         addJoins($scope.fieldsAndJoinsAndFunctionsAndWildcards, true, ['name', 'label']);
       }
+      // Custom fields are supported if HAVING is
+      if (actionInfo.params.having) {
+        $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: 'custom.*', text: 'custom.*', 'description': 'All custom fields'});
+      }
       $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
     };
 
@@ -663,11 +668,12 @@
     // Format oop params
     function formatOOP(entity, action, params, indent) {
       var code = '',
-        newLine = "\n" + _.repeat(' ', indent);
+        newLine = "\n" + _.repeat(' ', indent),
+        perm = params.checkPermissions === false ? 'FALSE' : '';
       if (entity.substr(0, 7) !== 'Custom_') {
-        code = "\\Civi\\Api4\\" + entity + '::' + action + '()';
+        code = "\\Civi\\Api4\\" + entity + '::' + action + '(' + perm + ')';
       } else {
-        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
+        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
       }
       _.each(params, function(param, key) {
         var val = '';
@@ -700,7 +706,7 @@
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
           });
         }
-        else {
+        else if (key !== 'checkPermissions') {
           code += newLine + "->set" + ucfirst(key) + '(' + phpFormat(param, 2 + indent) + ')';
         }
       });

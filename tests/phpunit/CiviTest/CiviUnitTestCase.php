@@ -1054,12 +1054,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   protected function eventCreatePaid($params, $options = [['name' => 'hundy', 'amount' => 100]], $key = 'event') {
+    $params['is_monetary'] = TRUE;
     $event = $this->eventCreate($params);
-    $this->ids['event'][$key] = (int) $event['id'];
-    $this->priceSetID = $this->ids['PriceSet'][] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
-    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->priceSetID);
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->priceSetID, TRUE, FALSE);
-    $priceSet = $priceSet[$this->priceSetID] ?? NULL;
+    $this->ids['Event'][$key] = (int) $event['id'];
+    $this->ids['PriceSet'][$key] = $this->eventPriceSetCreate(55, 0, 'Radio', $options);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_event', $event['id'], $this->ids['PriceSet'][$key]);
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->ids['PriceSet'][$key], TRUE, FALSE);
+    $priceSet = $priceSet[$this->ids['PriceSet'][$key]] ?? NULL;
     $this->eventFeeBlock = $priceSet['fields'] ?? NULL;
     return $event;
   }
@@ -3594,6 +3595,39 @@ VALUES
     $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
+  }
+
+  /**
+   * Create and return a case object for the given Client ID.
+   *
+   * @param int $clientId
+   * @param int $loggedInUser
+   *   Omit or pass NULL to use the same as clientId
+   * @param array $extra
+   *   Optional specific parameters such as start_date
+   *
+   * @return CRM_Case_BAO_Case
+   */
+  public function createCase($clientId, $loggedInUser = NULL, $extra = NULL) {
+    if (empty($loggedInUser)) {
+      // backwards compatibility - but it's more typical that the creator is a different person than the client
+      $loggedInUser = $clientId;
+    }
+    $caseParams = [
+      'activity_subject' => 'Case Subject',
+      'client_id'        => $clientId,
+      'case_type_id'     => 1,
+      'status_id'        => 1,
+      'case_type'        => 'housing_support',
+      'subject'          => 'Case Subject',
+      'start_date'       => ($extra['start_date'] ?? date("Y-m-d")),
+      'start_date_time'  => ($extra['start_date_time'] ?? date("YmdHis")),
+      'medium_id'        => 2,
+      'activity_details' => '',
+    ];
+    $form = new CRM_Case_Form_Case();
+    $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
+    return $caseObj;
   }
 
 }

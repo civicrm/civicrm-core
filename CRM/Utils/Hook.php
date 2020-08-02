@@ -152,20 +152,6 @@ abstract class CRM_Utils_Hook {
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
   ) {
-    if (!\Civi\Core\Container::isContainerBooted()) {
-      $prebootHooks = ['civicrm_container', 'civicrm_entityTypes'];
-      // 'civicrm_config' ?
-      if (in_array($fnSuffix, $prebootHooks)) {
-        $count = is_array($names) ? count($names) : $names;
-        return $this->invokeViaUF($count, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
-      }
-      else {
-        // TODO: Emit a warning, eg
-        // error_log("Warning: hook_$fnSuffix fired prematurely. Dropped.");
-        return;
-      }
-    }
-
     if (!is_array($names)) {
       // We were called with the old contract wherein $names is actually an int.
       // Symfony dispatcher requires some kind of name.
@@ -2425,13 +2411,20 @@ abstract class CRM_Utils_Hook {
   /**
    * Check system status.
    *
-   * @param array $messages
-   *   Array<CRM_Utils_Check_Message>. A list of messages regarding system status.
+   * @param CRM_Utils_Check_Message[] $messages
+   *   A list of messages regarding system status
+   * @param array $statusNames
+   *   If specified, only these checks are being requested and others should be skipped
+   * @param bool $includeDisabled
+   *   Run checks that have been explicitly disabled (default false)
    * @return mixed
    */
-  public static function check(&$messages) {
-    return self::singleton()
-      ->invoke(['messages'], $messages, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_check');
+  public static function check(&$messages, $statusNames = [], $includeDisabled = FALSE) {
+    return self::singleton()->invoke(['messages'],
+      $messages, $statusNames, $includeDisabled,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_check'
+    );
   }
 
   /**

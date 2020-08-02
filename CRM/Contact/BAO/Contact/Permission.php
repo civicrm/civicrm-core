@@ -307,17 +307,16 @@ AND    $operationClause
     if (CRM_Core_Permission::check('view all contacts') ||
       CRM_Core_Permission::check('edit all contacts')
     ) {
-      if (is_array($contactAlias)) {
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
         $wheres = [];
-        foreach ($contactAlias as $alias) {
+        foreach ((array) $contactAlias as $alias) {
           // CRM-6181
           $wheres[] = "$alias.is_deleted = 0";
         }
         return [NULL, '(' . implode(' AND ', $wheres) . ')'];
       }
       else {
-        // CRM-6181
-        return [NULL, "$contactAlias.is_deleted = 0"];
+        return [NULL, '( 1 )'];
       }
     }
 
@@ -332,14 +331,17 @@ AND    $operationClause
       }
 
       $fromClause = implode(" ", $clauses);
-      $whereClase = NULL;
+      $whereClause = NULL;
     }
     else {
       $fromClause = " INNER JOIN civicrm_acl_contact_cache aclContactCache ON {$contactAlias}.id = aclContactCache.contact_id ";
-      $whereClase = " aclContactCache.user_id = $contactID AND $contactAlias.is_deleted = 0";
+      $whereClause = " aclContactCache.user_id = $contactID";
+      if (!CRM_Core_Permission::check('access deleted contacts')) {
+        $whereClause .= " AND $contactAlias.is_deleted = 0";
+      }
     }
 
-    return [$fromClause, $whereClase];
+    return [$fromClause, $whereClause];
   }
 
   /**

@@ -201,7 +201,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * This is a bit too much about wierd form interpretation to be this deep.
    *
-   * CRM-11885
+   * @see https://issues.civicrm.org/jira/browse/CRM-11885
    *  if non_deductible_amount exists i.e. Additional Details fieldset was opened [and staff typed something] -> keep
    * it.
    *
@@ -954,7 +954,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         $smarty = CRM_Core_Smarty::singleton();
         $smarty->assign('dataArray', $dataArray);
-        $smarty->assign('totalTaxAmount', $params['tax_amount']);
+        $smarty->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
       }
 
       // lets store it in the form variable so postProcess hook can get to this and use it

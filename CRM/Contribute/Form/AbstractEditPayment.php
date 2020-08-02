@@ -718,7 +718,7 @@ WHERE  contribution_id = {$id}
       $title .= " - {$info['title']}";
     }
     $this->assign('transaction', TRUE);
-    $this->assign('payments', $paymentInfo['transaction']);
+    $this->assign('payments', $paymentInfo['transaction'] ?? NULL);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
   }

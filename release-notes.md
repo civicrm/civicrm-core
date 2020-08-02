@@ -15,6 +15,44 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.28.0
+
+Released August 5, 2020
+
+- **[Synopsis](release-notes/5.28.0.md#synopsis)**
+- **[Features](release-notes/5.28.0.md#features)**
+- **[Bugs resolved](release-notes/5.28.0.md#bugs)**
+- **[Miscellany](release-notes/5.28.0.md#misc)**
+- **[Credits](release-notes/5.28.0.md#credits)**
+- **[Feedback](release-notes/5.28.0.md#feedback)**
+
+## CiviCRM 5.27.3
+
+Released July 23, 2020
+
+- **[Synopsis](release-notes/5.27.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.27.3.md#bugs)**
+- **[Credits](release-notes/5.27.3.md#credits)**
+- **[Feedback](release-notes/5.27.3.md#feedback)**
+
+## CiviCRM 5.27.2
+
+Released July 14, 2020
+
+- **[Synopsis](release-notes/5.27.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.27.2.md#bugs)**
+- **[Credits](release-notes/5.27.2.md#credits)**
+- **[Feedback](release-notes/5.27.2.md#feedback)**
+
+## CiviCRM 5.27.1
+
+Released July 9, 2020
+
+- **[Synopsis](release-notes/5.27.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.27.1.md#bugs)**
+- **[Credits](release-notes/5.27.1.md#credits)**
+- **[Feedback](release-notes/5.27.1.md#feedback)**
+
 ## CiviCRM 5.27.0
 
 Released July 1, 2020
@@ -346,7 +384,7 @@ Released October 5, 2019
 - **[Credits](release-notes/5.18.1.md#credits)**
 - **[Feedback](release-notes/5.18.1.md#feedback)**
 
-# CiviCRM 5.18.0
+## CiviCRM 5.18.0
 
 Released October 2, 2019
 

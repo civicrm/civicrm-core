@@ -415,7 +415,7 @@ WHERE ceft.entity_id = %1";
     $fItemParams
       = [
         'financial_account_id' => $financialAccount,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
+        'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'created_date' => date('YmdHis'),
         'transaction_date' => $params['trxnParams']['trxn_date'],
         'amount' => $amount,

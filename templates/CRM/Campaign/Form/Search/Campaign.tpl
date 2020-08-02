@@ -10,7 +10,7 @@
 
 {if !$hasCampaigns}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     &nbsp;
     {ts}None found.{/ts}
   </div>

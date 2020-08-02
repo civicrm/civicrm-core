@@ -114,7 +114,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     if ($name) {
       $defaults['name'] = $name;
       $provider = CRM_SMS_Provider::singleton(['provider' => $name]);
-      $defaults['api_url'] = $provider->_apiURL;
+      $defaults['api_url'] = $provider->_apiURL ?? '';
     }
 
     if (!$this->_id) {

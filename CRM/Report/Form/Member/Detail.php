@@ -35,10 +35,8 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
    * The functionality for group filtering has been improved but not
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
-   *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
 
@@ -335,7 +333,8 @@ HERESQL;
             if (!empty($regularOptions)) {
               $clauseParts[] = "{$this->_aliases['civicrm_contribution_recur']}.contribution_status_id IN ($regularOptions)";
             }
-            return '(' . implode(') OR (', $clauseParts) . ')';
+            // Double parentheses b/c ORs should be treated as a group
+            return '((' . implode(') OR (', $clauseParts) . '))';
           }
           return;
 

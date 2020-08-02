@@ -81,7 +81,7 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'result' => TRUE,
         ],
         self::UPDATE_STATUS => [
-          'title' => ts('Update pending contribution status'),
+          'title' => ts('Record payments for contributions'),
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
         ],

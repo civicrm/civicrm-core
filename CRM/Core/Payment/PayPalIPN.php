@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
@@ -257,18 +256,18 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->total_amount = $input['amount'];
     }
 
-    $transaction = new CRM_Core_Transaction();
-
     $status = $input['paymentStatus'];
     if ($status == 'Denied' || $status == 'Failed' || $status == 'Voided') {
-      return $this->failed($objects, $transaction);
+      $this->failed($objects);
+      return;
     }
     if ($status === 'Pending') {
       Civi::log()->debug('Returning since contribution status is Pending');
       return;
     }
     elseif ($status == 'Refunded' || $status == 'Reversed') {
-      return $this->cancelled($objects, $transaction);
+      $this->cancelled($objects);
+      return;
     }
     elseif ($status !== 'Completed') {
       Civi::log()->debug('Returning since contribution status is not handled');
@@ -278,13 +277,12 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     // check if contribution is already completed, if so we ignore this ipn
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     if ($contribution->contribution_status_id == $completedStatusId) {
-      $transaction->commit();
       Civi::log()->debug('PayPalIPN: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
       echo 'Success: Contribution has already been handled<p>';
       return;
     }
 
-    $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
+    $this->completeTransaction($input, $ids, $objects);
   }
 
   /**
@@ -303,7 +301,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
     $contributionRecurID = $this->retrieve('contributionRecurID', 'Integer', FALSE);
 
-    $this->getInput($input, $ids);
+    $this->getInput($input);
 
     if ($component == 'event') {
       $ids['event'] = $this->retrieve('eventID', 'Integer', TRUE);
@@ -376,12 +374,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * @param array $input
-   * @param array $ids
    *
    * @throws \CRM_Core_Exception
    */
-  public function getInput(&$input, &$ids) {
-    $billingID = $ids['billing'] = CRM_Core_BAO_LocationType::getBilling();
+  public function getInput(&$input) {
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
     $input['txnType'] = $this->retrieve('txn_type', 'String', FALSE);
     $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
     $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);

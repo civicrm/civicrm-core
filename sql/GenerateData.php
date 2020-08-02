@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -1269,21 +1267,22 @@ class CRM_GCD {
       }
     }
 
-    $offset = mt_rand(1, 43000);
-    $query = "SELECT city, state, zip, latitude, longitude FROM zipcodes LIMIT $offset, 1";
-    $dao = new CRM_Core_DAO();
-    $dao->query($query);
-    while ($dao->fetch()) {
-      if ($this->stateMap[$dao->state]) {
-        $stateID = $this->stateMap[$dao->state];
-      }
-      else {
-        $stateID = 1004;
-      }
-
-      $zip = str_pad($dao->zip, 5, '0', STR_PAD_LEFT);
-      return array(1228, $stateID, $dao->city, $zip, $dao->latitude, $dao->longitude);
+    static $zipCodes = NULL;
+    if ($zipCodes === NULL) {
+      $zipCodes = json_decode(file_get_contents(__DIR__ . '/zipcodes.json'));
     }
+
+    $zipCode = $zipCodes[mt_rand(0, count($zipCodes))];
+
+    if ($this->stateMap[$zipCode->state]) {
+      $stateID = $this->stateMap[$zipCode->state];
+    }
+    else {
+      $stateID = 1004;
+    }
+
+    $zip = str_pad($zipCode->zip, 5, '0', STR_PAD_LEFT);
+    return array(1228, $stateID, $zipCode->city, $zip, $zipCode->latitude, $zipCode->longitude);
   }
 
   /**
@@ -1886,7 +1885,7 @@ order by cc.id; ";
    * @param null $financialAccountId
    */
   private function addFinancialItem($result, $financialAccountId) {
-    $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1");
+    $defaultFinancialAccount = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = 1");
     while ($result->fetch()) {
       $trxnParams = array(
         'trxn_date' => CRM_Utils_Date::processDate($result->receive_date),

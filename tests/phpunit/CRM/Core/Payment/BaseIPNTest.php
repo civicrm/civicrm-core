@@ -93,7 +93,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
   }
 
@@ -104,12 +103,12 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpMembershipObjects();
     $this->_setUpRecurringContribution();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertFalse(empty($this->objects['membership']));
+    $this->assertNotEmpty($this->objects['membership']);
     $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership']);
     $this->assertTrue(is_a($this->objects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertFalse(empty($this->objects['contributionRecur']));
-    $this->assertFalse(empty($this->objects['paymentProcessor']));
+    $this->assertNotEmpty($this->objects['contributionRecur']);
+    $this->assertNotEmpty($this->objects['paymentProcessor']);
   }
 
   /**
@@ -145,7 +144,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
     $contribution->loadRelatedObjects($this->input, $this->ids, TRUE);
-    $this->assertFalse(empty($contribution->_relatedObjects['membership']));
+    $this->assertNotEmpty($contribution->_relatedObjects['membership']);
     $this->assertArrayHasKey($this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($contribution->_relatedObjects['financialType'], 'CRM_Financial_BAO_FinancialType'));
@@ -156,12 +155,13 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    */
-  public function testsendMailMembershipObjects() {
+  public function testSendMailMembershipObjects() {
     $this->_setUpMembershipObjects();
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
     $values = [];
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
-    $this->assertTrue(is_array($msg), "Message returned as an array in line");
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $this->assertInternalType('array', $msg, 'Message returned as an array in line');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertContains('Membership Type: General', $msg['body']);
   }
@@ -173,9 +173,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function testSendMailMembershipObjectsNoLeakage() {
     $this->_setUpMembershipObjects();
+    $contribution = new CRM_Contribute_BAO_Contribution();
     $values = [];
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertContains('Membership Type: General', $msg['body']);
 
@@ -188,7 +189,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->input['invoiceID'] = 'abc';
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->assertEquals('Donald', $this->objects['contact']->first_name);
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertEquals('Dr. Donald Duck II', $msg['to']);
     $this->assertContains('Membership Type: Fowl', $msg['body']);
   }
@@ -196,11 +199,12 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    */
-  public function testsendMailMembershipWithoutLoadObjects() {
+  public function testSendMailMembershipWithoutLoadObjects() {
     $this->_setUpMembershipObjects();
-    $values = [];
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
-    $this->assertTrue(is_array($msg), "Message returned as an array in line" . __LINE__);
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $this->assertInternalType('array', $msg, 'Message not returned as an array');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertContains('Membership Type: General', $msg['body']);
   }
@@ -217,7 +221,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertFalse(empty($this->objects['event']));
     $this->assertTrue(is_a($this->objects['event'], 'CRM_Event_BAO_Event'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
-    $this->assertFalse(empty($this->objects['event']->id));
+    $this->assertNotEmpty($this->objects['event']->id);
   }
 
   /**
@@ -227,8 +231,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpParticipantObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $values = [];
-    $this->assertFalse(empty($this->objects['event']));
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
+    $this->assertNotEmpty($this->objects['event']);
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertContains('registration has been received and your status has been updated to Attended.', $msg['body']);
     $this->assertContains('Annual CiviCRM meet', $msg['html']);
   }
@@ -237,9 +243,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function testComposeMailParticipantObjects() {
     $this->_setUpParticipantObjects();
-    $values = [];
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
-    $this->assertTrue(is_array($msg), "Message returned as an array in line" . __LINE__);
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertContains('Thank you for your registration', $msg['body']);
   }
@@ -247,12 +253,12 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    */
-  public function testsendMailParticipantObjectsCheckLog() {
+  public function testSendMailParticipantObjectsCheckLog() {
     $this->_setUpParticipantObjects();
-    $values = [];
     $mut = new CiviMailUtils($this, TRUE);
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
+    $this->callAPISuccess('Contribution', 'sendconfirmation', [
+      'id' => $this->_contributionId,
+    ]);
     $mut->checkMailLog([
       'Thank you for your registration',
       'Annual CiviCRM meet',
@@ -276,8 +282,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     ];
     $this->quickCleanup($tablesToTruncate, FALSE);
     $mut = new CiviMailUtils($this, TRUE);
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $mut->assertMailLogEmpty('no mail should have been send as event set to no confirm');
     $mut->stop();
   }
@@ -330,11 +337,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with a pledge.
    */
-  public function testsendMailPledge() {
+  public function testSendMailPledge() {
     $this->_setUpPledgeObjects();
-    $values = [];
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, NULL);
-    $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, TRUE);
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->_contributionId;
+    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertContains('Contribution Information', $msg['html']);
   }
 

@@ -284,7 +284,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test process with instant payment when more than one configured for the page.
    *
-   * CRM-16923
+   * @see https://issues.civicrm.org/jira/browse/CRM-16923
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception

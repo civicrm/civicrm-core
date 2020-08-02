@@ -463,13 +463,18 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'cid' => 9,
       'context' => 'activity',
       'activity_type_id' => 1,
-      'is_unit_test' => 1,
     ];
     $expectedFilters = [
       'activity_type_filter_id' => 1,
     ];
 
-    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $activityFilter = Civi::contactSettings()->get('activity_tab_filter');
+      $activities = $e->errorData;
+    }
     //Assert whether filters are correctly set.
     $this->checkArrayEquals($expectedFilters, $activityFilter);
     // This should include activities of type Meeting only.
@@ -479,7 +484,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     unset($_GET['activity_type_id']);
 
     $_GET['activity_type_exclude_id'] = $expectedFilters['activity_type_exclude_filter_id'] = 1;
-    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $activityFilter = Civi::contactSettings()->get('activity_tab_filter');
+      $activities = $e->errorData;
+    }
     $this->assertEquals(['activity_type_exclude_filter_id' => 1], $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
@@ -525,7 +536,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // with no contact ID and there should be 8 schedule activities shown on dashboard
     $count = 8;
     foreach ([$activitiesNew] as $activities) {
-      $this->assertEquals($count, count($activities));
+      $this->assertCount($count, $activities);
 
       foreach ($activities as $key => $value) {
         $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -537,10 +548,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
     $this->setShowCaseActivitiesInCore(TRUE);
     $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
-    $this->assertEquals(9, count($activitiesNew));
+    $this->assertCount(9, $activitiesNew);
     // Scan through to find the meeting.
-    $this->assertTrue(in_array('test meeting activity', array_column($activitiesNew, 'subject')),
-      "failed to find scheduled case Meeting activity");
+    $this->assertContains('test meeting activity', array_column($activitiesNew, 'subject'), "failed to find scheduled case Meeting activity");
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
   }
@@ -553,7 +563,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->setUpForActivityDashboardTests();
     foreach ([CRM_Activity_BAO_Activity::getActivities($this->_params)] as $activities) {
       // Skipped until we get back to the upgraded version properly.
-      $this->assertEquals(0, count($activities));
+      $this->assertCount(0, $activities);
     }
   }
 

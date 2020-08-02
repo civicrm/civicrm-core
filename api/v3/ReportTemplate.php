@@ -97,6 +97,9 @@ function civicrm_api3_report_template_delete($params) {
  *
  * @return array
  *   API result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['report_id', 'instance_id']);

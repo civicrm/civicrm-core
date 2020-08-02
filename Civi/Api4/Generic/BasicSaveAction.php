@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -24,29 +22,23 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * $ACTION one or more $ENTITIES.
- *
- * If saving more than one new $ENTITY with similar values, use the `defaults` parameter.
- *
- * Set `reload` if you need the api to return complete $ENTITY records.
+ * @inheritDoc
  */
 class BasicSaveAction extends AbstractSaveAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicCreateAction $thisAction) => array
+   *   Function(array $item, BasicCreateAction $thisAction): array
    */
   private $setter;
 
   /**
-   * Basic Create constructor.
+   * Basic Save constructor.
    *
    * @param string $entityName
    * @param string $actionName
    * @param string $idField
    * @param callable $setter
-   *   Function(array $item, BasicCreateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $idField = 'id', $setter = NULL) {
     parent::__construct($entityName, $actionName, $idField);

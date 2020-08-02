@@ -64,7 +64,14 @@ class Civi {
    * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   public static function dispatcher() {
-    return Civi\Core\Container::singleton()->get('dispatcher');
+    // NOTE: The dispatcher object is initially created as a boot service
+    // (ie `dispatcher.boot`). For compatibility with the container (eg
+    // `RegisterListenersPass` and `createEventDispatcher` addons),
+    // it is also available as the `dispatcher` service.
+    //
+    // The 'dispatcher.boot' and 'dispatcher' services are the same object,
+    // but 'dispatcher.boot' is resolvable earlier during bootstrap.
+    return Civi\Core\Container::getBootService('dispatcher.boot');
   }
 
   /**
