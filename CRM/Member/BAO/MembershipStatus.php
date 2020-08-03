@@ -240,12 +240,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     foreach ($dates as $dat) {
       if (${$dat . 'Date'} && ${$dat . 'Date'} != "null") {
         ${$dat . 'Date'} = CRM_Utils_Date::customFormat(${$dat . 'Date'}, '%Y%m%d');
-
-        ${$dat . 'Year'} = substr(${$dat . 'Date'}, 0, 4);
-
-        ${$dat . 'Month'} = substr(${$dat . 'Date'}, 4, 2);
-
-        ${$dat . 'Day'} = substr(${$dat . 'Date'}, 6, 2);
       }
       else {
         ${$dat . 'Date'} = '';
@@ -266,13 +260,15 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
  ORDER BY weight ASC";
 
     $membershipStatus = CRM_Core_DAO::executeQuery($query);
-    $hour = $minute = $second = 0;
 
     while ($membershipStatus->fetch()) {
       $startEvent = NULL;
       $endEvent = NULL;
       foreach ($events as $eve) {
         foreach ($dates as $dat) {
+          $month = date('m', strtotime(${$dat . 'Date'}));
+          $day = date('d', strtotime(${$dat . 'Date'}));
+          $year = date('Y', strtotime(${$dat . 'Date'}));
           // calculate start-event/date and end-event/date
           if (($membershipStatus->{$eve . '_event'} == $dat . '_date') &&
             ${$dat . 'Date'}
@@ -281,27 +277,27 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
               $membershipStatus->{$eve . '_event_adjust_interval'}
             ) {
               // add in months
-              if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'month') {
-                ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'} + $membershipStatus->{$eve . '_event_adjust_interval'},
-                  ${$dat . 'Day'},
-                  ${$dat . 'Year'}
+              if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'month') {
+                ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
+                  $month + $membershipStatus->{$eve . '_event_adjust_interval'},
+                  $day,
+                  $year
                 ));
               }
               // add in days
-              if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'day') {
-                ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'},
-                  ${$dat . 'Day'} + $membershipStatus->{$eve . '_event_adjust_interval'},
-                  ${$dat . 'Year'}
+              if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'day') {
+                ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
+                  $month,
+                  $day + $membershipStatus->{$eve . '_event_adjust_interval'},
+                  $year
                 ));
               }
               // add in years
-              if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'year') {
-                ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'},
-                  ${$dat . 'Day'},
-                  ${$dat . 'Year'} + $membershipStatus->{$eve . '_event_adjust_interval'}
+              if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'year') {
+                ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
+                  $month,
+                  $day,
+                  $year + $membershipStatus->{$eve . '_event_adjust_interval'}
                 ));
               }
               // if no interval and unit, present
