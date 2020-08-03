@@ -224,21 +224,9 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    $addLineItems = FALSE;
-    if (empty($contribution->id)) {
-      $addLineItems = TRUE;
-    }
+    $addLineItems = empty($contribution->id);
     $participant = &$objects['participant'];
-
-    // CRM-15546
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ]);
-    $contribution->contribution_status_id = $contributionStatuses['Failed'];
-    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
-    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
-    $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
+    $contribution->contribution_status_id = CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Failed');
     $contribution->save();
 
     // Add line items for recurring payments.
