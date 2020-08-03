@@ -203,8 +203,10 @@
 
     {if ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192)}
       {if $action eq 2 and $multiRecordFieldListing}
-      {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
-        {assign var=floatStyle value='float:right'}
+        <div class="crm-multi-record-custom-field-listing">
+          {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
+          {assign var=floatStyle value='float:right'}
+        </div>
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
         {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
