@@ -197,38 +197,40 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Find the membership status based on start date, end date, join date & status date.
    *
+   * Loop through all the membership status definitions, ordered by their
+   * weight. For each, we loop through all possible variations of the given
+   * start, end, and join dates and adjust the starts and ends based on that
+   * membership status's rules, where the last computed set of adjusted start
+   * and end becomes a candidate. Then we compare that candidate to either
+   * "today" or some other given date, and if it falls between the adjusted
+   * start and end we have a match and we stop looping through status
+   * definitions. Then we call a hook in case that wasn't enough loops.
+   *
    * @param string $startDate
    *   Start date of the member whose membership status is to be calculated.
    * @param string $endDate
    *   End date of the member whose membership status is to be calculated.
    * @param string $joinDate
    *   Join date of the member whose membership status is to be calculated.
-   * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
-   * @param bool $excludeIsAdmin the statuses those having is_admin = 1.
-   *   Exclude the statuses those having is_admin = 1.
+   * @param string $statusDate
+   *   Either the string "today" or a date against which we compare the adjusted start and end based on the status rules.
+   * @param bool $excludeIsAdmin
+   *   Exclude the statuses having is_admin = 1.
    * @param int $membershipTypeID
+   *   Not used directly but gets passed to the hook.
    * @param array $membership
-   *   Membership params as available to calling function - passed to the hook.
+   *   Membership params as available to calling function - not used directly but passed to the hook.
    *
    * @return array
    */
   public static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
-    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = []
+    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID = NULL, $membership = []
   ) {
     $membershipDetails = [];
 
     if (!$statusDate || $statusDate == 'today') {
-      $statusDate = getdate();
-      $statusDate = date('Ymd',
-        mktime($statusDate['hours'],
-          $statusDate['minutes'],
-          $statusDate['seconds'],
-          $statusDate['mon'],
-          $statusDate['mday'],
-          $statusDate['year']
-        )
-      );
+      $statusDate = date('Ymd');
     }
     else {
       $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
@@ -266,9 +268,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       $endEvent = NULL;
       foreach ($events as $eve) {
         foreach ($dates as $dat) {
-          $month = date('m', strtotime(${$dat . 'Date'}));
-          $day = date('d', strtotime(${$dat . 'Date'}));
-          $year = date('Y', strtotime(${$dat . 'Date'}));
           // calculate start-event/date and end-event/date
           if (($membershipStatus->{$eve . '_event'} == $dat . '_date') &&
             ${$dat . 'Date'}
@@ -276,6 +275,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
             if ($membershipStatus->{$eve . '_event_adjust_unit'} &&
               $membershipStatus->{$eve . '_event_adjust_interval'}
             ) {
+              $month = date('m', strtotime(${$dat . 'Date'}));
+              $day = date('d', strtotime(${$dat . 'Date'}));
+              $year = date('Y', strtotime(${$dat . 'Date'}));
               // add in months
               if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'month') {
                 ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,

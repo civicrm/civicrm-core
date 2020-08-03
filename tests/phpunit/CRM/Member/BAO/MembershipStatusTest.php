@@ -35,6 +35,8 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
       'Database check on updated membership status record.'
     );
     $this->assertEquals($result, 'pending', 'Verify membership status is_active.');
+
+    $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }
 
   public function testRetrieve() {
@@ -88,6 +90,8 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
       'Database check on updated membership status record.'
     );
     $this->assertEquals($isActive, 0, 'Verify membership status is_active.');
+
+    $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }
 
   public function testGetMembershipStatus() {
@@ -99,6 +103,8 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
     $result = CRM_Member_BAO_MembershipStatus::getMembershipStatus($membershipStatus->id);
     $this->assertEquals($result['name'], 'pending', 'Verify membership status name.');
+
+    $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }
 
   public function testDel() {
@@ -157,6 +163,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
       'is_active' => 1,
       'is_reserved' => 0,
     ]);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_membership_status SET id=4 WHERE name='Expired'");
 
   }
 
@@ -173,6 +180,244 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
     $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($toDate, $toDate, $toDate, 'today', TRUE, NULL, $params);
     $this->assertEquals($result['name'], 'Current', 'Verify membership status record.');
+
+    $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
+  }
+
+  /**
+   * Test getMembershipStatusByDate more
+   *
+   * @dataProvider statusByDateProvider
+   *
+   * @param array $input
+   * @param array $expected
+   */
+  public function testGetMembershipStatusByDateMore($input, $expected) {
+    // Sanity check we have something close to the stock install.
+    $this->assertEquals(7, $this->callAPISuccess('MembershipStatus', 'getcount'));
+
+    $this->assertEquals(
+      $expected,
+      CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+        $input['startDate'],
+        $input['endDate'],
+        $input['joinDate'],
+        $input['statusDate']
+      )
+    );
+  }
+
+  /**
+   * Data provider for testGetMembershipStatusByDateMore
+   * @return array
+   */
+  public function statusByDateProvider():array {
+    return [
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-03-01',
+        ],
+        [
+          'id' => '1',
+          'name' => 'New',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-04-29',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-05-01',
+        ],
+        [
+          'id' => '3',
+          'name' => 'Grace',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-06-01',
+        ],
+        [
+          'id' => '4',
+          'name' => 'Expired',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2019-01-01',
+          'statusDate' => '2020-03-01',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2019-01-01',
+          'statusDate' => '2020-04-29',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2019-01-01',
+          'statusDate' => '2020-05-01',
+        ],
+        [
+          'id' => '3',
+          'name' => 'Grace',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2020-04-30',
+          'joinDate' => '2019-01-01',
+          'statusDate' => '2020-06-01',
+        ],
+        [
+          'id' => '4',
+          'name' => 'Expired',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-03-01',
+        ],
+        [
+          'id' => '1',
+          'name' => 'New',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-04-29',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-12-30',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2021-01-01',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2021-01-31',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2021-02-21',
+        ],
+        [
+          'id' => '3',
+          'name' => 'Grace',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '2021-01-31',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2021-03-21',
+        ],
+        [
+          'id' => '4',
+          'name' => 'Expired',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-03-01',
+        ],
+        [
+          'id' => '1',
+          'name' => 'New',
+        ],
+      ],
+      [
+        [
+          'startDate' => '2020-02-01',
+          'endDate' => '',
+          'joinDate' => '2020-01-01',
+          'statusDate' => '2020-06-01',
+        ],
+        [
+          'id' => '2',
+          'name' => 'Current',
+        ],
+      ],
+    ];
   }
 
   public function testgetMembershipStatusCurrent() {
@@ -186,6 +431,8 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
 
     $this->assertEquals(empty($result), FALSE, 'Verify membership status records is_current_member.');
+
+    $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }
 
 }
