@@ -311,6 +311,12 @@ class CRM_Utils_File {
   }
 
   /**
+   * Note this function can be called during tasks that are outside of a
+   * normal Civi page lifecycle, such as uninstalling the module from drupal,
+   * so we duplicate several tasks done in CRM_Core_DAO::init() to avoid
+   * (a) triggering unintended database access, and (b) polluting or confusing
+   * variables in the static space in PEAR::DB, e.g. between a CMS db DAO and
+   * a Civi db DAO.
    *
    * @param string|NULL $dsn
    * @param string $queryString
@@ -325,13 +331,15 @@ class CRM_Utils_File {
     }
     else {
       require_once 'DB.php';
-      $db = DB::connect($dsn);
+      $db_options = CRM_Utils_SQL::isSSLDSN($dsn) ? ['ssl' => TRUE] : [];
+      $db = DB::connect($dsn, $db_options);
     }
 
     if (PEAR::isError($db)) {
       die("Cannot open $dsn: " . $db->getMessage());
     }
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
+      // @todo This would wipe out any other settings in sql_mode - that seems wrong.
       $db->query('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
     $db->query('SET NAMES utf8mb4');
@@ -347,7 +355,7 @@ class CRM_Utils_File {
       $query = trim($query);
       if (!empty($query)) {
         CRM_Core_Error::debug_query($query);
-        $res = &$db->query($query);
+        $res = $db->query($query);
         if (PEAR::isError($res)) {
           if ($dieOnErrors) {
             die("Cannot execute $query: " . $res->getMessage());
