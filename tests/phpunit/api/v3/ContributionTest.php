@@ -2714,7 +2714,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-17718 test appropriate action if financial type has changed for single line items.
+   * Test financial_type_id override behaviour with a single line item.
+   *
+   * CRM-17718 a passed in financial_type_id is allowed to override the original contribution where there
+   * is only one line item.
    */
   public function testRepeatTransactionPassedInFinancialType() {
     $originalContribution = $this->setUpRecurringContribution();
@@ -2741,7 +2744,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ],
     ];
 
-    $this->callAPISuccessGetSingle('contribution', [
+    $this->callAPISuccessGetSingle('Contribution', [
       'total_amount' => 100,
       'financial_type_id' => 2,
     ]);
@@ -2762,6 +2765,37 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
+  }
+
+  /**
+   * Test financial_type_id override behaviour with a single line item.
+   *
+   * CRM-17718 a passed in financial_type_id is not allowed to override the original contribution where there
+   * is more than one line item.
+   */
+  public function testRepeatTransactionPassedInFinancialTypeTwoLineItems() {
+    $this->_params = $this->getParticipantOrderParams();
+    $originalContribution = $this->setUpRecurringContribution();
+
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
+      'original_contribution_id' => $originalContribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => 'repeat',
+      'financial_type_id' => 2,
+    ]);
+
+    // Retrieve the new contribution and note the financial type passed in has been ignored.
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'trxn_id' => 'repeat',
+    ]);
+    $this->assertEquals(4, $contribution['financial_type_id']);
+
+    $lineItems = $this->callAPISuccess('line_item', 'get', [
+      'entity_id' => $contribution['id'],
+    ])['values'];
+    foreach ($lineItems as $lineItem) {
+      $this->assertNotEquals(2, $lineItem['financial_type_id']);
+    }
   }
 
   /**
@@ -3014,7 +3048,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test that $is_recur is assigned to the receipt.
    */
   public function testCompleteTransactionForRecurring() {
-
+    $this->mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $recurring = $this->setUpRecurringContribution();
     $contributionPage = $this->createReceiptableContributionPage(['is_recur' => TRUE, 'recur_frequency_unit' => 'month', 'recur_interval' => 1]);
@@ -4112,6 +4146,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *   Parameters to merge into the recur only.
    *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   protected function setUpRecurringContribution($generalParams = [], $recurParams = []) {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
@@ -4125,12 +4160,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'payment_processor_id' => $this->paymentProcessorID,
     ], $generalParams, $recurParams));
-    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+    $contributionParams = array_merge(
       $this->_params,
       [
         'contribution_recur_id' => $contributionRecur['id'],
-      ], $generalParams)
-    );
+        'contribution_status_id' => 'Pending',
+      ], $generalParams);
+    $contributionParams['api.Payment.create'] = ['total_amount' => $contributionParams['total_amount']];
+    $originalContribution = $this->callAPISuccess('Order', 'create', $contributionParams);
     return $originalContribution;
   }
 
