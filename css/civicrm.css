@@ -1835,8 +1835,6 @@ input.crm-form-entityref {
 
 .crm-container .crm-button input {
   background: none;
-  _background: #6C6C6C;
-  /* IE6 only */
   border: medium none;
   color: #FFF;
   cursor: pointer;
@@ -1898,8 +1896,6 @@ input.crm-form-entityref {
   padding: 3px 5px 2px;
   margin: 0;
   background: none;
-  _background: #6C6C6C;
-  /* IE6 only */
   border: none;
 }
 
