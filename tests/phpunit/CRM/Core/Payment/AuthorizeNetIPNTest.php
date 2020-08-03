@@ -113,7 +113,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $contributionRecur  = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $this->_contributionRecurID]);
     $processor_id = $contributionRecur['processor_id'];
     $this->assertEquals('Pending', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionRecur['contribution_status_id']));
-    // Process the initial one.
+    // Process the initial one after a second's break to ensure modified date really is later.
+    sleep(1);
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN(
       $this->getRecurTransaction(['x_subscription_id' => $processor_id])
     );
