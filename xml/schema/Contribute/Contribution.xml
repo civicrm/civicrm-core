@@ -114,6 +114,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Contribution Page</label>
     </html>
     <add>1.5</add>
   </field>

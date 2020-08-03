@@ -120,7 +120,7 @@
     {$form.financial_type_id.html|crmAddClass:twenty}
   </td>
   <td>
-    <label>{ts}Contribution Page{/ts}</label> <br />
+    <label>{$form.contribution_page_id.label}</label> <br />
     {$form.contribution_page_id.html|crmAddClass:twenty}
   </td>
 </tr>
