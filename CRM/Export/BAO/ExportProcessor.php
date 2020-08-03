@@ -1434,28 +1434,27 @@ class CRM_Export_BAO_ExportProcessor {
    * @return mixed
    */
   public function getSqlColumnDefinition($fieldName, $columnName) {
-
-    // early exit for master_id, CRM-12100
-    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    // also for current_employer, CRM-16939
-    if ($columnName == 'master_id' || $columnName == 'current_employer') {
-      return "`$fieldName` varchar(128)";
-    }
-
     $queryFields = $this->getQueryFields();
     // @todo remove the enotice avoidance here, ensure all columns are declared.
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
 
+    // special case: civicirm_primary_id exports the contact id and is an index field
+    if ($fieldName == 'civicrm_primary_id') {
+      return "$fieldName varchar(16)";
+    }
+
     // set the sql columns
     if (isset($fieldSpec['type'])) {
       switch ($fieldSpec['type']) {
         case CRM_Utils_Type::T_INT:
+          // Integer fields may be references that are retrieved for export as text of arbitrary length.
+          // We use "text" instead of "varchar(xyz)" to avoid row width limitations of mysql.
+          // This solution replaces a previous collection of ad-hoc partial solutions.
+          return "$fieldName text";
+
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "`$fieldName` varchar(255)";
-          }
           return "`$fieldName` varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
@@ -1486,8 +1485,10 @@ class CRM_Export_BAO_ExportProcessor {
       }
     }
     else {
+      // handle fields for which we have no 'type' configured (yet!)
       if (substr($fieldName, -3, 3) == '_id') {
-        return "`$fieldName` varchar(255)";
+        // Will likely get expanded into text of arbitrary length.
+        return "$fieldName text";
       }
       elseif (substr($fieldName, -5, 5) == '_note') {
         return "`$fieldName` text";
