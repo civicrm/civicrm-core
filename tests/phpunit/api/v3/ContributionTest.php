@@ -3489,14 +3489,32 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test membership is renewed when transaction completed.
+   * Test membership is renewed for 2 terms when transaction completed based on the line item having 2 terms as qty.
+   *
+   * Also check that altering the qty for the most recent contribution results in repeattransaction picking it up.
    */
   public function testCompleteTransactionMembershipPriceSetTwoTerms() {
     $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][1]);
     $this->callAPISuccess('contribution', 'completetransaction', ['id' => $this->_ids['contribution']]);
-    $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->_ids['membership']]);
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 years')), $membership['end_date']);
+
+    $paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
+
+    $contributionRecurID = $this->callAPISuccess('ContributionRecur', 'create', ['contact_id' => $membership['contact_id'], 'payment_processor_id' => $paymentProcessorID, 'amount' => 20, 'frequency_interval' => 1])['id'];
+    $this->callAPISuccess('Contribution', 'create', ['id' => $this->_ids['contribution'], 'contribution_recur_id' => $contributionRecurID]);
+    $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->_ids['membership']]);
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 4 years')), $membership['end_date']);
+
+    // Update the most recent contribution to have a qty of 1 in it's line item and then repeat, expecting just 1 year to be added.
+    $contribution = Contribution::get()->setOrderBy(['id' => 'DESC'])->setSelect(['id'])->execute()->first();
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET price_field_value_id = ' . $this->_ids['price_field_value'][0] . ' WHERE contribution_id = ' . $contribution['id']);
+    $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->_ids['membership']]);
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 5 years')), $membership['end_date']);
+
     $this->cleanUpAfterPriceSets();
   }
 
