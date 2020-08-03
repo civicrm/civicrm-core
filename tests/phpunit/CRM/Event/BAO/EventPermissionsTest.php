@@ -15,6 +15,8 @@
  */
 class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
+  use CRMTraits_ACL_PermissionTrait;
+
   public function setUp() {
     parent::setUp();
     $this->_contactId = $this->createLoggedInUser();
@@ -99,9 +101,18 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
     $this->assertTrue($permissions);
   }
 
+  /**
+   * Test that the contact can view an event with an ACL permitting everyone to view it.
+   */
+  public function testViewAclEventAllowed() {
+    $this->setupScenarioCoreACLEveryonePermittedToEvent();
+    $permittedEventID = CRM_Core_Permission::event(CRM_Core_Permission::VIEW, $this->scenarioIDs['Event']['permitted_event']);
+    $this->assertEquals($this->scenarioIDs['Event']['permitted_event'], $permittedEventID);
+  }
+
   public function testEditOtherEventDenied() {
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
-    self::setViewAllEventPermissions();
+    $this->setViewAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::EDIT);
     $this->assertFalse($permissions);
