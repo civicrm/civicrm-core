@@ -4989,8 +4989,7 @@ civicrm_relationship.start_date > {$today}
     $sqlParts = $this->getSearchSQLParts(NULL, NULL, NULL, FALSE, FALSE, TRUE);
     $query = "SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name
       {$sqlParts['from']}
-      {$sqlParts['where']}
-      {$sqlParts['having']}";
+      {$sqlParts['where']}";
     $dao = CRM_Core_DAO::executeQuery($query);
     return $dao;
   }
