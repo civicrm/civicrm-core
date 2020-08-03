@@ -1850,9 +1850,6 @@ input.crm-form-entityref {
 .crm-container .crm-button-type-back {
   margin-left: 20px;
 }
-.crm-container .crm-button-type-cancel input {
-  color: #E6E6DC!important;
-}
 
 .crm-container a.button,
 .crm-container a.button:link,
