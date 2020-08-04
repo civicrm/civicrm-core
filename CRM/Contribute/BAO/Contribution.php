@@ -10,6 +10,8 @@
  */
 
 use Civi\Api4\Activity;
+use Civi\Api4\ContributionPage;
+use Civi\Api4\ContributionRecur;
 
 /**
  *
@@ -1343,6 +1345,38 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $rows[] = $val;
     }
     return $rows;
+  }
+
+  /**
+   * Should an email receipt be sent for this contribution on completion.
+   *
+   * @param array $input
+   * @param int $contributionPageID
+   * @param int $recurringContributionID
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function isEmailReceipt(array $input, $contributionPageID, $recurringContributionID): bool {
+    if (isset($input['is_email_receipt'])) {
+      return (bool) $input['is_email_receipt'];
+    }
+    if ($recurringContributionID) {
+      //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
+      // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
+      // dev/core#1245 this maybe not the desired effect because the default value for is_email_receipt is set to 0 rather than 1 in
+      // Instance that had the table added via an upgrade in 4.1
+      // see also https://github.com/civicrm/civicrm-svn/commit/7f39befd60bc735408d7866b02b3ac7fff1d4eea#diff-9ad8e290180451a2d6eacbd3d1ca7966R354
+      // https://lab.civicrm.org/dev/core/issues/1245
+      return (bool) ContributionRecur::get(FALSE)->addWhere('id', '=', $recurringContributionID)->addSelect('is_email_receipt')->execute()->first()['is_email_receipt'];
+    }
+    if ($contributionPageID) {
+      return (bool) ContributionPage::get(FALSE)->addWhere('id', '=', $contributionPageID)->addSelect('is_email_receipt')->execute()->first()['is_email_receipt'];
+    }
+    // This would be the case for backoffice (where is_email_receipt is not passed in) or events, where Event::sendMail will filter
+    // again anyway.
+    return TRUE;
   }
 
   /**
@@ -4480,25 +4514,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
 
-    $values = [];
-
     if ($input['component'] == 'contribute') {
-      if ($contribution->contribution_page_id) {
-        CRM_Contribute_BAO_ContributionPage::setValues($contribution->contribution_page_id, $values);
-        // The only thing we use from this is is_email_receipt so this makes it explicit.
-        $values = array_key_exists('is_email_receipt', $values) ? ['is_email_receipt' => $values['is_email_receipt']] : [];
-      }
-
-      if ($recurContrib && $recurringContributionID) {
-        //CRM-13273 - is_email_receipt setting on recurring contribution should take precedence over contribution page setting
-        // but CRM-16124 if $input['is_email_receipt'] is set then that should not be overridden.
-        // dev/core#1245 this maybe not the desired effect because the default value for is_email_receipt is set to 0 rather than 1 in
-        // Instance that had the table added via an upgrade in 4.1
-        // see also https://github.com/civicrm/civicrm-svn/commit/7f39befd60bc735408d7866b02b3ac7fff1d4eea#diff-9ad8e290180451a2d6eacbd3d1ca7966R354
-        // https://lab.civicrm.org/dev/core/issues/1245
-        $values['is_email_receipt'] = $recurContrib->is_email_receipt;
-      }
-
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
         self::updateMembershipBasedOnCompletionOfContribution(
           $contribution,
@@ -4557,13 +4573,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
     }
 
-    $isEmailReceipt = !array_key_exists('is_email_receipt', $values) || $values['is_email_receipt'] == 1;
-    if (isset($input['is_email_receipt'])) {
-      $isEmailReceipt = $input['is_email_receipt'];
-    }
-    // CRM-9132 legacy behaviour was that receipts were sent out in all instances. Still sending
-    // when array_key 'is_email_receipt doesn't exist in case some instances where is needs setting haven't been set
-    if ($isEmailReceipt) {
+    if (self::isEmailReceipt($input, $contribution->contribution_page_id, $recurringContributionID)) {
       civicrm_api3('Contribution', 'sendconfirmation', [
         'id' => $contribution->id,
         'payment_processor_id' => $paymentProcessorId,
