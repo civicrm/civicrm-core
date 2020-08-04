@@ -2620,8 +2620,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       else {
         $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       }
-      $contributionParams['contact_id'] = $templateContribution['contact_id'];
-      $contributionParams['source'] = empty($templateContribution['source']) ? ts('Recurring contribution') : $templateContribution['source'];
+      foreach (['contact_id', 'currency', 'source'] as $fieldName) {
+        $contributionParams[$fieldName] = $templateContribution[$fieldName];
+      }
+
+      $contributionParams['source'] = $contributionParams['source'] ?: ts('Recurring contribution');
 
       //CRM-18805 -- Contribution page not recorded on recurring transactions, Recurring contribution payments
       //do not create CC or BCC emails or profile notifications.
@@ -4461,11 +4464,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'source' => self::getRecurringContributionDescription($contribution, $event),
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
-
-    // CRM-20678 Ensure that the currency is correct in subseqent transcations.
-    if (empty($contributionParams['currency']) && isset($objects['first_contribution']->currency)) {
-      $contributionParams['currency'] = $objects['first_contribution']->currency;
-    }
 
     $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorId;
 
