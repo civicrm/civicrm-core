@@ -145,16 +145,19 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * Process recurring contributions.
+   *
    * @param array $input
    * @param array $ids
    * @param array $objects
    * @param bool $first
-   * @return void
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function recur(&$input, &$ids, &$objects, $first) {
+  public function recur($input, $ids, $objects, $first) {
     if (!isset($input['txnType'])) {
       Civi::log()->debug('PayPalProIPN: Could not find txn_type in input request.');
-      echo "Failure: Invalid parameters<p>";
+      echo 'Failure: Invalid parameters<p>';
       return;
     }
 
@@ -165,7 +168,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     // the contribution record
     if ($recur->invoice_id != $input['invoice']) {
       Civi::log()->debug('PayPalProIPN: Invoice values dont match between database and IPN request recur is ' . $recur->invoice_id . ' input is ' . $input['invoice']);
-      echo "Failure: Invoice values dont match between database and IPN request recur is " . $recur->invoice_id . " input is " . $input['invoice'];
+      echo 'Failure: Invoice values dont match between database and IPN request recur is ' . $recur->invoice_id . " input is " . $input['invoice'];
       return;
     }
 
@@ -345,7 +348,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $status = $input['paymentStatus'];
-    if ($status == 'Denied' || $status == 'Failed' || $status == 'Voided') {
+    if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
       $this->failed($objects);
       return;
     }
@@ -353,7 +356,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       Civi::log()->debug('Returning since contribution status is Pending');
       return;
     }
-    elseif ($status == 'Refunded' || $status == 'Reversed') {
+    elseif ($status === 'Refunded' || $status === 'Reversed') {
       $this->cancelled($objects);
       return;
     }
