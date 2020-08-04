@@ -3975,6 +3975,42 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a blank location does not overwrite a location with data.
+   *
+   * This is a poor data edge case where a contact has an address record with no meaningful data.
+   * This record should be removed in favour of the one with data.
+   *
+   * @dataProvider  getBooleanDataProvider
+   *
+   * @param bool $isReverse
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergeWithBlankLocationData($isReverse) {
+    $this->createLoggedInUser();
+    $this->ids['contact'][0] = $this->callAPISuccess('contact', 'create', $this->_params)['id'];
+    $this->ids['contact'][1] = $this->callAPISuccess('contact', 'create', $this->_params)['id'];
+    $contactIDWithBlankAddress = ($isReverse ? $this->ids['contact'][1] : $this->ids['contact'][0]);
+    $contactIDWithoutBlankAddress = ($isReverse ? $this->ids['contact'][0] : $this->ids['contact'][1]);
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactIDWithBlankAddress,
+      'location_type_id' => 1,
+    ]);
+    $this->callAPISuccess('Address', 'create', [
+      'country_id' => 'MX',
+      'contact_id' => $contactIDWithoutBlankAddress,
+      'street_address' => 'First on the left after you cross the border',
+      'postal_code' => 90210,
+      'location_type_id' => 1,
+    ]);
+
+    $contact = $this->doMerge($isReverse);
+    $this->assertEquals('Mexico', $contact['country']);
+    $this->assertEquals('90210', $contact['postal_code']);
+    $this->assertEquals('First on the left after you cross the border', $contact['street_address']);
+  }
+
+  /**
    * Test merging 2 contacts with custom fields.
    *
    * @throws \API_Exception
@@ -4841,6 +4877,23 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $contact['count']);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact1, 'skip_undelete' => 1]);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact2, 'skip_undelete' => 1]);
+  }
+
+  /**
+   * Do the merge on the 2 contacts.
+   *
+   * @param bool $isReverse
+   *
+   * @return array|int
+   * @throws \CRM_Core_Exception
+   */
+  protected function doMerge($isReverse = FALSE) {
+    $this->callAPISuccess('Contact', 'merge', [
+      'to_keep_id' => $isReverse ? $this->ids['contact'][1] : $this->ids['contact'][0],
+      'to_remove_id' => $isReverse ? $this->ids['contact'][0] : $this->ids['contact'][1],
+      'auto_flip' => FALSE,
+    ]);
+    return $this->callAPISuccessGetSingle('Contact', ['id' => $isReverse ? $this->ids['contact'][1] : $this->ids['contact'][0]]);
   }
 
 }
