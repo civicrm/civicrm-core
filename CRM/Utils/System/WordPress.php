@@ -82,6 +82,44 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
           'url' => admin_url('admin.php'),
         ];
       });
+      Civi::paths()->register('civicrm.files', function () {
+        $upload_dir = wp_get_upload_dir();
+
+        $old = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
+        $new = [
+          'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => $upload_dir['baseurl'] . '/civicrm/',
+        ];
+
+        if ($old['path'] === $new['path']) {
+           return $new;
+        }
+
+        $oldExists = file_exists($old['path']);
+        $newExists = file_exists($new['path']);
+
+        if ($oldExists && !$newExists) {
+          return $old;
+        }
+        elseif (!$oldExists && $newExists) {
+          return $new;
+        }
+        elseif (!$oldExists && !$newExists) {
+          // neither exists. but that's ok. we're in one of these two cases:
+          // - we're just starting installation... which will get sorted in a moment
+          //   when someone calls mkdir().
+          // - we're running a bespoke setup... which will get sorted in a moment
+          //   by applying $civicrm_paths.
+          return $new;
+        }
+        elseif ($oldExists && $newExists) {
+          // situation ambiguous. encourage admin to set value explicitly.
+          if (!isset($GLOBALS['civicrm_paths']['civicrm.files'])) {
+            \Civi::log()->warning("The system has data from both old+new conventions. Please use civicrm.settings.php to set civicrm.files explicitly.");
+          }
+          return $new;
+        }
+      });
     }
     else {
       // Legacy support - only relevant for older extern routes.
