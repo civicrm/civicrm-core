@@ -236,18 +236,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
     }
 
-    $dates = ['start', 'end', 'join'];
-    $events = ['start', 'end'];
-
-    foreach ($dates as $dat) {
-      if (${$dat . 'Date'} && ${$dat . 'Date'} != "null") {
-        ${$dat . 'Date'} = CRM_Utils_Date::customFormat(${$dat . 'Date'}, '%Y%m%d');
-      }
-      else {
-        ${$dat . 'Date'} = '';
-      }
-    }
-
     //fix for CRM-3570, if we have statuses with is_admin=1,
     //exclude these statuses from calculatation during import.
     $where = "is_active = 1";
@@ -263,21 +251,27 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
     $membershipStatus = CRM_Core_DAO::executeQuery($query);
 
+    $dates = [
+      'start' => ($startDate && $startDate !== 'null') ? date('Ymd', strtotime($startDate)) : '',
+      'end' => ($endDate && $endDate !== 'null') ? date('Ymd', strtotime($endDate)) : '',
+      'join' => ($joinDate && $joinDate !== 'null') ? date('Ymd', strtotime($joinDate)) : '',
+    ];
+
     while ($membershipStatus->fetch()) {
       $startEvent = NULL;
       $endEvent = NULL;
-      foreach ($events as $eve) {
-        foreach ($dates as $dat) {
+      foreach (['start', 'end'] as $eve) {
+        foreach ($dates as $dat => $date) {
           // calculate start-event/date and end-event/date
-          if (($membershipStatus->{$eve . '_event'} == $dat . '_date') &&
-            ${$dat . 'Date'}
+          if (($membershipStatus->{$eve . '_event'} === $dat . '_date') &&
+            $date
           ) {
             if ($membershipStatus->{$eve . '_event_adjust_unit'} &&
               $membershipStatus->{$eve . '_event_adjust_interval'}
             ) {
-              $month = date('m', strtotime(${$dat . 'Date'}));
-              $day = date('d', strtotime(${$dat . 'Date'}));
-              $year = date('Y', strtotime(${$dat . 'Date'}));
+              $month = date('m', strtotime($date));
+              $day = date('d', strtotime($date));
+              $year = date('Y', strtotime($date));
               // add in months
               if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'month') {
                 ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
@@ -305,7 +299,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
               // if no interval and unit, present
             }
             else {
-              ${$eve . 'Event'} = ${$dat . 'Date'};
+              ${$eve . 'Event'} = $date;
             }
           }
         }
