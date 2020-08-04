@@ -9,9 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Dompdf\Dompdf;
-use Dompdf\Options;
-
 /**
  *
  * @package CRM
@@ -479,7 +476,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
           'metric' => 'px',
         ]);
         // functions call for adding activity with attachment
-        $fileName = self::putFile($html, $pdfFileName);
+        $fileName = self::putFile($html, $pdfFileName, [
+          'margin_top' => 10,
+          'margin_left' => 65,
+          'metric' => 'px',
+        ]);
         self::addActivities($subject, $contactIds, $fileName, $params);
 
         CRM_Utils_System::civiExit();
@@ -554,22 +555,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   Content for pdf in html format.
    *
    * @param string $name
+   * @param array $format
    *
    * @return string
    *   Name of file which is in pdf format
    */
-  public static function putFile($html, $name = 'Invoice.pdf') {
-    $options = new Options();
-    $options->set('isRemoteEnabled', TRUE);
-
-    $doc = new DOMPDF($options);
-    $doc->load_html($html);
-    $doc->render();
-    $html = $doc->output();
-    $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir . $name;
-    file_put_contents($fileName, $html);
-    return $fileName;
+  public static function putFile($html, $name = 'Invoice.pdf', $format = NULL) {
+    return CRM_Utils_Mail::appendPDF($name, $html, $format)['fullPath'] ?? '';
   }
 
   /**
