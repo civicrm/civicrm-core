@@ -294,6 +294,9 @@ class Requirements {
    * @return array
    */
   public function checkMysqlVersion(array $db_config) {
+    if (!class_exists('\CRM_Upgrade_Incremental_General')) {
+      require_once dirname(__FILE__) . '/../../CRM/Upgrade/Incremental/General.php';
+    }
     $min = \CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER;
     $results = [
       'title' => 'CiviCRM MySQL Version',
