@@ -870,8 +870,8 @@ class CRM_Export_BAO_ExportProcessor {
     // These oddly constructed keys are for legacy reasons. Altering them will affect test success
     // but in time it may be good to rationalise them.
     $label = $this->getOutputSpecificationLabel($key, $relationshipType, $locationType, $entityLabel);
-    $index = $this->getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel);
-    $fieldKey = $this->getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel);
+    $index = $this->getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityTypeID);
+    $fieldKey = $this->getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityTypeID);
 
     $this->outputSpecification[$index]['header'] = $label;
     $this->outputSpecification[$index]['sql_columns'] = $this->getSqlColumnDefinition($fieldKey, $key);
@@ -961,13 +961,12 @@ class CRM_Export_BAO_ExportProcessor {
    * @param \CRM_Contact_BAO_Query $query
    * @param CRM_Core_DAO $iterationDAO
    * @param array $outputColumns
-   * @param $metadata
    * @param $paymentDetails
    * @param $addPaymentHeader
    *
    * @return array|bool
    */
-  public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader) {
+  public function buildRow($query, $iterationDAO, $outputColumns, $paymentDetails, $addPaymentHeader) {
     $paymentTableId = $this->getPaymentTableID();
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
@@ -1021,7 +1020,7 @@ class CRM_Export_BAO_ExportProcessor {
         $this->buildRelationshipFieldsForRow($row, $iterationDAO->contact_id, $value, $field);
       }
       else {
-        $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails);
+        $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails);
       }
     }
 
@@ -1083,12 +1082,13 @@ class CRM_Export_BAO_ExportProcessor {
    * @param $field
    * @param $iterationDAO
    * @param $fieldValue
-   * @param $metadata
    * @param $paymentDetails
    *
    * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails) {
+  public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails) {
 
     $i18n = CRM_Core_I18n::singleton();
     if ($field == 'id') {
@@ -1146,31 +1146,27 @@ class CRM_Export_BAO_ExportProcessor {
             return $i18n->crm_translate($fieldValue);
 
           default:
-            $fieldSpec = $metadata[$field] ?? [];
+            $fieldSpec = $this->outputSpecification[$this->getMungedFieldName($field)]['metadata'];
             // No I don't know why we do it this way & whether we could
             // make better use of pseudoConstants.
             if (!empty($fieldSpec['context'])) {
               return $i18n->crm_translate($fieldValue, $fieldSpec);
             }
-            if (!empty($fieldSpec['pseudoconstant'])) {
+            if (!empty($fieldSpec['pseudoconstant']) && !empty($fieldSpec['hasLocationType'])) {
               if (!empty($fieldSpec['bao'])) {
-                return CRM_Core_PseudoConstant::getLabel($fieldSpec['bao'], $fieldSpec['name'], $fieldValue);
+                $transformedValue = CRM_Core_PseudoConstant::getLabel($fieldSpec['bao'], $fieldSpec['name'], $fieldValue);
+                if ($transformedValue) {
+                  return $transformedValue;
+                }
+                return $fieldValue;
               }
-              // This is not our normal syntax for pseudoconstants but I am a bit loath to
-              // call an external function until sure it is not increasing php processing given this
-              // may be iterated 100,000 times & we already have the $imProvider var loaded.
-              // That can be next refactor...
               // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
               // but I have to reach a stable point....
               $varName = $fieldSpec['pseudoconstant']['var'];
               if ($varName === 'imProviders') {
                 return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
               }
-              if ($varName === 'phoneTypes') {
-                return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Phone', 'phone_type_id', $fieldValue);
-              }
             }
-
             return $fieldValue;
         }
       }
@@ -1692,7 +1688,7 @@ class CRM_Export_BAO_ExportProcessor {
    *       yet find a way to comment them for posterity.
    */
   public function getExportStructureArrays() {
-    $outputColumns = $metadata = [];
+    $outputColumns = [];
     $queryFields = $this->getQueryFields();
     foreach ($this->getReturnProperties() as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$this->isRelationshipTypeKey($key)) {
@@ -1729,13 +1725,12 @@ class CRM_Export_BAO_ExportProcessor {
               $daoFieldName .= "-" . $type[1];
             }
             $this->addOutputSpecification($actualDBFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
-            $metadata[$daoFieldName] = $this->getMetaDataForField($actualDBFieldName);
             $outputColumns[$daoFieldName] = TRUE;
           }
         }
       }
     }
-    return [$outputColumns, $metadata];
+    return [$outputColumns];
   }
 
   /**
@@ -2070,13 +2065,13 @@ WHERE  id IN ( $deleteIDString )
    */
   public function getPreview($limit) {
     $rows = [];
-    list($outputColumns, $metadata) = $this->getExportStructureArrays();
+    list($outputColumns) = $this->getExportStructureArrays();
     $query = $this->runQuery([], '');
     CRM_Core_DAO::disableFullGroupByMode();
     $result = CRM_Core_DAO::executeQuery($query[1] . ' LIMIT ' . (int) $limit);
     CRM_Core_DAO::reenableFullGroupByMode();
     while ($result->fetch()) {
-      $rows[] = $this->buildRow($query[0], $result, $outputColumns, $metadata, [], []);
+      $rows[] = $this->buildRow($query[0], $result, $outputColumns, [], []);
     }
     return $rows;
   }
