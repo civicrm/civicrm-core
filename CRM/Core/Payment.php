@@ -1504,7 +1504,8 @@ abstract class CRM_Core_Payment {
     catch (CRM_Core_Exception $e) {
       Civi::log()->error('ipn_payment_callback_exception', [
         'context' => [
-          'backtrace' => CRM_Core_Error::formatBacktrace(debug_backtrace()),
+          'backtrace' => $e->getTraceAsString(),
+          'message' => $e->getMessage(),
         ],
       ]);
     }
