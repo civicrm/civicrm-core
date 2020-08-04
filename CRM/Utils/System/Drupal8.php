@@ -56,6 +56,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     // Validate the user object
     $violations = $account->validate();
     if (count($violations)) {
+      foreach ($violations as $violation) {
+        CRM_Core_Session::setStatus($violation->getPropertyPath() . ': ' . $violation->getMessage(), '', 'alert');
+      }
       return FALSE;
     }
 

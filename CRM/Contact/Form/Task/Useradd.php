@@ -73,6 +73,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $this->addRule('cms_pass', 'Password is required', 'required');
     $this->addRule(['cms_pass', 'cms_confirm_pass'], 'ERROR: Password mismatch', 'compare');
     $this->add('text', 'email', ts('Email:'), ['class' => 'huge'])->freeze();
+    $this->addRule('email', 'Email is required', 'required');
     $this->add('hidden', 'contactID');
 
     //add a rule to check username uniqueness
@@ -101,8 +102,12 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->exportValues();
 
-    CRM_Core_BAO_CMSUser::create($params, 'email');
-    CRM_Core_Session::setStatus('', ts('User Added'), 'success');
+    if (CRM_Core_BAO_CMSUser::create($params, 'email') === FALSE) {
+      CRM_Core_Error::statusBounce(ts('Error creating CMS user account.'));
+    }
+    else {
+      CRM_Core_Session::setStatus(ts('User Added'), '', 'success');
+    }
   }
 
   /**
