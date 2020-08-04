@@ -227,7 +227,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'source' => 'Template Contribution',
       'payment_instrument_id' => 1,
-      'currency' => 'USD',
+      'currency' => 'AUD',
       'contact_id' => $this->individualCreate(),
       'contribution_status_id' => 1,
       'receive_date' => 'yesterday',
@@ -254,6 +254,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contribution_recur_id' => $contributionRecur['id'],
     ]);
     $this->assertEquals('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
+    $this->assertEquals('AUD', $repeatContribution['values'][$repeatContribution['id']]['currency']);
   }
 
   /**
