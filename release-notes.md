@@ -19,10 +19,10 @@ Other resources for identifying changes are:
 
 Released August 3, 2020
 
-- **[Synopsis](release-notes/5.27.3.md#synopsis)**
-- **[Bugs resolved](release-notes/5.27.3.md#bugs)**
-- **[Credits](release-notes/5.27.3.md#credits)**
-- **[Feedback](release-notes/5.27.3.md#feedback)**
+- **[Synopsis](release-notes/5.27.4.md#synopsis)**
+- **[Bugs resolved](release-notes/5.27.4.md#bugs)**
+- **[Credits](release-notes/5.27.4.md#credits)**
+- **[Feedback](release-notes/5.27.4.md#feedback)**
 
 ## CiviCRM 5.27.3
 
