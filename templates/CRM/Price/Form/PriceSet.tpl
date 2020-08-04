@@ -17,11 +17,10 @@
     {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
       {assign var='adminFld' value=true}
       {if $priceSet.id && !$priceSet.is_quick_config}
-        {capture assign="priceSetURL"}{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`"}{/capture}
         <div class='float-right'>
-          {ts 1=$priceSetURL}<a class="crm-hover-button" target="_blank" href=%1>
-            <i aria-hidden="true" title="Edit Priceset" class="crm-i fa-wrench"></i>
-          </a>{/ts}
+          <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`"}">
+            {icon icon="fa-wrench"}{ts}Edit Price Set{/ts}{/icon}
+          </a>
         </div>
       {/if}
     {/if}

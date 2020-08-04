@@ -8,8 +8,8 @@
  +--------------------------------------------------------------------+
 *}
 {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
-  {capture assign="configureURL"}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`"}{/capture}
-  {ts 1=$configureURL}<a class="button " target="_blank" href=%1><i aria-hidden="true" title="Configure Event" class="crm-i fa-wrench"></i> Configure</a>{/ts}
+  {capture assign="buttonTitle"}{ts}Configure Event{/ts}{/capture}
+  {crmButton target="_blank" p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`" title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
   <div class='clear'></div>
 {/if}
 {* Callback snippet: Load payment processor *}
