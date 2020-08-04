@@ -1850,9 +1850,6 @@ input.crm-form-entityref {
 .crm-container .crm-button-type-back {
   margin-left: 20px;
 }
-.crm-container .crm-button-type-cancel input {
-  color: #E6E6DC!important;
-}
 
 .crm-container a.button,
 .crm-container a.button:link,
@@ -1862,7 +1859,7 @@ input.crm-form-entityref {
 .crm-container input[type=button],
 .crm-container .crm-button {
   text-shadow: 0 1px 0 black;
-  background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
+  background: #696969;
   color: #FFF;
   font-size: 13px;
   font-weight: normal;
@@ -1919,7 +1916,7 @@ input.crm-form-entityref {
 .crm-container .ui-dialog-buttonset .ui-button:focus,
 .crm-container a.button:hover,
 .crm-container a.button:focus {
-  background-position: 0 -25px;
+  background: #3e3e3e;
 }
 
 .crm-container .crm-button-disabled,
@@ -1930,7 +1927,6 @@ input.crm-form-entityref {
 .crm-container .crm-button[disabled] {
   opacity: .6;
   cursor: default;
-  background-position: top left;
 }
 
 .crm-container .crm-button-disabled input[disabled] {
@@ -3196,7 +3192,7 @@ span.crm-select-item-color {
   right: 0;
 }
 .crm-container .ui-dialog-titlebar.ui-widget-header {
-  background: url("../i/crm-button-bg.gif") repeat-x scroll left center #70716B;
+  background: #5D677B;
   color: #F5F6F1;
 }
 .crm-container .ui-dialog-title {
