@@ -7,6 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+  {capture assign="configureURL"}{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`"}{/capture}
+  {ts 1=$configureURL}<a class="button " target="_blank" href=%1><i aria-hidden="true" title="Configure Event" class="crm-i fa-wrench"></i> Configure</a>{/ts}
+  <div class='clear'></div>
+{/if}
 {* Callback snippet: Load payment processor *}
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
