@@ -908,7 +908,7 @@
     })
 
     // Example for Font Awesome: <button crm-icon="fa-check">Save</button>
-    // Example for jQuery UI (deprecated): <button crm-icon="check">Save</button>
+    // Example for jQuery UI (deprecated): <button crm-icon="fa-check">Save</button>
     .directive('crmIcon', function() {
       return {
         restrict: 'EA',

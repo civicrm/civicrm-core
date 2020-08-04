@@ -99,10 +99,10 @@
     </div>
 
     <div class="crm-submit-buttons">
-      <span class="crm-button crm-i-button">
+      <span class="crm-button">
         <i class="crm-i fa-wrench" aria-hidden="true"></i> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
       </span>
-      <span class="crm-button crm-i-button">
+      <span class="crm-button">
         <i class="crm-i fa-times" aria-hidden="true"></i> <input type="submit" value="{ts}Revert to Default{/ts}" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');"/>
       </span>
     </div>
