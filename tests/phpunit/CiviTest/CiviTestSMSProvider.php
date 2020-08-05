@@ -25,7 +25,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
     if (isset($providerParams['provider'])) {
       $providers = CRM_SMS_BAO_Provider::getProviders(NULL, array('name' => $providerParams['provider']));
       $provider = current($providers);
-      $providerID = $provider['id'];
+      $providerID = $provider['id'] ?? NULL;
     }
     else {
       $providerID = $providerParams['provider_id'] ?? NULL;
