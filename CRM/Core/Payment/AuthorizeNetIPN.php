@@ -100,15 +100,15 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return bool
    */
-  public function recur(&$input, &$ids, &$objects, $first) {
+  public function recur($input, $ids, $objects, $first) {
     $this->_isRecurring = TRUE;
     $recur = &$objects['contributionRecur'];
     $paymentProcessorObject = $objects['contribution']->_relatedObjects['paymentProcessor']['object'];
 
     // do a subscription check
     if ($recur->processor_id != $input['subscription_id']) {
-      CRM_Core_Error::debug_log_message("Unrecognized subscription.");
-      echo "Failure: Unrecognized subscription<p>";
+      CRM_Core_Error::debug_log_message('Unrecognized subscription.');
+      echo 'Failure: Unrecognized subscription<p>';
       return FALSE;
     }
 
@@ -178,7 +178,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     // check if contribution is already completed, if so we ignore this ipn
     if ($objects['contribution']->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
-      echo "Success: Contribution has already been handled<p>";
+      echo 'Success: Contribution has already been handled<p>';
       return TRUE;
     }
 
