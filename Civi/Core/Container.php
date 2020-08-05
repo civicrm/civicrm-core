@@ -237,6 +237,11 @@ class Container {
       [new Reference('service_container')]
     ))->setFactory([new Reference(self::SELF), 'createResources'])->setPublic(TRUE);
 
+    $container->setDefinition('resources.js_strings', new Definition(
+      'CRM_Core_Resources_Strings',
+      [new Reference('cache.js_strings')]
+    ))->setPublic(TRUE);
+
     $container->setDefinition('prevnext', new Definition(
       'CRM_Core_PrevNextCache_Interface',
       [new Reference('service_container')]
@@ -450,7 +455,7 @@ class Container {
     $sys = \CRM_Extension_System::singleton();
     return new \CRM_Core_Resources(
       $sys->getMapper(),
-      $container->get('cache.js_strings'),
+      new \CRM_Core_Resources_Strings($container->get('cache.js_strings')),
       \CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
     );
   }

@@ -135,13 +135,13 @@ class CRM_Core_Resources {
    *
    * @param CRM_Extension_Mapper $extMapper
    *   Map extension names to their base path or URLs.
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Core_Resources_Strings $strings
    *   JS-localization cache.
    * @param string|null $cacheCodeKey Random code to append to resource URLs; changing the code forces clients to reload resources
    */
-  public function __construct($extMapper, $cache, $cacheCodeKey = NULL) {
+  public function __construct($extMapper, $strings, $cacheCodeKey = NULL) {
     $this->extMapper = $extMapper;
-    $this->strings = new CRM_Core_Resources_Strings($cache);
+    $this->strings = $strings;
     $this->cacheCodeKey = $cacheCodeKey;
     if ($cacheCodeKey !== NULL) {
       $this->cacheCode = Civi::settings()->get($cacheCodeKey);
