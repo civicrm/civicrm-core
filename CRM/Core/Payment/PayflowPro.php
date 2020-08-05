@@ -334,18 +334,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
   }
 
   /**
-   * NOTE: 'doTransferCheckout' not implemented
-   *
-   * @param array $params
-   * @param $component
-   *
-   * @throws Exception
-   */
-  public function doTransferCheckout(&$params, $component) {
-    throw new CRM_Core_Exception(ts('This function is not implemented'));
-  }
-
-  /**
    * This public function checks to see if we have the right processor config values set
    *
    * NOTE: Called by Events and Contribute to check config params are set prior to trying
@@ -367,9 +355,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     if (!empty($errorMsg)) {
       return implode('<p>', $errorMsg);
     }
-    else {
-      return NULL;
-    }
+    return NULL;
   }
 
   /**
@@ -392,9 +378,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * Submit transaction using cURL
    *
    * @param string $submiturl Url to direct HTTPS GET to
-   * @param $payflow_query value string to be posted
+   * @param string $payflow_query value string to be posted
    *
    * @return mixed|object
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function submit_transaction($submiturl, $payflow_query) {
     // get data ready for API
