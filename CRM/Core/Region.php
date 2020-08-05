@@ -62,17 +62,14 @@ class CRM_Core_Region {
     if (is_array($this->snippets['default'])) {
       $this->snippets['default']['markup'] = $default;
     }
-    // We hand as much of the work off to the CMS as possible
-    $cms = CRM_Core_Config::singleton()->userSystem;
 
     $this->sort();
 
+    $cms = CRM_Core_Config::singleton()->userSystem;
     $smarty = CRM_Core_Smarty::singleton();
     $html = '';
-    foreach ($this->snippets as $snippet) {
-      if ($snippet['disabled']) {
-        continue;
-      }
+
+    $renderSnippet = function($snippet) use (&$html, $smarty, $cms, $allowCmsOverride, &$renderSnippet) {
       switch ($snippet['type']) {
         case 'markup':
           $html .= $snippet['markup'];
@@ -97,8 +94,12 @@ class CRM_Core_Region {
           break;
 
         case 'jquery':
-          $snippet['script'] = sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']);
-          // no break - continue processing as script
+          $renderSnippet([
+            'type' => 'script',
+            'script' => sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']),
+          ]);
+          break;
+
         case 'script':
           if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
@@ -128,6 +129,12 @@ class CRM_Core_Region {
         default:
           throw new CRM_Core_Exception(ts('Snippet type %1 is unrecognized',
             [1 => $snippet['type']]));
+      }
+    };
+
+    foreach ($this->snippets as $snippet) {
+      if (empty($snippet['disabled'])) {
+        $renderSnippet($snippet);
       }
     }
     return $html;
