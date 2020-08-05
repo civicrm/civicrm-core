@@ -120,6 +120,17 @@ trait CRM_Core_Resources_CollectionTrait {
   }
 
   /**
+   * Remove all snippets.
+   *
+   * @return static
+   */
+  public function clear() {
+    $this->snippets = [];
+    $this->isSorted = TRUE;
+    return $this;
+  }
+
+  /**
    * Get snippet.
    *
    * @param string $name
@@ -127,6 +138,67 @@ trait CRM_Core_Resources_CollectionTrait {
    */
   public function &get($name) {
     return $this->snippets[$name];
+  }
+
+  /**
+   * Get a list of all snippets in this collection.
+   *
+   * @return iterable
+   */
+  public function getAll(): iterable {
+    $this->sort();
+    return $this->snippets;
+  }
+
+  /**
+   * Alter the contents of the collection.
+   *
+   * @param callable $callback
+   *   The callback is invoked once for each member in the collection.
+   *   The callback may return one of three values:
+   *   - TRUE: The item is OK and belongs in the collection.
+   *   - FALSE: The item is not OK and should be omitted from the collection.
+   *   - Array: The item should be revised (using the returned value).
+   * @return static
+   */
+  public function filter($callback) {
+    $this->sort();
+    $names = array_keys($this->snippets);
+    foreach ($names as $name) {
+      $ret = $callback($this->snippets[$name]);
+      if ($ret === TRUE) {
+        // OK
+      }
+      elseif ($ret === FALSE) {
+        unset($this->snippets[$name]);
+      }
+      elseif (is_array($ret)) {
+        $this->snippets[$name] = $ret;
+        $this->isSorted = FALSE;
+      }
+      else {
+        throw new \RuntimeException("CollectionTrait::filter() - Callback returned invalid value");
+      }
+    }
+    return $this;
+  }
+
+  /**
+   * Find all snippets which match the given criterion.
+   *
+   * @param callable $callback
+   * @return iterable
+   *   List of matching snippets.
+   */
+  public function find($callback): iterable {
+    $r = [];
+    $this->sort();
+    foreach ($this->snippets as $name => $snippet) {
+      if ($callback($snippet)) {
+        $r[$name] = $snippet;
+      }
+    }
+    return $r;
   }
 
   /**
