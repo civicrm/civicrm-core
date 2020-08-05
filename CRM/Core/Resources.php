@@ -178,12 +178,14 @@ class CRM_Core_Resources {
    * @throws \CRM_Core_Exception
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
-    if ($translate) {
-      $domain = ($translate === TRUE) ? $ext : $translate;
-      $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
-    }
-    $url = $this->getUrl($ext, $this->filterMinify($ext, $file), TRUE);
-    return $this->addScriptUrl($url, $weight, $region);
+    CRM_Core_Region::instance($region)->addScriptFile($ext, $file, [
+      'weight' => $weight,
+      'translate' => $translate,
+      'name' => "$ext:$file",
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptFile() produce slightly different orderings..
+    ]);
+    return $this;
   }
 
   /**
@@ -197,7 +199,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addScriptUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    CRM_Core_Region::instance($region)->add(['scriptUrl' => $url, 'weight' => $weight]);
+    CRM_Core_Region::instance($region)->add([
+      'scriptUrl' => $url,
+      'weight' => $weight,
+      'name' => $url,
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings..
+    ]);
     return $this;
   }
 
@@ -324,11 +332,12 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    /** @var Civi\Core\Themes $theme */
-    $theme = Civi::service('themes');
-    foreach ($theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file) as $url) {
-      $this->addStyleUrl($url, $weight, $region);
-    }
+    CRM_Core_Region::instance($region)->addStyleFile($ext, $file, [
+      'weight' => $weight,
+      'name' => "$ext:$file",
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings..
+    ]);
     return $this;
   }
 
@@ -343,7 +352,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    CRM_Core_Region::instance($region)->add(['styleUrl' => $url, 'weight' => $weight]);
+    CRM_Core_Region::instance($region)->add([
+      'styleUrl' => $url,
+      'weight' => $weight,
+      'name' => $url,
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings..
+    ]);
     return $this;
   }
 

@@ -295,6 +295,42 @@ trait CRM_Core_Resources_CollectionTrait {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
+   * @param string $ext
+   *   extension name; use 'civicrm' for core.
+   * @param string $file
+   *   file path -- relative to the extension base dir.
+   * @param array $options
+   *   Open-ended list of options (per add()).
+   *   Ex: ['weight' => 123]
+   *   Accepts some additional options:
+   *   - bool|string $translate: Whether to load translated strings for this file. Use one of:
+   *     - FALSE: Do not load translated strings.
+   *     - TRUE: Load translated strings. Use the $ext's default domain.
+   *     - string: Load translated strings. Use a specific domain.
+   *
+   * @return static
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function addScriptFile(string $ext, string $file, array $options = []) {
+    // TODO: Maybe this should be its own resource type to allow smarter management?
+
+    $res = Civi::resources();
+
+    $translate = $options['translate'] ?? TRUE;
+    unset($options['translate']);
+    if ($translate) {
+      $domain = ($translate === TRUE) ? $ext : $translate;
+      $this->addString(Civi::service('resources.js_strings')->get($domain, $res->getPath($ext, $file), 'text/javascript'), $domain);
+    }
+    $url = $res->getUrl($ext, $res->filterMinify($ext, $file), TRUE);
+    $this->add($options + ['scriptUrl' => $url, 'name' => "$ext:$file"]);
+    return $this;
+  }
+
+  /**
+   * Add a JavaScript file to the current page using <SCRIPT SRC>.
+   *
    * @param string $url
    * @param array $options
    *   Open-ended list of options (per add())
@@ -369,6 +405,29 @@ trait CRM_Core_Resources_CollectionTrait {
    */
   public function addStyle(string $code, array $options = []) {
     $this->add($options + ['style' => $code]);
+    return $this;
+  }
+
+  /**
+   * Add a CSS file to the current page using <LINK HREF>.
+   *
+   * @param string $ext
+   *   extension name; use 'civicrm' for core.
+   * @param string $file
+   *   file path -- relative to the extension base dir.
+   * @param array $options
+   *   Open-ended list of options (per add())
+   *   Ex: ['weight' => 123]
+   * @return static
+   */
+  public function addStyleFile(string $ext, string $file, array $options = []) {
+    // TODO: Maybe this should be its own resource type to allow smarter management?
+
+    /** @var Civi\Core\Themes $theme */
+    $theme = Civi::service('themes');
+    foreach ($theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file) as $url) {
+      $this->add($options + ['styleUrl' => $url, 'name' => "$ext:$file"]);
+    }
     return $this;
   }
 
