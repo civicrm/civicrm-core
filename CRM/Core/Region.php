@@ -119,7 +119,7 @@ class CRM_Core_Region {
           break;
 
         case 'settings':
-          $settingsData = json_encode(Civi::resources()->getSettings($this->_name), JSON_UNESCAPED_SLASHES);
+          $settingsData = json_encode($this->getSettings(), JSON_UNESCAPED_SLASHES);
           $js = "(function(vars) {
             if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
             })($settingsData)";

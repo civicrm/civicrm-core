@@ -253,6 +253,31 @@ trait CRM_Core_Resources_CollectionTrait {
   // -----------------------------------------------
 
   /**
+   * Export permission data to the client to enable smarter GUIs.
+   *
+   * Note: Application security stems from the server's enforcement
+   * of the security logic (e.g. in the API permissions). There's no way
+   * the client can use this info to make the app more secure; however,
+   * it can produce a better-tuned (non-broken) UI.
+   *
+   * @param string|iterable $permNames
+   *   List of permission names to check/export.
+   * @return static
+   */
+  public function addPermissions($permNames) {
+    // TODO: Maybe this should be its own resource type to allow smarter management?
+    $permNames = is_scalar($permNames) ? [$permNames] : $permNames;
+
+    $perms = [];
+    foreach ($permNames as $permName) {
+      $perms[$permName] = CRM_Core_Permission::check($permName);
+    }
+    return $this->addSetting([
+      'permissions' => $perms,
+    ]);
+  }
+
+  /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
    * @param string $code
@@ -278,6 +303,57 @@ trait CRM_Core_Resources_CollectionTrait {
    */
   public function addScriptUrl(string $url, array $options = []) {
     $this->add($options + ['scriptUrl' => $url]);
+    return $this;
+  }
+
+  /**
+   * Add translated string to the js CRM object.
+   * It can then be retrived from the client-side ts() function
+   * Variable substitutions can happen from client-side
+   *
+   * Note: this function rarely needs to be called directly and is mostly for internal use.
+   * See CRM_Core_Resources::addScriptFile which automatically adds translated strings from js files
+   *
+   * Simple example:
+   * // From php:
+   * CRM_Core_Resources::singleton()->addString('Hello');
+   * // The string is now available to javascript code i.e.
+   * ts('Hello');
+   *
+   * Example with client-side substitutions:
+   * // From php:
+   * CRM_Core_Resources::singleton()->addString('Your %1 has been %2');
+   * // ts() in javascript works the same as in php, for example:
+   * ts('Your %1 has been %2', {1: objectName, 2: actionTaken});
+   *
+   * NOTE: This function does not work with server-side substitutions
+   * (as this might result in collisions and unwanted variable injections)
+   * Instead, use code like:
+   * CRM_Core_Resources::singleton()->addSetting(array('myNamespace' => array('myString' => ts('Your %1 has been %2', array(subs)))));
+   * And from javascript access it at CRM.myNamespace.myString
+   *
+   * @param string|array $text
+   * @param string|null $domain
+   * @return static
+   */
+  public function addString($text, $domain = 'civicrm') {
+    // TODO: Maybe this should be its own resource type to allow smarter management?
+
+    foreach ((array) $text as $str) {
+      $translated = ts($str, [
+        'domain' => ($domain == 'civicrm') ? NULL : [$domain, NULL],
+        'raw' => TRUE,
+      ]);
+
+      // We only need to push this string to client if the translation
+      // is actually different from the original
+      if ($translated != $str) {
+        $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
+        $this->addSetting([
+          $bucket => [$str => $translated],
+        ]);
+      }
+    }
     return $this;
   }
 
@@ -308,6 +384,108 @@ trait CRM_Core_Resources_CollectionTrait {
   public function addStyleUrl(string $url, array $options = []) {
     $this->add($options + ['styleUrl' => $url]);
     return $this;
+  }
+
+  /**
+   * Add JavaScript variables to CRM.vars
+   *
+   * Example:
+   *   From the server:
+   *     CRM_Core_Resources::singleton()->addVars('myNamespace', array('foo' => 'bar'));
+   *   Access var from javascript:
+   *     CRM.vars.myNamespace.foo // "bar"
+   *
+   * @see https://docs.civicrm.org/dev/en/latest/standards/javascript/
+   *
+   * @param string $nameSpace
+   *   Usually the name of your extension.
+   * @param array $vars
+   * @return static
+   */
+  public function addVars(string $nameSpace, array $vars) {
+    $s = &$this->findCreateSettingSnippet();
+    $s['settings']['vars'][$nameSpace] = $this->mergeSettings(
+      $s['settings']['vars'][$nameSpace] ?? [],
+      $vars
+    );
+    return $this;
+  }
+
+  /**
+   * Add JavaScript variables to the root of the CRM object.
+   * This function is usually reserved for low-level system use.
+   * Extensions and components should generally use addVars instead.
+   *
+   * @param array $settings
+   * @return static
+   */
+  public function addSetting(array $settings) {
+    $s = &$this->findCreateSettingSnippet();
+    $s['settings'] = $this->mergeSettings($s['settings'], $settings);
+    return $this;
+  }
+
+  /**
+   * Add JavaScript variables to the global CRM object via a callback function.
+   *
+   * @param callable $callable
+   * @return static
+   */
+  public function addSettingsFactory($callable) {
+    $s = &$this->findCreateSettingSnippet();
+    $s['settingsFactories'][] = $callable;
+    return $this;
+  }
+
+  /**
+   * Get a fully-formed/altered list of settings, including the results of
+   * any callbacks/listeners.
+   *
+   * @return array
+   */
+  public function getSettings(): array {
+    $s = &$this->findCreateSettingSnippet();
+    $result = $s['settings'];
+    foreach ($s['settingsFactories'] as $callable) {
+      $result = $this->mergeSettings($result, $callable());
+    }
+    CRM_Utils_Hook::alterResourceSettings($result);
+    return $result;
+  }
+
+  /**
+   * @param array $settings
+   * @param array $additions
+   * @return array
+   *   combination of $settings and $additions
+   */
+  private function mergeSettings(array $settings, array $additions): array {
+    foreach ($additions as $k => $v) {
+      if (isset($settings[$k]) && is_array($settings[$k]) && is_array($v)) {
+        $v += $settings[$k];
+      }
+      $settings[$k] = $v;
+    }
+    return $settings;
+  }
+
+  /**
+   * @return array
+   */
+  private function &findCreateSettingSnippet(): array {
+    $snippet = &$this->get('settings');
+    if ($snippet !== NULL) {
+      return $snippet;
+    }
+
+    $this->add([
+      'name' => 'settings',
+      'type' => 'settings',
+      'settings' => [],
+      'settingsFactories' => [],
+      'weight' => -100000,
+    ]);
+    return $this->get('settings');
   }
 
 }

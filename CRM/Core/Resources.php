@@ -147,19 +147,13 @@ class CRM_Core_Resources {
    * the client can use this info to make the app more secure; however,
    * it can produce a better-tuned (non-broken) UI.
    *
-   * @param array $permNames
+   * @param string|iterable $permNames
    *   List of permission names to check/export.
    * @return CRM_Core_Resources
    */
   public function addPermissions($permNames) {
-    $permNames = (array) $permNames;
-    $perms = [];
-    foreach ($permNames as $permName) {
-      $perms[$permName] = CRM_Core_Permission::check($permName);
-    }
-    return $this->addSetting([
-      'permissions' => $perms,
-    ]);
+    $this->getSettingRegion()->addPermissions($permNames);
+    return $this;
   }
 
   /**
@@ -243,11 +237,7 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addVars($nameSpace, $vars, $region = NULL) {
-    $s = &$this->findCreateSettingSnippet($region);
-    $s['settings']['vars'][$nameSpace] = $this->mergeSettings(
-      $s['settings']['vars'][$nameSpace] ?? [],
-      $vars
-    );
+    $this->getSettingRegion($region)->addVars($nameSpace, $vars);
     return $this;
   }
 
@@ -263,8 +253,7 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addSetting($settings, $region = NULL) {
-    $s = &$this->findCreateSettingSnippet($region);
-    $s['settings'] = $this->mergeSettings($s['settings'], $settings);
+    $this->getSettingRegion($region)->addSetting($settings);
     return $this;
   }
 
@@ -272,68 +261,18 @@ class CRM_Core_Resources {
    * Add JavaScript variables to the global CRM object via a callback function.
    *
    * @param callable $callable
-   * @param string|NULL $region
    * @return CRM_Core_Resources
    */
-  public function addSettingsFactory($callable, $region = NULL) {
-    $s = &$this->findCreateSettingSnippet($region);
-    $s['settingsFactories'][] = $callable;
+  public function addSettingsFactory($callable) {
+    $this->getSettingRegion()->addSettingsFactory($callable);
     return $this;
   }
 
   /**
    * Helper fn for addSettingsFactory.
-   * @deprecated
    */
-  public function getSettings($region = NULL) {
-    $s = &$this->findCreateSettingSnippet($region);
-    $result = $s['settings'];
-    foreach ($s['settingsFactories'] as $callable) {
-      $result = $this->mergeSettings($result, $callable());
-    }
-    CRM_Utils_Hook::alterResourceSettings($result);
-    return $result;
-  }
-
-  /**
-   * @param array $settings
-   * @param array $additions
-   * @return array
-   *   combination of $settings and $additions
-   */
-  protected function mergeSettings($settings, $additions) {
-    foreach ($additions as $k => $v) {
-      if (isset($settings[$k]) && is_array($settings[$k]) && is_array($v)) {
-        $v += $settings[$k];
-      }
-      $settings[$k] = $v;
-    }
-    return $settings;
-  }
-
-  /**
-   * @param string $regionName
-   * @return array
-   */
-  private function &findCreateSettingSnippet($regionName) {
-    if (!$regionName) {
-      $regionName = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
-    }
-
-    $region = CRM_Core_Region::instance($regionName);
-    $snippet = &$region->get('settings');
-    if ($snippet !== NULL) {
-      return $snippet;
-    }
-
-    $region->add([
-      'name' => 'settings',
-      'type' => 'settings',
-      'settings' => [],
-      'settingsFactories' => [],
-      'weight' => -100000,
-    ]);
-    return $region->get('settings');
+  public function getSettings() {
+    return $this->getSettingRegion()->getSettings();
   }
 
   /**
@@ -367,21 +306,7 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addString($text, $domain = 'civicrm') {
-    foreach ((array) $text as $str) {
-      $translated = ts($str, [
-        'domain' => ($domain == 'civicrm') ? NULL : [$domain, NULL],
-        'raw' => TRUE,
-      ]);
-
-      // We only need to push this string to client if the translation
-      // is actually different from the original
-      if ($translated != $str) {
-        $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
-        $this->addSetting([
-          $bucket => [$str => $translated],
-        ]);
-      }
-    }
+    $this->getSettingRegion()->addString($text, $domain);
     return $this;
   }
 
@@ -951,6 +876,16 @@ class CRM_Core_Resources {
    */
   public static function isFullyFormedUrl($url) {
     return (substr($url, 0, 4) === 'http') || (substr($url, 0, 1) === '/');
+  }
+
+  /**
+   * @param string|NULL $region
+   *   Optional request for a specific region. If NULL/omitted, use global default.
+   * @return \CRM_Core_Region
+   */
+  private function getSettingRegion($region = NULL) {
+    $region = $region ?: (self::isAjaxMode() ? 'ajax-snippet' : 'html-header');
+    return CRM_Core_Region::instance($region);
   }
 
 }
