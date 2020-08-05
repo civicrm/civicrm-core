@@ -1145,18 +1145,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // create employer relationship with $contactID only when new organization is there
     // else retain the existing relationship
     else {
-      // get the Employee relationship type id
-      $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
-
-      // keep relationship params ready
-      $relParams['relationship_type_id'] = $relTypeId . '_a_b';
-      $relParams['is_permission_a_b'] = 1;
-      $relParams['is_active'] = 1;
       $isNotCurrentEmployer = TRUE;
     }
-
-    // formalities for creating / editing organization.
-    $behalfOrganization['contact_type'] = 'Organization';
 
     if (!$orgID) {
       // check if matching organization contact exists
@@ -1187,9 +1177,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     );
     // create relationship
     if ($isNotCurrentEmployer) {
-      $relParams['contact_check'][$orgID] = 1;
-      $cid = ['contact' => $contactID];
-      CRM_Contact_BAO_Relationship::legacyCreateMultiple($relParams, $cid);
+      \Civi\Api4\Relationship::create()
+        ->addValue('contact_id_a', $contactID)
+        ->addValue('contact_id_b', $orgID)
+        ->addValue('relationship_type_id', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b'))
+        ->addValue('is_permission_a_b:name', 'View and update')
+        ->setCheckPermissions(FALSE)
+        ->execute();
     }
 
     // if multiple match - send a duplicate alert
