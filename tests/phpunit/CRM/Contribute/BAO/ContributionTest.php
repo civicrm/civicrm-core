@@ -1338,7 +1338,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'postal_code' => '222222',
       'country' => 'United States',
     ];
-    $contactID = $this->individualCreate();
+    $originalContactId = $contactID = $this->individualCreate();
     $orgId = $this->organizationCreate(['organization_name' => 'testorg1']);
     $orgCount = $this->callAPISuccessGetCount('Contact', [
       'contact_type' => "Organization",
@@ -1347,7 +1347,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals($orgCount, 1);
 
     $values = $params = [];
-    $behalfOrganization = [
+    $originalBehalfOrganization = $behalfOrganization = [
       'organization_name' => 'testorg1',
       'phone' => [
         1 => [
@@ -1383,9 +1383,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'country-3' => 1,
       'state_province-3' => 1,
     ];
-    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $values, $params, $fields);
+    $empty = [];
+    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $empty, $empty, $empty);
 
-    //Check whether new organisation is not created.
+    //Check whether new organisation is created.
     $result = $this->callAPISuccess('Contact', 'get', [
       'contact_type' => "Organization",
       'organization_name' => "testorg1",
@@ -1399,7 +1400,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     //Check if alert is assigned to params if more than 1 dupe exists.
     $orgId = $this->organizationCreate(['organization_name' => 'testorg1', 'email' => 'testorg@gmail.com']);
-    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $values, $params, $fields);
+    CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($originalBehalfOrganization, $originalContactId, $values, $params, $fields);
     $this->assertEquals($params['onbehalf_dupe_alert'], 1);
   }
 
