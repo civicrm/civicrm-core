@@ -1135,9 +1135,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    *   elements => An array of form elements for the merge UI
    *
-   *   rel_table_elements => An array of form elements for the merge UI for
-   *     entities related to the contact (eg: checkbox to move 'mailings')
-   *
    *   rel_tables => Stores the tables that have related entities for the contact
    *     for example mailings, groups
    *
@@ -1167,7 +1164,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $compareFields = self::retrieveFields($main, $other);
 
-    $rows = $elements = $relTableElements = $migrationInfo = [];
+    $rows = $elements = $migrationInfo = [];
 
     foreach ($compareFields['contact'] as $field) {
       if ($field === 'contact_sub_type') {
@@ -1224,7 +1221,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
     $relTables = $mergeHandler->getTablesRelatedToTheMergePair();
     foreach ($relTables as $name => $null) {
-      $relTableElements[] = ['checkbox', "move_$name"];
       $migrationInfo["move_$name"] = 1;
 
       $relTables[$name]['main_url'] = str_replace('$cid', $mainId, $relTables[$name]['url']);
@@ -1312,7 +1308,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $result = [
       'rows' => $rows,
       'elements' => $elements,
-      'rel_table_elements' => $relTableElements,
       'rel_tables' => $relTables,
       'main_details' => $main,
       'other_details' => $other,
