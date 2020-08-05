@@ -89,12 +89,12 @@
 
   {if $event.summary}
       <div class="crm-section event_summary-section">
-        {$event.summary}
+        {$event.summary|purify}
       </div>
   {/if}
   {if $event.description}
       <div class="crm-section event_description-section summary">
-          {$event.description}
+          {$event.description|purify}
       </div>
   {/if}
   <div class="clear"></div>
