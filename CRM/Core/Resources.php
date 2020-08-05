@@ -46,20 +46,6 @@ class CRM_Core_Resources {
   private $strings = NULL;
 
   /**
-   * Settings in free-form data tree.
-   *
-   * @var array
-   */
-  protected $settings = [];
-
-  /**
-   * Setting factories.
-   *
-   * @var callable[]
-   */
-  protected $settingsFactories = [];
-
-  /**
    * Added core resources.
    *
    * Format is ($regionName => bool).
@@ -269,9 +255,11 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addVars($nameSpace, $vars, $region = NULL) {
-    $existing = CRM_Utils_Array::value($nameSpace, CRM_Utils_Array::value('vars', $this->settings), []);
-    $vars = $this->mergeSettings($existing, $vars);
-    $this->addSetting(['vars' => [$nameSpace => $vars]], $region);
+    $s = &$this->findCreateSettingSnippet($region);
+    $s['settings']['vars'][$nameSpace] = $this->mergeSettings(
+      $s['settings']['vars'][$nameSpace] ?? [],
+      $vars
+    );
     return $this;
   }
 
@@ -287,22 +275,8 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addSetting($settings, $region = NULL) {
-    if (!$region) {
-      $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
-    }
-    $this->settings = $this->mergeSettings($this->settings, $settings);
-    if (isset($this->addedSettings[$region])) {
-      return $this;
-    }
-    $resources = $this;
-    $settingsResource = [
-      'callback' => function (&$snippet, &$html) use ($resources, $region) {
-        $html .= "\n" . $resources->renderSetting($region);
-      },
-      'weight' => -100000,
-    ];
-    CRM_Core_Region::instance($region)->add($settingsResource);
-    $this->addedSettings[$region] = TRUE;
+    $s = &$this->findCreateSettingSnippet($region);
+    $s['settings'] = $this->mergeSettings($s['settings'], $settings);
     return $this;
   }
 
@@ -310,21 +284,23 @@ class CRM_Core_Resources {
    * Add JavaScript variables to the global CRM object via a callback function.
    *
    * @param callable $callable
+   * @param string|NULL $region
    * @return CRM_Core_Resources
    */
-  public function addSettingsFactory($callable) {
-    // Make sure our callback has been registered
-    $this->addSetting([]);
-    $this->settingsFactories[] = $callable;
+  public function addSettingsFactory($callable, $region = NULL) {
+    $s = &$this->findCreateSettingSnippet($region);
+    $s['settingsFactories'][] = $callable;
     return $this;
   }
 
   /**
    * Helper fn for addSettingsFactory.
+   * @deprecated
    */
-  public function getSettings() {
-    $result = $this->settings;
-    foreach ($this->settingsFactories as $callable) {
+  public function getSettings($region = NULL) {
+    $s = &$this->findCreateSettingSnippet($region);
+    $result = $s['settings'];
+    foreach ($s['settingsFactories'] as $callable) {
       $result = $this->mergeSettings($result, $callable());
     }
     CRM_Utils_Hook::alterResourceSettings($result);
@@ -348,17 +324,28 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Helper fn for addSetting.
-   * Render JavaScript variables for the global CRM object.
-   *
-   * @return string
+   * @param string $regionName
+   * @return array
    */
-  public function renderSetting($region = NULL) {
-    $vars = json_encode($this->getSettings(), JSON_UNESCAPED_SLASHES);
-    $js = "(function(vars) {
-  if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
-})($vars)";
-    return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
+  private function &findCreateSettingSnippet($regionName) {
+    if (!$regionName) {
+      $regionName = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
+    }
+
+    $region = CRM_Core_Region::instance($regionName);
+    $snippet = &$region->get('settings');
+    if ($snippet !== NULL) {
+      return $snippet;
+    }
+
+    $region->add([
+      'name' => 'settings',
+      'type' => 'settings',
+      'settings' => [],
+      'settingsFactories' => [],
+      'weight' => -100000,
+    ]);
+    return $region->get('settings');
   }
 
   /**

@@ -4,7 +4,6 @@
  * Maintain a set of markup/templates to inject inside various regions
  */
 class CRM_Core_Region {
-  static private $_instances = NULL;
 
   /**
    * Obtain the content for a given region.
@@ -15,10 +14,10 @@ class CRM_Core_Region {
    * @return CRM_Core_Region
    */
   public static function &instance($name, $autocreate = TRUE) {
-    if ($autocreate && !isset(self::$_instances[$name])) {
-      self::$_instances[$name] = new CRM_Core_Region($name);
+    if ($autocreate && !isset(Civi::$statics[__CLASS__][$name])) {
+      Civi::$statics[__CLASS__][$name] = new CRM_Core_Region($name);
     }
-    return self::$_instances[$name];
+    return Civi::$statics[__CLASS__][$name];
   }
 
   /**
@@ -95,13 +94,14 @@ class CRM_Core_Region {
    *   - script: string, Javascript code
    *   - scriptUrl: string, URL of a Javascript file
    *   - jquery: string, Javascript code which runs inside a jQuery(function($){...}); block
+   *   - settings: array, list of static values to convey.
    *   - style: string, CSS code
    *   - styleUrl: string, URL of a CSS file
    *
    * @return array
    */
   public function add($snippet) {
-    static $types = ['markup', 'template', 'callback', 'scriptUrl', 'script', 'jquery', 'style', 'styleUrl'];
+    static $types = ['markup', 'template', 'callback', 'scriptUrl', 'script', 'jquery', 'settings', 'style', 'styleUrl'];
     $defaults = [
       'region' => $this->_name,
       'weight' => 1,
@@ -139,11 +139,10 @@ class CRM_Core_Region {
    * Get snippet.
    *
    * @param string $name
-   *
-   * @return mixed
+   * @return array|NULL
    */
-  public function get($name) {
-    return !empty($this->_snippets[$name]) ? $this->_snippets[$name] : NULL;
+  public function &get($name) {
+    return $this->_snippets[$name];
   }
 
   /**
@@ -216,6 +215,14 @@ class CRM_Core_Region {
           if (!$allowCmsOverride || !$cms->addStyle($snippet['style'], $this->_name)) {
             $html .= sprintf("<style type=\"text/css\">\n%s\n</style>\n", $snippet['style']);
           }
+          break;
+
+        case 'settings':
+          $settingsData = json_encode(Civi::resources()->getSettings($this->_name), JSON_UNESCAPED_SLASHES);
+          $js = "(function(vars) {
+            if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
+            })($settingsData)";
+          $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
           break;
 
         default:

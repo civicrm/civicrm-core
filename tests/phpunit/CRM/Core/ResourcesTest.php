@@ -150,7 +150,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ['fruit' => ['yours' => 'orange', 'mine' => 'apple']],
       $this->res->getSettings()
     );
-    $actual = $this->res->renderSetting();
+    $actual = CRM_Core_Region::instance('html-header')->render('');
     $expected = json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]);
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
