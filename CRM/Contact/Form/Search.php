@@ -450,6 +450,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'group_contact_status', ts('Group Status')
       );
 
+      $this->assign('permissionEditSmartGroup', CRM_Core_Permission::check('edit groups'));
       $this->assign('permissionedForGroup', $permissionForGroup);
     }
 

@@ -11,7 +11,7 @@
 {* smog = 'show members of group'; amtg = 'add members to group' *}
 {if $context EQ 'smog'}
   {* Provide link to modify smart group search criteria if we are viewing a smart group (ssID = saved search ID) *}
-  {if $permissionedForGroup}
+  {if $permissionEditSmartGroup}
     {if !empty($ssID)}
       {if $ssMappingID}
         {capture assign=editSmartGroupURL}{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$ssID`"}{/capture}
@@ -25,7 +25,9 @@
         {help id="id-edit-smartGroup"}
       </div>
     {/if}
+  {/if}
 
+  {if $permissionedForGroup}
     {capture assign=addMembersURL}{crmURL q="context=amtg&amtgID=`$group.id`&reset=1"}{/capture}
     <div class="crm-submit-buttons">
       <a href="{$addMembersURL}" class="button no-popup"><span><i class="crm-i fa-user-plus" aria-hidden="true"></i> {ts 1=$group.title}Add Contacts to %1{/ts}</span></a>
