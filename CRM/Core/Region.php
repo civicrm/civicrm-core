@@ -48,10 +48,6 @@ class CRM_Core_Region {
    * @param string $name
    */
   public function __construct($name) {
-    // Templates injected into regions should normally be file names, but sometimes inline notation is handy.
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
-
     $this->_name = $name;
     $this->_snippets = [];
 
@@ -223,7 +219,6 @@ class CRM_Core_Region {
           break;
 
         default:
-          require_once 'CRM/Core/Exception.php';
           throw new CRM_Core_Exception(ts('Snippet type %1 is unrecognized',
             [1 => $snippet['type']]));
       }
