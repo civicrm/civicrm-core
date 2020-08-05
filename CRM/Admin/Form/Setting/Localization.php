@@ -325,8 +325,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $ufm = new CRM_Core_DAO_UFMatch();
       $ufm->contact_id = $session->get('userID');
       if ($newLocale && $ufm->find(TRUE)) {
-        $ufm->language = $newLocale;
-        $ufm->save();
         $session->set('lcMessages', $newLocale);
       }
     }
