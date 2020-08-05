@@ -60,7 +60,7 @@ trait ArrayQueryActionTrait {
    * @return bool
    */
   private function evaluateFilters($row) {
-    $where = $this->getWhere();
+    $where = array_values($this->getWhere());
     $allConditions = in_array($where[0], ['AND', 'OR', 'NOT']) ? $where : ['AND', $where];
     return $this->walkFilters($row, $allConditions);
   }
