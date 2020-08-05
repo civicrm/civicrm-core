@@ -325,7 +325,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         // After 1 day (86400 seconds) increase the error level
         $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR;
       }
-      $msg .= '<p>' . ts('To enable scheduling support, please set up the cron job.') .
+      $msg .= '<p>' . ts('A cron job is required to execute scheduled jobs automatically.') .
        '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/jobs/') . '</p>';
     }
 
