@@ -254,48 +254,4 @@ class CRM_Core_Region {
     return 0;
   }
 
-  /**
-   * Add block of static HTML to a region.
-   *
-   * @param string $markup
-   *   HTML.
-   *
-   * public function addMarkup($markup) {
-   * return $this->add(array(
-   * 'type' => 'markup',
-   * 'markup' => $markup,
-   * ));
-   * }
-   *
-   * /**
-   * Add a Smarty template file to a region.
-   *
-   * Note: File is not evaluated until the page is rendered
-   *
-   * @param string $template
-   *   Path to the Smarty template file.
-   *
-   * public function addTemplate($template) {
-   * return $this->add(array(
-   * 'type' => 'template',
-   * 'template' => $template,
-   * ));
-   * }
-   *
-   * /**
-   * Use a callback function to extend a region.
-   *
-   * @param mixed $callback
-   * @param array $arguments
-   *   Optional, array of parameters for callback; if omitted, the default arguments are ($snippetSpec, $html).
-   *
-   * public function addCallback($callback, $arguments = FALSE) {
-   * return $this->add(array(
-   * 'type' => 'callback',
-   * 'callback' => $callback,
-   * 'arguments' => $arguments,
-   * ));
-   * }
-   */
-
 }
