@@ -179,6 +179,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       [
         'type' => 'submit',
         'value' => 1,
+        'class' => 'crm-button crm-button_qf_Entry_upload_force-save',
       ]
     );
 
