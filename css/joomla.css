@@ -352,7 +352,7 @@ div#toolbar-box, div#toolbar-box div.m{
 .crm-container input {
   height: auto;
 }
-.crm-container input[type=submit] {
+.crm-container button[type=submit] {
   height: auto;
 }
 
@@ -377,7 +377,7 @@ div#toolbar-box, div#toolbar-box div.m{
 }
 
 /* Remove Joomla subhead toolbar & whitespace border */
-	
+
 body.admin.com_civicrm .subhead-collapse {
 	display:none;
 }
