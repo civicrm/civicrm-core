@@ -705,13 +705,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (in_array($button['type'], ['next', 'upload', 'done']) && $button['name'] === ts('Save')) {
           $attrs['accesskey'] = 'S';
         }
-        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
-        if ($icon) {
-          $attrs['crm-icon'] = $icon;
-        }
+        $buttonContents = CRM_Core_Page::crmIcon($button['icon'] ?? $defaultIcon) . ' ' . $button['name'];
         $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
         $attrs['type'] = 'submit';
-        $prevnext[] = $this->createElement('xbutton', $buttonName, $button['name'], $attrs);
+        $prevnext[] = $this->createElement('xbutton', $buttonName, $buttonContents, $attrs);
       }
       if (!empty($button['isDefault'])) {
         $this->setDefaultAction($button['type']);
