@@ -145,32 +145,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 var submitcount = 0;
-/**
- * Old submit-once function. Will be removed soon.
- * @deprecated
- */
-function submitOnce(obj, formId, procText) {
-  // if named button clicked, change text
-  if (obj.value != null) {
-    cj('input[name=' + obj.name + ']').val(procText + " ...");
-  }
-  cj(obj).closest('form').attr('data-warn-changes', 'false');
-  if (document.getElementById) { // disable submit button for newer browsers
-    cj('input[name=' + obj.name + ']').attr("disabled", true);
-    document.getElementById(formId).submit();
-    return true;
-  }
-  else { // for older browsers
-    if (submitcount == 0) {
-      submitcount++;
-      return true;
-    }
-    else {
-      alert("Your request is currently being processed ... Please wait.");
-      return false;
-    }
-  }
-}
 
 /**
  * Function to show / hide the row in optionFields
