@@ -56,6 +56,8 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       CRM_Core_Page::crmIcon('fa-wrench') . ' ' . ts('Configure CKEditor'),
       [
         'type' => 'submit',
+        'class' => 'crm-button',
+        'style' => 'display:inline-block;vertical-align:middle;float:none!important;',
         'value' => 1,
       ]
     );

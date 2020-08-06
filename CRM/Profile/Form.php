@@ -907,7 +907,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
         'xbutton',
         $this->_duplicateButtonName,
         ts('Save Matching Contact'),
-        ['type' => 'submit']
+        [
+          'type' => 'submit',
+          'class' => 'crm-button',
+        ]
       );
     }
   }
