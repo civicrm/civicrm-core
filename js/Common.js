@@ -192,7 +192,7 @@ if (!CRM.vars) CRM.vars = {};
   $.propHooks.disabled = {
     set: function (el, value, name) {
       // Sync button enabled status with wrapper css
-      if ($(el).is('span.crm-button > input.crm-form-submit')) {
+      if ($(el).is('.crm-button.crm-form-submit')) {
         $(el).parent().toggleClass('crm-button-disabled', !!value);
       }
       // Sync button enabled status with dialog button
@@ -971,7 +971,7 @@ if (!CRM.vars) CRM.vars = {};
       $('form[data-submit-once]', e.target)
         .submit(submitOnceForm)
         .on('invalid-form', submitFormInvalid);
-      $('form[data-submit-once] input[type=submit]', e.target).click(function(e) {
+      $('form[data-submit-once] button[type=submit]', e.target).click(function(e) {
         submitButton = e.target;
       });
     })
