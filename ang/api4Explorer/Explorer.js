@@ -72,7 +72,9 @@
         {name: 'ang2', label: ts('Batch Calls'), code: ''}
       ],
       cli: [
-        {name: 'cv', label: ts('CV'), code: ''}
+        {name: 'short', label: ts('CV (short)'), code: ''},
+        {name: 'long', label: ts('CV (long)'), code: ''},
+        {name: 'pipe', label: ts('CV (pipe)'), code: ''}
       ]
     };
 
@@ -654,8 +656,44 @@
             break;
 
           case 'cli':
-            // Write cli code
-            code.cv = 'cv api4 ' + entity + '.' + action + " '" + stringify(params) + "'";
+            // Cli code using json input
+            code.long = 'cv api4 ' + entity + '.' + action + ' ' + cliFormat(JSON.stringify(params));
+            code.pipe = 'echo ' + cliFormat(JSON.stringify(params)) + ' | cv api4 ' + entity + '.' + action + ' --in=json';
+
+            // Cli code using short syntax
+            code.short = 'cv api4 ' + entity + '.' + action;
+            var limitSet = false;
+            _.each(params, function(param, key) {
+              switch (true) {
+                case (key === 'select' && !_.includes(param.join(), ' ')):
+                  code.short += ' +s ' + cliFormat(param.join(','));
+                  break;
+                case (key === 'where' && !_.intersection(_.map(param, 0), ['AND', 'OR', 'NOT']).length):
+                  _.each(param, function(clause) {
+                    code.short += ' +w ' + cliFormat(clause[0] + ' ' + clause[1] + (clause.length > 2 ? (' ' + JSON.stringify(clause[2])) : ''));
+                  });
+                  break;
+                case (key === 'orderBy'):
+                  _.each(param, function(dir, field) {
+                    code.short += ' +o ' + cliFormat(field + ' ' + dir);
+                  });
+                  break;
+                case (key === 'values'):
+                  _.each(param, function(val, field) {
+                    code.short += ' +v ' + cliFormat(field + '=' + val);
+                  });
+                  break;
+                case (key === 'limit' || key === 'offset'):
+                  // These 2 get combined
+                  if (!limitSet) {
+                    limitSet = true;
+                    code.short += ' +l ' + (params.limit || '0') + (params.offset ? ('@' + params.offset) : '');
+                  }
+                  break;
+                default:
+                  code.short += ' ' + key + '=' + (typeof param === 'string' ? cliFormat(param) : cliFormat(JSON.stringify(param)));
+              }
+            });
         }
       }
       _.each($scope.code, function(vals) {
@@ -799,6 +837,20 @@
         return "'" + val + "'";
       }
       return JSON.stringify(val).replace(/\$/g, '\\$');
+    }
+
+    // Format string to be cli-input-safe
+    function cliFormat(str) {
+      if (!_.includes(str, ' ') && !_.includes(str, '"') && !_.includes(str, "'")) {
+        return str;
+      }
+      if (!_.includes(str, "'")) {
+        return "'" + str + "'";
+      }
+      if (!_.includes(str, '"')) {
+        return '"' + str + '"';
+      }
+      return "'" + str.replace(/'/g, "\\'") + "'";
     }
 
     function fetchMeta() {
