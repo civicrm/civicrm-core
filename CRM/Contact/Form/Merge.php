@@ -230,8 +230,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       // add related table elements
       foreach ($rowsElementsAndInfo['rel_table_elements'] as $relTableElement) {
-        $element = $this->addElement($relTableElement[0], $relTableElement[1]);
-        $element->setChecked(TRUE);
+        $this->addElement($relTableElement[0], $relTableElement[1]);
+        $this->_defaults[$relTableElement[1]] = 1;
       }
 
       $this->assign('rel_tables', $rowsElementsAndInfo['rel_tables']);
@@ -412,6 +412,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         'other_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_oid]['modified_date']) . ($mostRecent == $this->_oid ? ' (' . ts('Most Recent') . ')' : ''),
       ],
     ]);
+  }
+
+  /**
+   * Set the defaults for the form.
+   *
+   * @return array
+   *   Array of default values
+   */
+  public function setDefaultValues() {
+    return $this->_defaults;
   }
 
 }
