@@ -50,7 +50,12 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
 
-    $this->addElement('xbutton', 'ckeditor_config', ts('Configure CKEditor'), ['type' => 'submit']);
+    $this->addElement(
+      'xbutton',
+      'ckeditor_config',
+      CRM_Core_Page::crmIcon('fa-wrench') . ' ' . ts('Configure CKEditor'),
+      ['type' => 'submit']
+    );
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');
     $this->assign('editOptions', $editOptions);

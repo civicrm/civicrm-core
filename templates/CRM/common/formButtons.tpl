@@ -38,14 +38,8 @@
     {else}
       {assign var='html' value=$form.buttons.$key.html}
     {/if}
-    {crmGetAttribute html=$html attr='crm-icon' assign='icon'}
-    {capture assign=iconPrefix}{$icon|truncate:3:"":true}{/capture}
-    {if $icon && $iconPrefix eq 'fa-'}
-      {capture assign=iconDisp}<i class="crm-i {$icon}" aria-hidden="true"></i>{/capture}
-    {/if}
     {crmGetAttribute html=$html attr='disabled' assign='disabled'}
     <span class="crm-button crm-button-type-{$key|crmBtnType} crm-button{$key}{if $disabled} crm-button-disabled{/if}"{if $buttonStyle} style="{$buttonStyle}"{/if}>
-      {$iconDisp}
       {$html}
     </span>
   {/if}
