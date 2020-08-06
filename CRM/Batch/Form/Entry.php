@@ -176,7 +176,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $this->addElement('xbutton',
       $forceSave,
       ts('Ignore Mismatch & Process the Batch?'),
-      ['type' => 'submit']
+      [
+        'type' => 'submit',
+        'value' => 1,
+      ]
     );
 
     $this->addButtons([

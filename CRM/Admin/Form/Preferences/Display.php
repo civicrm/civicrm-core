@@ -54,7 +54,10 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
       'xbutton',
       'ckeditor_config',
       CRM_Core_Page::crmIcon('fa-wrench') . ' ' . ts('Configure CKEditor'),
-      ['type' => 'submit']
+      [
+        'type' => 'submit',
+        'value' => 1,
+      ]
     );
 
     $editOptions = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 0');

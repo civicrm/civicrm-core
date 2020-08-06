@@ -668,6 +668,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
 
+      // A lot of forms use the hacky method of looking at
+      // `$params['button name']` (dating back to them being inputs with a
+      // "value" of the button label) rather than looking at
+      // `$this->controller->getButtonName()`. It makes sense to give buttons a
+      // value by default as a precaution.
+      $attrs['value'] = 1;
+
       if (!empty($button['class'])) {
         $attrs['class'] .= ' ' . $button['class'];
       }
