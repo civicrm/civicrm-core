@@ -1535,7 +1535,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!empty($this->_charts)) {
       $this->addElement('select', "charts", ts('Chart'), $this->_charts);
       $this->assign('charts', $this->_charts);
-      $this->addElement('submit', $this->_chartButtonName, ts('View'));
+      $this->addElement('xbutton', $this->_chartButtonName, ts('View'), ['type' => 'submit']);
     }
   }
 
@@ -1660,7 +1660,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('group', TRUE);
     }
 
-    $this->addElement('submit', $this->_groupButtonName, '', ['style' => 'display: none;']);
+    $this->addElement('xbutton', $this->_groupButtonName, '', [
+      'type' => 'submit',
+      'style' => 'display: none;',
+    ]);
 
     $this->addChartOptions();
     $showResultsLabel = $this->getResultsLabel();

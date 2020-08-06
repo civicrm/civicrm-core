@@ -26,7 +26,7 @@ endif; ?>
           <div>
 
           <input type="text" name="civisetup[advanced][db]" value="<?php echo htmlentities($model->extras['advanced']['db']); ?>" data-original="<?php echo htmlentities($model->extras['advanced']['db']); ?>">
-          <input id="db_apply_button" type="submit" name="civisetup[action][Start]" value="<?php echo htmlentities(ts('Apply')); ?>" />
+          <button id="db_apply_button" type="submit" name="civisetup[action][Start]"><?php echo htmlentities(ts('Apply')); ?></button>
           <a href="" onclick="civisetupAdvancedDbCancel(); return false;" title="<?php echo htmlentities(ts('Cancel')) ?>"><i class="fa fa-close"></i></a>
           <script type="text/javascript">
             function civisetupAdvancedDbCancel() {
