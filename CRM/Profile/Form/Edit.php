@@ -209,7 +209,10 @@ SELECT module,is_reserved
 
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
-      $this->addElement('xbutton', $this->_deleteButtonName, ts('Delete'), ['type' => 'submit']);
+      $this->addElement('xbutton', $this->_deleteButtonName, ts('Delete'), [
+        'type' => 'submit',
+        'value' => 1,
+      ]);
 
       return;
     }

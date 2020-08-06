@@ -359,6 +359,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       [
         'type' => 'submit',
         'class' => 'crm-form-submit cancel',
+        'value' => 1,
       ]
     );
     if (Civi::settings()->get('deferred_revenue_enabled')) {
