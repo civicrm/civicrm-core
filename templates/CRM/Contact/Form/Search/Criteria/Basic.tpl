@@ -10,7 +10,7 @@
 <div class="advanced-search-fields basic-fields form-layout">
   {foreach from=$basicSearchFields item=fieldSpec}
     {assign var=field value=$form[$fieldSpec.name]}
-    {if $field}
+    {if $field && !in_array($fieldSpec.name, array('first_name', 'last_name'))}
       <div class="search-field {$fieldSpec.class|escape}">
         {if $fieldSpec.template}
           {include file=$fieldSpec.template}
