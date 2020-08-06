@@ -78,7 +78,8 @@
     "typo3/phar-stream-wrapper": "^2 || ^3.0",
     "brick/money": "~0.4",
     "ext-intl": "*",
-    "pear/mail_mime": "~1.10"
+    "pear/mail_mime": "~1.10",
+    "pear/db": "1.10"
   },
   "scripts": {
     "post-install-cmd": [
@@ -250,6 +251,9 @@
       },
       "electrolinux/phpquery": {
         "PHP7.4 Fix for array access using {} instead of []": "https://raw.githubusercontent.com/civicrm/civicrm-core/fe45bdfc4f3e3d3deb27e3d853cdbc7f616620a9/tools/scripts/composer/patches/php74_array_access_fix_phpquery.patch"
+      },
+      "pear/db": {
+        "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/a48a43c2b5f6d694fff1cfb99d522c5d9e2459a0/tools/scripts/composer/pear_db_civicrm_changes.patch"
       },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"

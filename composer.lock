@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ff9c045fb03756148c0c66562aa61fd",
+    "content-hash": "46e891da51f0683373d9a6e62fb6f868",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -997,6 +997,66 @@
             ],
             "description": "More info available on: http://pear.php.net/package/Console_Getopt",
             "time": "2015-07-20T20:28:12+00:00"
+        },
+        {
+            "name": "pear/db",
+            "version": "v1.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pear/DB.git",
+                "reference": "e158c3a48246b67cd8c95856ffbb93de4ef380fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pear/DB/zipball/e158c3a48246b67cd8c95856ffbb93de4ef380fe",
+                "reference": "e158c3a48246b67cd8c95856ffbb93de4ef380fe",
+                "shasum": ""
+            },
+            "require": {
+                "pear/pear-core-minimal": "*"
+            },
+            "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/a48a43c2b5f6d694fff1cfb99d522c5d9e2459a0/tools/scripts/composer/pear_db_civicrm_changes.patch"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "DB": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "./"
+            ],
+            "license": [
+                "PHP License v3.01"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel Convissor",
+                    "email": "danielc@php.net",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Adam Harvey",
+                    "email": "aharvey@php.net",
+                    "role": "Lead"
+                },
+                {
+                    "name": "Stig Bakken",
+                    "email": "stig@php.net",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Tomas V.V.Cox",
+                    "email": "cox@idecnet.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "More info available on: http://pear.php.net/package/DB",
+            "time": "2020-04-19T19:45:59+00:00"
         },
         {
             "name": "pear/log",
