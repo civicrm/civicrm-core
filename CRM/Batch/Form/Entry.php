@@ -173,9 +173,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // add the force save button
     $forceSave = $this->getButtonName('upload', 'force');
 
-    $this->addElement('submit',
+    $this->addElement('xbutton',
       $forceSave,
-      ts('Ignore Mismatch & Process the Batch?')
+      ts('Ignore Mismatch & Process the Batch?'),
+      ['type' => 'submit']
     );
 
     $this->addButtons([

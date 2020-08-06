@@ -351,7 +351,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // TODO: Is this condition ever true? Can this code be removed?
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"]);
+      $this->addElement('xbutton', 'done', ts('Done'), [
+        'type' => 'button',
+        'onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'",
+      ]);
     }
   }
 

@@ -45,7 +45,7 @@
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Form_Contact' addSequence=1}" />
 </div>
 
-<div class="form-item"><input type="submit" name="_qf_Contact_next" value="{ts}Save{/ts}" class="crm-form-submit" /></div>
+<div class="form-item"><button type="submit" name="_qf_Contact_next" class="crm-button crm-form-submit">{ts}Save{/ts}</button></div>
 
 </form>
 </div>
