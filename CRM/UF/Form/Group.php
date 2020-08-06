@@ -231,7 +231,10 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // views are implemented as frozen form
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'"]);
+      $this->addElement('xbutton', 'done', ts('Done'), [
+        'type' => 'button',
+        'onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'",
+      ]);
     }
 
     $this->addFormRule(['CRM_UF_Form_Group', 'formRule'], $this);

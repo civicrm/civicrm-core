@@ -18,9 +18,9 @@
 {ts 1=$display_name 2=$email}Are you sure you want to resubscribe: %1 (%2){/ts}
 <br/>
 <center>
-<input type="submit" name="_qf_resubscribe_next" value="{ts}Resubscribe{/ts}" class="crm-form-submit" />
+<button type="submit" name="_qf_resubscribe_next" class="crm-button crm-form-submit">{ts}Resubscribe{/ts}</button>
 &nbsp;&nbsp;&nbsp;
-<input type="submit" name="_qf_resubscribe_cancel" value="{ts}Cancel{/ts}" class="crm-form-submit" />
+<button type="submit" name="_qf_resubscribe_cancel" class="crm-button crm-form-submit">{ts}Cancel{/ts}</button>
 </center>
 </form>
 </div>

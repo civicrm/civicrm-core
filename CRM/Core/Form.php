@@ -686,7 +686,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       if ($button['type'] === 'reset') {
-        $prevnext[] = $this->createElement($button['type'], 'reset', $button['name'], $attrs);
+        $attrs['type'] = 'reset';
+        $prevnext[] = $this->createElement('xbutton', 'reset', $button['name'], $attrs);
       }
       else {
         if (!empty($button['subName'])) {
@@ -709,7 +710,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $attrs['crm-icon'] = $icon;
         }
         $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
-        $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
+        $attrs['type'] = 'submit';
+        $prevnext[] = $this->createElement('xbutton', $buttonName, $button['name'], $attrs);
       }
       if (!empty($button['isDefault'])) {
         $this->setDefaultAction($button['type']);
@@ -2448,7 +2450,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->_actionButtonName = $this->getButtonName('next', 'action');
       }
       $this->assign('actionButtonName', $this->_actionButtonName);
-      $this->add('submit', $this->_actionButtonName, ts('Go'), ['class' => 'hiddenElement crm-search-go-button']);
+      $this->add('xbutton', $this->_actionButtonName, ts('Go'), [
+        'type' => 'submit',
+        'class' => 'hiddenElement crm-search-go-button',
+      ]);
 
       // Radio to choose "All items" or "Selected items only"
       $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', ['checked' => 'checked']);
