@@ -811,17 +811,28 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->addElement('xbutton',
       $this->_dedupeButtonName,
       ts('Check for Matching Contact(s)'),
-      ['type' => 'submit']
+      [
+        'type' => 'submit',
+        'value' => 1,
+        'class' => "crm-button crm-button{$this->_dedupeButtonName}",
+      ]
     );
     $this->addElement('xbutton',
       $this->_duplicateButtonName,
       ts('Save Matching Contact'),
-      ['type' => 'submit']
+      [
+        'type' => 'submit',
+        'value' => 1,
+        'class' => "crm-button crm-button{$this->_duplicateButtonName}",
+      ]
     );
     $this->addElement('xbutton',
       $this->getButtonName('next', 'sharedHouseholdDuplicate'),
       ts('Save With Duplicate Household'),
-      ['type' => 'submit']
+      [
+        'type' => 'submit',
+        'value' => 1,
+      ]
     );
 
     $buttons = [

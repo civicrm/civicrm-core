@@ -97,16 +97,12 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 =======
     <div class="crm-submit-buttons">
-      <span class="crm-button">
-        <button type="submit" name="save" class="crm-form-submit" accesskey="S">
-          <i class="crm-i fa-wrench" aria-hidden="true"></i> {ts}Save{/ts}
-        </button>
-      </span>
-      <span class="crm-button">
-        <button type="submit" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');">
-          <i class="crm-i fa-times" aria-hidden="true"></i> {ts}Revert to Default{/ts}
-        </button>
-      </span>
+      <button type="submit" name="save" class="crm-form-submit crm-button" accesskey="S">
+        <i class="crm-i fa-wrench" aria-hidden="true"></i> {ts}Save{/ts}
+      </button>
+      <button type="submit" name="revert" class="crm-form-submit crm-button" onclick="return confirm('{$revertConfirm}');">
+        <i class="crm-i fa-times" aria-hidden="true"></i> {ts}Revert to Default{/ts}
+      </button>
     </div>
     <input type="hidden" value="{$preset}" name="preset" />
 >>>>>>> 4a004942c6... Put icons inside of button elements:templates/CRM/Admin/Page/CKEditorConfig.tpl

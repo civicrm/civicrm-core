@@ -714,6 +714,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         $buttonContents = CRM_Core_Page::crmIcon($button['icon'] ?? $defaultIcon) . ' ' . $button['name'];
         $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
+        $attrs['class'] .= " crm-button crm-button-type-{$button['type']} crm-button{$buttonName}";
         $attrs['type'] = 'submit';
         $prevnext[] = $this->createElement('xbutton', $buttonName, $buttonContents, $attrs);
       }
