@@ -322,6 +322,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       [
         'type' => 'submit',
         'class' => 'submit-link',
+        'value' => 1,
       ]
     );
 
@@ -559,6 +560,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $form->addElement('xbutton', "addMore[$x]", ts('Another search field'), [
         'type' => 'submit',
         'class' => 'submit-link',
+        'value' => 1,
       ]);
     }
     //end of block for

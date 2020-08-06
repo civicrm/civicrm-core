@@ -68,6 +68,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     $buttonAttrs = [
       'type' => 'submit',
       'class' => 'crm-form-submit',
+      'value' => 1,
     ];
     $this->addElement('xbutton', $this->getButtonName('refresh'), ts('Search'), $buttonAttrs);
     $this->addElement('xbutton', $this->getButtonName('cancel'), ts('Cancel'), $buttonAttrs);
