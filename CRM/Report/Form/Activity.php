@@ -811,7 +811,7 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     if (!empty($this->_params['include_case_activities_value'])) {
       $caseJoin = "LEFT JOIN civicrm_case_activity {$this->_aliases['civicrm_case_activity']} ON {$this->_aliases['civicrm_activity']}.id = {$this->_aliases['civicrm_case_activity']}.activity_id";
     }
-
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
     $sql = "{$this->_select}
       FROM $tempTableName tar
       INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON {$this->_aliases['civicrm_activity']}.id = tar.civicrm_activity_id
@@ -821,7 +821,6 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
       {$caseJoin}
       {$this->_where} {$groupByFromSelect} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
-    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
     $this->addToDeveloperTab($sql);
 
     return $sql;

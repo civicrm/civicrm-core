@@ -342,6 +342,9 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @return string
    */
   public function buildQuery($applyLimit = FALSE) {
+
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
+
     $eventID = implode(',', $this->eventIDs);
 
     $optionGroupDAO = new CRM_Core_DAO_OptionGroup();
@@ -363,6 +366,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     ];
 
     $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, 'civicrm_event.id');
+
     $sql = "
             SELECT  " . implode(', ', $select) . ",
                     SUM(civicrm_participant.fee_amount) as total,

@@ -428,6 +428,7 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     // note the group by columns are same as that used in alterDisplay as $newRows - $key
     $this->limit();
     $this->orderBy();
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
     $sql = "{$this->_select}
 FROM {$this->temporaryTableName} entity_log_civireport
 WHERE {$this->logTypeTableClause}

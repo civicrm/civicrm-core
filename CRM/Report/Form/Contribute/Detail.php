@@ -520,6 +520,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   public function buildQuery($applyLimit = FALSE) {
     if ($this->isTempTableBuilt) {
       $this->limit();
+      CRM_Utils_Hook::alterReportVar('sql', $this, $this);
       return "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->temporaryTables['civireport_contribution_detail_temp3']['name']} $this->_orderBy $this->_limit";
     }
     return parent::buildQuery($applyLimit);

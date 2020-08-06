@@ -580,6 +580,8 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->limit();
     }
 
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
+
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$limitFilter} {$this->_groupBy} {$this->_having} {$this->_rollup}";
 
     if (!empty($this->_orderByArray)) {
@@ -592,7 +594,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $sql = "SELECT SQL_CALC_FOUND_ROWS  * FROM ( $sql ) as inner_query {$this->_orderBy} $this->_limit";
     }
 
-    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
     $this->addToDeveloperTab($sql);
 
     return $sql;
