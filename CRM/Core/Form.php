@@ -1205,10 +1205,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           }
         }
       }
-      $element = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
+      // We use a class here to avoid html5 issues with collapsed cutsomfield sets.
+      $optAttributes['class'] = $optAttributes['class'] ?? '';
       if ($required) {
-        $element->setAttribute('required', TRUE);
+        $optAttributes['class'] .= ' required';
       }
+      $element = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
       $options[] = $element;
     }
     $group = $this->addGroup($options, $name, $title, $separator);
