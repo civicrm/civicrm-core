@@ -326,7 +326,11 @@
       }
       // Then lookup implicit links
       _.each(path, function(node) {
-        entity = _.find(links[entity], {alias: node}).entity;
+        var link = _.find(links[entity], {alias: node});
+        if (!link) {
+          return false;
+        }
+        entity = link.entity;
       });
       return entity;
     }
