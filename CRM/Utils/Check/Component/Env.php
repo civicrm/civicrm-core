@@ -281,6 +281,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @throws CRM_Core_Exception
    */
   public function checkLastCron($force = FALSE) {
+    // TODO: Remove this check when MINIMUM_UPGRADABLE_VERSION goes to 4.7.
+    if (CRM_Utils_System::version() !== CRM_Core_BAO_Domain::version()) {
+      return [];
+    }
+
     $messages = [];
 
     // Cron doesn't work in non-production environments; skip.
