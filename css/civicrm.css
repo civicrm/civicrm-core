@@ -1173,7 +1173,7 @@ input.crm-form-entityref {
   cursor: pointer;
 }
 
-#crm-container input.submit-link {
+#crm-container button.submit-link {
   color: #285286;
   background: none transparent;
   border: none;
@@ -1833,17 +1833,6 @@ input.crm-form-entityref {
   margin-left: .5em;
 }
 
-.crm-container .crm-button input {
-  background: none;
-  border: medium none;
-  color: #FFF;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: normal;
-  margin: 0;
-  padding: 1px 8px 2px 4px;
-}
-
 .crm-container .crm-button-type-cancel,
 .crm-container .crm-button-type-back {
   margin-left: 20px;
@@ -1855,12 +1844,14 @@ input.crm-form-entityref {
   min-height: 0;
 }
 
+/* A few of these are redundant: pretty much all buttons have the crm-button
+class.  It can't hurt, though. */
 .crm-container a.button,
 .crm-container a.button:link,
 .crm-container a.button:visited,
-.crm-container input.crm-form-submit,
+.crm-container button.crm-form-submit,
 .crm-container .ui-dialog-buttonset .ui-button,
-.crm-container input[type=button],
+.crm-container button[type=button],
 .crm-container .crm-button {
   text-shadow: 0 1px 0 black;
   background: #696969;
@@ -1877,7 +1868,7 @@ input.crm-form-entityref {
 .crm-container a.button,
 .crm-container a.button:link,
 .crm-container a.button:visited,
-.crm-container span.crm-button {
+.crm-container .crm-button {
   display: block;
   float: left;
   overflow: hidden;
@@ -1897,23 +1888,11 @@ input.crm-form-entityref {
   margin-bottom: -4px;
 }
 
-.crm-container input.crm-form-submit,
-.crm-container input[type=button] {
-  padding: 2px 6px;
-}
-
-.crm-container .crm-button input[type=button],
-.crm-container .crm-button input.crm-form-submit {
-  padding: 0;
-  margin: 0;
-  background: none;
-  border: none;
-}
-
+/* Also redundant, see above */
 .crm-container .crm-button:hover,
 .crm-container .crm-button:focus,
-.crm-container input[type=submit]:hover,
-.crm-container input[type=button]:hover,
+.crm-container button[type=submit]:hover,
+.crm-container button[type=button]:hover,
 .crm-container .ui-dialog-buttonset .ui-button:hover,
 .crm-container .ui-dialog-buttonset .ui-button:focus,
 .crm-container a.button:hover,
@@ -1921,18 +1900,24 @@ input.crm-form-entityref {
   background: #3e3e3e;
 }
 
+/* Also redundant, see above */
 .crm-container .crm-button-disabled,
 .crm-container .crm-button.crm-button-disabled,
 .crm-container .ui-dialog-buttonset .ui-button[disabled],
-.crm-container input.crm-form-submit[disabled],
-.crm-container input[type=button][disabled],
+.crm-container button.crm-form-submit[disabled],
+.crm-container button[type=button][disabled],
 .crm-container .crm-button[disabled] {
   opacity: .6;
   cursor: default;
 }
 
-.crm-container .crm-button-disabled input[disabled] {
-  opacity: 1;
+/* Also redundant, see above */
+.crm-container .crm-button,
+.crm-container a.button,
+.crm-container a.button:link,
+.crm-container button.crm-form-submit,
+.crm-container button[type=button] {
+  border-radius: 3px;
 }
 
 .crm-container .ui-dialog-buttonpane {
@@ -2889,15 +2874,6 @@ tbody.scrollContent tr.alternateRow {
 }
 
 /* rounded corners */
-.crm-container .crm-button,
-.crm-container a.button,
-.crm-container a.button:link,
-.crm-container input.crm-form-submit,
-.crm-container input[type=button] {
-  border-radius: 3px;
-}
-
-
 .crm-container div.status,
 .crm-container #help,
 .crm-container .help,
