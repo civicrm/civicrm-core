@@ -203,12 +203,11 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         );
         $this->addElement('xbutton',
           'done',
-          ts('Done'),
+          CRM_Core_Page::crmIcon('fa-times') . ' ' . ts('Done'),
           [
             'type' => 'button',
             'onclick' => "location.href='$url'",
             'class' => 'crm-form-submit cancel',
-            'crm-icon' => 'fa-times',
           ]
         );
       }
