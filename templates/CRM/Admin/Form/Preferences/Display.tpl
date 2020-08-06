@@ -161,9 +161,7 @@
       <td>
         {$form.editor_id.html}
         &nbsp;
-        <span class="crm-button" style="display:inline-block;vertical-align:middle;float:none!important;">
-          {$form.ckeditor_config.html}
-        </span>
+        {$form.ckeditor_config.html}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">

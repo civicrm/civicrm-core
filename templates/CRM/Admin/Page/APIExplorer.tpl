@@ -285,11 +285,9 @@
         </table>
       </div>
       <div class="crm-submit-buttons">
-        <span class="crm-button">
-          <button type="submit" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}">
-            <i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Execute{/ts}
-          </button>
-        </span>
+        <button type="submit" class="crm-button crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}">
+          <i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Execute{/ts}
+        </button>
       </div>
 
 <pre id="api-result" class="linenums">

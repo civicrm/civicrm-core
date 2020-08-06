@@ -212,6 +212,7 @@ SELECT module,is_reserved
       $this->addElement('xbutton', $this->_deleteButtonName, ts('Delete'), [
         'type' => 'submit',
         'value' => 1,
+        'class' => 'crm-button',
       ]);
 
       return;
