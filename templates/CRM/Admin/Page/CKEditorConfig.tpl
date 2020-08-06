@@ -100,10 +100,14 @@
 
     <div class="crm-submit-buttons">
       <span class="crm-button">
-        <i class="crm-i fa-wrench" aria-hidden="true"></i> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
+        <button type="submit" name="save" class="crm-form-submit" accesskey="S">
+          <i class="crm-i fa-wrench" aria-hidden="true"></i> {ts}Save{/ts}
+        </button>
       </span>
       <span class="crm-button">
-        <i class="crm-i fa-times" aria-hidden="true"></i> <input type="submit" value="{ts}Revert to Default{/ts}" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');"/>
+        <button type="submit" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');">
+          <i class="crm-i fa-times" aria-hidden="true"></i> {ts}Revert to Default{/ts}
+        </button>
       </span>
     </div>
     <input type="hidden" value="{$preset}" name="preset" />
