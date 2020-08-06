@@ -498,7 +498,7 @@
         var buttonContainers = '.crm-submit-buttons, .action-link',
           buttons = [],
           added = [];
-        $(buttonContainers, $el).find('input.crm-form-submit, a.button, button').each(function() {
+        $(buttonContainers, $el).find('.crm-form-submit, .crm-form-xbutton, a.button, button').each(function() {
           var $el = $(this),
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
@@ -522,7 +522,7 @@
         $el.dialog('option', 'buttons', buttons);
       }
       // Allow a button to prevent ajax submit
-      $('input[data-no-ajax-submit=true]').click(function() {
+      $('input[data-no-ajax-submit=true], button[data-no-ajax-submit=true]').click(function() {
         $(this).closest('form').ajaxFormUnbind();
       });
       // For convenience, focus the first field
