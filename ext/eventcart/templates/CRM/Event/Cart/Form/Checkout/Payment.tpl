@@ -88,71 +88,59 @@
       </td>
       <td class="total">
   &nbsp;{$total|crmMoney:$currency|string_format:"%10s"}
-        <input type="hidden" id="total_amount" value="{$total}">
+        <input type="hidden" id="total_amount" name="total_amount" value="{$total}">
       </td>
     </tr>
   </tfoot>
 </table>
-{if $payment_required == true}
-  {if $form.is_pay_later.label}
-    <div class="crm-section {$form.is_pay_later.name}-section">
-      <div class="label">{$form.is_pay_later.label}</div>
-      <div class="content">{$form.is_pay_later.html}
-      </div>
-      <div class="clear"></div>
+
+{if $form.first_name}
+  <div class="crm-section {$form.first_name.name}-section">
+    <div class="label">{$form.first_name.label}</div>
+    <div class="content">{$form.first_name.html}
     </div>
-    <div class="pay-later-instructions" style="display:none">
-      {$pay_later_instructions}
-    </div>
-{/if}
-{include file='CRM/Core/BillingBlockWrapper.tpl'}
-{/if}
-{if $collect_billing_email == true}
-<div class="crm-section {$form.billing_contact_email.name}-section">
-  <div class="label">{$form.billing_contact_email.label}</div>
-  <div class="content">{$form.billing_contact_email.html}
+    <div class="clear"></div>
   </div>
-  <div class="clear"></div>
-</div>
+{/if}
+{if $form.last_name}
+  <div class="crm-section {$form.last_name.name}-section">
+    <div class="label">{$form.last_name.label}</div>
+    <div class="content">{$form.last_name.html}
+    </div>
+    <div class="clear"></div>
+  </div>
+{/if}
+{if $form.email}
+  <div class="crm-section {$form.email.name}-section">
+    <div class="label">{$form.email.label}</div>
+    <div class="content">{$form.email.html}
+    </div>
+    <div class="clear"></div>
+  </div>
 {/if}
 
-<script type="text/javascript">
-{if $form.is_pay_later.name}
-var pay_later_sel = "input#{$form.is_pay_later.name}";
+{if $payment_required}
+  {if $form.payment_processor_id.label}
+    {* PP selection only works with JS enabled, so we hide it initially *}
+    <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
+      <legend>{ts}Payment Options{/ts}</legend>
+      <div class="crm-section payment_processor-section">
+        <div class="label">{$form.payment_processor_id.label}</div>
+        <div class="content">{$form.payment_processor_id.html}</div>
+        <div class="clear"></div>
+      </div>
+    </fieldset>
+  {/if}
+  {include file='CRM/Core/BillingBlockWrapper.tpl'}
 {/if}
-{literal}
-CRM.$(function($) {
 
-  function refresh() {
-    {/literal}{if $form.is_pay_later.name}{literal}
-    var is_pay_later = $(pay_later_sel).prop("checked");
-    {/literal}{else}
-    var is_pay_later = false;
-    {/if}{literal}
-    $(".credit_card_info-group").toggle(!is_pay_later);
-    $(".pay-later-instructions").toggle(is_pay_later);
-    $("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
-  }
-  {/literal}{if $form.is_pay_later.name}{literal}
-  $(pay_later_sel).change(function() {
-    refresh();
-  });
-  {/literal}{/if}{literal}
-  $("input#source").prop('disabled', true);
-  $(".payment_type-section :radio").change(function() {
-    var sel = $(this).attr("id");
-    $(".check_number-section").toggle(
-        $(this).is(":checked") &&
-        $("label[for="+sel+"]").html() == "{/literal}{ts escape='js'}Check{/ts}{literal}"
-    );
-  });
-  refresh();
-});
-{/literal}
-</script>
+{if $isCaptcha}
+  {include file='CRM/common/ReCAPTCHA.tpl'}
+{/if}
 
 <div id="crm-submit-buttons" class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 
 {include file="CRM/Event/Cart/Form/viewCartLink.tpl"}
+{include file="CRM/Form/validate.tpl"}

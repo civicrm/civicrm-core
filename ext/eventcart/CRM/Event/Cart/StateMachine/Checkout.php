@@ -7,18 +7,17 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
 
   /**
    * @param object $controller
-   * @param const|int $action
+   * @param int $action
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
     $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
     $cart->load_associations();
-    if ($cart->is_empty()) {
+    if (empty($cart->events_in_carts) && empty(CRM_Core_Session::singleton()->get('last_event_cart_id'))) {
       CRM_Core_Error::statusBounce(ts("You don't have any events in you cart. Please add some events."), CRM_Utils_System::url('civicrm/event'));
     }
 
-    $pages = [];
     $pages['CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices'] = NULL;
     foreach ($cart->events_in_carts as $event_in_cart) {
       if ($event_in_cart->is_parent_event()) {
@@ -30,9 +29,9 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
         }
       }
     }
-    $pages["CRM_Event_Cart_Form_Checkout_Payment"] = NULL;
-    $pages["CRM_Event_Cart_Form_Checkout_ThankYou"] = NULL;
-    $this->addSequentialPages($pages, $action);
+    $pages['CRM_Event_Cart_Form_Checkout_Payment'] = NULL;
+    $pages['CRM_Event_Cart_Form_Checkout_ThankYou'] = NULL;
+    $this->addSequentialPages($pages);
   }
 
 }

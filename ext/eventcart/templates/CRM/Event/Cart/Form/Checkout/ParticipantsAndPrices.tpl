@@ -88,3 +88,5 @@
   //]]>
 </script>
 {/literal}
+
+{include file="CRM/Form/validate.tpl"}
