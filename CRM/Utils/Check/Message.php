@@ -246,6 +246,11 @@ class CRM_Utils_Check_Message {
    * @throws \CiviCRM_API3_Exception
    */
   private function checkStatusPreference() {
+    // TODO: Remove this check when MINIMUM_UPGRADABLE_VERSION goes to 4.7.
+    if (CRM_Utils_System::version() !== CRM_Core_BAO_Domain::version() && !CRM_Core_DAO::checkTableExists('civicrm_status_pref')) {
+      return FALSE;
+    }
+
     $this->hiddenUntil = FALSE;
     // Debug & info can't be hidden
     if ($this->level < 2) {

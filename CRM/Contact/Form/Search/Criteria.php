@@ -323,6 +323,8 @@ class CRM_Contact_Form_Search_Criteria {
     return [
       // For now an empty array is still left in place for ordering.
       'sort_name' => [],
+      'first_name' => [],
+      'last_name' => [],
       'email' => ['name' => 'email'],
       'contact_type' => ['name' => 'contact_type'],
       'group' => [
