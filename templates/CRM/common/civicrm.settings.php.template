@@ -432,6 +432,11 @@ if (!defined('CIVICRM_PSR16_STRICT')) {
  * configuration option, but wish to, for example, use fr_CA instead of the
  * default fr_FR (for French), set one or more of the constants below to an
  * appropriate regional value.
+ *
+ * Note that since 5.26.0 specifically https://github.com/civicrm/civicrm-core/pull/16700
+ * This generally doesn't get used by WordPress especially if using the Polylang plugin.
+ * The reason is that the WordPress implementation has been changed to get the full locale
+ * from the WordPress plugin rather than just the 2 string language code.
  */
 // define('CIVICRM_LANGUAGE_MAPPING_FR', 'fr_CA');
 // define('CIVICRM_LANGUAGE_MAPPING_EN', 'en_CA');
