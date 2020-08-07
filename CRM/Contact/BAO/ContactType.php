@@ -45,9 +45,11 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param string $contactType
    *
    * @return bool
+   *
+   * @throws \API_Exception
    */
   public static function isActive($contactType) {
-    $contact = self::contactTypeInfo(FALSE);
+    $contact = self::contactTypeInfo();
     return array_key_exists($contactType, $contact);
   }
 
@@ -113,51 +115,25 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   /**
    * Retrieve all subtypes Information.
    *
-   * @todo - call getAllContactTypes & return filtered results.
-   *
    * @param array $contactType
-   *   ..
    * @param bool $all
-   * @param bool $ignoreCache
    *
    * @return array
-   *   Array of sub type information
+   *   Array of sub type information, subset of getAllContactTypes.
+   *
+   * @throws \API_Exception
    */
-  public static function subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE) {
-    $argString = $all ? 'CRM_CT_STI_1_' : 'CRM_CT_STI_0_';
-    if (!empty($contactType)) {
-      $contactType = (array) $contactType;
-      $argString .= implode('_', $contactType);
+  public static function subTypeInfo($contactType = NULL, $all = FALSE) {
+    $contactTypes = self::getAllContactTypes();
+    foreach ($contactTypes as $index => $type) {
+      if (empty($type['parent']) ||
+        (!$all && !$type['is_active'])
+        || ($contactType && $type['parent'] !== $contactType)
+      ) {
+        unset($contactTypes[$index]);
+      }
     }
-    if (!Civi::cache('contactTypes')->has($argString) || $ignoreCache) {
-      $ctWHERE = '';
-      if (!empty($contactType)) {
-        $ctWHERE = " AND parent.name IN ('" . implode("','", $contactType) . "')";
-      }
-
-      $sql = "
-SELECT subtype.*, parent.name as parent, parent.label as parent_label
-FROM   civicrm_contact_type subtype
-INNER JOIN civicrm_contact_type parent ON subtype.parent_id = parent.id
-WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
-";
-      if ($all === FALSE) {
-        $sql .= " AND subtype.is_active = 1 AND parent.is_active = 1 ORDER BY parent.id";
-      }
-      $dao = CRM_Core_DAO::executeQuery($sql, [],
-        FALSE, 'CRM_Contact_DAO_ContactType'
-      );
-      $values = [];
-      while ($dao->fetch()) {
-        $value = [];
-        CRM_Core_DAO::storeValues($dao, $value);
-        $value['parent'] = $dao->parent;
-        $value['parent_label'] = $dao->parent_label;
-        $values[$dao->name] = $value;
-      }
-      Civi::cache('contactTypes')->set($argString, $values);
-    }
-    return Civi::cache('contactTypes')->get($argString);
+    return $contactTypes;
   }
 
   /**
@@ -173,6 +149,7 @@ WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
    * @return array
    *   all subtypes OR list of subtypes associated to
    *   a given basic contact type
+   * @throws \API_Exception
    */
   public static function subTypes($contactType = NULL, $all = FALSE, $columnName = 'name', $ignoreCache = FALSE) {
     if ($columnName === 'name') {

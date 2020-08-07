@@ -66,19 +66,24 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     // check for type:Individual
     $result = CRM_Contact_BAO_ContactType::subTypes('Individual');
     $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Individual')), $result);
+    $this->assertEquals($this->getExpectedContactSubTypes('Individual'), CRM_Contact_BAO_ContactType::subTypeInfo('Individual'));
 
     // check for type:Organization
     $result = CRM_Contact_BAO_ContactType::subTypes('Organization');
     $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Organization')), $result);
+    $this->assertEquals($this->getExpectedContactSubTypes('Organization'), CRM_Contact_BAO_ContactType::subTypeInfo('Organization'));
 
     // check for type:Household
     $result = CRM_Contact_BAO_ContactType::subTypes('Household');
     $this->assertEquals(array_keys($this->getExpectedContactSubTypes('Household')), $result);
+    $this->assertEquals($this->getExpectedContactSubTypes('Household'), CRM_Contact_BAO_ContactType::subTypeInfo('Household'));
 
     // check for all contact types
     $result = CRM_Contact_BAO_ContactType::subTypes();
     $subtypes = array_keys($this->getExpectedAllSubtypes());
     $this->assertEquals(sort($subtypes), sort($result));
+    $this->assertEquals($this->getExpectedAllSubtypes(), CRM_Contact_BAO_ContactType::subTypeInfo());
+
   }
 
   /**
