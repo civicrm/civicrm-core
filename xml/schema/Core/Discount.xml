@@ -5,6 +5,7 @@
   <class>Discount</class>
   <name>civicrm_discount</name>
   <comment>Stores discounts for events on the basis of date</comment>
+  <add>2.1</add>
   <log>true</log>
   <field>
     <name>id</name>

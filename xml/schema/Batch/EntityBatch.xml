@@ -5,6 +5,7 @@
   <class>EntityBatch</class>
   <name>civicrm_entity_batch</name>
   <comment>Batch entities (Contributions, Participants, Contacts) to a batch.</comment>
+  <add>3.3</add>
   <field>
     <name>id</name>
     <title>EntityBatch ID</title>
