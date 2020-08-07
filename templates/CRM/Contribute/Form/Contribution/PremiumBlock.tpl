@@ -332,8 +332,6 @@
           $('#selectProduct').rules('add', 'premiums');
         });
 
-        // need to use jquery validate's ignore option, so that it will not ignore hidden fields
-        CRM.validate.params['ignore'] = '.ignore';
       });
     </script>
     {/literal}
