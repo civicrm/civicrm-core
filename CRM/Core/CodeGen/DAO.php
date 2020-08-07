@@ -26,6 +26,8 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
    */
   private $tsFunctionName;
 
+  private $useHelper = '';
+
   /**
    * CRM_Core_CodeGen_DAO constructor.
    *
@@ -37,6 +39,11 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     parent::__construct($config);
     $this->name = $name;
     $this->tsFunctionName = $tsFunctionName;
+    // Cleanup helper class with a use statement
+    if (strpos($tsFunctionName, '::ts')) {
+      $this->tsFunctionName = 'E::ts';
+      $this->useHelper = 'use \\' . explode('::', $tsFunctionName)[0] . ' as E;';
+    }
   }
 
   /**
@@ -78,6 +85,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     }
     $template->assign('genCodeChecksum', $this->getTableChecksum());
     $template->assign('tsFunctionName', $this->tsFunctionName);
+    $template->assign('useHelper', $this->useHelper);
     $template->run('dao.tpl', $this->getAbsFileName());
   }
 
@@ -98,6 +106,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
       }
       $template->assign('genCodeChecksum', 'NEW');
       $template->assign('tsFunctionName', $this->tsFunctionName);
+      $template->assign('useHelper', $this->useHelper);
       $this->raw = $template->fetch('dao.tpl');
     }
     return $this->raw;

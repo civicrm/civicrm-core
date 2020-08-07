@@ -7,7 +7,7 @@
  * {$generated}
  * (GenCodeChecksum:{$genCodeChecksum})
  */
-
+{$useHelper}
 /**
  * Database access object for the {$table.entity} entity.
  */
