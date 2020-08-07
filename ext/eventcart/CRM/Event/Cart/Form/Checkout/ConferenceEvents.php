@@ -132,15 +132,14 @@ EOS;
       if (!$session_event_id) {
         continue;
       }
+      /** @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
       $event_in_cart = $this->cart->add_event($session_event_id);
 
-      $values = [];
-      CRM_Core_DAO::storeValues($this->main_participant, $values);
-      $values['id'] = NULL;
-      $values['event_id'] = $event_in_cart->event_id;
-      $participant = CRM_Event_Cart_BAO_MerParticipant::create($values);
-      $participant->save();
-      $event_in_cart->add_participant($participant);
+      $participantParams = [];
+      CRM_Core_DAO::storeValues($this->main_participant, $participantParams);
+      $participantParams['id'] = NULL;
+      $participantParams['event_id'] = $event_in_cart->event_id;
+      $event_in_cart->add_participant($participantParams);
     }
     $this->cart->save();
   }

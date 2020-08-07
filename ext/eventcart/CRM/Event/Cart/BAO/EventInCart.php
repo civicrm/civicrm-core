@@ -1,5 +1,7 @@
 <?php
 
+use CRM_Event_Cart_ExtensionUtil as E;
+
 /**
  * Class CRM_Event_Cart_BAO_EventInCart
  */
@@ -8,6 +10,12 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $event;
   public $event_cart;
   public $location = NULL;
+
+  /**
+   * Array of CRM_Event_Cart_BAO_MerParticipant indexed by participant ID
+   *
+   * @var array
+   */
   public $participants = [];
 
   /**
@@ -20,10 +28,14 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   /**
    * Add participant to cart.
    *
-   * @param $participant
+   * @param array $participantParams
    */
-  public function add_participant($participant) {
-    $this->participants[$participant->id] = $participant;
+  public function add_participant($participantParams) {
+    $participantParams['cart_id'] = $participantParams['cart_id'] ?? $this->event_cart_id;
+    $participantParams['event_id'] = $participantParams['event_id'] ?? $this->event_id;
+
+    $merParticipantObject = CRM_Event_Cart_BAO_MerParticipant::create($participantParams);
+    $this->participants[$merParticipantObject->id] = $merParticipantObject;
   }
 
   /**
@@ -164,7 +176,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   }
 
   /**
-   * @param null $event_cart
+   * @param CRM_Event_Cart_BAO_Cart $event_cart
    */
   public function load_associations($event_cart = NULL) {
     if ($this->assocations_loaded) {
@@ -175,7 +187,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     $defaults = [];
     $this->event = CRM_Event_BAO_Event::retrieve($params, $defaults);
 
-    if ($event_cart != NULL) {
+    if ($event_cart !== NULL) {
       $this->event_cart = $event_cart;
       $this->event_cart_id = $event_cart->id;
     }
@@ -183,10 +195,19 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
       $this->event_cart = CRM_Event_Cart_BAO_Cart::find_by_id($this->event_cart_id);
     }
 
-    $participants = CRM_Event_Cart_BAO_MerParticipant::find_all_by_event_and_cart_id($this->event_id, $this->event_cart->id);
-    foreach ($participants as $participant) {
+    $this->participants = CRM_Event_Cart_BAO_MerParticipant::find_all_by_event_and_cart_id($this->event_id, $this->event_cart->id);
+    if (empty($this->participants)) {
+      $participantParams = ['event_id' => $this->event_id, 'cart_id' => $this->event_cart->id];
+      if ($this->event_cart->defaultParticipantContactID) {
+        $participantParams['contact_id'] = $this->event_cart->defaultParticipantContactID;
+      }
+      $newParticipant = CRM_Event_Cart_BAO_MerParticipant::create($participantParams);
+      $this->event_cart->defaultParticipantContactID = $newParticipant->contact_id;
+      $this->participants[$newParticipant->id] = $newParticipant;
+    }
+    /** @var \CRM_Event_BAO_Participant $participant */
+    foreach ($this->participants as $participant) {
       $participant->load_associations();
-      $this->add_participant($participant);
     }
   }
 
@@ -246,7 +267,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
       return $this->id;
     }
     if ($offset == 'main_conference_event_id') {
-      return $this->main_conference_event_id;
+      return $this->main_conference_event_id ?? NULL;
     }
     $fields = &$this->fields();
     return $fields[$offset];
@@ -285,7 +306,6 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    */
   public static function get_registration_link($event_id) {
     $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
-    $cart->load_associations();
     $event_in_cart = $cart->get_event_in_cart_by_event_id($event_id);
 
     if ($event_in_cart) {
@@ -299,7 +319,7 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
       return [
         'label' => ts("Add to Cart"),
         'path' => 'civicrm/event/add_to_cart',
-        'query' => "reset=1&id={$event_id}",
+        'query' => "reset=1&id={$event_id}&cid={$cart->defaultParticipantContactID}",
       ];
     }
   }
@@ -316,13 +336,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
    *
    * @return bool
    */
-  public function is_child_event($parent_event_id = NULL) {
-    if ($parent_event_id == NULL) {
-      return $this->event->parent_event_id;
-    }
-    else {
-      return $this->event->parent_event_id == $parent_event_id;
-    }
+  public function is_child_event($parent_event_id) {
+    return ($this->event->parent_event_id === $parent_event_id);
   }
 
 }

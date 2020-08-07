@@ -45,6 +45,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
       'registration_end_date' => '+ 1 month',
       'payment_processor' => $processors,
     ])['id'];
+    \Civi::settings()->set('eventcart_payment_processors', $processors);
     $this->createLoggedInUser();
 
     $forms = [
@@ -67,7 +68,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         'Y' => date('Y') + 1,
       ],
       'credit_card_type' => 'Visa',
-      'billing_contact_email' => 'bobby@example.com',
+      'email-5' => 'bobby@example.com',
       'billing_first_name' => 'John',
       'billing_middle_name' => '',
       'billing_last_name' => "O'Connor",

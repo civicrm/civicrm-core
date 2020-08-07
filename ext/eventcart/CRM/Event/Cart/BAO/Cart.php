@@ -12,6 +12,12 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public $events_in_carts = [];
 
   /**
+   * The default contact ID to use when creating a participant
+   * @var int
+   */
+  public $defaultParticipantContactID = NULL;
+
+  /**
    * @param array $params
    *
    * @return CRM_Event_Cart_BAO_Cart
@@ -39,6 +45,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
       'event_id' => $event_id,
       'event_cart_id' => $this->id,
     ];
+    /** @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
     $event_in_cart = CRM_Event_Cart_BAO_EventInCart::create($params);
     $event_in_cart->load_associations($this);
     $this->events_in_carts[$event_in_cart->event_id] = $event_in_cart;
@@ -46,14 +53,14 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param $participant
+   * @param array $participantParams
    */
-  public function add_participant_to_cart($participant) {
-    $event_in_cart = $this->get_event_in_cart_by_event_id($participant->event_id);
+  public function add_participant_to_cart($participantParams) {
+    $event_in_cart = $this->get_event_in_cart_by_event_id($participantParams['event_id']);
     if (!$event_in_cart) {
-      $event_in_cart = $this->add_event($participant->event_id);
+      $event_in_cart = $this->add_event($participantParams['event_id']);
     }
-    $event_in_cart->add_participant($participant);
+    $event_in_cart->add_participant($participantParams);
     $event_in_cart->save();
   }
 
@@ -64,18 +71,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @throws Exception
    */
   public static function create($params) {
-    $transaction = new CRM_Core_Transaction();
-
-    $cart = self::add($params);
-
-    if (is_a($cart, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      throw new CRM_Core_Exception(ts('There was an error creating an event cart'));
-    }
-
-    $transaction->commit();
-
-    return $cart;
+    return self::add($params);
   }
 
   /**
@@ -109,9 +105,9 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public static function find_or_create_for_current_session() {
     $session = CRM_Core_Session::singleton();
     $event_cart_id = $session->get('event_cart_id');
-    $userID = $session->get('userID');
+    $userID = CRM_Core_Session::getLoggedInContactID();
     $cart = FALSE;
-    if (!is_null($event_cart_id)) {
+    if (!empty($event_cart_id)) {
       $cart = self::find_uncompleted_by_id($event_cart_id);
       if ($cart && $userID) {
         if (!$cart->user_id) {
@@ -119,7 +115,6 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
           if ($saved_cart) {
             $cart->adopt_participants($saved_cart->id);
             $saved_cart->delete();
-            $cart->load_associations();
           }
           else {
             $cart->user_id = $userID;
@@ -140,6 +135,9 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
       }
       $session->set('event_cart_id', $cart->id);
     }
+    // cid can be 0 for new contact
+    $cart->defaultParticipantContactID = CRM_Utils_Request::retrieveValue('cid', 'Integer', CRM_Core_Session::getLoggedInContactID());
+    $cart->load_associations();
     return $cart;
   }
 
@@ -165,10 +163,10 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return array
    */
   public function get_main_events_in_carts() {
-    //return CRM_Event_Cart_BAO_EventInCart::find_all_by_params( array('main_conference_event_id'
     $all = [];
+    /** @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
     foreach ($this->events_in_carts as $event_in_cart) {
-      if (!$event_in_cart->is_child_event()) {
+      if (!$event_in_cart->is_child_event($event_in_cart->event_id)) {
         $all[] = $event_in_cart;
       }
     }
@@ -219,6 +217,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    */
   public function get_subparticipants($main_participant) {
     $subparticipants = [];
+    /** @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
     foreach ($this->events_in_carts as $event_in_cart) {
       if ($event_in_cart->is_child_event($main_participant->event_id)) {
         foreach ($event_in_cart->participants as $participant) {
@@ -246,7 +245,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    *
    * @return null
    */
-  public function &get_event_in_cart_by_id($event_in_cart_id) {
+  public function get_event_in_cart_by_id($event_in_cart_id) {
     foreach ($this->events_in_carts as $event_in_cart) {
       if ($event_in_cart->id == $event_in_cart_id) {
         return $event_in_cart;
@@ -272,6 +271,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     }
     $this->associations_loaded = TRUE;
     $this->events_in_carts = CRM_Event_Cart_BAO_EventInCart::find_all_by_event_cart_id($this->id);
+    /** @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
     foreach ($this->events_in_carts as $event_in_cart) {
       $event_in_cart->load_associations($this);
     }
@@ -341,6 +341,31 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     $sql = "UPDATE civicrm_participant SET cart_id='%1' WHERE cart_id='%2'";
 
     CRM_Core_DAO::executeQuery($sql, $params);
+  }
+
+  /**
+   * Get payment processors.
+   *
+   * This differs from the option value in that we append description for
+   * disambiguation.
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getPaymentProcessors(): array {
+    $results = civicrm_api3('PaymentProcessor', 'get', [
+      'is_test' => 0,
+      'return' => ['id', 'name', 'description', 'domain_id'],
+    ]);
+
+    $processors = [];
+    foreach ($results['values'] as $processorID => $details) {
+      $processors[$processorID] = $details['name'];
+      if (!empty($details['description'])) {
+        $processors[$processorID] .= ' : ' . $details['description'];
+      }
+    }
+    return $processors;
   }
 
 }

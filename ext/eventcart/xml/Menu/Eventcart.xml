@@ -45,4 +45,10 @@
     <is_public>true</is_public>
     <is_ssl>false</is_ssl>
   </item>
+  <item>
+    <path>civicrm/admin/setting/eventcart</path>
+    <title>Event Cart Settings</title>
+    <page_callback>CRM_Admin_Form_Generic</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
 </menu>
