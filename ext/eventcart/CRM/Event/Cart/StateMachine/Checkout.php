@@ -19,14 +19,7 @@ class CRM_Event_Cart_StateMachine_Checkout extends CRM_Core_StateMachine {
     }
 
     $pages = [];
-    $is_monetary = FALSE;
-    $is_conference = FALSE;
-    foreach ($cart->events_in_carts as $event_in_cart) {
-      if ($event_in_cart->event->is_monetary) {
-        $is_monetary = TRUE;
-      }
-    }
-    $pages["CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices"] = NULL;
+    $pages['CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices'] = NULL;
     foreach ($cart->events_in_carts as $event_in_cart) {
       if ($event_in_cart->is_parent_event()) {
         foreach ($event_in_cart->participants as $participant) {
