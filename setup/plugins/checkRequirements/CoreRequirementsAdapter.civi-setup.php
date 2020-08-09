@@ -29,6 +29,7 @@ if (!defined('CIVI_SETUP')) {
       'username' => $model->db['username'],
       'password' => $model->db['password'],
       'database' => $model->db['database'],
+      'ssl_params' => $model->db['ssl_params'] ?? NULL,
     ));
     _corereqadapter_addMessages($e, 'database', $dbMsgs);
   });

@@ -59,6 +59,13 @@ if (!defined('CIVI_SETUP')) {
     $params['dbPass'] = addslashes($m->db['password']);
     $params['dbHost'] = addslashes($m->db['server']);
     $params['dbName'] = addslashes($m->db['database']);
+    // The '&' prefix is awkward, but we don't know what's already in the file.
+    // At the time of writing, it has ?new_link=true. If that is removed,
+    // then need to update this.
+    // The PHP_QUERY_RFC3986 is important because PEAR::DB will interpret plus
+    // signs as a reference to its old DSN format and mangle the DSN, so we
+    // need to use %20 for spaces.
+    $params['dbSSL'] = empty($m->db['ssl_params']) ? '' : addslashes('&' . http_build_query($m->db['ssl_params'], '', '&', PHP_QUERY_RFC3986));
     $params['cms'] = addslashes($m->cms);
     $params['CMSdbUser'] = addslashes($m->cmsDb['username']);
     $params['CMSdbPass'] = addslashes($m->cmsDb['password']);
