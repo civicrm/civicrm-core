@@ -735,7 +735,7 @@ class CRM_Core_DAO extends DB_DataObject {
       // if there is no value then make the variable NULL
       if ($exists) {
         if ($value === '') {
-          $this->$dbName = 'null';
+          $this->$dbName = '';
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
