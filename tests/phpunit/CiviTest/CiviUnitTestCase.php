@@ -3234,9 +3234,22 @@ VALUES
    * @throws \CRM_Core_Exception
    */
   public function getFormObject($class, $formValues = [], $pageName = '') {
+    $_POST = $formValues;
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Core_Controller();
+    switch ($class) {
+      case 'CRM_Event_Cart_Form_Checkout_Payment':
+      case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
+        $form->controller = new CRM_Event_Cart_Controller_Checkout();
+        break;
+
+      default:
+        $form->controller = new CRM_Core_Controller();
+    }
+    if (!$pageName) {
+      $formParts = explode('_', $class);
+      $pageName = array_pop($formParts);
+    }
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
     $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
     return $form;
