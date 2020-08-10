@@ -402,6 +402,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'isTest' => FALSE,
       // filename of optional PDF version to add as attachment (do not include path)
       'PDFFilename' => NULL,
+      // Disable Smarty?
+      'disableSmarty' => FALSE,
     ];
     $params = array_merge($defaults, $params);
 
@@ -511,14 +513,17 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $contact = $contact[$contactID];
     }
 
-    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], TRUE);
-    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], TRUE);
-    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], TRUE);
+    // When using Smarty we need to pass the $escapeSmarty parameter.
+    $escapeSmarty = !$params['disableSmarty'];
+
+    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
+    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
+    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], $escapeSmarty);
 
     if ($contactID) {
-      $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['subject'], FALSE, TRUE);
-      $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, TRUE);
-      $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, TRUE);
+      $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['subject'], FALSE, $escapeSmarty);
+      $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, $escapeSmarty);
+      $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, $escapeSmarty);
 
       $contactArray = [$contactID => $contact];
       CRM_Utils_Hook::tokenValues($contactArray,
@@ -535,20 +540,30 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
     }
 
-    // strip whitespace from ends and turn into a single line
-    $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
+    // Normally Smarty is run, but it can be disabled using the disableSmarty
+    // parameter, which may be useful for non-core uses of MessageTemplate.send
+    // In particular it helps with the mosaicomsgtpl extension.
+    if (!$params['disableSmarty']) {
+      // strip whitespace from ends and turn into a single line
+      $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
 
-    // parse the three elements with Smarty
-    $smarty = CRM_Core_Smarty::singleton();
-    foreach ($params['tplParams'] as $name => $value) {
-      $smarty->assign($name, $value);
+      // parse the three elements with Smarty
+      $smarty = CRM_Core_Smarty::singleton();
+      foreach ($params['tplParams'] as $name => $value) {
+        $smarty->assign($name, $value);
+      }
+      foreach ([
+        'subject',
+        'text',
+        'html',
+      ] as $elem) {
+        $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
+      }
     }
-    foreach ([
-      'subject',
-      'text',
-      'html',
-    ] as $elem) {
-      $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
+    else {
+      // Since we're not relying on Smarty for this function, we DIY.
+      // strip whitespace from ends and turn into a single line
+      $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
     }
 
     // send the template, honouring the target user’s preferences (if any)

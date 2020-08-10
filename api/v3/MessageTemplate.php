@@ -181,4 +181,9 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['pdf_filename']['title'] = 'PDF Filename';
   $params['pdf_filename']['api.aliases'] = ['PDFFilename'];
   $params['pdf_filename']['type'] = CRM_Utils_Type::T_STRING;
+
+  $params['disable_smarty']['description'] = 'Disable Smarty. Normal CiviMail tokens are still supported. By default Smarty is enabled.';
+  $params['disable_smarty']['title'] = 'Disable Smarty';
+  $params['disable_smarty']['api.aliases'] = ['disableSmarty'];
+  $params['disable_smarty']['type'] = CRM_Utils_Type::T_BOOLEAN;
 }
