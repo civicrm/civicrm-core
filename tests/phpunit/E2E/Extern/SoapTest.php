@@ -62,7 +62,7 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
     foreach ($this->getSoapEndPoints() as $key => $url) {
       $this->url = $url;
       if (empty($this->url)) {
-        $this->markTestSkipped("Failed to set url. Have you configured `cv` for testing?");
+        $this->markTestSkipped('Failed to set url for endpoint ' . $key . ' . Have you configured `cv` for testing?');
       }
       $client = $this->createClient();
       $client->authenticate($this->adminUser, mt_rand());
@@ -78,7 +78,7 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
     foreach ($this->getSoapEndPoints() as $key => $url) {
       $this->url = $url;
       if (empty($this->url)) {
-        $this->markTestSkipped("Failed to set url. Have you configured `cv` for testing?");
+        $this->markTestSkipped('Failed to set url for endpoint ' . $key . ' . Have you configured `cv` for testing?');
       }
       $client = $this->createClient();
       $key = $client->authenticate($this->adminUser, $this->adminPass);
@@ -93,14 +93,14 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
     foreach ($this->getSoapEndPoints() as $key => $url) {
       $this->url = $url;
       if (empty($this->url)) {
-        $this->markTestSkipped("Failed to set url. Have you configured `cv` for testing?");
+        $this->markTestSkipped('Failed to set url for endpoint ' . $key . ' . Have you configured `cv` for testing?');
       }
       $client = $this->createClient();
-      $key = $client->authenticate($this->adminUser, $this->adminPass);
+      $key = $client->authenticate($this->adminUser, $this->adminPass, !($key === 'traditional'));
       $contacts = $client->get_contact($key, array(
         'contact_id' => 101,
         'return.display_name' => 1,
-      ));
+      ), 'Failure on end point ' . $key);
       $this->assertEquals($contacts['is_error'], 0);
       $this->assertEquals($contacts['count'], 1);
       $this->assertEquals($contacts['values'][101]['contact_id'], 101);

@@ -72,7 +72,7 @@ class CRM_Utils_SoapServer {
     $t = time();
 
     if ($key !== sha1($soap_key)) {
-      throw new SoapFault('Client', 'Invalid key');
+      throw new SoapFault('Client', 'Invalid key ' . print_r($soap_key, 1));
     }
 
     if (self::$soap_timeout &&

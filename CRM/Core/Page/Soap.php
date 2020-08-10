@@ -12,7 +12,6 @@ class CRM_Core_Page_Soap extends CRM_Core_Page {
     if (defined('PANTHEON_ENVIRONMENT')) {
       ini_set('session.save_handler', 'files');
     }
-    session_start();
 
     $server = new SoapServer(NULL,
       [
