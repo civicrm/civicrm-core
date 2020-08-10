@@ -189,6 +189,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'source' => 'Webform Payment',
       'status_id' => $pendingMembershipId,
       'is_pay_later' => 1,
+      'skipStatusCal' => 1,
     ];
 
     // Contact 1
@@ -203,6 +204,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+      'receive_date' => date('Ymd'),
     ]);
     $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
