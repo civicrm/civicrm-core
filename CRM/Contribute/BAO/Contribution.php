@@ -3185,10 +3185,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           foreach ($lineItems as &$eachItem) {
             if (isset($this->_relatedObjects['membership'])
               && is_array($this->_relatedObjects['membership'])
-              && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
-              $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->join_date);
-              $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
-              $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);
+              && array_key_exists($eachItem['entity_id'] . '_' . $eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
+              $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['entity_id'] . '_' . $eachItem['membership_type_id']]->join_date);
+              $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['entity_id'] . '_' . $eachItem['membership_type_id']]->start_date);
+              $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['entity_id'] . '_' . $eachItem['membership_type_id']]->end_date);
             }
             // This is actually used in conjunction with is_quick_config in the template & we should deprecate it.
             // However, that does create upgrade pain so would be better to be phased in.
@@ -4706,7 +4706,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $membership->join_date = CRM_Utils_Date::isoToMysql($membership->join_date);
           $membership->start_date = CRM_Utils_Date::isoToMysql($membership->start_date);
           $membership->end_date = CRM_Utils_Date::isoToMysql($membership->end_date);
-          $this->_relatedObjects['membership'][$membership->membership_type_id] = $membership;
+          $this->_relatedObjects['membership'][$membership->id . '_' . $membership->membership_type_id] = $membership;
+
         }
       }
     }
