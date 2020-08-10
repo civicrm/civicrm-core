@@ -95,7 +95,7 @@
       <p>
         {$form.add_activity_type_id.html}
         {if $hasAccessToAllCases} &nbsp;
-          {$form.timeline_id.html}{$form._qf_CaseView_next.html} &nbsp;
+          {$form.timeline_id.html}{*This CaseView_next button is hidden, but gets clicked by the onChange handler for timeline_id in CaseView.js*}{$form._qf_CaseView_next.html} &nbsp;
           {$form.report_id.html}
         {/if}
       </p>
@@ -112,7 +112,7 @@
 
         {if $mergeCases}
           <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Merge Case{/ts}</a>
-          {$form._qf_CaseView_next_merge_case.html}
+          {*This CaseView_next_merge_case button is hidden, but gets clicked by javascript in CaseView.js when the mergeCasesDialog popup is saved.*}{$form._qf_CaseView_next_merge_case.html}
           <span id="mergeCasesDialog" class="hiddenElement">
             {$form.merge_case_id.html}
           </span>
