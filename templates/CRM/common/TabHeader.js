@@ -23,7 +23,7 @@ CRM.$(function($) {
           params.autoClose = params.openInline = params.cancelButton = params.refreshAction = false;
           ui.panel.on('crmFormLoad', function() {
             // Hack: "Save and done" and "Cancel" buttons submit without ajax
-            $('.cancel.crm-form-submit, input[name$=upload_done]', this).on('click', function(e) {
+            $('.cancel.crm-form-submit, button[name$=upload_done]', this).on('click', function(e) {
               $(this).closest('form').ajaxFormUnbind();
             });
           });

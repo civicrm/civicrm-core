@@ -272,7 +272,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         ['class' => 'crm-select2 crm-action-menu fa-list-ol']
       );
     }
-    $this->addElement('submit', $this->getButtonName('next'), ' ', ['class' => 'hiddenElement']);
+    $this->addElement('xbutton', $this->getButtonName('next'), ' ', [
+      'class' => 'hiddenElement',
+      'type' => 'submit',
+    ]);
 
     $this->buildMergeCaseForm();
 
@@ -517,11 +520,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         FALSE,
         ['class' => 'crm-select2 huge']
       );
-      $this->addElement('submit',
+      $this->addElement('xbutton',
         $this->getButtonName('next', 'merge_case'),
         ts('Merge'),
         [
           'class' => 'hiddenElement',
+          'type' => 'submit',
         ]
       );
     }
