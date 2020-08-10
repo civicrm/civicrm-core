@@ -351,7 +351,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     //flush component settings
     CRM_Core_Component::getEnabledComponents(TRUE);
 
-    $_REQUEST = $_GET = $_POST = [];
+    $_REQUEST = $_GET = $_POST = $_SESSION = [];
     error_reporting(E_ALL);
 
     $this->renameLabels();
@@ -476,6 +476,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->unsetExtensionSystem();
     $this->assertEquals([], CRM_Core_DAO::$_nullArray);
     $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
+    $_GET = $_POST = $_SESSION = [];
   }
 
   /**
