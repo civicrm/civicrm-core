@@ -184,12 +184,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // New Membership Status
     $newMembershipId = array_search('New', $memStatus);
 
-
     $membershipParam = [
       'membership_type_id' => $this->_membershipTypeID,
       'source' => 'Webform Payment',
       'status_id' => $pendingMembershipId,
-      'is_pay_later' => 1
+      'is_pay_later' => 1,
     ];
 
     // Contact 1
@@ -197,12 +196,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membershipParam['contact_id'] = $contactId1;
     $membershipID1 = $this->contactMembershipCreate($membershipParam);
 
+    // Pending Payment Status
     $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => '1',
       'total_amount' => 100,
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
-      'contribution_status_id' => 2, // Pending Payment Status
+      'contribution_status_id' => 2,
     ]);
     $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
@@ -230,7 +230,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_id' => $membershipID3,
     ]);
 
-
+    // Change Payment Status to Completed
     $form = new CRM_Contribute_Form_Contribution();
     $form->_id = $ContributionCreate['id'];
     $form->testSubmit([
@@ -238,7 +238,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => '1',
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
-      'contribution_status_id' => 1, // Change Payment Status to Completed
+      'contribution_status_id' => 1,
     ],
       CRM_Core_Action::UPDATE);
 
