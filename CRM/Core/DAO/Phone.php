@@ -174,7 +174,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
         'location_type_id' => [
           'name' => 'location_type_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Phone Location Type'),
+          'title' => ts('Phone Location Type ID'),
           'description' => ts('Which Location does this phone belong to.'),
           'where' => 'civicrm_phone.location_type_id',
           'table_name' => 'civicrm_phone',
@@ -183,6 +183,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Select',
+            'label' => ts("Phone Location Type"),
           ],
           'pseudoconstant' => [
             'table' => 'civicrm_location_type',
@@ -301,6 +302,7 @@ class CRM_Core_DAO_Phone extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Select',
+            'label' => ts("Phone Type"),
           ],
           'pseudoconstant' => [
             'optionGroupName' => 'phone_type',

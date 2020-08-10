@@ -639,6 +639,9 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields['world_region']['context'] = 'country';
     $queryFields['state_province']['context'] = 'province';
     $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT];
+    // Set the label to gender for gender_id as we it's ... magic (not in a good way).
+    // In other places the query object offers e.g contribution_status & contribution_status_id
+    $queryFields['gender_id']['title'] = ts('Gender');
     $this->queryFields = $queryFields;
   }
 

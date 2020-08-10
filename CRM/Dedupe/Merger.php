@@ -1185,7 +1185,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $rows["move_$field"] = [
         'main' => self::getFieldValueAndLabel($field, $main)['label'],
         'other' => self::getFieldValueAndLabel($field, $other)['label'],
-        'title' => $fields[$field]['title'],
+        'title' => $fields[$field]['html']['label'] ?? $fields[$field]['title'],
       ];
 
       $value = self::getFieldValueAndLabel($field, $other)['value'];

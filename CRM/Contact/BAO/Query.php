@@ -2189,7 +2189,7 @@ class CRM_Contact_BAO_Query {
         $name, $op, $value, $grouping,
         'CRM_Contact_DAO_Contact',
         $field,
-        $field['title'],
+        $field['html']['label'] ?? $field['title'],
         CRM_Utils_Type::typeToString($dataType)
       );
       if ($name === 'gender_id') {
