@@ -66,14 +66,10 @@
           </table>
 
           {*add dupe buttons *}
-          <span class="crm-button crm-button_qf_Contact_refresh_dedupe">
-            {$form._qf_Contact_refresh_dedupe.html}
-          </span>
+          {$form._qf_Contact_refresh_dedupe.html}
           {if $isDuplicate}
             &nbsp;&nbsp;
-              <span class="crm-button crm-button_qf_Contact_upload_duplicate">
-                {$form._qf_Contact_upload_duplicate.html}
-              </span>
+            {$form._qf_Contact_upload_duplicate.html}
           {/if}
           <div class="spacer"></div>
         </div>
@@ -212,7 +208,7 @@
     loadMultiRecordFields();
 
     {/literal}{if $oldSubtypes}{literal}
-    $('input[name=_qf_Contact_upload_view], input[name=_qf_Contact_upload_new]').click(function() {
+    $('button[name=_qf_Contact_upload_view], button[name=_qf_Contact_upload_new]').click(function() {
       var submittedSubtypes = $('#contact_sub_type').val();
       var oldSubtypes = {/literal}{$oldSubtypes}{literal};
 

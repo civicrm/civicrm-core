@@ -808,17 +808,31 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->addField('image_URL', ['maxlength' => '255', 'label' => ts('Browse/Upload Image')]);
 
     // add the dedupe button
-    $this->addElement('submit',
+    $this->addElement('xbutton',
       $this->_dedupeButtonName,
-      ts('Check for Matching Contact(s)')
+      ts('Check for Matching Contact(s)'),
+      [
+        'type' => 'submit',
+        'value' => 1,
+        'class' => "crm-button crm-button{$this->_dedupeButtonName}",
+      ]
     );
-    $this->addElement('submit',
+    $this->addElement('xbutton',
       $this->_duplicateButtonName,
-      ts('Save Matching Contact')
+      ts('Save Matching Contact'),
+      [
+        'type' => 'submit',
+        'value' => 1,
+        'class' => "crm-button crm-button{$this->_duplicateButtonName}",
+      ]
     );
-    $this->addElement('submit',
+    $this->addElement('xbutton',
       $this->getButtonName('next', 'sharedHouseholdDuplicate'),
-      ts('Save With Duplicate Household')
+      ts('Save With Duplicate Household'),
+      [
+        'type' => 'submit',
+        'value' => 1,
+      ]
     );
 
     $buttons = [

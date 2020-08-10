@@ -904,9 +904,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     if ($this->_context == 'dialog') {
       $this->addElement(
-        'submit',
+        'xbutton',
         $this->_duplicateButtonName,
-        ts('Save Matching Contact')
+        ts('Save Matching Contact'),
+        [
+          'type' => 'submit',
+          'class' => 'crm-button',
+        ]
       );
     }
   }

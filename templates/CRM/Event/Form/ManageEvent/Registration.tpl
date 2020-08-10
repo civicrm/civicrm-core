@@ -396,7 +396,7 @@ invert              = 0
 <script type="text/javascript">
 {literal}    (function($, _) { // Generic Closure
 
-    $(".crm-submit-buttons input").click( function() {
+    $(".crm-submit-buttons button").click( function() {
       $(".dedupenotify .ui-notify-close").click();
     });
 

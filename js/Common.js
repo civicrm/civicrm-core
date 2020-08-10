@@ -145,32 +145,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 var submitcount = 0;
-/**
- * Old submit-once function. Will be removed soon.
- * @deprecated
- */
-function submitOnce(obj, formId, procText) {
-  // if named button clicked, change text
-  if (obj.value != null) {
-    cj('input[name=' + obj.name + ']').val(procText + " ...");
-  }
-  cj(obj).closest('form').attr('data-warn-changes', 'false');
-  if (document.getElementById) { // disable submit button for newer browsers
-    cj('input[name=' + obj.name + ']').attr("disabled", true);
-    document.getElementById(formId).submit();
-    return true;
-  }
-  else { // for older browsers
-    if (submitcount == 0) {
-      submitcount++;
-      return true;
-    }
-    else {
-      alert("Your request is currently being processed ... Please wait.");
-      return false;
-    }
-  }
-}
 
 /**
  * Function to show / hide the row in optionFields
@@ -218,7 +192,7 @@ if (!CRM.vars) CRM.vars = {};
   $.propHooks.disabled = {
     set: function (el, value, name) {
       // Sync button enabled status with wrapper css
-      if ($(el).is('span.crm-button > input.crm-form-submit')) {
+      if ($(el).is('.crm-button.crm-form-submit')) {
         $(el).parent().toggleClass('crm-button-disabled', !!value);
       }
       // Sync button enabled status with dialog button
@@ -997,7 +971,7 @@ if (!CRM.vars) CRM.vars = {};
       $('form[data-submit-once]', e.target)
         .submit(submitOnceForm)
         .on('invalid-form', submitFormInvalid);
-      $('form[data-submit-once] input[type=submit]', e.target).click(function(e) {
+      $('form[data-submit-once] button[type=submit]', e.target).click(function(e) {
         submitButton = e.target;
       });
     })
