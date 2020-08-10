@@ -40,7 +40,6 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
   public function testCreateHiddenGroupFromSearchBuilder() {
     $this->createLoggedInUser();
     $formValues = [
-      'qfKey' => 'dde96a85ddebb90fb66de44859404aeb_2077',
       'entryURL' => 'http://dmaster.local/civicrm/contact/search/builder?reset=1',
       'mapper' => [1 => [['Individual']]],
       'operator' => [1 => ['=']],
