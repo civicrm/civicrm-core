@@ -717,15 +717,12 @@ class CRM_Utils_System {
      * process typically done in CLI and cron scripts. See: CRM-12648
      *
      * Q: Can we move this to the userSystem class so that it can be tuned
-     * per-CMS? For example, when dealing with UnitTests UF, there's no
-     * userFrameworkDSN.
+     * per-CMS? For example, when dealing with UnitTests UF, does it need to
+     * do this session write since the original issue was for Drupal.
      */
     $session = CRM_Core_Session::singleton();
     $session->set('civicrmInitSession', TRUE);
 
-    if ($config->userFrameworkDSN) {
-      $dbDrupal = DB::connect($config->userFrameworkDSN);
-    }
     return $config->userSystem->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }
 
