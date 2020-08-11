@@ -736,6 +736,10 @@ class CRM_Core_DAO extends DB_DataObject {
       if ($exists) {
         if ($value === '') {
           $this->$dbName = 'null';
+          // If a field is of type string and is required i.e. can't be null rather than setting to the string 'null' lets set it to a blank string instead.
+          if (!empty($field['required']) && $field['type'] === CRM_Utils_Type::T_STRING) {
+            $this->$dbName = '';
+          }
         }
         elseif (is_array($value) && !empty($field['serialize'])) {
           $this->$dbName = CRM_Core_DAO::serializeField($value, $field['serialize']);
