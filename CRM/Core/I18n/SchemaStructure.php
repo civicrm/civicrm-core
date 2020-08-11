@@ -154,7 +154,7 @@ class CRM_Core_I18n_SchemaStructure {
           'help_post' => "text COMMENT 'Description and/or help text to display after this field.'",
         ],
         'civicrm_price_field_value' => [
-          'label' => "varchar(255) NOT NULL COMMENT 'Price field option label'",
+          'label' => "varchar(255) DEFAULT NULL COMMENT 'Price field option label'",
           'description' => "text DEFAULT NULL COMMENT 'Price field option description.'",
           'help_pre' => "text DEFAULT NULL COMMENT 'Price field option pre help text.'",
           'help_post' => "text DEFAULT NULL COMMENT 'Price field option post field help.'",
@@ -586,7 +586,6 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_price_field_value' => [
           'label' => [
             'type' => "Text",
-            'required' => "true",
           ],
           'description' => [
             'type' => "TextArea",
