@@ -29,6 +29,8 @@ class PriceFieldValueCreationSpecProvider implements Generic\SpecProviderInterfa
   public function modifySpec(RequestSpec $spec) {
     // Name will be auto-generated from label if not supplied
     $spec->getFieldByName('name')->setRequired(FALSE);
+    // Ensure that label is required this matches v3 API but doesn't match DAO because form fields allow for NULLs
+    $spec->getFieldByName('label')->setRequired(TRUE);
   }
 
   /**
