@@ -541,6 +541,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
 
+      if ($table === 'civicrm_setting') {
+        // Per https://lab.civicrm.org/dev/core/-/issues/1934
+        // Note this line is not unit tested as yet as a quick-fix for a regression
+        // but it would be better to do a SELECT request & only update if needed (as a general rule
+        // more selects & less UPDATES will result in less deadlocks while de-duping.
+        // Note the delete is not important here - it can stay with the deleted contact on the
+        // off chance they get restored.
+        $sqls[] = "UPDATE IGNORE civicrm_setting SET contact_id = $mainId WHERE contact_id = $otherId";
+        continue;
+      }
+
       // use UPDATE IGNORE + DELETE query pair to skip on situations when
       // there's a UNIQUE restriction on ($field, some_other_field) pair
       if (isset($cidRefs[$table])) {
