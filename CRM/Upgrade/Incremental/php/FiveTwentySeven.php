@@ -74,6 +74,37 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_27_5($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Make label field non required on price field value', 'priceFieldValueLabelNonRequired');
+  }
+
+  /**
+   * Make the price field value label column non required
+   * @return bool
+   */
+  public static function priceFieldValueLabelNonRequired() {
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    if ($domain->locales) {
+      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      foreach ($locales as $locale) {
+        CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label_{$locale}` `label_{$locale}` varchar(255) DEFAULT NULL  COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_price_field_value SET label_{$locale} = NULL WHERE label_{$locale} = 'null'", [], TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    else {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_price_field_value CHANGE `label` `label` varchar(255) DEFAULT NULL  COMMENT 'Price field option label'", [], TRUE, NULL, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_price_field_value SET label = NULL WHERE label = 'null'", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
   public function priceFieldValueLabelRequired($ctx) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
