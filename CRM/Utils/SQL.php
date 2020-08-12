@@ -168,4 +168,21 @@ class CRM_Utils_SQL {
     return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
   }
 
+  /**
+   * Does the DSN indicate the connection should use ssl.
+   *
+   * @param string $dsn
+   *
+   * @return bool
+   */
+  public static function isSSLDSN(string $dsn):bool {
+    // Note that ssl= below is not an official PEAR::DB option. It doesn't know
+    // what to do with it. We made it up because it's not required
+    // to have client-side certificates to use ssl, so here you can specify
+    // you want that by putting ssl=1 in the DSN string.
+    //
+    // Cast to bool in case of error which we interpret as no ssl.
+    return (bool) preg_match('/[\?&](key|cert|ca|capath|cipher|ssl)=/', $dsn);
+  }
+
 }
