@@ -88,6 +88,7 @@ class DAOGetAction extends AbstractGetAction {
     // Early return if table doesn't exist yet due to pending upgrade
     $baoName = $this->getBaoName();
     if (!$baoName::tableHasBeenAdded()) {
+      \Civi::log()->warning("Could not read from {$this->getEntityName()} before table has been added. Upgrade required.", ['civi.tag' => 'upgrade_needed']);
       return;
     }
 
