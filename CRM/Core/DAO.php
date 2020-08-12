@@ -1181,15 +1181,12 @@ LIKE %1
 
   /**
    * @param $version
-   *
+   * @deprecated
    * @return bool
    */
   public function checkVersion($version) {
-    $query = "
-SELECT version
-FROM   civicrm_domain
-";
-    $dbVersion = CRM_Core_DAO::singleValueQuery($query);
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Domain::version');
+    $dbVersion = CRM_Core_BAO_Domain::version();
     return trim($version) == trim($dbVersion);
   }
 
