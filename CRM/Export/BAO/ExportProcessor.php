@@ -971,7 +971,6 @@ class CRM_Export_BAO_ExportProcessor {
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
     }
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
     $row = [];
@@ -1002,10 +1001,7 @@ class CRM_Export_BAO_ExportProcessor {
       if (property_exists($iterationDAO, $field)) {
         $fieldValue = $iterationDAO->$field;
         // to get phone type from phone type id
-        if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
-          $fieldValue = $phoneTypes[$fieldValue];
-        }
-        elseif ($field == 'provider_id' || $field == 'im_provider') {
+        if ($field == 'provider_id' || $field == 'im_provider') {
           $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
         elseif (strstr($field, 'master_id')) {
@@ -1152,7 +1148,7 @@ class CRM_Export_BAO_ExportProcessor {
             if (!empty($fieldSpec['context'])) {
               return $i18n->crm_translate($fieldValue, $fieldSpec);
             }
-            if (!empty($fieldSpec['pseudoconstant']) && !empty($fieldSpec['hasLocationType'])) {
+            if (!empty($fieldSpec['pseudoconstant']) && !empty($fieldSpec['hasLocationType']) && $fieldSpec['name'] !== 'phone_type_id') {
               if (!empty($fieldSpec['bao'])) {
                 $transformedValue = CRM_Core_PseudoConstant::getLabel($fieldSpec['bao'], $fieldSpec['name'], $fieldValue);
                 if ($transformedValue) {
@@ -2171,10 +2167,7 @@ WHERE  id IN ( $deleteIDString )
     foreach ($value as $relationField => $relationValue) {
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
         $fieldValue = $relDAO->$relationField;
-        if ($relationField == 'phone_type_id') {
-          $fieldValue = $phoneTypes[$relationValue];
-        }
-        elseif ($relationField == 'provider_id') {
+        if ($relationField == 'provider_id') {
           $fieldValue = $imProviders[$relationValue] ?? NULL;
         }
         // CRM-13995

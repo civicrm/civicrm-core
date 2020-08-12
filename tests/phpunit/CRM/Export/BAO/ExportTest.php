@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\OptionValue;
+
 /**
  * Class CRM_Core_DAOTest
  *
@@ -80,6 +82,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_campaign',
     ]);
+    OptionValue::update()->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
 
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
@@ -277,6 +280,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Country' => 'Netherlands',
       'Phone' => '',
       'Phone Extension' => '',
+      'Phone Type ID' => '',
       'Phone Type' => '',
       'Email' => 'home@example.com',
       'On Hold' => 'No',
@@ -795,12 +799,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * Less over the top complete than the im test.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
   public function testExportPhoneData() {
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
+
+    OptionValue::update()->addWhere('name', '=', 'Mobile')->setValues(['label' => 'Much Much longer than just phone'])->execute();
     $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home'];
     $phoneTypes = ['Mobile', 'Phone'];
     foreach ($this->contactIDs as $contactID) {
@@ -839,26 +847,29 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
       $locationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType);
       $fields[] = ['name' => 'phone', 'location_type_id' => $locationTypeID];
+      $fields[] = ['name' => 'phone_type', 'location_type_id' => $locationTypeID];
       $fields[] = ['name' => 'phone_type_id', 'location_type_id' => $locationTypeID];
       foreach ($relationships as $contactID => $relationship) {
         $fields[] = ['name' => 'phone_type_id', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
+        $fields[] = ['name' => 'phone_type', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
       }
       foreach ($phoneTypes as $phoneType) {
         $phoneTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType);
         $fields[] = ['name' => 'phone', 'phone_type_id' => $phoneTypeID, 'location_type_id' => $locationTypeID];
         foreach ($relationships as $contactID => $relationship) {
           $fields[] = ['name' => 'phone_type_id', 'phone_type_id' => $phoneTypeID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
+          $fields[] = ['name' => 'phone_type', 'phone_type_id' => $phoneTypeID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
         }
       }
     }
 
     $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
     foreach ($this->csv->getRecords() as $row) {
-      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Mobile']);
+      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Much Much longer than just phone']);
       $this->assertEquals('', $row['Billing-Phone-Phone']);
-      $this->assertEquals('Phone', $row['Spouse of-Phone Type']);
-      $this->assertEquals('Mobile', $row['Phone Type']);
-      $this->assertEquals('Mobile', $row['Billing-Phone Type']);
+      $this->assertEquals('Much Much longer than just phone', $row['Spouse of-Phone Type']);
+      $this->assertEquals('Much Much longer than just phone', $row['Phone Type']);
+      $this->assertEquals('Much Much longer than just phone', $row['Billing-Phone Type']);
     }
   }
 
@@ -1087,6 +1098,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Country' => 'Netherlands',
       'Phone' => '',
       'Phone Extension' => '',
+      'Phone Type ID' => '',
       'Phone Type' => '',
       'Email' => 'home@example.com',
       'On Hold' => 'No',
@@ -1556,6 +1568,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'tags' => 1,
       'notes' => 1,
       'phone_type_id' => 1,
+      'phone_type' => 1,
     ];
     if (!$isContactMode) {
       unset($returnProperties['groups']);
@@ -2228,25 +2241,26 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       68 => 'Country',
       69 => 'Phone',
       70 => 'Phone Extension',
-      71 => 'Phone Type',
-      72 => 'Email',
-      73 => 'On Hold',
-      74 => 'Use for Bulk Mail',
-      75 => 'Signature Text',
-      76 => 'Signature Html',
-      77 => 'IM Provider',
-      78 => 'IM Screen Name',
-      79 => 'OpenID',
-      80 => 'World Region',
-      81 => 'Website',
-      82 => 'Group(s)',
-      83 => 'Tag(s)',
-      84 => 'Note(s)',
+      71 => 'Phone Type ID',
+      72 => 'Phone Type',
+      73 => 'Email',
+      74 => 'On Hold',
+      75 => 'Use for Bulk Mail',
+      76 => 'Signature Text',
+      77 => 'Signature Html',
+      78 => 'IM Provider',
+      79 => 'IM Screen Name',
+      80 => 'OpenID',
+      81 => 'World Region',
+      82 => 'Website',
+      83 => 'Group(s)',
+      84 => 'Tag(s)',
+      85 => 'Note(s)',
     ];
     if (!$isContactExport) {
-      unset($headers[82]);
       unset($headers[83]);
       unset($headers[84]);
+      unset($headers[85]);
     }
     return $headers;
   }
@@ -2532,6 +2546,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'groups' => '`groups` text',
       'tags' => '`tags` text',
       'notes' => '`notes` text',
+      'phone_type' => '`phone_type` varchar(255)',
     ];
     if (!$isContactExport) {
       unset($columns['groups']);

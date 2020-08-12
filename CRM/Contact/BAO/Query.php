@@ -1121,6 +1121,9 @@ class CRM_Contact_BAO_Query {
         }
 
         $field = $this->_fields[$elementName] ?? NULL;
+        if (isset($this->_pseudoConstantsSelect[$field['name']])) {
+          $this->_pseudoConstantsSelect[$name . '-' . $field['name']] = $this->_pseudoConstantsSelect[$field['name']];
+        }
 
         // hack for profile, add location id
         if (!$field) {
