@@ -552,7 +552,8 @@ class CRM_Core_DAO extends DB_DataObject {
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
-    if ($fields && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
+    $daoExt = constant(static::class . '::EXT');
+    if ($fields && $daoExt === 'civicrm' && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
       $fields = array_filter($fields, function($field) use ($dbVer) {
         $add = $field['add'] ?? '1.0.0';
         if (substr_count($add, '.') < 2) {
