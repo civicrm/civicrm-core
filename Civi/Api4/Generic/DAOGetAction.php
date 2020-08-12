@@ -85,6 +85,12 @@ class DAOGetAction extends AbstractGetAction {
   protected $having = [];
 
   public function _run(Result $result) {
+    // Early return if table doesn't exist yet due to pending upgrade
+    $baoName = $this->getBaoName();
+    if (!$baoName::tableHasBeenAdded()) {
+      return;
+    }
+
     $this->setDefaultWhereClause();
     $this->expandSelectClauseWildcards();
     $this->getObjects($result);

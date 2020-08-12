@@ -1149,6 +1149,23 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Checks if this DAO's table ought to exist.
+   *
+   * If there are pending DB updates, this function compares the CiviCRM version of the table to the current schema version.
+   *
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public static function tableHasBeenAdded() {
+    if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
+      return TRUE;
+    }
+    $daoExt = constant(static::class . '::EXT');
+    $daoVersion = constant(static::class . '::TABLE_ADDED') ?? '1.0';
+    return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+  }
+
+  /**
    * Check if there is a given table in the database.
    *
    * @param string $tableName
