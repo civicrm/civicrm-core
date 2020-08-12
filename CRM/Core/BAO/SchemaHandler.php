@@ -880,6 +880,23 @@ MODIFY      {$columnName} varchar( $length )
   }
 
   /**
+   * Get the collation actually being used by the tables in the database.
+   *
+   * The db collation may not match the collation used by the tables, get what is
+   * set on the tables (represented by civicrm_contact).
+   *
+   * @return string
+   */
+  public static function getInUseCollation() {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_contact\'');
+      $dao->fetch();
+      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__];
+  }
+
+  /**
    * Get the database collation.
    *
    * @return string
