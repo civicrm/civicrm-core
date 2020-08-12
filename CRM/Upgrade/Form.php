@@ -287,19 +287,6 @@ SET    version = '$version'
   }
 
   /**
-   * @param $version
-   *
-   * @return bool
-   */
-  public function checkVersion($version) {
-    $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain',
-      $version, 'id',
-      'version'
-    );
-    return (bool) $domainID;
-  }
-
-  /**
    * @return array
    * @throws Exception
    */
