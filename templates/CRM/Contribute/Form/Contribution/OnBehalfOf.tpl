@@ -147,7 +147,6 @@
       $.ajax({
         url         : locationUrl,
         dataType    : "json",
-        timeout     : 5000, //Time in milliseconds
         success     : function(data, status) {
           for (var ele in data) {
             if ($("#"+ ele).hasClass('crm-chain-select-target')) {
