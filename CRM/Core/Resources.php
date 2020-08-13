@@ -269,7 +269,10 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addVars($nameSpace, $vars, $region = NULL) {
-    $existing = CRM_Utils_Array::value($nameSpace, CRM_Utils_Array::value('vars', $this->settings), []);
+    if (!$region) {
+      $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
+    }
+    $existing = $this->settings[$region]['vars'][$nameSpace] ?? [];
     $vars = $this->mergeSettings($existing, $vars);
     $this->addSetting(['vars' => [$nameSpace => $vars]], $region);
     return $this;
@@ -290,7 +293,7 @@ class CRM_Core_Resources {
     if (!$region) {
       $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
     }
-    $this->settings = $this->mergeSettings($this->settings, $settings);
+    $this->settings[$region] = $this->mergeSettings($this->settings[$region] ?? [], $settings);
     if (isset($this->addedSettings[$region])) {
       return $this;
     }
@@ -321,9 +324,14 @@ class CRM_Core_Resources {
 
   /**
    * Helper fn for addSettingsFactory.
+   *
+   * @param string $region
+   *   The region to get settings for
+   *
+   * @return array
    */
-  public function getSettings() {
-    $result = $this->settings;
+  public function getSettings($region) {
+    $result = $this->settings[$region];
     foreach ($this->settingsFactories as $callable) {
       $result = $this->mergeSettings($result, $callable());
     }
@@ -351,16 +359,19 @@ class CRM_Core_Resources {
    * Helper fn for addSetting.
    * Render JavaScript variables for the global CRM object.
    *
+   * @param string $region
+   *   The region to render the settings in
+   *
    * @return string
    */
-  public function renderSetting($region = NULL) {
+  public function renderSetting($region) {
     // On a standard page request we construct the CRM object from scratch
-    if (($region === 'html-header') || !self::isAjaxMode()) {
-      $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
+    if (($region === 'html-header') || (($region !== 'billing-block') && !self::isAjaxMode())) {
+      $js = 'var CRM = ' . json_encode($this->getSettings($region)) . ';';
     }
     // For an ajax request we append to it
     else {
-      $js = 'CRM.$.extend(true, CRM, ' . json_encode($this->getSettings()) . ');';
+      $js = 'CRM.$.extend(true, CRM, ' . json_encode($this->getSettings($region)) . ');';
     }
     return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
@@ -856,7 +867,7 @@ class CRM_Core_Resources {
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), [
+    if (in_array($_REQUEST['snippet'] ?? NULL, [
       CRM_Core_Smarty::PRINT_SNIPPET,
       CRM_Core_Smarty::PRINT_NOFORM,
       CRM_Core_Smarty::PRINT_JSON,

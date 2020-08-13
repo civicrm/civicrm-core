@@ -137,7 +137,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      $this->res->getSettings()
+      $this->res->getSettings('html-header')
     );
   }
 
@@ -147,10 +147,23 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addSetting(['fruit' => ['yours' => 'orange']]);
     $this->assertTreeEquals(
       ['fruit' => ['yours' => 'orange', 'mine' => 'apple']],
-      $this->res->getSettings()
+      $this->res->getSettings('html-header')
     );
-    $actual = $this->res->renderSetting();
-    $expected = json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]);
+    $actual = $this->res->renderSetting('html-header');
+    $expected = 'var CRM = ' . json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]) . ';';
+    $this->assertTrue(strpos($actual, $expected) !== FALSE);
+  }
+
+  public function testAddSettingToBillingBlock() {
+    $this->res
+      ->addSetting(['cheese' => ['cheddar' => 'yellow']], 'billing-block')
+      ->addSetting(['cheese' => ['edam' => 'red']], 'billing-block');
+    $this->assertTreeEquals(
+      ['cheese' => ['edam' => 'red', 'cheddar' => 'yellow']],
+      $this->res->getSettings('billing-block')
+    );
+    $actual = $this->res->renderSetting('billing-block');
+    $expected = 'CRM.$.extend(true, CRM, ' . json_encode(['cheese' => ['edam' => 'red', 'cheddar' => 'yellow']]) . ');';
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
@@ -161,7 +174,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       $event->data['fruit']['mine'] = 'banana';
     });
     $this->res->addSetting(['fruit' => ['mine' => 'apple']]);
-    $settings = $this->res->getSettings();
+    $settings = $this->res->getSettings('html-header');
     $this->assertTreeEquals(['fruit' => ['mine' => 'banana']], $settings);
   }
 
@@ -173,7 +186,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       return ['fruit' => ['mine' => 'apple']];
     });
 
-    $actual = $this->res->getSettings();
+    $actual = $this->res->getSettings('html-header');
     $expected = ['fruit' => ['yours' => 'orange', 'mine' => 'apple']];
     $this->assertTreeEquals($expected, $actual);
   }
@@ -185,14 +198,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->res->addSettingsFactory(function () use (&$muckableValue) {
       return $muckableValue;
     });
-    $actual = $this->res->getSettings();
+    $actual = $this->res->getSettings('html-header');
     $expected = ['fruit' => ['mine' => 'apple', 'yours' => 'orange', 'theirs' => 'apricot']];
     $this->assertTreeEquals($expected, $actual);
 
     // note: the setting is not fixed based on what the factory returns when registered; it's based
     // on what the factory returns when getSettings is called
     $muckableValue = ['fruit' => ['yours' => 'banana']];
-    $actual = $this->res->getSettings();
+    $actual = $this->res->getSettings('html-header');
     $expected = ['fruit' => ['mine' => 'apple', 'yours' => 'banana']];
     $this->assertTreeEquals($expected, $actual);
   }
