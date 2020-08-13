@@ -552,7 +552,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
-    $daoExt = constant(static::class . '::EXT');
+    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
     if ($fields && $daoExt === 'civicrm' && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
       $fields = array_filter($fields, function($field) use ($dbVer) {
         $add = $field['add'] ?? '1.0.0';
@@ -1161,8 +1161,8 @@ class CRM_Core_DAO extends DB_DataObject {
     if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
       return TRUE;
     }
-    $daoExt = constant(static::class . '::EXT');
-    $daoVersion = constant(static::class . '::TABLE_ADDED') ?? '1.0';
+    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    $daoVersion = defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
     return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
   }
 
