@@ -1271,6 +1271,28 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when getting case email subject patterns.
+   *
+   * All emails related to cases have case hash/id in the subject, e.g:
+   * [case #ab12efg] Magic moment
+   * [case #1234] Magic is here
+   *
+   * Using this hook you can replace/enrich default list with some other
+   * patterns, e.g. include case type categories (see CiviCase extension) like:
+   * [(case|project|policy initiative) #hash]
+   * [(case|project|policy initiative) #id]
+   *
+   * @param array $subjectPatterns
+   *   Cases related email subject regexp patterns.
+   *
+   * @return mixed
+   */
+  public static function caseEmailSubjectPatterns(&$subjectPatterns) {
+    return self::singleton()
+      ->invoke(['caseEmailSubjectPatterns'], $subjectPatterns, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_caseEmailSubjectPatterns');
+  }
+
+  /**
    * This hook is called soon after the CRM_Core_Config object has ben initialized.
    * You can use this hook to modify the config object and hence behavior of CiviCRM dynamically.
    *

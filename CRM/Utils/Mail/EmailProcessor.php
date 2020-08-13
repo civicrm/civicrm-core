@@ -224,6 +224,15 @@ class CRM_Utils_Mail_EmailProcessor {
 
         // preseve backward compatibility
         if ($usedfor == 0 || $is_create_activities) {
+          // Mail account may have 'Skip emails which do not have a Case ID
+          // or Case hash' option, if its enabled and email is not related
+          // to cases - then we need to put email to ignored folder.
+          $caseMailUtils = new CRM_Utils_Mail_CaseMail();
+          if (!empty($dao->is_non_case_email_skipped) && !$caseMailUtils->isCaseEmail($mail->subject)) {
+            $store->markIgnored($key);
+            continue;
+          }
+
           // if its the activities that needs to be processed ..
           try {
             $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);

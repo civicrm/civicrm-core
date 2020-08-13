@@ -74,6 +74,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_31_0($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add is_non_case_email_skipped column to civicrm_mail_settings', 'addColumn',
+      'civicrm_mail_settings', 'is_non_case_email_skipped', "TINYINT DEFAULT 0 NOT NULL COMMENT 'Skip emails which do not have a Case ID or Case hash'");
     $this->addTask('Add is_contact_creation_disabled_if_no_match column to civicrm_mail_settings', 'addColumn',
       'civicrm_mail_settings', 'is_contact_creation_disabled_if_no_match', "TINYINT DEFAULT 0 NOT NULL COMMENT 'If this option is enabled, CiviCRM will not create new contacts when filing emails'");
   }

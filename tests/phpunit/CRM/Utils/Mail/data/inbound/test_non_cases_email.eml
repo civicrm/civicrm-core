@@ -1,0 +1,15 @@
+Delivered-To: to@test.test
+Received: by 10.2.13.84 with SMTP id 1234567890;
+        Wed, 19 Dec 2018 10:01:11 +0100 (CET)
+Return-Path: <>
+Message-ID: <abc.def.fhi@test.test>
+Date: Wed, 19 Dec 2018 10:01:07 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+From: from@test.test
+To: to@test.test
+Subject: Love letter
+
+I love you unit test, because you are not related to cases.

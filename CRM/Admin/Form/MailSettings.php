@@ -71,6 +71,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
     $this->addField('activity_status', ['placeholder' => FALSE]);
 
+    $this->add('checkbox', 'is_non_case_email_skipped', ts('Skip emails which do not have a Case ID or Case hash'));
     $this->add('checkbox', 'is_contact_creation_disabled_if_no_match', ts('Do not create new contacts when filing emails'));
   }
 
@@ -148,6 +149,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       'is_ssl',
       'is_default',
       'activity_status',
+      'is_non_case_email_skipped',
       'is_contact_creation_disabled_if_no_match',
     ];
 
@@ -156,6 +158,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       if (in_array($f, [
         'is_default',
         'is_ssl',
+        'is_non_case_email_skipped',
         'is_contact_creation_disabled_if_no_match',
       ])) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
@@ -168,7 +171,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     $params['domain_id'] = CRM_Core_Config::domainID();
 
     // assign id only in update mode
-    $status = ts('Your New  Email Settings have been saved.');
+    $status = ts('Your New Email Settings have been saved.');
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
       $status = ts('Your Email Settings have been updated.');

@@ -52,7 +52,9 @@
       <tr class="crm-mail-settings-form-block-is_default"><td class="label">{$form.is_default.label}</td><td>{$form.is_default.html}</td></tr>
       <tr><td class="label">&nbsp;</td><td class="description">{ts}How this mail account will be used. Only one box may be used for bounce processing. It will also be used as the envelope email when sending mass mailings.{/ts}</td></tr>
 
-      <tr class="crm-mail-settings-form-block-is_contact_creation_disabled_if_no_match"><td class="label">&nbsp;</td><td>{$form.is_contact_creation_disabled_if_no_match.html}{$form.is_contact_creation_disabled_if_no_match.label}</td></tr>
+      <tr class="crm-mail-settings-form-block-is_non_case_email_skipped"><td class="label">&nbsp;</td><td>{$form.is_non_case_email_skipped.html}{$form.is_non_case_email_skipped.label} {help id='is_non_case_email_skipped'}</td></tr>
+
+      <tr class="crm-mail-settings-form-block-is_contact_creation_disabled_if_no_match"><td class="label">&nbsp;</td><td>{$form.is_contact_creation_disabled_if_no_match.html}{$form.is_contact_creation_disabled_if_no_match.label} {help id='is_contact_creation_disabled_if_no_match'}</td></tr>
 
       <tr class="crm-mail-settings-form-block-activity_status"><td class="label">&nbsp;</td><td>{$form.activity_status.label}<div>{$form.activity_status.html}</div></td></tr>
     </table>
@@ -68,9 +70,9 @@
     function showActivityFields() {
       var fields = [
         '.crm-mail-settings-form-block-activity_status',
+        '.crm-mail-settings-form-block-is_non_case_email_skipped',
         '.crm-mail-settings-form-block-is_contact_creation_disabled_if_no_match',
       ];
-
       $(fields.join(', '), $form).toggle($(this).val() === '0');
     }
     $('select[name="is_default"]').each(showActivityFields).change(showActivityFields);
