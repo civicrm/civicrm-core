@@ -106,4 +106,11 @@ trait CustomValueActionTrait {
     return $this->customGroup;
   }
 
+  /**
+   * @return \CRM_Core_DAO|string
+   */
+  protected function getBaoName() {
+    return \CRM_Core_BAO_CustomValue::class;
+  }
+
 }

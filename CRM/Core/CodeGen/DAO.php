@@ -28,6 +28,8 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
 
   private $useHelper = '';
 
+  private $ext = "'civicrm'";
+
   /**
    * CRM_Core_CodeGen_DAO constructor.
    *
@@ -39,10 +41,11 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
     parent::__construct($config);
     $this->name = $name;
     $this->tsFunctionName = $tsFunctionName;
-    // Cleanup helper class with a use statement
+    // If this DAO belongs to an extension, add `use` statement and define EXT constant.
     if (strpos($tsFunctionName, '::ts')) {
       $this->tsFunctionName = 'E::ts';
       $this->useHelper = 'use \\' . explode('::', $tsFunctionName)[0] . ' as E;';
+      $this->ext = 'E::LONG_NAME';
     }
   }
 
@@ -107,6 +110,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
       $template->assign('indicesPhp', var_export($this->tables[$this->name]['index'], 1));
     }
     $template->assign('tsFunctionName', $this->tsFunctionName);
+    $template->assign('ext', $this->ext);
     $template->assign('useHelper', $this->useHelper);
     return $template;
   }

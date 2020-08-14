@@ -212,6 +212,7 @@ class CRM_Core_CodeGen_Specification {
       'objectName' => $klass,
       'title' => $tableXML->title ?? self::nameToTitle($klass),
       'icon' => $tableXML->icon ?? NULL,
+      'add' => $tableXML->add ?? NULL,
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
       'bao' => ($useBao ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),

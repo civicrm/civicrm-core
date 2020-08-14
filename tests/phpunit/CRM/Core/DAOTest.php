@@ -542,4 +542,17 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('api_key', $permissionedContactFields);
   }
 
+  public function testTableHasBeenAdded() {
+    // Hack a different db version
+    CRM_Core_BAO_Domain::getDomain()->version = '5.28.0';
+
+    // Table was added in 5.29
+    $this->assertFalse(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
+
+    // Remove domain version override:
+    CRM_Core_BAO_Domain::version(TRUE);
+
+    $this->assertTrue(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
+  }
+
 }

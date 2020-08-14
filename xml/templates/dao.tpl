@@ -13,6 +13,9 @@
  */
 class {$table.className} extends CRM_Core_DAO {ldelim}
 
+     const EXT = {$ext};
+     const TABLE_ADDED = '{$table.add}';
+
      /**
       * Static instance to hold the table name.
       *

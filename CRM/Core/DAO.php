@@ -552,7 +552,8 @@ class CRM_Core_DAO extends DB_DataObject {
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
-    if ($fields && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
+    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    if ($fields && $daoExt === 'civicrm' && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
       $fields = array_filter($fields, function($field) use ($dbVer) {
         $add = $field['add'] ?? '1.0.0';
         if (substr_count($add, '.') < 2) {
@@ -1146,6 +1147,23 @@ class CRM_Core_DAO extends DB_DataObject {
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
     return $result;
+  }
+
+  /**
+   * Checks if this DAO's table ought to exist.
+   *
+   * If there are pending DB updates, this function compares the CiviCRM version of the table to the current schema version.
+   *
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public static function tableHasBeenAdded() {
+    if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
+      return TRUE;
+    }
+    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    $daoVersion = defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
+    return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
   }
 
   /**

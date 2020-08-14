@@ -28,15 +28,9 @@ abstract class CRM_Utils_Check_Component {
    */
   public function getChecksConfig() {
     if (!isset(Civi::$statics[__FUNCTION__])) {
-      // TODO: Remove this check when MINIMUM_UPGRADABLE_VERSION goes to 4.7.
-      if (CRM_Utils_System::version() !== CRM_Core_BAO_Domain::version() && !CRM_Core_DAO::checkTableExists('civicrm_status_pref')) {
-        Civi::$statics[__FUNCTION__] = [];
-      }
-      else {
-        Civi::$statics[__FUNCTION__] = (array) StatusPreference::get(FALSE)
-          ->addWhere('domain_id', '=', 'current_domain')
-          ->execute()->indexBy('name');
-      }
+      Civi::$statics[__FUNCTION__] = (array) StatusPreference::get(FALSE)
+        ->addWhere('domain_id', '=', 'current_domain')
+        ->execute()->indexBy('name');
     }
     return Civi::$statics[__FUNCTION__];
   }

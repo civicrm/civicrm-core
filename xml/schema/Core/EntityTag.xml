@@ -5,6 +5,7 @@
   <class>EntityTag</class>
   <name>civicrm_entity_tag</name>
   <comment>Tag entities (Contacts, Groups, Actions) to categories.</comment>
+  <add>1.1</add>
   <log>true</log>
   <field>
     <name>id</name>
