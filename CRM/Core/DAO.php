@@ -1521,6 +1521,7 @@ LIKE %1
     }
 
     if ($trapException) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     }
 
@@ -1536,6 +1537,7 @@ LIKE %1
     }
 
     if (is_a($result, 'DB_Error')) {
+      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
       return $result;
     }
 

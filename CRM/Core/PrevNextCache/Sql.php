@@ -40,8 +40,9 @@ class CRM_Core_PrevNextCache_Sql implements CRM_Core_PrevNextCache_Interface {
     $insertSQL = "
 INSERT INTO civicrm_prevnext_cache (cachekey, entity_id1, data)
 ";
-    $result = CRM_Core_DAO::executeQuery($insertSQL . $sql, $sqlParams, FALSE, NULL, FALSE, TRUE, TRUE);
+    $result = CRM_Core_DAO::executeQuery($insertSQL . $sql, $sqlParams, FALSE);
     if (is_a($result, 'DB_Error')) {
+      CRM_Core_Error::deprecatedFunctionWarning('errors are not expected to be returned');
       throw new CRM_Core_Exception($result->message);
     }
     return TRUE;
