@@ -679,7 +679,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Test custom data exporting.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
   public function testExportCustomData() {
@@ -690,17 +692,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     for ($i = 0; $i < 70; $i++) {
       $longString .= 'Blah';
     }
+    $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
 
     $this->callAPISuccess('Contact', 'create', [
       'id' => $this->contactIDs[1],
       $this->getCustomFieldName('text') => $longString,
       $this->getCustomFieldName('country') => 'LA',
+      $this->getCustomFieldName('select_string') => 'blah',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
       ['name' => $this->getCustomFieldName('text')],
       ['name' => $this->getCustomFieldName('country')],
+      ['name' => $this->getCustomFieldName('select_string')],
     ];
 
     $this->doExportTest([
@@ -711,6 +716,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals($longString, $row['Enter text here']);
     $this->assertEquals('Waipu', $row['Billing-City']);
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
+    $this->assertEquals($longString, $row['Pick Color']);
   }
 
   /**
