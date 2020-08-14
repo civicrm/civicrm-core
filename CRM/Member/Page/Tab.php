@@ -48,6 +48,23 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit memberships')) {
       $permissions[] = CRM_Core_Permission::EDIT;
+      $linkButtons['add_membership'] = [
+        'title' => ts('Add Membership'),
+        'url' => 'civicrm/contact/view/membership',
+        'qs' => "reset=1&action=add&cid={$this->_contactId}&context=membership",
+        'icon' => 'fa-plus-circle',
+        'accessKey' => 'N',
+      ];
+      if ($this->_accessContribution && CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
+        $linkButtons['creditcard_membership'] = [
+          'title' => ts('Submit Credit Card Membership'),
+          'url' => 'civicrm/contact/view/membership',
+          'qs' => "reset=1&action=add&cid={$this->_contactId}&context=membership&mode=live",
+          'icon' => 'fa-credit-card',
+          'accessKey' => 'C',
+        ];
+      }
+      $this->assign('linkButtons', $linkButtons ?? []);
     }
     if (CRM_Core_Permission::check('delete in CiviMember')) {
       $permissions[] = CRM_Core_Permission::DELETE;
@@ -317,10 +334,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card membership
-    $newCredit = CRM_Core_Config::isEnabledBackOfficeCreditCardPayments();
-    $this->assign('newCredit', $newCredit);
-
-    if ($newCredit) {
+    if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
       $this->_isPaymentProcessor = TRUE;
     }
     else {
