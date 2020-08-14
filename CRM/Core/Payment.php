@@ -831,7 +831,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 20,
           'autocomplete' => 'off',
-          'class' => 'creditcard',
+          'class' => 'creditcard, required',
         ],
         'is_required' => TRUE,
         // 'description' => '16 digit card number', // If you enable a description field it will be shown below the field on the form
@@ -844,6 +844,7 @@ abstract class CRM_Core_Payment {
           'size' => 5,
           'maxlength' => 10,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'is_required' => $isCVVRequired,
         'rules' => [
@@ -867,7 +868,7 @@ abstract class CRM_Core_Payment {
             'rule_parameters' => TRUE,
           ],
         ],
-        'extra' => ['class' => 'crm-form-select'],
+        'extra' => ['class' => 'crm-form-select required'],
       ],
       'credit_card_type' => [
         'htmlType' => 'select',
@@ -884,6 +885,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 34,
           'autocomplete' => 'on',
+          'class' => 'required',
         ],
         'is_required' => TRUE,
       ],
@@ -896,6 +898,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 34,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'rules' => [
           [
@@ -915,6 +918,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 11,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'is_required' => TRUE,
         'rules' => [
@@ -933,6 +937,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 64,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'is_required' => TRUE,
 
@@ -1034,6 +1039,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1060,6 +1066,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1073,6 +1080,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1086,6 +1094,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1096,6 +1105,7 @@ abstract class CRM_Core_Payment {
       'name' => "billing_state_province_id-{$billingLocationID}",
       'cc_field' => TRUE,
       'is_required' => TRUE,
+      'extra' => ['class' => 'required'],
     ];
 
     $metadata["billing_postal_code-{$billingLocationID}"] = [
@@ -1107,6 +1117,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1120,6 +1131,7 @@ abstract class CRM_Core_Payment {
         '' => ts('- select -'),
       ] + CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
+      'extra' => ['class' => 'required'],
     ];
     return $metadata;
   }
