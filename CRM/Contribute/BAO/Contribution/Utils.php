@@ -170,7 +170,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
             // and always calling it first.
             $form->postProcessHook();
           }
-          $result = $payment->doPayment($paymentParams);
+          $processorParams = $paymentParams;
+          $result = $payment->doPayment($processorParams);
           $form->_params = array_merge($form->_params, $result);
           $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
           if (!empty($result['trxn_id'])) {

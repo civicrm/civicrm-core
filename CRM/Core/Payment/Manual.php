@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Payment\PropertyBag;
+
 /**
  *
  * @package CRM
@@ -101,7 +103,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
    * more agnostic.
    *
-   * @param array $params
+   * @param array|PropertyBag $params
    *
    * @param string $component
    *
@@ -111,8 +113,8 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
-    $params['payment_status_id'] = $this->getResult();
-    return $params;
+    $params = PropertyBag::cast($params);
+    return ['payment_status_id' => $this->getResult()];
   }
 
   /**
