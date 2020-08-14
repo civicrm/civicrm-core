@@ -539,10 +539,10 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addYesNo('pledge_test', ts('Pledge is a Test?'), TRUE);
     $form->add('text', 'pledge_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('pledge_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $form->addRule('pledge_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $form->add('text', 'pledge_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     $form->addYesNo('pledge_acknowledge_date_is_not_null', ts('Acknowledgement sent?'), TRUE);
 
