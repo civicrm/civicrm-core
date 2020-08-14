@@ -33,7 +33,6 @@
   {/if}
 
   <div class="crm-block crm-form-block crm-contribution-form-block">
-
     {if !$email and $action neq 8 and $context neq 'standalone'}
       <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
@@ -102,7 +101,7 @@
           </tr>
 
           {if $buildRecurBlock && !$payNow}
-            <tr id='recurringPaymentBlock' class='hiddenElement'>
+            <tr id='recurringPaymentBlock'>
               <td></td>
               <td>
                 <strong>{$form.is_recur.html} {ts}every{/ts}
@@ -343,6 +342,7 @@
             loadPanes(cj(this).attr('id'));
           });
         });
+
         // load panes function calls for snippet based on id of crm-accordion-header
         function loadPanes(id) {
           var url = "{/literal}{crmURL p='civicrm/contact/view/contribution' q="snippet=4&id=`$entityID`&formType=" h=0}{literal}" + id;
@@ -398,9 +398,7 @@
         {* Additional Detail / Honoree Information / Premium Information *}
         {foreach from=$allPanes key=paneName item=paneValue}
           <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
-            <div class="crm-accordion-header" id="{$paneValue.id}">
-              {$paneName}
-            </div><!-- /.crm-accordion-header -->
+            <div class="crm-accordion-header" id="{$paneValue.id}">{$paneName}</div>
             <div class="crm-accordion-body">
               <div class="{$paneValue.id}"></div>
             </div><!-- /.crm-accordion-body -->
@@ -469,17 +467,13 @@
       });
     </script>
   {/if} {* not delete mode if*}
-
 {/if} {* closing of main custom data if *}
 
 {literal}
 <script type="text/javascript">
-
   {/literal}
-
   // load form during form rule.
   {if $buildPriceSet}{literal}buildAmount();{/literal}{/if}
-
   {literal}
 
   // CRM-16451: set financial type of 'Price Set' in back office contribution
