@@ -222,7 +222,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->add('wysiwyg', 'goal_general', ts('Campaign Goals'), ['rows' => 2, 'cols' => 40]);
     $this->add('text', 'goal_revenue', ts('Revenue Goal'), ['size' => 8, 'maxlength' => 12]);
     $this->addRule('goal_revenue', ts('Please enter a valid money value (e.g. %1).',
-      [1 => CRM_Utils_Money::format('99.99', ' ')]
+      [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(99.99)]
     ), 'money');
 
     // is this Campaign active
