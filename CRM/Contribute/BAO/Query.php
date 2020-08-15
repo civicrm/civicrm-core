@@ -915,10 +915,10 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addFormFieldsFromMetadata();
 
     $form->add('text', 'contribution_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $form->add('text', 'contribution_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     // Adding select option for curreny type -- CRM-4711
     $form->add('select', 'contribution_currency_type',

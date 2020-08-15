@@ -162,7 +162,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     // collect goal amount
     $this->add('text', 'goal_amount', ts('Goal Amount'), ['size' => 8, 'maxlength' => 12]);
-    $this->addRule('goal_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $this->addRule('goal_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     // is confirmation page enabled?
     $this->addElement('checkbox', 'is_confirm_enabled', ts('Use a confirmation page?'));
