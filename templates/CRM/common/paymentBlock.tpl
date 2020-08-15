@@ -24,6 +24,7 @@
     // to be hidden (or removed) in which case it can go from this function.
     var billing_block = cj("div#billing-payment-block");
     if (isHide) {
+      cj('div#billing-payment-block select.crm-select2').addClass('crm-no-validate')
       payment_options.hide();
       payment_processor.hide();
       payment_information.hide();
@@ -32,6 +33,7 @@
       cj('input[name="payment_processor_id"]').removeProp('checked');
     }
     else {
+      cj('div#billing-payment-block select.crm-select2').removeClass('crm-no-validate')
       payment_options.show();
       payment_processor.show();
       payment_information.show();
