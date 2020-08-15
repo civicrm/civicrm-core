@@ -295,12 +295,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $transaction = new CRM_Core_Transaction();
 
-    // @todo remove $ids from here $ids['userId'] is still used
     $params['id'] = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membership', $ids));
-    if (empty($params['modified_id']) && !empty($ids['userID'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('$ids["userID"] no longer supported - use $params["modified_id"]');
-      $params['modified_id'] = $ids['userID'];
-    }
     $membership = self::add($params);
 
     if (is_a($membership, 'CRM_Core_Error')) {
