@@ -45,7 +45,6 @@ trait CRMTraits_Financial_OrderTrait {
     $orderID = $this->callAPISuccess('Order', 'create', [
       'total_amount' => '200',
       'financial_type_id' => 'Donation',
-      'contribution_status_id' => 'Pending',
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $this->_contributionPageID,
       'payment_processor_id' => $this->_paymentProcessorID,
@@ -86,6 +85,80 @@ trait CRMTraits_Financial_OrderTrait {
     ])['id'];
 
     $this->ids['ContributionRecur'][0] = $contributionRecur['id'];
+    $this->ids['Contribution'][0] = $orderID;
+  }
+
+  /**
+   * Create an order with more than one membership.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createMultipleMembershipOrder() {
+    $this->createExtraneousContribution();
+    $this->ids['contact'][0] = $this->individualCreate();
+    $this->ids['contact'][1] = $this->individualCreate();
+    $this->ids['membership_type'][0] = $this->membershipTypeCreate();
+    $this->ids['membership_type'][1] = $this->membershipTypeCreate(['name' => 'Type 2']);
+    $priceFieldID = $this->callAPISuccessGetValue('price_field', [
+      'return' => 'id',
+      'label' => 'Membership Amount',
+      'options' => ['limit' => 1, 'sort' => 'id DESC'],
+    ]);
+    $generalPriceFieldValueID = $this->callAPISuccessGetValue('price_field_value', [
+      'return' => 'id',
+      'label' => 'General',
+      'options' => ['limit' => 1, 'sort' => 'id DESC'],
+    ]);
+
+    $orderID = $this->callAPISuccess('Order', 'create', [
+      'total_amount' => 400,
+      'financial_type_id' => 'Member Dues',
+      'contact_id' => $this->_contactID,
+      'is_test' => 0,
+      'payment_instrument_id' => 'Check',
+      'receive_date' => '2019-07-25 07:34:23',
+      'line_items' => [
+        [
+          'params' => [
+            'contact_id' => $this->ids['contact'][0],
+            'membership_type_id' => $this->ids['membership_type'][0],
+            'source' => 'Payment',
+          ],
+          'line_item' => [
+            [
+              'label' => 'General',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_membership',
+              'price_field_id' => $priceFieldID,
+              'price_field_value_id' => $generalPriceFieldValueID,
+            ],
+          ],
+        ],
+        [
+          'params' => [
+            'contact_id' => $this->ids['contact'][1],
+            'membership_type_id' => $this->ids['membership_type'][0],
+            'source' => 'Payment',
+          ],
+          'line_item' => [
+            [
+              'label' => 'General',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_membership',
+              'price_field_id' => $priceFieldID,
+              'price_field_value_id' => $generalPriceFieldValueID,
+            ],
+          ],
+        ],
+      ],
+    ])['id'];
+
     $this->ids['Contribution'][0] = $orderID;
   }
 

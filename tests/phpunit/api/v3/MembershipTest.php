@@ -21,7 +21,9 @@
  * @group headless
  */
 class api_v3_MembershipTest extends CiviUnitTestCase {
-  protected $_apiversion;
+
+  use CRMTraits_Financial_OrderTrait;
+
   protected $_contactID;
   protected $_membershipID;
   protected $_membershipID2;
@@ -37,7 +39,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
     $this->_membershipTypeID2 = $this->membershipTypeCreate([
@@ -1006,7 +1007,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
-    if ($objectName == 'Membership' && $op == 'edit') {
+    if ($objectName === 'Membership' && $op === 'edit') {
       $existingMembership = $this->callAPISuccessGetSingle('membership', ['id' => $params['id']]);
       unset($params['id'], $params['membership_id']);
       $params['join_date'] = $params['membership_start_date'] = $params['start_date'] = date('Ymd000000', strtotime($existingMembership['start_date']));
@@ -1526,6 +1527,22 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
 
+  }
+
+  /**
+   * Test that a contribution linked to multiple memberships results in all being updated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultipleMembershipContribution() {
+    $this->createMultipleMembershipOrder();
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->ids['Contribution'][0],
+      'payment_instrument_id' => 'Check',
+      'total_amount' => 400,
+    ]);
+    $memberships = $this->callAPISuccess('membership', 'get')['values'];
+    $this->assertCount(2, $memberships);
   }
 
   /**
