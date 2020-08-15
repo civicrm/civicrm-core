@@ -135,23 +135,13 @@ class CRM_Utils_SQL_TempTable {
   /**
    * Get the utf8 string for the table.
    *
-   * If the db collation is already utf8 by default (either
-   * utf8 or utf84mb) then rely on that. Otherwise set to utf8.
-   *
-   * Respecting the DB collation supports utf8mb4 adopters, which is currently
-   * not the norm in civi installs.
+   * Our tables are either utf8_unicode_ci OR utf8mb8_unicode_ci - check the contact table
+   * to see which & use the matching one.
    *
    * @return string
    */
   public function getUtf8String() {
-    if (!$this->utf8) {
-      return '';
-    }
-    $dbUTF = CRM_Core_BAO_SchemaHandler::getDBCollation();
-    if (strpos($dbUTF, 'utf8') !== FALSE) {
-      return '';
-    }
-    return self::UTF8;
+    return $this->utf8 ? ('COLLATE ' . CRM_Core_BAO_SchemaHandler::getInUseCollation()) : '';
   }
 
   /**
