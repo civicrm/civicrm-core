@@ -116,7 +116,7 @@ function civicrm_api3_group_contact_create($params) {
       $params['contact_id'] = $info['values'][$params['id']]['contact_id'];
     }
   }
-  $action = CRM_Utils_Array::value('status', $params, 'Added');
+  $action = $params['status'] ?? 'Added';
   return _civicrm_api3_group_contact_common($params, $action);
 }
 
