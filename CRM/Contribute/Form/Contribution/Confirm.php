@@ -155,7 +155,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $paymentProcessorOutcome, $receiptDate, $recurringContributionID) {
     $contributionParams = [
       'financial_type_id' => $financialTypeID,
-      'receive_date' => isset($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
+      'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
       'tax_amount' => $params['tax_amount'] ?? NULL,
       'amount_level' => $params['amount_level'] ?? NULL,
       'invoice_id' => $params['invoiceID'],
