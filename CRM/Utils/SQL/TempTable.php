@@ -50,7 +50,14 @@
  */
 class CRM_Utils_SQL_TempTable {
 
+  /**
+   * @deprecated
+   * The system will attempt to use the same as your other tables, and
+   * if you really need something else then use createWithColumns and
+   * specify it per-column there.
+   */
   const UTF8 = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
+
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
   // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
@@ -135,8 +142,10 @@ class CRM_Utils_SQL_TempTable {
   /**
    * Get the utf8 string for the table.
    *
-   * Our tables are either utf8_unicode_ci OR utf8mb8_unicode_ci - check the contact table
-   * to see which & use the matching one.
+   * Our tables are either utf8_unicode_ci OR utf8mb4_unicode_ci - check the contact table
+   * to see which & use the matching one. Or early adopters may have switched
+   * switched to other collations e.g. utf8mb4_0900_ai_ci (the default in mysql
+   * 8).
    *
    * @return string
    */
@@ -241,9 +250,11 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
+   * @deprecated
    * @return bool
    */
   public function isUtf8() {
+    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
     return $this->utf8;
   }
 
@@ -322,6 +333,7 @@ class CRM_Utils_SQL_TempTable {
    * @return $this
    */
   public function setUtf8($value = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
     $this->utf8 = $value;
     return $this;
   }
