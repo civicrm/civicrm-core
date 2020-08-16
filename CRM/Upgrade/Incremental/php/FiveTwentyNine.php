@@ -25,10 +25,11 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev == '5.29.beta1') {
+      if (CIVICRM_UF === 'Drupal8') {
+        $preUpgradeMessage .= '<p>' . ts('<em>Pre-announcement for upcoming version 5.30</em>: If your composer configuration or composer.json does not enable patching, you MUST do that BEFORE running composer to update your files to version 5.30. Either by using `composer config \'extra.enable-patching\' true`, or updating the top level composer.json\'s extra section with `"enable-patching": true`. See %1 for details.', [1 => '<a href="' . CRM_Utils_System::docURL2('installation/drupal8', TRUE) . '">Drupal 8 installation guide</a>']) . '</p>';
+      }
+    }
   }
 
   /**
