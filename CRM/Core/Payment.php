@@ -844,7 +844,7 @@ abstract class CRM_Core_Payment {
           'size' => 5,
           'maxlength' => 10,
           'autocomplete' => 'off',
-          'class' => 'required',
+          'class' => ($isCVVRequired ? 'required' : ''),
         ],
         'is_required' => $isCVVRequired,
         'rules' => [
