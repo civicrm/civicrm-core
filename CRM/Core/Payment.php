@@ -831,7 +831,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 20,
           'autocomplete' => 'off',
-          'class' => 'creditcard, required',
+          'class' => 'creditcard required',
         ],
         'is_required' => TRUE,
         // 'description' => '16 digit card number', // If you enable a description field it will be shown below the field on the form
