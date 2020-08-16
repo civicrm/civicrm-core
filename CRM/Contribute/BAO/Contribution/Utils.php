@@ -172,6 +172,17 @@ class CRM_Contribute_BAO_Contribution_Utils {
           }
           $processorParams = $paymentParams;
           $result = $payment->doPayment($processorParams);
+          if (empty($result['fee_amount']) && is_array($processorParams) && !empty($processorParams['fee_amount'])) {
+            // It's possible a processor might be setting fee_amount in the processorParams
+            // & expecting it to be parsed as this may have happened historically (the array used to be
+            // passed on to weird & wonderful places.)
+            // We don't have to worry about the other return params we support as we can see
+            // below that trxn_id was always taking from what was returned, ditto payment_status_id.
+            // Note we add the is_array check as most processors are not using property bags & we can reasonably
+            // communicate the need to add this to return properties to the very few that are.
+            CRM_Core_Error::deprecatedFunctionWarning('fee amount should be returned from doPayment if it needs to be set');
+            $result['fee_amount'] = $processorParams['fee_amount'];
+          }
           $form->_params = array_merge($form->_params, $result);
           $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
           if (!empty($result['trxn_id'])) {
