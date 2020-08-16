@@ -1419,7 +1419,7 @@ class CRM_Utils_System {
    * @return mixed
    */
   public static function formatDocUrl($url) {
-    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/latest/', $url);
+    return preg_replace('#^(installation|user|sysadmin|dev)/#', '\1/en/latest/', $url);
   }
 
   /**
