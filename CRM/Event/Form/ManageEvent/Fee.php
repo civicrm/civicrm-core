@@ -814,7 +814,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         $params['value'][$index] = CRM_Utils_Rule::cleanMoney(trim($value));
       }
     }
-    foreach ($params['discounted_value'] as $index => $discountedValueSet) {
+    foreach ($params['discounted_value'] ?? [] as $index => $discountedValueSet) {
       foreach ($discountedValueSet as $innerIndex => $value) {
         if (CRM_Utils_System::isNull($value)) {
           unset($params['discounted_value'][$index][$innerIndex]);
