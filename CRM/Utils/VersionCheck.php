@@ -74,9 +74,10 @@ class CRM_Utils_VersionCheck {
   /**
    * Self-populates version info
    *
-   * @throws \Exception
+   * @param bool $force
+   * @throws Exception
    */
-  public function initialize() {
+  public function initialize($force = FALSE) {
     $this->getJob();
 
     // Populate remote $versionInfo from cache file
@@ -84,9 +85,9 @@ class CRM_Utils_VersionCheck {
 
     // Fallback if scheduled job is enabled but has failed to run.
     $expiryTime = time() - self::CACHEFILE_EXPIRE;
-    if (!empty($this->cronJob['is_active']) &&
+    if ($force || (!empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
-    ) {
+    )) {
       // First try updating the files modification time, for 2 reasons:
       //  - if the file is not writeable, this saves the trouble of pinging back
       //  - if the remote server is down, this will prevent an immediate retry

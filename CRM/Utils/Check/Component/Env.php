@@ -471,13 +471,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if new versions are available
+   * @param bool $force
    * @return CRM_Utils_Check_Message[]
+   * @throws CRM_Core_Exception
    */
-  public function checkVersion() {
+  public function checkVersion($force = FALSE) {
     $messages = [];
     try {
       $vc = new CRM_Utils_VersionCheck();
-      $vc->initialize();
+      $vc->initialize($force);
     }
     catch (Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
@@ -492,7 +494,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     // Show a notice if the version_check job is disabled
-    if (empty($vc->cronJob['is_active'])) {
+    if (!$force && empty($vc->cronJob['is_active'])) {
       $args = empty($vc->cronJob['id']) ? ['reset' => 1] : ['reset' => 1, 'action' => 'update', 'id' => $vc->cronJob['id']];
       $messages[] = new CRM_Utils_Check_Message(
         'checkVersionDisabled',
