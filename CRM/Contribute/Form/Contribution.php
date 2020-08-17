@@ -1124,7 +1124,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
       try {
         $completeStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        $result = $payment->doPayment($paymentParams, 'contribute');
+        $result = $payment->doPayment($paymentParams);
         $this->assign('trxn_id', $result['trxn_id']);
         $contribution->trxn_id = $result['trxn_id'];
         /* Our scenarios here are

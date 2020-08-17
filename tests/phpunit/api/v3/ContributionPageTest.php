@@ -17,6 +17,9 @@
  * @group headless
  */
 class api_v3_ContributionPageTest extends CiviUnitTestCase {
+
+  use CRM_Core_Payment_AuthorizeNetTrait;
+
   protected $testAmount = 34567;
   protected $params;
   protected $id = 0;
@@ -447,12 +450,18 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test submit with a membership block in place.
    *
-   * @throws \Exception
+   * @dataProvider getProcessors
+   *
+   * @param string $processor
+   *   Processor to test.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail() {
+  public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail($processor) {
     $mut = new CiviMailUtils($this, TRUE);
     $this->_ids['membership_type'] = [$this->membershipTypeCreate(['minimum_fee' => 0])];
-    $this->setUpMembershipContributionPage();
+    $this->setUpMembershipContributionPage(FALSE, FALSE, [], $processor);
     $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
 
     $submitParams = [
@@ -482,6 +491,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
+  }
+
+  /**
+   * Data provider for processors to test.
+   */
+  public function getProcessors() {
+    return [['AuthorizeNet'], ['Dummy']];
   }
 
   /**
@@ -841,6 +857,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * An activity should also be created. CRM-16417.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPaymentProcessorFailure() {
     $this->setUpContributionPage();
@@ -1093,6 +1110,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - create another - end date should be extended
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitMembershipComplexPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
@@ -1409,12 +1427,14 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @param bool $isSeparatePayment
    * @param bool $isRecur
    * @param array $membershipTypeParams Parameters to pass to membershiptype.create API
+   * @param string $processorKey
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE, $membershipTypeParams = []) {
+  public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE, $membershipTypeParams = [], $processorKey = 'Dummy') {
     $this->setUpMembershipBlockPriceSet($membershipTypeParams);
-    $this->setupPaymentProcessor();
+    $this->setupPaymentProcessor($processorKey);
     $this->setUpContributionPage($isRecur);
 
     $this->callAPISuccess('membership_block', 'create', [
@@ -1610,6 +1630,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * membership type for different intervals.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUpMultiIntervalMembershipContributionPage() {
     $this->setupPaymentProcessor();
@@ -1676,6 +1697,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test submit with a membership block in place.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitMultiIntervalMembershipContributionPage() {
     $this->setUpMultiIntervalMembershipContributionPage();
@@ -1714,15 +1736,25 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Create a payment processor instance.
    *
+   * @param string $key
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function setupPaymentProcessor() {
-    $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate([
-      'payment_processor_type_id' => 'Dummy',
-      'class_name' => 'Payment_Dummy',
-      'billing_mode' => 1,
-    ]);
+  protected function setupPaymentProcessor($key = 'Dummy') {
+    if ($key === 'Dummy') {
+      $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate([
+        'payment_processor_type_id' => 'Dummy',
+        'class_name' => 'Payment_Dummy',
+        'billing_mode' => 1,
+      ]);
+    }
+    elseif ($key === 'AuthorizeNet') {
+      $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorAuthorizeNetCreate();
+      $this->setupMockHandler($this->params['payment_processor_id']);
+    }
     $this->_paymentProcessor = $this->callAPISuccess('payment_processor', 'getsingle', ['id' => $this->params['payment_processor_id']]);
+
   }
 
   /**
@@ -1731,6 +1763,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - we process 1 pledge with a future start date. A recur contribution and the pledge should be created with first payment date in the future.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitPledgePaymentPaymentProcessorRecurFuturePayment() {
     $this->params['adjust_recur_start_date'] = TRUE;

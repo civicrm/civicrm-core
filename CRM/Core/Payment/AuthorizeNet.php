@@ -103,15 +103,21 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * Submit a payment using Advanced Integration Method.
    *
-   * @param array $params
+   * @param array|PropertyBag $params
    *   Assoc array of input parameters for this transaction.
    *
+   * @param string $component
+   *
    * @return array
-   *   the result in a nice formatted array (or an error object)
+   *   the result in an array with payment_status_id being the vital key.
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params) {
+  public function doPayment(&$params, $component = 'contribute') {
+    $this->_component = $component;
+    if ((float) $params['amount'] === 0.0) {
+      return $this->getSuccessResult();
+    }
     if (!defined('CURLOPT_SSLCERT')) {
       // Note that guzzle doesn't necessarily require CURL, although it prefers it. But we should leave this error
       // here unless someone suggests it is not required since it's likely helpful.
@@ -136,7 +142,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
       $this->doRecurPayment();
-      return $params;
+      return array_merge($params, ['payment_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')]);
     }
 
     $postFields = [];
@@ -151,7 +157,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     foreach ($authorizeNetFields as $field => $value) {
       // CRM-7419, since double quote is used as enclosure while doing csv parsing
-      $value = ($field == 'x_description') ? str_replace('"', "'", $value) : $value;
+      $value = ($field === 'x_description') ? str_replace('"', "'", $value) : $value;
       $postFields[] = $field . '=' . urlencode($value);
     }
 
@@ -173,9 +179,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     // fetch available contribution statuses
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
-    // check for application errors
-    // TODO:
-    // AVS, CVV2, CAVV, and other verification results
+    // It is not necessary to return all params & as a follow up this should be refined to the confirmed array.
+    // See note lower down with the todo.
+    $result = $params;
+
     switch ($response_fields[0]) {
       case self::AUTH_REVIEW:
         $params['payment_status_id'] = array_search('Pending', $contributionStatus);
@@ -192,13 +199,15 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
       default:
         // Success
-        $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
+        // @todo - if we proceed with https://github.com/civicrm/civicrm-core/pull/18150
+        // then once we have documented the expectations for return params & checked no forms
+        // are attempting to access trxn_id from the $params-passed-as-reference
+        // then we should stop setting it on $params & just return 'result' here.
+        $result['trxn_id'] = $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
+        $result['payment_status_id'] = array_search('Completed', $contributionStatus);
         break;
     }
-
-    // TODO: include authorization code?
-
-    return $params;
+    return $result;
   }
 
   /**

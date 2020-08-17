@@ -1368,9 +1368,8 @@ abstract class CRM_Core_Payment {
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the mome.
-    if ($params['amount'] == 0) {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-      return $result;
+    if ((float) $params['amount'] === 0.0) {
+      return $this->getSuccessResult();
     }
 
     if ($this->_paymentProcessor['billing_mode'] == 4) {
@@ -1846,6 +1845,15 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    */
   public function isSendReceiptForPending() {
     return FALSE;
+  }
+
+  /**
+   * Get the result array to return from doPayment on success.
+   *
+   * @return array
+   */
+  protected function getSuccessResult(): array {
+    return ['payment_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')];
   }
 
 }
