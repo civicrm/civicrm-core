@@ -150,4 +150,15 @@
       <type>Select</type>
     </html>
   </field>
+  <field>
+    <name>is_contact_creation_disabled_if_no_match</name>
+    <type>boolean</type>
+    <title>Do not create new contacts when filing emails</title>
+    <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <description>If this option is enabled, CiviCRM will not create new contacts when filing emails.</description>
+    <add>5.30</add>
+  </field>
 </table>

@@ -70,6 +70,8 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     ];
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
     $this->addField('activity_status', ['placeholder' => FALSE]);
+
+    $this->add('checkbox', 'is_contact_creation_disabled_if_no_match', ts('Do not create new contacts when filing emails'));
   }
 
   /**
@@ -146,6 +148,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       'is_ssl',
       'is_default',
       'activity_status',
+      'is_contact_creation_disabled_if_no_match',
     ];
 
     $params = [];
@@ -153,6 +156,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       if (in_array($f, [
         'is_default',
         'is_ssl',
+        'is_contact_creation_disabled_if_no_match',
       ])) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
       }

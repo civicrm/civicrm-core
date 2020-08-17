@@ -136,6 +136,13 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
   public $activity_status;
 
   /**
+   * If this is enabled CiviCRM will not create new contact when filing emails.
+   *
+   * @var bool
+   */
+  public $is_contact_creation_disabled_if_no_match;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -395,6 +402,18 @@ class CRM_Core_DAO_MailSettings extends CRM_Core_DAO {
             'optionEditPath' => 'civicrm/admin/options/activity_status',
           ],
           'add' => '4.7',
+        ],
+        'is_contact_creation_disabled_if_no_match' => [
+          'name' => 'is_contact_creation_disabled_if_no_match',
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+          'title' => ts('Do not create new contacts when filing emails'),
+          'description' => ts('If this option is enabled, CiviCRM will not create new contacts when filing emails.'),
+          'where' => 'civicrm_mail_settings.is_contact_creation_disabled_if_no_match',
+          'table_name' => 'civicrm_mail_settings',
+          'entity' => 'MailSettings',
+          'bao' => 'CRM_Core_BAO_MailSettings',
+          'localizable' => 0,
+          'add' => '5.30',
         ],
       ];
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
