@@ -169,4 +169,37 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->eventQueue = $this->callAPISuccess('MailingEventQueue', 'get', ['api.MailingEventQueue.create' => ['hash' => 'aaaaaaaaaaaaaaaa']]);
   }
 
+  /**
+   * Set up mail account with 'Do not create new contacts when filing emails'
+   * option enabled.
+   */
+  public function setUpDoNotCreateContact() {
+    $this->callAPISuccess('MailSettings', 'get', [
+      'api.MailSettings.create' => [
+        'name' => 'mailbox',
+        'protocol' => 'Localdir',
+        'source' => __DIR__ . '/data/mail',
+        'domain' => 'example.com',
+        'is_default' => '0',
+        'is_contact_creation_disabled_if_no_match' => TRUE,
+      ],
+    ]);
+  }
+
+  /**
+   * Test case email processing when is_non_case_email_skipped is enabled.
+   */
+  public function testInboundProcessingDoNotCreateContact() {
+    $this->setUpDoNotCreateContact();
+    $mail = 'test_non_cases_email.eml';
+
+    copy(__DIR__ . '/data/inbound/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->callAPISuccess('job', 'fetch_activities', []);
+    $result = civicrm_api3('Contact', 'get', [
+      'sequential' => 1,
+      'email' => "from@test.test",
+    ]);
+    $this->assertEmpty($result['values']);
+  }
+
 }

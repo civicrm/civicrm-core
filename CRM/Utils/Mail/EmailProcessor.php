@@ -157,7 +157,7 @@ class CRM_Utils_Mail_EmailProcessor {
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
-    catch (Exception$e) {
+    catch (Exception $e) {
       $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
@@ -226,7 +226,8 @@ class CRM_Utils_Mail_EmailProcessor {
         if ($usedfor == 0 || $is_create_activities) {
           // if its the activities that needs to be processed ..
           try {
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+            $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE);
           }
           catch (Exception $e) {
             echo $e->getMessage();
@@ -241,6 +242,7 @@ class CRM_Utils_Mail_EmailProcessor {
           if (!empty($dao->activity_status)) {
             $params['status_id'] = $dao->activity_status;
           }
+
           $result = civicrm_api('activity', 'create', $params);
 
           if ($result['is_error']) {
