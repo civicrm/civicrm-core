@@ -54,23 +54,12 @@
     selectCreateOrg(orgOption, false);
 
     if (is_for_organization.length) {
-      showHideOnBehalfOfBlock();
-
-      is_for_organization.on('change', function() {
-        showHideOnBehalfOfBlock();
-      });
-    }
-
-    function showHideOnBehalfOfBlock() {
       $('#on-behalf-block').toggle(is_for_organization.is(':checked'));
-
-      if (is_for_organization.is(':checked')) {
-        $('#onBehalfOfOrg select.crm-select2').removeClass('crm-no-validate');
-      }
-      else {
-        $('#onBehalfOfOrg select.crm-select2').addClass('crm-no-validate');
-      }
     }
+
+    is_for_organization.on('change', function(){
+      $('#on-behalf-block').toggle($(this).is(':checked'));
+    });
 
     $("input:radio[name='org_option']").click( function( ) {
       var orgOption = $(this).attr('id');
