@@ -151,7 +151,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     // Success
     $params['trxn_result_code'] = $pjpgResponse['dc_response_code'];
     $params['trxn_id'] = $pjpgResponse['dc_transaction_id'];
-    $params['gross_amount'] = $params['amount'];
 
     return $params;
   }

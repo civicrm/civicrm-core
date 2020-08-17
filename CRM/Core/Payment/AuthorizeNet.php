@@ -193,7 +193,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       default:
         // Success
         $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
-        $params['gross_amount'] = $response_fields[9];
         break;
     }
 
