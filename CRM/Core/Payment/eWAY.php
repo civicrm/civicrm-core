@@ -340,7 +340,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
       $beaglestatus = ': ' . $beaglestatus;
     }
     $params['trxn_result_code'] = $eWAYResponse->Status() . $beaglestatus;
-    $params['gross_amount'] = $eWAYResponse->Amount();
     $params['trxn_id'] = $eWAYResponse->TransactionNumber();
 
     return $params;

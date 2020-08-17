@@ -339,7 +339,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     /* Success */
     $params['trxn_id'] = $result['transactionid'];
-    $params['gross_amount'] = $result['amt'];
     $params['fee_amount'] = $result['feeamt'];
     $params['net_amount'] = $result['settleamt'] ?? NULL;
     if ($params['net_amount'] == 0 && $params['fee_amount'] != 0) {

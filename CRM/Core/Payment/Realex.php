@@ -175,7 +175,6 @@ class CRM_Core_Payment_Realex extends CRM_Core_Payment {
     $params['trxn_id'] = $response['PASREF'];
     $params['trxn_result_code'] = serialize($extras);
     $params['currencyID'] = $this->_getParam('currency');
-    $params['gross_amount'] = $this->_getParam('amount');
     $params['fee_amount'] = 0;
 
     return $params;
