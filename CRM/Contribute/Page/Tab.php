@@ -86,7 +86,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
           ];
         }
 
-        if (!$paymentProcessorObj->supports('ChangeSubscriptionAmount') && !$paymentProcessorObj->supports('EditRecurringContribution')) {
+        if (
+        (!CRM_Core_Permission::check('edit contributions') && $context === 'contribution') ||
+        (!$paymentProcessorObj->supports('ChangeSubscriptionAmount')
+          && !$paymentProcessorObj->supports('EditRecurringContribution')
+        )) {
           unset($links[CRM_Core_Action::UPDATE]);
         }
       }
