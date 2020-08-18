@@ -206,6 +206,9 @@ class Container {
       []
     ))->setPublic(TRUE);
 
+    $container->setDefinition('bundle.bootstrap3', new Definition('CRM_Core_Resources_Bundle', ['bootstrap3']))
+      ->setFactory('CRM_Core_Resources_Common::createBootstrap3Bundle');
+
     $container->setDefinition('bundle.coreStyles', new Definition('CRM_Core_Resources_Bundle', ['coreStyles']))
       ->setFactory('CRM_Core_Resources_Common::createStyleBundle');
 
