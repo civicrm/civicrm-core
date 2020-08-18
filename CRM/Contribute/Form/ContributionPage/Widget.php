@@ -188,10 +188,9 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     $this->assign_by_ref('colorFields', $this->_colorFields);
 
     $this->_refreshButtonName = $this->getButtonName('refresh');
-    $this->addElement('xbutton',
+    $this->addElement('submit',
       $this->_refreshButtonName,
-      ts('Save and Preview'),
-      ['type' => 'submit']
+      ts('Save and Preview')
     );
     parent::buildQuickForm();
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Widget', 'formRule'], $this);

@@ -355,12 +355,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->add('datepicker', 'discount_end_date[' . $i . ']', ts('Discount End Date'), [], FALSE, ['time' => FALSE]);
     }
     $_showHide->addToTemplate();
-    $this->addElement('xbutton', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
-      [
-        'type' => 'submit',
-        'class' => 'crm-form-submit cancel',
-        'value' => 1,
-      ]
+    $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
+      ['class' => 'crm-form-submit cancel']
     );
     if (Civi::settings()->get('deferred_revenue_enabled')) {
       $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();

@@ -668,13 +668,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
 
-      // A lot of forms use the hacky method of looking at
-      // `$params['button name']` (dating back to them being inputs with a
-      // "value" of the button label) rather than looking at
-      // `$this->controller->getButtonName()`. It makes sense to give buttons a
-      // value by default as a precaution.
-      $attrs['value'] = 1;
-
       if (!empty($button['class'])) {
         $attrs['class'] .= ' ' . $button['class'];
       }
@@ -693,8 +686,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       if ($button['type'] === 'reset') {
-        $attrs['type'] = 'reset';
-        $prevnext[] = $this->createElement('xbutton', 'reset', $button['name'], $attrs);
+        $prevnext[] = $this->createElement($button['type'], 'reset', $button['name'], $attrs);
       }
       else {
         if (!empty($button['subName'])) {
@@ -712,11 +704,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (in_array($button['type'], ['next', 'upload', 'done']) && $button['name'] === ts('Save')) {
           $attrs['accesskey'] = 'S';
         }
-        $buttonContents = CRM_Core_Page::crmIcon($button['icon'] ?? $defaultIcon) . ' ' . $button['name'];
+        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
+        if ($icon) {
+          $attrs['crm-icon'] = $icon;
+        }
         $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
-        $attrs['class'] .= " crm-button crm-button-type-{$button['type']} crm-button{$buttonName}";
-        $attrs['type'] = 'submit';
-        $prevnext[] = $this->createElement('xbutton', $buttonName, $buttonContents, $attrs);
+        $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
       }
       if (!empty($button['isDefault'])) {
         $this->setDefaultAction($button['type']);
@@ -2452,10 +2445,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->_actionButtonName = $this->getButtonName('next', 'action');
       }
       $this->assign('actionButtonName', $this->_actionButtonName);
-      $this->add('xbutton', $this->_actionButtonName, ts('Go'), [
-        'type' => 'submit',
-        'class' => 'hiddenElement crm-search-go-button',
-      ]);
+      $this->add('submit', $this->_actionButtonName, ts('Go'), ['class' => 'hiddenElement crm-search-go-button']);
 
       // Radio to choose "All items" or "Selected items only"
       $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', ['checked' => 'checked']);
