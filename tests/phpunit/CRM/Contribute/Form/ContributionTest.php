@@ -1721,4 +1721,32 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     unset($_REQUEST['id']);
   }
 
+  /**
+   * Mostly just check there's no errors opening the Widget tab on contribution
+   * pages.
+   */
+  public function testOpeningWidgetAdminPage() {
+    $page_id = $this->callAPISuccess('ContributionPage', 'create', [
+      'title' => 'my page',
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_processor' => $this->paymentProcessorID,
+    ])['id'];
+
+    $form = new CRM_Contribute_Form_ContributionPage_Widget();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Contribute_Form_ContributionPage_Widget', 'Widget');
+
+    $form->set('reset', '1');
+    $form->set('action', 'update');
+    $form->set('id', $page_id);
+
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    $contents = ob_get_contents();
+    ob_end_clean();
+
+    // The page contents load later by ajax, so there's just the surrounding
+    // html available now, but we can check at least one thing while we're here.
+    $this->assertStringContainsString("selectedTab = 'widget';", $contents);
+  }
+
 }
