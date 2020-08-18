@@ -52,21 +52,62 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_31_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Activate core extension "Greenwich"', 'installGreenwich');
+    // Additional tasks here...
+    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
+    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
+  }
 
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
   //   return TRUE;
   // }
+
+  /**
+   * Install greenwich and csslib extensions.
+   *
+   * This feature is restructured as a core extension - which is primarily a code cleanup step.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function installGreenwich(CRM_Queue_TaskContext $ctx) {
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic.
+    // (2) On new installs, the extension is activated purely via default SQL INSERT.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'csslib',
+      'name' => 'CSS Library',
+      'label' => 'CSS Library',
+      'file' => 'csslib',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'greenwich',
+      'name' => 'Theme: Greenwich',
+      'label' => 'Theme: Greenwich',
+      'file' => 'greenwich',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+
+    return TRUE;
+  }
 
 }
