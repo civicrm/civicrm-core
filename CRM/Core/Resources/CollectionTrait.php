@@ -102,25 +102,53 @@ trait CRM_Core_Resources_CollectionTrait {
         }
       }
     }
-    elseif (!in_array($snippet['type'], $this->types)) {
-      throw new \RuntimeException("Unsupported snippet type: " . $snippet['type']);
+    if (!in_array($snippet['type'] ?? NULL, $this->types)) {
+      $typeExpr = $snippet['type'] ?? '(' . implode(',', array_keys($snippet)) . ')';
+      throw new \RuntimeException("Unsupported snippet type: $typeExpr");
     }
     // Traditional behavior: sort by (1) weight and (2) either name or natural position. This second thing is called 'sortId'.
     if (isset($snippet['name'])) {
       $snippet['sortId'] = $snippet['name'];
     }
     else {
-      $snippet['sortId'] = $this->nextId();
       switch ($snippet['type']) {
         case 'scriptUrl':
         case 'styleUrl':
+          $snippet['sortId'] = $this->nextId();
           $snippet['name'] = $snippet[$snippet['type']];
           break;
 
+        case 'scriptFile':
+        case 'styleFile':
+          $snippet['sortId'] = $this->nextId();
+          $snippet['name'] = implode(':', $snippet[$snippet['type']]);
+          break;
+
         default:
+          $snippet['sortId'] = $this->nextId();
           $snippet['name'] = $snippet['sortId'];
           break;
       }
+    }
+
+    if ($snippet['type'] === 'scriptFile' && !isset($snippet['scriptFileUrls'])) {
+      $res = Civi::resources();
+      list ($ext, $file) = $snippet['scriptFile'];
+
+      $snippet['translate'] = $snippet['translate'] ?? TRUE;
+      if ($snippet['translate']) {
+        $domain = ($snippet['translate'] === TRUE) ? $ext : $snippet['translate'];
+        // Is this too early?
+        $this->addString(Civi::service('resources.js_strings')->get($domain, $res->getPath($ext, $file), 'text/javascript'), $domain);
+      }
+      $snippet['scriptFileUrls'] = [$res->getUrl($ext, $res->filterMinify($ext, $file), TRUE)];
+    }
+
+    if ($snippet['type'] === 'styleFile' && !isset($snippet['styleFileUrls'])) {
+      /** @var Civi\Core\Themes $theme */
+      $theme = Civi::service('themes');
+      list ($ext, $file) = $snippet['styleFile'];
+      $snippet['styleFileUrls'] = $theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file);
     }
 
     $this->snippets[$snippet['name']] = $snippet;
@@ -361,18 +389,7 @@ trait CRM_Core_Resources_CollectionTrait {
    * @throws \CRM_Core_Exception
    */
   public function addScriptFile(string $ext, string $file, array $options = []) {
-    // TODO: Maybe this should be its own resource type to allow smarter management?
-
-    $res = Civi::resources();
-
-    $translate = $options['translate'] ?? TRUE;
-    unset($options['translate']);
-    if ($translate) {
-      $domain = ($translate === TRUE) ? $ext : $translate;
-      $this->addString(Civi::service('resources.js_strings')->get($domain, $res->getPath($ext, $file), 'text/javascript'), $domain);
-    }
-    $url = $res->getUrl($ext, $res->filterMinify($ext, $file), TRUE);
-    $this->add($options + ['scriptUrl' => $url, 'name' => "$ext:$file"]);
+    $this->add($options + ['scriptFile' => [$ext, $file]]);
     return $this;
   }
 
@@ -469,13 +486,7 @@ trait CRM_Core_Resources_CollectionTrait {
    * @return static
    */
   public function addStyleFile(string $ext, string $file, array $options = []) {
-    // TODO: Maybe this should be its own resource type to allow smarter management?
-
-    /** @var Civi\Core\Themes $theme */
-    $theme = Civi::service('themes');
-    foreach ($theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file) as $url) {
-      $this->add($options + ['styleUrl' => $url, 'name' => "$ext:$file"]);
-    }
+    $this->add($options + ['styleFile' => [$ext, $file]]);
     return $this;
   }
 
