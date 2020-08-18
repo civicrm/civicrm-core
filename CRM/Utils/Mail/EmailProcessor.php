@@ -242,16 +242,20 @@ class CRM_Utils_Mail_EmailProcessor {
           if (!empty($dao->activity_status)) {
             $params['status_id'] = $dao->activity_status;
           }
-          $result = civicrm_api('activity', 'create', $params);
 
-          if ($result['is_error']) {
-            $matches = FALSE;
-            echo "Failed Processing: {$mail->subject}. Reason: {$result['error_message']}\n";
-          }
-          else {
-            $matches = TRUE;
-            CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
-            echo "Processed as Activity: {$mail->subject}\n";
+          // Create activity if its not empty.
+          if (!empty($params['subject']) || !empty($params['target_contact_id'])) {
+            $result = civicrm_api('activity', 'create', $params);
+
+            if ($result['is_error']) {
+              $matches = FALSE;
+              echo "Failed Processing: {$mail->subject}. Reason: {$result['error_message']}\n";
+            }
+            else {
+              $matches = TRUE;
+              CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
+              echo "Processed as Activity: {$mail->subject}\n";
+            }
           }
         }
 
