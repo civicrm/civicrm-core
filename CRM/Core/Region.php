@@ -3,7 +3,7 @@
 /**
  * Maintain a set of markup/templates to inject inside various regions
  */
-class CRM_Core_Region {
+class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Core_Resources_CollectionAdderInterface {
 
   /**
    * Obtain the content for a given region.
@@ -20,9 +20,7 @@ class CRM_Core_Region {
     return Civi::$statics[__CLASS__][$name];
   }
 
-  use CRM_Core_Resources_CollectionTrait {
-    CRM_Core_Resources_CollectionTrait::add as _add;
-  }
+  use CRM_Core_Resources_CollectionTrait;
 
   /**
    * Symbolic name of this region
