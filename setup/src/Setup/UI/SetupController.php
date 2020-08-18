@@ -247,7 +247,7 @@ class SetupController implements SetupControllerInterface {
    *
    * @param array $fields
    *   HTTP inputs -- e.g. with a form element like this:
-   *   `<button type="submit" name="civisetup[action][Foo]">Do the foo</button>`
+   *   `<input type="submit" name="civisetup[action][Foo]" value="Do the foo">`
    * @param string $default
    *   The action-name to return if no other action is identified.
    * @return string

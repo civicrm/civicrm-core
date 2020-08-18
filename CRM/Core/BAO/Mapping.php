@@ -318,12 +318,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     $hasRelationTypes = [];
 
     $columnCount = $columnNo;
-    $form->addElement('xbutton', 'addBlock', ts('Also include contacts where'),
-      [
-        'type' => 'submit',
-        'class' => 'submit-link',
-        'value' => 1,
-      ]
+    $form->addElement('submit', 'addBlock', ts('Also include contacts where'),
+      ['class' => 'submit-link']
     );
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypes();
@@ -557,11 +553,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         $form->add('text', "value[$x][$i]", '');
       }
 
-      $form->addElement('xbutton', "addMore[$x]", ts('Another search field'), [
-        'type' => 'submit',
-        'class' => 'submit-link',
-        'value' => 1,
-      ]);
+      $form->addElement('submit', "addMore[$x]", ts('Another search field'), ['class' => 'submit-link']);
     }
     //end of block for
 

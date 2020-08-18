@@ -46,7 +46,7 @@ uasort($msgs, function($a, $b) {
 </table>
 
 <div class="action-box">
-  <button id="recheck_button" type="submit" name="civisetup[action][Start]"><?php echo htmlentities(ts('Refresh')); ?></button>
+  <input id="recheck_button" type="submit" name="civisetup[action][Start]" value="<?php echo htmlentities(ts('Refresh')); ?>" />
   <div class="advancedTip">
     <?php echo ts('After updating your system, refresh to test the requirements again.'); ?>
   </div>
