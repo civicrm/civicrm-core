@@ -75,7 +75,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
    */
   public function buildQuickForm() {
     if ($this->_batchStatus == 'Closed') {
-      $this->add('xbutton', 'export_batch', ts('Export Batch'), ['type' => 'submit']);
+      $this->add('submit', 'export_batch', ts('Export Batch'));
     }
 
     // do not build rest of form unless it is open/reopened batch
@@ -85,9 +85,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
 
     parent::buildQuickForm();
     if (CRM_Batch_BAO_Batch::checkBatchPermission('close', $this->_values['created_id'])) {
-      $this->add('xbutton', 'close_batch', ts('Close Batch'), ['type' => 'submit']);
+      $this->add('submit', 'close_batch', ts('Close Batch'));
       if (CRM_Batch_BAO_Batch::checkBatchPermission('export', $this->_values['created_id'])) {
-        $this->add('xbutton', 'export_batch', ts('Close & Export Batch'), ['type' => 'submit']);
+        $this->add('submit', 'export_batch', ts('Close & Export Batch'));
       }
     }
 
@@ -99,9 +99,8 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ts('Task'),
       ['' => ts('- actions -')] + ['Remove' => ts('Remove from Batch')]);
 
-    $this->add('xbutton', 'rSubmit', ts('Go'),
+    $this->add('submit', 'rSubmit', ts('Go'),
       [
-        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'GoRemove',
       ]);
@@ -124,9 +123,8 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ts('Task'),
       ['' => ts('- actions -')] + ['Assign' => ts('Assign to Batch')]);
 
-    $this->add('xbutton', 'submit', ts('Go'),
+    $this->add('submit', 'submit', ts('Go'),
       [
-        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'Go',
       ]);

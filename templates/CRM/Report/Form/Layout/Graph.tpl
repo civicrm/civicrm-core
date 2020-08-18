@@ -35,7 +35,6 @@
            createChart( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, allData[chartID].object );
          });
 
-         // FIXME
          $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
            // image creator php file path and append image name
            var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');

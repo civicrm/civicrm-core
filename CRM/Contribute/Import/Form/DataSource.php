@@ -38,10 +38,7 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
 
     $this->setDefaults(['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
-    $this->addElement('xbutton', 'loadMapping', ts('Load Mapping'), [
-      'type' => 'submit',
-      'onclick' => 'checkSelect()',
-    ]);
+    $this->addElement('submit', 'loadMapping', ts('Load Mapping'), NULL, ['onclick' => 'checkSelect()']);
 
     $this->addContactTypeSelector();
   }

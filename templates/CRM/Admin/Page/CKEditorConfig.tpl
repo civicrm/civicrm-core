@@ -99,12 +99,12 @@
     </div>
 
     <div class="crm-submit-buttons">
-      <button type="submit" name="save" class="crm-form-submit crm-button" accesskey="S">
-        <i class="crm-i fa-wrench" aria-hidden="true"></i> {ts}Save{/ts}
-      </button>
-      <button type="submit" name="revert" class="crm-form-submit crm-button" onclick="return confirm('{$revertConfirm}');">
-        <i class="crm-i fa-times" aria-hidden="true"></i> {ts}Revert to Default{/ts}
-      </button>
+      <span class="crm-button">
+        <i class="crm-i fa-wrench" aria-hidden="true"></i> <input type="submit" value="{ts}Save{/ts}" name="save" class="crm-form-submit" accesskey="S"/>
+      </span>
+      <span class="crm-button">
+        <i class="crm-i fa-times" aria-hidden="true"></i> <input type="submit" value="{ts}Revert to Default{/ts}" name="revert" class="crm-form-submit" onclick="return confirm('{$revertConfirm}');"/>
+      </span>
     </div>
     <input type="hidden" value="{$preset}" name="preset" />
   </fieldset>

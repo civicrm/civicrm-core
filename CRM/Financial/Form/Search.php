@@ -93,9 +93,8 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
       ts('Task'),
       ['' => ts('- actions -')] + $batchAction);
 
-    $this->add('xbutton', 'submit', ts('Go'),
+    $this->add('submit', 'submit', ts('Go'),
       [
-        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'Go',
       ]);

@@ -565,13 +565,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
       $url = CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&action=browse&gid=' . $this->_gid);
-      $this->addElement('xbutton',
+      $this->addElement('button',
         'done',
         ts('Done'),
-        [
-          'type' => 'button',
-          'onclick' => "location.href='$url'",
-        ]
+        ['onclick' => "location.href='$url'"]
       );
     }
   }
