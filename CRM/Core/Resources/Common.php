@@ -17,6 +17,25 @@ class CRM_Core_Resources_Common {
   const REGION = 'html-header';
 
   /**
+   * The 'bundle.bootstrap3' service is a collection of resources which are
+   * loaded when a page needs to support Boostrap CSS v3.
+   *
+   * @param string $name
+   *   i.e. 'bootstrap3'
+   * @return \CRM_Core_Resources_Bundle
+   */
+  public static function createBootstrap3Bundle($name) {
+    $bundle = new CRM_Core_Resources_Bundle($name);
+    $bundle->addStyleFile('civicrm', 'css/bootstrap3.css');
+    $bundle->addScriptFile('civicrm', 'js/bootstrap3.js', [
+      'translate' => FALSE,
+    ]);
+    CRM_Utils_Hook::alterBundle($bundle);
+    self::useRegion($bundle, self::REGION);
+    return $bundle;
+  }
+
+  /**
    * The 'bundle.coreStyles' service is a collection of resources used on some
    * non-Civi pages (wherein Civi may be mixed-in).
    *
