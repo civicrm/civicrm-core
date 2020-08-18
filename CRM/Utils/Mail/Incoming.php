@@ -323,10 +323,11 @@ class CRM_Utils_Mail_Incoming {
   /**
    * @param $mail
    * @param $createContact
+   * @param $requireContact
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail, $createContact = TRUE) {
+  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -347,7 +348,7 @@ class CRM_Utils_Mail_Incoming {
 
     // we definitely need a contact id for the from address
     // if we dont have one, skip this email
-    if (empty($params['from']['id'])) {
+    if ($requireContact && empty($params['from']['id'])) {
       return NULL;
     }
 

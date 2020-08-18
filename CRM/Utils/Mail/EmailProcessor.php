@@ -528,5 +528,4 @@ class CRM_Utils_Mail_EmailProcessor {
     }
     return $text;
   }
-
 }
