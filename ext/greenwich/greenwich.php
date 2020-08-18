@@ -40,55 +40,31 @@ function greenwich_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 }
 
 /**
- * Implements hook_civicrm_thems().
+ * Implements hook_civicrm_themes().
  */
 function greenwich_civicrm_themes(&$themes) {
   _greenwich_civix_civicrm_themes($themes);
   $themes['greenwich'] = [
-    // FIXME: Move assets into this extension
     'ext' => 'civicrm',
-    'title' => 'Greenwich (without Bootstrap)',
+    'title' => 'Greenwich',
     'help' => ts('CiviCRM 4.x look-and-feel'),
-    'url_callback' => '_greenwhich_resolver',
-    'search_order' => ['greenwich', \Civi\Core\Themes::FALLBACK_THEME],
-  ];
-  $themes['greenwich-bs'] = [
-    // FIXME: Move assets into this extension
-    'ext' => 'civicrm',
-    'title' => 'Greenwich (with Bootstrap)',
-    'help' => ts('CiviCRM 4.x look-and-feel'),
-    'url_callback' => '_greenwhich_resolver',
-    'search_order' => ['greenwich-bs', \Civi\Core\Themes::FALLBACK_THEME],
   ];
 }
 
 /**
- * For certain files (eg `bootstrap.css`), we want to customize the resolver.
- * Otherwise, delegate to the normal "simple" resolver.
- *
- * @param \Civi\Core\Themes $themes
- *   The theming subsystem.
- * @param string $themeKey
- *   The active/desired theme key.
- * @param string $cssExt
- *   The extension for which we want a themed CSS file (e.g. "civicrm").
- * @param string $cssFile
- *   File name (e.g. "css/bootstrap.css").
- * @return array|string
- *   List of CSS URLs, or PASSTHRU.
+ * Implements hook_civicrm_alterBundle().
  */
-function _greenwhich_resolver($themes, $themeKey, $cssExt, $cssFile) {
-  // FIXME: There isn't actually a canonical "$cssExt:$cssFile" for bootstrap.css...
-  switch ("$themeKey:$cssExt:$cssFile") {
-    case 'greenwich:civicrm:css/bootstrap.css':
-      return [];
-
-    case 'greenwich-bs:civicrm:css/bootstrap.css':
-      return [Civi::service('asset_builder')->getUrl('greenwich-bootstrap.css')];
-
+function greenwich_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
+  $theme = Civi::service('themes')->getActiveThemeKey();
+  switch ($theme . ':' . $bundle->name) {
+    case 'greenwich:bootstrap3':
+      $bundle->clear();
+      $bundle->addStyleUrl(Civi::service('asset_builder')->getUrl('greenwich-bootstrap.css'));
+      $bundle->addScriptFile('greenwich', 'extern/bootstrap3/assets/javascripts/bootstrap.min.js', [
+        'translate' => FALSE,
+      ]);
+      break;
   }
-
-  return \Civi\Core\Themes\Resolvers::simple($themes, $themeKey, $cssExt, $cssFile);
 }
 
 /**
