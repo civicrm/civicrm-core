@@ -105,7 +105,12 @@ trait CRM_Core_Resources_CollectionTrait {
     elseif (!in_array($snippet['type'], $this->types)) {
       throw new \RuntimeException("Unsupported snippet type: " . $snippet['type']);
     }
-    if (!isset($snippet['name'])) {
+    // Traditional behavior: sort by (1) weight and (2) either name or natural position. This second thing is called 'sortId'.
+    if (isset($snippet['name'])) {
+      $snippet['sortId'] = $snippet['name'];
+    }
+    else {
+      $snippet['sortId'] = $this->nextId();
       switch ($snippet['type']) {
         case 'scriptUrl':
         case 'styleUrl':
@@ -113,7 +118,7 @@ trait CRM_Core_Resources_CollectionTrait {
           break;
 
         default:
-          $snippet['name'] = count($this->snippets);
+          $snippet['name'] = $snippet['sortId'];
           break;
       }
     }
@@ -121,6 +126,17 @@ trait CRM_Core_Resources_CollectionTrait {
     $this->snippets[$snippet['name']] = $snippet;
     $this->isSorted = FALSE;
     return $snippet;
+  }
+
+  protected function nextId() {
+    if (!isset(Civi::$statics['CRM_Core_Resource_Count'])) {
+      $resId = Civi::$statics['CRM_Core_Resource_Count'] = 1;
+    }
+    else {
+      $resId = ++Civi::$statics['CRM_Core_Resource_Count'];
+    }
+
+    return $resId;
   }
 
   /**
@@ -215,6 +231,38 @@ trait CRM_Core_Resources_CollectionTrait {
   }
 
   /**
+   * Assimilate a list of resources into this list.
+   *
+   * @param iterable $snippets
+   *   List of snippets to add.
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface::merge()
+   */
+  public function merge(iterable $snippets) {
+    foreach ($snippets as $next) {
+      $name = $next['name'];
+      $current = $this->snippets[$name] ?? NULL;
+      if ($current === NULL) {
+        $this->add($next);
+      }
+      elseif ($current['type'] === 'settings' && $next['type'] === 'settings') {
+        $this->addSetting($next['settings']);
+        foreach ($next['settingsFactories'] as $factory) {
+          $this->addSettingsFactory($factory);
+        }
+        $this->isSorted = FALSE;
+      }
+      elseif ($current['type'] === 'settings' || $next['type'] === 'settings') {
+        throw new \RuntimeException(sprintf("Cannot merge snippets of types [%s] and [%s]" . $current['type'], $next['type']));
+      }
+      else {
+        $this->add($next);
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Ensure that the collection is sorted.
    *
    * @return static
@@ -241,10 +289,10 @@ trait CRM_Core_Resources_CollectionTrait {
       return 1;
     }
     // fallback to name sort; don't really want to do this, but it makes results more stable
-    if ($a['name'] < $b['name']) {
+    if ($a['sortId'] < $b['sortId']) {
       return -1;
     }
-    if ($a['name'] > $b['name']) {
+    if ($a['sortId'] > $b['sortId']) {
       return 1;
     }
     return 0;
