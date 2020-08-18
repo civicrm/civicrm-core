@@ -564,6 +564,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addCoreResources($region = 'html-header') {
+    if ($region !== 'html-header') {
+      // The signature of this method allowed different regions. However, this
+      // doesn't appear to be used - based on grepping `universe` generally
+      // and `civicrm-{core,backdrop,drupal,packages,wordpress,joomla}` specifically,
+      // it appears that all callers use 'html-header' (either implicitly or explicitly).
+      throw new \CRM_Core_Exception("Error: addCoreResources only supports html-header");
+    }
     if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
@@ -616,6 +623,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addCoreStyles($region = 'html-header') {
+    if ($region !== 'html-header') {
+      // The signature of this method allowed different regions. However, this
+      // doesn't appear to be used - based on grepping `universe` generally
+      // and `civicrm-{core,backdrop,drupal,packages,wordpress,joomla}` specifically,
+      // it appears that all callers use 'html-header' (either implicitly or explicitly).
+      throw new \CRM_Core_Exception("Error: addCoreResources only supports html-header");
+    }
     if (!isset($this->addedCoreStyles[$region])) {
       $this->addedCoreStyles[$region] = TRUE;
 
