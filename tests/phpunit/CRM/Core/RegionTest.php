@@ -17,6 +17,20 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
     $this->useTransaction();
   }
 
+  use CRM_Core_Resources_CollectionTestTrait;
+
+  /**
+   * @return \CRM_Core_Resources_CollectionInterface
+   */
+  public function createEmptyCollection() {
+    @++Civi::$statics['CRM_Core_RegionTestId'];
+    $r = new CRM_Core_Region('region_' . Civi::$statics['CRM_Core_RegionTestId']);
+    $r->filter(function($snippet) {
+      return $snippet['name'] !== 'default';
+    });
+    return $r;
+  }
+
   /**
    * When a {crmRegion} is blank and when there are no extra snippets, the
    * output is blank.
