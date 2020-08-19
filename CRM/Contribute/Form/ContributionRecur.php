@@ -192,21 +192,22 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    */
   protected function getSubscriptionContactID() {
     $sub = $this->getSubscriptionDetails();
-    return $sub->contact_id ?? FALSE;
+    return $sub->contact_id ? (int) $sub->contact_id : FALSE;
   }
 
   /**
    * Is this being used by a front end user to update their own recurring.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isSelfService() {
-    if (!is_null($this->selfService)) {
+    if ($this->selfService !== NULL) {
       return $this->selfService;
     }
     $this->selfService = FALSE;
     if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+      if ($this->getSubscriptionContactID() !== $this->getContactIDIfAccessingOwnRecord()) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
       }
       $this->selfService = TRUE;

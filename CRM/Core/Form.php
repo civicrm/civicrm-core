@@ -2219,11 +2219,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Get the contact id of the logged in user.
+   *
+   * @return int|false
    */
   public function getLoggedInUserContactID() {
     // check if the user is logged in and has a contact ID
     $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
+    return $session->get('userID') ? (int) $session->get('userID') : FALSE;
   }
 
   /**
@@ -2247,6 +2249,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - id_field
    *   - url (for ajax lookup)
    *
+   * @throws \CRM_Core_Exception
    * @todo add data attributes so we can deal with multiple instances on a form
    */
   public function addAutoSelector($profiles = [], $autoCompleteField = []) {
@@ -2635,6 +2638,28 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->set('selectedChild', $selectedChild);
       $this->assign('selectedChild', $selectedChild);
     }
+  }
+
+  /**
+   * Get the contact if from the url, using the checksum or the cid if it is the logged in user.
+   *
+   * This function returns the user being validated. It is not intended to get another user
+   * they have permission to (setContactID does do that) and can be used to check if the user is
+   * accessing their own record.
+   *
+   * @return int|false
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactIDIfAccessingOwnRecord() {
+    $contactID = (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    if (!$contactID) {
+      return FALSE;
+    }
+    if ($contactID === $this->getLoggedInUserContactID()) {
+      return $contactID;
+    }
+    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    return CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $userChecksum) ? $contactID : FALSE;
   }
 
 }
