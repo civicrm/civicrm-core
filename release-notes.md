@@ -15,6 +15,16 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.28.1
+
+Released August 19, 2020
+
+- **[Synopsis](release-notes/5.28.1.md#synopsis)**
+- **[Security advisories](release-notes/5.28.1.md#security)**
+- **[Bugs resolved](release-notes/5.28.1.md#bugs)**
+- **[Credits](release-notes/5.28.1.md#credits)**
+- **[Feedback](release-notes/5.28.1.md#feedback)**
+
 ## CiviCRM 5.28.0
 
 Released August 5, 2020
