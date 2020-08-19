@@ -52,9 +52,8 @@ trait CustomValueActionTrait {
    * @inheritDoc
    */
   protected function writeObjects($items) {
-    $result = [];
     $fields = $this->entityFields();
-    foreach ($items as $item) {
+    foreach ($items as $idx => $item) {
       FormattingUtil::formatWriteParams($item, $fields);
 
       // Convert field names to custom_xx format
@@ -65,9 +64,16 @@ trait CustomValueActionTrait {
         }
       }
 
-      $result[] = \CRM_Core_BAO_CustomValueTable::setValues($item);
+      \CRM_Core_BAO_CustomValueTable::setValues($item);
+
+      // Darn setValues function doesn't return an id.
+      if (empty($item['id'])) {
+        $tableName = CoreUtil::getTableName($this->getEntityName());
+        $items[$idx]['id'] = (int) \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM ' . $tableName);
+      }
     }
-    return $result;
+    FormattingUtil::formatOutputValues($items, $this->entityFields(), $this->getEntityName(), 'create');
+    return $items;
   }
 
   /**
