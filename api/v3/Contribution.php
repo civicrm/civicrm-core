@@ -654,10 +654,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
 function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstContribution = NULL) {
   $objects = $contribution->_relatedObjects;
   $objects['contribution'] = &$contribution;
-
-  if ($firstContribution) {
-    $objects['first_contribution'] = $firstContribution;
-  }
   $input['component'] = $contribution->_component;
   $input['is_test'] = $contribution->is_test;
   $input['amount'] = empty($input['total_amount']) ? $contribution->total_amount : $input['total_amount'];
