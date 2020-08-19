@@ -36,7 +36,7 @@
   </foreignKey>
   <field>
     <name>location_type_id</name>
-    <title>Phone Location Type</title>
+    <title>Phone Location Type ID</title>
     <type>int unsigned</type>
     <comment>Which Location does this phone belong to.</comment>
     <pseudoconstant>
@@ -46,6 +46,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Phone Location Type</label>
     </html>
     <add>2.0</add>
   </field>
@@ -157,6 +158,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Phone Type</label>
     </html>
     <add>2.2</add>
   </field>

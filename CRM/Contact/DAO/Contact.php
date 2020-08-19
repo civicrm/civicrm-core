@@ -1216,7 +1216,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
         'gender_id' => [
           'name' => 'gender_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Gender'),
+          'title' => ts('Gender ID'),
           'description' => ts('FK to gender ID'),
           'import' => TRUE,
           'where' => 'civicrm_contact.gender_id',
@@ -1229,6 +1229,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'localizable' => 0,
           'html' => [
             'type' => 'Select',
+            'label' => ts("Gender"),
           ],
           'pseudoconstant' => [
             'optionGroupName' => 'gender',

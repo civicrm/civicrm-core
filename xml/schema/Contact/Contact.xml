@@ -654,13 +654,14 @@
   </field>
   <field>
     <name>gender_id</name>
-    <title>Gender</title>
+    <title>Gender ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <optionGroupName>gender</optionGroupName>
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Gender</label>
     </html>
     <headerPattern>/^gender$/i</headerPattern>
     <comment>FK to gender ID</comment>
