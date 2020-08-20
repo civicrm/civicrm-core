@@ -450,6 +450,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'group_contact_status', ts('Group Status')
       );
 
+      $this->assign('permissionEditSmartGroup', CRM_Core_Permission::check('edit groups'));
       $this->assign('permissionedForGroup', $permissionForGroup);
     }
 
@@ -528,6 +529,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS, $_REQUEST);
     $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND, 'REQUEST');
+
+    if (!empty($this->_ssID) && !CRM_Core_Permission::check('edit groups')) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to modify smart groups'));
+    }
 
     /**
      * set the button names

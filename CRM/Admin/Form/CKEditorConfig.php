@@ -16,13 +16,9 @@
  */
 
 /**
- * Page for configuring CKEditor options.
- *
- * Note that while this is implemented as a CRM_Core_Page, it is actually a form.
- * Because the form needs to be submitted and refreshed via javascript, it seemed like
- * Quickform and CRM_Core_Form/Controller might get in the way.
+ * Form for configuring CKEditor options.
  */
-class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
+class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
 
   const CONFIG_FILEPATH = '[civicrm.files]/persist/crm-ckeditor-';
 
@@ -37,6 +33,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     'extraPlugins',
     'toolbarGroups',
     'removeButtons',
+    'customConfig',
     'filebrowserBrowseUrl',
     'filebrowserImageBrowseUrl',
     'filebrowserFlashBrowseUrl',
@@ -45,25 +42,31 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     'filebrowserFlashUploadUrl',
   ];
 
-  public $preset;
+  /**
+   * Prepare form
+   */
+  public function preProcess() {
+    CRM_Utils_Request::retrieve('preset', 'String', $this, FALSE, 'default', 'GET');
+
+    CRM_Utils_System::appendBreadCrumb([
+      [
+        'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
+        'title' => ts('Display Preferences'),
+      ],
+    ]);
+
+    // Initial build
+    if (empty($_POST['qfKey'])) {
+      $this->addResources();
+    }
+  }
 
   /**
-   * Run page.
+   * Add resources during initial build or rebuild
    *
-   * @return string
+   * @throws CRM_Core_Exception
    */
-  public function run() {
-    $this->preset = CRM_Utils_Array::value('preset', $_REQUEST, 'default');
-
-    // If the form was submitted, take appropriate action.
-    if (!empty($_POST['revert'])) {
-      self::deleteConfigFile($this->preset);
-      self::setConfigDefault();
-    }
-    elseif (!empty($_POST['config'])) {
-      $this->save($_POST);
-    }
-
+  public function addResources() {
     $settings = $this->getConfigSettings();
 
     CRM_Core_Resources::singleton()
@@ -80,24 +83,67 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
         'settings' => $settings,
       ]);
 
-    $configUrl = self::getConfigUrl($this->preset) ?: self::getConfigUrl('default');
+    $configUrl = self::getConfigUrl($this->get('preset')) ?: self::getConfigUrl('default');
 
-    $this->assign('preset', $this->preset);
+    $this->assign('preset', $this->get('preset'));
     $this->assign('presets', CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name'));
     $this->assign('skins', $this->getCKSkins());
     $this->assign('skin', CRM_Utils_Array::value('skin', $settings));
     $this->assign('extraPlugins', CRM_Utils_Array::value('extraPlugins', $settings));
     $this->assign('configUrl', $configUrl);
-    $this->assign('revertConfirm', htmlspecialchars(ts('Are you sure you want to revert all changes?', ['escape' => 'js'])));
+  }
 
-    CRM_Utils_System::appendBreadCrumb([
+  /**
+   * Build form
+   */
+  public function buildQuickForm() {
+    $revertConfirm = json_encode(ts('Are you sure you want to revert all changes?'));
+    $this->addButtons([
       [
-        'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
-        'title' => ts('Display Preferences'),
+        'type' => 'next',
+        'name' => ts('Save'),
+      ],
+      // Hidden button used to refresh form
+      [
+        'type' => 'submit',
+        'class' => 'hiddenElement',
+        'name' => ts('Save'),
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+      [
+        'type' => 'refresh',
+        'name' => ts('Revert to Default'),
+        'icon' => 'fa-undo',
+        'js' => ['onclick' => "return confirm($revertConfirm);"],
       ],
     ]);
+  }
 
-    return parent::run();
+  /**
+   * Handle form submission
+   */
+  public function postProcess() {
+    if (!empty($_POST[$this->getButtonName('refresh')])) {
+      self::deleteConfigFile($this->get('preset'));
+      self::setConfigDefault();
+    }
+    else {
+      if (!empty($_POST[$this->getButtonName('next')])) {
+        $this->save($_POST);
+        CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
+      }
+      // The "submit" hidden button saves but does not redirect
+      if (!empty($_POST[$this->getButtonName('submit')])) {
+        $this->save($_POST);
+        $this->addResources();
+      }
+      else {
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/ckeditor', ['reset' => 1]));
+      }
+    }
   }
 
   /**
@@ -110,29 +156,33 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       // Standardize line-endings
       . preg_replace('~\R~u', "\n", $params['config']);
 
-    // Use all params starting with config_
+    // Generate a whitelist of allowed config params
+    $allOptions = json_decode(file_get_contents(\Civi::paths()->getPath('[civicrm.root]/js/wysiwyg/ck-options.json')), TRUE);
+    // These two aren't really blacklisted they're just in a different part of the form
+    $blackList = array_diff($this->blackList, ['skin', 'extraPlugins']);
+    // All options minus blacklist = whitelist
+    $whiteList = array_diff(array_column($allOptions, 'id'), $blackList);
+
+    // Save whitelisted params starting with config_
     foreach ($params as $key => $val) {
       $val = trim($val);
-      if (strpos($key, 'config_') === 0 && strlen($val)) {
+      if (strpos($key, 'config_') === 0 && strlen($val) && in_array(substr($key, 7), $whiteList)) {
         if ($val != 'true' && $val != 'false' && $val != 'null' && $val[0] != '{' && $val[0] != '[' && !is_numeric($val)) {
-          $val = json_encode($val, JSON_UNESCAPED_SLASHES);
+          $val = '"' . $val . '"';
         }
-        elseif ($val[0] == '{' || $val[0] == '[') {
-          if (!is_array(json_decode($val, TRUE))) {
-            // Invalid JSON. Do not save.
-            continue;
-          }
+        try {
+          $val = CRM_Utils_JS::encode(CRM_Utils_JS::decode($val, TRUE));
+          $pos = strrpos($config, '};');
+          $key = preg_replace('/^config_/', 'config.', $key);
+          $setting = "\n\t{$key} = {$val};\n";
+          $config = substr_replace($config, $setting, $pos, 0);
         }
-        $pos = strrpos($config, '};');
-        $key = preg_replace('/^config_/', 'config.', $key);
-        $setting = "\n\t{$key} = {$val};\n";
-        $config = substr_replace($config, $setting, $pos, 0);
+        catch (CRM_Core_Exception $e) {
+          CRM_Core_Session::setStatus(ts("Error saving %1.", [1 => $key]), ts('Invalid Value'), 'error');
+        }
       }
     }
-    self::saveConfigFile($this->preset, $config);
-    if (!empty($params['save'])) {
-      CRM_Core_Session::setStatus(ts("You may need to clear your browser's cache to see the changes in CiviCRM."), ts('CKEditor Saved'), 'success');
-    }
+    self::saveConfigFile($this->get('preset'), $config);
   }
 
   /**
@@ -190,7 +240,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   private function getConfigSettings() {
     $matches = $result = [];
-    $file = self::getConfigFile($this->preset) ?: self::getConfigFile('default');
+    $file = self::getConfigFile($this->get('preset')) ?: self::getConfigFile('default');
     $result['skin'] = 'moono';
     if ($file) {
       $contents = file_get_contents($file);

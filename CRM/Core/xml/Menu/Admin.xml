@@ -670,7 +670,7 @@
   <item>
     <path>civicrm/admin/ckeditor</path>
     <title>Configure CKEditor</title>
-    <page_callback>CRM_Admin_Page_CKEditorConfig</page_callback>
+    <page_callback>CRM_Admin_Form_CKEditorConfig</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>
