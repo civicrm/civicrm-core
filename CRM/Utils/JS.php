@@ -152,6 +152,7 @@ class CRM_Utils_JS {
 
   /**
    * @param string $str
+   * @param bool $throwException
    * @return string|null
    * @throws CRM_Core_Exception
    */
