@@ -135,12 +135,6 @@ class CRM_Core_Payment_BaseIPN {
     if (!$this->loadObjects($input, $ids, $objects, $required, $paymentProcessorID)) {
       return FALSE;
     }
-    //the process is that the loadObjects is kind of hacked by loading the objects for the original contribution and then somewhat inconsistently using them for the
-    //current contribution. Here we ensure that the original contribution is available to the complete transaction function
-    //we don't want to fix this in the payment processor classes because we would have to fix all of them - so better to fix somewhere central
-    if (isset($objects['contributionRecur'])) {
-      $objects['first_contribution'] = $objects['contribution'];
-    }
     return TRUE;
   }
 
