@@ -100,6 +100,29 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
+   * Checks if status_id (id or string (eg. 5 or "Pending from pay later") is allowed for class
+   *
+   * @param int|string $status_id
+   * @param string $class
+   *
+   * @return bool
+   */
+  public static function getIsValidStatusForClass($status_id, $class = 'Pending') {
+    $classParticipantStatuses = civicrm_api3('ParticipantStatusType', 'get', [
+      'class' => $class,
+      'is_active' => 1,
+    ])['values'];
+    $allowedParticipantStatuses = [];
+    foreach ($classParticipantStatuses as $id => $detail) {
+      $allowedParticipantStatuses[$id] = $detail['name'];
+    }
+    if (in_array($status_id, $allowedParticipantStatuses) || array_key_exists($status_id, $allowedParticipantStatuses)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * @param array $params
    *
    * @return array

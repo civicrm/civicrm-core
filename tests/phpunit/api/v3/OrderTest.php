@@ -339,6 +339,16 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'id' => $order['id'],
     ]);
 
+    // Enable the "Pending from approval" status which is not enabled by default
+    $pendingFromApprovalParticipantStatus = civicrm_api3('ParticipantStatusType', 'getsingle', [
+      'name' => "Pending from approval",
+    ]);
+    civicrm_api3('ParticipantStatusType', 'create', [
+      'id' => $pendingFromApprovalParticipantStatus['id'],
+      'name' => "Pending from approval",
+      'is_active' => 1,
+    ]);
+
     $p['line_items'][] = [
       'line_item' => $lineItems,
       'params' => [
@@ -347,6 +357,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
         'source' => 'Online Event Registration: API Testing',
+        'participant_status_id' => 'Pending from approval',
       ],
     ];
 
@@ -358,12 +369,15 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         'net_amount' => 600,
       ],
     ];
-    $paymentParticipant = [
+    $orderParams = [
       'contribution_id' => $order['id'],
     ];
-    $order = $this->callAPISuccess('order', 'get', $paymentParticipant);
+    $order = $this->callAPISuccess('order', 'get', $orderParams);
     $this->checkPaymentResult($order, $expectedResult);
-    $this->callAPISuccessGetCount('ParticipantPayment', $paymentParticipant, 2);
+    $paymentParticipant = $this->callAPISuccess('ParticipantPayment', 'get', $orderParams)['values'];
+    $this->assertEquals(2, count($paymentParticipant), 'Expected two participant payments');
+    $participant = $this->callAPISuccessGetSingle('Participant', ['participant_id' => end($paymentParticipant)['participant_id']]);
+    $this->assertEquals('Pending from approval', $participant['participant_status']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $order['id'],
     ]);
