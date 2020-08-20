@@ -7,6 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{include file="CRM/common/enableDisableApi.tpl"}
 {strip}
   <table class="selector row-highlight">
     <tr class="columnheader">
