@@ -2613,7 +2613,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @return bool|array
    * @throws CiviCRM_API3_Exception
    */
-  protected static function repeatTransaction(&$contribution, &$input, $contributionParams) {
+  protected static function repeatTransaction(&$contribution, $input, $contributionParams) {
     if (!empty($contribution->id)) {
       return FALSE;
     }
@@ -4498,7 +4498,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
-    $contributionParams['payment_processor'] = $input['payment_processor'] = $paymentProcessorId;
+    $contributionParams['payment_processor'] = $paymentProcessorId;
 
     // If paymentProcessor is not set then the payment_instrument_id would not be correct.
     // not clear when or if this would occur if you encounter this please fix here & add a unit test.
