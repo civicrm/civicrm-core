@@ -139,8 +139,9 @@ class CRM_Utils_Money {
    */
   public static function subtractCurrencies($leftOp, $rightOp, $currency) {
     if (is_numeric($leftOp) && is_numeric($rightOp)) {
-      $money = Money::of($leftOp, $currency, new DefaultContext(), RoundingMode::CEILING);
-      return $money->minus($rightOp)->getAmount()->toFloat();
+      $leftMoney = Money::of($leftOp, $currency, new DefaultContext(), RoundingMode::CEILING);
+      $rightMoney = Money::of($rightOp, $currency, new DefaultContext(), RoundingMode::CEILING);
+      return $leftMoney->minus($rightMoney)->getAmount()->toFloat();
     }
   }
 
