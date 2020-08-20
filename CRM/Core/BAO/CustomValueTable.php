@@ -540,7 +540,7 @@ AND    $cond
     }
 
     if (!isset($params['entityID']) || !CRM_Utils_Type::validate($params['entityID'], 'Integer', FALSE)) {
-      return CRM_Core_Error::createAPIError(ts('entity_id needs to be set and of type Integer'));
+      throw new CRM_Core_Exception(ts('entity_id needs to be set and of type Integer'));
     }
 
     // first collect all the id/value pairs. The format is:
@@ -550,7 +550,7 @@ AND    $cond
       if ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($n, TRUE)) {
         $fieldID = (int ) $customFieldInfo[0];
         if (CRM_Utils_Type::escape($fieldID, 'Integer', FALSE) === NULL) {
-          return CRM_Core_Error::createAPIError(ts('field ID needs to be of type Integer for index %1',
+          throw new CRM_Core_Exception(ts('field ID needs to be of type Integer for index %1',
             [1 => $fieldID]
           ));
         }
@@ -620,7 +620,7 @@ AND    cf.id IN ( $fieldIDList )
         }
         // Ensure that value is of the right data type
         elseif (CRM_Utils_Type::escape($fieldValue['value'], $dataType, FALSE) === NULL) {
-          return CRM_Core_Error::createAPIError(ts('value: %1 is not of the right field data type: %2',
+          throw new CRM_Core_Exception(ts('value: %1 is not of the right field data type: %2',
             [
               1 => $fieldValue['value'],
               2 => $dao->data_type,
@@ -668,7 +668,7 @@ AND    cf.id IN ( $fieldIDList )
       return ['is_error' => 0, 'result' => 1];
     }
 
-    return CRM_Core_Error::createAPIError(ts('Unknown error'));
+    throw new CRM_Core_Exception(ts('Unknown error'));
   }
 
   /**

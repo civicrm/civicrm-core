@@ -135,33 +135,35 @@ class CustomValueTest extends BaseCustomValueTest {
 
     // CASE 1: Test CustomValue::create
     // Create two records for a single contact and using CustomValue::get ensure that two records are created
-    CustomValue::create($group)
-      ->addValue($colorField, 'g')
-      ->addValue("entity_id", $this->contactID)
-      ->execute();
-    CustomValue::create($group)
-      ->addValue($colorField, 'r')
-      ->addValue("entity_id", $this->contactID)
-      ->execute();
+    $created = [
+      CustomValue::create($group)
+        ->addValue($colorField, 'g')
+        ->addValue("entity_id", $this->contactID)
+        ->execute()->first(),
+      CustomValue::create($group)
+        ->addValue($colorField . ':label', 'Red')
+        ->addValue("entity_id", $this->contactID)
+        ->execute()->first(),
+    ];
     // fetch custom values using API4 CustomValue::get
     $result = CustomValue::get($group)
       ->addSelect('id', 'entity_id', $colorField, $colorField . ':label')
-      ->addOrderBy($colorField, 'DESC')
+      ->addOrderBy($colorField, 'ASC')
       ->execute();
 
     // check if two custom values are created
     $this->assertEquals(2, count($result));
     $expectedResult = [
       [
-        'id' => 2,
-        $colorField => 'r',
-        $colorField . ':label' => 'Red',
-        'entity_id' => $this->contactID,
-      ],
-      [
         'id' => 1,
         $colorField => 'g',
         $colorField . ':label' => 'Green',
+        'entity_id' => $this->contactID,
+      ],
+      [
+        'id' => 2,
+        $colorField => 'r',
+        $colorField . ':label' => 'Red',
         'entity_id' => $this->contactID,
       ],
     ];
@@ -169,6 +171,9 @@ class CustomValueTest extends BaseCustomValueTest {
     foreach ($expectedResult as $key => $field) {
       foreach ($field as $attr => $value) {
         $this->assertEquals($expectedResult[$key][$attr], $result[$key][$attr]);
+        if (!strpos($attr, ':')) {
+          $this->assertEquals($expectedResult[$key][$attr], $created[$key][$attr]);
+        }
       }
     }
 
