@@ -2329,6 +2329,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container span.expanded:before,
 .crm-container a.expanded:before,
 .crm-container .crm-expand-row.expanded:before {
+  font-family: "FontAwesome";
   content: "\f0d7";
 }
 
