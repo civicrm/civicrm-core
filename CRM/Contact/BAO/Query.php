@@ -6942,6 +6942,17 @@ AND   displayRelType.is_active = 1
   }
 
   /**
+   * Get the field datatype, using the type in the database rather than the pseudofield, if a pseudofield.
+   *
+   * @param string $fieldName
+   *
+   * @return string
+   */
+  public function getDataTypeForRealField($fieldName) {
+    return CRM_Utils_Type::typeToString($this->getMetadataForRealField($fieldName)['type']);
+  }
+
+  /**
    * If we have a field that is better rendered via the pseudoconstant handled them here.
    *
    * Rather than joining in the additional table we render the option value on output.
