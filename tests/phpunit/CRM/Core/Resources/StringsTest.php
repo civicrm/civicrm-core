@@ -12,6 +12,7 @@
 /**
  * Tests for parsing translatable strings in HTML content.
  * @group headless
+ * @group resources
  */
 class CRM_Core_Resources_StringsTest extends CiviUnitTestCase {
 

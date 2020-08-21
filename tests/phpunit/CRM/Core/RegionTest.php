@@ -3,6 +3,7 @@
 /**
  * Class CRM_Core_RegionTest
  * @group headless
+ * @group resources
  */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
 
