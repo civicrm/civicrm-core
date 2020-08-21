@@ -330,8 +330,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
 
-    $contactID = $this->getContactID();
-    if ($this->getContactID() === 0) {
+    if ($contactID === 0) {
       $this->addCidZeroOptions();
     }
 

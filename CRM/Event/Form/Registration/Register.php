@@ -391,8 +391,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::buildAmount($this);
     }
 
-    $pps = $this->getProcessors();
-    if ($this->getContactID() === 0 && !$this->_values['event']['is_multiple_registrations']) {
+    if ($contactID === 0 && !$this->_values['event']['is_multiple_registrations']) {
       //@todo we are blocking for multiple registrations because we haven't tested
       $this->addCIDZeroOptions();
     }
@@ -405,9 +404,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     $this->assign('bypassPayment', $bypassPayment);
 
-    $userID = $this->getContactID();
-
-    if (!$userID) {
+    if (!$contactID) {
       $createCMSUser = FALSE;
 
       if ($this->_values['custom_pre_id']) {
