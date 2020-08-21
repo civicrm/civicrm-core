@@ -1325,6 +1325,11 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @throws \CiviCRM_API3_Exception
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
+    // If this is a new API call then restart the recursion counter
+    if ($params['restart']) {
+	    unset(\Civi::$statics[__CLASS__]['related_contacts']);
+	    unset($params['restart']);
+    }
     // CRM-4213 check for loops, using static variable to record contacts already processed.
     if (!isset(\Civi::$statics[__CLASS__]['related_contacts'])) {
       \Civi::$statics[__CLASS__]['related_contacts'] = [];
