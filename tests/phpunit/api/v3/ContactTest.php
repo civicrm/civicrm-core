@@ -3306,7 +3306,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that getquick returns contacts with an exact first name match first.
    */
   public function testGetQuickID() {
-    $max = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_contact");
+    $max = CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_contact');
     $this->getQuickSearchSampleData();
     $result = $this->callAPISuccess('contact', 'getquick', [
       'name' => $max + 2,
@@ -3479,6 +3479,28 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', ['includeOrderByClause' => FALSE]);
     $result = $this->callAPISuccess('contact', 'getquick', ['name' => 'bob']);
     $this->assertEquals('Bob, Bob :: bob@bob.com', $result['values'][0]['data']);
+  }
+
+  /**
+   * Test deleted contacts are excluded from getquick results.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testGetQuickNotDeleted() {
+    $this->getQuickSearchSampleData();
+    $result = $this->callAPISuccess('contact', 'getquick', [
+      'name' => 'abc',
+      'field_name' => 'external_identifier',
+      'table_name' => 'cc',
+    ])['values'];
+    $this->assertCount(1, $result);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $result['0']['id']]);
+    $result = $this->callAPISuccess('contact', 'getquick', [
+      'name' => 'abc',
+      'field_name' => 'external_identifier',
+      'table_name' => 'cc',
+    ])['values'];
+    $this->assertCount(0, $result);
   }
 
   /**
