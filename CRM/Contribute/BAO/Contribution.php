@@ -4819,7 +4819,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if (empty($item['financial_type_id'])) {
           $item['financial_type_id'] = $params['financial_type_id'];
         }
-        $lineItemAmount += $item['line_total'] + CRM_Utils_Array::value('tax_amount', $item, 0.00);
+        $lineItemAmount += $item['line_total'] + ($item['tax_amount'] ?? 0.00);
       }
     }
 
@@ -4827,11 +4827,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $params['total_amount'] = $lineItemAmount;
     }
     else {
-      $currency = CRM_Utils_Array::value('currency', $params, '');
-
-      if (empty($currency)) {
-        $currency = CRM_Core_Config::singleton()->defaultCurrency;
-      }
+      $currency = $params['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
 
       if (!CRM_Utils_Money::equals($totalAmount, $lineItemAmount, $currency)) {
         throw new CRM_Contribute_Exception_CheckLineItemsException();
