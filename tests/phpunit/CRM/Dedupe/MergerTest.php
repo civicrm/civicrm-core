@@ -326,6 +326,35 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test function that gets duplicate pairs.
+   *
+   * It turns out there are 2 code paths retrieving this data so my initial
+   * focus is on ensuring they match.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isReverse
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetMatchesExcludeDeleted($isReverse) {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['Contact' => ['id' => 'IS NOT NULL']],
+    ])['values'];
+    $this->assertCount(2, $pairs);
+    $this->callAPISuccess('Contact', 'delete', ['id' => ($isReverse ? $pairs[0]['dstID'] : $pairs[0]['srcID'])]);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'check_permissions' => TRUE,
+      'criteria' => ['Contact' => ['id' => ['>' => 1]]],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
    * Test results are returned when criteria are passed in.
    *
    * @throws \CRM_Core_Exception
