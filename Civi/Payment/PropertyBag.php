@@ -423,8 +423,7 @@ class PropertyBag implements \ArrayAccess {
     if (!is_numeric($value)) {
       throw new \InvalidArgumentException("setAmount requires a numeric amount value");
     }
-
-    return $this->set('amount', $label, \CRM_Utils_Money::format($value, NULL, NULL, TRUE));
+    return $this->set('amount', $label, filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
   }
 
   /**
