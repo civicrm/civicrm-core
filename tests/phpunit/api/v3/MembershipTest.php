@@ -181,7 +181,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Pending Membership Status
     $pendingMembershipId = array_search('Pending', $memStatus);
     // New Membership Status
-    $newMembershipId = array_search('New', $memStatus);
+    $newMembershipId = array_search('test status', $memStatus);
 
     $membershipParam = [
       'membership_type_id' => $this->_membershipTypeID,
@@ -235,6 +235,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Change Payment Status to Completed
     $form = new CRM_Contribute_Form_Contribution();
     $form->_id = $ContributionCreate['id'];
+    $params = ['id' => $ContributionCreate['id']];
+    $values = $ids = [];
+    CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
+    $form->_values = $values;
     $form->testSubmit([
       'total_amount' => 100,
       'financial_type_id' => '1',
@@ -261,7 +265,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // check for Membership 3
     $params = ['id' => $membershipID3];
     $membership3 = $this->callAPISuccess('membership', 'get', $params);
-    $result3 = $membership3['values'][$membership3];
+    $result3 = $membership3['values'][$membershipID3];
     $this->assertEquals($result3['contact_id'], $contactId3);
     $this->assertEquals($result3['status_id'], $newMembershipId);
   }
