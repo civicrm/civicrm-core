@@ -103,13 +103,16 @@ function civicrm_api3_order_create($params) {
           // pledge payment
         }
       }
-      if (empty($priceSetID)) {
+      // Each set of lineitems maps to an event or a membership but each entity can (will) be linked to a different priceset.
+      if (!empty($lineItems['line_item'])) {
         $item = reset($lineItems['line_item']);
         $priceSetID = (int) civicrm_api3('PriceField', 'getvalue', [
           'return' => 'price_set_id',
           'id' => $item['price_field_id'],
         ]);
-        $params['line_item'][$priceSetID] = [];
+      }
+      else {
+        $priceSetID = 0;
       }
       $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
