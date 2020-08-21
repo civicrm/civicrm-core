@@ -189,7 +189,7 @@ class CRM_Activity_BAO_Query {
         // We no longer expect "subject" as a specific criteria (as of CRM-19447),
         // but we still use activity_subject in Activity.Get API
       case 'activity_subject':
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldSpec['where'], $op, $value, CRM_Utils_Type::typeToString($fieldSpec['type']));
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldSpec['where'], $op, $value, $query->getDataTypeForRealField($name));
         $query->_qill[$grouping][]  = $query->getQillForField($fieldSpec['is_pseudofield_for'] ?? $fieldSpec['name'], $value, $op, $fieldSpec);
         break;
 
