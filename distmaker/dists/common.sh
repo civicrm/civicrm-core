@@ -257,6 +257,19 @@ function dm_install_cvext() {
   cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
 }
 
+## usage: dm_export_patches <src-repo> <out-dir> <range>
+function dm_export_patches() {
+  if [ ! -d "$1" ]; then
+    echo "ignore: $1"
+    return
+  fi
+  echo "Export \"$1\" ($3) to \"$2\""
+  pushd "$1" >> /dev/null
+    git format-patch "$3" -o "$2"
+  popd >> /dev/null
+}
+
+
 ## Edit a file by applying a regular expression.
 ## Note: We'd rather just call "sed", but it differs on GNU+BSD.
 ## usage: dm_preg_edit <search-pattern> <replacement-pattern> <file>
