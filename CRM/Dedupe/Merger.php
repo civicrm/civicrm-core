@@ -541,6 +541,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
 
+      if ($table === 'civicrm_dedupe_exception') {
+        $sqls[] = "UPDATE IGNORE civicrm_dedupe_exception SET contact_id1 = $mainId WHERE contact_id1 = $otherId";
+        $sqls[] = "UPDATE IGNORE civicrm_dedupe_exception SET contact_id2 = $mainId WHERE contact_id2 = $otherId";
+        $sqls[] = "DELETE FROM civicrm_dedupe_exception WHERE contact_id1 = $otherId OR contact_id2 = $otherId";
+        continue;
+      }
+
       if ($table === 'civicrm_setting') {
         // Per https://lab.civicrm.org/dev/core/-/issues/1934
         // Note this line is not unit tested as yet as a quick-fix for a regression
