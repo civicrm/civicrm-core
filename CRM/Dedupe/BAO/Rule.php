@@ -136,7 +136,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
       $from = "{$this->rule_table} t1";
       $str = 'NULL';
       if (isset($this->params[$this->rule_table][$this->rule_field])) {
-        $str = CRM_Utils_Type::escape($this->params[$this->rule_table][$this->rule_field], 'String');
+        $str = trim(CRM_Utils_Type::escape($this->params[$this->rule_table][$this->rule_field], 'String'));
       }
       if ($this->rule_length) {
         $where[] = "SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR('$str', 1, {$this->rule_length})";
