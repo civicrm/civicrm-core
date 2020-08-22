@@ -33,6 +33,7 @@
       </div>
     {/if}
 
+    {crmRegion name='event-register-not-you-block'}
     {if $contact_id}
       <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}. (<a
@@ -40,6 +41,8 @@
           title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
       </div>
     {/if}
+    {/crmRegion}
+
     {if $event.intro_text}
       <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
