@@ -936,7 +936,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // as they would then me membership.contact_id, membership.is_test etc
     return civicrm_api3('Membership', 'get', [
       'id' => ['IN' => $membershipIDs],
-      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test', 'status_id', 'end_date'],
+      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test', 'status_id', 'end_date', 'join_date', 'start_date'],
     ])['values'];
   }
 
@@ -3180,13 +3180,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             ]);
             $values['priceSetID'] = $priceSet['id'];
           }
+          $memberships = self::getRelatedMemberships($this->id);
           foreach ($lineItems as &$eachItem) {
-            if (isset($this->_relatedObjects['membership'])
-              && is_array($this->_relatedObjects['membership'])
-              && array_key_exists($eachItem['membership_type_id'], $this->_relatedObjects['membership'])) {
-              $eachItem['join_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->join_date);
-              $eachItem['start_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->start_date);
-              $eachItem['end_date'] = CRM_Utils_Date::customFormat($this->_relatedObjects['membership'][$eachItem['membership_type_id']]->end_date);
+            if (!empty($eachItem['membership_type_id'])) {
+              $membership = $memberships[$eachItem['entity_id']];
+              $eachItem['join_date'] = CRM_Utils_Date::customFormat($membership['join_date']);
+              $eachItem['start_date'] = CRM_Utils_Date::customFormat($membership['start_date']);
+              $eachItem['end_date'] = CRM_Utils_Date::customFormat($membership['end_date']);
             }
             // This is actually used in conjunction with is_quick_config in the template & we should deprecate it.
             // However, that does create upgrade pain so would be better to be phased in.

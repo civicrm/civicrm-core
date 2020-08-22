@@ -1566,13 +1566,28 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['cancel_date'] = $params['cancel_reason'] = 'null';
       }
 
+      $newContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']);
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
       // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
-      if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+      if ($newContributionStatus === 'Pending') {
         $params['is_pay_later'] = 1;
       }
-      elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+      elseif ($newContributionStatus === 'Completed') {
         $params['is_pay_later'] = 0;
+        if ($this->_id) {
+          $amountToPay = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_id);
+          if ($amountToPay) {
+            civicrm_api3('Payment', 'create', [
+              'contribution_id' => $this->_id,
+              'payment_instrument_id' => $params['payment_instrument_id'],
+              'check_number' => $params['check_number'] ?? '',
+              'trxn_date' => $params['receive_date'],
+              'total_amount' => $amountToPay,
+            ]);
+            unset($params['contribution_status_id']);
+            $params['is_post_payment_create'] = TRUE;
+          }
+        }
       }
 
       // Add Additional common information to formatted params.
@@ -1601,7 +1616,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $contribution = CRM_Contribute_BAO_Contribution::create($params);
 
       // process associated membership / participant, CRM-4395
-      if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
+      // @todo - this is now done via Payment.create for transition to completed.
+      if ($contribution->id && $action & CRM_Core_Action::UPDATE && empty($params['is_post_payment_create'])) {
         $this->statusMessage[] = CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution->id,
           $contribution->contribution_status_id,
           CRM_Utils_Array::value('contribution_status_id',
