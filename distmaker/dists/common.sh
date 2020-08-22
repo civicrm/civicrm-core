@@ -257,7 +257,9 @@ function dm_install_cvext() {
   cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
 }
 
+## Export a list of patch files from a git repo
 ## usage: dm_export_patches <src-repo> <out-dir> <range>
+## ex: dm_export_patches "$HOME/src/somerepo" "/tmp/export" 5.1.2..5.1.6
 function dm_export_patches() {
   if [ ! -d "$1" ]; then
     echo "ignore: $1"
