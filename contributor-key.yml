@@ -88,6 +88,7 @@
 - github      : andrew-cormick-dockery
   name        : Andrew Cormick-Dockery
   jira        : andrew_dockery
+  organization: Australian Greens
 
 - github      : andrewperry
   name        : Andrew Perry
