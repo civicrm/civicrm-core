@@ -206,6 +206,12 @@ class Container {
       []
     ))->setPublic(TRUE);
 
+    $container->setDefinition('bundle.coreStyles', new Definition('CRM_Core_Resources_Bundle', ['coreStyles']))
+      ->setFactory('CRM_Core_Resources_Common::createStyleBundle');
+
+    $container->setDefinition('bundle.coreResources', new Definition('CRM_Core_Resources_Bundle', ['coreResources']))
+      ->setFactory('CRM_Core_Resources_Common::createFullBundle');
+
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer');
 

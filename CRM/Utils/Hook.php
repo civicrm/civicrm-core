@@ -422,6 +422,22 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Alter the contents of a resource bundle (ie a collection of JS/CSS/etc).
+   *
+   * TIP: $bundle->add*() and $bundle->filter() should be useful for
+   * adding/removing/updating items.
+   *
+   * @param CRM_Core_Resources_Bundle $bundle
+   * @return null
+   * @see CRM_Core_Resources_CollectionInterface::add()
+   * @see CRM_Core_Resources_CollectionInterface::filter()
+   */
+  public static function alterBundle($bundle) {
+    return self::singleton()
+      ->invoke(['bundle'], $bundle, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_alterBundle');
+  }
+
+  /**
    * This hook is invoked during the CiviCRM form preProcess phase.
    *
    * @param string $formName
