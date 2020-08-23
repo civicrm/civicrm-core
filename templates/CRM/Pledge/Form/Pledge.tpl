@@ -217,14 +217,14 @@
 
      function calculatedPaymentAmount( ) {
        var thousandMarker = {/literal}{crmSetting name="monetaryThousandSeparator" group="CiviCRM Localization"}{literal};
-       var seperator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+       var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
        var amount = document.getElementById("amount").value;
-       // replace all thousandMarker and change the seperator to a dot
-       amount = amount.replace(thousandMarker,'').replace(seperator,'.');
+       // replace all thousandMarker and change the separator to a dot
+       amount = amount.replace(thousandMarker,'').replace(separator,'.');
        var installments = document.getElementById("installments").value;
        if ( installments != '' && installments != NaN) {
             amount =  amount/installments;
-            var installmentAmount = formatMoney( amount, 2, seperator, thousandMarker );
+            var installmentAmount = formatMoney( amount, 2, separator, thousandMarker );
             document.getElementById("eachPaymentAmount").value = installmentAmount;
        }
      }

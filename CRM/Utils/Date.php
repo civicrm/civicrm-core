@@ -26,7 +26,7 @@ class CRM_Utils_Date {
    * @param array $date
    *   ('Y', 'M', 'd').
    * @param string $separator
-   *   The seperator to use when formatting the date.
+   *   The separator to use when formatting the date.
    * @param int|string $invalidDate what to return if the date is invalid
    *
    * @return string

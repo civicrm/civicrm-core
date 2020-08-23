@@ -35,7 +35,7 @@ class CRM_Core_Report_Excel {
   public static function makeCSVTable($header, $rows, $outputHeader = TRUE) {
 
     $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
+    $separator = $config->fieldSeparator;
     $add_character = "\015\012";
 
     if ($outputHeader) {
@@ -68,7 +68,7 @@ class CRM_Core_Report_Excel {
               }
             }
 
-            $str = implode($seperator, $strArray);
+            $str = implode($separator, $strArray);
             $value = &$str;
           }
 
@@ -76,7 +76,7 @@ class CRM_Core_Report_Excel {
         }
 
         if ($colNo < $fields_cnt - 1) {
-          $schema_insert .= $seperator;
+          $schema_insert .= $separator;
         }
         $colNo++;
       }

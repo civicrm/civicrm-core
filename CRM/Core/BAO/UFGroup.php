@@ -1316,8 +1316,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
             'Multi-Select State/Province',
             'Multi-Select Country',
           ])) {
-            $valSeperator = CRM_Core_DAO::VALUE_SEPARATOR;
-            $selectedOptions = explode($valSeperator, $params[$index]);
+            $valSeparator = CRM_Core_DAO::VALUE_SEPARATOR;
+            $selectedOptions = explode($valSeparator, $params[$index]);
 
             foreach ($selectedOptions as $key => $multiOption) {
               if ($multiOption) {
@@ -2982,7 +2982,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
   /**
    * Update the profile type 'group_type' as per profile fields including group types and group subtype values.
-   * Build and store string like: group_type1,group_type2[VALUE_SEPERATOR]group_type1Type:1:2:3,group_type2Type:1:2
+   * Build and store string like: group_type1,group_type2[VALUE_SEPARATOR]group_type1Type:1:2:3,group_type2Type:1:2
    *
    * FIELDS                                                   GROUP_TYPE
    * BirthDate + Email                                        Individual,Contact

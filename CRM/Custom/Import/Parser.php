@@ -312,7 +312,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
-    $store->set('seperator', $this->_separator);
+    $store->set('separator', $this->_separator);
     $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 
