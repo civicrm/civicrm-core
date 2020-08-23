@@ -26,7 +26,19 @@ class CRM_Core_Resources_Common {
    */
   public static function createStyleBundle($name) {
     $bundle = new CRM_Core_Resources_Bundle($name);
-    // TODO
+
+    // Load custom or core css
+    $config = CRM_Core_Config::singleton();
+    if (!empty($config->customCSSURL)) {
+      $customCSSURL = Civi::resources()->addCacheCode($config->customCSSURL);
+      $bundle->addStyleUrl($customCSSURL, 99);
+    }
+    if (!Civi::settings()->get('disable_core_css')) {
+      $bundle->addStyleFile('civicrm', 'css/civicrm.css', -99);
+    }
+    // crm-i.css added ahead of other styles so it can be overridden by FA.
+    $bundle->addStyleFile('civicrm', 'css/crm-i.css', -101);
+
     CRM_Utils_Hook::alterBundle($bundle);
     self::useRegion($bundle, self::REGION);
     return $bundle;

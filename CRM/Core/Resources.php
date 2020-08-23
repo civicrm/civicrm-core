@@ -64,15 +64,6 @@ class CRM_Core_Resources {
   protected $addedCoreResources = [];
 
   /**
-   * Added core styles.
-   *
-   * Format is ($regionName => bool).
-   *
-   * @var array
-   */
-  protected $addedCoreStyles = [];
-
-  /**
    * Added settings.
    *
    * Format is ($regionName => bool).
@@ -616,9 +607,6 @@ class CRM_Core_Resources {
   /**
    * This will add CiviCRM's standard CSS
    *
-   * TODO: Separate the functional code (like addStyle/addScript) from the policy code
-   * (like addCoreResources/addCoreStyles).
-   *
    * @param string $region
    * @return CRM_Core_Resources
    */
@@ -630,21 +618,7 @@ class CRM_Core_Resources {
       // it appears that all callers use 'html-header' (either implicitly or explicitly).
       throw new \CRM_Core_Exception("Error: addCoreResources only supports html-header");
     }
-    if (!isset($this->addedCoreStyles[$region])) {
-      $this->addedCoreStyles[$region] = TRUE;
-
-      // Load custom or core css
-      $config = CRM_Core_Config::singleton();
-      if (!empty($config->customCSSURL)) {
-        $customCSSURL = $this->addCacheCode($config->customCSSURL);
-        $this->addStyleUrl($customCSSURL, 99, $region);
-      }
-      if (!Civi::settings()->get('disable_core_css')) {
-        $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
-      }
-      // crm-i.css added ahead of other styles so it can be overridden by FA.
-      $this->addStyleFile('civicrm', 'css/crm-i.css', -101, $region);
-    }
+    $this->addBundle('coreStyles');
     return $this;
   }
 
