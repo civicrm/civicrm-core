@@ -296,7 +296,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
     //use value field.
     $valueFieldName = 'amount';
-    $seperator = '|';
+    $separator = '|';
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $taxTerm = Civi::settings()->get('tax_term');
     $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
@@ -312,7 +312,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $qf->assign('taxTerm', $taxTerm);
           $qf->assign('invoicing', $invoicing);
         }
-        $priceVal = implode($seperator, [
+        $priceVal = implode($separator, [
           $customOption[$optionKey][$valueFieldName] + $taxAmount,
           $count,
           $max_value,
@@ -403,7 +403,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal = implode($seperator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
+          $priceVal = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
           if (isset($opt['visibility_id'])) {
             $visibility_id = $opt['visibility_id'];
           }
@@ -499,7 +499,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
           }
 
-          $priceVal[$opt['id']] = implode($seperator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
+          $priceVal[$opt['id']] = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
 
           if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
@@ -562,7 +562,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
             $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
           }
-          $priceVal = implode($seperator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
+          $priceVal = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             [
               'price' => json_encode([$opt['id'], $priceVal]),

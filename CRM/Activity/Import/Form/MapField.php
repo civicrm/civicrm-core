@@ -350,7 +350,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     $mapperKeys = [];
@@ -431,7 +431,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain, $mapperLocType, $mapperPhoneType);
-    $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
+    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
       CRM_Import_Parser::MODE_PREVIEW
     );
 

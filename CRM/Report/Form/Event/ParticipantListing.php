@@ -693,7 +693,7 @@ ORDER BY  cv.label
         }
       }
 
-      // Handle value seperator in Fee Level
+      // Handle value separator in Fee Level
       if (array_key_exists('civicrm_participant_participant_fee_level', $row)) {
         $feeLevel = $row['civicrm_participant_participant_fee_level'];
         if ($feeLevel) {

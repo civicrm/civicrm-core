@@ -134,10 +134,10 @@ class CRM_Utils_Mail_EmailProcessor {
     }
 
     $config = CRM_Core_Config::singleton();
-    $verpSeperator = preg_quote($config->verpSeparator);
-    $twoDigitStringMin = $verpSeperator . '(\d+)' . $verpSeperator . '(\d+)';
-    $twoDigitString = $twoDigitStringMin . $verpSeperator;
-    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeperator;
+    $verpSeparator = preg_quote($config->verpSeparator);
+    $twoDigitStringMin = $verpSeparator . '(\d+)' . $verpSeparator . '(\d+)';
+    $twoDigitString = $twoDigitStringMin . $verpSeparator;
+    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeparator;
 
     // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
     $commonRegex = '/^' . preg_quote($dao->localpart) . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain) . '$/';
