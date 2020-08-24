@@ -55,6 +55,13 @@
               {$form.component_mode.html}
             </td>
           </tr>
+          <tr>
+            <td>
+              {$form.saved_search.label} <br/>{$form.saved_search.html}
+            </td>
+            <td colspan="2">
+            </td>
+          </tr>
         </table>
       </div>
     </div>
@@ -116,6 +123,7 @@
           d.group_type = groupTypes,
           d.visibility = $(".crm-group-search-form-block select#visibility").val(),
           d.status = groupStatus,
+          d.savedSearch = $('.crm-group-search-form-block select#saved_search').val(),
           d.component_mode = $(".crm-group-search-form-block select#component_mode").val(),
           d.showOrgInfo = {/literal}"{$showOrgInfo}"{literal},
           d.parentsOnly = parentsOnly

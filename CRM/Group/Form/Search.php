@@ -40,6 +40,14 @@ class CRM_Group_Form_Search extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title')
     );
 
+    $optionTypes = [
+      '1' => ts('Smart Group'),
+      '2' => ts('Normal Group'),
+    ];
+    $this->add('select', 'saved_search', ts('Group Type'),
+      ['' => ts('- any -')] + $optionTypes
+    );
+
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
     $config = CRM_Core_Config::singleton();
     if ($config->userFramework == 'Joomla') {
