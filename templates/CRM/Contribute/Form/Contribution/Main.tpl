@@ -65,16 +65,19 @@
 
   <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
 
+    {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$ccid}
       <div class="messages status no-popup crm-not-you-message">
         {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
       </div>
     {/if}
+    {/crmRegion}
 
     <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
       {$intro_text}
     </div>
     {include file="CRM/common/cidzero.tpl"}
+
     {if $islifetime or $ispricelifetime}
       <div class="help">{ts}You have a current Lifetime Membership which does not need to be renewed.{/ts}</div>
     {/if}
