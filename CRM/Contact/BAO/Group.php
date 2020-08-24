@@ -1227,7 +1227,7 @@ WHERE {$whereClause}";
     if ($savedSearch == 1) {
       $clauses[] = 'groups.saved_search_id IS NOT NULL';
     }
-    else if ($savedSearch == 2) {
+    elseif ($savedSearch == 2) {
       $clauses[] = 'groups.saved_search_id IS NULL';
     }
 
