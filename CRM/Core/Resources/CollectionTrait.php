@@ -356,7 +356,7 @@ trait CRM_Core_Resources_CollectionTrait {
   /**
    * @return array
    */
-  protected function &findCreateSettingSnippet($options = []): array {
+  public function &findCreateSettingSnippet($options = []): array {
     $snippet = &$this->get('settings');
     if ($snippet !== NULL) {
       return $snippet;

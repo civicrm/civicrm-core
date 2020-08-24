@@ -36,7 +36,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    * @return array
    * @see CRM_Core_Resources_CollectionTrait::findCreateSettingSnippet()
    */
-  abstract protected function &findCreateSettingSnippet($options = []): array;
+  abstract public function &findCreateSettingSnippet($options = []): array;
 
   /**
    * Export permission data to the client to enable smarter GUIs.
