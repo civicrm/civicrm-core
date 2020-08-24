@@ -329,6 +329,27 @@ trait CRM_Core_Resources_CollectionTrait {
   // -----------------------------------------------
 
   /**
+   * Assimilate all the resources listed in a bundle.
+   *
+   * @param iterable|string|\CRM_Core_Resources_Bundle $bundle
+   *   Either bundle object, or the symbolic name of a bundle.
+   *   Note: For symbolic names, the bundle must be a container service ('bundle.FOO').
+   * @return static
+   */
+  public function addBundle($bundle) {
+    if (is_iterable($bundle)) {
+      foreach ($bundle as $b) {
+        $this->addBundle($b);
+        return $this;
+      }
+    }
+    if (is_string($bundle)) {
+      $bundle = Civi::service('bundle.' . $bundle);
+    }
+    return $this->merge($bundle->getAll());
+  }
+
+  /**
    * Export permission data to the client to enable smarter GUIs.
    *
    * Note: Application security stems from the server's enforcement

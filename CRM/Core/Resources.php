@@ -46,6 +46,15 @@ class CRM_Core_Resources {
   private $strings = NULL;
 
   /**
+   * Any bundles that have been added.
+   *
+   * Format is ($bundleName => bool).
+   *
+   * @var array
+   */
+  protected $addedBundles = [];
+
+  /**
    * Added core resources.
    *
    * Format is ($regionName => bool).
@@ -137,6 +146,54 @@ class CRM_Core_Resources {
     }
     $this->ajaxPopupsEnabled = (bool) Civi::settings()->get('ajaxPopupsEnabled');
     $this->paths = Civi::paths();
+  }
+
+  /**
+   * Assimilate all the resources listed in a bundle.
+   *
+   * @param iterable|string|\CRM_Core_Resources_Bundle $bundle
+   *   Either bundle object, or the symbolic name of a bundle, or a list of budnles.
+   *   Note: For symbolic names, the bundle must be a container service ('bundle.FOO').
+   * @return static
+   */
+  public function addBundle($bundle) {
+    if (is_iterable($bundle)) {
+      foreach ($bundle as $b) {
+        $this->addBundle($b);
+        return $this;
+      }
+    }
+
+    if (is_string($bundle)) {
+      $bundle = Civi::service('bundle.' . $bundle);
+    }
+
+    if (isset($this->addedBundles[$bundle->name])) {
+      return $this;
+    }
+    $this->addedBundles[$bundle->name] = TRUE;
+
+    // If an item is already assigned to a region, we'll respect that.
+    // Otherwise, we'll use defaults.
+    $pickRegion = function ($snippet) {
+      if (isset($snippet['settings'])) {
+        return $this->getSettingRegion($snippet['region'] ?? NULL)->_name;
+      }
+      else {
+        return $snippet['region'] ?? self::DEFAULT_REGION;
+      }
+    };
+
+    $byRegion = [];
+    foreach ($bundle->getAll() as $snippet) {
+      $snippet['region'] = $pickRegion($snippet);
+      $byRegion[$snippet['region']][$snippet['name']] = $snippet;
+    }
+
+    foreach ($byRegion as $regionName => $snippets) {
+      CRM_Core_Region::instance($regionName)->merge($snippets);
+    }
+    return $this;
   }
 
   /**
