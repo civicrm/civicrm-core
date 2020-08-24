@@ -64,6 +64,7 @@ trait CRM_Core_Resources_CollectionTrait {
    */
   public function add($snippet) {
     $snippet = array_merge($this->defaults, $snippet);
+    $snippet['id'] = $this->nextId();
     if (!isset($snippet['type'])) {
       foreach ($this->types as $type) {
         // auto-detect
@@ -85,18 +86,18 @@ trait CRM_Core_Resources_CollectionTrait {
       switch ($snippet['type']) {
         case 'scriptUrl':
         case 'styleUrl':
-          $snippet['sortId'] = $this->nextId();
+          $snippet['sortId'] = $snippet['id'];
           $snippet['name'] = $snippet[$snippet['type']];
           break;
 
         case 'scriptFile':
         case 'styleFile':
-          $snippet['sortId'] = $this->nextId();
+          $snippet['sortId'] = $snippet['id'];
           $snippet['name'] = implode(':', $snippet[$snippet['type']]);
           break;
 
         default:
-          $snippet['sortId'] = $this->nextId();
+          $snippet['sortId'] = $snippet['id'];
           $snippet['name'] = $snippet['sortId'];
           break;
       }

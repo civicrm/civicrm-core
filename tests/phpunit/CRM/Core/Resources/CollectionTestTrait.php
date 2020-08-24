@@ -42,7 +42,7 @@ trait CRM_Core_Resources_CollectionTestTrait {
     };
 
     $addCases(
-    // List of equivalent method calls
+      // List of equivalent method calls
       [
         'add(scriptUrl): dfl' => ['add', ['scriptUrl' => 'http://example.com/foo.js']],
         'addScriptUrl(): dfl' => ['addScriptUrl', 'http://example.com/foo.js'],
@@ -53,10 +53,20 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'name' => 'http://example.com/foo.js',
         'disabled' => FALSE,
         'weight' => 1,
-        'sortId' => 1,
         'type' => 'scriptUrl',
         'scriptUrl' => 'http://example.com/foo.js',
       ]
+    );
+
+    // For historical reasons, the `add(scriptUrl)` and `addScriptUrl()` calls
+    // differ very slightly in how data is ordered.
+    $addCases(
+      ['add(scriptUrl): dfl: sortId' => ['add', ['scriptUrl' => 'http://example.com/foo.js']]],
+      ['sortId' => ($this instanceof CRM_Core_RegionTest ? 2 : 1)]
+    );
+    $addCases(
+      ['addScriptUrl(): dfl: sortId' => ['addScriptUrl', 'http://example.com/foo.js']],
+      ['sortId' => 'http://example.com/foo.js']
     );
 
     $addCases(
@@ -69,7 +79,6 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'name' => 'http://example.com/foo.js',
         'disabled' => FALSE,
         'weight' => 100,
-        'sortId' => 1,
         'type' => 'scriptUrl',
         'scriptUrl' => 'http://example.com/foo.js',
       ]
@@ -84,7 +93,6 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'name' => 'http://example.com/foo.css',
         'disabled' => FALSE,
         'weight' => 1,
-        'sortId' => 1,
         'type' => 'styleUrl',
         'styleUrl' => 'http://example.com/foo.css',
       ]
@@ -99,7 +107,6 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'name' => 'civicrm:css/civicrm.css',
         'disabled' => FALSE,
         'weight' => 1,
-        'sortId' => 1,
         'type' => 'styleFile',
         'styleFile' => ['civicrm', 'css/civicrm.css'],
         'styleFileUrls' => [
@@ -111,7 +118,6 @@ trait CRM_Core_Resources_CollectionTestTrait {
     $basicFooJs = [
       'name' => 'civicrm:js/foo.js',
       'disabled' => FALSE,
-      'sortId' => 1,
       'type' => 'scriptFile',
       'scriptFile' => ['civicrm', 'js/foo.js'],
       'scriptFileUrls' => [
@@ -153,10 +159,10 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'addScript()' => ['addScript', 'window.alert("Boo!");'],
       ],
       [
-        'name' => 1,
+        // Regions always have a 'default' with ID#1, so our test always becomes #2.
+        'name' => ($this instanceof CRM_Core_RegionTest ? 2 : 1),
         'disabled' => FALSE,
         'weight' => 1,
-        'sortId' => 1,
         'type' => 'script',
         'script' => 'window.alert("Boo!");',
       ]
@@ -321,17 +327,17 @@ trait CRM_Core_Resources_CollectionTestTrait {
       return $snippet;
     };
 
-    // If there isn't an explicit expectation for 'region', then we won't check it.
-    if (!isset($expect['region']) || '*' === $expect['region']) {
-      if (isset($actual['region'])) {
-        unset($expect['region']);
-        unset($actual['region']);
-      }
-    }
-
     $expect = $normalizeSnippet($expect);
     $actual = $normalizeSnippet($actual);
-    $this->assertEquals($expect, $actual, $message);
+
+    foreach ($expect as $expectKey => $expectValue) {
+      if ($expectValue === '*') {
+        $this->assertTrue(!empty($actual[$expectKey]));
+      }
+      else {
+        $this->assertEquals($expectValue, $actual[$expectKey]);
+      }
+    }
   }
 
 }

@@ -99,6 +99,9 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   public function addScriptFile(string $ext, string $file, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
       'scriptFile' => [$ext, $file],
+      'name' => "$ext:$file",
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptFile() produce slightly different orderings.
     ]));
     return $this;
   }
@@ -119,6 +122,9 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   public function addScriptUrl(string $url, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
       'scriptUrl' => $url,
+      'name' => $url,
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings.
     ]));
     return $this;
   }
@@ -215,6 +221,9 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   public function addStyleFile(string $ext, string $file, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
       'styleFile' => [$ext, $file],
+      'name' => "$ext:$file",
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings.
     ]));
     return $this;
   }
@@ -235,6 +244,9 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   public function addStyleUrl(string $url, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
       'styleUrl' => $url,
+      'name' => $url,
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings.
     ]));
     return $this;
   }
