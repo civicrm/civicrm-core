@@ -9,6 +9,10 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+use Civi\Api4\Relationship;
+use Civi\Api4\RelationshipType;
+
 /**
  *  Test APIv3 civicrm_membership functions
  *
@@ -495,7 +499,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and max_related property for Membership_Type and Membership entities
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateWithRelationship() {
     // Create membership type: inherited through employment, max_related = 2
@@ -665,6 +668,75 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($employerId[0]);
     $this->membershipTypeDelete(['id' => $membershipTypeId]);
     $this->contactDelete($membershipOrgId);
+  }
+
+  /**
+   * Test that loops are not created when adding spouse relationships.
+   *
+   * This add a test for https://issues.civicrm.org/jira/browse/CRM-4213 in the hope of removing
+   * the buggy fix for that without a resurgence.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testCreateWithSpouseRelationship() {
+    $relationshipTypeID = RelationshipType::get()->addSelect('id')->addWhere('name_a_b', '=', 'Spouse of')->execute()->first()['id'];
+    MembershipType::update()->setValues([
+      'relationship_direction' => ['b_a', 'a_b'],
+      'relationship_type_id' => [$relationshipTypeID, $relationshipTypeID],
+    ])
+      ->addWhere('name', '=', 'General')
+      ->execute()->first()['id'];
+
+    $spouse1ID = $this->individualCreate(['first_name' => 'him']);
+    $spouse2ID = $this->individualCreate(['first_name' => 'her']);
+    $spouse3ID = $this->individualCreate(['first_name' => 'they']);
+    $spouse4ID = $this->individualCreate(['first_name' => 'them']);
+    Relationship::create()->setValues([
+      'contact_id_a' => $spouse1ID,
+      'contact_id_b' => $spouse2ID,
+      'relationship_type_id' => $relationshipTypeID,
+    ])->execute();
+
+    $this->contactMembershipCreate([
+      'contact_id' => $spouse1ID,
+      'start_date' => date('Y-m-d'),
+      'end_date' => '+1 year',
+    ]);
+
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse2ID,
+      'membership_type_id' => 'General',
+    ]);
+
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse1ID,
+      'membership_type_id' => 'General',
+    ]);
+    // Add another Spouse
+    Relationship::create()->setValues([
+      'contact_id_a' => $spouse3ID,
+      'contact_id_b' => $spouse1ID,
+      'relationship_type_id' => $relationshipTypeID,
+    ])->execute();
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse3ID,
+      'membership_type_id' => 'General',
+    ]);
+    $this->callAPISuccessGetCount('Membership', [], 3);
+    Relationship::create()->setValues([
+      'contact_id_a' => $spouse1ID,
+      'contact_id_b' => $spouse4ID,
+      'relationship_type_id' => $relationshipTypeID,
+    ])->execute();
+
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse4ID,
+      'membership_type_id' => 'General',
+    ]);
+
+    $this->callAPISuccessGetCount('Membership', [], 4);
   }
 
   /**

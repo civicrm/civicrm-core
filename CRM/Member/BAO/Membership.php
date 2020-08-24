@@ -1316,25 +1316,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @param CRM_Core_DAO $dao
    *   Membership object.
    *
-   * @param bool $reset
-   *
-   * @return array|null
-   *   Membership details, if created.
-   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function createRelatedMemberships($params, $dao, $reset = FALSE) {
-    // CRM-4213 check for loops, using static variable to record contacts already processed.
-    if (!isset(\Civi::$statics[__CLASS__]['related_contacts'])) {
-      \Civi::$statics[__CLASS__]['related_contacts'] = [];
-    }
-    if ($reset) {
-      // CRM-17723.
-      unset(\Civi::$statics[__CLASS__]['related_contacts']);
-      return FALSE;
-    }
-    $relatedContactIds = &\Civi::$statics[__CLASS__]['related_contacts'];
+  public static function createRelatedMemberships($params, $dao) {
 
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;
@@ -1371,9 +1356,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     );
 
     // CRM-4213, CRM-19735 check for loops, using static variable to record contacts already processed.
-    // Remove repeated related contacts, which already inherited membership of this type.
-    $relatedContactIds[$membership->contact_id][$membership->membership_type_id] = TRUE;
+    // Remove repeated related contacts, which already inherited membership of this type$relatedContactIds[$membership->contact_id][$membership->membership_type_id] = TRUE;
     foreach ($allRelatedContacts as $cid => $status) {
+      // relatedContactIDs is always empty now - will remove next roud because of whitespace readability.
       if (empty($relatedContactIds[$cid]) || empty($relatedContactIds[$cid][$membership->membership_type_id])) {
         $relatedContactIds[$cid][$membership->membership_type_id] = TRUE;
 
@@ -1470,7 +1455,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $ids = [];
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
-          CRM_Member_BAO_Membership::create($params);
+          if (!self::hasExistingInheritedMembership($params)) {
+            CRM_Member_BAO_Membership::create($params);
+          }
         }
         else {
           // related membership already exists, so this is just an update
@@ -1495,7 +1482,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         if ($numRelatedAvailable <= 0) {
           break;
         }
-        CRM_Member_BAO_Membership::create($params);
+        if (!self::hasExistingInheritedMembership($params)) {
+          CRM_Member_BAO_Membership::create($params);
+        }
         $numRelatedAvailable--;
       }
     }
@@ -2090,6 +2079,58 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       $count++;
     }
     return $count;
+  }
+
+  /**
+   * Does the existing membership match the required membership.
+   *
+   * Check before updating that the params are not a match - this is part of avoiding
+   * a loop if we have already updated.
+   *
+   * https://issues.civicrm.org/jira/browse/CRM-4213
+   * @param array $params
+   *
+   * @param array $membership
+   *
+   * @return bool
+   */
+  protected static function matchesRequiredMembership($params, $membership) {
+    foreach (['start_date', 'end_date'] as $date) {
+      if (strtotime($params[$date]) !== strtotime($membership[$date])) {
+        return FALSE;
+      }
+      if ((int) $params['status_id'] !== (int) $membership['status_id']) {
+        return FALSE;
+      }
+      if ((int) $params['membership_type_id'] !== (int) $membership['membership_type_id']) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Params of new membership.
+   *
+   * @param array $params
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function hasExistingInheritedMembership($params) {
+    foreach (civicrm_api3('Membership', 'get', ['contact_id' => $params['contact_id']])['values'] as $membership) {
+      if (!empty($membership['owner_membership_id'])
+        && $membership['membership_type_id'] === $params['membership_type_id']
+        && (int) $params['owner_membership_id'] !== (int) $membership['owner_membership_id']
+      ) {
+        // Inheriting it from another contact, don't update here.
+        return TRUE;
+      }
+      if (self::matchesRequiredMembership($params, $membership)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
