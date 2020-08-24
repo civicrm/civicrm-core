@@ -12,52 +12,82 @@
 /**
  * Class CRM_Core_Resources_CollectionInterface
  *
- * This is a building-block for creating classes which maintain a list of resources.
+ * A resource collection is a mix of *resources* (or *snippets* or *assets*) that can be
+ * added to a page. A fully-formed resource might look like this:
+ *
+ * ```
+ * array(
+ *   'name' => 'jQuery',
+ *   'region' => 'html-header',
+ *   'weight' => 100,
+ *   'type' => 'scriptUrl',
+ *   'scriptUrl' => 'https://example.com/js/jquery.min.js'
+ * )
+ * ```
+ *
+ * Typically, a resource is created with just one option, eg
+ *
+ * ```
+ * // Add resources in array notation
+ * $c->add(['script' => 'alert("Hello");']);
+ * $c->add(['scriptFile' => ['civicrm', 'js/crm.ckeditor.js']]);
+ * $c->add(['scriptUrl' => 'https://example.com/js/jquery.min.js']);
+ * $c->add(['style' => 'p { font-size: 4em; }']);
+ * $c->add(['styleFile' => ['civicrm', 'css/dashboard.css']]);
+ * $c->add(['styleUrl' => 'https://example.com/css/foobar.css']);
+ *
+ * // Add resources with helper methods
+ * $c->addScript('alert("Hello");');
+ * $c->addScriptFile('civicrm', 'js/crm.ckeditor.js');
+ * $c->addScriptUrl('https://example.com/js/jquery.min.js');
+ * $c->addStyle('p { font-size: 4em; }');
+ * $c->addStyleFile('civicrm', 'css/dashboard.css');
+ * $c->addStyleUrl('https://example.com/css/foobar.css');
+ * ```
+ *
+ * The other properties are automatically computed (dependent upon context),
+ * but they may be set explicitly. These options include:
+ *
+ *   - type: string (markup, template, callback, script, scriptFile, scriptUrl, jquery, style, styleFile, styleUrl)
+ *   - name: string, symbolic identifier for this resource
+ *   - weight: int, default=1. Lower weights come before higher weights.
+ *     (If two resources have the same weight, then a secondary ordering will be
+ *     used to ensure reproducibility. However, the secondary ordering is
+ *     not guaranteed among versions/implementations.)
+ *   - disabled: int, default=0
+ *   - region: string
+ *   - translate: bool|string, Autoload translations. (Only applies to 'scriptFile')
+ *       - FALSE: Do not load translated strings.
+ *       - TRUE: Load translated strings. Use the $ext's default domain.
+ *       - string: Load translated strings. Use a specific domain.
+ *
+ * For example, the following are equivalent ways to set the 'weight' option:
+ *
+ * ```php
+ * $c->add([
+ *   'script' => 'alert("Hello");',
+ *   'weight' => 100,
+ * ]);
+ * $c->addScript('alert("Hello");', ['weight' => 100]);
+ * ```
+ *
+ * Passing options in array (key-value) notation is clearest. For backward
+ * compatibility, some methods (eg `addScript()`) accept options in positional form.
+ * Where applicable, the docblock of each `addFoo()` will include a comment about positional form.
  */
 interface CRM_Core_Resources_CollectionInterface {
 
   /**
    * Add an item to the collection. For example, when working with 'page-header' collection:
    *
-   * ```
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'markup' => '<div style="color:red">Hello!</div>',
-   * ));
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'script' => 'alert("Hello");',
-   * ));
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'template' => 'CRM/Myextension/Extra.tpl',
-   * ));
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'callback' => 'myextension_callback_function',
-   * ));
-   * ```
-   *
    * Note: This function does not perform any extra encoding of markup, script code, or etc. If
    * you're passing in user-data, you must clean it yourself.
    *
    * @param array $snippet
-   *   Array; keys:.
-   *   - type: string (auto-detected for markup, template, callback, script, scriptFile, scriptUrl, jquery, style, styleFile, styleUrl)
-   *   - name: string, optional
-   *   - weight: int, optional; default=1
-   *   - disabled: int, optional; default=0
-   *   - markup: string, HTML; required (for type==markup)
-   *   - template: string, path; required (for type==template)
-   *   - callback: mixed; required (for type==callback)
-   *   - arguments: array, optional (for type==callback)
-   *   - script: string, Javascript code
-   *   - scriptFile: array, the name of the extension and file. Ex: ['civicrm', 'js/foo.js']
-   *   - scriptUrl: string, URL of a Javascript file
-   *   - jquery: string, Javascript code which runs inside a jQuery(function($){...}); block
-   *   - settings: array, list of static values to convey.
-   *   - style: string, CSS code
-   *   - styleFile: array, the name of the extension and file. Ex: ['civicrm', 'js/foo.js']
-   *   - styleUrl: string, URL of a CSS file
-   *
+   *   The resource to add. For a full list of properties, see CRM_Core_Resources_CollectionInterface.
    * @return array
    *   The full/computed snippet (with defaults applied).
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function add($snippet);
 
@@ -67,7 +97,9 @@ interface CRM_Core_Resources_CollectionInterface {
    * Ex: $region->update('default', ['disabled' => TRUE]);
    *
    * @param string $name
-   * @param $snippet
+   *   Symbolic of the resource/snippet to update.
+   * @param array $snippet
+   *   Resource options. See CollectionInterface docs.
    * @return static
    */
   public function update($name, $snippet);

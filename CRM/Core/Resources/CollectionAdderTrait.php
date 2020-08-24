@@ -12,11 +12,9 @@
 /**
  * Class CRM_Core_Resources_CollectionTrait
  *
- * This is a building-block for creating classes which maintain a list of resources.
- *
- * The class is generally organized in two sections: First, we have core
- * bit that manages a list of '$snippets'. Second, we have a set of helper
- * functions which add some syntactic sugar for the snippets.
+ * This trait is a building-block for creating classes which maintain a list of
+ * resources. It defines a set of helper functions which provide syntactic sugar
+ * for calling the add() method.
  */
 trait CRM_Core_Resources_CollectionAdderTrait {
 
@@ -27,6 +25,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    * @return array
    *   The full/computed snippet (with defaults applied).
    * @see CRM_Core_Resources_CollectionInterface::add()
+   * @see CRM_Core_Resources_CollectionTrait::add()
    */
   abstract public function add($snippet);
 
@@ -35,20 +34,17 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    *
    * @param array $options
    * @return array
+   * @see CRM_Core_Resources_CollectionTrait::findCreateSettingSnippet()
    */
   abstract protected function &findCreateSettingSnippet($options = []): array;
 
   /**
    * Export permission data to the client to enable smarter GUIs.
    *
-   * Note: Application security stems from the server's enforcement
-   * of the security logic (e.g. in the API permissions). There's no way
-   * the client can use this info to make the app more secure; however,
-   * it can produce a better-tuned (non-broken) UI.
-   *
    * @param string|iterable $permNames
    *   List of permission names to check/export.
    * @return static
+   * @see CRM_Core_Resources_CollectionAdderInterface::addPermissions()
    */
   public function addPermissions($permNames) {
     // TODO: Maybe this should be its own resource type to allow smarter management?
@@ -66,12 +62,16 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
+   * Ex: addScript('alert("Hello world");', ['weight' => 123]);
+   *
    * @param string $code
    *   JavaScript source code.
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScript(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addScript()
    */
   public function addScript(string $code, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
@@ -83,27 +83,18 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
-   * Options may be use key-value format (preferred) or positional format (legacy).
-   *
-   * - addScriptFile('myext', 'my.js', ['weight' => 123, 'region' => 'page-footer'])
-   * - addScriptFile('myext', 'my.js', 123, 'page-footer')
+   * Ex: addScriptFile('myextension', 'myscript.js', ['weight' => 123]);
    *
    * @param string $ext
-   *   extension name; use 'civicrm' for core.
+   *   Extension name; use 'civicrm' for core.
    * @param string $file
-   *   file path -- relative to the extension base dir.
+   *   File path -- relative to the extension base dir.
    * @param array $options
-   *   Open-ended list of options (per add()).
-   *   Ex: ['weight' => 123]
-   *   Accepts some additional options:
-   *   - bool|string $translate: Whether to load translated strings for this file. Use one of:
-   *     - FALSE: Do not load translated strings.
-   *     - TRUE: Load translated strings. Use the $ext's default domain.
-   *     - string: Load translated strings. Use a specific domain.
-   *
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScriptFile(string $code, int $weight, string $region, mixed $translate).
    * @return static
-   *
-   * @throws \CRM_Core_Exception
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addScriptFile()
    */
   public function addScriptFile(string $ext, string $file, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
@@ -113,17 +104,17 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   }
 
   /**
-   * Add a JavaScript file to the current page using <SCRIPT SRC>.
+   * Add a JavaScript URL to the current page using <SCRIPT SRC>.
    *
-   * Options may be use key-value format (preferred) or positional format (legacy).
-   *
-   * - addScriptUrl('http://example.com/foo.js', ['weight' => 123, 'region' => 'page-footer'])
-   * - addScriptUrl('http://example.com/foo.js', 123, 'page-footer')
+   * Ex: addScriptUrl('http://example.com/foo.js', ['weight' => 123])
    *
    * @param string $url
    * @param array $options
-   *   Open-ended list of options (per add())
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScriptUrl(string $url, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addScriptUrl()
    */
   public function addScriptUrl(string $url, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
@@ -161,6 +152,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    * @param string|array $text
    * @param string|null $domain
    * @return static
+   * @see CRM_Core_Resources_CollectionAdderInterface::addString()
    */
   public function addString($text, $domain = 'civicrm') {
     // TODO: Maybe this should be its own resource type to allow smarter management?
@@ -186,12 +178,16 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   /**
    * Add a CSS content to the current page using <STYLE>.
    *
+   * Ex: addStyle('p { color: red; }', ['weight' => 100]);
+   *
    * @param string $code
    *   CSS source code.
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addStyle(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addStyle()
    */
   public function addStyle(string $code, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
@@ -203,14 +199,18 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   /**
    * Add a CSS file to the current page using <LINK HREF>.
    *
+   * Ex: addStyleFile('myextension', 'mystyles.css', ['weight' => 100]);
+   *
    * @param string $ext
-   *   extension name; use 'civicrm' for core.
+   *   Extension name; use 'civicrm' for core.
    * @param string $file
-   *   file path -- relative to the extension base dir.
+   *   File path -- relative to the extension base dir.
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addStyle(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addStyleFile()
    */
   public function addStyleFile(string $ext, string $file, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
@@ -222,11 +222,15 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   /**
    * Add a CSS file to the current page using <LINK HREF>.
    *
+   * Ex: addStyleUrl('http://example.com/foo.css', ['weight' => 100]);
+   *
    * @param string $url
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addStyleUrl(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addStyleUrl()
    */
   public function addStyleUrl(string $url, ...$options) {
     $this->add(self::mergeStandardOptions($options, [
@@ -243,8 +247,11 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    * @param array $settings
    *   Data to export.
    * @param array $options
-   *   Extra processing instructions on where/how to place the data.
+   *   Not used.
+   *   Positional equivalence: addSetting(array $settings, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addSetting()
    */
   public function addSetting(array $settings, ...$options) {
     $s = &$this->findCreateSettingSnippet($options);
@@ -257,6 +264,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    *
    * @param callable $callable
    * @return static
+   * @see CRM_Core_Resources_CollectionAdderInterface::addSettingsFactory()
    */
   public function addSettingsFactory($callable) {
     $s = &$this->findCreateSettingSnippet();
@@ -278,9 +286,13 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    * @param string $nameSpace
    *   Usually the name of your extension.
    * @param array $vars
+   *   Data to export.
    * @param array $options
-   *   There are no supported options.
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addVars(string $namespace, array $vars, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addVars()
    */
   public function addVars(string $nameSpace, array $vars, ...$options) {
     $s = &$this->findCreateSettingSnippet($options);

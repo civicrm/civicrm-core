@@ -53,45 +53,14 @@ trait CRM_Core_Resources_CollectionTrait {
   protected $types = [];
 
   /**
-   * Add an item to the collection. For example, when working with 'page-header' collection:
-   *
-   * ```
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'markup' => '<div style="color:red">Hello!</div>',
-   * ));
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'script' => 'alert("Hello");',
-   * ));
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'template' => 'CRM/Myextension/Extra.tpl',
-   * ));
-   * CRM_Core_Region::instance('page-header')->add(array(
-   *   'callback' => 'myextension_callback_function',
-   * ));
-   * ```
-   *
-   * Note: This function does not perform any extra encoding of markup, script code, or etc. If
-   * you're passing in user-data, you must clean it yourself.
+   * Add an item to the collection.
    *
    * @param array $snippet
-   *   Array; keys:.
-   *   - type: string (auto-detected for markup, template, callback, script, scriptUrl, jquery, style, styleUrl)
-   *   - name: string, optional
-   *   - weight: int, optional; default=1
-   *   - disabled: int, optional; default=0
-   *   - markup: string, HTML; required (for type==markup)
-   *   - template: string, path; required (for type==template)
-   *   - callback: mixed; required (for type==callback)
-   *   - arguments: array, optional (for type==callback)
-   *   - script: string, Javascript code
-   *   - scriptUrl: string, URL of a Javascript file
-   *   - jquery: string, Javascript code which runs inside a jQuery(function($){...}); block
-   *   - settings: array, list of static values to convey.
-   *   - style: string, CSS code
-   *   - styleUrl: string, URL of a CSS file
-   *
+   *   Resource options. See CollectionInterface docs.
    * @return array
    *   The full/computed snippet (with defaults applied).
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionInterface::add()
    */
   public function add($snippet) {
     $snippet = array_merge($this->defaults, $snippet);
@@ -170,18 +139,26 @@ trait CRM_Core_Resources_CollectionTrait {
   }
 
   /**
+   * Update specific properties of a snippet.
+   *
    * @param string $name
-   * @param $snippet
+   *   Symbolic of the resource/snippet to update.
+   * @param array $snippet
+   *   Resource options. See CollectionInterface docs.
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface::update()
    */
   public function update($name, $snippet) {
     $this->snippets[$name] = array_merge($this->snippets[$name], $snippet);
     $this->isSorted = FALSE;
+    return $this;
   }
 
   /**
    * Remove all snippets.
    *
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface::clear()
    */
   public function clear() {
     $this->snippets = [];
@@ -194,6 +171,7 @@ trait CRM_Core_Resources_CollectionTrait {
    *
    * @param string $name
    * @return array|NULL
+   * @see CRM_Core_Resources_CollectionInterface::get()
    */
   public function &get($name) {
     return $this->snippets[$name];
@@ -203,6 +181,7 @@ trait CRM_Core_Resources_CollectionTrait {
    * Get a list of all snippets in this collection.
    *
    * @return iterable
+   * @see CRM_Core_Resources_CollectionInterface::getAll()
    */
   public function getAll(): iterable {
     $this->sort();
@@ -219,6 +198,7 @@ trait CRM_Core_Resources_CollectionTrait {
    *   - FALSE: The item is not OK and should be omitted from the collection.
    *   - Array: The item should be revised (using the returned value).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface::filter()
    */
   public function filter($callback) {
     $this->sort();
@@ -246,8 +226,13 @@ trait CRM_Core_Resources_CollectionTrait {
    * Find all snippets which match the given criterion.
    *
    * @param callable $callback
+   *   The callback is invoked once for each member in the collection.
+   *   The callback may return one of three values:
+   *   - TRUE: The item is OK and belongs in the collection.
+   *   - FALSE: The item is not OK and should be omitted from the collection.
    * @return iterable
    *   List of matching snippets.
+   * @see CRM_Core_Resources_CollectionInterface::find()
    */
   public function find($callback): iterable {
     $r = [];

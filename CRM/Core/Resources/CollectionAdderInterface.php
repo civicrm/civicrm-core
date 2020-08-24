@@ -43,54 +43,46 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
+   * Ex: addScript('alert("Hello world");', ['weight' => 123]);
+   *
    * @param string $code
    *   JavaScript source code.
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScript(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addScript(string $code, ...$options);
 
   /**
    * Add a JavaScript file to the current page using <SCRIPT SRC>.
    *
-   * Options may be use key-value format (preferred) or positional format (legacy).
-   *
-   * - addScriptFile('myext', 'my.js', ['weight' => 123, 'region' => 'page-footer'])
-   * - addScriptFile('myext', 'my.js', 123, 'page-footer')
+   * Ex: addScriptFile('myextension', 'myscript.js', ['weight' => 123]);
    *
    * @param string $ext
-   *   extension name; use 'civicrm' for core.
+   *   Extension name; use 'civicrm' for core.
    * @param string $file
-   *   file path -- relative to the extension base dir.
+   *   File path -- relative to the extension base dir.
    * @param array $options
-   *   Open-ended list of options (per add()).
-   *   Ex: ['weight' => 123]
-   *   Accepts some additional options:
-   *     - bool|string $translate: Whether to load translated strings for this file. Use one of:
-   *     - FALSE: Do not load translated strings.
-   *     - TRUE: Load translated strings. Use the $ext's default domain.
-   *     - string: Load translated strings. Use a specific domain.
-   *
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScriptFile(string $code, int $weight, string $region, mixed $translate).
    * @return static
-   *
-   * @throws \CRM_Core_Exception
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addScriptFile(string $ext, string $file, ...$options);
 
   /**
-   * Add a JavaScript file to the current page using <SCRIPT SRC>.
+   * Add a JavaScript URL to the current page using <SCRIPT SRC>.
    *
-   * Options may be use key-value format (preferred) or positional format (legacy).
-   *
-   * - addScriptUrl('http://example.com/foo.js', ['weight' => 123, 'region' => 'page-footer'])
-   * - addScriptUrl('http://example.com/foo.js', 123, 'page-footer')
+   * Ex: addScriptUrl('http://example.com/foo.js', ['weight' => 123])
    *
    * @param string $url
    * @param array $options
-   *   Open-ended list of options (per add())
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addScriptUrl(string $url, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addScriptUrl(string $url, ...$options);
 
@@ -129,37 +121,46 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   /**
    * Add a CSS content to the current page using <STYLE>.
    *
+   * Ex: addStyle('p { color: red; }', ['weight' => 100]);
+   *
    * @param string $code
    *   CSS source code.
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addStyle(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addStyle(string $code, ...$options);
 
   /**
    * Add a CSS file to the current page using <LINK HREF>.
    *
+   * Ex: addStyleFile('myextension', 'mystyles.css', ['weight' => 100]);
+   *
    * @param string $ext
-   *   extension name; use 'civicrm' for core.
+   *   Extension name; use 'civicrm' for core.
    * @param string $file
-   *   file path -- relative to the extension base dir.
+   *   File path -- relative to the extension base dir.
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addStyle(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addStyleFile(string $ext, string $file, ...$options);
 
   /**
    * Add a CSS file to the current page using <LINK HREF>.
    *
+   * Ex: addStyleUrl('http://example.com/foo.css', ['weight' => 100]);
+   *
    * @param string $url
    * @param array $options
-   *   Open-ended list of options (per add())
-   *   Ex: ['weight' => 123]
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addStyleUrl(string $code, int $weight, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addStyleUrl(string $url, ...$options);
 
@@ -167,10 +168,10 @@ interface CRM_Core_Resources_CollectionAdderInterface {
    * Add JavaScript variables to CRM.vars
    *
    * Example:
-   * From the server:
-   * CRM_Core_Resources::singleton()->addVars('myNamespace', array('foo' => 'bar'));
-   * Access var from javascript:
-   * CRM.vars.myNamespace.foo // "bar"
+   *   From the server:
+   *     CRM_Core_Resources::singleton()->addVars('myNamespace', array('foo' => 'bar'));
+   *   Access var from javascript:
+   *     CRM.vars.myNamespace.foo // "bar"
    *
    * @see https://docs.civicrm.org/dev/en/latest/standards/javascript/
    *
@@ -179,8 +180,10 @@ interface CRM_Core_Resources_CollectionAdderInterface {
    * @param array $vars
    *   Data to export.
    * @param array $options
-   *   Extra processing instructions on where/how to place the data.
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addVars(string $namespace, array $vars, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
    */
   public function addVars(string $nameSpace, array $vars, ...$options);
 
@@ -192,8 +195,11 @@ interface CRM_Core_Resources_CollectionAdderInterface {
    * @param array $settings
    *   Data to export.
    * @param array $options
-   *   Extra processing instructions on where/how to place the data.
+   *   Not used.
+   *   Positional equivalence: addSetting(array $settings, string $region).
    * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addSetting()
    */
   public function addSetting(array $settings, ...$options);
 
