@@ -92,20 +92,6 @@
     </html>
   </field>
   <field>
-    <name>contribution_page_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>The Contribution Page which triggered this pcp</comment>
-    <add>2.2</add>
-    <drop>4.1</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_page_id</name>
-    <table>civicrm_contribution_page</table>
-    <key>id</key>
-    <drop>4.1</drop>
-  </foreignKey>
-  <field>
     <name>page_id</name>
     <title>Contribution Page</title>
     <type>int unsigned</type>
@@ -181,15 +167,6 @@
     <html>
       <type>Select</type>
     </html>
-  </field>
-  <field>
-    <name>referer</name>
-    <title>Referer</title>
-    <type>varchar</type>
-    <length>255</length>
-    <default>NULL</default>
-    <add>2.2</add>
-    <drop>4.1</drop>
   </field>
   <field>
     <name>is_active</name>

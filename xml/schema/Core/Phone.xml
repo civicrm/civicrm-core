@@ -138,16 +138,6 @@
     <add>4.3</add>
   </index>
   <field>
-    <name>phone_type</name>
-    <type>enum</type>
-    <values>Phone, Mobile, Fax, Pager</values>
-    <headerPattern>/phone\s+type/i</headerPattern>
-    <dataPattern>/phone|mobile|fax|pager/i</dataPattern>
-    <comment>What type of telecom device is this.</comment>
-    <add>1.1</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
     <name>phone_type_id</name>
     <title>Phone Type ID</title>
     <type>int unsigned</type>

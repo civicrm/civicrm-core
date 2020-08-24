@@ -19,15 +19,6 @@
     <autoincrement>false</autoincrement>
   </primaryKey>
   <field>
-    <name>query</name>
-    <title>SQL Query</title>
-    <type>text</type>
-    <import>true</import>
-    <comment>SQL query for this search</comment>
-    <add>1.1</add>
-    <drop>1.5</drop>
-  </field>
-  <field>
     <name>form_values</name>
     <title>Submitted Form Values</title>
     <type>text</type>
@@ -35,14 +26,6 @@
     <comment>Submitted form values for this search</comment>
     <serialize>PHP</serialize>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>is_active</name>
-    <type>boolean</type>
-    <title>Saved Search Enabled</title>
-    <comment>Is this entry active?</comment>
-    <add>1.1</add>
-    <drop>1.5</drop>
   </field>
   <field>
     <name>mapping_id</name>

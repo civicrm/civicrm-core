@@ -39,13 +39,6 @@
     <typeColumn>entity_table</typeColumn>
     <add>2.2</add>
   </dynamicForeignKey>
-  <foreignKey>
-    <name>entity_id</name>
-    <table>civicrm_contribution_page</table>
-    <key>id</key>
-    <add>2.2</add>
-    <drop>4.1</drop>
-  </foreignKey>
   <field>
     <name>target_entity_type</name>
     <title>Target Entity</title>

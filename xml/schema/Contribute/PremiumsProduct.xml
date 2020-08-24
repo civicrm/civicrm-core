@@ -48,14 +48,6 @@
     <add>1.4</add>
   </foreignKey>
   <field>
-    <name>sort_position</name>
-    <title>Sort Position</title>
-    <type>int unsigned</type>
-    <required>true</required>
-    <add>1.4</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>weight</name>
     <title>Order</title>
     <type>int unsigned</type>

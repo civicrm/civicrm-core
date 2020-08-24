@@ -85,21 +85,6 @@
     <onDelete>RESTRICT</onDelete>
   </foreignKey>
   <field>
-    <name>contribution_type_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>If membership is paid by a contribution - what contribution type should be used. FK to Contribution Type ID</comment>
-    <add>1.5</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <add>1.5</add>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
     <title>Membership Financial Type</title>
     <type>int unsigned</type>
@@ -192,13 +177,6 @@
     <add>1.5</add>
     <serialize>SEPARATOR_TRIMMED</serialize>
   </field>
-  <foreignKey>
-    <name>relationship_type_id</name>
-    <table>civicrm_relationship_type</table>
-    <key>id</key>
-    <add>1.5</add>
-    <drop>3.3</drop>
-  </foreignKey>
   <index>
     <name>index_relationship_type_id</name>
     <fieldName>relationship_type_id</fieldName>

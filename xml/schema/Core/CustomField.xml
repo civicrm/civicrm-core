@@ -212,14 +212,6 @@
     <add>1.4</add>
   </field>
   <field>
-    <name>date_parts</name>
-    <type>varchar</type>
-    <length>255</length>
-    <comment>which date part included in display </comment>
-    <add>1.4</add>
-    <drop>3.1</drop>
-  </field>
-  <field>
     <name>date_format</name>
     <type>varchar</type>
     <title>Field Data Format</title>
