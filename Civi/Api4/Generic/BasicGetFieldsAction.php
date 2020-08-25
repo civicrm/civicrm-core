@@ -129,6 +129,7 @@ class BasicGetFieldsAction extends BasicGetAction {
         'data_type' => \CRM_Utils_Array::value('type', $field, 'String'),
       ], array_flip($fields));
       $field += $defaults;
+      $field['label'] = $field['label'] ?? $field['title'];
       if (isset($defaults['options'])) {
         $field['options'] = $this->formatOptionList($field['options']);
       }
@@ -217,14 +218,22 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'name',
         'data_type' => 'String',
+        'description' => ts('Unique field identifier'),
       ],
       [
         'name' => 'title',
         'data_type' => 'String',
+        'description' => ts('Technical name of field, shown in API and exports'),
+      ],
+      [
+        'name' => 'label',
+        'data_type' => 'String',
+        'description' => ts('User-facing label, shown on most forms and displays'),
       ],
       [
         'name' => 'description',
         'data_type' => 'String',
+        'description' => ts('Explanation of the purpose of the field'),
       ],
       [
         'name' => 'default_value',
