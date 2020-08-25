@@ -13,10 +13,9 @@
  * Class CRM_Core_Resources_CollectionTrait
  *
  * This is a building-block for creating classes which maintain a list of resources.
+ * It implements of the `CollectionInterface`.
  *
- * The class is generally organized in two sections: First, we have core
- * bit that manages a list of '$snippets'. Second, we have a set of helper
- * functions which add some syntactic sugar for the snippets.
+ * @see CRM_Core_Resources_CollectionInterface
  */
 trait CRM_Core_Resources_CollectionTrait {
 

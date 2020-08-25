@@ -23,6 +23,7 @@ class CRM_Core_Resources_Common {
    * @param string $name
    *   i.e. 'coreStyles'
    * @return \CRM_Core_Resources_Bundle
+   * @see \Civi\Core\Container::createContainer()
    */
   public static function createStyleBundle($name) {
     $bundle = new CRM_Core_Resources_Bundle($name);
@@ -51,6 +52,7 @@ class CRM_Core_Resources_Common {
    * @param string $name
    *   i.e. 'coreResources'
    * @return \CRM_Core_Resources_Bundle
+   * @see \Civi\Core\Container::createContainer()
    */
   public static function createFullBundle($name) {
     $bundle = new CRM_Core_Resources_Bundle($name);

@@ -74,6 +74,8 @@
  * Passing options in array (key-value) notation is clearest. For backward
  * compatibility, some methods (eg `addScript()`) accept options in positional form.
  * Where applicable, the docblock of each `addFoo()` will include a comment about positional form.
+ *
+ * @see CRM_Core_Resources_CollectionTrait
  */
 interface CRM_Core_Resources_CollectionInterface {
 

@@ -14,7 +14,9 @@
  *
  * This trait is a building-block for creating classes which maintain a list of
  * resources. It defines a set of helper functions which provide syntactic sugar
- * for calling the add() method.
+ * for calling the add() method. It implements most of the `CollectionAdderInterface`.
+ *
+ * @see CRM_Core_Resources_CollectionAdderInterface
  */
 trait CRM_Core_Resources_CollectionAdderTrait {
 

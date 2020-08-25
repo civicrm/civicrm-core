@@ -11,6 +11,8 @@
 
 /**
  * The collection-adder interface provides write-only support for a collection.
+ *
+ * @see CRM_Core_Resources_CollectionAdderTrait
  */
 interface CRM_Core_Resources_CollectionAdderInterface {
 
