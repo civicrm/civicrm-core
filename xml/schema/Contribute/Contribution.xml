@@ -81,7 +81,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
     <pseudoconstant>
@@ -92,6 +92,7 @@
     <export>true</export>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
     <add>4.3</add>
   </field>
