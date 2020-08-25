@@ -224,8 +224,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   /**
    * Helper fn for addSettingsFactory.
    */
-  public function getSettings() {
-    return $this->getSettingRegion()->getSettings();
+  public function getSettings($region = NULL) {
+    return $this->getSettingRegion($region)->getSettings();
   }
 
   /**
