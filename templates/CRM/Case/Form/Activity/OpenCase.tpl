@@ -42,15 +42,17 @@
       var caseStatusLabels = {/literal}{$caseStatusLabels.values|@json_encode}{literal};
       var caseStatusNames = {/literal}{$caseStatusNames.values|@json_encode}{literal};
       if ($('#case_type_id, #status_id', $form).length === 2) {
-        $('#case_type_id', $form).change(function() {
-          if ($(this).val()) {
-            var definition = caseTypes[$(this).val()].definition;
+        updateCaseStatusOptions();
+        $('#case_type_id', $form).change(updateCaseStatusOptions);
+        function updateCaseStatusOptions() {
+          if ($('#case_type_id', $form).val()) {
+            var definition = caseTypes[$('#case_type_id', $form).val()].definition;
             var newOptions = CRM._.filter(caseStatusLabels, function(opt) {
               return !definition.statuses || !definition.statuses.length || definition.statuses.indexOf(caseStatusNames[opt.key]) > -1;
             });
             CRM.utils.setOptions($('#status_id', $form), newOptions);
           }
-        })
+        }
       }
     });
   </script>
