@@ -66,7 +66,7 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();
-    $getFields = ['name', 'title', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize'];
+    $getFields = ['name', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize'];
     foreach ($schema as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {
@@ -78,7 +78,7 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
         $entity['fields'] = civicrm_api4($entity['name'], 'getFields', [
           'select' => $getFields,
           'where' => [['permission', 'IS NULL']],
-          'orderBy' => ['title'],
+          'orderBy' => ['label'],
           'loadOptions' => $loadOptions,
         ]);
         // Get the names of params this entity supports (minus some obvious ones)

@@ -73,6 +73,7 @@ class SpecFormatter {
       $field = new FieldSpec($name, $entity, $dataTypeName);
       $field->setRequired(!empty($data['required']));
       $field->setTitle($data['title'] ?? NULL);
+      $field->setLabel($data['html']['label'] ?? NULL);
       $field->setOptions(!empty($data['pseudoconstant']));
     }
     $field->setSerialize($data['serialize'] ?? NULL);

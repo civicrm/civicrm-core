@@ -35,6 +35,11 @@ class FieldSpec {
   /**
    * @var string
    */
+  protected $label;
+
+  /**
+   * @var string
+   */
   protected $title;
 
   /**
@@ -161,6 +166,24 @@ class FieldSpec {
    */
   public function setName($name) {
     $this->name = $name;
+
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getLabel() {
+    return $this->label;
+  }
+
+  /**
+   * @param string $label
+   *
+   * @return $this
+   */
+  public function setLabel($label) {
+    $this->label = $label;
 
     return $this;
   }

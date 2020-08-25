@@ -297,7 +297,7 @@
 
       this.getFieldLabel = function(col) {
         var info = searchMeta.parseExpr(col),
-          label = info.field.title;
+          label = info.field.label;
         if (info.fn) {
           label = '(' + info.fn.title + ') ' + label;
         }
@@ -393,7 +393,7 @@
           return _.transform(searchMeta.getEntity(entityName).fields, function(result, field) {
             var item = {
               id: prefix + field.name + (field.options ? suffix : ''),
-              text: field.title,
+              text: field.label,
               description: field.description
             };
             if (disabledIf(item.id)) {
