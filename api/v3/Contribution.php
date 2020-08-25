@@ -471,17 +471,17 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws \Exception
  */
 function civicrm_api3_contribution_completetransaction($params) {
-  $input = $ids = [];
-  if (isset($params['payment_processor_id'])) {
-    $input['payment_processor_id'] = $params['payment_processor_id'];
-  }
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
 
-  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+  $loadRelatedObjectsParams = $ids = [];
+  if (isset($params['payment_processor_id'])) {
+    $loadRelatedObjectsParams['payment_processor_id'] = $params['payment_processor_id'];
+  }
+  if (!$contribution->loadRelatedObjects($loadRelatedObjectsParams, $ids, TRUE)) {
     throw new API_Exception('failed to load related objects');
   }
   elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
@@ -493,7 +493,6 @@ function civicrm_api3_contribution_completetransaction($params) {
     $input['fee_amount'] = $params['fee_amount'];
   }
   return _ipn_process_transaction($params, $contribution, $input, $ids);
-
 }
 
 /**
@@ -603,12 +602,13 @@ function civicrm_api3_contribution_repeattransaction($params) {
   }
 
   $original_contribution = clone $contribution;
-  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
-    'return' => 'payment_processor_id',
-    'id' => $contribution->contribution_recur_id,
-  ]);
+
   try {
-    if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+    $loadRelatedObjectsParams['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+      'return' => 'payment_processor_id',
+      'id' => $contribution->contribution_recur_id,
+    ]);
+    if (!$contribution->loadRelatedObjects($loadRelatedObjectsParams, $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');
     }
 
