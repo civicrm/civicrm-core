@@ -96,38 +96,36 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     $domainIDs = [];
     $optionValues = [];
 
-    // Create domains
-    $domainIDs[] = $this->callAPISuccess('Domain', 'create', [
-      'name' => "Test extra domain 1",
-      'domain_version' => CRM_Utils_System::version(),
-    ])['id'];
-    $domainIDs[] = $this->callAPISuccess('Domain', 'create', [
-      'name' => "Test extra domain 2",
-      'domain_version' => CRM_Utils_System::version(),
-    ])['id'];
-
-    // Create 'from' email addresses
-    foreach ($domainIDs as $domainID) {
-      $result = $this->callAPISuccess('option_value', 'create', [
+    // Create domain and from_email_address
+    for ($i = 1; $i < 3; $i++) {
+      $domainID = $this->callAPISuccess('Domain', 'create', [
+        'name' => "Test extra domain " . $i,
+        'domain_version' => CRM_Utils_System::version(),
+      ])['id'];
+      $optionValues[] = $this->callAPISuccess('option_value', 'create', [
         'option_group_id' => 'from_email_address',
         'name' => '"Test ' . $domainID . '" <test@example.com>',
         'label' => '"Test ' . $domainID . '" <test@example.com>',
         'value' => 'test' . $domainID,
         'is_active' => 1,
         'domain_id' => $domainID,
-      ]);
-      $optionValues[] = $result['id'];
+      ])['id'];
+      $domainIDs[] = $domainID;
     }
 
-    // Check values are as expected for each domain
+    // Check expected values for each domain
     foreach ($domainIDs as $domainID) {
       \CRM_Core_Config::domainID($domainID);
       $result = CRM_Core_OptionGroup::values('from_email_address');
+
+      // Reset the domain, so we don't break future tests if this fails
+      \CRM_Core_Config::domainID($original_domain);
+
+      // Assert
       $this->assertEquals(array_keys($result)[0], 'test' . $domainID);
     }
 
     // Clean up
-    \CRM_Core_Config::domainID($original_domain);
     foreach ($optionValues as $id) {
       $this->callAPISuccess('option_value', 'delete', ['id' => $id]);
     }
@@ -136,7 +134,6 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery('DELETE FROM civicrm_domain where id = %1', [1 => [$domainID, 'Int']]);
     }
     unset($original_domain, $domainIDs, $optionValues);
-
   }
 
 }
