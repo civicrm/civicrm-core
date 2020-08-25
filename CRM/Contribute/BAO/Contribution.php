@@ -4545,12 +4545,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
     }
 
-    if (empty($contribution->_relatedObjects['participant']) && !empty($contribution->_relatedObjects['membership'])) {
-      // @fixme Can we remove this if altogether? - we removed the participant if / else and left relatedObjects['participant'] to ensure behaviour didn't change but it is probably not required.
-      // @todo - use getRelatedMemberships instead
-      $contribution->trxn_id = $input['trxn_id'] ?? NULL;
-      $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
-    }
     $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
 
     CRM_Core_Error::debug_log_message('Contribution record updated successfully');
