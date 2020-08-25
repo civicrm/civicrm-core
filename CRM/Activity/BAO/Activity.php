@@ -2164,7 +2164,6 @@ AND cl.modified_id  = c.id
       ],
     ];
     $fields = array_merge($activityFields, $exportableFields);
-    $fields['activity_type_id']['title'] = ts('Activity Type ID');
     $fields['activity_priority_id'] = $fields['priority_id'];
 
     if ($name === 'Case') {

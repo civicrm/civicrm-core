@@ -826,7 +826,7 @@
   </field>
   <field>
     <name>employer_id</name>
-    <title>Current Employer</title>
+    <title>Current Employer ID</title>
     <uniqueName>current_employer_id</uniqueName>
     <type>int unsigned</type>
     <comment>OPTIONAL FK to civicrm_contact record.</comment>
@@ -834,6 +834,7 @@
     <add>2.1</add>
     <html>
       <type>EntityRef</type>
+      <label>Current Employer</label>
     </html>
     <contactType>Individual</contactType>
   </field>

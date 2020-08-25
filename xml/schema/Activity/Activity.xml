@@ -59,7 +59,7 @@
   </index>
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type</title>
+    <title>Activity Type ID</title>
     <import>true</import>
     <type>int unsigned</type>
     <required>true</required>
@@ -73,6 +73,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Activity Type</label>
     </html>
   </field>
   <index>
@@ -191,11 +192,12 @@
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
-    <title>Phone (called)</title>
+    <title>Phone (called) ID</title>
     <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
     <add>2.0</add>
     <html>
       <type>EntityRef</type>
+      <label>Phone (called)</label>
     </html>
   </field>
   <foreignKey>
