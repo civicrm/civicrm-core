@@ -60,6 +60,51 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $_GET = $this->originalGet;
   }
 
+  /**
+   * Make two bundles (multi-regional). Add them to CRM_Core_Resources.
+   * Ensure that the resources land in the right regions.
+   */
+  public function testAddBundle() {
+    $foo = new CRM_Core_Resources_Bundle('foo', ['scriptUrl', 'styleUrl', 'markup']);
+    $bar = new CRM_Core_Resources_Bundle('bar', ['scriptUrl', 'styleUrl', 'markup']);
+
+    $foo->addScriptUrl('http://example.com/foo.js', 100, 'testAddBundle_foo');
+    $foo->add(['markup' => 'Hello, foo', 'region' => 'page-header']);
+    $bar->addScriptUrl('http://example.com/bar.js', 100, 'testAddBundle_bar');
+    $bar->add(['markup' => 'Hello, bar', 'region' => 'page-header']);
+    $foo->addStyleUrl('http://example.com/shoes.css');
+
+    $this->res->addBundle($foo);
+    $this->res->addBundle([$bar]);
+
+    $getPropsByRegion = function($region, $key) {
+      $props = [];
+      foreach (CRM_Core_Region::instance($region)->getAll() as $snippet) {
+        if (isset($snippet[$key])) {
+          $props[] = $snippet[$key];
+        }
+      }
+      return $props;
+    };
+
+    $this->assertEquals(
+      ['http://example.com/foo.js'],
+      $getPropsByRegion('testAddBundle_foo', 'scriptUrl')
+    );
+    $this->assertEquals(
+      ['http://example.com/bar.js'],
+      $getPropsByRegion('testAddBundle_bar', 'scriptUrl')
+    );
+    $this->assertEquals(
+      ['', 'Hello, foo', 'Hello, bar'],
+      $getPropsByRegion('page-header', 'markup')
+    );
+    $this->assertEquals(
+      ['http://example.com/shoes.css'],
+      $getPropsByRegion('page-footer', 'styleUrl')
+    );
+  }
+
   public function testAddScriptFile() {
     $this->res
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')

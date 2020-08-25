@@ -219,23 +219,17 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     }
     $this->addedBundles[$bundle->name] = TRUE;
 
-    // If an item is already assigned to a region, we'll respect that.
-    // Otherwise, we'll use defaults.
-    $pickRegion = function ($snippet) {
-      if (isset($snippet['settings'])) {
-        return $this->getSettingRegion($snippet['region'] ?? NULL)->_name;
+    // Ensure that every asset has a region.
+    $bundle->filter(function($snippet) {
+      if (empty($snippet['region'])) {
+        $snippet['region'] = isset($snippet['settings'])
+          ? $this->getSettingRegion()->_name
+          : self::DEFAULT_REGION;
       }
-      else {
-        return $snippet['region'] ?? self::DEFAULT_REGION;
-      }
-    };
+      return $snippet;
+    });
 
-    $byRegion = [];
-    foreach ($bundle->getAll() as $snippet) {
-      $snippet['region'] = $pickRegion($snippet);
-      $byRegion[$snippet['region']][$snippet['name']] = $snippet;
-    }
-
+    $byRegion = CRM_Utils_Array::index(['region', 'name'], $bundle->getAll());
     foreach ($byRegion as $regionName => $snippets) {
       CRM_Core_Region::instance($regionName)->merge($snippets);
     }

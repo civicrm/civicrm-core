@@ -29,10 +29,13 @@ class CRM_Core_Resources_Bundle implements CRM_Core_Resources_CollectionInterfac
   public $name;
 
   /**
+   * @param string|NULL $name
+   * @param string[]|NULL $types
+   *   List of resource-types to permit in this bundle. NULL for a default list.
    */
-  public function __construct($name = NULL) {
+  public function __construct($name = NULL, $types = NULL) {
     $this->name = $name;
-    $this->types = ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl'];
+    $this->types = $types ?: ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl'];
   }
 
 }
