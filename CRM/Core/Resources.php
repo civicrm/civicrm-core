@@ -177,11 +177,32 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    * Assimilate all the resources listed in a bundle.
    *
    * @param iterable|string|\CRM_Core_Resources_Bundle $bundle
-   *   Either bundle object, or the symbolic name of a bundle, or a list of budnles.
+   *   Either bundle object, or the symbolic name of a bundle, or a list of bundles.
    *   Note: For symbolic names, the bundle must be a container service ('bundle.FOO').
    * @return static
    */
   public function addBundle($bundle) {
+    // There are two ways you might write this method: (1) immediately merge
+    // resources from the bundle, or (2) store a reference to the bundle and
+    // merge resources later. Both have pros/cons. The implementation does #1.
+    //
+    // The upshot of #1 is *multi-region* support. For example, a bundle might
+    // add some JS to `html-header` and then add some HTML to `page-header`.
+    // Implementing this requires splitting the bundle (ie copying specific
+    // resources to their respective regions). The timing of `addBundle()` is
+    // favorable to splitting.
+    //
+    // The upshot of #2 would be *reduced timing sensitivity for downstream*:
+    // if party A wants to include some bundle, and party B wants to refine
+    // the same bundle, then it wouldn't matter if A or B executed first.
+    // This should make DX generally more forgiving. But we can't split until
+    // everyone has their shot at tweaking the bundle.
+    //
+    // In theory, you could have both characteristics if you figure the right
+    // time at which to perform a split. Or maybe you could have both by tracking
+    // more detailed references+events among the bundles/regions. I haven't
+    // seen a simple way to do get both.
+
     if (is_iterable($bundle)) {
       foreach ($bundle as $b) {
         $this->addBundle($b);
