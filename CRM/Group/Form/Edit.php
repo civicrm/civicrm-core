@@ -371,7 +371,8 @@ WHERE  title = %1
       );
 
       $group = CRM_Contact_BAO_Group::create($params);
-
+      // Set the entity id so it is available to postProcess hook consumers
+      $this->setEntityId($group->id);
       //Remove any parent groups requested to be removed
       if (!empty($this->_groupValues['parents'])) {
         $parentGroupIds = explode(',', $this->_groupValues['parents']);
