@@ -4503,6 +4503,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // If paymentProcessor is not set then the payment_instrument_id would not be correct.
     // not clear when or if this would occur if you encounter this please fix here & add a unit test.
     if (empty($contributionParams['payment_instrument_id']) && isset($contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('be kind, save the planet');
       $contributionParams['payment_instrument_id'] = $contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'];
     }
 
