@@ -354,14 +354,10 @@ class CRM_Core_Resources {
    * @return string
    */
   public function renderSetting($region = NULL) {
-    // On a standard page request we construct the CRM object from scratch
-    if (($region === 'html-header') || !self::isAjaxMode()) {
-      $js = 'var CRM = ' . json_encode($this->getSettings()) . ';';
-    }
-    // For an ajax request we append to it
-    else {
-      $js = 'CRM.$.extend(true, CRM, ' . json_encode($this->getSettings()) . ');';
-    }
+    $vars = json_encode($this->getSettings(), JSON_UNESCAPED_SLASHES);
+    $js = "(function(vars) {
+  if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
+})($vars)";
     return sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $js);
   }
 
