@@ -40,11 +40,13 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute DSN.
     $connectionOptions = \Drupal::database()->getConnectionOptions();
+    $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($connectionOptions);
     $model->db = $model->cmsDb = array(
       'server' => \Civi\Setup\DbUtil::encodeHostPort($connectionOptions['host'], $connectionOptions['port'] ?: NULL),
       'username' => $connectionOptions['username'],
       'password' => $connectionOptions['password'],
       'database' => $connectionOptions['database'],
+      'ssl_params' => empty($ssl_params) ? NULL : $ssl_params,
     );
 
     // Compute cmsBaseUrl.
