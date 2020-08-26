@@ -37,6 +37,13 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    */
   public static function create($params) {
     $trxn = new CRM_Financial_DAO_FinancialTrxn();
+    if ($params['id']) {
+      CRM_Utils_Hook::pre('edit', 'FinancialTrxn', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'FinancialTrxn', NULL, $params);
+    }
+
     $trxn->copyValues($params);
 
     if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
@@ -69,6 +76,14 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
     $entityTrxn->copyValues($entityFinancialTrxnParams);
     $entityTrxn->save();
+
+    if ($params['id']) {
+      CRM_Utils_Hook::post('edit', 'FinancialTrxn', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'FinancialTrxn', NULL, $params);
+    }
+
     return $trxn;
   }
 
