@@ -4439,7 +4439,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Moving it out of the BaseIPN class is just the first step.
    *
    * @param array $input
-   * @param array $ids
+   * @param int|null $contributionContactID
    * @param array $objects
    * @param bool $isPostPaymentCreate
    *   Is this being called from the payment.create api. If so the api has taken care of financial entities.
@@ -4447,18 +4447,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   transitioning related elements).
    *
    * @return array
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function completeOrder($input, $ids, $objects, $isPostPaymentCreate = FALSE) {
+  public static function completeOrder($input, $contributionContactID, $objects, $isPostPaymentCreate = FALSE) {
     $transaction = new CRM_Core_Transaction();
     $contribution = $objects['contribution'];
-    // @todo see if we even need this - it's used further down to create an activity
-    // but the BAO layer should create that - we just need to add a test to cover it & can
-    // maybe remove $ids altogether.
-    $contributionContactID = $ids['related_contact'] ?? NULL;
-    // Unset ids just to make it clear it's not used again.
-    unset($ids);
+
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id]);

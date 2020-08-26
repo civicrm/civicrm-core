@@ -428,7 +428,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     //complete the contribution.
     // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
     // as this method is not preferred / supported.
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids['related_contact'] ?? NULL, $objects);
 
     // reset template values before processing next transactions
     $template->clearTemplateVars();
