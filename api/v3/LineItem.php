@@ -63,6 +63,7 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  */
 function civicrm_api3_line_item_get($params) {
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
+    CRM_Core_Error::deprecatedFunctionWarning('is this tested');
     CRM_Price_BAO_LineItem::getAPILineItemParams($params);
   }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
@@ -80,6 +81,7 @@ function civicrm_api3_line_item_get($params) {
  */
 function civicrm_api3_line_item_delete($params) {
   if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
+    CRM_Core_Error::deprecatedFunctionWarning('is this tested');
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::DELETE);
     if (empty($params['financial_type_id'])) {
       $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
