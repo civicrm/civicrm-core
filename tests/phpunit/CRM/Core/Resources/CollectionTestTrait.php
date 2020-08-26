@@ -23,6 +23,8 @@ trait CRM_Core_Resources_CollectionTestTrait {
   abstract public function createEmptyCollection();
 
   public function getSnippetExamples() {
+    $allowsMarkup = ($this instanceof CRM_Core_RegionTest);
+    $defaultCount = ($this instanceof CRM_Core_RegionTest) ? 1 : 0;
     $es = [];
 
     /**
@@ -159,14 +161,29 @@ trait CRM_Core_Resources_CollectionTestTrait {
         'addScript()' => ['addScript', 'window.alert("Boo!");'],
       ],
       [
-        // Regions always have a 'default' with ID#1, so our test always becomes #2.
-        'name' => ($this instanceof CRM_Core_RegionTest ? 2 : 1),
+        'name' => 1 + $defaultCount,
         'disabled' => FALSE,
         'weight' => 1,
         'type' => 'script',
         'script' => 'window.alert("Boo!");',
       ]
     );
+
+    if ($allowsMarkup) {
+      $addCases(
+        [
+          'add(markup)' => ['add', ['markup' => '<p>HELLO</p>']],
+          'addMarkup()' => ['addMarkup', '<p>HELLO</p>'],
+        ],
+        [
+          'name' => 1 + $defaultCount,
+          'disabled' => FALSE,
+          'weight' => 1,
+          'type' => 'markup',
+          'markup' => '<p>HELLO</p>',
+        ]
+      );
+    }
 
     return $es;
   }

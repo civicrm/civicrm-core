@@ -29,6 +29,22 @@ interface CRM_Core_Resources_CollectionAdderInterface {
   // TODO public function addBundle($bundle);
 
   /**
+   * Add an HTML blob.
+   *
+   * Ex: addMarkup('<p>Hello world!</p>', ['weight' => 123]);
+   *
+   * @param string $markup
+   *   HTML code.
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addMarkup(string $code, int $weight, string $region).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addScript()
+   */
+  public function addMarkup(string $markup, ...$options);
+
+  /**
    * Export permission data to the client to enable smarter GUIs.
    *
    * Note: Application security stems from the server's enforcement

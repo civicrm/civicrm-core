@@ -41,6 +41,27 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   abstract public function &findCreateSettingSnippet($options = []): array;
 
   /**
+   * Add an HTML blob.
+   *
+   * Ex: addMarkup('<p>Hello world!</p>', ['weight' => 123]);
+   *
+   * @param string $markup
+   *   HTML code.
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addMarkup(string $code, int $weight, string $region).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addMarkup()
+   */
+  public function addMarkup(string $markup, ...$options) {
+    $this->add(self::mergeStandardOptions($options, [
+      'markup' => $markup,
+    ]));
+    return $this;
+  }
+
+  /**
    * Export permission data to the client to enable smarter GUIs.
    *
    * @param string|iterable $permNames
