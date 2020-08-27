@@ -300,8 +300,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_INT,
             'type' => CRM_Utils_Type::T_INT,
           ],
-          'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
-          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
           'contribution_source' => [
             'title' => ts('Source'),
             'name' => 'source',
@@ -317,6 +316,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'order_bys' => [
           'contribution_id' => ['title' => ts('Contribution #')],
           'contribution_status_id' => ['title' => ts('Contribution Status')],
+          'receive_date'  => ['title' => ts('Date Received')],
         ],
         'grouping' => 'contri-fields',
       ],
@@ -364,7 +364,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ],
           'trxn_date' => [
             'title' => ts('Transaction Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
+            'operatorType' => CRM_Report_Form::OP_DATETIME,
             'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ],
           'status_id' => [
@@ -383,6 +383,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         ],
         'order_bys' => [
           'payment_instrument_id' => ['title' => ts('Payment Method')],
+          'trxn_date' => ['title' => ts('Transaction Date')],
         ],
       ],
       'civicrm_entity_financial_trxn' => [
@@ -536,8 +537,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
+            $fromTime = $this->_params["{$fieldName}_from_time"] ?? NULL;
+            $toTime = $this->_params["{$fieldName}_to_time"] ?? NULL;
 
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type'], $fromTime, $toTime);
           }
           else {
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
