@@ -12,14 +12,16 @@ class DbUtil {
   public static function parseDsn($dsn) {
     $parsed = parse_url($dsn);
     return array(
-      'server' => self::encodeHostPort($parsed['host'], $parsed['port']),
+      'server' => self::encodeHostPort($parsed['host'], $parsed['port'] ?? NULL),
       'username' => $parsed['user'] ?: NULL,
       'password' => $parsed['pass'] ?: NULL,
       'database' => $parsed['path'] ? ltrim($parsed['path'], '/') : NULL,
+      'ssl_params' => self::parseSSL($parsed['query'] ?? NULL),
     );
   }
 
   /**
+   * @todo Is this used anywhere? It doesn't support SSL as-is.
    * Convert an datasource from array notation to URL notation.
    *
    * @param array $db
@@ -40,7 +42,25 @@ class DbUtil {
    */
   public static function softConnect($db) {
     list($host, $port) = self::decodeHostPort($db['server']);
-    $conn = @mysqli_connect($host, $db['username'], $db['password'], $db['database'], $port);
+    if (empty($db['ssl_params'])) {
+      $conn = @mysqli_connect($host, $db['username'], $db['password'], $db['database'], $port);
+    }
+    else {
+      $conn = NULL;
+      $init = mysqli_init();
+      mysqli_ssl_set(
+        $init,
+        $db['ssl_params']['key'] ?? NULL,
+        $db['ssl_params']['cert'] ?? NULL,
+        $db['ssl_params']['ca'] ?? NULL,
+        $db['ssl_params']['capath'] ?? NULL,
+        $db['ssl_params']['cipher'] ?? NULL
+      );
+      // @todo socket parameter, but if you're using sockets do you need SSL?
+      if (@mysqli_real_connect($init, $host, $db['username'], $db['password'], $db['database'], $port, NULL, MYSQLI_CLIENT_SSL)) {
+        $conn = $init;
+      }
+    }
     return $conn;
   }
 
@@ -92,6 +112,33 @@ class DbUtil {
    */
   public static function encodeHostPort($host, $port) {
     return $host . ($port ? (':' . $port) : '');
+  }
+
+  /**
+   * For SSL you can have client certificates, which has some required and
+   * optional parameters, or you can have anonymous SSL, which just requires
+   * some indication that you want that.
+   *
+   * @param string $query_string
+   * @return array
+   */
+  public static function parseSSL($query_string) {
+    if (empty($query_string)) {
+      return [];
+    }
+    parse_str($query_string, $parsed_query);
+    $sensible_parameters = [
+      // ssl=1 alone means no client certificate - it's not a real mysqli option
+      'ssl' => NULL,
+      'key' => NULL,
+      'cert' => NULL,
+      'ca' => NULL,
+      'capath' => NULL,
+      'cipher' => NULL,
+    ];
+    // Only want to include a param if it's in our list of sensibles, e.g.
+    // we don't want new_link=true.
+    return array_intersect_key($parsed_query, $sensible_parameters);
   }
 
   /**
