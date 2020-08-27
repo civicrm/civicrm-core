@@ -41,23 +41,6 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-    <name>contribution_type_id</name>
-    <uniqueName>pledge_contribution_type_id</uniqueName>
-    <export>false</export>
-    <type>int unsigned</type>
-    <comment>FK to Contribution Type. This is propagated to contribution record when pledge payments are made.</comment>
-    <add>2.1</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <add>2.1</add>
-    <drop>4.3</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
     <title>Type</title>
     <uniqueName>pledge_financial_type_id</uniqueName>

@@ -75,14 +75,6 @@
     <add>1.8</add>
   </index>
   <field>
-    <name>gender</name>
-    <type>enum</type>
-    <import>true</import>
-    <values>Female, Male, Other</values>
-    <add>1.1</add>
-    <drop>1.2</drop>
-  </field>
-  <field>
     <name>prefix_id</name>
     <type>int unsigned</type>
     <comment>Prefix or Title for name (Ms, Mr...). FK to prefix ID</comment>
@@ -108,32 +100,6 @@
     <fieldName>suffix_id</fieldName>
     <add>1.6</add>
   </index>
-  <field>
-    <name>prefix</name>
-    <type>varchar</type>
-    <length>64</length>
-    <import>true</import>
-    <comment>Prefix to Name.</comment>
-    <add>1.1</add>
-    <drop>1.2</drop>
-  </field>
-  <field>
-    <name>suffix</name>
-    <type>varchar</type>
-    <length>64</length>
-    <import>true</import>
-    <comment>Suffix to Name.</comment>
-    <add>1.1</add>
-    <drop>1.2</drop>
-  </field>
-  <field>
-    <name>greeting_type</name>
-    <type>varchar</type>
-    <length>128</length>
-    <comment>Preferred greeting format.</comment>
-    <add>1.1</add>
-    <drop>2.2</drop>
-  </field>
   <field>
     <name>greeting_type_id</name>
     <title>Greeting Type</title>

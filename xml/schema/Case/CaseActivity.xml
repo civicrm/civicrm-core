@@ -54,31 +54,4 @@
     <fieldName>activity_id</fieldName>
     <add>2.0</add>
   </index>
-
-  <field>
-   <name>activity_entity_table</name>
-   <type>varchar</type>
-   <length>64</length>
-   <required>true</required>
-   <comment>Name of table where item being referenced is stored (activity, phonecall or meeting).</comment>
-   <add>1.8</add>
-   <drop>2.0</drop>
-  </field>
-
-  <field>
-   <name>activity_entity_id</name>
-   <type>int unsigned</type>
-   <required>true</required>
-   <comment>Entity (activity, phonecall or meeting) id for which the assigment is created</comment>
-   <add>1.8</add>
-   <drop>2.0</drop>
-  </field>
-
-  <dynamicForeignKey>
-   <idColumn>activity_entity_id</idColumn>
-   <typeColumn>activity_entity_table</typeColumn>
-   <add>1.8</add>
-   <drop>2.0</drop>
-  </dynamicForeignKey>
-
 </table>

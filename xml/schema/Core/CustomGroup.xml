@@ -48,14 +48,6 @@
     <add>1.1</add>
   </field>
   <field>
-    <name>extends_entity_column_name</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>linking custom group for dynamic object</comment>
-    <add>1.6</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
     <name>extends_entity_column_id</name>
     <type>int unsigned</type>
     <title>Custom Group Subtype List</title>

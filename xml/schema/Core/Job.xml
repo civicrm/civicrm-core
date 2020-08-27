@@ -86,15 +86,6 @@
     <add>4.1</add>
   </field>
   <field>
-    <name>api_prefix</name>
-    <type>varchar</type>
-    <length>255</length>
-    <default>"civicrm_api3"</default>
-    <comment>Prefix of the job api call</comment>
-    <add>4.1</add>
-    <drop>4.3</drop>
-  </field>
-  <field>
     <name>api_entity</name>
     <title>API Entity</title>
     <type>varchar</type>
