@@ -678,6 +678,9 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   }
   $input['card_type_id'] = $params['card_type_id'] ?? NULL;
   $input['pan_truncation'] = $params['pan_truncation'] ?? NULL;
+  if (!empty($params['payment_instrument_id'])) {
+    $input['payment_instrument_id'] = $params['payment_instrument_id'];
+  }
   return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects,
     $params['is_post_payment_create'] ?? NULL);
 }
