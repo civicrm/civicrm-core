@@ -325,6 +325,7 @@ class CRM_Utils_File {
     }
     else {
       require_once 'DB.php';
+      $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
       $db = DB::connect($dsn);
     }
 

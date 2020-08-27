@@ -592,7 +592,8 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function checkFKExists($table_name, $constraint_name) {
     $config = CRM_Core_Config::singleton();
-    $dbUf = DB::parseDSN($config->dsn);
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
+    $dbUf = DB::parseDSN($dsn);
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = %1
@@ -832,7 +833,8 @@ MODIFY      {$columnName} varchar( $length )
     // If we specified a list of databases assume the user knows what they are doing.
     // If they specify the database they should also specify the pattern.
     if (!$databaseList) {
-      $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+      $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
       $logging_database = $dsn['database'];
       $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$logging_database}` WHERE Engine <> 'MyISAM' AND (" . implode(' OR ', $logTableNameLikePatterns) . ")");
       while ($dao->fetch()) {

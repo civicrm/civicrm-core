@@ -158,11 +158,13 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     $nonStandardTableNameString = $this->getNonStandardTableNameFilterString();
 
     if (defined('CIVICRM_LOGGING_DSN')) {
-      $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN);
+      $dsn = DB::parseDSN($dsn);
       $this->useDBPrefix = (CIVICRM_LOGGING_DSN != CIVICRM_DSN);
     }
     else {
-      $dsn = DB::parseDSN(CIVICRM_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
       $this->useDBPrefix = FALSE;
     }
     $this->db = $dsn['database'];

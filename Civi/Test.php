@@ -59,7 +59,8 @@ class Test {
   public static function dsn($part = NULL) {
     if (!isset(self::$singletons['dsn'])) {
       require_once "DB.php";
-      self::$singletons['dsn'] = \DB::parseDSN(CIVICRM_DSN);
+      $dsn = \CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      self::$singletons['dsn'] = \DB::parseDSN($dsn);
     }
 
     if ($part === NULL) {
