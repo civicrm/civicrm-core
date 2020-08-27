@@ -4899,4 +4899,54 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('2020-02-02 00:00:00', $contribution['receive_date']);
   }
 
+  /**
+   * Make sure that recording a payment with Different Payment Instrument update main contribution record payment
+   * instrument too. If multiple Payment Recorded, last payment record payment (when No more due) instrument set to main
+   * payment
+   */
+  public function testPaymentVerifyPaymentInstrumentChange() {
+    // Create Pending contribution with pay later mode, with payment instrument Check
+    $params = [
+      'contact_id' => $this->_individualId,
+      'total_amount' => 100,
+      'receive_date' => '2020-02-02',
+      'contribution_status_id' => 'Pending',
+      'is_pay_later' => 1,
+      'payment_instrument_id' => 'Check',
+    ];
+    $contributionID = $this->contributionCreate($params);
+
+
+    // Record the the Payment with instrument other than Check, e.g EFT
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 50,
+      'trxn_date' => '2020-03-04',
+      'payment_instrument_id' => 'EFT'
+    ];
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    $contribution = $this->callAPISuccess('Contribution', 'getSingle', [
+      'id' => $contributionID,
+    ]);
+    // payment status should be 'Partially paid'
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+
+    // Record the the Payment with instrument other than Check, e.g Cash (pay all remaining amount)
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 50,
+      'trxn_date' => '2020-03-04',
+      'payment_instrument_id' => 'Cash'
+    ];
+    $this->callAPISuccess('payment', 'create', $paymentParams);
+
+    //check if contribution Payment Instrument (Payment Method) is is set to "Cash".
+    $contribution = $this->callAPISuccess('Contribution', 'getSingle', [
+      'id' => $contributionID,
+    ]);
+    $this->assertEquals('Cash', $contribution['payment_instrument']);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+  }
+
 }
