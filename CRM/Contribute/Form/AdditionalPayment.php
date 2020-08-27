@@ -57,6 +57,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   public $_action = NULL;
 
+  protected $_contributionType = NULL;
+
   /**
    * Pre process form.
    *
@@ -66,6 +68,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public function preProcess() {
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $this->_contributionType = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'financial_type_id');
     parent::preProcess();
     $this->_contactId = $this->_contactID;
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, FALSE, 'contribution');
@@ -112,6 +115,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('absolutePaymentAmount', abs($paymentAmt));
 
     $this->setPageTitle($this->isARefund() ? ts('Refund') : ts('Payment'));
+
+    if (!empty($_POST['hidden_custom'])) {
+      $this->applyCustomData('Contribution', $this->_contributionType, $this->_id);
+    }
   }
 
   /**
@@ -195,6 +202,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $attributes['total_amount'],
       TRUE, 'currency', NULL
     );
+
+    // assign custom data type and subtype to the template
+    $this->assign('customDataType', 'Contribution');
+    $this->assign('customDataSubType', $this->_contributionType);
+    $this->assign('entityID', $this->_id);
 
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
@@ -284,6 +296,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    */
   public function postProcess() {
     $submittedValues = $this->controller->exportValues($this->_name);
+    $submittedValues['custom'] = CRM_Core_BAO_CustomField::postProcess($submittedValues, $this->_id, 'Contribution');
     $this->submit($submittedValues);
     $childTab = 'contribute';
     if ($this->_component === 'event') {
@@ -307,7 +320,19 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_params = $submittedValues;
     $this->beginPostProcess();
     $this->_contributorContactID = $this->_contactID;
+
+    if (array_key_exists('custom', $this->_params)) {
+      // remove custom field from object, otherwise Custom Field try to get added using Contact ID
+      // will get DB Error: constraint violation
+      $custom = $this->_params['custom'];
+      unset($this->_params['custom']);
+    }
     $this->processBillingAddress();
+
+    // Re-assing custom value to object
+    if (isset($custom) && !empty($custom)) {
+      $this->_params['custom'] = $custom;
+    }
     $participantId = NULL;
     if ($this->_component === 'event') {
       $participantId = $this->_id;
@@ -329,6 +354,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     // From the
     $trxnsData['is_send_contribution_notification'] = FALSE;
     $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
+
+    if (!empty($this->_params['custom']) && is_array($this->_params['custom'])) {
+      CRM_Core_BAO_CustomValueTable::store($this->_params['custom'], 'civicrm_contribution', $this->_contributionId);
+    }
 
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);

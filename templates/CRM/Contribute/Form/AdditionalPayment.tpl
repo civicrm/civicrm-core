@@ -99,6 +99,7 @@
       {/if}
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     </div>
+    {include file="CRM/common/customDataBlock.tpl"}
 
     {literal}
     <script type="text/javascript">

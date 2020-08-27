@@ -512,4 +512,79 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->_contributionId = $contribution['id'];
   }
 
+  /**
+   * Test the submit function that update Custom Field for Contribution Record.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testPaymentWithCustomField() {
+
+    // create custom Group
+    $contributionCustomFieldsGroup = civicrm_api3('CustomGroup', 'create', [
+      'title' => "Custom Fields on Contribution",
+      'extends' => "Contribution",
+    ]);
+
+    // create custom field
+    $contributionCustomField = civicrm_api3('CustomField', 'create', [
+      "custom_group_id" => $contributionCustomFieldsGroup['id'],
+      "name" => "my_contribution_custom_field",
+      "label" => "Contribution Custom Field",
+      "data_type" => "String",
+      "html_type" => "Text",
+      "is_active" => "1",
+      "is_view" => "0",
+      "text_length" => "255",
+    ]);
+
+    // Create Pending Order
+    $this->createPendingOrder();
+
+    $form = new CRM_Contribute_Form_AdditionalPayment();
+
+    $submitParams = [
+      'contribution_id' => $this->_contributionId,
+      'contact_id' => $this->_individualId,
+      'total_amount' => 50,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'trxn_date' => '2019-04-01 13:05:11',
+      'payment_processor_id' => 0,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
+      'check_number' => 'check-12345',
+      "custom_{$contributionCustomField['id']}" => "Hello",
+    ];
+
+    $submitParams['custom'] = CRM_Core_BAO_CustomField::postProcess($submitParams, $this->_contributionId, 'Contribution');
+    $form->cid = $this->_individualId;
+    $form->testSubmit($submitParams);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $this->_contributionId]);
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertEquals('Hello', $contribution["custom_{$contributionCustomField['id']}"]);
+
+    // Pay remaining Amount
+    $submitParams = [
+      'contribution_id' => $this->_contributionId,
+      'contact_id' => $this->_individualId,
+      'total_amount' => 50,
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'trxn_date' => '2019-04-02 13:05:11',
+      'payment_processor_id' => 0,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
+      'check_number' => 'check-123456',
+      "custom_{$contributionCustomField['id']}" => "Hello 2",
+    ];
+    $submitParams['custom'] = CRM_Core_BAO_CustomField::postProcess($submitParams, $this->_contributionId, 'Contribution');
+    $form->cid = $this->_individualId;
+    $form->testSubmit($submitParams);
+
+    // Contribution Status should be Completed and check updated Custom Field value.
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $this->_contributionId]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals('Hello 2', $contribution["custom_{$contributionCustomField['id']}"]);
+  }
+
 }
