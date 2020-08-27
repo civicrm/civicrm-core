@@ -4921,7 +4921,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => $contributionID,
       'total_amount' => 50,
       'trxn_date' => '2020-03-04',
-      'payment_instrument_id' => 'EFT'
+      'payment_instrument_id' => 'EFT',
     ];
     $this->callAPISuccess('payment', 'create', $paymentParams);
 
@@ -4936,7 +4936,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => $contributionID,
       'total_amount' => 50,
       'trxn_date' => '2020-03-04',
-      'payment_instrument_id' => 'Cash'
+      'payment_instrument_id' => 'Cash',
     ];
     $this->callAPISuccess('payment', 'create', $paymentParams);
 
