@@ -4545,8 +4545,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     // Add new soft credit against current $contribution.
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
+    if ($recurringContributionID) {
+      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($recurringContributionID, $contribution->id);
     }
 
     $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
