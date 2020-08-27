@@ -4916,7 +4916,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ];
     $contributionID = $this->contributionCreate($params);
 
-
     // Record the the Payment with instrument other than Check, e.g EFT
     $paymentParams = [
       'contribution_id' => $contributionID,
