@@ -673,7 +673,7 @@ WHERE  id = %1";
         continue;
       }
 
-      list($params, $lineItem, $totalTax, $totalPrice) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice);
+      list($params, $lineItem, $totalTax, $totalPrice) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice, $totalTax);
     }
 
     $amount_level = [];
@@ -1692,8 +1692,7 @@ WHERE     ct.id = cp.financial_type_id AND
    *
    * @return array
    */
-  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice): array {
-    $totalTax = 0;
+  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice, &$totalTax = 0): array {
     switch ($field['html_type']) {
       case 'Text':
         $firstOption = reset($field['options']);
