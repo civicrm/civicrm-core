@@ -85,7 +85,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       // create relationships for the ones that are required
       foreach ($xml->CaseRoles as $caseRoleXML) {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-          if ($relationshipTypeXML->creator) {
+          if (!empty($relationshipTypeXML->creator)) {
             if (!$this->createRelationships($relationshipTypeXML,
               $params
             )
