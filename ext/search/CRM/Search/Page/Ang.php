@@ -32,7 +32,7 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
 
     // Add client-side vars for the search UI
     $vars = [
-      'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
+      'operators' => \Civi\Api4\Utils\CoreUtil::getOperators(),
       'schema' => $this->schema,
       'links' => $this->getLinks(),
       'loadOptions' => $this->loadOptions,

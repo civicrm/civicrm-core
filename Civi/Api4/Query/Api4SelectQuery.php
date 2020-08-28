@@ -362,7 +362,7 @@ class Api4SelectQuery {
   protected function composeClause(array $clause, string $type) {
     // Pad array for unary operators
     list($expr, $operator, $value) = array_pad($clause, 3, NULL);
-    if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+    if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \API_Exception('Illegal operator');
     }
 

@@ -11,6 +11,7 @@
  */
 
 use Civi\Api4\Service\Schema\Joinable\Joinable;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  *
@@ -30,7 +31,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
       });
     }
     $vars = [
-      'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
+      'operators' => CoreUtil::getOperators(),
       'basePath' => Civi::resources()->getUrl('civicrm'),
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
       'links' => $entityLinks,

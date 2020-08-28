@@ -20,6 +20,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\Api4\Query\Api4SelectQuery;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Retrieve $ENTITIES based on criteria specified in the `where` parameter.
@@ -154,7 +155,7 @@ class DAOGetAction extends AbstractGetAction {
    * @throws \API_Exception
    */
   public function addHaving(string $expr, string $op, $value = NULL) {
-    if (!in_array($op, \CRM_Core_DAO::acceptedSQLOperators())) {
+    if (!in_array($op, CoreUtil::getOperators())) {
       throw new \API_Exception('Unsupported operator');
     }
     $this->having[] = [$expr, $op, $value];

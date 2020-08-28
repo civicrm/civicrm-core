@@ -2830,7 +2830,7 @@ SELECT contact_id
   /**
    * @see http://issues.civicrm.org/jira/browse/CRM-9150
    * support for other syntaxes is discussed in ticket but being put off for now
-   * @return array
+   * @return string[]
    */
   public static function acceptedSQLOperators() {
     return [
