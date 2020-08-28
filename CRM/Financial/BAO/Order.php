@@ -237,18 +237,17 @@ class CRM_Financial_BAO_Order {
       $lineItems[$valueID] = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID, 0)[1][$valueID];
     }
 
-    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     foreach ($lineItems as &$lineItem) {
       // Set any pre-calculation to zero as we will calculate.
       $lineItem['tax_amount'] = 0;
       if ($this->getOverrideFinancialTypeID() !== FALSE) {
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
-      $taxRate = $taxRates[$lineItem['financial_type_id']] ?? 0;
+      $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
       if ($this->getOverrideTotalAmount() !== FALSE) {
         if ($taxRate) {
           // Total is tax inclusive.
-          $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount();
+          $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
           $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
         }
         else {
@@ -275,6 +274,21 @@ class CRM_Financial_BAO_Order {
       $amount += $lineItem['tax_amount'] ?? 0.0;
     }
     return $amount;
+  }
+
+  /**
+   * Get the tax rate for the given financial type.
+   *
+   * @param int $financialTypeID
+   *
+   * @return float
+   */
+  public function getTaxRate(int $financialTypeID) {
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    if (!isset($taxRates[$financialTypeID])) {
+      return 0;
+    }
+    return $taxRates[$financialTypeID];
   }
 
 }
