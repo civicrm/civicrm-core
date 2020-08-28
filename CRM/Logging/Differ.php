@@ -28,7 +28,8 @@ class CRM_Logging_Differ {
    * @param string $interval
    */
   public function __construct($log_conn_id, $log_date, $interval = '10 SECOND') {
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+    $dsn = DB::parseDSN($dsn);
     $this->db = $dsn['database'];
     $this->log_conn_id = $log_conn_id;
     $this->log_date = $log_date;

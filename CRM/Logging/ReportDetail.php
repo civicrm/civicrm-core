@@ -257,7 +257,8 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    * Store the dsn for the logging database in $this->db.
    */
   protected function storeDB() {
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+    $dsn = DB::parseDSN($dsn);
     $this->db = $dsn['database'];
   }
 

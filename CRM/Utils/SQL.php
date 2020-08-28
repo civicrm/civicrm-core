@@ -185,4 +185,22 @@ class CRM_Utils_SQL {
     return (bool) preg_match('/[\?&](key|cert|ca|capath|cipher|ssl)=/', $dsn);
   }
 
+  /**
+   * If DB_DSN_MODE is auto then we should replace mysql with mysqli if mysqli is available or the other way around as appropriate
+   * @param string $dsn
+   *
+   * @return string
+   */
+  public static function autoSwitchDSN($dsn) {
+    if (defined('DB_DSN_MODE') && DB_DSN_MODE === 'auto') {
+      if (extension_loaded('mysqli')) {
+        $dsn = preg_replace('/^mysql:/', 'mysqli:', $dsn);
+      }
+      else {
+        $dsn = preg_replace('/^mysqli:/', 'mysql:', $dsn);
+      }
+    }
+    return $dsn;
+  }
+
 }

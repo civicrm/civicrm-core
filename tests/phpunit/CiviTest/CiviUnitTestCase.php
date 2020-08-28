@@ -228,7 +228,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     static $dbName = NULL;
     if ($dbName === NULL) {
       require_once "DB.php";
-      $dsninfo = DB::parseDSN(CIVICRM_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsninfo = DB::parseDSN($dsn);
       $dbName = $dsninfo['database'];
     }
     return $dbName;

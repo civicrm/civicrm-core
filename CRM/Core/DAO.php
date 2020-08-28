@@ -161,6 +161,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public static function init($dsn) {
     Civi::$statics[__CLASS__]['init'] = 1;
     $options = &PEAR::getStaticProperty('DB_DataObject', 'options');
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
     $options['database'] = $dsn;
     $options['quote_identifiers'] = TRUE;
     if (CRM_Utils_SQL::isSSLDSN($dsn)) {

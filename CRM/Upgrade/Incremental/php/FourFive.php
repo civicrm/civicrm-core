@@ -52,7 +52,8 @@ class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base 
     // if DB is been into upgrade for 3.4.2 version, it would have pdf_format_id name for FK
     // else FK_civicrm_msg_template_pdf_format_id
     $config = CRM_Core_Config::singleton();
-    $dbUf = DB::parseDSN($config->dsn);
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
+    $dbUf = DB::parseDSN($dsn);
     $query = "
 SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
 WHERE TABLE_NAME = 'civicrm_msg_template'
