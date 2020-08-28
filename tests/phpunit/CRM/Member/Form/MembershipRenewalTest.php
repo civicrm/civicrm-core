@@ -239,7 +239,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_middle_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -248,7 +248,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId, 'is_test' => TRUE, 'return' => ['total_amount', 'tax_amount']]);
     $this->assertEquals(50, $contribution['total_amount']);
-    $this->assertEquals(5, $contribution['tax_amount']);
+    $this->assertEquals(4.55, $contribution['tax_amount']);
   }
 
   /**
