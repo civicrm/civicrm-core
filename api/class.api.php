@@ -14,15 +14,15 @@
  * ```
  *   require_once('/your/civi/folder/api/class.api.php');
  *   // the path to civicrm.settings.php
- *   $api = new civicrm_api3 (array('conf_path'=> '/your/path/to/your/civicrm/or/joomla/site));
+ *   $api = new civicrm_api3 (['conf_path'=> '/your/path/to/your/civicrm/or/joomla/site']);
  * ```
  *
  * or to query a remote server via the rest api
  *
  * ```
- *   $api = new civicrm_api3 (array ('server' => 'http://example.org',
- *                                   'api_key'=>'theusersecretkey',
- *                                   'key'=>'thesitesecretkey'));
+ *   $api = new civicrm_api3 (['server' => 'http://example.org',
+ *                             'api_key'=>'theusersecretkey',
+ *                             'key'=>'thesitesecretkey']);
  * ```
  *
  * No matter how initialised and if civicrm is local or remote, you use the class the same way.
@@ -34,7 +34,7 @@
  * So, to get the individual contacts:
  *
  * ```
- *   if ($api->Contact->Get(array('contact_type'=>'Individual','return'=>'sort_name,current_employer')) {
+ *   if ($api->Contact->Get(['contact_type'=>'Individual','return'=>'sort_name,current_employer']) {
  *     // each key of the result array is an attribute of the api
  *     echo "\n contacts found " . $api->count;
  *     foreach ($api->values as $c) {
@@ -49,7 +49,7 @@
  * Or, to create an event:
  *
  * ```
- *   if ($api->Event->Create(array('title'=>'Test','event_type_id' => 1,'is_public' => 1,'start_date' => 19430429))) {
+ *   if ($api->Event->Create(['title'=>'Test','event_type_id' => 1,'is_public' => 1,'start_date' => 19430429])) {
  *     echo "created event id:". $api->id;
  *   } else {
  *     echo $api->errorMsg();
@@ -62,7 +62,7 @@
  *
  * ```
  *   $api->Activity->Get (42);
- *   $api->Activity->Get (array('id'=>42));
+ *   $api->Activity->Get (['id'=>42]);
  * ```
  *
  *
@@ -87,23 +87,23 @@ class civicrm_api3 {
     $this->local      = TRUE;
     $this->input      = [];
     $this->lastResult = [];
-    if (isset($config) && isset($config['server'])) {
+    if (!empty($config) && !empty($config['server'])) {
       // we are calling a remote server via REST
       $this->local = FALSE;
       $this->uri = $config['server'];
-      if (isset($config['path'])) {
+      if (!empty($config['path'])) {
         $this->uri .= "/" . $config['path'];
       }
       else {
         $this->uri .= '/sites/all/modules/civicrm/extern/rest.php';
       }
-      if (isset($config['key'])) {
+      if (!empty($config['key'])) {
         $this->key = $config['key'];
       }
       else {
         die("\nFATAL:param['key] missing\n");
       }
-      if (isset($config['api_key'])) {
+      if (!empty($config['api_key'])) {
         $this->api_key = $config['api_key'];
       }
       else {
@@ -111,7 +111,7 @@ class civicrm_api3 {
       }
       return;
     }
-    if (isset($config) && isset($config['conf_path'])) {
+    if (!empty($config) && !empty($config['conf_path'])) {
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
       }
