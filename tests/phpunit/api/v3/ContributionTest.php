@@ -179,7 +179,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution2 = $this->callAPISuccess('contribution', 'create', $p);
 
     // Now we have 2 - test getcount.
-    $contribution = $this->callAPISuccess('contribution', 'getcount', []);
+    $contribution = $this->callAPISuccess('contribution', 'getcount');
     $this->assertEquals(2, $contribution);
     // Test id only format.
     $contribution = $this->callAPISuccess('contribution', 'get', [
@@ -3562,17 +3562,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @param int $priceFieldValueID
    * @param array $contriParams
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpPendingContribution($priceFieldValueID, $contriParams = []) {
     $contactID = $this->individualCreate();
-    $membership = $this->callAPISuccess('membership', 'create', [
-      'contact_id' => $contactID,
-      'membership_type_id' => $this->_ids['membership_type'],
-      'start_date' => 'yesterday - 1 year',
-      'end_date' => 'yesterday',
-      'join_date' => 'yesterday - 1 year',
-    ]);
-    $contribution = $this->callAPISuccess('contribution', 'create', array_merge([
+    $contribution = $this->callAPISuccess('Order', 'create', array_merge([
       'domain_id' => 1,
       'contact_id' => $contactID,
       'receive_date' => date('Ymd'),
@@ -3585,23 +3580,33 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 2,
       'contribution_page_id' => $this->_ids['contribution_page'],
-      'api.membership_payment.create' => ['membership_id' => $membership['id']],
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'price_field_id' => $this->_ids['price_field'][0],
+              'qty' => 1,
+              'entity_table' => 'civicrm_membership',
+              'unit_price' => 20,
+              'line_total' => 20,
+              'financial_type_id' => 1,
+              'price_field_value_id' => $priceFieldValueID,
+            ],
+          ],
+          'params' => [
+            'contact_id' => $contactID,
+            'membership_type_id' => $this->_ids['membership_type'],
+            'start_date' => 'yesterday - 1 year',
+            'end_date' => 'yesterday',
+            'join_date' => 'yesterday - 1 year',
+          ],
+        ],
+      ],
     ], $contriParams));
 
-    $this->callAPISuccess('line_item', 'create', [
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'contribution_id' => $contribution['id'],
-      'price_field_id' => $this->_ids['price_field'][0],
-      'qty' => 1,
-      'unit_price' => 20,
-      'line_total' => 20,
-      'financial_type_id' => 1,
-      'price_field_value_id' => $priceFieldValueID,
-    ]);
     $this->_ids['contact'] = $contactID;
     $this->_ids['contribution'] = $contribution['id'];
-    $this->_ids['membership'] = $membership['id'];
+    $this->_ids['membership'] = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'membership_id', 'contribution_id' => $contribution['id']]);
   }
 
   /**
