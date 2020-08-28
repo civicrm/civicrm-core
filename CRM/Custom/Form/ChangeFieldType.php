@@ -146,13 +146,14 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $customField = new CRM_Core_DAO_CustomField();
     $customField->id = $this->_id;
     $customField->find(TRUE);
+    $customField->serialize = in_array($dstHtmlType, $mutliValueOps, TRUE);
 
     if ($dstHtmlType == 'Text' && in_array($srcHtmlType, [
       'Select',
       'Radio',
       'Autocomplete-Select',
     ])) {
-      $customField->option_group_id = "NULL";
+      $customField->option_group_id = 'NULL';
       CRM_Core_BAO_CustomField::checkOptionGroup($this->_values['option_group_id']);
     }
 
@@ -165,7 +166,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
       $this->firstValueToFlatten($tableName, $this->_values['column_name']);
     }
 
-    $customField->html_type = $dstHtmlType;
+    $customField->html_type = ($dstHtmlType === 'Multi-Select') ? 'Select' : $dstHtmlType;
     $customField->save();
 
     // Reset cache for custom fields
