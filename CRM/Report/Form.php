@@ -5937,7 +5937,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
         $from = $this->_params["{$fieldName}_from"] ?? NULL;
         $to = $this->_params["{$fieldName}_to"] ?? NULL;
-        return $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
+        $fromTime = $this->_params["{$fieldName}_from_time"] ?? NULL;
+        $toTime = $this->_params["{$fieldName}_to_time"] ?? NULL;
+        return $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type'], $fromTime, $toTime);
       }
     }
     else {
