@@ -386,12 +386,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    if ($cid) {
+    // skip cid (contact id of membership/participant record) to get associated payments for membership/participant record,
+    // contribution record may be on different contact id.
+    $skip_cid = CRM_Utils_Request::retrieve('skip_cid', 'Boolean', $this, FALSE, FALSE);
+
+    if ($cid && !$skip_cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        // @todo - why do we retrieve these when they are not used?
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );

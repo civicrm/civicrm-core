@@ -590,7 +590,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('force', 1);
-    $controller->set('cid', $contactId);
+    $controller->set('skip_cid', TRUE);
     $controller->set('memberId', $membershipId);
     $controller->set('context', 'contribution');
     $controller->process();
