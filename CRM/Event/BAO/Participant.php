@@ -1877,7 +1877,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * Evaluate whether a participant record is eligible for self-service transfer/cancellation.  If so,
    * return additional participant/event details.
    *
-   * TODO: This function fails when the "hours until self-service" is less than zero.
    * @param int $participantId
    * @param string $url
    * @param bool $isBackOffice
@@ -1930,7 +1929,12 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
       if ($timenow > $cancelDeadline) {
         $details['eligible'] = FALSE;
-        $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred less than %1 hours prior to the event's start time. Contact the event organizer if you have questions.", [1 => $time_limit]);
+        // Change the language of the status message based on whether the waitlist time limit is positive or negative.
+        $afterOrPrior = $time_limit < 0 ? 'after' : 'prior';
+        $moreOrLess = $time_limit < 0 ? 'more' : 'less';
+        $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 to the event's start time. Contact the event organizer if you have questions.",
+        [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
+
       }
     }
     return $details;

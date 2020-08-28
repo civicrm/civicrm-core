@@ -1158,6 +1158,8 @@ WHERE civicrm_event.is_active = 1
           'conference_sessions' => $sessions,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
+          'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
+          'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? 'after' : 'before',
         ]);
 
         // CRM-13890 : NOTE wait list condition need to be given so that

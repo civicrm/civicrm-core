@@ -215,6 +215,16 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.30.alpha1',
+        'upgrade_descriptor' => ts('Support negative hours for cancellation/transfer'),
+        'templates' => [
+          ['name' => 'participant_confirm', 'type' => 'html'],
+          ['name' => 'participant_confirm', 'type' => 'text'],
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+        ],
+      ],
 
     ];
   }

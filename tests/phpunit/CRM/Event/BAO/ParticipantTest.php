@@ -493,6 +493,15 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
+    // Cancellation deadline is < 0 hours
+    $scenarios[] = [
+      'selfSvcEnabled' => 1,
+      'selfSvcHours' => -12,
+      'hoursToEvent' => 4,
+      'participantStatusId' => 1,
+      'isBackOffice' => FALSE,
+      'successExpected' => TRUE,
+    ];
     return $scenarios;
   }
 
