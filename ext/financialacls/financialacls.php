@@ -143,6 +143,31 @@ function financialacls_civicrm_themes(&$themes) {
   _financialacls_civix_civicrm_themes($themes);
 }
 
+/**
+ * Intervene to prevent deletion, where permissions block it.
+ *
+ * @param \CRM_Core_DAO $op
+ * @param string $objectName
+ * @param int|null $id
+ * @param array $params
+ *
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ */
+function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
+  if ($objectName === 'LineItem' && $op === 'delete' && !empty($params['check_permissions'])) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::DELETE);
+      if (empty($params['financial_type_id'])) {
+        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
+      }
+      if (!in_array($params['financial_type_id'], array_keys($types))) {
+        throw new API_Exception('You do not have permission to delete this line item');
+      }
+    }
+  }
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
