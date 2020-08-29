@@ -16,7 +16,7 @@
       </div>
       <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">
         <input class="form-control" ng-model="clause[0]" crm-ui-select="{data: data.fields, allowClear: true, placeholder: 'Field'}" />
-        <select class="form-control api4-operator" ng-model="clause[1]" ng-options="o for o in $ctrl.operators" ></select>
+        <select class="form-control api4-operator" ng-model="clause[1]" ng-options="o.key as o.value for o in $ctrl.operators" ></select>
         <input class="form-control" ng-model="clause[2]" crm-search-value="{field: clause[0], op: clause[1], format: data.format}" />
       </div>
       <fieldset class="clearfix" ng-if="$ctrl.conjunctions[clause[0]]" crm-search-clause="{format: data.format, clauses: clause[1], op: clause[0], fields: data.fields, groupParent: data.clauses, groupIndex: index}">
