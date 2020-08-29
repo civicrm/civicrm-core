@@ -464,6 +464,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['html'] = preg_replace('/<body(.*)$/im', "<body\\1\n{$testDao->html}", $mailContent['html']);
     }
 
+    // Overwrite subject from form field
+    if (!empty($params['subject'])) {
+      $mailContent['subject'] = $params['subject'];
+    }
+
     // replace tokens in the three elements (in subject as if it was the text body)
     $domain = CRM_Core_BAO_Domain::getDomain();
     $hookTokens = [];

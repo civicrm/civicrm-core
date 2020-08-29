@@ -143,6 +143,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $this->addRule('from_email_address', ts('From Email Address is required'), 'required');
     }
 
+    $attributes = ['class' => 'huge'];
+    $this->add('text', 'cc_id', ts('CC'), $attributes);
+    $this->add('text', 'subject', ts('Subject'), $attributes + ['placeholder' => ts('Optional')]);
     $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), [
       'rows' => 2,
       'cols' => 40,
@@ -413,6 +416,14 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       // from email address
       $fromEmailAddress = $params['from_email_address'] ?? NULL;
+      if (!empty($params['cc_id'])) {
+        $values['cc_receipt'] = $params['cc_id'];
+      }
+
+      // get subject from UI
+      if (!empty($params['subject'])) {
+        $sendTemplateParams['subject'] = $values['subject'] = $params['subject'];
+      }
 
       // condition to check for download PDF Invoice or email Invoice
       if ($invoiceElements['createPdf']) {
