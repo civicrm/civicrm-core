@@ -1689,6 +1689,7 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param array $field
    * @param int $id
    * @param float $totalPrice
+   * @param float $totalTax
    *
    * @return array
    */
