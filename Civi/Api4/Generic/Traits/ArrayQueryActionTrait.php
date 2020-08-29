@@ -158,6 +158,15 @@ trait ArrayQueryActionTrait {
       case 'NOT IN':
         return !in_array($value, $expected);
 
+      case 'CONTAINS':
+        if (is_array($value)) {
+          return in_array($expected, $value);
+        }
+        elseif (is_string($value) || is_numeric($value)) {
+          return strpos((string) $value, (string) $expected) !== FALSE;
+        }
+        return $value == $expected;
+
       default:
         throw new NotImplementedException("Unsupported operator: '$operator' cannot be used with array data");
     }

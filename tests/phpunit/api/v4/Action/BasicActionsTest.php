@@ -255,6 +255,49 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertEquals(['shape', 'size', 'weight'], array_keys($result));
   }
 
+  public function testContainsOperator() {
+    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
+
+    $records = [
+      ['group' => 'one', 'fruit:name' => ['apple', 'pear'], 'weight' => 11],
+      ['group' => 'two', 'fruit:name' => ['pear', 'banana'], 'weight' => 12],
+    ];
+    MockBasicEntity::save()->setRecords($records)->execute();
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS', 'apple')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('one', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:name', 'CONTAINS', 'pear')
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('group', 'CONTAINS', 'o')
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'CONTAINS', 1)
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('fruit:label', 'CONTAINS', 'Banana')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('two', $result->first()['group']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'CONTAINS', 2)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('two', $result->first()['group']);
+  }
+
   public function testPseudoconstantMatch() {
     MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
 
