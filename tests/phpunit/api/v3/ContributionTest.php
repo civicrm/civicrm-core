@@ -4948,4 +4948,26 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $contribution['contribution_status']);
   }
 
+  /**
+   * Test the "clean money" functionality.
+   */
+  public function testCleanMoney() {
+    $params = [
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'total_amount' => '$100',
+      'fee_amount' => '$20',
+      'net_amount' => '$80',
+      'non_deductible_amount' => '$80',
+      'sequential' => 1,
+    ];
+    $id = $this->callAPISuccess('Contribution', 'create', $params)['id'];
+    // Reading the return values of the API isn't reliable here; get the data from the db.
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $id]);
+    $this->assertEquals('100.00', $contribution['total_amount']);
+    $this->assertEquals('20.00', $contribution['fee_amount']);
+    $this->assertEquals('80.00', $contribution['net_amount']);
+    $this->assertEquals('80.00', $contribution['non_deductible_amount']);
+  }
+
 }

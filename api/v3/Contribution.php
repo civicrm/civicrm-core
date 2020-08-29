@@ -32,7 +32,7 @@ function civicrm_api3_contribution_create($params) {
   // The BAO should not clean money - it should be done in the form layer & api wrapper
   // (although arguably the api should expect pre-cleaned it seems to do some cleaning.)
   if (empty($params['skipCleanMoney'])) {
-    foreach (['total_amount', 'net_amount', 'fee_amount'] as $field) {
+    foreach (['total_amount', 'net_amount', 'fee_amount', 'non_deductible_amount'] as $field) {
       if (isset($params[$field])) {
         $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
       }
