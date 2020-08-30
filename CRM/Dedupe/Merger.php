@@ -1395,7 +1395,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
       }
     }
-    self::mergeLocations($mainId, $otherId, $migrationInfo);
+    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
+    $mergeHandler->setMigrationInfo($migrationInfo);
+    self::mergeLocations($mergeHandler);
 
     // **** Do contact related migrations
     // @todo - move all custom field processing to the move class & eventually have an
@@ -1403,7 +1405,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $customFieldBAO = new CRM_Core_BAO_CustomField();
     $customFieldBAO->move($otherId, $mainId, $submittedCustomFields);
     // add the related tables and unset the ones that don't sport any of the duplicate contact's info
-    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
+
     CRM_Dedupe_Merger::moveContactBelongings($mergeHandler, $moveTables, $tableOperations);
     unset($moveTables, $tableOperations);
 
@@ -1782,43 +1784,19 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * The use of the new hook is tested, including the fact it is called before contributions are merged, as this
    * is likely to be significant data in merge hooks.
    *
-   * @param int $mainId
-   * @param int $otherId
-   *
-   * @param array $migrationInfo
-   *   Migration info for the merge. This is passed to the hook as informational only.
+   * @param \CRM_Dedupe_MergeHandler $mergeHandler
    */
-  public static function mergeLocations($mainId, $otherId, $migrationInfo) {
-    foreach ($migrationInfo as $key => $value) {
-      $isLocationField = (substr($key, 0, 14) === 'move_location_' and $value != NULL);
-      if (!$isLocationField) {
-        continue;
-      }
-      $locField = explode('_', $key);
-      $fieldName = $locField[2];
-      $fieldCount = $locField[3];
-
-      // Set up the operation type (add/overwrite)
-      // Ignore operation for websites
-      // @todo Tidy this up
-      $operation = 0;
-      if ($fieldName !== 'website') {
-        $operation = $migrationInfo['location_blocks'][$fieldName][$fieldCount]['operation'] ?? NULL;
-      }
-      // default operation is overwrite.
-      if (!$operation) {
-        $operation = 2;
-      }
-      $locBlocks[$fieldName][$fieldCount]['operation'] = $operation;
-    }
+  public static function mergeLocations($mergeHandler) {
+    $locBlocks = $mergeHandler->getLocationBlocksToMerge();
     $blocksDAO = [];
+    $migrationInfo = $mergeHandler->getMigrationInfo();
 
     // @todo Handle OpenID (not currently in API).
     if (!empty($locBlocks)) {
       $locationBlocks = self::getLocationBlockInfo();
 
-      $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mainId, ['is_primary' => 1]);
-      $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mainId, ['is_billing' => 1]);
+      $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mergeHandler->getToKeepID(), ['is_primary' => 1]);
+      $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mergeHandler->getToKeepID(), ['is_billing' => 1]);
 
       foreach ($locBlocks as $name => $block) {
         $blocksDAO[$name] = ['delete' => [], 'update' => []];
@@ -1839,7 +1817,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // For the block which belongs to other-contact, link the location block to main-contact
           $otherBlockDAO = new $daoName();
-          $otherBlockDAO->contact_id = $mainId;
+          $otherBlockDAO->contact_id = $mergeHandler->getToKeepID();
 
           // Get the ID of this block on the 'other' contact, otherwise skip
           $otherBlockDAO->id = $otherBlockId;
@@ -1878,9 +1856,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $otherBlockDAO->is_billing = 0;
           }
 
-          $operation = CRM_Utils_Array::value('operation', $values, 2);
           // overwrite - need to delete block which belongs to main-contact.
-          if (!empty($mainBlockId) && ($operation == 2)) {
+          if (!empty($mainBlockId) && $values['is_replace']) {
             $deleteDAO = new $daoName();
             $deleteDAO->id = $mainBlockId;
             $deleteDAO->find(TRUE);
@@ -1900,7 +1877,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
 
-    CRM_Utils_Hook::alterLocationMergeData($blocksDAO, $mainId, $otherId, $migrationInfo);
+    CRM_Utils_Hook::alterLocationMergeData($blocksDAO, $mergeHandler->getToKeepID(), $mergeHandler->getToRemoveID(), $migrationInfo);
     foreach ($blocksDAO as $blockDAOs) {
       if (!empty($blockDAOs['update'])) {
         foreach ($blockDAOs['update'] as $blockDAO) {
