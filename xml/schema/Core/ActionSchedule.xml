@@ -51,6 +51,7 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Entity value</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>3.4</add>
   </field>
   <field>
@@ -58,6 +59,7 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Entity status</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>3.4</add>
   </field>
   <field>
@@ -169,6 +171,7 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Contact IDs to which reminder should be sent.</comment>
+    <serialize>COMMA</serialize>
     <add>3.4</add>
   </field>
   <field>
