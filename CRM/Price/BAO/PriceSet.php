@@ -673,13 +673,15 @@ WHERE  id = %1";
         continue;
       }
 
-      list($params, $lineItem, $totalTax, $totalPrice) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice);
+      list($params, $lineItem) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice);
     }
 
     $amount_level = [];
     $totalParticipant = 0;
     if (is_array($lineItem)) {
       foreach ($lineItem as $values) {
+        $totalPrice += $values['line_total'] + $values['tax_amount'];
+        $totalTax += $values['tax_amount'];
         $totalParticipant += $values['participant_count'];
         // This is a bit nasty. The logic of 'quick config' was because price set configuration was
         // (and still is) too difficult to replace the 'quick config' price set configuration on the contribution
@@ -1766,7 +1768,7 @@ WHERE     ct.id = cp.financial_type_id AND
         }
         break;
     }
-    return [$params, $lineItem, $totalTax, $totalPrice];
+    return [$params, $lineItem];
   }
 
 }
