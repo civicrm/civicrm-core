@@ -749,7 +749,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ], $params);
 
     $result = $this->callAPISuccess('PaymentProcessor', 'create', $params);
-    return $result['id'];
+    return (int) $result['id'];
   }
 
   /**

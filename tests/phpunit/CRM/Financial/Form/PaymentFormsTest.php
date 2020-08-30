@@ -38,8 +38,8 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testEventPaymentForms() {
-    $processors = [$this->paymentProcessorAuthorizeNetCreate(['is_test' => FALSE])];
-    $this->setupMockHandler($processors[0]);
+    $this->createAuthorizeNetProcessor();
+    $processors = [$this->ids['PaymentProcessor']['anet']];
     $eventID = $this->eventCreatePaid([
       'end_date' => '+ 1 month',
       'registration_end_date' => '+ 1 month',
@@ -93,9 +93,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         $qfKey = $form->controller->_key;
       }
       $this->callAPISuccessGetSingle('Participant', ['participant_status_id' => 'Registered']);
-      $request = explode('&', $this->getRequestBodies()[0]);
-      // This is stand in for now just to check a request happened. We can improve later.
-      $this->assertContains('x_card_num=4111111111111111', $request);
+      $this->assertRequestValid(['x_city' => 'The+Shire', 'x_state' => 'IL', 'x_amount' => 1.0]);
     }
   }
 
