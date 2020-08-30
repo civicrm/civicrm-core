@@ -340,6 +340,9 @@
         else if (type === 'Money') {
           return CRM.formatMoney(value);
         }
+        if (_.isArray(value)) {
+          return value.join(', ');
+        }
         return value;
       }
 

@@ -32,7 +32,7 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
 
     // Add client-side vars for the search UI
     $vars = [
-      'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
+      'operators' => CRM_Utils_Array::makeNonAssociative($this->getOperators()),
       'schema' => $this->schema,
       'links' => $this->getLinks(),
       'loadOptions' => $this->loadOptions,
@@ -53,6 +53,29 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
     ]);
     $loader->load();
     parent::run();
+  }
+
+  /**
+   * @return string[]
+   */
+  private function getOperators() {
+    return [
+      '=' => '=',
+      '!=' => '≠',
+      '>' => '>',
+      '<' => '<',
+      '>=' => '≥',
+      '<=' => '≤',
+      'CONTAINS' => ts('Contains'),
+      'IN' => ts('Is In'),
+      'NOT IN' => ts('Not In'),
+      'LIKE' => ts('Is Like'),
+      'NOT LIKE' => ts('Not Like'),
+      'BETWEEN' => ts('Is Between'),
+      'NOT BETWEEN' => ts('Not Between'),
+      'IS NULL' => ts('Is Null'),
+      'IS NOT NULL' => ts('Not Null'),
+    ];
   }
 
   /**

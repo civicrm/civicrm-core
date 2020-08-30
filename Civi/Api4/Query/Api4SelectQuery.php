@@ -26,8 +26,8 @@ use Civi\Api4\Utils\SelectUtil;
  * Leaf operators are one of:
  *
  * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
- * * "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', or 'IS NULL'.
+ * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
+ * * 'IS NOT NULL', or 'IS NULL', 'CONTAINS'.
  */
 class Api4SelectQuery {
 
@@ -362,7 +362,7 @@ class Api4SelectQuery {
   protected function composeClause(array $clause, string $type) {
     // Pad array for unary operators
     list($expr, $operator, $value) = array_pad($clause, 3, NULL);
-    if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+    if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \API_Exception('Illegal operator');
     }
 
@@ -379,7 +379,8 @@ class Api4SelectQuery {
         $fieldAlias = $expr;
         // Attempt to format if this is a real field
         if (isset($this->apiFieldSpec[$expr])) {
-          FormattingUtil::formatInputValue($value, $expr, $this->apiFieldSpec[$expr]);
+          $field = $this->getField($expr);
+          FormattingUtil::formatInputValue($value, $expr, $field);
         }
       }
       // Expr references a non-field expression like a function; convert to alias
@@ -392,7 +393,8 @@ class Api4SelectQuery {
         foreach ($this->selectAliases as $selectAlias => $selectExpr) {
           list($selectField) = explode(':', $selectAlias);
           if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
-            FormattingUtil::formatInputValue($value, $expr, $this->apiFieldSpec[$fieldName]);
+            $field = $this->getField($fieldName);
+            FormattingUtil::formatInputValue($value, $expr, $field);
             $fieldAlias = $selectAlias;
             break;
           }
@@ -415,7 +417,29 @@ class Api4SelectQuery {
         return sprintf('%s %s %s', $fieldAlias, $operator, $valExpr->render($this->apiFieldSpec));
       }
       elseif ($fieldName) {
-        FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName]);
+        $field = $this->getField($fieldName);
+        FormattingUtil::formatInputValue($value, $fieldName, $field);
+      }
+    }
+
+    if ($operator === 'CONTAINS') {
+      switch ($field['serialize'] ?? NULL) {
+        case \CRM_Core_DAO::SERIALIZE_JSON:
+          $operator = 'LIKE';
+          $value = '%"' . $value . '"%';
+          // FIXME: Use this instead of the above hack once MIN_INSTALL_MYSQL_VER is bumped to 5.7.
+          // return sprintf('JSON_SEARCH(%s, "one", "%s") IS NOT NULL', $fieldAlias, \CRM_Core_DAO::escapeString($value));
+          break;
+
+        case \CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND:
+          $operator = 'LIKE';
+          $value = '%' . \CRM_Core_DAO::VALUE_SEPARATOR . $value . \CRM_Core_DAO::VALUE_SEPARATOR . '%';
+          break;
+
+        default:
+          $operator = 'LIKE';
+          $value = '%' . $value . '%';
+          break;
       }
     }
 

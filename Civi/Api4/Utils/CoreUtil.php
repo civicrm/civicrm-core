@@ -71,4 +71,13 @@ class CoreUtil {
     return $entityName;
   }
 
+  /**
+   * @return string[]
+   */
+  public static function getOperators() {
+    $operators = \CRM_Core_DAO::acceptedSQLOperators();
+    $operators[] = 'CONTAINS';
+    return $operators;
+  }
+
 }

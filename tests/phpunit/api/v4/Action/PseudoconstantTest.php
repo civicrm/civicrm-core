@@ -27,6 +27,7 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Participant;
 use Civi\Api4\Tag;
 
 /**
@@ -271,6 +272,31 @@ class PseudoconstantTest extends BaseCustomValueTest {
     $this->assertEquals('colorful', $options[$tag]['description']);
     $this->assertEquals('#aabbcc', $options[$tag]['color']);
     $this->assertEquals($tag, $options[$tag]['label']);
+  }
+
+  public function testParticipantRole() {
+    $event = $this->createEntity(['type' => 'Event']);
+    $contact = $this->createEntity(['type' => 'Individual']);
+    $participant = Participant::create()
+      ->addValue('contact_id', $contact['id'])
+      ->addValue('event_id', $event['id'])
+      ->addValue('role_id:label', ['Attendee', 'Volunteer'])
+      ->execute()->first();
+
+    $search1 = Participant::get()
+      ->addSelect('role_id', 'role_id:label')
+      ->addWhere('role_id:label', 'CONTAINS', 'Volunteer')
+      ->addOrderBy('id')
+      ->execute()->last();
+
+    $this->assertEquals(['Attendee', 'Volunteer'], $search1['role_id:label']);
+    $this->assertEquals(['1', '2'], $search1['role_id']);
+
+    $search2 = Participant::get()
+      ->addWhere('role_id:label', 'CONTAINS', 'Host')
+      ->execute()->indexBy('id');
+
+    $this->assertArrayNotHasKey($participant['id'], (array) $search2);
   }
 
 }
