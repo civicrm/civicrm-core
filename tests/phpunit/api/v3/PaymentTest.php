@@ -187,6 +187,33 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test contribution receipts triggered by Payment.create with is_send_contribution_notification = TRUE.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentSendContributionReceipt() {
+    $mut = new CiviMailUtils($this);
+    $contribution = $this->createPartiallyPaidParticipantOrder();
+    $event = $this->callAPISuccess('Event', 'get', []);
+    $this->addLocationToEvent($event['id']);
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 150,
+      'check_number' => '345',
+      'trxn_date' => '2018-08-13 17:57:56',
+      'is_send_contribution_notification' => TRUE,
+    ];
+    $this->callAPISuccess('Payment', 'create', $params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
+    $this->assertNotEmpty($contribution['receipt_date']);
+    $mut->checkMailLog([
+      'Price Field - Price Field 1        1   $ 100.00    $ 100.00',
+      'event place',
+      'streety street',
+    ]);
+  }
+
+  /**
    * Test email receipt for partial payment.
    *
    * @throws \CRM_Core_Exception
@@ -229,8 +256,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'event place',
       'streety street',
     ]);
-    $mut->stop();
-    $mut->clearMessages();
     $this->validateAllPayments();
   }
 
@@ -263,8 +288,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Balance Owed: $ 0.00',
       'Thank you for completing this payment.',
     ]);
-    $mut->stop();
-    $mut->clearMessages();
     $this->validateAllPayments();
   }
 
@@ -319,8 +342,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Transaction Date: November 13th, 2018 12:01 PM',
       'Total Paid: $ 170' . $decimalSeparator . '00',
     ]);
-    $mut->stop();
-    $mut->clearMessages();
     $this->validateAllPayments();
   }
 

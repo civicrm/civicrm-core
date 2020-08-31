@@ -63,6 +63,16 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Clean up after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function __destruct() {
+    $this->stop();
+    $this->clearMessages();
+  }
+
+  /**
    * Start writing emails to db instead of current option.
    */
   public function start() {
