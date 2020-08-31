@@ -750,12 +750,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
     $ids = [];
-
-    // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
-    // is the same as the parent org of an existing membership of the contact
-    $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $is_test, $membershipID, TRUE
-    );
+    $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $membershipID]);
 
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
@@ -765,7 +760,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // CRM-15475
       array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
     ])) {
-
       $memParams = [
         'id' => $currentMembership['id'],
         'status_id' => $currentMembership['status_id'],
@@ -785,7 +779,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // Check and fix the membership if it is STALE
     CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
 
-    $isMembershipCurrent = $currentMembership['is_current_member'];
+    $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
 
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
     $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
