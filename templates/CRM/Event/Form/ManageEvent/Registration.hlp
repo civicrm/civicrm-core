@@ -89,5 +89,5 @@
   {ts}Cancellation or Transfer Time Limit{/ts}
 {/htxt}
 {htxt id="id-selfcancelxfer_time"}
-  {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
+  {ts}Number of hours prior to event start date to allow self-service cancellation or transfer. Enter a negative number of hours to allow cancellation after the event starts. Enter 0 (or leave empty) to allow cancellation or transfer up until the event has started.{/ts}
 {/htxt}

@@ -659,7 +659,7 @@
   </field>
   <field>
     <name>selfcancelxfer_time</name>
-    <type>int unsigned</type>
+    <type>int</type>
     <default>0</default>
     <title>Self-service Cancellation or Transfer Time</title>
     <comment>Number of hours prior to event start date to allow self-service cancellation or transfer.</comment>
