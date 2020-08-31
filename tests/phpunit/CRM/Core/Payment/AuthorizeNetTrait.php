@@ -72,4 +72,32 @@ trait CRM_Core_Payment_AuthorizeNetTrait {
     return '﻿<?xml version="1.0" encoding="utf-8"?><ARBCreateSubscriptionResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd"><refId>8d468ca1b1dd5c2b56c7</refId><messages><resultCode>Ok</resultCode><message><code>I00001</code><text>Successful.</text></message></messages><subscriptionId>6632052</subscriptionId><profile><customerProfileId>1512023280</customerProfileId><customerPaymentProfileId>1512027350</customerPaymentProfileId></profile></ARBCreateSubscriptionResponse>';
   }
 
+  /**
+   * Create an AuthorizeNet processors with a configured mock handler.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function createAuthorizeNetProcessor() {
+    $processorID = $this->paymentProcessorAuthorizeNetCreate(['is_test' => FALSE]);
+    $this->setupMockHandler($processorID);
+    $this->ids['PaymentProcessor']['anet'] = $processorID;
+  }
+
+  /**
+   * Assert the request sent to Authorize.net contains the expected values.
+   *
+   * @param array $expected
+   */
+  protected function assertRequestValid($expected = []) {
+    $expected = array_merge([
+      'x_card_num' => '4111111111111111',
+      'x_card_code' => 123,
+    ], $expected);
+    $request = explode('&', $this->getRequestBodies()[0]);
+    // This is stand in for now just to check a request happened. We can improve later.
+    foreach ($expected as $key => $value) {
+      $this->assertContains($key . '=' . $value, $request);
+    }
+  }
+
 }
