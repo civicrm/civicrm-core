@@ -168,6 +168,27 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
   }
 }
 
+/**
+ * Implements hook_civicrm_selectWhereClause().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
+ */
+function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
+  if ($entity === 'LineItem') {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      $types = [];
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+      if ($types) {
+        $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
+      }
+      else {
+        $clauses['financial_type_id'] = '= 0';
+      }
+    }
+  }
+
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**

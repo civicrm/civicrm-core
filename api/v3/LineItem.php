@@ -62,9 +62,6 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *   Array of matching line_items
  */
 function civicrm_api3_line_item_get($params) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
-    CRM_Price_BAO_LineItem::getAPILineItemParams($params);
-  }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
