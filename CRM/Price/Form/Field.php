@@ -642,6 +642,9 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
     $params['price'] = CRM_Utils_Rule::cleanMoney($params['price']);
+    foreach ($params['option_amount'] as $key => $amount) {
+      $params['option_amount'][$key] = CRM_Utils_Rule::cleanMoney($amount);
+    }
 
     $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
