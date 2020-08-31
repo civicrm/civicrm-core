@@ -85,7 +85,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       // create relationships for the ones that are required
       foreach ($xml->CaseRoles as $caseRoleXML) {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-          if ($relationshipTypeXML->creator) {
+          // simplexml treats node values differently than you'd expect,
+          // e.g. as an array
+          // Just using `if ($relationshipTypeXML->creator)` ends up always
+          // being true, so you have to cast to int or somehow force evaluation
+          // of the actual value. And casting to (bool) seems to behave
+          // differently on these objects than casting to (int).
+          if (!empty($relationshipTypeXML->creator)) {
             if (!$this->createRelationships($relationshipTypeXML,
               $params
             )
@@ -105,7 +111,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     foreach ($xml->ActivitySets as $activitySetsXML) {
       foreach ($activitySetsXML->ActivitySet as $activitySetXML) {
         if ($standardTimeline) {
-          if ($activitySetXML->timeline) {
+          if (!empty($activitySetXML->timeline)) {
             return $this->processStandardTimeline($activitySetXML, $params);
           }
         }
