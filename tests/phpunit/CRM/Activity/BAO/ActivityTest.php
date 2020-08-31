@@ -1567,6 +1567,137 @@ $text
   }
 
   /**
+   * Checks that tokens are uniquely replaced for contacts.
+   */
+  public function testSendEmailWillReplaceTokensUniquelyForEachContact() {
+    $contactId1 = $this->individualCreate(['last_name' => 'Red']);
+    $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+    $contact = $this->callAPISuccess('Contact', 'get', ['sequential' => 1, 'id' => ['IN' => [$contactId1, $contactId2]]]);
+
+    // Create a campaign.
+    $result = $this->callAPISuccess('Campaign', 'create', [
+      'version' => $this->_apiversion,
+      'title' => __FUNCTION__ . ' campaign',
+    ]);
+    $campaign_id = $result['id'];
+
+    // Add contact tokens in subject, html , text.
+    $subject = __FUNCTION__ . ' subject' . '{contact.display_name}';
+    $html = __FUNCTION__ . ' html' . '{contact.display_name}';
+    $text = __FUNCTION__ . ' text' . '{contact.display_name}';
+    $userID = $loggedInUser;
+
+    CRM_Activity_BAO_Activity::sendEmail(
+      $contact['values'],
+      $subject,
+      $text,
+      $html,
+      $contact['values'][0]['email'],
+      $userID,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments = NULL,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = array_column($contact['values'], 'id'),
+      $additionalDetails = NULL,
+      NULL,
+      $campaign_id
+    );
+    $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
+    // An activity created for each of the two contacts
+    $this->assertEquals(2, $result['count']);
+    $id = 0;
+    foreach ($result['values'] as $activity) {
+      $htmlValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $html);
+      $textValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $text);
+      $subjectValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $subject);
+      $details = "-ALTERNATIVE ITEM 0-
+$htmlValue
+-ALTERNATIVE ITEM 1-
+$textValue
+-ALTERNATIVE END-
+";
+      $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+      $this->assertEquals($activity['subject'], $subjectValue, 'Activity subject does not match.');
+      $id++;
+    }
+  }
+
+  /**
+   * Checks that attachments are not duplicated for activities.
+   */
+  public function testSendEmailDoesNotDuplicateAttachmentFileIdsForActivitiesCreated() {
+    $contactId1 = $this->individualCreate(['last_name' => 'Red']);
+    $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+    $contact = $this->callAPISuccess('Contact', 'get', ['sequential' => 1, 'id' => ['IN' => [$contactId1, $contactId2]]]);
+
+    // Create a campaign.
+    $result = $this->callAPISuccess('Campaign', 'create', [
+      'version' => $this->_apiversion,
+      'title' => __FUNCTION__ . ' campaign',
+    ]);
+    $campaign_id = $result['id'];
+
+    $subject = __FUNCTION__ . ' subject';
+    $html = __FUNCTION__ . ' html';
+    $text = __FUNCTION__ . ' text';
+    $userID = $loggedInUser;
+
+    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $fileName = "test_email_create.txt";
+    $fileUri = "{$filepath}/{$fileName}";
+    // Create a file.
+    CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', $fileName);
+    $attachments = [
+      'attachFile_1' =>
+        [
+          'uri' => $fileUri,
+          'type' => 'text/plain',
+          'location' => $fileUri,
+        ],
+    ];
+
+    CRM_Activity_BAO_Activity::sendEmail(
+      $contact['values'],
+      $subject,
+      $text,
+      $html,
+      $contact['values'][0]['email'],
+      $userID,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = array_column($contact['values'], 'id'),
+      $additionalDetails = NULL,
+      NULL,
+      $campaign_id
+    );
+    $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
+    // An activity created for each of the two contacts, i.e two activities.
+    $this->assertEquals(2, $result['count']);
+    $activityIds = array_column($result['values'], 'id');
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'return' => ['file_id'],
+      'id' => ['IN' => $activityIds],
+      'sequential' => 1,
+    ]);
+
+    // Verify that the that both activities are linked to the same File Id.
+    $this->assertEquals($result['values'][0]['file_id'], $result['values'][1]['file_id']);
+  }
+
+  /**
    * Adds a case with one activity.
    *
    */

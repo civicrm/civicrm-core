@@ -1063,9 +1063,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $from = "$fromDisplayName <$fromEmail>";
     }
 
-    //create the meta level record first ( email activity )
-    $activityID = self::createEmailActivity($userID, $subject, $html, $text, $additionalDetails, $campaignId, $attachments, $caseId);
-
     $returnProperties = [];
     if (isset($messageToken['contact'])) {
       foreach ($messageToken['contact'] as $key => $value) {
@@ -1118,6 +1115,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $sent = $notSent = [];
+    $attachmentFileIds = [];
+    $firstActivityCreated = FALSE;
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
       $emailAddress = $values['email'];
@@ -1171,6 +1170,20 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       $sent = FALSE;
+      // To minimize storage requirements, only one copy of any file attachments uploaded to CiviCRM is kept,
+      // even when multiple contacts will receive separate emails from CiviCRM.
+      if (!empty($attachmentFileIds)) {
+        $attachments = array_merge_recursive($attachments, $attachmentFileIds);
+      }
+
+      // Create email activity.
+      $activityID = self::createEmailActivity($userID, $tokenSubject, $tokenHtml, $tokenText, $additionalDetails, $campaignId, $attachments, $caseId);
+
+      if ($firstActivityCreated == FALSE && !empty($attachments)) {
+        $attachmentFileIds = self::getAttachmentFileIds($activityID, $attachments);
+        $firstActivityCreated = TRUE;
+      }
+
       if (self::sendMessage(
         $from,
         $userID,
@@ -1191,6 +1204,48 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     return [$sent, $activityID];
+  }
+
+  /**
+   * Returns a array of attachment key with matching file ID.
+   *
+   * The function searches for all file Ids added for the activity and returns an array that
+   * uses the attachment key as the key and the file ID in the database for that matching attachment
+   * key by comparing the file URI for that attachment to the matching file URI fetched from the
+   * database. Having the file id matched per attachment key helps not to create a new file entry
+   * when a new activity with these attachments when the email activity is created.
+   *
+   * @param int $activityID
+   *   Activity Id.
+   * @param array $attachments
+   *   Attachments.
+   *
+   * @return array
+   *   Array of attachment key versus file Id.
+   */
+  private static function getAttachmentFileIds($activityID, $attachments) {
+    $queryParams = [1 => [$activityID, 'Positive'], 2 => [CRM_Activity_DAO_Activity::getTableName(), 'String']];
+    $query = "SELECT file_id, uri FROM civicrm_entity_file INNER JOIN civicrm_file ON civicrm_entity_file.file_id = civicrm_file.id
+WHERE entity_id =%1 AND entity_table = %2";
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+
+    $fileDetails = [];
+    while ($dao->fetch()) {
+      $fileDetails[$dao->uri] = $dao->file_id;
+    }
+
+    $activityAttachments = [];
+    foreach ($attachments as $attachmentKey => $attachment) {
+      foreach ($fileDetails as $keyUri => $fileId) {
+        $path = explode('/', $attachment['uri']);
+        $filename = $path[count($path) - 1];
+        if ($filename == $keyUri) {
+          $activityAttachments[$attachmentKey]['id'] = $fileId;
+        }
+      }
+    }
+
+    return $activityAttachments;
   }
 
   /**
