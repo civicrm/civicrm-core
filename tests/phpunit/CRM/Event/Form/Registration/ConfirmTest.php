@@ -92,9 +92,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @dataProvider getThousandSeparators
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    *
-   * @throws \Exception
+   * @dataProvider getThousandSeparators
    */
   public function testPaidSubmit($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -165,6 +166,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(8000.67, $contribution['total_amount']);
     $this->assertEquals(1.67, $contribution['fee_amount']);
     $this->assertEquals(7999, $contribution['net_amount']);
+    $this->assertNotEmpty($contribution['receipt_date']);
     $this->assertNotContains(' (multiple participants)', $contribution['amount_level']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(

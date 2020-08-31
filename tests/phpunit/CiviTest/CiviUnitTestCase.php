@@ -729,6 +729,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public function paymentProcessorAuthorizeNetCreate($params = []) {
     $params = array_merge([
