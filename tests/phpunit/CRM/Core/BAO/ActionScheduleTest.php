@@ -1162,6 +1162,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership->contact_id]));
     $actionSchedule = $this->fixtures['sched_membership_join_2week'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionSchedule['created_date'] = '2012-03-21 01:00:00';
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
 
@@ -1183,6 +1184,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $actionSchedule = $this->fixtures['sched_membership_start_1week'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionSchedule['created_date'] = '2012-03-21 01:00:00';
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
 
@@ -1263,6 +1265,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_offset' => '1',
       'start_action_unit' => 'day',
       'subject' => 'subject sched_contact_bday_yesterday',
+      'created_date' => '2005-06-08 20:00:00',
     ];
 
     // Create schedule reminder where parent group ($groupID) is selectd to limit recipients,
@@ -1658,6 +1661,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_bday_yesterday'];
+    $actionSchedule['created_date'] = '2005-07-07 01:00:00';
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
     $this->assertCronRuns([
@@ -1771,6 +1775,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $modifiedDate = $this->callAPISuccess('Contact', 'getvalue', ['id' => $contact['id'], 'return' => 'modified_date']);
     $actionSchedule = $this->fixtures['sched_contact_mod_anniv'];
+    $actionSchedule['created_date'] = date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['modified_date'] . '+3 years +1 day'));
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
     $this->assertCronRuns([
@@ -1835,6 +1840,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $actionSchedule = $this->fixtures['sched_membership_join_2week'];
     $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionSchedule['created_date'] = '2012-03-28 01:00:00';
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
 
@@ -1898,6 +1904,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleBefore = $this->fixtures['sched_membership_end_2week'];
     // Send email on end_date/expiry date
     $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];
+    $actionScheduleOn['created_date'] = '2012-06-14 00:00:00';
+
     // Send email 1 day after end_date/grace period
     $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];
     $actionScheduleAfter['created_date'] = '2012-06-15 01:00:00';

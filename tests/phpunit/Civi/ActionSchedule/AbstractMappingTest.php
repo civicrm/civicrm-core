@@ -283,6 +283,8 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
 
     $actualMessages = [];
     foreach ($this->cronTimes() as $time) {
+      $this->schedule->created_date = $time;
+      $this->schedule->save();
       \CRM_Utils_Time::setTime($time);
       $this->callAPISuccess('job', 'send_reminder', []);
       foreach ($this->mut->getAllMessages('ezc') as $message) {
