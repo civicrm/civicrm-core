@@ -479,10 +479,7 @@ function civicrm_api3_contribution_completetransaction($params) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
 
-  if (isset($params['payment_processor_id'])) {
-    $input['payment_processor_id'] = $params['payment_processor_id'];
-  }
-  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $params['payment_processor_id'] ?? NULL], $ids, TRUE)) {
     throw new API_Exception('failed to load related objects');
   }
   elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
@@ -606,12 +603,12 @@ function civicrm_api3_contribution_repeattransaction($params) {
     );
   }
 
-  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+  $paymentProcessorID = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
     'id' => $contribution->contribution_recur_id,
   ]);
   try {
-    if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+    if (!$contribution->loadRelatedObjects(['payment_processor_id' => $paymentProcessorID], $ids, TRUE)) {
       throw new API_Exception('failed to load related objects');
     }
 
