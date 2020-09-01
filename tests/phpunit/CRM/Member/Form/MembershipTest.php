@@ -536,6 +536,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *  Check if the related contribuion is also updated if the minimum_fee didn't match
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionUpdateOnMembershipTypeChange() {
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
