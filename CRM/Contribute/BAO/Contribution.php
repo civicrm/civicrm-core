@@ -4449,7 +4449,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // @todo see if we even need this - it's used further down to create an activity
     // but the BAO layer should create that - we just need to add a test to cover it & can
     // maybe remove $ids altogether.
-    $contributionContactID = $ids['related_contact'] ?? NULL;
+    $contributionContactID = $ids['related_contact'];
+    $participantID = $ids['participant'];
+    $recurringContributionID = $ids['contributionRecur'];
+
     // Unset ids just to make it clear it's not used again.
     unset($ids);
     // The previous details are used when calculating line items so keep it before any code that 'does something'
@@ -4472,9 +4475,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'financial_type_id',
     ];
 
-    $participant = $objects['participant'] ?? NULL;
-    $recurContrib = $objects['contributionRecur'] ?? NULL;
-    $recurringContributionID = (empty($recurContrib->id)) ? NULL : $recurContrib->id;
     $event = $objects['event'] ?? NULL;
 
     $paymentProcessorId = '';
@@ -4520,7 +4520,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     else {
       if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
-        $participantParams['id'] = $participant->id;
+        $participantParams['id'] = $participantID;
         $participantParams['status_id'] = 'Registered';
         civicrm_api3('Participant', 'create', $participantParams);
       }

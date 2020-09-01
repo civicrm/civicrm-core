@@ -681,7 +681,11 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   if (!empty($params['payment_instrument_id'])) {
     $input['payment_instrument_id'] = $params['payment_instrument_id'];
   }
-  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects,
+  return CRM_Contribute_BAO_Contribution::completeOrder($input, [
+    'related_contact' => $ids['related_contact'] ?? NULL,
+    'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+    'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+  ], $objects,
     $params['is_post_payment_create'] ?? NULL);
 }
 
