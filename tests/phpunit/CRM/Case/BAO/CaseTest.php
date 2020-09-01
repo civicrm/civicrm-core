@@ -723,4 +723,83 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->callAPISuccess('RelationshipType', 'create', $changeParams);
   }
 
+  /**
+   * Test change case status with linked cases choosing the option to
+   * update the linked cases.
+   */
+  public function testChangeCaseStatusLinkedCases() {
+    $loggedInUser = $this->createLoggedInUser();
+    $clientId1 = $this->individualCreate();
+    $clientId2 = $this->individualCreate();
+    $case1 = $this->createCase($clientId1, $loggedInUser);
+    $case2 = $this->createCase($clientId2, $loggedInUser);
+    $linkActivity = $this->callAPISuccess('Activity', 'create', [
+      'case_id' => $case1->id,
+      'source_contact_id' => $loggedInUser,
+      'target_contact' => $clientId1,
+      'activity_type_id' => 'Link Cases',
+      'subject' => 'Test Link Cases',
+      'status_id' => 'Completed',
+    ]);
+
+    // Put it in the format needed for endPostProcess
+    $activity = new StdClass();
+    $activity->id = $linkActivity['id'];
+    $params = ['link_to_case_id' => $case2->id];
+    CRM_Case_Form_Activity_LinkCases::endPostProcess(NULL, $params, $activity);
+
+    // Get the option_value.value for case status Closed
+    $closedStatusResult = $this->callAPISuccess('OptionValue', 'get', [
+      'option_group_id' => 'case_status',
+      'name' => 'Closed',
+      'return' => ['value'],
+    ]);
+    $closedStatus = $closedStatusResult['values'][$closedStatusResult['id']]['value'];
+
+    // Go thru the motions to change case status
+    $form = new CRM_Case_Form_Activity_ChangeCaseStatus();
+    $form->_caseId = [$case1->id];
+    $form->_oldCaseStatus = [$case1->status_id];
+    $params = [
+      'id' => $case1->id,
+      'case_status_id' => $closedStatus,
+      'updateLinkedCases' => '1',
+    ];
+
+    CRM_Case_Form_Activity_ChangeCaseStatus::beginPostProcess($form, $params);
+    // Check that the second case is now also in the form member.
+    $this->assertEquals([$case1->id, $case2->id], $form->_caseId);
+
+    // We need to pass in an actual activity later
+    $result = $this->callAPISuccess('Activity', 'create', [
+      'case_id' => $case1->id,
+      'source_contact_id' => $loggedInUser,
+      'target_contact' => $clientId1,
+      'activity_type_id' => 'Change Case Status',
+      'subject' => 'Status changed',
+      'status_id' => 'Completed',
+    ]);
+    $changeStatusActivity = new CRM_Activity_DAO_Activity();
+    $changeStatusActivity->id = $result['id'];
+    $changeStatusActivity->find(TRUE);
+
+    $params = [
+      'case_id' => $case1->id,
+      'target_contact_id' => [$clientId1],
+      'case_status_id' => $closedStatus,
+      'activity_date_time' => $changeStatusActivity->activity_date_time,
+    ];
+
+    CRM_Case_Form_Activity_ChangeCaseStatus::endPostProcess($form, $params, $changeStatusActivity);
+
+    // @todo Check other case got closed.
+    /*
+     * We can't do this here because it doesn't happen until the parent
+     * activity does its thing.
+    $linkedCase = $this->callAPISuccess('Case', 'get', ['id' => $case2->id]);
+    $this->assertEquals($closedStatus, $linkedCase['values'][$linkedCase['id']]['status_id']);
+    $this->assertEquals(date('Y-m-d', strtotime($changeStatusActivity->activity_date_time)), $linkedCase['values'][$linkedCase['id']]['end_date']);
+     */
+  }
+
 }
