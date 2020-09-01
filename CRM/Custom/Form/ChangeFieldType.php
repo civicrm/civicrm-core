@@ -54,6 +54,9 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $params = ['id' => $this->_id];
     CRM_Core_BAO_CustomField::retrieve($params, $this->_values);
 
+    if ($this->_values['html_type'] == 'Select' && $this->_values['serialize']) {
+      $this->_values['html_type'] = 'Multi-Select';
+    }
     $this->_htmlTypeTransitions = self::fieldTypeTransitions(CRM_Utils_Array::value('data_type', $this->_values),
       CRM_Utils_Array::value('html_type', $this->_values)
     );
