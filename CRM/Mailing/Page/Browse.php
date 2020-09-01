@@ -243,11 +243,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    // hack to display results as per search
-    $rows = $controller->getRows($controller);
-
-    $this->assign('rows', $rows);
-
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
