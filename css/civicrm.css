@@ -1835,6 +1835,8 @@ input.crm-form-entityref {
 
 .crm-container .crm-button input {
   background: none;
+  _background: #6C6C6C;
+  /* IE6 only */
   border: medium none;
   color: #FFF;
   cursor: pointer;
@@ -1847,12 +1849,6 @@ input.crm-form-entityref {
 .crm-container .crm-button-type-cancel,
 .crm-container .crm-button-type-back {
   margin-left: 20px;
-}
-
-/* Reset WP backend min-height for buttons */
-
-.wp-core-ui .crm-container .button {
-  min-height: 0;
 }
 
 .crm-container a.button,
@@ -1874,19 +1870,11 @@ input.crm-form-entityref {
   border: 1px solid #3e3e3e;
 }
 
-.crm-container a.button,
-.crm-container a.button:link,
-.crm-container a.button:visited,
 .crm-container span.crm-button {
   display: block;
-  float: left;
-  overflow: hidden;
-  line-height: 135%;
-}
-
-/* Preserving the important but not sure why */
-.crm-container span.crm-button {
   float: left !important;
+  overflow: hidden;
+  padding: 1px;
 }
 
 .crm-container button.crm-button {
@@ -1904,10 +1892,20 @@ input.crm-form-entityref {
 
 .crm-container .crm-button input[type=button],
 .crm-container .crm-button input.crm-form-submit {
-  padding: 0;
+  padding: 3px 5px 2px;
   margin: 0;
   background: none;
+  _background: #6C6C6C;
+  /* IE6 only */
   border: none;
+}
+
+.crm-container a.button,
+.crm-container a.button:link,
+.crm-container a.button:visited {
+  display: block;
+  float: left;
+  line-height: 135%;
 }
 
 .crm-container .crm-button:hover,
@@ -2048,6 +2046,31 @@ input.crm-form-entityref {
   margin-left: 3px;
 }
 
+.crm-container .crm-button.crm-icon-button {
+  padding: 2px 2px 1px 4px;
+}
+
+.crm-container .crm-button.crm-icon-button input {
+  padding-left: 18px;
+}
+
+.crm-container .crm-button.button-crm-i {
+  padding: 2px 0 1px 5px;
+}
+
+.crm-container .crm-button.button-crm-i input {
+  padding-left: 0;
+}
+
+.crm-container .crm-button-icon {
+  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
+  height: 16px;
+  width: 16px;
+  display: block;
+  position: absolute;
+  pointer-events: none;
+}
+
 .crm-container .delete-icon {
   background-position: -176px -96px;
 }
@@ -2092,6 +2115,22 @@ a.crm-i:hover {
 
 .crm-i.crm-i-green {
   color: #86c661;
+}
+
+.crm-i-button {
+  position: relative;
+}
+
+.crm-i-button>.crm-i {
+  position: absolute;
+  pointer-events: none;
+  top: .4em;
+  left: .4em;
+}
+
+.crm-container .crm-button.crm-i-button input[type="button"],
+.crm-container .crm-button.crm-i-button input.crm-form-submit {
+  padding-left: 1.6em;
 }
 
 .crm-container a.helpicon {
