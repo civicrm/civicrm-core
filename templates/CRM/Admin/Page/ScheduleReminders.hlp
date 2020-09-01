@@ -18,6 +18,14 @@
   <p>{ts}For Membership and Contact reminders, you can limit or additionally include recipients by choosing specific contacts, or choosing a group.{/ts}</p>
 {/htxt}
 
+{htxt id="id-created_date-title"}
+  {ts}Created on{/ts}
+{/htxt}
+
+{htxt id="id-created_date"}
+  {ts}Reminder messages will not be sent for messages that should have already gone out before the Schedule Reminder was created.{/ts}
+{/htxt}
+
 {htxt id="id-from_name_email-title"}
   {ts}Specify FROM Name and Email{/ts}
 {/htxt}
@@ -33,4 +41,3 @@
 {htxt id="communication_language"}
   {ts}This is the communication language. If there are template translation or tokens, they will be localized accordingly. By default, the system default language will be used.{/ts}
 {/htxt}
-

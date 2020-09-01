@@ -73,6 +73,8 @@ class CRM_Upgrade_Incremental_php_FiveThirty extends CRM_Upgrade_Incremental_Bas
   public function upgrade_5_30_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add core (required) extension Financial ACLs', 'installFinancialAcls');
+    $this->addTask('core-issue#365 - Add created_date to civicrm_action_schedule', 'addColumn',
+      'civicrm_action_schedule', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When was the schedule reminder created.'");
   }
 
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {

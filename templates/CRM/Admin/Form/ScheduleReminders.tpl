@@ -25,6 +25,10 @@
         <td class="label">{$form.entity.label}</td>
         <td>{$form.entity.html}</td>
     </tr>
+    <tr>
+       <td class="label">{$form.created_date.label}&nbsp;&nbsp;{help id="id-created_date"}</td>
+       <td>{$form.created_date.html}</td>
+   </tr>
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>

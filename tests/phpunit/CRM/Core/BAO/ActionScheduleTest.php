@@ -1900,7 +1900,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];
     // Send email 1 day after end_date/grace period
     $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];
+    $actionScheduleAfter['created_date'] = '2012-06-15 01:00:00';
     $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership->membership_type_id;
+
     foreach (['actionScheduleBefore', 'actionScheduleOn', 'actionScheduleAfter'] as $value) {
       $$value = CRM_Core_BAO_ActionSchedule::add($$value);
       $this->assertInternalType('numeric', $$value->id);
@@ -2031,6 +2033,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('Contact', 'create', $contactParams);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_grad_anniv'];
+    $actionSchedule['created_date'] = '2018-12-22 20:00:00';
     $actionSchedule['entity_value'] = "custom_{$createField['id']}";
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
@@ -2136,10 +2139,60 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     $actionSchedule = $this->fixtures['sched_eventtype_start_1week_before'];
     $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
-    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+    $actionScheduleID = $this->callAPISuccess('action_schedule', 'create', $actionSchedule)['id'];
 
     //echo "CREATED\n"; ob_flush(); sleep(20);
 
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns([
+      [
+        // 2 weeks before
+        'time' => '2012-03-02 01:00:00',
+        'recipients' => [],
+      ],
+      [
+        // 1 week before
+        'time' => '2012-03-08 01:00:00',
+        'recipients' => [['test-event@example.com']],
+      ],
+      [
+        // And then nothing else
+        'time' => '2012-03-16 01:00:00',
+        'recipients' => [],
+      ],
+    ]);
+
+    // CASE 2: Create a schedule reminder which was created 2 weeks before the event start date,
+    // so it shouldn't deliver reminders schedule to send 1 week before the event start date
+    $actionSchedule = $this->fixtures['sched_eventtype_start_1week_before'];
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
+    $actionSchedule['created_date'] = '20120302000000';
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+    // end_date=2012-06-15 ; schedule is 2 weeks before end_date
+    $this->assertCronRuns([
+      [
+        // 2 weeks before
+        'time' => '2012-03-02 01:00:00',
+        'recipients' => [],
+      ],
+      [
+        // 1 week before
+        'time' => '2012-03-08 01:00:00',
+        'recipients' => [],
+      ],
+      [
+        // And then nothing else
+        'time' => '2012-03-16 01:00:00',
+        'recipients' => [],
+      ],
+    ]);
+
+    // CASE 3: Create a schedule reminder which is created less then a week before the event start date,
+    // so it should deliver reminders schedule to send 1 week before the event start date
+    $actionSchedule = $this->fixtures['sched_eventtype_start_1week_before'];
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
+    $actionSchedule['created_date'] = '20120309000000';
+    $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
     $this->assertCronRuns([
       [
@@ -2478,7 +2531,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Sheep.
     $actionSchedule = $this->fixtures['sched_membership_join_2week'];
     $actionSchedule['entity_value'] = $membershipType1->id;
+    $actionSchedule['created_date'] = '2012-03-28 01:00:00';
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    print_r($actionScheduleDao);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
     $this->assertCronRuns([
@@ -2496,6 +2551,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Black Sheep.
     $actionSchedule = $this->fixtures['sched_membership_start_1week'];
     $actionSchedule['entity_value'] = $membershipType2->id;
+    $actionSchedule['created_date'] = '2012-03-21 01:00:00';
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
 

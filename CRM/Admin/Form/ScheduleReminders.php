@@ -158,6 +158,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('number', 'start_action_offset', ts('When'), ['class' => 'six', 'min' => 0]);
     $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
 
+    $date = $this->add('datepicker', 'created_date', ts('Created on'), [], FALSE);
+    if ($this->_action & CRM_Core_Action::UPDATE) {
+      $date->freeze();
+    }
+
     $isActive = ts('Scheduled Reminder Active');
     $recordActivity = ts('Record activity for automated email');
     if ($providersCount) {
@@ -381,6 +386,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $defaults['is_active'] = 1;
       $defaults['mode'] = 'Email';
       $defaults['record_activity'] = 1;
+      $defaults['created_date'] = date('Y-m-d H:i:s');
     }
     else {
       $defaults = $this->_values;
