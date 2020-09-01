@@ -260,14 +260,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * @param int $participantId
    * @param int $statusId
    *
-   * @return mixed
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public static function updatePendingOnlineContribution($participantId, $statusId) {
-    if (!$participantId || !$statusId) {
-      return NULL;
-    }
 
     $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId,
       'Event'
@@ -292,7 +288,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       $contributionStatusId = array_search('Cancelled', $contributionStatuses);
     }
 
-    if (!$contributionStatusId) {
+    if (!$contributionStatusId || !$participantId || !$contributionId) {
       return;
     }
 
@@ -305,9 +301,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     ];
 
     //change related contribution status.
-    $updatedStatusId = self::updateContributionStatus($params);
-
-    return $updatedStatusId;
+    self::updateContributionStatus($params);
   }
 
   /**
@@ -315,7 +309,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    *
    * @param array $params
    *
-   * @return NULL|int
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
@@ -331,10 +324,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $componentId = $params['component_id'] ?? NULL;
     $componentName = $params['componentName'] ?? NULL;
     $contributionId = $params['contribution_id'] ?? NULL;
-
-    if (!$contributionId || !$componentId || !$componentName || !$statusId) {
-      return NULL;
-    }
 
     $input = $ids = $objects = [];
 
@@ -389,13 +378,13 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       $transaction = new CRM_Core_Transaction();
       $baseIPN->cancelled($objects, $transaction, $input);
       $transaction->commit();
-      return $statusId;
+      return;
     }
-    elseif ($statusId == $contributionStatuses['Failed']) {
+    if ($statusId == $contributionStatuses['Failed']) {
       $transaction = new CRM_Core_Transaction();
       $baseIPN->failed($objects, $transaction, $input);
       $transaction->commit();
-      return $statusId;
+      return;
     }
 
     // status is not pending
@@ -432,8 +421,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     // reset template values before processing next transactions
     $template->clearTemplateVars();
-
-    return $statusId;
   }
 
   /**
@@ -513,7 +500,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
         if ($statusChange) {
           CRM_Event_BAO_Participant::transitionParticipants([$key], $value['status_id'], $fromStatusId);
         }
-        if ($relatedStatusChange) {
+        if ($relatedStatusChange && $key && $value['status_id']) {
           //update related contribution status, CRM-4395
           self::updatePendingOnlineContribution($key, $value['status_id']);
         }
