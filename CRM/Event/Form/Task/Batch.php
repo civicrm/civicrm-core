@@ -383,6 +383,19 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       $input['net_amount'] = $input['amount'] - $input['fee_amount'];
     }
 
+    // @fixme This allows us to stop using $objects['paymentProcessor'] in completeOrder by passing in $input['payment_processor_id'] instead.
+    // Further checking is needed to see if validateData ever sets $objects['paymentProcessor'] in this case.
+    if (!isset($input['payment_processor_id'])) {
+      if (isset($objects['paymentProcessor'])) {
+        if (is_array($objects['paymentProcessor'])) {
+          $input['payment_processor_id'] = $objects['paymentProcessor']['id'];
+        }
+        else {
+          $input['payment_processor_id'] = $objects['paymentProcessor']->id;
+        }
+      }
+    }
+
     //complete the contribution.
     // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
     // as this method is not preferred / supported.
