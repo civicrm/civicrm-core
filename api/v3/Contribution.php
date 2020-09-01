@@ -643,7 +643,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
  */
 function _ipn_process_transaction($params, $contribution, $input) {
   $ids = [];
-  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $input['payment_processor_id']], $ids, TRUE)) {
     throw new API_Exception('failed to load related objects');
   }
 
