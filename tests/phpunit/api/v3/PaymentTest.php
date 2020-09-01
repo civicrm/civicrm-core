@@ -183,6 +183,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => '-20', 'contribution_id' => $contributionID2]);
     $this->validateAllPayments();
   }
 
@@ -211,6 +212,37 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'event place',
       'streety street',
     ]);
+  }
+
+  /**
+   * Test full refund when no payment has actually been record.
+   */
+  public function testFullRefundWithPaymentAlreadyRefunded() {
+    $params1 = [
+      'contact_id' => $this->_individualId,
+      'trxn_id' => 111111,
+      'total_amount' => 10,
+    ];
+    $contributionID1 = $this->contributionCreate($params1);
+    $paymentParams = ['contribution_id' => $contributionID1];
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
+    $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
+    $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
+    $this->validateAllPayments();
+  }
+
+  public function testNegativePaymentWithNegativeContribution() {
+    $params1 = [
+      'contact_id' => $this->_individualId,
+      'trxn_id' => 111111,
+      'total_amount' => -10,
+    ];
+    $contributionID1 = $this->contributionCreate($params1);
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => '-20', 'contribution_id' => $contributionID1]);
+    $paymentParams = ['contribution_id' => $contributionID1];
+    $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
+    $this->validateAllPayments();
   }
 
   /**
