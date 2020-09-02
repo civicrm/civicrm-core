@@ -748,7 +748,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    */
   public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $isPayLater) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
     $ids = [];
     $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $membershipID]);
 
@@ -767,7 +766,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'end_date' => $currentMembership['end_date'],
         'join_date' => $currentMembership['join_date'],
         'membership_type_id' => $membershipTypeID,
-        'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
         'membership_activity_status' => ($pending || $isPayLater) ? 'Scheduled' : 'Completed',
       ];
       if ($contributionRecurID) {

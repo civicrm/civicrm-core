@@ -91,6 +91,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'relationship_type_id' => 20,
       'min_fee' => 100,
       'financial_type_id' => $this->financialTypeID,
+      'max_related' => 10,
     ])['id'];
 
     $this->_membershipID = $this->callAPISuccess('Membership', 'create', [
@@ -144,7 +145,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
-      'max_related' => '',
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '50.00',
@@ -225,7 +225,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
-      'max_related' => '',
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '50.00',
@@ -281,7 +280,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '1',
       'is_recur' => 1,
-      'max_related' => 0,
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '77.00',
@@ -493,7 +491,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
-      'max_related' => '',
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
@@ -546,7 +543,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
-      'max_related' => '',
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
@@ -561,7 +557,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'trxn_id' => 777,
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_middle_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -573,6 +569,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->assertEquals(strtotime($membership['end_date']), strtotime($originalMembership['end_date']));
+    $this->assertEquals(10, $membership['max_related']);
+
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 2,
@@ -609,7 +607,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
-      'max_related' => '',
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
@@ -685,7 +682,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'membership_type_id' => [23, $this->membershipTypeAnnualFixedID],
       'auto_renew' => '1',
       'is_recur' => 1,
-      'max_related' => 0,
       'num_terms' => '1',
       'total_amount' => $this->formatMoneyInput('7800.90'),
       //Member dues, see data.xml
