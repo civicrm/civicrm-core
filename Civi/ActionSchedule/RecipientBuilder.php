@@ -409,14 +409,14 @@ class RecipientBuilder {
       else {
         $startDateClauses[] = "DATE_SUB(!casNow, INTERVAL 1 DAY ) <= {$date}";
       }
-      if (!empty($actionSchedule->created_date) && !$actionSchedule->is_repeat) {
-        $startDateClauses[] = $actionSchedule->start_action_condition == 'before' ? "'{$actionSchedule->created_date}' >= {$date}" : "'{$actionSchedule->created_date}' <= {$date}";
+      if (!empty($actionSchedule->created_date)) {
+        $startDateClauses[] = "'{$actionSchedule->created_date}' <= {$date}";
       }
     }
     elseif ($actionSchedule->absolute_date) {
       $startDateClauses[] = "DATEDIFF(DATE('!casNow'),'{$actionSchedule->absolute_date}') = 0";
-      if (!empty($actionSchedule->created_date) && !$actionSchedule->is_repeat) {
-        $startDateClauses[] = "DATEDIFF(DATE('{$actionSchedule->created_date}'),'{$actionSchedule->absolute_date}') > 0";
+      if (!empty($actionSchedule->created_date)) {
+        $startDateClauses[] = "DATEDIFF(DATE('{$actionSchedule->created_date}'),'{$actionSchedule->absolute_date}') >= 0";
       }
     }
     return $startDateClauses;

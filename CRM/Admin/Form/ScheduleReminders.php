@@ -158,7 +158,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('number', 'start_action_offset', ts('When'), ['class' => 'six', 'min' => 0]);
     $this->addRule('start_action_offset', ts('Value should be a positive number'), 'positiveInteger');
 
-    $date = $this->add('datepicker', 'created_date', ts('Created on'), [], FALSE);
+    $date = $this->add('datepicker', 'created_date', ts('Created Date'), [], FALSE);
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $date->freeze();
     }

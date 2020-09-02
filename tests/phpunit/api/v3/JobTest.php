@@ -270,6 +270,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'limit_to' => TRUE,
       'sms_provider_id' => $provider['id'],
       'mode' => 'User_Preference',
+      'created_date' => date('YmdHis', strtotime('-2 days')),
     ]);
     $this->callAPISuccess('job', 'send_reminder', []);
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
@@ -405,6 +406,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'limit_to' => TRUE,
       'sms_provider_id' => $provider['id'],
       'mode' => 'SMS',
+      'created_date' => date('YmdHis', strtotime('-2 days')),
     ]);
     $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
     $this->callAPISuccess('job', 'send_reminder', []);

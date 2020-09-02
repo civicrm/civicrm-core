@@ -19,7 +19,7 @@
 {/htxt}
 
 {htxt id="id-created_date-title"}
-  {ts}Created on{/ts}
+  {ts}Created date{/ts}
 {/htxt}
 
 {htxt id="id-created_date"}
