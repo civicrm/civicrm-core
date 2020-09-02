@@ -324,19 +324,18 @@ class CRM_Core_Payment_BaseIPN {
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
-    if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
-      if (!empty($memberships)) {
-        foreach ($memberships as $membership) {
-          if ($membership) {
-            $this->cancelMembership($membership, $membership->status_id);
-          }
+    if (!empty($memberships)) {
+      foreach ($memberships as $membership) {
+        if ($membership) {
+          $this->cancelMembership($membership, $membership->status_id);
         }
       }
-
-      if ($participant) {
-        $this->cancelParticipant($participant->id);
-      }
     }
+
+    if ($participant) {
+      $this->cancelParticipant($participant->id);
+    }
+
     if ($transaction) {
       $transaction->commit();
     }
