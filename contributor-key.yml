@@ -449,6 +449,9 @@
   organization: Wikimedia Foundation
   jira        : ejegg
 
+- github      : elcapo
+  name        : Carlos Capote
+
 - github      : elisseck
   name        : Eli Lisseck
   organization: AGH Strategies
@@ -595,6 +598,9 @@
   jira        : guyiac
 
 - github      : GValFr35
+
+- github      : irenemeisel
+  name        : Irene Meisel
 
 - github      : kewljuice
   name        : Wouter Hechtermans
@@ -1116,8 +1122,12 @@
   organization: CompuCorp
   jira        : mukesh
 
+- github      : muniodiego
+  name        : Diego Muñio
+
 - github      : mwestergaard
   name        : Mark Westergaard
+  organization: iXiam
 
 - github      : nbrettell
   name        : Nathan Brettell
@@ -1270,6 +1280,8 @@
 
 - name        : Rareș Pamfil
   jira        : rares
+
+- github      : Rar9
 
 - github      : ray-wright
   name        : Ray Wright
