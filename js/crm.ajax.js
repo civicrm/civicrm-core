@@ -517,7 +517,7 @@
             added.push(identifier);
           }
           // display:none causes the form to not submit when pressing "enter"
-          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
         });
         $el.dialog('option', 'buttons', buttons);
       }
