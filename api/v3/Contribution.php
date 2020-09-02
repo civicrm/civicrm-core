@@ -602,7 +602,6 @@ function civicrm_api3_contribution_repeattransaction($params) {
     );
   }
 
-  $original_contribution = clone $contribution;
   $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
     'id' => $contribution->contribution_recur_id,
@@ -626,7 +625,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
     ];
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
-    return _ipn_process_transaction($params, $contribution, $input, $ids, $original_contribution);
+    return _ipn_process_transaction($params, $contribution, $input, $ids);
   }
   catch (Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
@@ -645,13 +644,11 @@ function civicrm_api3_contribution_repeattransaction($params) {
  *
  * @param array $ids
  *
- * @param CRM_Contribute_BAO_Contribution $firstContribution
- *
  * @return mixed
  * @throws \CRM_Core_Exception
  * @throws \CiviCRM_API3_Exception
  */
-function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstContribution = NULL) {
+function _ipn_process_transaction($params, $contribution, $input, $ids) {
   $objects = $contribution->_relatedObjects;
   $objects['contribution'] = &$contribution;
   $input['component'] = $contribution->_component;
