@@ -66,12 +66,12 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
 function _civicrm_api3_mailing_event_subscribe_create_spec(&$params) {
   $params['email'] = [
     'api.required' => 1,
-    'title' => 'Unsubscribe Email',
+    'title' => 'Subscribe Email',
     'type' => CRM_Utils_Type::T_STRING,
   ];
   $params['group_id'] = [
     'api.required' => 1,
-    'title' => 'Unsubscribe From Group',
+    'title' => 'Subscribe To Group',
     'type' => CRM_Utils_Type::T_INT,
   ];
 }
