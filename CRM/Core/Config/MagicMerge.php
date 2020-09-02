@@ -170,7 +170,6 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkUsersTableName' => ['setting'],
       'verpSeparator' => ['setting'],
       'wkhtmltopdfPath' => ['setting'],
-      'wpBasePage' => ['setting'],
       'wpLoadPhp' => ['setting'],
 
       // "path" properties are managed via Civi::paths and $civicrm_paths
@@ -204,6 +203,7 @@ class CRM_Core_Config_MagicMerge {
       // @todo remove geocodeMethod. As of Feb 2018, $config->geocodeMethod works but gives a deprecation warning.
       'geocodeMethod' => ['callback', 'CRM_Utils_Geocode', 'getProviderClass'],
       'defaultCurrencySymbol' => ['callback', 'CRM_Core_BAO_Country', 'getDefaultCurrencySymbol'],
+      'wpBasePage' => ['callback', 'CRM_Utils_System_WordPress', 'getBasePage'],
     ];
   }
 
