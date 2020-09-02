@@ -62,7 +62,7 @@
     {if !$table and $summary.addShowAllLink.Contact}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Contact&text=$text"}"
-        title="{ts}View all results for contacts{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for contacts{/ts}</a>
+        title="{ts}View all results for contacts{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for contacts{/ts}</a>
       </div>{/if}
     {* note we using location="below" because we don't want to use rows per page for now. And therefore don't put location="bottom" for now. *}
     {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
@@ -125,7 +125,7 @@
     {if !$table and $summary.addShowAllLink.Activity}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Activity&text=$text"}"
-        title="{ts}View all results for activities{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for activities{/ts}</a>
+        title="{ts}View all results for activities{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for activities{/ts}</a>
       </div>
     {/if}
     {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
@@ -182,7 +182,7 @@
     {if !$table and $summary.addShowAllLink.Case}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Case&text=$text"}"
-        title="{ts}View all results for cases{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for cases{/ts}</a>
+        title="{ts}View all results for cases{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for cases{/ts}</a>
       </div>
     {/if}
     {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
@@ -236,7 +236,7 @@
     {if !$table and $summary.addShowAllLink.Contribution}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Contribution&text=$text"}"
-        title="{ts}View all results for contributions{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for contributions{/ts}</a>
+        title="{ts}View all results for contributions{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for contributions{/ts}</a>
       </div>
     {/if}
     {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
@@ -293,7 +293,7 @@
     {if !$table and $summary.addShowAllLink.Participant}
       <div class="crm-section full-text-view-all-section"><a
         href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Participant&text=$text"}"
-        title="{ts}View all results for participants{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for participants{/ts}</a>
+        title="{ts}View all results for participants{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for participants{/ts}</a>
       </div>{/if}
     {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
     {* END Actions/Results section *}
@@ -349,7 +349,7 @@
     {if !$table and $summary.addShowAllLink.Membership}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Membership&text=$text"}"
-        title="{ts}View all results for memberships{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for memberships{/ts}</a>
+        title="{ts}View all results for memberships{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for memberships{/ts}</a>
       </div>
     {/if}
     {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
@@ -395,7 +395,7 @@
   {if !$table and $summary.addShowAllLink.File}
   <div class="crm-section full-text-view-all-section">
     <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=File&text=$text"}"
-          title="{ts}View all results for files{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View all results for files{/ts}</a>
+          title="{ts}View all results for files{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i>&nbsp;{ts}View all results for files{/ts}</a>
   </div>{/if}
   {if $table}{include file="CRM/common/pager.tpl" location="below"}{/if}
 {* END Actions/Results section *}
