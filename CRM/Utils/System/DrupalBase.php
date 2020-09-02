@@ -660,7 +660,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
     // Get the menu for above URL.
     $item = CRM_Core_Menu::get($path);
-    return !empty($item['is_public']);
+    return (empty($item) || !empty($item['is_public']));
   }
 
   /**
