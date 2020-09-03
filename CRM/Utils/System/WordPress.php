@@ -21,6 +21,13 @@
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
+   * Get a normalized version of the wpBasePage.
+   */
+  public static function getBasePage() {
+    return rtrim(Civi::settings()->get('wpBasePage'), '/');
+  }
+
+  /**
    */
   public function __construct() {
     /**
