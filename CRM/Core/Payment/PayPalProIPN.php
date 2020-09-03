@@ -321,7 +321,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @return void
    */
-  public function single(&$input, &$ids, &$objects, $recur = FALSE, $first = FALSE) {
+  public function single($input, $ids, $objects, $recur = FALSE, $first = FALSE) {
     $contribution = &$objects['contribution'];
 
     // make sure the invoice is valid and matches what we have in the contribution record
