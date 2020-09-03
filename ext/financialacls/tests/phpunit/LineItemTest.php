@@ -43,7 +43,7 @@ class LineItemTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   public function testLineItemApiPermissions() {
     $contact1 = $this->individualCreate();
     $defaultPriceFieldID = $this->getDefaultPriceFieldID();
-    $this->callAPISuccess('Order', 'create', [
+    $order = $this->callAPISuccess('Order', 'create', [
       'financial_type_id' => 'Donation',
       'contact_id' => $contact1,
       'line_items' => [
@@ -73,6 +73,8 @@ class LineItemTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
       'delete in CiviContribute',
       'view contributions of type Donation',
       'delete contributions of type Donation',
+      'add contributions of type Donation',
+      'edit contributions of type Donation',
     ]);
     Civi::settings()->set('acl_financial_type', TRUE);
     $this->createLoggedInUser();
@@ -83,6 +85,22 @@ class LineItemTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
 
     $this->callAPISuccess('LineItem', 'Delete', ['check_permissions' => TRUE, 'id' => $lineItems[0]['id']]);
     $this->callAPIFailure('LineItem', 'Delete', ['check_permissions' => TRUE, 'id' => $lineItems[1]['id']]);
+    $lineParams = [
+      'entity_id' => $order['id'],
+      'entity_table' => 'civicrm_contribution',
+      'line_total' => 20,
+      'unit_price' => 20,
+      'price_field_id' => $defaultPriceFieldID,
+      'qty' => 1,
+      'financial_type_id' => 'Donation',
+      'check_permissions' => TRUE,
+    ];
+    $line = $this->callAPISuccess('LineItem', 'Create', $lineParams);
+    $lineParams['financial_type_id'] = 'Event Fee';
+    $this->callAPIFailure('LineItem', 'Create', $lineParams);
+
+    $this->callAPIFailure('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => TRUE, 'financial_type_id' => 'Event Fee']);
+    $this->callAPISuccess('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => TRUE, 'financial_type_id' => 'Donation']);
   }
 
   /**

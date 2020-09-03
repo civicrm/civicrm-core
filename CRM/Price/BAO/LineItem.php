@@ -35,11 +35,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $id = $params['id'] ?? NULL;
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
-      $op = CRM_Core_Action::UPDATE;
     }
     else {
       CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
-      $op = CRM_Core_Action::ADD;
     }
 
     // unset entity table and entity id in $params
@@ -54,21 +52,12 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         $params['unit_price'] = 0;
       }
     }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
-      if (empty($params['financial_type_id'])) {
-        throw new Exception('Mandatory key(s) missing from params array: financial_type_id');
-      }
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
-      if (!in_array($params['financial_type_id'], array_keys($types))) {
-        throw new Exception('You do not have permission to create this line item');
-      }
-    }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();
     $lineItemBAO->copyValues($params);
 
     $return = $lineItemBAO->save();
-    if ($lineItemBAO->entity_table == 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+    if ($lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       $membershipPaymentParams = [
         'membership_id' => $lineItemBAO->entity_id,
         'contribution_id' => $lineItemBAO->contribution_id,
