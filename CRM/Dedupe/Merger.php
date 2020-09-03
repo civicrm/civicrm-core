@@ -1935,10 +1935,29 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts, $mode);
     }
     else {
-      CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString);
+      self::deletePairFromPrevNextCache((int) $mainId, (int) $otherId);
     }
     self::releaseLocks($locks);
     return $resultStats;
+  }
+
+  /**
+   * Delete merged pair from the previous next cache table as the are no longer a merge candidate.
+   *
+   * It's possible there may be more than one set of merge results cached, with different cache keys.
+   * Once we have merged a pair these should all go (even from a different merge search) as they
+   * can only be merged once.
+   *
+   * @param int $contactID1
+   * @param int $contactID2
+   */
+  protected static function deletePairFromPrevNextCache(int $contactID1, int $contactID2) {
+    CRM_Core_DAO::executeQuery("
+      DELETE FROM civicrm_prevnext_cache
+      WHERE  entity_table = 'civicrm_contact'
+        AND (entity_id1 = %1 AND entity_id2 = %2) OR (entity_id1 = %2 AND entity_id2 = %1)",
+      [1 => [$contactID1, 'Integer'], 2 => [$contactID2, 'Integer']]
+    );
   }
 
   /**
