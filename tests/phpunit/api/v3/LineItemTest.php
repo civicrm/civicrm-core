@@ -14,33 +14,29 @@
  * @group headless
  */
 class api_v3_LineItemTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
-  protected $testAmount = 34567;
   protected $params;
-  protected $id = 0;
-  protected $contactIds = [];
   protected $_entity = 'line_item';
-  protected $contribution_result = NULL;
 
-  public $DBResetRequired = TRUE;
-  protected $_financialTypeId = 1;
-
+  /**
+   * Prepare for test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
-    $this->useTransaction(TRUE);
-    $this->_individualId = $this->individualCreate();
+    $this->useTransaction();
     $contributionParams = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->individualCreate(),
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 'Donation',
       'non_deductible_amount' => 10.00,
       'fee_amount' => 51.00,
       'net_amount' => 91.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $this->params = [
       'price_field_value_id' => 1,
       'price_field_id' => 1,
@@ -52,13 +48,20 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test basic create line item.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testCreateLineItem() {
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params + ['debug' => 1], __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count']);
-    $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck($this->params, $result['id'], $this->_entity);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
+    $this->assertCount(1, $result);
+    $this->getAndCheck($this->params, key($result), $this->_entity);
   }
 
+  /**
+   * Test basic get line item.
+   */
   public function testGetBasicLineItem() {
     $getParams = [
       'entity_table' => 'civicrm_contribution',
@@ -67,17 +70,27 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     $this->assertEquals(1, $getResult['count']);
   }
 
+  /**
+   * Test delete line item.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testDeleteLineItem() {
     $getParams = [
       'entity_table' => 'civicrm_contribution',
     ];
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $deleteParams = ['id' => $getResult['id']];
-    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
+  /**
+   * Test getfields function.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testGetFieldsLineItem() {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
