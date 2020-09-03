@@ -325,6 +325,44 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test editing a custom field
+   */
+  public function testCustomFieldEdit() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $customGroup = $this->entityCustomGroupWithSingleFieldCreate('Contact', 'ContactTest.php');
+
+    // get the custom group table name
+    $params = ['id' => $customGroup['custom_group_id']];
+    $custom_group = $this->callAPISuccess('custom_group', 'getsingle', $params);
+
+    // get the field db column name
+    $params = ['id' => $customGroup['custom_field_id']];
+    $custom_field = $this->callAPISuccess('custom_field', 'getsingle', $params);
+
+    // check it
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE `log_{$custom_group['table_name']}`");
+    $dao->fetch();
+    $this->assertStringContainsString("`{$custom_field['column_name']}` varchar(255)", $dao->Create_Table);
+
+    // Edit the field
+    $params = [
+      'id' => $customGroup['custom_field_id'],
+      'label' => 'Label changed',
+      'text_length' => 768,
+    ];
+    $this->callAPISuccess('custom_field', 'create', $params);
+
+    // update logging schema
+    $schema->fixSchemaDifferences();
+
+    // verify
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE `log_{$custom_group['table_name']}`");
+    $dao->fetch();
+    $this->assertStringContainsString("`{$custom_field['column_name']}` varchar(768)", $dao->Create_Table);
+  }
+
+  /**
    * Determine if we are running on MySQL 8 version 8.0.19 or later.
    *
    * @return bool
