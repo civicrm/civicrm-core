@@ -280,7 +280,7 @@ class CRM_Core_DAO_AllCoreTables {
    * Get the classname for the table.
    *
    * @param string $tableName
-   * @return string
+   * @return string|CRM_Core_DAO|NULL
    */
   public static function getClassForTable($tableName) {
     //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
@@ -296,7 +296,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $daoName
    *   Ex: 'Contact'.
-   * @return CRM_Core_DAO|NULL
+   * @return string|CRM_Core_DAO|NULL
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getFullName($daoName) {

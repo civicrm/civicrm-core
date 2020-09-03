@@ -13,6 +13,7 @@
 namespace Civi\Api4\Generic\Traits;
 
 use Civi\Api4\CustomField;
+use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 
 /**
@@ -178,7 +179,7 @@ trait DAOActionTrait {
       if (NULL !== $value) {
 
         if ($field['suffix']) {
-          $options = FormattingUtil::getPseudoconstantList($this->getEntityName(), 'custom_' . $field['id'], $field['suffix'], $params, $this->getActionName());
+          $options = FormattingUtil::getPseudoconstantList($field, $field['suffix'], $params, $this->getActionName());
           $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
         }
 
@@ -210,24 +211,33 @@ trait DAOActionTrait {
   /**
    * Gets field info needed to save custom data
    *
-   * @param string $name
+   * @param string $fieldExpr
    *   Field identifier with possible suffix, e.g. MyCustomGroup.MyField1:label
    * @return array|NULL
    */
-  protected function getCustomFieldInfo($name) {
-    if (strpos($name, '.') === FALSE) {
+  protected function getCustomFieldInfo(string $fieldExpr) {
+    if (strpos($fieldExpr, '.') === FALSE) {
       return NULL;
     }
-    list($groupName, $fieldName) = explode('.', $name);
+    list($groupName, $fieldName) = explode('.', $fieldExpr);
     list($fieldName, $suffix) = array_pad(explode(':', $fieldName), 2, NULL);
-    if (empty(\Civi::$statics['APIv4_Custom_Fields'][$groupName])) {
-      \Civi::$statics['APIv4_Custom_Fields'][$groupName] = (array) CustomField::get(FALSE)
+    $cacheKey = "APIv4_Custom_Fields-$groupName";
+    $info = \Civi::cache('metadata')->get($cacheKey);
+    if (!isset($info[$fieldName])) {
+      $info = [];
+      $fields = CustomField::get(FALSE)
         ->addSelect('id', 'name', 'html_type', 'custom_group.extends')
         ->addWhere('custom_group.name', '=', $groupName)
         ->execute()->indexBy('name');
+      foreach ($fields as $name => $field) {
+        $field['custom_field_id'] = $field['id'];
+        $field['name'] = $groupName . '.' . $name;
+        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group.extends']);
+        $info[$name] = $field;
+      }
+      \Civi::cache('metadata')->set($cacheKey, $info);
     }
-    $info = \Civi::$statics['APIv4_Custom_Fields'][$groupName][$fieldName] ?? NULL;
-    return $info ? ['suffix' => $suffix] + $info : NULL;
+    return isset($info[$fieldName]) ? ['suffix' => $suffix] + $info[$fieldName] : NULL;
   }
 
   /**
