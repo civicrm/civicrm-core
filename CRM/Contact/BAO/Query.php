@@ -1091,12 +1091,14 @@ class CRM_Contact_BAO_Query {
         }
         // add address table - doesn't matter if we do it mutliple times - it's the same data
         // @todo ditch the double processing of addressJoin
+        $addWhere = FALSE;
         if ((in_array($elementCmpName, self::$_locationSpecificFields) || !empty($addressCustomFieldIds))
           && !in_array($elementCmpName, ['email', 'phone', 'im', 'openid'])
         ) {
           list($aName, $addressJoin) = $this->addAddressTable($name, $lCond);
           $locationTypeJoin[$tName] = " ( $aName.location_type_id = $ltName.id ) ";
           $processed[$aName] = 1;
+          $addWhere = TRUE;
         }
 
         $cond = $elementType = '';
@@ -1159,7 +1161,6 @@ class CRM_Contact_BAO_Query {
         }
 
         // Check if there is a value, if so also add to where Clause
-        $addWhere = FALSE;
         if ($this->_params) {
           $nm = $elementName;
           if (isset($locationTypeId)) {
