@@ -472,28 +472,32 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  */
 function civicrm_api3_contribution_completetransaction($params) {
   $input = $ids = [];
-  if (isset($params['payment_processor_id'])) {
-    $input['payment_processor_id'] = $params['payment_processor_id'];
-  }
+
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
 
+  if (isset($params['payment_processor_id'])) {
+    $input['payment_processor_id'] = $params['payment_processor_id'];
+  }
   if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
     throw new API_Exception('failed to load related objects');
   }
   elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
-  $input['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
+  $params['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
 
-  if (!empty($params['fee_amount'])) {
-    $input['fee_amount'] = $params['fee_amount'];
-  }
+  $passThroughParams = [
+    'fee_amount',
+    'payment_processor_id',
+    'trxn_id',
+  ];
+  $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+
   return _ipn_process_transaction($params, $contribution, $input, $ids);
-
 }
 
 /**
