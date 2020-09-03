@@ -285,7 +285,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       $contributionStatusId = array_search('Completed', $contributionStatuses);
     }
     if (array_key_exists($statusId, $negativeStatuses)) {
-      $contributionStatusId = array_search('Cancelled', $contributionStatuses);
+      civicrm_api3('Contribution', 'create', ['id' => $contributionId, 'contribution_status_id' => 'Cancelled']);
+      return;
     }
 
     if (!$contributionStatusId || !$participantId || !$contributionId) {
@@ -374,12 +375,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'flip' => 1,
     ]);
     $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = $params['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] ?? NULL;
-    if ($statusId == $contributionStatuses['Cancelled']) {
-      $transaction = new CRM_Core_Transaction();
-      $baseIPN->cancelled($objects, $transaction, $input);
-      $transaction->commit();
-      return;
-    }
     if ($statusId == $contributionStatuses['Failed']) {
       $transaction = new CRM_Core_Transaction();
       $baseIPN->failed($objects, $transaction, $input);

@@ -163,6 +163,18 @@ trait CRMTraits_Financial_OrderTrait {
   }
 
   /**
+   * Create an order for an event.
+   *
+   * @param array $orderParams
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createEventOrder($orderParams = []) {
+    $this->ids['Contribution'][0] = $this->callAPISuccess('Order', 'create', array_merge($this->getParticipantOrderParams(), $orderParams))['id'];
+    $this->ids['Participant'][0] = $this->callAPISuccessGetValue('ParticipantPayment', ['return' => 'participant_id', 'contribution_id' => $this->ids['Contribution'][0]]);
+  }
+
+  /**
    * Create an extraneous contribution to throw off any 'number one bugs'.
    *
    * Ie this means our real data starts from 2 & we won't hit 'pretend passes'
