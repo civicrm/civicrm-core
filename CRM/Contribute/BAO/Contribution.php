@@ -149,18 +149,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     $setPrevContribution = TRUE;
-    // CRM-13964 partial payment
-    if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_to_pay'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('partial_amount params are deprecated from Contribution.create - use Payment.create');
-      $partialAmtTotal = $params['partial_payment_total'];
-      $partialAmtPay = $params['partial_amount_to_pay'];
-      $params['total_amount'] = $partialAmtTotal;
-      if ($partialAmtPay < $partialAmtTotal) {
-        $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid');
-        $params['is_pay_later'] = 0;
-        $setPrevContribution = FALSE;
-      }
-    }
     if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getOriginalContribution($contributionID);
     }
@@ -3569,47 +3557,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $statusId = $params['contribution']->contribution_status_id;
-    // CRM-13964 partial payment
-    if ($contributionStatus == 'Partially paid'
-      && !empty($params['partial_payment_total']) && !empty($params['partial_amount_to_pay'])
-    ) {
-      CRM_Core_Error::deprecatedFunctionWarning('partial_amount params are deprecated from Contribution.create - use Payment.create');
-      $partialAmtPay = CRM_Utils_Rule::cleanMoney($params['partial_amount_to_pay']);
-      $partialAmtTotal = CRM_Utils_Rule::cleanMoney($params['partial_payment_total']);
-
-      $fromFinancialAccountId = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], 'Accounts Receivable Account is');
-      $statusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      $params['total_amount'] = $partialAmtPay;
-
-      $balanceTrxnInfo = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution']->id, $params['financial_type_id']);
-      if (empty($balanceTrxnInfo['trxn_id'])) {
-        // create new balance transaction record
-        $toFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($params['financial_type_id'], 'Accounts Receivable Account is');
-
-        $balanceTrxnParams['total_amount'] = $partialAmtTotal;
-        $balanceTrxnParams['to_financial_account_id'] = $toFinancialAccount;
-        $balanceTrxnParams['contribution_id'] = $params['contribution']->id;
-        $balanceTrxnParams['trxn_date'] = !empty($params['contribution']->receive_date) ? $params['contribution']->receive_date : date('YmdHis');
-        $balanceTrxnParams['fee_amount'] = $params['fee_amount'] ?? NULL;
-        $balanceTrxnParams['net_amount'] = $params['net_amount'] ?? NULL;
-        $balanceTrxnParams['currency'] = $params['contribution']->currency;
-        $balanceTrxnParams['trxn_id'] = $params['contribution']->trxn_id;
-        $balanceTrxnParams['status_id'] = $statusId;
-        $balanceTrxnParams['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
-        $balanceTrxnParams['check_number'] = $params['check_number'] ?? NULL;
-        $balanceTrxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
-        $balanceTrxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
-        if (!empty($balanceTrxnParams['from_financial_account_id']) &&
-          ($statusId == array_search('Completed', $contributionStatuses) || $statusId == array_search('Partially paid', $contributionStatuses))
-        ) {
-          $balanceTrxnParams['is_payment'] = 1;
-        }
-        if (!empty($params['payment_processor'])) {
-          $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
-        }
-        $financialTxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
-      }
-    }
 
     // build line item array if its not set in $params
     if (empty($params['line_item']) || $additionalParticipantId) {
@@ -4390,22 +4337,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $adjustTotalAmount
       );
     }
-  }
-
-  /**
-   * Compute the stats values
-   *
-   * @param string $stat either 'mode' or 'median'
-   * @param string $sql
-   * @param string $alias of civicrm_contribution
-   *
-   * @return array|null
-   * @deprecated
-   *
-   */
-  public static function computeStats($stat, $sql, $alias = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('computeStats is now deprecated');
-    return [];
   }
 
   /**
