@@ -196,7 +196,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       $this->res->getSettings('html-header')
     );
     $actual = CRM_Core_Region::instance('html-header')->render('');
-    $expected = 'var CRM = ' . json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]) . ';';
+    $expected = '})(' . json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]) . ')';
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
@@ -209,7 +209,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       $this->res->getSettings('billing-block')
     );
     $actual = CRM_Core_Region::instance('billing-block')->render('');
-    $expected = 'CRM.$.extend(true, CRM, ' . json_encode(['cheese' => ['edam' => 'red', 'cheddar' => 'yellow']]) . ');';
+    $expected = '})(' . json_encode(['cheese' => ['edam' => 'red', 'cheddar' => 'yellow']]) . ')';
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
