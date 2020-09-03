@@ -56,16 +56,19 @@ class CustomGroupJoinable extends Joinable {
    * @inheritDoc
    */
   public function getEntityFields() {
-    if (!$this->entityFields) {
+    $cacheKey = 'APIv4_CustomGroupJoinable-' . $this->getTargetTable();
+    $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
+    if (!$entityFields) {
       $fields = CustomField::get(FALSE)
         ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', '*'])
         ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {
-        $this->entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntityFromExtends($field['custom_group.extends']));
+        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, self::getEntityFromExtends($field['custom_group.extends']));
       }
+      \Civi::cache('metadata')->set($cacheKey, $entityFields);
     }
-    return $this->entityFields;
+    return $entityFields;
   }
 
   /**
@@ -102,7 +105,7 @@ class CustomGroupJoinable extends Joinable {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function getEntityFromExtends($extends) {
+  public static function getEntityFromExtends($extends) {
     if (strpos($extends, 'Participant') === 0) {
       return 'Participant';
     }
