@@ -295,7 +295,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     $params = [
       'component_id' => $participantId,
-      'componentName' => 'Event',
       'contribution_id' => $contributionId,
       'contribution_status_id' => $contributionStatusId,
       'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
@@ -323,13 +322,13 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     // get minimum required values.
     $statusId = $params['contribution_status_id'] ?? NULL;
     $componentId = $params['component_id'] ?? NULL;
-    $componentName = $params['componentName'] ?? NULL;
     $contributionId = $params['contribution_id'] ?? NULL;
 
     $input = $ids = $objects = [];
 
     //get the required ids.
     $ids['contribution'] = $contributionId;
+    $ids['participant'] = $params['component_id'];
 
     if (!$ids['contact'] = CRM_Utils_Array::value('contact_id', $params)) {
       $ids['contact'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
@@ -338,25 +337,14 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       );
     }
 
-    if ($componentName === 'Event') {
-      $name = 'event';
-      $ids['participant'] = $componentId;
-
-      if (!$ids['event'] = CRM_Utils_Array::value('event_id', $params)) {
-        $ids['event'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-          $componentId,
-          'event_id'
-        );
-      }
+    if (!$ids['event'] = CRM_Utils_Array::value('event_id', $params)) {
+      $ids['event'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+        $componentId,
+        'event_id'
+      );
     }
 
-    if ($componentName === 'Membership') {
-      $name = 'contribute';
-      $ids['membership'] = $componentId;
-    }
-    $ids['contributionPage'] = NULL;
-    $ids['contributionRecur'] = NULL;
-    $input['component'] = $name;
+    $input['component'] = 'event';
 
     $baseIPN = new CRM_Core_Payment_BaseIPN();
 
