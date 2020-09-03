@@ -49,7 +49,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($user_register_conf != 'visitors' && !$user->hasPermission('administer users')) {
       $account->block();
     }
-    elseif (!$verify_mail_conf) {
+    elseif ($verify_mail_conf) {
       $account->activate();
     }
 
@@ -98,7 +98,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     // If this is a user creating their own account, login them in!
-    if ($account->isActive() && $user->isAnonymous()) {
+    if (!$verify_mail_conf && $account->isActive() && $user->isAnonymous()) {
       \user_login_finalize($account);
     }
 
