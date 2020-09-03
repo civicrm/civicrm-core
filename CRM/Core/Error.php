@@ -600,13 +600,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $string
    */
   public static function debug_query($string) {
-    if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
-      if (CIVICRM_DEBUG_LOG_QUERY === 'backtrace') {
-        CRM_Core_Error::backtrace($string, TRUE);
-      }
-      elseif (CIVICRM_DEBUG_LOG_QUERY) {
-        CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log', PEAR_LOG_DEBUG);
-      }
+    if (!defined('CIVICRM_DEBUG_LOG_QUERY')) {
+      define('CIVICRM_DEBUG_LOG_QUERY', CRM_Utils_Constant::value('CIVICRM_DEBUG_LOG_QUERY', FALSE));
+    }
+    if (CIVICRM_DEBUG_LOG_QUERY === 'backtrace') {
+      CRM_Core_Error::backtrace($string, TRUE);
+    }
+    elseif (CIVICRM_DEBUG_LOG_QUERY) {
+      CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log', PEAR_LOG_DEBUG);
     }
   }
 

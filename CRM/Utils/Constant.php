@@ -34,9 +34,10 @@ class CRM_Utils_Constant {
     if (defined($name)) {
       return constant($name);
     }
-    else {
-      return $default;
+    if (getenv($name)) {
+      return getenv($name);
     }
+    return $default;
   }
 
 }
