@@ -2,43 +2,31 @@
 
 ![Screenshot](/images/screenshot.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+This extension is aimed at containing the original Core eWAY (Single Currency) Payment Processor Type that is legacy. See known issues below
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
+* PHP v7.1+
+* CiviCRM 5.31
 
 ## Installation (Web UI)
 
-This extension has not yet been published for installation via the web UI.
+Navigate to the Extensions Page and install the extension.
 
-## Installation (CLI, Zip)
+## Installation (CLI)
 
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl ewaysingle@https://github.com/FIXME/ewaysingle/archive/master.zip
-```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
+To enable this extension in the CLI do the following
 
 ```bash
-git clone https://github.com/FIXME/ewaysingle.git
 cv en ewaysingle
 ```
 
 ## Usage
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+The eWAY (Single Currency) Payment Processor Type will show up as one of the options when your adding in a PaymentProcessor.
 
 ## Known Issues
 
-(* FIXME *)
+This Payment Processor does not do any kind of recurring payments at all for that you would need another extension e.g. [Agileware Eway Recurring](https://github.com/agileware/au.com.agileware.ewayrecurring)

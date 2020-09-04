@@ -22,11 +22,11 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
-/**************************************************************************************************************************
+/**
  * Licensed to CiviCRM under the Academic Free License version 3.0
- * Written & Contributed by Dolphin Software P/L - March 2008 
+ * Written & Contributed by Dolphin Software P/L - March 2008
  *
  * 'eWAY_GatewayRequest.php' - Based on the standard supplied eWay sample code 'GatewayResponse.php'
  *
@@ -35,209 +35,181 @@
  *
  * ALSO: Added a 'GetTransactionNumber' function.
  *
- **************************************************************************************************************************/
+ */
 use CRM_Ewaysingle_ExtensionUtil as E;
- 
-class GatewayRequest
-{
-	var $txCustomerID = "";
 
-	var $txAmount = 0;
+class GatewayRequest {
+  public $txCustomerID = "";
 
-	var $txCardholderName = "";
+  public $txAmount = 0;
 
-	var $txCardNumber = "";
+  public $txCardholderName = "";
 
-	var $txCardExpiryMonth = "01";
+  public $txCardNumber = "";
 
-	var $txCardExpiryYear = "00";
+  public $txCardExpiryMonth = "01";
 
-	var $txTransactionNumber = "";
+  public $txCardExpiryYear = "00";
 
-	var $txCardholderFirstName = "";
+  public $txTransactionNumber = "";
 
-	var $txCardholderLastName = "";
+  public $txCardholderFirstName = "";
 
-	var $txCardholderEmailAddress = "";
+  public $txCardholderLastName = "";
 
-	var $txCardholderAddress = "";
+  public $txCardholderEmailAddress = "";
 
-	var $txCardholderPostalCode = "";
+  public $txCardholderAddress = "";
 
-	var $txInvoiceReference = "";
+  public $txCardholderPostalCode = "";
 
-	var $txInvoiceDescription = "";
+  public $txInvoiceReference = "";
 
-    var $txCVN = "";
+  public $txInvoiceDescription = "";
 
-	var $txOption1 = "";
+  public $txCVN = "";
 
-	var $txOption2 = "";
+  public $txOption1 = "";
 
-	var $txOption3 = "";
-    
-    var $txCustomerBillingCountry = "";
+  public $txOption2 = "";
 
-    var $txCustomerIPAddress = "";
+  public $txOption3 = "";
 
-   function __construct()
-   {
-      // Empty Constructor
-   }
+  public $txCustomerBillingCountry = "";
 
-   function GetTransactionNumber()
-   {
-      return $this->txTransactionNumber;
-   }
+  public $txCustomerIPAddress = "";
 
-   function EwayCustomerID($value) 
-   {
-      $this->txCustomerID=$value;
-   }
+  public function __construct() {
+    // Empty Constructor
+  }
 
-   function InvoiceAmount($value)
-   {
-      $this->txAmount=$value;
-   }
+  public function GetTransactionNumber() {
+    return $this->txTransactionNumber;
+  }
 
-   function CardHolderName($value)
-   {
-      $this->txCardholderName=$value;
-   }
+  public function EwayCustomerID($value) {
+    $this->txCustomerID = $value;
+  }
 
-   function CardExpiryMonth($value)  
-   {
-      $this->txCardExpiryMonth=$value;
-   }
+  public function InvoiceAmount($value) {
+    $this->txAmount = $value;
+  }
 
-   function CardExpiryYear($value)
-   {
-      $this->txCardExpiryYear=$value;
-   }
+  public function CardHolderName($value) {
+    $this->txCardholderName = $value;
+  }
 
-   function TransactionNumber($value)
-   {
-      $this->txTransactionNumber=$value;
-   }
+  public function CardExpiryMonth($value) {
+    $this->txCardExpiryMonth = $value;
+  }
 
-   function PurchaserFirstName($value)
-   {
-      $this->txCardholderFirstName=$value;
-   }
+  public function CardExpiryYear($value) {
+    $this->txCardExpiryYear = $value;
+  }
 
-   function PurchaserLastName($value)
-   {
-      $this->txCardholderLastName=$value;
-   }
+  public function TransactionNumber($value) {
+    $this->txTransactionNumber = $value;
+  }
 
-   function CardNumber($value)
-   {
-      $this->txCardNumber=$value;
-   }
+  public function PurchaserFirstName($value) {
+    $this->txCardholderFirstName = $value;
+  }
 
-   function PurchaserAddress($value)
-   {
-      $this->txCardholderAddress=$value;
-   }
+  public function PurchaserLastName($value) {
+    $this->txCardholderLastName = $value;
+  }
 
-   function PurchaserPostalCode($value)
-   {
-      $this->txCardholderPostalCode=$value;
-   }
+  public function CardNumber($value) {
+    $this->txCardNumber = $value;
+  }
 
-   function PurchaserEmailAddress($value)
-   {
-      $this->txCardholderEmailAddress=$value;
-   }
+  public function PurchaserAddress($value) {
+    $this->txCardholderAddress = $value;
+  }
 
-   function InvoiceReference($value) 
-   {
-      $this->txInvoiceReference=$value; 
-   }
+  public function PurchaserPostalCode($value) {
+    $this->txCardholderPostalCode = $value;
+  }
 
-   function InvoiceDescription($value) 
-   {
-      $this->txInvoiceDescription=$value; 
-   }
+  public function PurchaserEmailAddress($value) {
+    $this->txCardholderEmailAddress = $value;
+  }
 
-   function CVN($value) 
-   {
-      $this->txCVN=$value; 
-   }
+  public function InvoiceReference($value) {
+    $this->txInvoiceReference = $value;
+  }
 
-   function EwayOption1($value) 
-   {
-      $this->txOption1=$value; 
-   }
+  public function InvoiceDescription($value) {
+    $this->txInvoiceDescription = $value;
+  }
 
-   function EwayOption2($value) 
-   {
-      $this->txOption2=$value; 
-   }
+  public function CVN($value) {
+    $this->txCVN = $value;
+  }
 
-   function EwayOption3($value) 
-   {
-      $this->txOption3=$value; 
-   }
+  public function EwayOption1($value) {
+    $this->txOption1 = $value;
+  }
 
-   function CustomerBillingCountry($value) 
-   {
-       $this->txCustomerBillingCountry=$value; 
-   }
+  public function EwayOption2($value) {
+    $this->txOption2 = $value;
+  }
 
-   function CustomerIPAddress($value) 
-   {
-       $this->txCustomerIPAddress=$value; 
-   }
+  public function EwayOption3($value) {
+    $this->txOption3 = $value;
+  }
 
-   function ToXml()
-   {
-      // We don't really need the overhead of creating an XML DOM object
-      // to really just concatenate a string together.
+  public function CustomerBillingCountry($value) {
+    $this->txCustomerBillingCountry = $value;
+  }
 
-      $xml = "<ewaygateway>";
-      $xml .= $this->CreateNode("ewayCustomerID",                 $this->txCustomerID);
-      $xml .= $this->CreateNode("ewayTotalAmount",                $this->txAmount);
-      $xml .= $this->CreateNode("ewayCardHoldersName",            $this->txCardholderName);
-      $xml .= $this->CreateNode("ewayCardNumber",                 $this->txCardNumber);
-      $xml .= $this->CreateNode("ewayCardExpiryMonth",            $this->txCardExpiryMonth);
-      $xml .= $this->CreateNode("ewayCardExpiryYear",             $this->txCardExpiryYear);
-      $xml .= $this->CreateNode("ewayTrxnNumber",                 $this->txTransactionNumber);
-      $xml .= $this->CreateNode("ewayCustomerInvoiceDescription", $this->txInvoiceDescription);
-      $xml .= $this->CreateNode("ewayCustomerFirstName",          $this->txCardholderFirstName);
-      $xml .= $this->CreateNode("ewayCustomerLastName",           $this->txCardholderLastName);
-      $xml .= $this->CreateNode("ewayCustomerEmail",              $this->txCardholderEmailAddress);
-      $xml .= $this->CreateNode("ewayCustomerAddress",            $this->txCardholderAddress);
-      $xml .= $this->CreateNode("ewayCustomerPostcode",           $this->txCardholderPostalCode);
-      $xml .= $this->CreateNode("ewayCustomerInvoiceRef",         $this->txInvoiceReference);
-      $xml .= $this->CreateNode("ewayCVN",                        $this->txCVN);
-      $xml .= $this->CreateNode("ewayOption1",                    $this->txOption1);
-      $xml .= $this->CreateNode("ewayOption2",                    $this->txOption2);
-      $xml .= $this->CreateNode("ewayOption3",                    $this->txOption3);
-      $xml .= $this->CreateNode("ewayCustomerIPAddress",          $this->txCustomerIPAddress);
-      $xml .= $this->CreateNode("ewayCustomerBillingCountry",     $this->txCustomerBillingCountry);
-      $xml .= "</ewaygateway>";
-      
-      return $xml;
-   }
-   
-   
-   /********************************************************
+  public function CustomerIPAddress($value) {
+    $this->txCustomerIPAddress = $value;
+  }
+
+  public function ToXml() {
+    // We don't really need the overhead of creating an XML DOM object
+    // to really just concatenate a string together.
+
+    $xml = "<ewaygateway>";
+    $xml .= $this->CreateNode("ewayCustomerID", $this->txCustomerID);
+    $xml .= $this->CreateNode("ewayTotalAmount", $this->txAmount);
+    $xml .= $this->CreateNode("ewayCardHoldersName", $this->txCardholderName);
+    $xml .= $this->CreateNode("ewayCardNumber", $this->txCardNumber);
+    $xml .= $this->CreateNode("ewayCardExpiryMonth", $this->txCardExpiryMonth);
+    $xml .= $this->CreateNode("ewayCardExpiryYear", $this->txCardExpiryYear);
+    $xml .= $this->CreateNode("ewayTrxnNumber", $this->txTransactionNumber);
+    $xml .= $this->CreateNode("ewayCustomerInvoiceDescription", $this->txInvoiceDescription);
+    $xml .= $this->CreateNode("ewayCustomerFirstName", $this->txCardholderFirstName);
+    $xml .= $this->CreateNode("ewayCustomerLastName", $this->txCardholderLastName);
+    $xml .= $this->CreateNode("ewayCustomerEmail", $this->txCardholderEmailAddress);
+    $xml .= $this->CreateNode("ewayCustomerAddress", $this->txCardholderAddress);
+    $xml .= $this->CreateNode("ewayCustomerPostcode", $this->txCardholderPostalCode);
+    $xml .= $this->CreateNode("ewayCustomerInvoiceRef", $this->txInvoiceReference);
+    $xml .= $this->CreateNode("ewayCVN", $this->txCVN);
+    $xml .= $this->CreateNode("ewayOption1", $this->txOption1);
+    $xml .= $this->CreateNode("ewayOption2", $this->txOption2);
+    $xml .= $this->CreateNode("ewayOption3", $this->txOption3);
+    $xml .= $this->CreateNode("ewayCustomerIPAddress", $this->txCustomerIPAddress);
+    $xml .= $this->CreateNode("ewayCustomerBillingCountry", $this->txCustomerBillingCountry);
+    $xml .= "</ewaygateway>";
+
+    return $xml;
+  }
+
+  /**
    * Builds a simple XML Node
    *
    * 'NodeName' is the anem of the node being created.
    * 'NodeValue' is its value
    *
-   ********************************************************/
-   function CreateNode($NodeName, $NodeValue)
-   {
+   */
+  public function CreateNode($NodeName, $NodeValue) {
     require_once E::path('lib/XML/Util.php');
 
     $xml = new XML_Util();
     $node = "<" . $NodeName . ">" . $xml->replaceEntities($NodeValue) . "</" . $NodeName . ">";
     return $node;
-   }
-   
-} // class GatewayRequest
+  }
 
-?>
+}

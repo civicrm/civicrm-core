@@ -89,6 +89,11 @@ require_once E::path('lib/eWAY/eWAY_GatewayResponse.php');
 class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
   /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
    * *******************************************************
    * Constructor
    *
@@ -104,6 +109,20 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
+  }
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
   }
 
   /**
@@ -246,50 +265,13 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     $requestxml = $eWAYRequest->ToXML();
 
-    $submit = curl_init($gateway_URL);
-
-    if (!$submit) {
-      throw new PaymentProcessorException('Could not initiate connection to payment gateway', 9004);
-    }
-
-    curl_setopt($submit, CURLOPT_POST, TRUE);
-    // return the result on success, FALSE on failure
-    curl_setopt($submit, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($submit, CURLOPT_POSTFIELDS, $requestxml);
-    curl_setopt($submit, CURLOPT_TIMEOUT, 36000);
-    // if open_basedir or safe_mode are enabled in PHP settings CURLOPT_FOLLOWLOCATION won't work so don't apply it
-    // it's not really required CRM-5841
-    if (ini_get('open_basedir') == '' && ini_get('safe_mode' == 'Off')) {
-      // ensures any Location headers are followed
-      curl_setopt($submit, CURLOPT_FOLLOWLOCATION, 1);
-    }
-
-    // Send the data out over the wire
-    //--------------------------------
-    $responseData = curl_exec($submit);
-
-    //----------------------------------------------------------------------------------------------------
-    // See if we had a curl error - if so tell 'em and bail out
-    //
-    // NOTE: curl_error does not return a logical value (see its documentation), but
-    //       a string, which is empty when there was no error.
-    //----------------------------------------------------------------------------------------------------
-    if ((curl_errno($submit) > 0) || (strlen(curl_error($submit)) > 0)) {
-      $errorNum = curl_errno($submit);
-      $errorDesc = curl_error($submit);
-
-      // Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0) {
-        $errorNum = 9005;
-      }
-
-      // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0) {
-        $errorDesc = 'Connection to eWAY payment gateway failed';
-      }
-
-      throw new PaymentProcessorException($errorDesc, $errorNum);
-    }
+    $responseData = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_site'], [
+      'body' => $requestxml,
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ])->getBody();
 
     //----------------------------------------------------------------------------------------------------
     // If null data returned - tell 'em and bail out
@@ -307,11 +289,6 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     if (empty($responseData)) {
       throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
-
-    //----------------------------------------------------------------------------------------------------
-    // Success so far - close the curl and check the data
-    //----------------------------------------------------------------------------------------------------
-    curl_close($submit);
 
     //----------------------------------------------------------------------------------------------------
     // Payment successfully sent to gateway - process the response now

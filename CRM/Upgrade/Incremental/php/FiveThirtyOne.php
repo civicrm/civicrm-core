@@ -71,8 +71,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
    * @param string $rev
    */
   public function upgrade_5_31_alpha1($rev) {
-   $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-   $this->addTask('enableeWAYSingleCurrencyExtension', 'enableEwaySingleExtension');
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('enableeWAYSingleCurrencyExtension', 'enableEwaySingleExtension');
   }
 
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
