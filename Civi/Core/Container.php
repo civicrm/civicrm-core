@@ -206,6 +206,12 @@ class Container {
       []
     ))->setPublic(TRUE);
 
+    $container->setDefinition('bundle.coreStyles', new Definition('CRM_Core_Resources_Bundle', ['coreStyles']))
+      ->setFactory('CRM_Core_Resources_Common::createStyleBundle');
+
+    $container->setDefinition('bundle.coreResources', new Definition('CRM_Core_Resources_Bundle', ['coreResources']))
+      ->setFactory('CRM_Core_Resources_Common::createFullBundle');
+
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer');
 
@@ -236,6 +242,11 @@ class Container {
       'CRM_Core_Resources',
       [new Reference('service_container')]
     ))->setFactory([new Reference(self::SELF), 'createResources'])->setPublic(TRUE);
+
+    $container->setDefinition('resources.js_strings', new Definition(
+      'CRM_Core_Resources_Strings',
+      [new Reference('cache.js_strings')]
+    ))->setPublic(TRUE);
 
     $container->setDefinition('prevnext', new Definition(
       'CRM_Core_PrevNextCache_Interface',
@@ -450,7 +461,7 @@ class Container {
     $sys = \CRM_Extension_System::singleton();
     return new \CRM_Core_Resources(
       $sys->getMapper(),
-      $container->get('cache.js_strings'),
+      new \CRM_Core_Resources_Strings($container->get('cache.js_strings')),
       \CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
     );
   }
