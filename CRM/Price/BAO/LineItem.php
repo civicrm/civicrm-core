@@ -37,7 +37,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
     }
     else {
-      CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
+      CRM_Utils_Hook::pre('create', 'LineItem', $id, $params);
     }
 
     // unset entity table and entity id in $params
