@@ -1310,12 +1310,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           if ($htmlType == 'Link') {
             $url = $params[$index];
           }
-          elseif (in_array($htmlType, [
-            'CheckBox',
-            'Multi-Select',
-            'Multi-Select State/Province',
-            'Multi-Select Country',
-          ])) {
+          elseif (!empty($field['serialize'])) {
             $valSeparator = CRM_Core_DAO::VALUE_SEPARATOR;
             $selectedOptions = explode($valSeparator, $params[$index]);
 
