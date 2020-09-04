@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
+
 /**
  *
  * @package CRM
@@ -231,9 +233,15 @@ class CRM_Financial_BAO_Order {
     }
 
     foreach ($this->getPriceOptions() as $fieldID => $valueID) {
+      if (!isset($this->priceSetID)) {
+        $this->setPriceSetID(PriceField::get()->addSelect('price_set_id')->addWhere('id', '=', $fieldID)->execute()->first()['price_set_id']);
+      }
       $throwAwayArray = [];
       // @todo - still using getLine for now but better to bring it to this class & do a better job.
-      $lineItems[$valueID] = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID, 0)[1][$valueID];
+      $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID, 0)[1];
+      foreach ($newLines as $newLine) {
+        $lineItems[$newLine['price_field_value_id']] = $newLine;
+      }
     }
 
     foreach ($lineItems as &$lineItem) {
@@ -261,7 +269,7 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * Get the total tax amount for the order.
+   * Get the total amount for the order.
    *
    * @return float
    *
@@ -271,6 +279,21 @@ class CRM_Financial_BAO_Order {
     $amount = 0.0;
     foreach ($this->getLineItems() as $lineItem) {
       $amount += $lineItem['tax_amount'] ?? 0.0;
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total tax amount for the order.
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getTotalAmount() :float {
+    $amount = 0.0;
+    foreach ($this->getLineItems() as $lineItem) {
+      $amount += $lineItem['line_total'] ?? 0.0;
     }
     return $amount;
   }
