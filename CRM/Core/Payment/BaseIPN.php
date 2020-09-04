@@ -119,9 +119,6 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
-    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
-
     $objects['contact'] = &$contact;
     $objects['contribution'] = &$contribution;
 
@@ -305,9 +302,6 @@ class CRM_Core_Payment_BaseIPN {
       'flip' => 1,
     ]);
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
-    $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
-    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
-    $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
     $contribution->cancel_date = self::$_now;
     $contribution->cancel_reason = $input['reasonCode'] ?? NULL;
     $contribution->save();
