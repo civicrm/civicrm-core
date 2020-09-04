@@ -89,7 +89,7 @@ class CustomValueTest extends BaseCustomValueTest {
         'entity' => "Custom_$group",
         'data_type' => 'String',
         'fk_entity' => NULL,
-        'serialize' => NULL,
+        'serialize' => 0,
         'options' => $optionValues,
       ],
       [
@@ -109,7 +109,7 @@ class CustomValueTest extends BaseCustomValueTest {
         'entity' => "Custom_$group",
         'data_type' => 'String',
         'fk_entity' => NULL,
-        'serialize' => NULL,
+        'serialize' => 0,
       ],
       [
         'name' => 'id',
