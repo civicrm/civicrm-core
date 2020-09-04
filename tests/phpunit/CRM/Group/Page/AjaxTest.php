@@ -553,6 +553,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     // Load the Manage Group page code and we should get a count from our
     // group because the cache is fresh.
     $_GET = $this->_params;
+    // look for Smart Group only
+    $_GET['savedSearch'] = 1;
     try {
       CRM_Group_Page_AJAX::getGroupList();
     }
