@@ -432,7 +432,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return int
    */
-  public function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
+  public static function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
     $numTerms = CRM_Core_DAO::singleValueQuery("
       SELECT membership_num_terms FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
@@ -4440,11 +4440,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
     $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
+    $contributionID = (int) $contribution->id;
 
     if ($input['component'] == 'contribute') {
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
         self::updateMembershipBasedOnCompletionOfContribution(
-          $contribution,
+          $contributionID,
           $changeDate
         );
       }
@@ -4457,7 +4458,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    $contributionParams['id'] = $contribution->id;
+    $contributionParams['id'] = $contributionID;
     $contributionParams['is_post_payment_create'] = $isPostPaymentCreate;
 
     if (!$contributionResult) {
@@ -4466,7 +4467,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     // Add new soft credit against current $contribution.
     if ($recurringContributionID) {
-      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($recurringContributionID, $contribution->id);
+      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($recurringContributionID, $contributionID);
     }
 
     $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
@@ -4475,7 +4476,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $transaction->commit();
 
     // @todo - check if Contribution::create does this, test, remove.
-    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contribution->id, $recurringContributionID,
+    CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
       $contributionParams['contribution_status_id'], $input['amount']);
 
     // create an activity record
@@ -4492,7 +4493,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if (self::isEmailReceipt($input, $contribution->contribution_page_id, $recurringContributionID)) {
       civicrm_api3('Contribution', 'sendconfirmation', [
-        'id' => $contribution->id,
+        'id' => $contributionID,
         'payment_processor_id' => $paymentProcessorId,
       ]);
       CRM_Core_Error::debug_log_message("Receipt sent");
@@ -5088,14 +5089,14 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * Note that the way in which $memberships are loaded as objects is pretty messy & I think we could just
    * load them in this function. Code clean up would compensate for any minor performance implication.
    *
-   * @param \CRM_Contribute_BAO_Contribution $contribution
+   * @param int $contributionID
    * @param string $changeDate
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function updateMembershipBasedOnCompletionOfContribution($contribution, $changeDate) {
-    $memberships = self::getRelatedMemberships($contribution->id);
+  public static function updateMembershipBasedOnCompletionOfContribution($contributionID, $changeDate) {
+    $memberships = self::getRelatedMemberships($contributionID);
     foreach ($memberships as $membership) {
       $membershipParams = [
         'id' => $membership['id'],
@@ -5133,9 +5134,9 @@ LIMIT 1;";
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
         // ... except testCompleteTransactionMembershipPriceSetTwoTerms hits this line so the above is obviously not true....
         // @todo once apiv4 ships with core switch to that & find sanity.
-        $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
+        $membershipParams['num_terms'] = self::getNumTermsByContributionAndMembershipType(
           $membershipParams['membership_type_id'],
-          $contribution->id
+          $contributionID
         );
       }
       // @todo remove all this stuff in favour of letting the api call further down handle in
