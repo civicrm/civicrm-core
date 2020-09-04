@@ -3551,13 +3551,16 @@ VALUES
    * @throws \CRM_Core_Exception
    */
   protected function validateAllContributions() {
-    $contributions = $this->callAPISuccess('Contribution', 'get', [])['values'];
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['return' => ['tax_amount', 'total_amount']])['values'];
     foreach ($contributions as $contribution) {
       $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
       $total = 0;
+      $taxTotal = 0;
       foreach ($lineItems as $lineItem) {
         $total += $lineItem['line_total'];
+        $taxTotal += (float) ($lineItem['tax_amount'] ?? 0);
       }
+      $this->assertEquals($taxTotal, (float) ($contribution['tax_amount'] ?? 0));
       $this->assertEquals($total, $contribution['total_amount']);
     }
   }

@@ -2098,7 +2098,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test to ensure mail is sent on chosing pay later
    */
-  public function testpayLater() {
+  public function testPayLater() {
     $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
@@ -2140,7 +2140,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'description' => 'Online Contribution: Help Support CiviCRM!',
       'price_set_id' => $priceSet['id'],
     ];
-    $this->callAPISuccess('contribution_page', 'submit', $params);
+    $this->callAPISuccess('ContributionPage', 'submit', $params);
 
     $mut->checkMailLog([
       'is_pay_later:::1',
