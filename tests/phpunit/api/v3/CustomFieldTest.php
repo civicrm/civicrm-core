@@ -618,4 +618,64 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->callAPISuccess('CustomField', 'create', $params);
   }
 
+  public function testLegacyHtmlType() {
+    $customGroup = $this->customGroupCreate([
+      'name' => 'testCustomGroup',
+      'title' => 'testCustomGroup',
+      'extends' => 'Individual',
+    ]);
+    $f1 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'SingleSelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'String',
+      'html_type' => 'Select',
+      'option_values' => [1 => 'One', 2 => 'Two'],
+    ]);
+    $f2 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'CheckBoxes',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'String',
+      'html_type' => 'CheckBox',
+      'option_values' => [1 => 'One', 2 => 'Two'],
+    ]);
+    $f3 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'MultiSelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'String',
+      'html_type' => 'Multi-Select',
+      'option_values' => [1 => 'One', 2 => 'Two'],
+    ]);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Multi-Select',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('MultiSelect', $result['values'][0]['label']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => ['IN' => ['Multi-Select', 'CheckBox']],
+      'sequential' => 1,
+    ]);
+    $this->assertCount(2, $result['values']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Select',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('SingleSelect', $result['values'][0]['label']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => ['IN' => ['Select']],
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('SingleSelect', $result['values'][0]['label']);
+  }
+
 }

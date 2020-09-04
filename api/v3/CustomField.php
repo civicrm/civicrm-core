@@ -122,18 +122,45 @@ function civicrm_api3_custom_field_delete($params) {
  * @return array
  */
 function civicrm_api3_custom_field_get($params) {
-  if (CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1') && ($params['legacy_html_type'] ?? TRUE) && !empty($params['return'])) {
-    if (is_array($params['return'])) {
+  // Legacy handling for serialize property
+  $handleLegacy = (($params['legacy_html_type'] ?? !isset($params['serialize'])) && CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1'));
+  if ($handleLegacy && !empty($params['return'])) {
+    if (!is_array($params['return'])) {
+      $params['return'] = explode(',', str_replace(' ', '', $params['return']));
+    }
+    if (!in_array('serialize', $params['return'])) {
       $params['return'][] = 'serialize';
     }
-    elseif (is_string($params['return'])) {
-      $params['return'] .= ',serialize';
+  }
+  if ($handleLegacy && !empty($params['html_type'])) {
+    $serializedTypes = ['CheckBox', 'Multi-Select', 'Multi-Select Country', 'Multi-Select State/Province'];
+    if (is_string($params['html_type'])) {
+      if (strpos($params['html_type'], 'Multi-Select') === 0) {
+        $params['html_type'] = str_replace('Multi-Select', 'Select', $params['html_type']);
+        $params['serialize'] = 1;
+      }
+      elseif (!in_array($params['html_type'], $serializedTypes)) {
+        $params['serialize'] = 0;
+      }
+    }
+    elseif (is_array($params['html_type']) && !empty($params['html_type']['IN'])) {
+      $excludeNonSerialized = !array_diff($params['html_type']['IN'], $serializedTypes);
+      $onlyNonSerialized = !array_intersect($params['html_type']['IN'], $serializedTypes);
+      $params['html_type']['IN'] = array_map(function($val) {
+        return str_replace('Multi-Select', 'Select', $val);
+      }, $params['html_type']['IN']);
+      if ($excludeNonSerialized) {
+        $params['serialize'] = 1;
+      }
+      if ($onlyNonSerialized) {
+        $params['serialize'] = 0;
+      }
     }
   }
 
   $results = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 
-  if (($params['legacy_html_type'] ?? TRUE) && !empty($results['values']) && is_array($results['values'])) {
+  if ($handleLegacy && !empty($results['values']) && is_array($results['values']) && !isset($params['serialize'])) {
     foreach ($results['values'] as $id => $result) {
       if (!empty($result['serialize']) && !empty($result['html_type'])) {
         $results['values'][$id]['html_type'] = str_replace('Select', 'Multi-Select', $result['html_type']);
