@@ -109,6 +109,7 @@ function dm_core_exts() {
   echo ext/sequentialcreditnotes
   echo ext/flexmailer
   echo ext/eventcart
+  echo ext/ewaysingle
   echo ext/financialacls
 }
 

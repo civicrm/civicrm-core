@@ -77,10 +77,11 @@
  */
 
 use Civi\Payment\Exception\PaymentProcessorException;
+use CRM_Ewaysingle_ExtensionUtil as E;
 
 // require Standard eWAY API libraries
-require_once 'eWAY/eWAY_GatewayRequest.php';
-require_once 'eWAY/eWAY_GatewayResponse.php';
+require_once E::path('lib/eWAY/eWAY_GatewayRequest.php');
+require_once E::path('lib/eWAY/eWAY_GatewayResponse.php');
 
 /**
  * Class CRM_Core_Payment_eWAY.
