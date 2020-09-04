@@ -14,6 +14,8 @@
  * @group headless
  */
 class api_v3_LineItemTest extends CiviUnitTestCase {
+  use CRM_Financial_Form_SalesTaxTrait;
+
   protected $params;
   protected $_entity = 'line_item';
 
@@ -46,6 +48,30 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
       'unit_price' => 50,
       'line_total' => 50,
     ];
+  }
+
+  /**
+   * Test tax is calculated correctly on the line item.
+   */
+  public function testCreateLineItemWithTax() {
+    $this->enableSalesTaxOnFinancialType('Donation');
+    $this->params['financial_type_id'] = 'Donation';
+    $result = $this->callAPISuccess('LineItem', 'create', $this->params);
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', ['id' => $result['id']]);
+    $this->assertEquals(5, $lineItem['tax_amount']);
+    $this->assertEquals(50, $lineItem['line_total']);
+  }
+
+  /**
+   * Enable tax for the given financial type.
+   *
+   * @todo move to a trait, share.
+   *
+   * @param string $type
+   */
+  public function enableSalesTaxOnFinancialType($type) {
+    $this->enableTaxAndInvoicing();
+    $this->relationForFinancialTypeWithFinancialAccount(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $type));
   }
 
   /**
