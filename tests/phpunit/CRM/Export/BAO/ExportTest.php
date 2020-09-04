@@ -1807,7 +1807,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // We need some data so that we can get to the end of the export
     // function. Hopefully one day that won't be required to get metadata info out.
     // eventually aspire to call $provider->getSQLColumns straight after it
-    // is intiated.
+    // is initiated.
     $this->setupBaseExportData($exportMode);
     $this->doExportTest(['selectAll' => TRUE, 'exportMode' => $exportMode, 'ids' => [1]]);
     $this->assertEquals($expected, $this->processor->getSQLColumns());
@@ -1913,7 +1913,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_fee_level' => '`participant_fee_level` longtext',
       'participant_is_pay_later' => '`participant_is_pay_later` varchar(16)',
       'participant_id' => '`participant_id` varchar(16)',
-      'participant_note' => '`participant_note` text',
+      'participant_note' => '`participant_note` longtext',
       'participant_role_id' => '`participant_role_id` varchar(128)',
       'participant_role' => '`participant_role` varchar(255)',
       'participant_source' => '`participant_source` varchar(128)',
@@ -2508,8 +2508,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'addressee' => '`addressee` varchar(255)',
       'email_greeting' => '`email_greeting` varchar(255)',
       'postal_greeting' => '`postal_greeting` varchar(255)',
-      'current_employer' => '`current_employer` varchar(128)',
-      'location_type' => '`location_type` text',
+      'current_employer' => '`current_employer` varchar(255)',
+      'location_type' => '`location_type` varchar(255)',
       'address_id' => '`address_id` varchar(16)',
       'street_address' => '`street_address` varchar(96)',
       'street_number' => '`street_number` varchar(16)',
@@ -2538,14 +2538,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'is_bulkmail' => '`is_bulkmail` varchar(16)',
       'signature_text' => '`signature_text` longtext',
       'signature_html' => '`signature_html` longtext',
-      'im_provider' => '`im_provider` text',
+      'im_provider' => '`im_provider` varchar(255)',
       'im' => '`im` varchar(64)',
       'openid' => '`openid` varchar(255)',
       'world_region' => '`world_region` varchar(128)',
       'url' => '`url` varchar(128)',
-      'groups' => '`groups` text',
-      'tags' => '`tags` text',
-      'notes' => '`notes` text',
+      'groups' => '`groups` longtext',
+      'tags' => '`tags` longtext',
+      'notes' => '`notes` longtext',
       'phone_type' => '`phone_type` varchar(255)',
     ];
     if (!$isContactExport) {
@@ -2628,7 +2628,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_status_id' => '`participant_status_id` varchar(16)',
       'participant_role' => '`participant_role` varchar(255)',
       'participant_role_id' => '`participant_role_id` varchar(128)',
-      'participant_note' => '`participant_note` text',
+      'participant_note' => '`participant_note` longtext',
       'participant_register_date' => '`participant_register_date` varchar(32)',
       'participant_source' => '`participant_source` varchar(128)',
       'participant_fee_level' => '`participant_fee_level` longtext',
@@ -2696,8 +2696,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'addressee' => '`addressee` varchar(255)',
       'email_greeting' => '`email_greeting` varchar(255)',
       'postal_greeting' => '`postal_greeting` varchar(255)',
-      'current_employer' => '`current_employer` varchar(128)',
-      'location_type' => '`location_type` text',
+      'current_employer' => '`current_employer` varchar(255)',
+      'location_type' => '`location_type` varchar(255)',
       'street_address' => '`street_address` varchar(96)',
       'street_number' => '`street_number` varchar(16)',
       'street_number_suffix' => '`street_number_suffix` varchar(8)',
@@ -2723,7 +2723,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'is_bulkmail' => '`is_bulkmail` varchar(16)',
       'signature_text' => '`signature_text` longtext',
       'signature_html' => '`signature_html` longtext',
-      'im_provider' => '`im_provider` text',
+      'im_provider' => '`im_provider` varchar(255)',
       'im' => '`im` varchar(64)',
       'openid' => '`openid` varchar(255)',
       'world_region' => '`world_region` varchar(128)',
@@ -2753,15 +2753,15 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'contribution_status' => '`contribution_status` varchar(255)',
       'contribution_recur_id' => '`contribution_recur_id` varchar(16)',
       'amount_level' => '`amount_level` longtext',
-      'contribution_note' => '`contribution_note` text',
+      'contribution_note' => '`contribution_note` longtext',
       'contribution_batch' => '`contribution_batch` text',
       'contribution_campaign_title' => '`contribution_campaign_title` varchar(255)',
       'contribution_campaign_id' => '`contribution_campaign_id` varchar(16)',
       'contribution_soft_credit_name' => '`contribution_soft_credit_name` varchar(255)',
-      'contribution_soft_credit_amount' => '`contribution_soft_credit_amount` varchar(255)',
+      'contribution_soft_credit_amount' => '`contribution_soft_credit_amount` varchar(32)',
       'contribution_soft_credit_type' => '`contribution_soft_credit_type` varchar(255)',
-      'contribution_soft_credit_contact_id' => '`contribution_soft_credit_contact_id` varchar(255)',
-      'contribution_soft_credit_contribution_id' => '`contribution_soft_credit_contribution_id` varchar(255)',
+      'contribution_soft_credit_contact_id' => '`contribution_soft_credit_contact_id` varchar(16)',
+      'contribution_soft_credit_contribution_id' => '`contribution_soft_credit_contribution_id` varchar(16)',
     ];
   }
 
@@ -2781,9 +2781,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'pledge_next_pay_amount' => '`pledge_next_pay_amount` text',
       'pledge_status' => '`pledge_status` varchar(255)',
       'pledge_is_test' => '`pledge_is_test` varchar(16)',
-      'pledge_contribution_page_id' => '`pledge_contribution_page_id` varchar(255)',
+      'pledge_contribution_page_id' => '`pledge_contribution_page_id` varchar(16)',
       'pledge_financial_type' => '`pledge_financial_type` text',
-      'pledge_frequency_interval' => '`pledge_frequency_interval` varchar(255)',
+      'pledge_frequency_interval' => '`pledge_frequency_interval` varchar(16)',
       'pledge_frequency_unit' => '`pledge_frequency_unit` varchar(255)',
       'pledge_currency' => '`pledge_currency` text',
       'pledge_campaign_id' => '`pledge_campaign_id` varchar(16)',

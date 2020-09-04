@@ -639,6 +639,9 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields['world_region']['context'] = 'country';
     $queryFields['state_province']['context'] = 'province';
     $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT];
+    $queryFields['tags']['type'] = CRM_Utils_Type::T_LONGTEXT;
+    $queryFields['groups']['type'] = CRM_Utils_Type::T_LONGTEXT;
+    $queryFields['notes']['type'] = CRM_Utils_Type::T_LONGTEXT;
     // Set the label to gender for gender_id as we it's ... magic (not in a good way).
     // In other places the query object offers e.g contribution_status & contribution_status_id
     $queryFields['gender_id']['title'] = ts('Gender');
@@ -803,7 +806,7 @@ class CRM_Export_BAO_ExportProcessor {
 
     // CRM-13982 - check if is deleted
     foreach ($params as $value) {
-      if ($value[0] == 'contact_is_deleted') {
+      if ($value[0] === 'contact_is_deleted') {
         unset($whereClauses['trash_clause']);
       }
     }
@@ -825,10 +828,10 @@ class CRM_Export_BAO_ExportProcessor {
     }
 
     if (empty($where)) {
-      $where = "WHERE " . implode(' AND ', $whereClauses);
+      $where = 'WHERE ' . implode(' AND ', $whereClauses);
     }
     else {
-      $where .= " AND " . implode(' AND ', $whereClauses);
+      $where .= ' AND ' . implode(' AND ', $whereClauses);
     }
 
     $groupBy = $this->getGroupBy($query);
@@ -1431,21 +1434,20 @@ class CRM_Export_BAO_ExportProcessor {
   public function getSqlColumnDefinition($fieldName, $columnName) {
 
     // early exit for master_id, CRM-12100
-    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    // also for current_employer, CRM-16939
-    if ($columnName == 'master_id' || $columnName == 'current_employer') {
+    // in the DB it is an ID, but in the export, we retrieve the display_name of the master record
+    if ($columnName === 'master_id') {
       return "`$fieldName` varchar(128)";
     }
 
     $queryFields = $this->getQueryFields();
-    // @todo remove the enotice avoidance here, ensure all columns are declared.
+    // @todo remove the e-notice avoidance here, ensure all columns are declared.
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
-
+    $type = $fieldSpec['type'] ?? ($fieldSpec['data_type'] ?? '');
     // set the sql columns
-    if (isset($fieldSpec['type'])) {
-      switch ($fieldSpec['type']) {
+    if ($type) {
+      switch ($type) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
@@ -1488,38 +1490,27 @@ class CRM_Export_BAO_ExportProcessor {
         return "`$fieldName` text";
       }
       else {
-        $changeFields = [
-          'groups',
-          'tags',
-          'notes',
-        ];
+        // set the sql columns for custom data
+        if (isset($queryFields[$columnName]['data_type'])) {
 
-        if (in_array($fieldName, $changeFields)) {
-          return "`$fieldName` text";
+          switch ($queryFields[$columnName]['data_type']) {
+            case 'String':
+              // May be option labels, which could be up to 512 characters
+              $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
+              return "`$fieldName` varchar($length)";
+
+            case 'Link':
+              return "`$fieldName` varchar(255)";
+
+            case 'Memo':
+              return "`$fieldName` text";
+
+            default:
+              return "`$fieldName` varchar(255)";
+          }
         }
         else {
-          // set the sql columns for custom data
-          if (isset($queryFields[$columnName]['data_type'])) {
-
-            switch ($queryFields[$columnName]['data_type']) {
-              case 'String':
-                // May be option labels, which could be up to 512 characters
-                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
-                return "`$fieldName` varchar($length)";
-
-              case 'Link':
-                return "`$fieldName` varchar(255)";
-
-              case 'Memo':
-                return "`$fieldName` text";
-
-              default:
-                return "`$fieldName` varchar(255)";
-            }
-          }
-          else {
-            return "`$fieldName` text";
-          }
+          return "`$fieldName` text";
         }
       }
     }
