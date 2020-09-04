@@ -26,7 +26,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return \CRM_Price_DAO_LineItem
+   * @return CRM_Price_BAO_LineItem
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
@@ -51,6 +51,12 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       if (!isset($params['unit_price'])) {
         $params['unit_price'] = 0;
       }
+    }
+
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    if (isset($params['financial_type_id'], $params['line_total'], $taxRates[$params['financial_type_id']])) {
+      $taxRate = $taxRates[$params['financial_type_id']];
+      $params['tax_amount'] = ($taxRate / 100) * $params['line_total'];
     }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();

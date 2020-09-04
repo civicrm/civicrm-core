@@ -26,16 +26,11 @@
  *
  * @return array
  *   api result array
+ *
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_line_item_create($params) {
-  // @todo the following line is not really appropriate for the api. The BAO should
-  // do the work.
-  $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-  if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates)) {
-    $taxRate = $taxRates[$params['financial_type_id']];
-    $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($params['line_total'], $taxRate);
-    $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
-  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'LineItem');
 }
 
