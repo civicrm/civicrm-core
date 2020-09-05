@@ -65,8 +65,39 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
   //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
   //  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_31_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('enableeWAYSingleCurrencyExtension', 'enableEwaySingleExtension');
+  }
+
+  public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
+    $eWAYPaymentProcessorType = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_payment_processor_type WHERE class_name = 'Payment_eWAY'");
+    if ($eWAYPaymentProcessorType) {
+      $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+        'type' => 'module',
+        'full_name' => 'ewaysingle',
+        'name' => 'eway Single currency extension',
+        'label' => 'eway Single currency extension',
+        'file' => 'ewaysingle',
+        'schema_version' => NULL,
+        'is_active' => 1,
+      ]);
+      CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+      $managedEntity = CRM_Utils_SQL_Insert::into('civicrm_managed')->row([
+        'name' => 'eWAY',
+        'module' => 'ewaysingle',
+        'entity_type' => 'PaymentProcessorType',
+        'entity_id' => $eWAYPaymentProcessorType,
+        'cleanup' => NULL,
+      ]);
+      CRM_Core_DAO::executeQuery($managedEntity->usingReplace()->toSQL());
+    }
+    return TRUE;
+  }
 
 }
