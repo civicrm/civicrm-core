@@ -1940,7 +1940,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     $this->setUpContributionPage();
     $submitParams = [
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
       'first_name' => 'J',
       'last_name' => 'T',
@@ -1949,7 +1948,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d H:i:s'),
     ];
 
-    // Create PriceSet/PriceField
+    // Add Existing PriceField
+    // This is a Shoe-eating Goat; qty = 1; unit_price = $10.00; There is no sales tax on Goats
+    $submitParams['price_' . $this->_ids['price_field'][0]] = reset($this->_ids['price_field_value']);
+
+    // Create additional PriceSet/PriceField
     $priceSetID = reset($this->_ids['price_set']);
     $priceField = $this->callAPISuccess('price_field', 'create', [
       'price_set_id' => $priceSetID,
@@ -1997,21 +2000,26 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_page_id' => $this->_ids['contribution_page'],
     ]);
 
-    // Retrieve the lineItem that belongs to the Printing Rights and check the tax_amount CiviCRM Core calculated for it
+    // Retrieve the lineItem that belongs to the Goat
     $lineItem1 = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'label' => 'Shoe-eating Goat',
+    ]);
+
+    // Retrieve the lineItem that belongs to the Printing Rights and check the tax_amount CiviCRM Core calculated for it
+    $lineItem2 = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contribution['id'],
       'label' => 'Printing Rights',
     ]);
 
     // Retrieve the lineItem that belongs to the Another Line Item and check the tax_amount CiviCRM Core calculated for it
-    $lineItem2 = $this->callAPISuccessGetSingle('LineItem', [
+    $lineItem3 = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contribution['id'],
       'label' => 'Another Line Item',
     ]);
 
-    $finalContribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $contribution['id'], 'return' => ['tax_amount', 'total_amount']]);
-    $this->assertEquals($lineItem1['line_total'] + $lineItem2['line_total'], round(180 * 16.95 + 110 * 2.95, 2), 'Line Item Total is incorrect.');
-    $this->assertEquals(round($lineItem1['tax_amount'] + $lineItem2['tax_amount'], 2), round(180 * 16.95 * 0.10 + 110 * 2.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
+    $this->assertEquals($lineItem1['line_total'] + $lineItem2['line_total'] + $lineItem3['line_total'], round(10 + 180 * 16.95 + 110 * 2.95, 2), 'Line Item Total is incorrect.');
+    $this->assertEquals(round($lineItem1['tax_amount'] + $lineItem2['tax_amount'] + $lineItem3['tax_amount'], 2), round(180 * 16.95 * 0.10 + 110 * 2.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
 
   /**
