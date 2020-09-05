@@ -98,14 +98,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $now = date('YmdHis');
 
-    // fix dates that already exist
-    $dates = ['create', 'start', 'end', 'cancel', 'modified'];
-    foreach ($dates as $date) {
-      $name = "{$date}_date";
-      if ($recur->$name) {
-        $recur->$name = CRM_Utils_Date::isoToMysql($recur->$name);
-      }
-    }
     $sendNotification = FALSE;
     $subscriptionPaymentStatus = NULL;
     // set transaction type
