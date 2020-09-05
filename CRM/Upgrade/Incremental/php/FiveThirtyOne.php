@@ -77,7 +77,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
 
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
     $eWAYPaymentProcessorType = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_payment_processor_type WHERE class_name = 'Payment_eWAY'");
-    if ($eWAYPaymentProcessorType) {
+    $ewayPaymentProcessorCount = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_payment_processor WHERE payment_processor_type_id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
+    if ($ewayPaymentProcessorCount) {
       $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
         'type' => 'module',
         'full_name' => 'ewaysingle',
@@ -96,6 +97,9 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
         'cleanup' => NULL,
       ]);
       CRM_Core_DAO::executeQuery($managedEntity->usingReplace()->toSQL());
+    }
+    else {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_payment_processor_type WHERE id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
     }
     return TRUE;
   }
