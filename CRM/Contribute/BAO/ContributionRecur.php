@@ -261,9 +261,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     if ($recur->find(TRUE)) {
       $transaction = new CRM_Core_Transaction();
       $recur->contribution_status_id = $cancelledId;
-      $recur->start_date = CRM_Utils_Date::isoToMysql($recur->start_date);
-      $recur->create_date = CRM_Utils_Date::isoToMysql($recur->create_date);
-      $recur->modified_date = CRM_Utils_Date::isoToMysql($recur->modified_date);
       $recur->cancel_reason = $params['cancel_reason'] ?? NULL;
       $recur->cancel_date = date('YmdHis');
       $recur->save();
