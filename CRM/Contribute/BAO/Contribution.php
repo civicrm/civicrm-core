@@ -12,6 +12,7 @@
 use Civi\Api4\Activity;
 use Civi\Api4\ContributionPage;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\Participant;
 
 /**
  *
@@ -4406,8 +4407,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'financial_type_id',
     ];
 
-    $eventID = $objects['event']->id ?? NULL;
-
+    // @todo - accept payment_processor_id as an input parameter as it is part of the
+    // incoming payment information (at least when coming from a payment processor).
+    // this is the last 'object' to get rid of....
     $paymentProcessorId = '';
     if (isset($objects['paymentProcessor'])) {
       if (is_array($objects['paymentProcessor'])) {
@@ -4422,7 +4424,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
-      'source' => self::getRecurringContributionDescription($contribution, $eventID),
+      'source' => self::getRecurringContributionDescription($contribution, $participantID),
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
@@ -4636,12 +4638,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Get the description (source field) for the recurring contribution.
    *
    * @param CRM_Contribute_BAO_Contribution $contribution
-   * @param int|null $eventID
+   * @param int|null $participantID
    *
    * @return string
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
-  protected static function getRecurringContributionDescription($contribution, $eventID) {
+  protected static function getRecurringContributionDescription($contribution, $participantID) {
     if (!empty($contribution->source)) {
       return $contribution->source;
     }
@@ -4652,8 +4655,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       ]);
       return ts('Online Contribution') . ': ' . $contributionPageTitle;
     }
-    elseif ($eventID) {
-      return ts('Online Event Registration') . ': ' . CRM_Event_PseudoConstant::event($eventID);
+    elseif ($participantID) {
+      $eventTitle = Participant::get(FALSE)
+        ->addSelect('event.title')
+        ->addWhere('id', '=', (int) $participantID)
+        ->execute()->first()['event.title'];
+      return ts('Online Event Registration') . ': ' . $eventTitle;
     }
     elseif (!empty($contribution->contribution_recur_id)) {
       return 'recurring contribution';
