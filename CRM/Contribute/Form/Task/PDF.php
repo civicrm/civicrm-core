@@ -142,12 +142,12 @@ AND    {$this->_componentClause}";
     $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
 
     foreach ($elements['details'] as $contribID => $detail) {
-      $input = $ids = $objects = [];
+      $input = $ids = [];
 
       if (in_array($detail['contact'], $elements['excludeContactIds'])) {
         continue;
       }
-
+      // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
       $input['component'] = $detail['component'];
 
       $ids['contact'] = $detail['contact'];
@@ -158,11 +158,9 @@ AND    {$this->_componentClause}";
       $ids['participant'] = $detail['participant'] ?? NULL;
       $ids['event'] = $detail['event'] ?? NULL;
 
-      if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
-        throw new CRM_Core_Exception('invalid data');
-      }
-
-      $contribution = &$objects['contribution'];
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->id = $contribID;
+      $contribution->fetch();
 
       // set some fake input values so we can reuse IPN code
       $input['amount'] = $contribution->total_amount;
@@ -181,9 +179,6 @@ AND    {$this->_componentClause}";
             1 => [$contribution->trxn_id, 'String'],
           ]);
 
-      // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
-      $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
-
       if (isset($params['from_email_address']) && !$elements['createPdf']) {
         // If a logged in user from email is used rather than a domain wide from email address
         // the from_email_address params key will be numerical and we need to convert it to be
@@ -195,7 +190,7 @@ AND    {$this->_componentClause}";
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }
 
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $elements['createPdf']);
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $elements['createPdf']);
 
       if ($mail['html']) {
         $message[] = $mail['html'];
