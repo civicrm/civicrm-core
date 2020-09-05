@@ -250,7 +250,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     // This provides legacy support for APIv3, allowing no-longer-existent html types
     if ($fieldName == 'html_type' && isset($props['version']) && $props['version'] == 3) {
       $options['Multi-Select'] = 'Multi-Select';
+      $options['Select Country'] = 'Select Country';
       $options['Multi-Select Country'] = 'Multi-Select Country';
+      $options['Select State/Province'] = 'Select State/Province';
       $options['Multi-Select State/Province'] = 'Multi-Select State/Province';
     }
     return $options;
@@ -678,11 +680,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
 
-    // FIXME: Why are select state/country separate widget types?
     $isSelect = (in_array($widget, [
       'Select',
-      'Select State/Province',
-      'Select Country',
       'CheckBox',
       'Radio',
     ]));
@@ -1057,8 +1056,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Select':
       case 'Autocomplete-Select':
       case 'Radio':
-      case 'Select Country':
-      case 'Select State/Province':
       case 'CheckBox':
         if ($field['data_type'] == 'ContactReference' && $value) {
           if (is_numeric($value)) {

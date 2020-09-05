@@ -143,8 +143,6 @@ class SpecFormatter {
     unset($inputAttrs['type']);
 
     $map = [
-      'Select State/Province' => 'Select',
-      'Select Country' => 'Select',
       'Select Date' => 'Date',
       'Link' => 'Url',
     ];

@@ -341,8 +341,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
                   case 'Radio':
                   case 'Select':
-                  case 'Select Country':
-                  case 'Select State/Province':
                     $editable = TRUE;
                     $fieldAttributes['data-type'] = $spec['data_type'] == 'Boolean' ? 'boolean' : 'select';
                     if (!$spec['is_required']) {
@@ -408,7 +406,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
     $headers = [];
     if (!empty($fieldIDs)) {
-      $fields = ['Radio', 'Select', 'Select Country', 'Select State/Province'];
+      $fields = ['Radio', 'Select'];
       foreach ($fieldIDs as $fieldID) {
         if ($this->_pageViewType == 'profileDataView') {
           $headers[$fieldID] = $customGroupInfo[$fieldID]['fieldLabel'];

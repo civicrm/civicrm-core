@@ -135,7 +135,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $fieldsToCreate = [
       [
         'data_type' => 'Country',
-        'html_type' => 'Select Country',
+        'html_type' => 'Select',
         'tests' => [
           'United States' => 1228,
           '' => NULL,
@@ -143,7 +143,8 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       ],
       [
         'data_type' => 'StateProvince',
-        'html_type' => 'Multi-Select State/Province',
+        'html_type' => 'Select',
+        'serialize' => 1,
         'tests' => [
           '' => 0,
           'Alabama' => 1000,
@@ -296,21 +297,21 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       'custom_group_id' => $groups['A']['id'],
       'label' => 'Country A',
       'dataType' => 'Country',
-      'htmlType' => 'Select Country',
+      'htmlType' => 'Select',
       'default_value' => NULL,
     ]);
     $countryB = $this->customFieldCreate([
       'custom_group_id' => $groups['A']['id'],
       'label' => 'Country B',
       'dataType' => 'Country',
-      'htmlType' => 'Select Country',
+      'htmlType' => 'Select',
       'default_value' => NULL,
     ]);
     $countryC = $this->customFieldCreate([
       'custom_group_id' => $groups['B']['id'],
       'label' => 'Country C',
       'dataType' => 'Country',
-      'htmlType' => 'Select Country',
+      'htmlType' => 'Select',
       'default_value' => NULL,
     ]);
 
@@ -460,7 +461,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'options_per_line' => NULL,
         'text_length' => NULL,
         'data_type' => 'Country',
-        'html_type' => 'Select Country',
+        'html_type' => 'Select',
         'is_search_range' => '0',
         'id' => $this->getCustomFieldID('country'),
         'label' => 'Country',
@@ -499,7 +500,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'options_per_line' => NULL,
         'text_length' => NULL,
         'data_type' => 'Country',
-        'html_type' => 'Select Country',
+        'html_type' => 'Select',
         'is_search_range' => '0',
         'id' => $this->getCustomFieldID('multi_country'),
         'label' => 'Country-multi',
@@ -797,7 +798,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'import' => 1,
         'data_type' => 'StateProvince',
         'type' => 1,
-        'html_type' => 'Select State/Province',
+        'html_type' => 'Select',
         'text_length' => NULL,
         'options_per_line' => NULL,
         'is_search_range' => '0',
@@ -835,7 +836,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'data_type' => 'StateProvince',
         'name' => $this->getCustomFieldName('multi_state'),
         'type' => 1,
-        'html_type' => 'Select State/Province',
+        'html_type' => 'Select',
         'text_length' => NULL,
         'options_per_line' => NULL,
         'is_search_range' => '0',

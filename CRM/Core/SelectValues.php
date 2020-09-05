@@ -174,8 +174,6 @@ class CRM_Core_SelectValues {
       'CheckBox' => ts('Checkbox(es)'),
       'Select Date' => ts('Select Date'),
       'File' => ts('File'),
-      'Select State/Province' => ts('Select State/Province'),
-      'Select Country' => ts('Select Country'),
       'RichTextEditor' => ts('Rich Text Editor'),
       'Autocomplete-Select' => ts('Autocomplete-Select'),
       'Link' => ts('Link'),

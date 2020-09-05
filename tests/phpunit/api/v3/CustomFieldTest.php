@@ -107,6 +107,16 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $dtype = CRM_Core_BAO_CustomField::dataType();
     $htype = CRM_Custom_Form_Field::$_dataToHTML;
 
+    // Legacy html types returned by v3
+    foreach ($htype as &$item) {
+      if (isset($item['StateProvince'])) {
+        $item['StateProvince'] = 'Select State/Province';
+      }
+      if (isset($item['Country'])) {
+        $item['Country'] = 'Select Country';
+      }
+    }
+
     $n = 0;
     foreach ($dtype as $dkey => $dvalue) {
       foreach ($htype[$n] as $hkey => $hvalue) {
@@ -676,6 +686,79 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     ]);
     $this->assertCount(1, $result['values']);
     $this->assertEquals('SingleSelect', $result['values'][0]['label']);
+  }
+
+  public function testLegacyStateCountryTypes() {
+    $customGroup = $this->customGroupCreate([
+      'name' => 'testCustomGroup',
+      'title' => 'testCustomGroup',
+      'extends' => 'Individual',
+    ]);
+    $f1 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'CountrySelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'Country',
+      'html_type' => 'Select Country',
+    ]);
+    $f2 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'StateSelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'StateProvince',
+      'html_type' => 'Select State/Province',
+    ]);
+    $f3 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'MultiSelectSP',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'StateProvince',
+      'html_type' => 'Multi-Select State/Province',
+    ]);
+    $f4 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'MultiSelectCountry',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'Country',
+      'html_type' => 'Select Country',
+      'serialize' => 1,
+    ]);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Multi-Select State/Province',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('MultiSelectSP', $result['values'][0]['label']);
+    $this->assertEquals('Multi-Select State/Province', $result['values'][0]['html_type']);
+    $this->assertEquals('1', $result['values'][0]['serialize']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Multi-Select Country',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('MultiSelectCountry', $result['values'][0]['label']);
+    $this->assertEquals('Multi-Select Country', $result['values'][0]['html_type']);
+    $this->assertEquals('1', $result['values'][0]['serialize']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Select Country',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('CountrySelect', $result['values'][0]['label']);
+    $this->assertEquals('Select Country', $result['values'][0]['html_type']);
+    $this->assertEquals('0', $result['values'][0]['serialize']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Select State/Province',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('StateSelect', $result['values'][0]['label']);
+    $this->assertEquals('Select State/Province', $result['values'][0]['html_type']);
+    $this->assertEquals('0', $result['values'][0]['serialize']);
   }
 
 }
