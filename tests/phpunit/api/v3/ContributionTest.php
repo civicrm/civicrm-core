@@ -3316,16 +3316,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $this->_individualId = $this->createLoggedInUser();
+    // Unset source to test whether one is generated if not set already on the contribution.
+    unset($this->_params['source']);
     $contributionID = $this->createPendingParticipantContribution();
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event']);
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 2], ['name' => 'post_1', 'title' => 'title_post_2', 'frontend_title' => 'public 2']);
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 3], ['name' => 'post_2', 'title' => 'title_post_3', 'frontend_title' => 'public 3']);
     $this->eliminateUFGroupOne();
 
-    $this->callAPISuccess('contribution', 'completetransaction', [
-      'id' => $contributionID,
-    ]
-    );
+    $this->callAPISuccess('contribution', 'completetransaction', ['id' => $contributionID]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['contribution_source']]);
+    $this->assertEquals('Online Event Registration: Annual CiviCRM meet', $contribution['contribution_source']);
     $participantStatus = $this->callAPISuccessGetValue('participant', [
       'id' => $this->_ids['participant'],
       'return' => 'participant_status_id',

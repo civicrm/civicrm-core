@@ -4406,7 +4406,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'financial_type_id',
     ];
 
-    $event = $objects['event'] ?? NULL;
+    $eventID = $objects['event']->id ?? NULL;
 
     $paymentProcessorId = '';
     if (isset($objects['paymentProcessor'])) {
@@ -4422,7 +4422,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
-      'source' => self::getRecurringContributionDescription($contribution, $event),
+      'source' => self::getRecurringContributionDescription($contribution, $eventID),
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
@@ -4636,12 +4636,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Get the description (source field) for the recurring contribution.
    *
    * @param CRM_Contribute_BAO_Contribution $contribution
-   * @param CRM_Event_DAO_Event|null $event
+   * @param int|null $eventID
    *
    * @return string
    * @throws \CiviCRM_API3_Exception
    */
-  protected static function getRecurringContributionDescription($contribution, $event) {
+  protected static function getRecurringContributionDescription($contribution, $eventID) {
     if (!empty($contribution->source)) {
       return $contribution->source;
     }
@@ -4652,8 +4652,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       ]);
       return ts('Online Contribution') . ': ' . $contributionPageTitle;
     }
-    elseif ($event) {
-      return ts('Online Event Registration') . ': ' . $event->title;
+    elseif ($eventID) {
+      return ts('Online Event Registration') . ': ' . CRM_Event_PseudoConstant::event($eventID);
     }
     elseif (!empty($contribution->contribution_recur_id)) {
       return 'recurring contribution';
