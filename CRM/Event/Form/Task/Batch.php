@@ -268,7 +268,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId,
       'Event'
     );
-    if (!$contributionId) {
+    if (!$contributionId || !$participantId) {
       return;
     }
 
@@ -280,28 +280,22 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
-    $contributionStatusId = NULL;
     if (array_key_exists($statusId, $positiveStatuses)) {
-      $contributionStatusId = array_search('Completed', $contributionStatuses);
+      $params = [
+        'component_id' => $participantId,
+        'contribution_id' => $contributionId,
+        'contribution_status_id' => array_search('Completed', $contributionStatuses),
+        'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
+      ];
+
+      //change related contribution status.
+      self::updateContributionStatus($params);
     }
     if (array_key_exists($statusId, $negativeStatuses)) {
       civicrm_api3('Contribution', 'create', ['id' => $contributionId, 'contribution_status_id' => 'Cancelled']);
       return;
     }
 
-    if (!$contributionStatusId || !$participantId || !$contributionId) {
-      return;
-    }
-
-    $params = [
-      'component_id' => $participantId,
-      'contribution_id' => $contributionId,
-      'contribution_status_id' => $contributionStatusId,
-      'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
-    ];
-
-    //change related contribution status.
-    self::updateContributionStatus($params);
   }
 
   /**
