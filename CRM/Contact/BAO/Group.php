@@ -1223,12 +1223,12 @@ WHERE {$whereClause}";
       $clauses[] = '`groups`.parents IS NULL';
     }
 
-    $savedSearch = CRM_Utils_Array::value('savedSearch', $params);
+    $savedSearch = $params['savedSearch'] ?? NULL;
     if ($savedSearch == 1) {
-      $clauses[] = 'groups.saved_search_id IS NOT NULL';
+      $clauses[] = '`groups`.saved_search_id IS NOT NULL';
     }
     elseif ($savedSearch == 2) {
-      $clauses[] = 'groups.saved_search_id IS NULL';
+      $clauses[] = '`groups`.saved_search_id IS NULL';
     }
 
     // only show child groups of a specific parent group
