@@ -98,7 +98,27 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     }
     $this->assertEquals(1, $groups['recordsTotal']);
     $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    // Search on just smart groups keeping the title filter
+    $_GET['savedSearch'] = 1;
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
+    $this->assertEquals(0, $groups['recordsTotal']);
+    // Now search on just normal groups keeping the title filter
+    $_GET['savedSearch'] = 2;
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
+    $this->assertEquals(1, $groups['recordsTotal']);
+    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
     unset($_GET['title']);
+    unset($_GET['savedSearch']);
 
     // check on status
     $_GET['status'] = 2;
