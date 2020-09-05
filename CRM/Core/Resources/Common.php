@@ -17,6 +17,41 @@ class CRM_Core_Resources_Common {
   const REGION = 'html-header';
 
   /**
+   * The 'bundle.bootstrap3' service is a collection of resources which are
+   * loaded when a page needs to support Boostrap CSS v3.
+   *
+   * @param string $name
+   *   i.e. 'bootstrap3'
+   * @return \CRM_Core_Resources_Bundle
+   */
+  public static function createBootstrap3Bundle($name) {
+    $bundle = new CRM_Core_Resources_Bundle($name, ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl', 'markup']);
+    // Leave it to the theme/provider to register specific resources.
+    // $bundle->addStyleFile('civicrm', 'css/bootstrap3.css');
+    // $bundle->addScriptFile('civicrm', 'js/bootstrap3.js', [
+    //  'translate' => FALSE,
+    //]);
+
+    //  This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.
+    $bundle->addMarkup('
+      <div id="bootstrap-theme">
+        <div class="messages warning no-popup collapse">
+          <p>
+            <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+            <strong>' . ts('Bootstrap theme not found.') . '</strong>
+          </p>
+          <p>' . ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') . '</p>
+        </div>
+      </div>',
+      ['region' => 'page-header']
+    );
+
+    CRM_Utils_Hook::alterBundle($bundle);
+    self::useRegion($bundle, self::REGION);
+    return $bundle;
+  }
+
+  /**
    * The 'bundle.coreStyles' service is a collection of resources used on some
    * non-Civi pages (wherein Civi may be mixed-in).
    *
