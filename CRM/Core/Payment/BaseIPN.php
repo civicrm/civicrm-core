@@ -232,17 +232,15 @@ class CRM_Core_Payment_BaseIPN {
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
-    if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
-      if (!empty($memberships)) {
-        foreach ($memberships as $membership) {
-          // @fixme Should we cancel only Pending memberships? per cancelled()
-          $this->cancelMembership($membership, $membership->status_id, FALSE);
-        }
+    if (!empty($memberships)) {
+      foreach ($memberships as $membership) {
+        // @fixme Should we cancel only Pending memberships? per cancelled()
+        $this->cancelMembership($membership, $membership->status_id, FALSE);
       }
+    }
 
-      if ($participant) {
-        $this->cancelParticipant($participant->id);
-      }
+    if ($participant) {
+      $this->cancelParticipant($participant->id);
     }
 
     if ($transaction) {
