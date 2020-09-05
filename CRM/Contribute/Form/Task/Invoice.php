@@ -210,7 +210,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $pendingStatusId = CRM_Utils_Array::key('Pending', $contributionStatusID);
 
     foreach ($invoiceElements['details'] as $contribID => $detail) {
-      $input = $ids = $objects = [];
+      $input = $ids = [];
       if (in_array($detail['contact'], $invoiceElements['excludeContactIds'])) {
         continue;
       }
@@ -225,19 +225,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $ids['participant'] = $detail['participant'] ?? NULL;
       $ids['event'] = $detail['event'] ?? NULL;
 
-      if (!$invoiceElements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
-        CRM_Core_Error::statusBounce('Supplied data was not able to be validated');
-      }
-
-      $contribution = &$objects['contribution'];
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->id = $contribID;
+      $contribution->fetch();
+      $contribution->loadRelatedObjects($input, $ids, TRUE);
 
       $input['amount'] = $contribution->total_amount;
       $input['invoice_id'] = $contribution->invoice_id;
       $input['receive_date'] = $contribution->receive_date;
       $input['contribution_status_id'] = $contribution->contribution_status_id;
       $input['organization_name'] = $contribution->_relatedObjects['contact']->organization_name;
-
-      $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
 
       // Fetch the billing address. getValues should prioritize the billing
       // address, otherwise will return the primary address.
