@@ -207,16 +207,16 @@ class Container {
     ))->setPublic(TRUE);
 
     $container->setDefinition('bundle.bootstrap3', new Definition('CRM_Core_Resources_Bundle', ['bootstrap3']))
-      ->setFactory('CRM_Core_Resources_Common::createBootstrap3Bundle');
+      ->setFactory('CRM_Core_Resources_Common::createBootstrap3Bundle')->setPublic(TRUE);
 
     $container->setDefinition('bundle.coreStyles', new Definition('CRM_Core_Resources_Bundle', ['coreStyles']))
-      ->setFactory('CRM_Core_Resources_Common::createStyleBundle');
+      ->setFactory('CRM_Core_Resources_Common::createStyleBundle')->setPublic(TRUE);
 
     $container->setDefinition('bundle.coreResources', new Definition('CRM_Core_Resources_Bundle', ['coreResources']))
-      ->setFactory('CRM_Core_Resources_Common::createFullBundle');
+      ->setFactory('CRM_Core_Resources_Common::createFullBundle')->setPublic(TRUE);
 
     $container->setDefinition('pear_mail', new Definition('Mail'))
-      ->setFactory('CRM_Utils_Mail::createMailer');
+      ->setFactory('CRM_Utils_Mail::createMailer')->setPublic(TRUE);
 
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
