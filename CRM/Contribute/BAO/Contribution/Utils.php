@@ -496,6 +496,7 @@ LIMIT 1
    *   Amount rounded and returned with the desired decimal places
    */
   public static function formatAmount($amount, $decimals = 2) {
+    throw new Exception('Lets see if this is tested');
     return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 
