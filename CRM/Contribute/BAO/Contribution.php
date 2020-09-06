@@ -2773,7 +2773,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Load all related objects - even where id not passed in? (allows API to call this).
    *
    * @return bool
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public function loadRelatedObjects($input, &$ids, $loadAll = FALSE) {
     // @todo deprecate this function - the steps should be
@@ -2840,7 +2840,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $payment = new CRM_Pledge_BAO_PledgePayment();
         $payment->id = $paymentID;
         if (!$payment->find(TRUE)) {
-          throw new Exception("Could not find pledge payment record: " . $paymentID);
+          throw new CRM_Core_Exception("Could not find pledge payment record: " . $paymentID);
         }
         $this->_relatedObjects['pledge_payment'][] = $payment;
       }
@@ -2858,7 +2858,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($ids['event'] &&
         !$event->find(TRUE)
       ) {
-        throw new Exception("Could not find event: " . $ids['event']);
+        throw new CRM_Core_Exception("Could not find event: " . $ids['event']);
       }
 
       $this->_relatedObjects['event'] = &$event;
@@ -2868,7 +2868,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($ids['participant'] &&
         !$participant->find(TRUE)
       ) {
-        throw new Exception("Could not find participant: " . $ids['participant']);
+        throw new CRM_Core_Exception("Could not find participant: " . $ids['participant']);
       }
       $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
 

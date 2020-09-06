@@ -143,42 +143,16 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    * @param bool $required
    * @param int $paymentProcessorID
-   * @param array $error_handling
    *
    * @return bool|array
+   * @throws \CRM_Core_Exception
    */
-  public function loadObjects($input, &$ids, &$objects, $required, $paymentProcessorID, $error_handling = NULL) {
-    if (empty($error_handling)) {
-      // default options are that we log an error & echo it out
-      // note that we should refactor this error handling into error code @ some point
-      // but for now setting up enough separation so we can do unit tests
-      $error_handling = [
-        'log_error' => 1,
-        'echo_error' => 1,
-      ];
-    }
+  public function loadObjects($input, &$ids, &$objects, $required, $paymentProcessorID) {
     $contribution = &$objects['contribution'];
     $ids['paymentProcessor'] = $paymentProcessorID;
-    try {
-      $success = $contribution->loadRelatedObjects($input, $ids);
-      if ($required && empty($contribution->_relatedObjects['paymentProcessor'])) {
-        throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
-      }
-    }
-    catch (Exception $e) {
-      $success = FALSE;
-      if (!empty($error_handling['log_error'])) {
-        CRM_Core_Error::debug_log_message($e->getMessage());
-      }
-      if (!empty($error_handling['echo_error'])) {
-        echo $e->getMessage();
-      }
-      if (!empty($error_handling['return_error'])) {
-        return [
-          'is_error' => 1,
-          'error_message' => ($e->getMessage()),
-        ];
-      }
+    $success = $contribution->loadRelatedObjects($input, $ids);
+    if ($required && empty($contribution->_relatedObjects['paymentProcessor'])) {
+      throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
     }
     $objects = array_merge($objects, $contribution->_relatedObjects);
     return $success;
