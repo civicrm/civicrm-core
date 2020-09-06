@@ -1511,6 +1511,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       foreach ($floatFields as $floatField) {
         $checkEntity[$floatField] = rtrim($checkEntity[$floatField], "0");
       }
+      unset($entity['xdebug']);
+      unset($checkEntity['xdebug']);
       $this->assertAPIArrayComparison($entity, $checkEntity, [], "checking if $fieldName was correctly updated\n" . print_r([
         'update-params' => $updateParams,
         'update-result' => $update,
