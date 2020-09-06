@@ -284,7 +284,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       $params = [
         'component_id' => $participantId,
         'contribution_id' => $contributionId,
-        'contribution_status_id' => array_search('Completed', $contributionStatuses),
         'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
       ];
 
@@ -314,7 +313,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    */
   public static function updateContributionStatus($params) {
     // get minimum required values.
-    $statusId = $params['contribution_status_id'] ?? NULL;
     $componentId = $params['component_id'] ?? NULL;
     $contributionId = $params['contribution_id'] ?? NULL;
 
@@ -357,12 +355,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'flip' => 1,
     ]);
     $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = $params['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] ?? NULL;
-    if ($statusId == $contributionStatuses['Failed']) {
-      $transaction = new CRM_Core_Transaction();
-      $baseIPN->failed($objects, $transaction, $input);
-      $transaction->commit();
-      return;
-    }
 
     // status is not pending
     if ($contribution->contribution_status_id != $contributionStatuses['Pending']) {
