@@ -268,7 +268,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId,
       'Event'
     );
-    if (!$contributionId || !$participantId) {
+    if (!$contributionId) {
       return;
     }
 
@@ -426,11 +426,11 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   public function submit($params) {
     $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
     if (isset($params['field'])) {
-      foreach ($params['field'] as $key => $value) {
+      foreach ($params['field'] as $participantID => $value) {
 
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          $key,
+          $participantID,
           'Participant'
         );
         foreach (array_keys($value) as $fieldName) {
@@ -444,7 +444,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
           }
         }
 
-        $value['id'] = $key;
+        $value['id'] = $participantID;
 
         if (!empty($value['participant_role'])) {
           if (is_array($value['participant_role'])) {
@@ -460,9 +460,9 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
         $relatedStatusChange = FALSE;
         if (!empty($value['participant_status'])) {
           $value['status_id'] = $value['participant_status'];
-          $fromStatusId = $this->_fromStatusIds[$key] ?? NULL;
+          $fromStatusId = $this->_fromStatusIds[$participantID] ?? NULL;
           if (!$fromStatusId) {
-            $fromStatusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $key, 'status_id');
+            $fromStatusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantID, 'status_id');
           }
 
           if ($fromStatusId != $value['status_id']) {
@@ -479,11 +479,11 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
         //need to trigger mails when we change status
         if ($statusChange) {
-          CRM_Event_BAO_Participant::transitionParticipants([$key], $value['status_id'], $fromStatusId);
+          CRM_Event_BAO_Participant::transitionParticipants([$participantID], $value['status_id'], $fromStatusId);
         }
-        if ($relatedStatusChange && $key && $value['status_id']) {
+        if ($relatedStatusChange && $participantID && $value['status_id']) {
           //update related contribution status, CRM-4395
-          self::updatePendingOnlineContribution($key, $value['status_id']);
+          self::updatePendingOnlineContribution((int) $participantID, $value['status_id']);
         }
       }
       CRM_Core_Session::setStatus(ts('The updates have been saved.'), ts('Saved'), 'success');
