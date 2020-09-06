@@ -441,10 +441,12 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     // should treat it as a modification.
     $this->resetSchemaCacheForTable("log_$table");
     $logTableSchema = $this->columnSpecsOf("log_$table");
-    foreach ($cols['ADD'] as $colKey => $col) {
-      if (array_key_exists($col, $logTableSchema)) {
-        $cols['MODIFY'][] = $col;
-        unset($cols['ADD'][$colKey]);
+    if (!empty($cols['ADD'])) {
+      foreach ($cols['ADD'] as $colKey => $col) {
+        if (array_key_exists($col, $logTableSchema)) {
+          $cols['MODIFY'][] = $col;
+          unset($cols['ADD'][$colKey]);
+        }
       }
     }
 
