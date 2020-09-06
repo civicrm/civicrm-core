@@ -52,8 +52,13 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
 
   /**
    * Test tax is calculated correctly on the line item.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateLineItemWithTax() {
+  public function testCreateLineItemWithTax($version) {
+    $this->_apiversion = $version;
     $this->enableSalesTaxOnFinancialType('Donation');
     $this->params['financial_type_id'] = 'Donation';
     $result = $this->callAPISuccess('LineItem', 'create', $this->params);
@@ -67,6 +72,8 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @todo move to a trait, share.
    *
+   * @dataProvider versionThreeAndFour
+   *
    * @param string $type
    */
   public function enableSalesTaxOnFinancialType($type) {
@@ -77,9 +84,14 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   /**
    * Test basic create line item.
    *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateLineItem() {
+  public function testCreateLineItem($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
     $this->assertCount(1, $result);
     $this->getAndCheck($this->params, key($result), $this->_entity);
@@ -87,8 +99,13 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
 
   /**
    * Test basic get line item.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetBasicLineItem() {
+  public function testGetBasicLineItem($version) {
+    $this->_apiversion = $version;
     $getParams = [
       'entity_table' => 'civicrm_contribution',
     ];
@@ -99,9 +116,14 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   /**
    * Test delete line item.
    *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   *
    * @throws \CRM_Core_Exception
    */
-  public function testDeleteLineItem() {
+  public function testDeleteLineItem($version) {
+    $this->_apiversion = $version;
     $getParams = [
       'entity_table' => 'civicrm_contribution',
     ];
