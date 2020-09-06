@@ -92,9 +92,7 @@ class CRM_Core_Payment_BaseIPN {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
     if (!$contribution->find(TRUE)) {
-      CRM_Core_Error::debug_log_message("Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE));
-      echo "Failure: Could not find contribution record for {$contribution->id}<p>";
-      return FALSE;
+      throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
     }
 
     // make sure contact exists and is valid
@@ -159,17 +157,8 @@ class CRM_Core_Payment_BaseIPN {
         'echo_error' => 1,
       ];
     }
+    $contribution = &$objects['contribution'];
     $ids['paymentProcessor'] = $paymentProcessorID;
-    if (is_a($objects['contribution'], 'CRM_Contribute_BAO_Contribution')) {
-      $contribution = &$objects['contribution'];
-    }
-    else {
-      //legacy support - functions are 'used' to be able to pass in a DAO
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $ids['contribution'] ?? NULL;
-      $contribution->find(TRUE);
-      $objects['contribution'] = &$contribution;
-    }
     try {
       $success = $contribution->loadRelatedObjects($input, $ids);
       if ($required && empty($contribution->_relatedObjects['paymentProcessor'])) {
