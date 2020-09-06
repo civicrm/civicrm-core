@@ -13,6 +13,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\ContributionPage;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\Participant;
+use Civi\Api4\PaymentProcessor;
 
 /**
  *
@@ -4425,10 +4426,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionParams['payment_processor'] = $paymentProcessorId;
 
-    // If paymentProcessor is not set then the payment_instrument_id would not be correct.
-    // not clear when or if this would occur if you encounter this please fix here & add a unit test.
     if (empty($contributionParams['payment_instrument_id']) && isset($contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'])) {
-      $contributionParams['payment_instrument_id'] = $contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'];
+      $contributionParams['payment_instrument_id'] = PaymentProcessor::get()->addWhere('id', '=', $paymentProcessorId)->addSelect('payment_instrument_id')->execute()->first()['payment_instrument_id'];
     }
 
     if ($recurringContributionID) {

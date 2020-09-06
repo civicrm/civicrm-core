@@ -757,7 +757,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Completed',
     ]);
-    $this->callAPISuccessGetCount('Contribution', [], 2);
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
+    $this->assertCount(2, $contributions);
+    $this->assertEquals('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
     // @todo this fails depending on what tests it is run with due some bad stuff in Membership.create
     // It needs to be addressed but might involve the switch to ORDER. Membership BAO does bad line item stuff.
     // $this->callAPISuccessGetCount('LineItem', [], 6);
