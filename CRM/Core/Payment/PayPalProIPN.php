@@ -412,77 +412,83 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   public function main() {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
-    if ($this->_isPaymentExpress) {
-      $this->handlePaymentExpress();
-      return;
-    }
-    $objects = $ids = $input = [];
-    $this->_component = $input['component'] = self::getValue('m');
-    $input['invoice'] = self::getValue('i', TRUE);
-    // get the contribution and contact ids from the GET params
-    $ids['contact'] = self::getValue('c', TRUE);
-    $ids['contribution'] = self::getValue('b', TRUE);
+    try {
+      if ($this->_isPaymentExpress) {
+        $this->handlePaymentExpress();
+        return;
+      }
+      $objects = $ids = $input = [];
+      $this->_component = $input['component'] = self::getValue('m');
+      $input['invoice'] = self::getValue('i', TRUE);
+      // get the contribution and contact ids from the GET params
+      $ids['contact'] = self::getValue('c', TRUE);
+      $ids['contribution'] = self::getValue('b', TRUE);
 
-    $this->getInput($input);
+      $this->getInput($input);
 
-    if ($this->_component == 'event') {
-      $ids['event'] = self::getValue('e', TRUE);
-      $ids['participant'] = self::getValue('p', TRUE);
-      $ids['contributionRecur'] = self::getValue('r', FALSE);
-    }
-    else {
-      // get the optional ids
-      //@ how can this not be broken retrieving from GET as we are dealing with a POST request?
-      // copy & paste? Note the retrieve function now uses data from _REQUEST so this will be included
-      $ids['membership'] = self::retrieve('membershipID', 'Integer', 'GET', FALSE);
-      $ids['contributionRecur'] = self::getValue('r', FALSE);
-      $ids['contributionPage'] = self::getValue('p', FALSE);
-      $ids['related_contact'] = self::retrieve('relatedContactID', 'Integer', 'GET', FALSE);
-      $ids['onbehalf_dupe_alert'] = self::retrieve('onBehalfDupeAlert', 'Integer', 'GET', FALSE);
-    }
+      if ($this->_component == 'event') {
+        $ids['event'] = self::getValue('e', TRUE);
+        $ids['participant'] = self::getValue('p', TRUE);
+        $ids['contributionRecur'] = self::getValue('r', FALSE);
+      }
+      else {
+        // get the optional ids
+        //@ how can this not be broken retrieving from GET as we are dealing with a POST request?
+        // copy & paste? Note the retrieve function now uses data from _REQUEST so this will be included
+        $ids['membership'] = self::retrieve('membershipID', 'Integer', 'GET', FALSE);
+        $ids['contributionRecur'] = self::getValue('r', FALSE);
+        $ids['contributionPage'] = self::getValue('p', FALSE);
+        $ids['related_contact'] = self::retrieve('relatedContactID', 'Integer', 'GET', FALSE);
+        $ids['onbehalf_dupe_alert'] = self::retrieve('onBehalfDupeAlert', 'Integer', 'GET', FALSE);
+      }
 
-    if (!$ids['membership'] && $ids['contributionRecur']) {
-      $sql = "
+      if (!$ids['membership'] && $ids['contributionRecur']) {
+        $sql = "
     SELECT m.id
       FROM civicrm_membership m
 INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contribution_id = %1
      WHERE m.contribution_recur_id = %2
      LIMIT 1";
-      $sqlParams = [
-        1 => [$ids['contribution'], 'Integer'],
-        2 => [$ids['contributionRecur'], 'Integer'],
-      ];
-      if ($membershipId = CRM_Core_DAO::singleValueQuery($sql, $sqlParams)) {
-        $ids['membership'] = $membershipId;
-      }
-    }
-
-    $paymentProcessorID = CRM_Utils_Array::value('processor_id', $this->_inputParameters);
-    if (!$paymentProcessorID) {
-      $paymentProcessorID = self::getPayPalPaymentProcessorID();
-    }
-
-    if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
-      return;
-    }
-
-    self::$_paymentProcessor = &$objects['paymentProcessor'];
-    //?? how on earth would we not have component be one of these?
-    // they are the only valid settings & this IPN file can't even be called without one of them
-    // grepping for this class doesn't find other paths to call this class
-    if ($this->_component == 'contribute' || $this->_component == 'event') {
-      if ($ids['contributionRecur']) {
-        // check if first contribution is completed, else complete first contribution
-        $first = TRUE;
-        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        if ($objects['contribution']->contribution_status_id == $completedStatusId) {
-          $first = FALSE;
+        $sqlParams = [
+          1 => [$ids['contribution'], 'Integer'],
+          2 => [$ids['contributionRecur'], 'Integer'],
+        ];
+        if ($membershipId = CRM_Core_DAO::singleValueQuery($sql, $sqlParams)) {
+          $ids['membership'] = $membershipId;
         }
-        $this->recur($input, $ids, $objects, $first);
+      }
+
+      $paymentProcessorID = CRM_Utils_Array::value('processor_id', $this->_inputParameters);
+      if (!$paymentProcessorID) {
+        $paymentProcessorID = self::getPayPalPaymentProcessorID();
+      }
+
+      if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
         return;
       }
+
+      self::$_paymentProcessor = &$objects['paymentProcessor'];
+      //?? how on earth would we not have component be one of these?
+      // they are the only valid settings & this IPN file can't even be called without one of them
+      // grepping for this class doesn't find other paths to call this class
+      if ($this->_component == 'contribute' || $this->_component == 'event') {
+        if ($ids['contributionRecur']) {
+          // check if first contribution is completed, else complete first contribution
+          $first = TRUE;
+          $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+          if ($objects['contribution']->contribution_status_id == $completedStatusId) {
+            $first = FALSE;
+          }
+          $this->recur($input, $ids, $objects, $first);
+          return;
+        }
+      }
+      $this->single($input, $ids, $objects, FALSE, FALSE);
     }
-    $this->single($input, $ids, $objects, FALSE, FALSE);
+    catch (CRM_Core_Exception $e) {
+      Civi::log()->debug($e->getMessage());
+      echo 'Invalid or missing data';
+    }
   }
 
   /**
