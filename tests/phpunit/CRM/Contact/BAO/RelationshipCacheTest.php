@@ -15,7 +15,7 @@
  * @package CiviCRM
  * @group headless
  */
-class RelationshipCacheTest extends CiviUnitTestCase {
+class CRM_Contact_BAO_RelationshipCacheTest extends CiviUnitTestCase {
 
   protected function setUp() {
     $this->useTransaction(TRUE);
