@@ -53,8 +53,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   public function retrieve($name, $type, $abort = TRUE) {
     $value = CRM_Utils_Type::validate(CRM_Utils_Array::value($name, $this->_inputParameters), $type, FALSE);
     if ($abort && $value === NULL) {
-      Civi::log()->debug("PayPalIPN: Could not find an entry for $name");
-      echo "Failure: Missing Parameter<p>" . CRM_Utils_Type::escape($name, 'String');
       throw new CRM_Core_Exception("PayPalIPN: Could not find an entry for $name");
     }
     return $value;
@@ -286,84 +284,90 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function main() {
-    $objects = $ids = $input = [];
-    $component = $this->retrieve('module', 'String');
-    $input['component'] = $component;
+    try {
+      $objects = $ids = $input = [];
+      $component = $this->retrieve('module', 'String');
+      $input['component'] = $component;
 
-    $ids['contact'] = $this->retrieve('contactID', 'Integer', TRUE);
-    $contributionID = $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
-    $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
-    $contributionRecurID = $this->retrieve('contributionRecurID', 'Integer', FALSE);
+      $ids['contact'] = $this->retrieve('contactID', 'Integer', TRUE);
+      $contributionID = $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
+      $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
+      $contributionRecurID = $this->retrieve('contributionRecurID', 'Integer', FALSE);
 
-    $this->getInput($input);
+      $this->getInput($input);
 
-    if ($component == 'event') {
-      $ids['event'] = $this->retrieve('eventID', 'Integer', TRUE);
-      $ids['participant'] = $this->retrieve('participantID', 'Integer', TRUE);
-    }
-    else {
-      // get the optional ids
-      $ids['membership'] = $membershipID;
-      $ids['contributionRecur'] = $contributionRecurID;
-      $ids['contributionPage'] = $this->retrieve('contributionPageID', 'Integer', FALSE);
-      $ids['related_contact'] = $this->retrieve('relatedContactID', 'Integer', FALSE);
-      $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
-    }
-
-    $paymentProcessorID = $this->getPayPalPaymentProcessorID($input, $ids);
-
-    Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
-
-    // Debugging related to possible missing membership linkage
-    if ($contributionRecurID && $this->retrieve('membershipID', 'Integer', FALSE)) {
-      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecurID);
-      $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
-        'contribution_id' => $templateContribution['id'],
-        'membership_id' => $membershipID,
-      ]);
-      $lineItems  = civicrm_api3('LineItem', 'get', [
-        'contribution_id' => $templateContribution['id'],
-        'entity_id' => $membershipID,
-        'entity_table' => 'civicrm_membership',
-      ]);
-      Civi::log()->debug('PayPalIPN: Received payment for membership ' . (int) $membershipID
-        . '. Original contribution was ' . (int) $contributionID . '. The template for this contribution is '
-        . $templateContribution['id'] . ' it is linked to ' . $membershipPayment['count']
-        . 'payments for this membership. It has ' . $lineItems['count'] . ' line items linked to  this membership.'
-        . '  it is  expected the original contribution will be linked by both entities to the membership.'
-      );
-      if (empty($membershipPayment['count']) && empty($lineItems['count'])) {
-        Civi::log()->debug('PayPalIPN: Will attempt to compensate');
-        $input['membership_id'] = $this->retrieve('membershipID', 'Integer', FALSE);
+      if ($component == 'event') {
+        $ids['event'] = $this->retrieve('eventID', 'Integer', TRUE);
+        $ids['participant'] = $this->retrieve('participantID', 'Integer', TRUE);
       }
-      if ($contributionRecurID) {
-        $recurLinks = civicrm_api3('ContributionRecur', 'get', [
+      else {
+        // get the optional ids
+        $ids['membership'] = $membershipID;
+        $ids['contributionRecur'] = $contributionRecurID;
+        $ids['contributionPage'] = $this->retrieve('contributionPageID', 'Integer', FALSE);
+        $ids['related_contact'] = $this->retrieve('relatedContactID', 'Integer', FALSE);
+        $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
+      }
+
+      $paymentProcessorID = $this->getPayPalPaymentProcessorID($input, $ids);
+
+      Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
+
+      // Debugging related to possible missing membership linkage
+      if ($contributionRecurID && $this->retrieve('membershipID', 'Integer', FALSE)) {
+        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecurID);
+        $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
+          'contribution_id' => $templateContribution['id'],
           'membership_id' => $membershipID,
-          'contribution_recur_id' => $contributionRecurID,
         ]);
-        Civi::log()->debug('PayPalIPN: Membership should be  linked to  contribution recur  record ' . $contributionRecurID
-          . ' ' . $recurLinks['count'] . 'links found'
+        $lineItems = civicrm_api3('LineItem', 'get', [
+          'contribution_id' => $templateContribution['id'],
+          'entity_id' => $membershipID,
+          'entity_table' => 'civicrm_membership',
+        ]);
+        Civi::log()->debug('PayPalIPN: Received payment for membership ' . (int) $membershipID
+          . '. Original contribution was ' . (int) $contributionID . '. The template for this contribution is '
+          . $templateContribution['id'] . ' it is linked to ' . $membershipPayment['count']
+          . 'payments for this membership. It has ' . $lineItems['count'] . ' line items linked to  this membership.'
+          . '  it is  expected the original contribution will be linked by both entities to the membership.'
         );
-      }
-    }
-    if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
-      return;
-    }
-
-    self::$_paymentProcessor = &$objects['paymentProcessor'];
-    if ($component == 'contribute') {
-      if ($ids['contributionRecur']) {
-        // check if first contribution is completed, else complete first contribution
-        $first = TRUE;
-        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        if ($objects['contribution']->contribution_status_id == $completedStatusId) {
-          $first = FALSE;
+        if (empty($membershipPayment['count']) && empty($lineItems['count'])) {
+          Civi::log()->debug('PayPalIPN: Will attempt to compensate');
+          $input['membership_id'] = $this->retrieve('membershipID', 'Integer', FALSE);
         }
-        $this->recur($input, $ids, $objects, $first);
+        if ($contributionRecurID) {
+          $recurLinks = civicrm_api3('ContributionRecur', 'get', [
+            'membership_id' => $membershipID,
+            'contribution_recur_id' => $contributionRecurID,
+          ]);
+          Civi::log()->debug('PayPalIPN: Membership should be  linked to  contribution recur  record ' . $contributionRecurID
+            . ' ' . $recurLinks['count'] . 'links found'
+          );
+        }
+      }
+      if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
         return;
       }
+
+      self::$_paymentProcessor = &$objects['paymentProcessor'];
+      if ($component == 'contribute') {
+        if ($ids['contributionRecur']) {
+          // check if first contribution is completed, else complete first contribution
+          $first = TRUE;
+          $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+          if ($objects['contribution']->contribution_status_id == $completedStatusId) {
+            $first = FALSE;
+          }
+          $this->recur($input, $ids, $objects, $first);
+          return;
+        }
+      }
+      $this->single($input, $ids, $objects);
     }
-    $this->single($input, $ids, $objects);
+    catch (CRM_Core_Exception $e) {
+      Civi::log()->debug($e->getMessage());
+      echo 'Invalid or missing data';
+    }
   }
 
   /**
