@@ -454,18 +454,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CiviCRM_API3_Exception
    */
   public static function create(&$params, $ids = []) {
-    $dateFields = [
-      'receive_date',
-      'cancel_date',
-      'receipt_date',
-      'thankyou_date',
-      'revenue_recognition_date',
-    ];
-    foreach ($dateFields as $df) {
-      if (isset($params[$df])) {
-        $params[$df] = CRM_Utils_Date::isoToMysql($params[$df]);
-      }
-    }
 
     $transaction = new CRM_Core_Transaction();
 
