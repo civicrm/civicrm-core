@@ -119,7 +119,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
             'count' => $sharedAddressCount,
           ]);
         }
-        CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
+        CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addresses Owner'));
       }
 
       // set in form controller so that queries are not fired again
@@ -244,7 +244,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       }
       $message .= '<ul><li>' . implode('</li><li>', $this->_sharedAddressMessage['contactList']) . '</li></ul>';
 
-      $session->setStatus($message, ts('Shared Addesses Owner Deleted'), 'info', ['expires' => 0]);
+      $session->setStatus($message, ts('Shared Addresses Owner Deleted'), 'info', ['expires' => 0]);
 
       $this->set('sharedAddressMessage', NULL);
     }
