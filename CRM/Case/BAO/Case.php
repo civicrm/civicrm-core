@@ -1890,6 +1890,7 @@ HERESQL;
         'case_id' => $dao->id,
         'case_type' => $dao->case_type,
         'client_name' => $clientView,
+        'status_id' => $dao->status_id,
         'case_status' => $statuses[$dao->status_id],
         'links' => $caseView,
       ];
