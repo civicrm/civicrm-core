@@ -2114,11 +2114,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       return $updateResult;
     }
 
-    //now we are ready w/ required ids, start processing.
-
-    $baseIPN = new CRM_Core_Payment_BaseIPN();
-
-    $input = $ids = $objects = [];
+    $input = $ids = [];
 
     $input['component'] = $componentDetails['component'] ?? NULL;
     $ids['contribution'] = $contributionId;
@@ -2130,14 +2126,16 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $ids['contributionRecur'] = NULL;
     $ids['contributionPage'] = NULL;
 
-    if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-      throw new CRM_Core_Exception('Unable to validate supplied data');
-    }
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $ids['contribution'];
+    $contribution->find();
 
-    $memberships = &$objects['membership'];
-    $participant = &$objects['participant'];
-    $pledgePayment = &$objects['pledge_payment'];
-    $contribution = &$objects['contribution'];
+    $contribution->loadRelatedObjects($input, $ids);
+
+    $memberships = $contribution->_relatedObjects['membership'] ?? [];
+    $participant = $contribution->_relatedObjects['participant'] ?? [];
+    $pledgePayment = $contribution->_relatedObjects['pledge_payment'] ?? [];
+
     $pledgeID = $oldStatus = NULL;
     $pledgePaymentIDs = [];
     if ($pledgePayment) {
