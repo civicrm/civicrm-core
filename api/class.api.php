@@ -75,6 +75,17 @@
  *   // is the json encoded result
  *   echo $api;
  * ```
+ *
+ * For remote calls, you may need to set the UserAgent and Referer strings for some environments (eg WordFence)
+ * Add 'referer' and 'useragent' to the initialisation config:
+ *
+ * ```
+ *   $api = new civicrm_api3 (['server' => 'http://example.org',
+ *                             'api_key'=>'theusersecretkey',
+ *                             'key'=>'thesitesecretkey',
+ *                             'referer'=>'https://my_site',
+ *                             'useragent'=>'curl']);
+ * ```
  */
 class civicrm_api3 {
 
@@ -109,6 +120,8 @@ class civicrm_api3 {
       else {
         die("\nFATAL:param['api_key] missing\n");
       }
+      $this->referer = !empty($config['referer']) ? $config['referer'] : '';
+      $this->useragent = !empty($config['useragent']) ? $config['useragent'] : 'curl';
       return;
     }
     if (!empty($config) && !empty($config['conf_path'])) {
@@ -180,6 +193,10 @@ class civicrm_api3 {
       curl_setopt($ch, CURLOPT_POST, TRUE);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+      curl_setopt($ch, CURLOPT_USERAGENT, $this->useragent);
+      if ($this->referer) {
+        curl_setopt($ch, CURLOPT_REFERER, $this->referer);
+      }
       $result = curl_exec($ch);
       // CiviCRM expects to get back a CiviCRM error object.
       if (curl_errno($ch)) {
