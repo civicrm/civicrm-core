@@ -171,7 +171,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    *
    * @param bool $version
    */
-  public function testMemberTypePeriodiTypeRequired($version) {
+  public function testMemberTypePeriodTypeRequired($version) {
     $this->_apiversion = $version;
     $this->callAPIFailure('MembershipType', 'create', [
       'domain_id' => 'Default Domain Name',

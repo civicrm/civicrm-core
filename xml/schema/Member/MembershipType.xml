@@ -145,6 +145,7 @@
     <title>Membership Type Plan</title>
     <type>varchar</type>
     <length>8</length>
+    <required>true</required>
     <comment>Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.</comment>
     <html>
       <type>Select</type>
