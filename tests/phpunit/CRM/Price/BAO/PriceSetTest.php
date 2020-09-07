@@ -82,7 +82,7 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 
   /**
    * Test CRM_Price_BAO_PriceSet::getMembershipCount() that return correct number of
-   *   membership type occurances against it's corresponding member orgaisation
+   *   membership type occurrences against it's corresponding member organisation
    *
    * @throws \CRM_Core_Exception
    */
