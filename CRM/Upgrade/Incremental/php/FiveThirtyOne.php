@@ -72,34 +72,36 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_31_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addTask('enableeWAYSingleCurrencyExtension', 'enableEwaySingleExtension');
+    $this->addTask('Remove Eway Single Currency Payment Processor type if not used or install the new extension for it', 'enableEwaySingleExtension');
   }
 
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
     $eWAYPaymentProcessorType = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_payment_processor_type WHERE class_name = 'Payment_eWAY'");
-    $ewayPaymentProcessorCount = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_payment_processor WHERE payment_processor_type_id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
-    if ($ewayPaymentProcessorCount) {
-      $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
-        'type' => 'module',
-        'full_name' => 'ewaysingle',
-        'name' => 'eway Single currency extension',
-        'label' => 'eway Single currency extension',
-        'file' => 'ewaysingle',
-        'schema_version' => NULL,
-        'is_active' => 1,
-      ]);
-      CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
-      $managedEntity = CRM_Utils_SQL_Insert::into('civicrm_managed')->row([
-        'name' => 'eWAY',
-        'module' => 'ewaysingle',
-        'entity_type' => 'PaymentProcessorType',
-        'entity_id' => $eWAYPaymentProcessorType,
-        'cleanup' => NULL,
-      ]);
-      CRM_Core_DAO::executeQuery($managedEntity->usingReplace()->toSQL());
-    }
-    else {
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_payment_processor_type WHERE id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
+    if ($eWAYPaymentProcessorType) {
+      $ewayPaymentProcessorCount = CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_payment_processor WHERE payment_processor_type_id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
+      if ($ewayPaymentProcessorCount) {
+        $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+          'type' => 'module',
+          'full_name' => 'ewaysingle',
+          'name' => 'eway Single currency extension',
+          'label' => 'eway Single currency extension',
+          'file' => 'ewaysingle',
+          'schema_version' => NULL,
+          'is_active' => 1,
+        ]);
+        CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+        $managedEntity = CRM_Utils_SQL_Insert::into('civicrm_managed')->row([
+          'name' => 'eWAY',
+          'module' => 'ewaysingle',
+          'entity_type' => 'PaymentProcessorType',
+          'entity_id' => $eWAYPaymentProcessorType,
+          'cleanup' => NULL,
+        ]);
+        CRM_Core_DAO::executeQuery($managedEntity->usingReplace()->toSQL());
+      }
+      else {
+        CRM_Core_DAO::executeQuery("DELETE FROM civicrm_payment_processor_type WHERE id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
+      }
     }
     return TRUE;
   }
