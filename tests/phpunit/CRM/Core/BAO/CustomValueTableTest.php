@@ -89,7 +89,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     $fields = [
       'custom_group_id' => $customGroup['id'],
       'data_type' => 'StateProvince',
-      'html_type' => 'Select State/Province',
+      'html_type' => 'Select',
       'default_value' => '',
     ];
 
