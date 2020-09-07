@@ -496,6 +496,7 @@ LIMIT 1
    *   Amount rounded and returned with the desired decimal places
    */
   public static function formatAmount($amount, $decimals = 2) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Utils_Rule::cleanMoney instead');
     return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 
