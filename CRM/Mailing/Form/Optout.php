@@ -47,7 +47,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
 
   public function buildQuickForm() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
-    CRM_Utils_System::setTitle(ts('Please Confirm Your Opt Out'));
+    CRM_Utils_System::setTitle(ts('Opt Out Confirmation'));
 
     $this->add('text', 'email_confirm', ts('Verify email address to opt out:'));
     $this->addRule('email_confirm', ts('Email address is required to opt out.'), 'required');
@@ -89,7 +89,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
         CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($queue_id, NULL, TRUE, $job_id);
       }
 
-      $statusMsg = ts('Email: %1 has been successfully opted out',
+      $statusMsg = ts('%1 opt out confirmed.',
         [1 => $values['email_confirm']]
       );
 
@@ -97,7 +97,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     }
     elseif ($result == FALSE) {
       // Email address not verified
-      $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this opt out request.',
+      $statusMsg = ts('%1 is not associated with this opt out request.',
         [1 => $values['email_confirm']]
       );
 
