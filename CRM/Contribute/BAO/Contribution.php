@@ -5163,11 +5163,6 @@ LIMIT 1;";
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
       $membershipParams['status_override_end_date'] = 'null';
-
-      //CRM-17723 - reset static $relatedContactIds array()
-      // @todo move it to Civi Statics.
-      $var = TRUE;
-      CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
       civicrm_api3('Membership', 'create', $membershipParams);
     }
   }

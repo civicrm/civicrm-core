@@ -1990,7 +1990,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * and left alone when it shouldn't.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessMembershipUpdateStatus() {
     $this->ids['MembershipType'] = $this->membershipTypeCreate();
@@ -2107,10 +2106,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals($organizationMembershipID, $expiredInheritedRelationship['owner_membership_id']);
     $this->assertMembershipStatus('Grace', (int) $expiredInheritedRelationship['status_id']);
 
-    // Reset static $relatedContactIds array in createRelatedMemberships(),
-    // to avoid bug where inherited membership gets deleted.
-    $var = TRUE;
-    CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
     // Check that after running process_membership job, statuses are correct.
     $this->callAPISuccess('Job', 'process_membership', []);
 

@@ -1024,6 +1024,7 @@ Expires: ',
    * Uses some data from tests/phpunit/CRM/Member/Form/dataset/data.xml .
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testTwoInheritedMembershipsViaPriceSetInBackend() {
     // Create an organization and give it a "Member of" relationship to $this->_individualId.
@@ -1046,7 +1047,7 @@ Expires: ',
     $primaryMembershipIds = [];
     foreach ($orgMembershipResult['values'] as $membership) {
       $primaryMembershipIds[] = $membership['id'];
-      $this->assertTrue(empty($membership['owner_membership_id']), "Membership on the organization has owner_membership_id so is inherited.");
+      $this->assertTrue(empty($membership['owner_membership_id']), 'Membership on the organization has owner_membership_id so is inherited.');
     }
 
     // CRM-20955: check that correct inherited memberships were created for the individual,
@@ -1101,6 +1102,7 @@ Expires: ',
    * checking that the line items have correct amounts.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testTwoMembershipsViaPriceSetInBackendWithDiscount() {
     // Register buildAmount hook to apply discount.
