@@ -15,6 +15,10 @@
  */
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
+  private $_contactID;
+  private $_membershipStatusID;
+  private $_membershipTypeID;
+
   public function setUp() {
     parent::setUp();
 
@@ -46,11 +50,12 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    *
    * @param $organizationId
    * @param bool $withRelationship
+   * @param int $maxRelated
    *
    * @return array|int
    * @throws \CRM_Core_Exception
    */
-  private function createMembershipType($organizationId, $withRelationship = FALSE) {
+  private function createMembershipType($organizationId, $withRelationship = FALSE, $maxRelated = 0) {
     $membershipType = $this->callAPISuccess('MembershipType', 'create', [
       //Default domain ID
       'domain_id' => 1,
@@ -62,7 +67,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'name' => 'Organiation Membership Type',
       'relationship_type_id' => ($withRelationship) ? 5 : NULL,
       'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
+      'max_related' => $maxRelated ?: NULL,
     ]);
+
     return $membershipType["values"][$membershipType["id"]];
   }
 
@@ -824,6 +831,143 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contact_id', 'Database check for created membership.'
     );
     return [$contactId, $membershipId];
+  }
+
+  /**
+   * Test done to verify bug dev/core#1854 remains fixed.
+   *
+   * Under certain special circumstances, updating a membership that had related
+   * memberships and a maximum related value, resulted in some related
+   * memberships being deleted, even though the maximum value was not reached.
+   *
+   * The problem presented itself when a membership is found for the nth contact
+   * related to the organization, the nth+1 contact didn't have a membership,
+   * and the nth+b contact does have a membership, where b > 1.
+   *
+   * This test builds that scenario and checks updating the status of the
+   * membership does not cause the deletion of memberships.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/1854
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMembershipUpdateDoesNotDeleteRelatedMembershipsByMistake() {
+    $membershipOrganizationId = $this->organizationCreate();
+    $employerId = $this->organizationCreate();
+
+    // Create membership type with relationship.
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE, 2);
+
+    // Creating membership for employer.
+    $membership = $this->callAPISuccess("Membership", "create", [
+      'membership_type_id' => $membershipTypeWithRelationship["id"],
+      'contact_id'         => $employerId,
+      'status_id'          => $this->_membershipStatusID,
+    ]);
+    $membership = $membership['values'][$membership["id"]];
+    $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
+
+    // Create relationship between organization and individual contacts.
+    $employees = $this->createContacts(5);
+    foreach ($employees as $contactID) {
+      $this->callAPISuccess('Relationship', 'create', [
+        'relationship_type_id' => 5,
+        'contact_id_a'         => $contactID,
+        'contact_id_b'         => $employerId,
+        'is_active'            => 1,
+      ]);
+    }
+    $this->deleteRelatedMemberhsips($membership["id"]);
+    $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
+
+    // Create related memberships for first and last contact.
+    $relatedMembership1 = $this->createRelatedMembershipForContact($employees[0], $membership);
+    $relatedMembership2 = $this->createRelatedMembershipForContact($employees[4], $membership);
+    $this->assertEquals(2, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 2.');
+
+    // Reset statics.
+    unset(\Civi::$statics[CRM_Member_BAO_Membership::class]['related_contacts']);
+
+    // Update membership by changing its status.
+    $otherStatusID = $this->membershipStatusCreate('another status ' . rand(1, 1000));
+    $membership["status_id"] = $otherStatusID;
+    $this->callAPISuccess("Membership", "create", $membership);
+
+    // Assert nothing has changed.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(2, $relatedMembershipsCount, "Related membership count should still be 2, but found $relatedMembershipsCount");
+    $this->assertMembershipExists($relatedMembership1['id']);
+    $this->assertMembershipExists($relatedMembership2['id']);
+
+    // Clean up: Delete exerything!
+    $this->membershipDelete($membership["id"]);
+    $this->membershipStatusDelete($otherStatusID);
+  }
+
+  /**
+   * Creates the given amount of contacts.
+   *
+   * @param int $count
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function createContacts($count) {
+    $contacts = [];
+    for ($i = 0; $i < $count; $i++) {
+      $contacts[] = $this->individualCreate();
+    }
+
+    return $contacts;
+  }
+
+  /**
+   * Deletes related memberships for given parent membership ID.
+   *
+   * @param int $parentMembershipID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function deleteRelatedMemberhsips($parentMembershipID) {
+    $memberships = $this->callAPISuccess("Membership", "get", [
+      'owner_membership_id' => $parentMembershipID,
+      'api.Membership.delete' => ['id' => '$value.id'],
+    ]);
+  }
+
+  /**
+   * Creates a related membership for the given contact ID.
+   *
+   * @param int $contactID
+   * @param array $parentMembership
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function createRelatedMembershipForContact($contactID, $parentMembership) {
+    $membership = $this->callAPISuccess("Membership", "create", [
+      'membership_type_id' => $parentMembership["membership_type_id"],
+      'contact_id'         => $contactID,
+      'status_id'          => $this->_membershipStatusID,
+      'owner_membership_id' => $parentMembership['id'],
+    ]);
+
+    return $membership;
+  }
+
+  /**
+   * Checks the given membership ID can be found.
+   *
+   * @param $membershipID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assertMembershipExists($membershipID) {
+    $membership = $this->callAPISuccess("Membership", "get", [
+      'id' => $membershipID,
+    ]);
+    $this->assertEquals(1, $membership['count']);
+    $this->assertEquals($membershipID, $membership['id']);
   }
 
 }
