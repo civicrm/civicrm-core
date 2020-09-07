@@ -69,6 +69,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $this->assertNotContains('Due Date', $invoiceHTML[$result['id']]);
     $this->assertNotContains('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
+    $this->assertContains('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
 
     $this->assertContains('Due Date', $invoiceHTML[$contribution['id']]);
     $this->assertContains('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
