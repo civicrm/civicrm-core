@@ -106,6 +106,7 @@ function dm_install_coreext() {
 ## Get a list of default/core extension directories (space-delimited)
 ## reldirs=$(dm_core_exts)
 function dm_core_exts() {
+  echo ext/search
   echo ext/sequentialcreditnotes
   echo ext/flexmailer
   echo ext/eventcart
