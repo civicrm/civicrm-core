@@ -750,7 +750,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $ids = [];
     $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $membershipID]);
-
+    $memParams = [
+      'id' => $currentMembership['id'],
+      'membership_type_id' => $membershipTypeID,
+      'join_date' => $currentMembership['join_date'],
+      'modified_id' => $contactID,
+      'custom' => $customFieldsFormatted,
+      'membership_activity_status' => ($pending || $isPayLater) ? 'Scheduled' : 'Completed',
+      // Since we are renewing, make status override false.
+      'is_override' => FALSE,
+    ];
+    if ($contributionRecurID) {
+      $memParams['contribution_recur_id'] = $contributionRecurID;
+    }
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
     //2. Paylater/IPN renew. CRM-4556.
@@ -759,18 +771,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // CRM-15475
       array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
     ])) {
-      $memParams = [
-        'id' => $currentMembership['id'],
+      $memParams = array_merge($memParams, [
         'status_id' => $currentMembership['status_id'],
         'start_date' => $currentMembership['start_date'],
         'end_date' => $currentMembership['end_date'],
-        'join_date' => $currentMembership['join_date'],
-        'membership_type_id' => $membershipTypeID,
-        'membership_activity_status' => ($pending || $isPayLater) ? 'Scheduled' : 'Completed',
-      ];
-      if ($contributionRecurID) {
-        $memParams['contribution_recur_id'] = $contributionRecurID;
-      }
+      ]);
       return CRM_Member_BAO_Membership::create($memParams);
     }
 
@@ -785,18 +790,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $membershipTypeID,
       $numRenewTerms
     );
-    $memParams = [
-      'membership_type_id' => $membershipTypeID,
+    $memParams = array_merge($memParams, [
       'end_date' => $dates['end_date'] ?? NULL,
-      'join_date' => $currentMembership['join_date'],
       'start_date' => $isMembershipCurrent ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
-      'id' => $currentMembership['id'],
-      'is_test' => $is_test,
-      // Since we are renewing, make status override false.
-      'is_override' => FALSE,
-      'modified_id' => $contactID,
       'log_start_date' => $dates['log_start_date'],
-    ];
+    ]);
 
     // Now Renew the membership
     if ($isMembershipCurrent) {
@@ -804,16 +802,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       if (!empty($currentMembership['id'])) {
         $ids['membership'] = $currentMembership['id'];
       }
-      $memParams['membership_activity_status'] = ($pending || $isPayLater) ? 'Scheduled' : 'Completed';
     }
 
-    // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
-    // perhaps shouldn't be?
-    if ($contributionRecurID) {
-      $memParams['contribution_recur_id'] = $contributionRecurID;
-    }
-
-    $memParams['custom'] = $customFieldsFormatted;
     // @todo stop passing $ids (membership and userId may be set by this point)
     $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
