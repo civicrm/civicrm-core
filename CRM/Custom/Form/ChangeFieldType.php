@@ -225,7 +225,6 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
 
       case 'Int':
       case 'Float':
-      case 'Int':
       case 'Money':
         if (in_array($htmlType, array_keys($singleValueOps))) {
           unset($singleValueOps[$htmlType]);

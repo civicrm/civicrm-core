@@ -158,8 +158,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         ['TextArea' => ts('TextArea'), 'RichTextEditor' => ts('Rich Text Editor')],
         ['Date' => ts('Select Date')],
         ['Radio' => ts('Radio')],
-        ['StateProvince' => ts('Select')],
-        ['Country' => ts('Select')],
+        ['Select' => ts('Select')],
+        ['Select' => ts('Select')],
         ['File' => ts('Select File')],
         ['Link' => ts('Link')],
         ['ContactReference' => ts('Autocomplete-Select')],
@@ -180,17 +180,14 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_id) {
       $this->assign('id', $this->_id);
       $this->_gid = $defaults['custom_group_id'];
+      $defaultValue = $defaults['default_value'] ?? NULL;
 
       //get the value for state or country
-      if ($defaults['data_type'] == 'StateProvince' &&
-        $stateId = CRM_Utils_Array::value('default_value', $defaults)
-      ) {
-        $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $stateId);
+      if ($defaults['data_type'] == 'StateProvince' && $defaultValue) {
+        $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $defaultValue);
       }
-      elseif ($defaults['data_type'] == 'Country' &&
-        $countryId = CRM_Utils_Array::value('default_value', $defaults)
-      ) {
-        $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $countryId);
+      elseif ($defaults['data_type'] == 'Country' && $defaultValue) {
+        $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $defaultValue);
       }
 
       if ($defaults['data_type'] == 'ContactReference' && !empty($defaults['filter'])) {
@@ -259,13 +256,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['is_view'] = 0;
     }
 
-    if (!empty($defaults['html_type'])) {
-      $dontShowLink = substr($defaults['html_type'], -14) == 'State/Province' || substr($defaults['html_type'], -7) == 'Country' ? 1 : 0;
-    }
-
-    if (isset($dontShowLink)) {
-      $this->assign('dontShowLink', $dontShowLink);
-    }
     if ($this->_action & CRM_Core_Action::ADD &&
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')
     ) {
@@ -330,6 +320,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
       if (!empty($this->_values['option_group_id'])) {
+        $this->assign('hasOptionGroup', TRUE);
         // Before dev/core#155 we didn't set the is_reserved flag properly, which should be handled by the upgrade script...
         //  but it is still possible that existing installs may have optiongroups linked to custom fields that are marked reserved.
         $optionGroupParams['id'] = $this->_values['option_group_id'];
