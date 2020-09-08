@@ -927,7 +927,7 @@ class CRM_Core_Permission {
     return [
       'administer CiviCRM' => ['administer CiviCRM system', 'administer CiviCRM data'],
       'administer CiviCRM data' => ['edit message templates', 'administer dedupe rules'],
-      'administer CiviCRM system' => ['edit api keys', 'edit system workflow message templates', 'administer payment processors'],
+      'administer CiviCRM system' => ['edit system workflow message templates'],
     ];
   }
 
