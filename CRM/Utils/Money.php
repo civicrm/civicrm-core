@@ -201,7 +201,7 @@ class CRM_Utils_Money {
    * @return string
    */
   protected static function formatLocaleNumericRounded($amount, $numberOfPlaces) {
-    return self::formatLocaleNumeric(round($amount, $numberOfPlaces));
+    return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
   }
 
   /**
@@ -216,7 +216,42 @@ class CRM_Utils_Money {
    *   Formatted amount.
    */
   public static function formatLocaleNumericRoundedByCurrency($amount, $currency) {
-    $amount = self::formatLocaleNumericRounded($amount, self::getCurrencyPrecision($currency));
+    return self::formatLocaleNumericRoundedByPrecision($amount, self::getCurrencyPrecision($currency));
+  }
+
+  /**
+   * Format money for display (just numeric part) according to the current locale with rounding to the supplied precision.
+   *
+   * This handles both rounding & replacement of the currency separators for the locale.
+   *
+   * @param string $amount
+   * @param int $precision
+   *
+   * @return string
+   *   Formatted amount.
+   */
+  public static function formatLocaleNumericRoundedByPrecision($amount, $precision) {
+    $amount = self::formatLocaleNumericRounded($amount, $precision);
+    return self::replaceCurrencySeparators($amount);
+  }
+
+  /**
+   * Format money for display with rounding to the supplied precision but without padding.
+   *
+   * If the string is shorter than the precision trailing zeros are not added to reach the precision
+   * beyond the 2 required for normally currency formatting.
+   *
+   * This handles both rounding & replacement of the currency separators for the locale.
+   *
+   * @param string $amount
+   * @param int $precision
+   *
+   * @return string
+   *   Formatted amount.
+   */
+  public static function formatLocaleNumericRoundedByOptionalPrecision($amount, $precision) {
+    $decimalPlaces = strlen(substr($amount, strpos($amount, '.') + 1));
+    $amount = self::formatLocaleNumericRounded($amount, $precision > $decimalPlaces ? $decimalPlaces : $precision);
     return self::replaceCurrencySeparators($amount);
   }
 
