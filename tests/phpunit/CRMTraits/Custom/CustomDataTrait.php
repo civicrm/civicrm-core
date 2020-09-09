@@ -10,6 +10,8 @@
  */
 
 use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomField;
+use Civi\Api4\OptionValue;
 
 /**
  * Trait Custom Data trait.
@@ -162,6 +164,25 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function getCustomFieldName($key) {
     return 'custom_' . $this->getCustomFieldID($key);
+  }
+
+  /**
+   * Add another option to the custom field.
+   *
+   * @param string $key
+   * @param array $values
+   *
+   * @return int
+   * @throws \API_Exception
+   */
+  protected function addOptionToCustomField($key, $values) {
+    $optionGroupID = CustomField::get(FALSE)
+      ->addWhere('id', '=', $this->getCustomFieldID($key))
+      ->addSelect('option_group_id')
+      ->execute()->first()['option_group_id'];
+    return (int) OptionValue::create(FALSE)
+      ->setValues(array_merge(['option_group_id' => $optionGroupID], $values))
+      ->execute()->first()['value'];
   }
 
   /**

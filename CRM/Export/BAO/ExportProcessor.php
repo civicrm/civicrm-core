@@ -1456,11 +1456,22 @@ class CRM_Export_BAO_ExportProcessor {
           return "`$fieldName` varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
-          if (isset($queryFields[$columnName]['maxlength'])) {
-            return "`$fieldName` varchar({$queryFields[$columnName]['maxlength']})";
+          if (isset($fieldSpec['maxlength'])) {
+            return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
-          else {
-            return "`$fieldName` varchar(255)";
+          $dataType = $fieldSpec['data_type'] ?? '';
+          // set the sql columns for custom data
+          switch ($dataType) {
+            case 'String':
+              // May be option labels, which could be up to 512 characters
+              $length = max(512, CRM_Utils_Array::value('text_length', $fieldSpec));
+              return "`$fieldName` varchar($length)";
+
+            case 'Memo':
+              return "`$fieldName` text";
+
+            default:
+              return "`$fieldName` varchar(255)";
           }
 
         case CRM_Utils_Type::T_TEXT:
@@ -1483,36 +1494,10 @@ class CRM_Export_BAO_ExportProcessor {
       }
     }
     else {
-      if (substr($fieldName, -3, 3) == '_id') {
+      if (substr($fieldName, -3, 3) === '_id') {
         return "`$fieldName` varchar(255)";
       }
-      elseif (substr($fieldName, -5, 5) == '_note') {
-        return "`$fieldName` text";
-      }
-      else {
-        // set the sql columns for custom data
-        if (isset($queryFields[$columnName]['data_type'])) {
-
-          switch ($queryFields[$columnName]['data_type']) {
-            case 'String':
-              // May be option labels, which could be up to 512 characters
-              $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
-              return "`$fieldName` varchar($length)";
-
-            case 'Link':
-              return "`$fieldName` varchar(255)";
-
-            case 'Memo':
-              return "`$fieldName` text";
-
-            default:
-              return "`$fieldName` varchar(255)";
-          }
-        }
-        else {
-          return "`$fieldName` text";
-        }
-      }
+      return "`$fieldName` text";
     }
   }
 
