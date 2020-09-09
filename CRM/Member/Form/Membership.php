@@ -822,7 +822,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
             $endDate,
             $joinDate,
-            'today',
+            'now',
             TRUE,
             $memType,
             $params

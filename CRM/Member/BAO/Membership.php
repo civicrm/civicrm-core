@@ -265,7 +265,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       }
 
       $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
-        'today', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
+        'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
       );
       if (empty($calcStatus)) {
         throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . date('Y-m-d H:i:s')));
@@ -1133,7 +1133,7 @@ AND civicrm_membership.is_test = %2";
    * @throws \CRM_Core_Exception
    */
   public static function fixMembershipStatusBeforeRenew(&$currentMembership, $changeToday) {
-    $today = NULL;
+    $today = 'now';
     if ($changeToday) {
       $today = CRM_Utils_Date::processDate($changeToday, NULL, FALSE, 'Y-m-d');
     }
@@ -1915,7 +1915,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           CRM_Utils_Date::customFormat($dates['join_date'],
             $statusFormat
           ),
-          'today',
+          'now',
           TRUE,
           $membershipTypeID,
           $memParams
@@ -2675,7 +2675,7 @@ WHERE {$whereClause}";
             $updates["start_date"] ?? $newMembership->start_date,
             $updates["end_date"] ?? $newMembership->end_date,
             $updates["join_date"] ?? $newMembership->join_date,
-            'today',
+            'now',
             FALSE,
             $newMembershipId,
             $newMembership
