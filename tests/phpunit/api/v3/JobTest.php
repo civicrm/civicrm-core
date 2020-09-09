@@ -338,6 +338,41 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Deleted events should not send reminders to additional contacts.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeletedEventRemindAddlContacts() {
+    $contactId = $this->individualCreate();
+    $groupId = $this->groupCreate(['name' => 'Additional Contacts', 'title' => 'Additional Contacts']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contactId,
+      'group_id' => $groupId,
+    ]);
+    $event = $this->eventCreate(['title' => 'delete this event']);
+    $eventId = $event['id'];
+
+    $this->callAPISuccess('action_schedule', 'create', [
+      'title' => 'Do not send me',
+      'subject' => 'I am a reminder attached to a (soon to be) deleted event.',
+      'entity_value' => $eventId,
+      'mapping_id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+      'start_action_date' => 'start_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'day',
+      'group_id' => $groupId,
+      'limit_to' => FALSE,
+      'mode' => 'Email',
+    ]);
+    $this->callAPISuccess('event', 'delete', ['id' => $eventId]);
+
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
+    $this->assertEquals(0, $successfulCronCount);
+  }
+
+  /**
    * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
    *
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both

@@ -235,4 +235,12 @@ class CRM_Contribute_ActionMapping_ByType implements \Civi\ActionSchedule\Mappin
     return FALSE;
   }
 
+  /**
+   * Determine whether a schedule based on this mapping should
+   * send to additional contacts.
+   */
+  public function sendToAdditional($entityId): bool {
+    return TRUE;
+  }
+
 }

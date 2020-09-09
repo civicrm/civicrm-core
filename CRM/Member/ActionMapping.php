@@ -168,4 +168,12 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
     }
   }
 
+  /**
+   * Determine whether a schedule based on this mapping should
+   * send to additional contacts.
+   */
+  public function sendToAdditional($entityId): bool {
+    return TRUE;
+  }
+
 }
