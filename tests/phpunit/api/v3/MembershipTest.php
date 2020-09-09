@@ -178,6 +178,104 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Multiple Membership Status for same contribution id.
+   */
+  public function testMultipleMembershipsContribution() {
+    // Main contact
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+    // Pending Membership Status
+    $pendingMembershipId = array_search('Pending', $memStatus);
+    // New Membership Status
+    $newMembershipId = array_search('test status', $memStatus);
+
+    $membershipParam = [
+      'membership_type_id' => $this->_membershipTypeID,
+      'source' => 'Webform Payment',
+      'status_id' => $pendingMembershipId,
+      'is_pay_later' => 1,
+      'skipStatusCal' => 1,
+    ];
+
+    // Contact 1
+    $contactId1 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId1;
+    $membershipID1 = $this->contactMembershipCreate($membershipParam);
+
+    // Pending Payment Status
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => '1',
+      'total_amount' => 100,
+      'contact_id' => $contactId1,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+      'receive_date' => date('Ymd'),
+    ]);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID1,
+    ]);
+
+    // Contact 2
+    $contactId2 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId2;
+    $membershipID2 = $this->contactMembershipCreate($membershipParam);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID2,
+    ]);
+
+    // Contact 3
+    $contactId3 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId3;
+    $membershipID3 = $this->contactMembershipCreate($membershipParam);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID3,
+    ]);
+
+    // Change Payment Status to Completed
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $ContributionCreate['id'];
+    $params = ['id' => $ContributionCreate['id']];
+    $values = $ids = [];
+    CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
+    $form->_values = $values;
+    $form->testSubmit([
+      'total_amount' => 100,
+      'financial_type_id' => '1',
+      'contact_id' => $contactId1,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 1,
+    ],
+      CRM_Core_Action::UPDATE);
+
+    // check for Membership 1
+    $params = ['id' => $membershipID1];
+    $membership1 = $this->callAPISuccess('membership', 'get', $params);
+    $result1 = $membership1['values'][$membershipID1];
+    $this->assertEquals($result1['contact_id'], $contactId1);
+    $this->assertEquals($result1['status_id'], $newMembershipId);
+
+    // check for Membership 2
+    $params = ['id' => $membershipID2];
+    $membership2 = $this->callAPISuccess('membership', 'get', $params);
+    $result2 = $membership2['values'][$membershipID2];
+    $this->assertEquals($result2['contact_id'], $contactId2);
+    $this->assertEquals($result2['status_id'], $newMembershipId);
+
+    // check for Membership 3
+    $params = ['id' => $membershipID3];
+    $membership3 = $this->callAPISuccess('membership', 'get', $params);
+    $result3 = $membership3['values'][$membershipID3];
+    $this->assertEquals($result3['contact_id'], $contactId3);
+    $this->assertEquals($result3['status_id'], $newMembershipId);
+  }
+
+  /**
    * Test membership get.
    */
   public function testContactMembershipsGet() {

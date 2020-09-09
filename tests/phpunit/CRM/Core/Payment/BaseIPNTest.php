@@ -104,8 +104,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_setUpRecurringContribution();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->assertNotEmpty($this->objects['membership']);
-    $this->assertArrayHasKey($this->_membershipTypeID, $this->objects['membership']);
-    $this->assertTrue(is_a($this->objects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
+    $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $this->objects['membership']);
+    $this->assertTrue(is_a($this->objects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertNotEmpty($this->objects['contributionRecur']);
     $this->assertNotEmpty($this->objects['paymentProcessor']);
@@ -145,8 +145,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->find(TRUE);
     $contribution->loadRelatedObjects($this->input, $this->ids, TRUE);
     $this->assertNotEmpty($contribution->_relatedObjects['membership']);
-    $this->assertArrayHasKey($this->_membershipTypeID, $contribution->_relatedObjects['membership']);
-    $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
+    $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $contribution->_relatedObjects['membership']);
+    $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($contribution->_relatedObjects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertFalse(empty($contribution->_relatedObjects['contributionRecur']));
     $this->assertFalse(empty($contribution->_relatedObjects['paymentProcessor']));
