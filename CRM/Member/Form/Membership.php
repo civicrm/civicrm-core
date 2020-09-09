@@ -1058,7 +1058,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $isTest = ($this->_mode === 'test') ? 1 : 0;
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
-    $joinDate = $startDate = $endDate = NULL;
+    $endDate = NULL;
     $membershipTypes = $membership = $calcDate = [];
     $membershipType = NULL;
     $paymentInstrumentID = $this->_paymentProcessor['object']->getPaymentInstrumentID();
@@ -1177,15 +1177,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['exclude_is_admin'] = TRUE;
     }
 
-    // process date params to mysql date format.
-    $dateTypes = [
-      'join_date' => 'joinDate',
-      'start_date' => 'startDate',
-      'end_date' => 'endDate',
-    ];
-    foreach ($dateTypes as $dateField => $dateVariable) {
-      $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
-    }
+    $joinDate = $formValues['join_date'];
+    $startDate = $formValues['start_date'];
+    $endDate = $formValues['end_date'];
 
     $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
 
@@ -1200,7 +1194,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     foreach ($calcDates as $memType => $calcDate) {
-      foreach (array_keys($dateTypes) as $d) {
+      foreach (['join_date', 'start_date', 'end_date'] as $d) {
         //first give priority to form values then calDates.
         $date = $formValues[$d] ?? NULL;
         if (!$date) {
