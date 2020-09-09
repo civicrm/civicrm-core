@@ -2569,33 +2569,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
   }
 
   /**
-   * Function to get primary OpenID of the contact.
-   *
-   * @param int $contactID
-   *   Contact id.
-   *
-   * @return string
-   *   >openid   OpenID if present else null
-   */
-  public static function getPrimaryOpenId($contactID) {
-    // fetch the primary OpenID
-    $query = "
-SELECT    civicrm_openid.openid as openid
-FROM      civicrm_contact
-LEFT JOIN civicrm_openid ON ( civicrm_contact.id = civicrm_openid.contact_id )
-WHERE     civicrm_contact.id = %1
-AND       civicrm_openid.is_primary = 1";
-    $p = [1 => [$contactID, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-
-    $openId = NULL;
-    if ($dao->fetch()) {
-      $openId = $dao->openid;
-    }
-    return $openId;
-  }
-
-  /**
    * Fetch the object and store the values in the values array.
    *
    * @param array $params

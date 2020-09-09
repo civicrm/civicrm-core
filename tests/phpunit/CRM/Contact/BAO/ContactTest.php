@@ -1187,30 +1187,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getPrimaryOpenId( ).
-   */
-  public function testGetPrimaryOpenId() {
-    //get the contact params
-    $params = $this->contactParams();
-    $params['openid'][2] = $params['openid'][1];
-    $params['openid'][2]['location_type_id'] = 2;
-    $params['openid'][2]['openid'] = 'http://primaryopenid.org/';
-    unset($params['openid'][1]['is_primary']);
-
-    //create contact
-    $contact = CRM_Contact_BAO_Contact::create($params);
-    $contactId = $contact->id;
-    //get the primary openid
-    $openID = CRM_Contact_BAO_Contact::getPrimaryOpenId($contactId);
-
-    //Now check the primary openid
-    $this->assertEquals($openID, strtolower($params['openid'][2]['openid']), 'Check Primary OpenID');
-
-    //cleanup DB by deleting the contact
-    $this->contactDelete($contactId);
-  }
-
-  /**
    * Test case for matchContactOnEmail( ).
    */
   public function testMatchContactOnEmail() {
