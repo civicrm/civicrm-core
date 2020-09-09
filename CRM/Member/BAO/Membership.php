@@ -1161,9 +1161,6 @@ AND civicrm_membership.is_test = %2";
       $memberDAO->find(TRUE);
 
       $memberDAO->status_id = $status['id'];
-      $memberDAO->join_date = CRM_Utils_Date::isoToMysql($memberDAO->join_date);
-      $memberDAO->start_date = CRM_Utils_Date::isoToMysql($memberDAO->start_date);
-      $memberDAO->end_date = CRM_Utils_Date::isoToMysql($memberDAO->end_date);
       $memberDAO->save();
       CRM_Core_DAO::storeValues($memberDAO, $currentMembership);
 
