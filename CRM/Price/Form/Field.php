@@ -78,6 +78,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   protected $_useForMember;
 
   /**
+   * Set the price Set Id (only used in tests)
+   */
+  public function setPriceSetId($priceSetId) {
+    $this->_sid = $priceSetId;
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -641,6 +648,25 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
+    $params['id'] = $this->getEntityId();
+    $priceField = $this->submit($params);
+    if (!is_a($priceField, 'CRM_Core_Error')) {
+      // Required by extensions implementing the postProcess hook (to get the ID of new entities)
+      $this->setEntityId($priceField->id);
+      CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
+    }
+    $buttonName = $this->controller->getButtonName();
+    $session = CRM_Core_Session::singleton();
+    if ($buttonName == $this->getButtonName('next', 'new')) {
+      CRM_Core_Session::setStatus(ts(' You can add another price set field.'), '', 'info');
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=add&sid=' . $this->_sid));
+    }
+    else {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));
+    }
+  }
+
+  public function submit($params) {
     $params['price'] = CRM_Utils_Rule::cleanMoney($params['price']);
     foreach ($params['option_amount'] as $key => $amount) {
       $params['option_amount'][$key] = CRM_Utils_Rule::cleanMoney($amount);
@@ -686,26 +712,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_visibility_id'] = [1 => CRM_Utils_Array::value('visibility_id', $params)];
     }
 
-    $params['id'] = $this->getEntityId();
-
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
 
     $priceField = CRM_Price_BAO_PriceField::create($params);
-
-    if (!is_a($priceField, 'CRM_Core_Error')) {
-      // Required by extensions implementing the postProcess hook (to get the ID of new entities)
-      $this->setEntityId($priceField->id);
-      CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
-    }
-    $buttonName = $this->controller->getButtonName();
-    $session = CRM_Core_Session::singleton();
-    if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another price set field.'), '', 'info');
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=add&sid=' . $this->_sid));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));
-    }
+    return $priceField;
   }
 
 }
