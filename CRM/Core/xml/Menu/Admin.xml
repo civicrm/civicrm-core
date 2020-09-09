@@ -37,11 +37,6 @@
      <page_callback>CRM_Custom_Form_MoveField</page_callback>
   </item>
   <item>
-     <path>civicrm/admin/custom/group/field/changetype</path>
-     <title>Custom Field - Change Type</title>
-     <page_callback>CRM_Custom_Form_ChangeFieldType</page_callback>
-  </item>
-  <item>
      <path>civicrm/admin/uf/group</path>
      <title>Profiles</title>
      <desc>Profiles allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features.</desc>

@@ -157,13 +157,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * Fetch object based on array of properties.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   An assoc array of name/value pairs.
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_CustomField
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve($params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
   }
 

@@ -289,6 +289,17 @@ if (!CRM.vars) CRM.vars = {};
     return rendered;
   };
 
+  CRM.utils.getOptions = function(select) {
+    var options = [];
+    $('option', select).each(function() {
+      var option = {key: $(this).attr('value'), value: $(this).text()};
+      if (option.key !== '') {
+        options.push(option);
+      }
+    });
+    return options;
+  };
+
   function chainSelect() {
     var $form = $(this).closest('form'),
       $target = $('select[data-name="' + $(this).data('target') + '"]', $form),

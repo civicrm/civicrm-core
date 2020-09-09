@@ -177,7 +177,6 @@ class CRM_Core_SelectValues {
       'RichTextEditor' => ts('Rich Text Editor'),
       'Autocomplete-Select' => ts('Autocomplete-Select'),
       'Link' => ts('Link'),
-      'ContactReference' => ts('Autocomplete-Select'),
     ];
   }
 

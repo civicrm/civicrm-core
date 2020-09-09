@@ -73,6 +73,7 @@
     <add>1.1</add>
     <html>
       <type>Select</type>
+      <label>Data Type</label>
     </html>
   </field>
   <field>
@@ -85,6 +86,10 @@
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::customHtmlType</callback>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <label>Field Input Type</label>
+    </html>
     <add>1.1</add>
   </field>
   <field>
