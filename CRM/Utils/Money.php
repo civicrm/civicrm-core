@@ -17,6 +17,7 @@
 
 use Brick\Money\Money;
 use Brick\Money\Context\DefaultContext;
+use Brick\Money\Context\CustomContext;
 use Brick\Math\RoundingMode;
 
 /**
@@ -201,7 +202,15 @@ class CRM_Utils_Money {
    * @return string
    */
   protected static function formatLocaleNumericRounded($amount, $numberOfPlaces) {
-    return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
+    if (!extension_loaded('intl')) {
+      self::missingIntlNotice();
+      return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
+    }
+    $money = Money::of($amount, CRM_Core_Config::singleton()->defaultCurrency, new CustomContext($numberOfPlaces), RoundingMode::CEILING);
+    $formatter = new \NumberFormatter(CRM_Core_I18n::getLocale(), NumberFormatter::CURRENCY);
+    $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, '');
+    $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
+    return $money->formatWith($formatter);
   }
 
   /**
@@ -304,6 +313,13 @@ class CRM_Utils_Money {
       setlocale(LC_MONETARY, $lc);
     }
     return $amount;
+  }
+
+  /**
+   * Emits a notice indicating we have fallen back to a less accurate way of formatting money due to missing intl extension
+   */
+  public static function missingIntlNotice() {
+    CRM_Core_Session::singleton()->setStatus(ts('As this system does not include the PHP intl extension, CiviCRM has fallen back onto a slightly less accurate and deprecated method to format money'), ts('Missing PHP INTL extension'));
   }
 
 }

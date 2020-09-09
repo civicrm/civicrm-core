@@ -75,10 +75,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
 
       // fix the display of the monetary value, CRM-4038
       foreach ($this->_moneyFields as $field) {
-        // @todo use formatLocaleNumericRoundedByOptionalPrecision - but note that there is an issue where php doesn't handle
-        // money strings beyond a certain total length - per https://github.com/civicrm/civicrm-core/pull/18409
-        // & https://github.com/civicrm/civicrm-core/pull/18409
-        $defaults[$field] = CRM_Utils_Money::format(CRM_Utils_Array::value($field, $defaults), NULL, '%a');
+        $defaults[$field] = isset($defaults[$field]) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults[$field], 9) : '';
       }
     }
 
