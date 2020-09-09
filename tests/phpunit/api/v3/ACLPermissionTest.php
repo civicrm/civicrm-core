@@ -51,6 +51,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_acl_entity_role',
       'civicrm_acl_contact_cache',
       'civicrm_contribution',
+      'civicrm_line_item',
       'civicrm_participant',
       'civicrm_uf_match',
       'civicrm_activity',
