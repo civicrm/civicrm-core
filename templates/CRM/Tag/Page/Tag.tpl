@@ -463,16 +463,16 @@
   <% {rdelim} %>
   <div class="crm-submit-buttons">
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= tagset || '' %>" class="button crm-popup">
-      <span><i class="crm-i fa-plus" aria-hidden="true"></i>&nbsp; {ts}Add Tag{/ts}</span>
+      <span><i class="crm-i fa-plus" aria-hidden="true"></i> {ts}Add Tag{/ts}</span>
     </a>
     <% if(tagset && adminTagsets) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=update&id="}<%= tagset %>" class="button crm-popup tagset-action-update">
-        <span><i class="crm-i fa-pencil" aria-hidden="true"></i>&nbsp; {ts}Edit Set{/ts}</span>
+        <span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Set{/ts}</span>
       </a>
     <% {rdelim} %>
     <% if(tagset && !length && adminTagsets && (!is_reserved || adminReserved)) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= tagset %>" class="button crm-popup small-popup tagset-action-delete">
-        <span><i class="crm-i fa-trash" aria-hidden="true"></i>&nbsp; {ts}Delete Set{/ts}</span>
+        <span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete Set{/ts}</span>
       </a>
     <% {rdelim} %>
   </div>
@@ -519,21 +519,21 @@
   <div class="crm-submit-buttons">
     <% if(!tagset) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/edit" q="action=add&parent_id="}<%= id %>" class="button crm-popup" title="{ts}Create new tag under this one{/ts}">
-        <span><i class="crm-i fa-plus" aria-hidden="true"></i>&nbsp; {ts}Add Child{/ts}</span>
+        <span><i class="crm-i fa-plus" aria-hidden="true"></i> {ts}Add Child{/ts}</span>
       </a>
     <% {rdelim} %>
     <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts}Duplicate this tag{/ts}">
-      <span><i class="crm-i fa-copy" aria-hidden="true"></i>&nbsp; {ts}Clone Tag{/ts}</span>
+      <span><i class="crm-i fa-copy" aria-hidden="true"></i> {ts}Clone Tag{/ts}</span>
     </a>
     <% if(!data.is_reserved || adminReserved) {ldelim} %>
       <% if(tagsetCount) {ldelim} %>
         <a href="#move" class="button move-tag-button" title="{ts}Move to a different tagset{/ts}">
-          <span><i class="crm-i fa-share-square-o" aria-hidden="true"></i>&nbsp; {ts}Move Tag{/ts}</span>
+          <span><i class="crm-i fa-share-square-o" aria-hidden="true"></i> {ts}Move Tag{/ts}</span>
         </a>
       <% {rdelim} %>
       <% if(!hasChildren) {ldelim} %>
         <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= id %>" class="button crm-popup small-popup">
-          <span><i class="crm-i fa-trash" aria-hidden="true"></i>&nbsp; {ts}Delete{/ts}</span>
+          <span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span>
         </a>
       <% {rdelim} %>
     <% {rdelim} %>
@@ -551,16 +551,16 @@
   <div class="crm-submit-buttons">
     <% if(!reserved || adminReserved) {ldelim} %>
       <a href="{crmURL p="civicrm/tag/merge" q="id="}<%= items.join() %>" class="button crm-popup small-popup" title="{ts}Combine tags into one{/ts}">
-        <span><i class="crm-i fa-compress" aria-hidden="true"></i>&nbsp; {ts}Merge Tags{/ts}</span>
+        <span><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Merge Tags{/ts}</span>
       </a>
       <% if(tagsetCount) {ldelim} %>
         <a href="#move" class="button move-tag-button" title="{ts}Move to a different tagset{/ts}">
-          <span><i class="crm-i fa-share-square-o" aria-hidden="true"></i>&nbsp; {ts}Move Tags{/ts}</span>
+          <span><i class="crm-i fa-share-square-o" aria-hidden="true"></i> {ts}Move Tags{/ts}</span>
         </a>
       <% {rdelim} %>
       <% if(!hasChildren) {ldelim} %>
         <a href="{crmURL p="civicrm/tag/edit" q="action=delete&id="}<%= items.join() %>" class="button crm-popup small-popup">
-          <span><i class="crm-i fa-trash" aria-hidden="true"></i>&nbsp; {ts}Delete All{/ts}</span>
+          <span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete All{/ts}</span>
         </a>
       <% {rdelim} %>
     <% {rdelim} %>

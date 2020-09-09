@@ -201,10 +201,14 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
           'reset=1&action=browse&fid=' . $this->_fid . '&gid=' . $this->_gid,
           TRUE, NULL, FALSE
         );
-        $this->addElement('button',
+        $this->addElement('xbutton',
           'done',
-          ts('Done'),
-          ['onclick' => "location.href='$url'", 'class' => 'crm-form-submit cancel', 'crm-icon' => 'fa-times']
+          CRM_Core_Page::crmIcon('fa-times') . ' ' . ts('Done'),
+          [
+            'type' => 'button',
+            'onclick' => "location.href='$url'",
+            'class' => 'crm-form-submit cancel',
+          ]
         );
       }
     }

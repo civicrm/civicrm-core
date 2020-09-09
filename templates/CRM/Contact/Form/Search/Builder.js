@@ -293,7 +293,7 @@
       })
       // Add new field - if there's a hidden one, show it
       // Otherwise allow form to submit and fetch more from the server
-      .on('click', 'input[name^=addMore]', function() {
+      .on('click', 'button[name^=addMore]', function() {
         var table = $(this).closest('table');
         if ($('tr:hidden', table).length) {
           $('tr:hidden', table).first().show();

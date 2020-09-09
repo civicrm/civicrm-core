@@ -1173,7 +1173,7 @@ input.crm-form-entityref {
   cursor: pointer;
 }
 
-#crm-container input.submit-link {
+#crm-container button.submit-link {
   color: #285286;
   background: none transparent;
   border: none;
@@ -1833,30 +1833,21 @@ input.crm-form-entityref {
   margin-left: .5em;
 }
 
-.crm-container .crm-button input {
-  background: none;
-  _background: #6C6C6C;
-  /* IE6 only */
-  border: medium none;
-  color: #FFF;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: normal;
-  margin: 0;
-  padding: 1px 8px 2px 4px;
-}
-
 .crm-container .crm-button-type-cancel,
 .crm-container .crm-button-type-back {
   margin-left: 20px;
 }
 
+/* Reset WP backend min-height for buttons */
+
+.wp-core-ui .crm-container .button {
+  min-height: 0;
+}
+
 .crm-container a.button,
 .crm-container a.button:link,
 .crm-container a.button:visited,
-.crm-container input.crm-form-submit,
 .crm-container .ui-dialog-buttonset .ui-button,
-.crm-container input[type=button],
 .crm-container .crm-button {
   text-shadow: 0 1px 0 black;
   background: #696969;
@@ -1868,50 +1859,15 @@ input.crm-form-entityref {
   text-decoration: none;
   cursor: pointer;
   border: 1px solid #3e3e3e;
-}
-
-.crm-container span.crm-button {
-  display: block;
-  float: left !important;
-  overflow: hidden;
-  padding: 1px;
-}
-
-.crm-container button.crm-button {
-  padding: 3px 6px;
-}
-
-.crm-container button.crm-button .icon {
-  margin-bottom: -4px;
-}
-
-.crm-container input.crm-form-submit,
-.crm-container input[type=button] {
-  padding: 2px 6px;
-}
-
-.crm-container .crm-button input[type=button],
-.crm-container .crm-button input.crm-form-submit {
-  padding: 3px 5px 2px;
-  margin: 0;
-  background: none;
-  _background: #6C6C6C;
-  /* IE6 only */
-  border: none;
-}
-
-.crm-container a.button,
-.crm-container a.button:link,
-.crm-container a.button:visited {
   display: block;
   float: left;
+  overflow: hidden;
   line-height: 135%;
+  border-radius: 3px;
 }
 
 .crm-container .crm-button:hover,
 .crm-container .crm-button:focus,
-.crm-container input[type=submit]:hover,
-.crm-container input[type=button]:hover,
 .crm-container .ui-dialog-buttonset .ui-button:hover,
 .crm-container .ui-dialog-buttonset .ui-button:focus,
 .crm-container a.button:hover,
@@ -1922,26 +1878,22 @@ input.crm-form-entityref {
 .crm-container .crm-button-disabled,
 .crm-container .crm-button.crm-button-disabled,
 .crm-container .ui-dialog-buttonset .ui-button[disabled],
-.crm-container input.crm-form-submit[disabled],
-.crm-container input[type=button][disabled],
 .crm-container .crm-button[disabled] {
   opacity: .6;
   cursor: default;
-}
-
-.crm-container .crm-button-disabled input[disabled] {
-  opacity: 1;
 }
 
 .crm-container .ui-dialog-buttonpane {
   background: linear-gradient(to bottom, #f2f2f2 0%,#ffffff 35%);
 }
 
-.crm-container .ui-dialog-buttonset .ui-button {
-  padding: 0;
-}
 .crm-container .ui-dialog-buttonset .ui-button .ui-icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
+}
+
+/* Override of a line in crm-i.css that may not be important anymore */
+.crm-container .ui-dialog-buttonset .ui-button .ui-icon[class*=" fa-"] {
+  margin-top: 0;
 }
 
 /* No crm-button styling for PayPal Express buttons */
@@ -2046,31 +1998,6 @@ input.crm-form-entityref {
   margin-left: 3px;
 }
 
-.crm-container .crm-button.crm-icon-button {
-  padding: 2px 2px 1px 4px;
-}
-
-.crm-container .crm-button.crm-icon-button input {
-  padding-left: 18px;
-}
-
-.crm-container .crm-button.button-crm-i {
-  padding: 2px 0 1px 5px;
-}
-
-.crm-container .crm-button.button-crm-i input {
-  padding-left: 0;
-}
-
-.crm-container .crm-button-icon {
-  background-image: url("../i/icons/jquery-ui-FFFFFF.png");
-  height: 16px;
-  width: 16px;
-  display: block;
-  position: absolute;
-  pointer-events: none;
-}
-
 .crm-container .delete-icon {
   background-position: -176px -96px;
 }
@@ -2115,22 +2042,6 @@ a.crm-i:hover {
 
 .crm-i.crm-i-green {
   color: #86c661;
-}
-
-.crm-i-button {
-  position: relative;
-}
-
-.crm-i-button>.crm-i {
-  position: absolute;
-  pointer-events: none;
-  top: .4em;
-  left: .4em;
-}
-
-.crm-container .crm-button.crm-i-button input[type="button"],
-.crm-container .crm-button.crm-i-button input.crm-form-submit {
-  padding-left: 1.6em;
 }
 
 .crm-container a.helpicon {
@@ -2928,15 +2839,6 @@ tbody.scrollContent tr.alternateRow {
 }
 
 /* rounded corners */
-.crm-container .crm-button,
-.crm-container a.button,
-.crm-container a.button:link,
-.crm-container input.crm-form-submit,
-.crm-container input[type=button] {
-  border-radius: 3px;
-}
-
-
 .crm-container div.status,
 .crm-container #help,
 .crm-container .help,

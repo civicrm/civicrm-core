@@ -87,7 +87,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i>&nbsp;{ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
