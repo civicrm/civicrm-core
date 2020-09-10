@@ -2,7 +2,9 @@
 
 ini_set('memory_limit', '2G');
 ini_set('safe_mode', 0);
+// phpcs:disable
 eval(cv('php:boot --level=classloader', 'phpcode'));
+// phpcs:enable
 
 // Allow autoloading of PHPUnit helper classes in this extension.
 foreach ([__DIR__] as $dir) {
