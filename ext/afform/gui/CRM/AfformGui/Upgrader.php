@@ -40,7 +40,6 @@ class CRM_AfformGui_Upgrader extends CRM_AfformGui_Upgrader_Base {
    * Cleanup navigation upon removal
    */
   public function uninstall() {
-   // $this->executeSqlFile('sql/myuninstall.sql');
     civicrm_api3('Navigation', 'get', [
       'name' => 'afform_gui',
       'return' => ['id'],
