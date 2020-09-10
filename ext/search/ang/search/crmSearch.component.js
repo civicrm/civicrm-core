@@ -169,7 +169,10 @@
         })
           .finally(function() {
             if (ctrl.debug) {
-              ctrl.debug.params = JSON.stringify(ctrl.params, null, 2);
+              ctrl.debug.params = JSON.stringify(_.extend({version: 4}, ctrl.params), null, 2);
+              if (ctrl.debug.timeIndex) {
+                ctrl.debug.timeIndex = Number.parseFloat(ctrl.debug.timeIndex).toPrecision(2);
+              }
             }
           });
       }
