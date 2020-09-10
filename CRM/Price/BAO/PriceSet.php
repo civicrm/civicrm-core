@@ -1234,16 +1234,20 @@ INNER JOIN  civicrm_price_set pset    ON ( pset.id = field.price_set_id )
   }
 
   /**
-   * @param $ids
+   * Return a count of priceFieldValueIDs that are memberships by organisation and membership type
+   *
+   * @param string $priceFieldValueIDs
+   *   Comma separated string of priceFieldValue IDs
    *
    * @return array
+   *   Returns an array of counts by membership organisation
    */
-  public static function getMembershipCount($ids) {
+  public static function getMembershipCount($priceFieldValueIDs) {
     $queryString = "
 SELECT       count( pfv.id ) AS count, mt.member_of_contact_id AS id
 FROM         civicrm_price_field_value pfv
 INNER JOIN    civicrm_membership_type mt ON mt.id = pfv.membership_type_id
-WHERE        pfv.id IN ( $ids )
+WHERE        pfv.id IN ( $priceFieldValueIDs )
 GROUP BY     mt.member_of_contact_id ";
 
     $crmDAO = CRM_Core_DAO::executeQuery($queryString);
