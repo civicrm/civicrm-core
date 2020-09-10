@@ -148,8 +148,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $contribution->_relatedObjects['membership']);
     $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
     $this->assertTrue(is_a($contribution->_relatedObjects['financialType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertFalse(empty($contribution->_relatedObjects['contributionRecur']));
-    $this->assertFalse(empty($contribution->_relatedObjects['paymentProcessor']));
+    $this->assertNotEmpty($contribution->_relatedObjects['contributionRecur']);
+    $this->assertNotEmpty($contribution->_relatedObjects['paymentProcessor']);
   }
 
   /**
@@ -215,10 +215,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testLoadParticipantObjects() {
     $this->_setUpParticipantObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertFalse(empty($this->objects['participant']));
+    $this->assertNotEmpty($this->objects['participant']);
     $this->assertTrue(is_a($this->objects['participant'], 'CRM_Event_BAO_Participant'));
     $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertFalse(empty($this->objects['event']));
+    $this->assertNotEmpty($this->objects['event']);
     $this->assertTrue(is_a($this->objects['event'], 'CRM_Event_BAO_Event'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
     $this->assertNotEmpty($this->objects['event']->id);
@@ -280,11 +280,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $tablesToTruncate = [
       'civicrm_mailing_spool',
     ];
-    $this->quickCleanup($tablesToTruncate, FALSE);
+    $this->quickCleanup($tablesToTruncate);
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
-    $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
+    $contribution->composeMessageArray($this->input, $this->ids, $values);
     $mut->assertMailLogEmpty('no mail should have been send as event set to no confirm');
     $mut->stop();
   }
@@ -295,11 +295,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testLoadPledgeObjects() {
     $this->_setUpPledgeObjects();
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertFalse(empty($this->objects['pledge_payment'][0]));
+    $this->assertNotEmpty($this->objects['pledge_payment'][0]);
     $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
     $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
     $this->assertTrue(is_a($this->objects['pledge_payment'][0], 'CRM_Pledge_BAO_PledgePayment'));
-    $this->assertFalse(empty($this->objects['pledge_payment'][0]->id));
+    $this->assertNotEmpty($this->objects['pledge_payment'][0]->id);
     $this->assertEquals($this->_financialTypeId, $this->objects['financialType']->id);
     $this->assertEquals($this->_processorId, $this->objects['paymentProcessor']['id']);
     $this->assertEquals($this->_contributionId, $this->objects['contribution']->id);
@@ -313,25 +313,41 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testLoadPledgeObjectsInvalidPledgeID() {
     $this->_setUpPledgeObjects();
     $this->ids['pledge_payment'][0] = 0;
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]);
-    $this->assertArrayHasKey('error_message', $result);
+    try {
+      $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Could not find payment processor for contribution record: 1', $e->getMessage());
+    }
     $this->assertArrayNotHasKey('pledge_payment', $this->objects);
-    $this->assertEquals('Could not find payment processor for contribution record: 1', $result['error_message']);
+
     $this->ids['pledge_payment'][0] = NULL;
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]);
-    $this->assertArrayHasKey('error_message', $result);
+    try {
+      $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Could not find payment processor for contribution record: 1', $e->getMessage());
+    }
     $this->assertArrayNotHasKey('pledge_payment', $this->objects);
-    $this->assertEquals('Could not find payment processor for contribution record: 1', $result['error_message']);
+
     $this->ids['pledge_payment'][0] = '';
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]);
-    $this->assertArrayHasKey('error_message', $result);
+
+    try {
+      $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL);
+      $this->assertArrayHasKey('error_message', $result);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Could not find payment processor for contribution record: 1', $e->getMessage());
+    }
     $this->assertArrayNotHasKey('pledge_payment', $this->objects);
-    $this->assertEquals('Could not find payment processor for contribution record: 1', $result['error_message']);
 
     $this->ids['pledge_payment'][0] = 999;
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, $this->_processorId, ['return_error' => 1]);
-    $this->assertArrayHasKey('error_message', $result);
-    $this->assertEquals('Could not find pledge payment record: 999', $result['error_message']);
+    try {
+      $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, $this->_processorId);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Could not find pledge payment record: 999', $e->getMessage());
+    }
   }
 
   /**
@@ -350,25 +366,15 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function testRequiredWithoutProcessorID() {
     $this->_setUpPledgeObjects();
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]);
-    $this->assertArrayHasKey('error_message', $result);
-    $this->assertEquals('Could not find payment processor for contribution record: 1', $result['error_message']);
+    try {
+      $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Could not find payment processor for contribution record: 1', $e->getMessage());
+    }
     // error is only returned if $required set to True
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, NULL, ['return_error' => 1]);
-    $this->assertFalse(is_array($result));
-    //check that error is not returned if error checking not set
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['log_error' => 1]);
-    $this->assertFalse(is_array($result));
-  }
-
-  /**
-   * Test that an error is not if required set & no processor ID
-   */
-  public function testRequiredWithContributionPage() {
-    $this->_setUpContributionObjects(TRUE);
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]);
-    $this->assertEquals(1, $result['is_error']);
-    ;
+    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, NULL);
+    $this->assertEquals(TRUE, $result);
   }
 
   /**
@@ -379,7 +385,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function testPaymentProcessorLoadsAsParam() {
     $this->_setUpContributionObjects();
     $this->input = array_merge($this->input, ['payment_processor_id' => $this->_processorId]);
-    $this->assertTrue($this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]));
+    $this->assertTrue($this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL));
   }
 
   /**
@@ -387,15 +393,14 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   public function testRequiredWithContributionPageError() {
     $this->_setUpContributionObjects();
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['return_error' => 1]);
-    $this->assertArrayHasKey('error_message', $result);
-    $this->assertEquals('Could not find payment processor for contribution record: 1', $result['error_message']);
+    try {
+      $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertEquals('Could not find payment processor for contribution record: 1', $e->getMessage());
+    }
     // error is only returned if $required set to True
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, NULL, ['return_error' => 1]);
-    $this->assertFalse(is_array($result));
-    //check that error is not returned if error checking not set
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL, ['log_error' => 1]);
-    $this->assertFalse(is_array($result));
+    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, NULL);
   }
 
   public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
@@ -469,8 +474,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contributionPageID = NULL;
 
     if (!empty($contributionPage)) {
-      $dao = new CRM_Core_DAO();
-      $contribution_page = $dao->createTestObject('CRM_Contribute_DAO_ContributionPage');
+      $contribution_page = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
       $contribution_page->payment_processor = 1;
       $contribution_page->save();
       $contribution->contribution_page_id = $contributionPageID = $contribution_page->id;
@@ -577,6 +581,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    *
    * @param string $participantStatus
    *   The participant to create status
+   *
+   * @throws \CRM_Core_Exception
    */
   public function _setUpParticipantObjects($participantStatus = 'Attended') {
     $event = $this->eventCreate(['is_email_confirm' => 1]);
