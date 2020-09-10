@@ -2,28 +2,26 @@
 // This file declares an Angular module which can be autoloaded
 // in CiviCRM. See also:
 // \https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules/n
-return array (
+return [
   'js' =>
-  array (
-    0 => 'ang/mockBespoke.js',
-    1 => 'ang/mockBespoke/*.js',
-    2 => 'ang/mockBespoke/*/*.js',
-  ),
+    [
+      0 => 'ang/mockBespoke.js',
+      1 => 'ang/mockBespoke/*.js',
+      2 => 'ang/mockBespoke/*/*.js',
+    ],
   'css' =>
-  array (
-    0 => 'ang/mockBespoke.css',
-  ),
+    [
+      0 => 'ang/mockBespoke.css',
+    ],
   'partials' =>
-  array (
-    0 => 'ang/mockBespoke',
-  ),
+    [
+      0 => 'ang/mockBespoke',
+    ],
   'requires' =>
-  array (
-    0 => 'crmUi',
-    1 => 'crmUtil',
-    2 => 'ngRoute',
-  ),
-  'settings' =>
-  array (
-  ),
-);
+    [
+      0 => 'crmUi',
+      1 => 'crmUtil',
+      2 => 'ngRoute',
+    ],
+  'settings' => [],
+];
