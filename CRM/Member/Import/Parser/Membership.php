@@ -428,7 +428,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
               $endDate,
               $joinDate,
-              'today',
+              'now',
               $excludeIsAdmin,
               $formatted['membership_type_id'],
               $formatted
@@ -518,7 +518,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
           $endDate,
           $joinDate,
-          'today',
+          'now',
           $excludeIsAdmin,
           $formatted['membership_type_id'],
           $formatted

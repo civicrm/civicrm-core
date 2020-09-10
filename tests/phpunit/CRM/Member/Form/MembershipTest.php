@@ -477,6 +477,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmit($thousandSeparator) {
     CRM_Core_Session::singleton()->getStatus(TRUE);

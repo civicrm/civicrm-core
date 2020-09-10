@@ -225,16 +225,16 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    */
   public static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
-    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID = NULL, $membership = []
+    $statusDate = 'now', $excludeIsAdmin = FALSE, $membershipTypeID = NULL, $membership = []
   ) {
     $membershipDetails = [];
 
-    if (!$statusDate || $statusDate == 'today') {
-      $statusDate = date('Ymd');
+    if (!$statusDate || $statusDate === 'today') {
+      $statusDate = 'now';
+      CRM_Core_Error::deprecatedFunctionWarning('pass now rather than today in');
     }
-    else {
-      $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
-    }
+
+    $statusDate = date('Ymd', strtotime($statusDate));
 
     //fix for CRM-3570, if we have statuses with is_admin=1,
     //exclude these statuses from calculatation during import.

@@ -2328,7 +2328,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
               $dates['end_date'],
               $dates['join_date'],
-              'today',
+              'now',
               TRUE,
               $membership->membership_type_id,
               (array) $membership
@@ -5180,7 +5180,7 @@ LIMIT 1;";
       $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
         $dates['end_date'],
         $dates['join_date'],
-        'today',
+        'now',
         TRUE,
         $membershipParams['membership_type_id'],
         $membershipParams
