@@ -605,11 +605,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $isTest = $self->_action & CRM_Core_Action::PREVIEW;
       $lifeMember = CRM_Member_BAO_Membership::getAllContactMembership($self->_membershipContactID, $isTest, TRUE);
 
-      $membershipOrgDetails = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization();
-
+      $membershipOrgDetails = CRM_Member_BAO_MembershipType::getAllMembershipTypes();
       $unallowedOrgs = [];
       foreach (array_keys($lifeMember) as $memTypeId) {
-        $unallowedOrgs[] = $membershipOrgDetails[$memTypeId];
+        $unallowedOrgs[] = $membershipOrgDetails[$memTypeId]['member_of_contact_id'];
       }
     }
 
@@ -774,7 +773,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         if (!empty($lifeMember)) {
           foreach ($priceFieldIDS as $priceFieldId) {
             if (($id = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id')) &&
-              in_array($membershipOrgDetails[$id], $unallowedOrgs)
+              in_array($membershipOrgDetails[$id]['member_of_contact_id'], $unallowedOrgs)
             ) {
               $errors['_qf_default'] = ts('You already have a lifetime membership and cannot select a membership with a shorter term.');
               break;
@@ -791,6 +790,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           foreach ($count as $id => $occurrence) {
             if ($occurrence > 1) {
               $errors['_qf_default'] = ts('You have selected multiple memberships for the same organization or entity. Please review your selections and choose only one membership per entity. Contact the site administrator if you need assistance.');
+              break;
             }
           }
         }
