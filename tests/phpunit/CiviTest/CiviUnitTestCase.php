@@ -727,19 +727,17 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return mixed
    * @throws \CRM_Core_Exception
    */
-  public function paymentProcessorTypeCreate($params = NULL) {
-    if (is_null($params)) {
-      $params = [
-        'name' => 'API_Test_PP',
-        'title' => 'API Test Payment Processor',
-        'class_name' => 'CRM_Core_Payment_APITest',
-        'billing_mode' => 'form',
-        'is_recur' => 0,
-        'is_reserved' => 1,
-        'is_active' => 1,
-      ];
-    }
-    $result = $this->callAPISuccess('payment_processor_type', 'create', $params);
+  public function paymentProcessorTypeCreate($params = []) {
+    $params = array_merge([
+      'name' => 'API_Test_PP',
+      'title' => 'API Test Payment Processor',
+      'class_name' => 'CRM_Core_Payment_APITest',
+      'billing_mode' => 'form',
+      'is_recur' => 0,
+      'is_reserved' => 1,
+      'is_active' => 1,
+    ], $params);
+    $result = $this->callAPISuccess('PaymentProcessorType', 'create', $params);
 
     CRM_Core_PseudoConstant::flush('paymentProcessorType');
 
