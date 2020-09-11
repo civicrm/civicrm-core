@@ -87,7 +87,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
     if (CRM_Batch_BAO_Batch::checkBatchPermission('close', $this->_values['created_id'])) {
       $this->add('xbutton', 'close_batch', ts('Close Batch'), ['type' => 'submit']);
       if (CRM_Batch_BAO_Batch::checkBatchPermission('export', $this->_values['created_id'])) {
-        $this->add('xbutton', 'export_batch', ts('Close & Export Batch'), ['type' => 'submit']);
+        $this->add('xbutton', 'export_batch', ts('Close and Export Batch'), ['type' => 'submit']);
       }
     }
 
