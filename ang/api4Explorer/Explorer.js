@@ -791,7 +791,7 @@
           $scope.debug = debugFormat(resp.data);
           $scope.result = [
             formatMeta(resp.data),
-            prettyPrintOne('(' + resp.data.values.length + ') ' + _.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)
+            prettyPrintOne((_.isArray(resp.data.values) ? '(' + resp.data.values.length + ') ' : '') + _.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)
           ];
         }, function(resp) {
           $scope.loading = false;
