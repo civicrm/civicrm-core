@@ -17,19 +17,6 @@
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
-   * Static holder for the default LT.
-   * @var int
-   */
-  public static $_defaultMembershipStatus = NULL;
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @param array $params
