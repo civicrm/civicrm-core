@@ -44,23 +44,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   }
 
   /**
-   * Returns whether or not this OpenID is allowed to login.
-   *
-   * @param string $identity_url
-   *   The OpenID to check.
-   *
-   * @return bool
-   */
-  public static function isAllowedToLogin($identity_url) {
-    $openId = new CRM_Core_DAO_OpenID();
-    $openId->openid = $identity_url;
-    if ($openId->find(TRUE)) {
-      return $openId->allowed_to_login == 1;
-    }
-    return FALSE;
-  }
-
-  /**
    * Get all the openids for a specified contact_id, with the primary openid being first
    *
    * @param int $id
