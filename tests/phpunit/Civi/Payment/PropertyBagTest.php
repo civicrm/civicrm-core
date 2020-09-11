@@ -45,6 +45,56 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * Test we can set an amount.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/18219
+   *
+   * @dataProvider setAmountDataProvider
+   *
+   * @param mixed $value input
+   * @param mixed $expect output expected. Typically a string like '1.23' or NULL
+   * @param string $expectedExceptionMessage if there is one expected.
+   */
+  public function testSetAmount($value, $expect, $expectedExceptionMessage = '') {
+    $propertyBag = new PropertyBag();
+    try {
+      $propertyBag->setAmount($value);
+    }
+    catch (\Exception $e) {
+      if ($expectedExceptionMessage) {
+        $this->assertEquals($expectedExceptionMessage, $e->getMessage(), 'Expected a different exception.');
+        // OK.
+        return;
+      }
+      // not expecting an exception, re-throw it.
+      throw $e;
+    }
+    $got = $propertyBag->getAmount();
+    $this->assertInternalType('string', $got);
+    $this->assertEquals($expect, $got);
+  }
+
+  /**
+   *
+   */
+  public function setAmountDataProvider() {
+    return [
+      [1, '1'],
+      [1.23, '1.23'],
+      [1.234, '1.234'],
+      [-1.23, '-1.23'],
+      ['1', '1'],
+      ['1.23', '1.23'],
+      ['1.234', '1.234'],
+      ['-1.23', '-1.23'],
+      ['1,000.23', NULL, 'setAmount requires a numeric amount value'],
+      ['1,000', NULL, 'setAmount requires a numeric amount value'],
+      ['1,23', NULL, 'setAmount requires a numeric amount value'],
+      ['1.230,12', NULL, 'setAmount requires a numeric amount value'],
+    ];
+  }
+
+  /**
    * Test we cannot set an invalid contact ID.
    *
    * @expectedException \InvalidArgumentException
