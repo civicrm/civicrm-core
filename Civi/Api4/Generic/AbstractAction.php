@@ -407,6 +407,9 @@ abstract class AbstractAction implements \ArrayAccess {
       'default' => ['administer CiviCRM'],
     ];
     $action = $this->getActionName();
+    if ($action === 'save') {
+      $action = 'create';
+    }
     if (isset($permissions[$action])) {
       return $permissions[$action];
     }
