@@ -3,7 +3,8 @@
 
   angular.module('search').component('crmSearch', {
     bindings: {
-      entity: '='
+      entity: '=',
+      load: '<'
     },
     templateUrl: '~/search/crmSearch.html',
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
@@ -244,6 +245,9 @@
             ctrl.stale = true;
           }
         }
+        if (ctrl.load) {
+          ctrl.load.saved = false;
+        }
       }
 
       function onChangeOrderBy() {
@@ -255,6 +259,9 @@
       function onChangeFilters() {
         ctrl.stale = true;
         ctrl.selectedRows.length = 0;
+        if (ctrl.load) {
+          ctrl.load.saved = false;
+        }
         if (ctrl.autoSearch) {
           ctrl.refreshAll();
         }
@@ -526,6 +533,13 @@
         }
         $scope.$watch('$ctrl.params.having', onChangeFilters, true);
 
+        if (this.load) {
+          this.params = this.load.api_params;
+          $timeout(function() {
+            ctrl.load.saved = true;
+          });
+        }
+
         loadFieldOptions();
       };
 
@@ -540,16 +554,21 @@
           description: '',
           visibility: 'User and User Admin Only',
           group_type: [],
-          id: null,
+          id: ctrl.load ? ctrl.load.id : null,
           entity: ctrl.entity,
-          params: angular.extend({}, ctrl.params, {version: 4, select: [selectField]})
+          params: angular.extend({}, ctrl.params, {version: 4})
         };
         delete model.params.orderBy;
         var options = CRM.utils.adjustDialogDefaults({
           autoOpen: false,
           title: ts('Save smart group')
         });
-        dialogService.open('saveSearchDialog', '~/search/saveSmartGroup.html', model, options);
+        dialogService.open('saveSearchDialog', '~/search/saveSmartGroup.html', model, options)
+          .then(function() {
+            if (ctrl.load) {
+              ctrl.load.saved = true;
+            }
+          });
       };
     }
   });

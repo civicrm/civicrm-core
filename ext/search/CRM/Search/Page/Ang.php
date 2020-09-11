@@ -49,7 +49,7 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
     $loader->setModules(['search']);
     $loader->setPageName('civicrm/search');
     $loader->useApp([
-      'defaultRoute' => '/Contact',
+      'defaultRoute' => '/create/Contact',
     ]);
     $loader->load();
     parent::run();

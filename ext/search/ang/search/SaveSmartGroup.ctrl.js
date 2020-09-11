@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').controller('SaveSmartGroup', function ($scope, crmApi4, dialogService) {
+  angular.module('search').controller('SaveSmartGroup', function ($scope, $element, crmApi4, dialogService) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model;
     $scope.groupEntityRefParams = {
@@ -23,9 +23,15 @@
       administerReservedGroups: CRM.checkPerm('administer reserved groups')
     };
     $scope.groupFields = _.indexBy(_.find(CRM.vars.search.schema, {name: 'Group'}).fields, 'name');
-    $scope.$watch('model.id', function (id) {
-      if (id) {
-        _.assign(model, $('#api-save-search-select-group').select2('data').extra);
+    $element.on('change', '#api-save-search-select-group', function() {
+      if ($(this).val()) {
+        $scope.$apply(function() {
+          var group = $('#api-save-search-select-group').select2('data').extra;
+          model.saved_search_id = group.saved_search_id;
+          model.description = group.description || '';
+          model.group_type = group.group_type || [];
+          model.visibility = group.visibility;
+        });
       }
     });
     $scope.cancel = function () {
