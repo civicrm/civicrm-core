@@ -23,7 +23,7 @@
             <a href="{$searchBuilderURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Search Builder{/ts}</a><br />
         {/if}
         {if $context eq 'smog'}
-            {help id="id-smog-criteria" group_id=$group.id group_title=$group.title ssID=$ssID ssMappingID=$ssMappingID permissionedForGroup=$permissionedForGroup}
+            {help id="id-smog-criteria" group_title=$group.title}
         {elseif $context eq 'amtg'}
             {help id="id-amtg-criteria" group_title=$group.title}
         {else}

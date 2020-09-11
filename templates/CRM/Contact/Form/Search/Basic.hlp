@@ -26,19 +26,6 @@
         <li>{ts}Use the 'Group Status...' checkboxes to view contacts with 'Pending' status and/or contacts who have been 'Removed' from this group.{/ts}</li>
       </ul>
     </p>
-    {if $params.permissionedForGroup}
-        {capture assign=addMembersURL}{crmURL q="context=amtg&amtgID=`$params.group_id`&reset=1"}{/capture}
-        <p>{ts 1=$addMembersURL 2=$params.group_title}Click <a href='%1'>Add Contacts to %2</a> if you want to add contacts to this group.{/ts}
-        {if !empty($params.ssID)}
-            {if $params.ssMappingID}
-                {capture assign=editSmartGroupURL}{crmURL p="civicrm/contact/search/builder" q="reset=1&force=1&ssID=`$params.ssID`"}{/capture}
-            {else}
-                {capture assign=editSmartGroupURL}{crmURL p="civicrm/contact/search/advanced" q="reset=1&force=1&ssID=`$params.ssID`"}{/capture}
-            {/if} 
-            {ts 1=$editSmartGroupURL}Click <a href='%1'>Edit Smart Group Search Criteria...</a> to change the search query used for this 'smart' group.{/ts}
-        {/if}
-        </p>
-    {/if}
 {/htxt}
 
 {htxt id="id-amtg-criteria-title"}

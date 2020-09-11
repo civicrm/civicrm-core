@@ -54,9 +54,9 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contact_BAO_SavedSearch
+   * @return CRM_Contact_DAO_SavedSearch
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve($params, &$defaults = []) {
     $savedSearch = new CRM_Contact_DAO_SavedSearch();
     $savedSearch->copyValues($params);
     if ($savedSearch->find(TRUE)) {
@@ -420,6 +420,35 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
         $formValues[$fieldName . '_to'] = $value;
         break;
     }
+  }
+
+  /**
+   * Generate a url to the appropriate search form for a given savedSearch
+   *
+   * @param int $id
+   *   Saved search id
+   * @return string
+   */
+  public static function getEditSearchUrl($id) {
+    $savedSearch = self::retrieve(['id' => $id]);
+    // APIv4 search
+    if (!empty($savedSearch->api_entity)) {
+      $groupName = self::getName($id);
+      return CRM_Utils_System::url('civicrm/search', NULL, FALSE, "/load/Group/$groupName");
+    }
+    // Classic search builder
+    if (!empty($savedSearch->mapping_id)) {
+      $path = 'civicrm/contact/search/builder';
+    }
+    // Classic custom search
+    elseif (!empty($savedSearch->search_custom_id)) {
+      $path = 'civicrm/contact/search/custom';
+    }
+    // Classic advanced search
+    else {
+      $path = 'civicrm/contact/search/advanced';
+    }
+    return CRM_Utils_System::url($path, ['reset' => 1, 'ssID' => $id]);
   }
 
 }
