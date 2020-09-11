@@ -417,7 +417,20 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
-   * Get the monetary amount.
+   * Set the monetary amount.
+   *
+   * - We expect to be called with a string amount with optional decimals using
+   *   a '.' as the decimal point (not a ',').
+   *
+   * - We're ok with floats/ints being passed in, too, but we'll cast them to a
+   *   string.
+   *
+   * - Negatives are fine.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/18219
+   *
+   * @param string|float|int $value
+   * @param string $label
    */
   public function setAmount($value, $label = 'default') {
     if (!is_numeric($value)) {
