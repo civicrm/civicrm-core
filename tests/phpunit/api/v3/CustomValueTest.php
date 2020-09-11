@@ -95,11 +95,11 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
-    $count = 0;
-    $optionSupportingHTMLTypes = ['Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Multi-Select'];
+    $optionSupportingHTMLTypes = CRM_Custom_Form_Field::$htmlTypesWithOptions;
 
     foreach ($customFieldDataType as $dataType => $label) {
       switch ($dataType) {
+        // skipping File data-type & state province due to caching issues
         // case 'Country':
         // case 'StateProvince':
         case 'String':
@@ -139,7 +139,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           }
 
           //Create custom field of $dataType and html-type $html
-          foreach ($dataToHtmlTypes[$count] as $html) {
+          foreach ($dataToHtmlTypes[$dataType] as $html) {
             // per CRM-18568 the like operator does not currently work for fields with options.
             // the LIKE operator could potentially bypass ACLs (as could IS NOT NULL) and some thought needs to be given
             // to it.
@@ -160,13 +160,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             //Now test with $validSQLOperator SQL operators against its custom value(s)
             $this->_testCustomValue($customField['values'][$customField['id']], $validSQLOperators, $type);
           }
-          $count++;
-          break;
 
-        default:
-          // skipping File data-type & state province due to caching issues
-          $count++;
-          break;
       }
     }
   }

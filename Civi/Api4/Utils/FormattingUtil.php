@@ -88,7 +88,7 @@ class FormattingUtil {
     // Evaluate pseudoconstant suffix
     $suffix = strpos($fieldName, ':');
     if ($suffix) {
-      $options = self::getPseudoconstantList($fieldSpec['entity'], $fieldSpec['name'], substr($fieldName, $suffix + 1), $action);
+      $options = self::getPseudoconstantList($fieldSpec, substr($fieldName, $suffix + 1), $action);
       $value = self::replacePseudoconstant($options, $value, TRUE);
       return;
     }
@@ -148,8 +148,7 @@ class FormattingUtil {
           // Evaluate pseudoconstant suffixes
           $suffix = strrpos($fieldExpr, ':');
           if ($suffix) {
-            $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
-            $fieldOptions[$fieldExpr] = $fieldOptions[$fieldExpr] ?? self::getPseudoconstantList($field['entity'], $fieldName, substr($fieldExpr, $suffix + 1), $result, $action);
+            $fieldOptions[$fieldExpr] = $fieldOptions[$fieldExpr] ?? self::getPseudoconstantList($field, substr($fieldExpr, $suffix + 1), $result, $action);
             $dataType = NULL;
           }
           if (!empty($field['serialize'])) {
@@ -178,9 +177,7 @@ class FormattingUtil {
   /**
    * Retrieves pseudoconstant option list for a field.
    *
-   * @param string $entity
-   *   Name of api entity
-   * @param string $fieldName
+   * @param array $field
    * @param string $valueType
    *   name|label|abbr from self::$pseudoConstantContexts
    * @param array $params
@@ -189,27 +186,28 @@ class FormattingUtil {
    * @return array
    * @throws \API_Exception
    */
-  public static function getPseudoconstantList($entity, $fieldName, $valueType, $params = [], $action = 'get') {
+  public static function getPseudoconstantList($field, $valueType, $params = [], $action = 'get') {
     $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
     if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
       throw new \API_Exception('Illegal expression');
     }
-    $baoName = $context ? CoreUtil::getBAOFromApiName($entity) : NULL;
+    $baoName = $context ? CoreUtil::getBAOFromApiName($field['entity']) : NULL;
     // Use BAO::buildOptions if possible
     if ($baoName) {
+      $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
       $options = $baoName::buildOptions($fieldName, $context, $params);
     }
     // Fallback for option lists that exist in the api but not the BAO
     if (!isset($options) || $options === FALSE) {
-      $options = civicrm_api4($entity, 'getFields', ['action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $fieldName]]])[0]['options'] ?? NULL;
+      $options = civicrm_api4($field['entity'], 'getFields', ['action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
       $options = $options ? array_column($options, $valueType, 'id') : $options;
     }
     if (is_array($options)) {
       return $options;
     }
-    throw new \API_Exception("No option list found for '$fieldName'");
+    throw new \API_Exception("No option list found for '{$field['name']}'");
   }
 
   /**

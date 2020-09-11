@@ -157,13 +157,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * Fetch object based on array of properties.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   An assoc array of name/value pairs.
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
    * @return CRM_Core_DAO_CustomField
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve($params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
   }
 
@@ -1697,6 +1697,25 @@ SELECT $columnName
   }
 
   /**
+   * Reformat existing values for a field when changing its serialize attribute
+   *
+   * @param CRM_Core_DAO_CustomField $field
+   * @throws CRM_Core_Exception
+   */
+  private static function alterSerialize($field) {
+    $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id, 'table_name');
+    $col = $field->column_name;
+    $sp = CRM_Core_DAO::VALUE_SEPARATOR;
+    if ($field->serialize) {
+      $sql = "UPDATE `$table` SET `$col` = CONCAT('$sp', `$col`, '$sp') WHERE `$col` IS NOT NULL AND `$col` NOT LIKE '$sp%' AND `$col` != ''";
+    }
+    else {
+      $sql = "UPDATE `$table` SET `$col` = SUBSTRING_INDEX(SUBSTRING(`$col`, 2), '$sp', 1) WHERE `$col` LIKE '$sp%'";
+    }
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
    * Determine whether it would be safe to move a field.
    *
    * @param int $fieldID
@@ -1989,6 +2008,9 @@ WHERE  id IN ( %1, %2 )
     $transaction = new CRM_Core_Transaction();
     $params = self::prepareCreate($params);
 
+    $alterSerialize = isset($params['serialize']) && !empty($params['id'])
+      && ($params['serialize'] != CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'serialize'));
+
     $customField = new CRM_Core_DAO_CustomField();
     $customField->copyValues($params);
     $customField->save();
@@ -2008,6 +2030,11 @@ WHERE  id IN ( %1, %2 )
 
     // make sure all values are present in the object for further processing
     $customField->find(TRUE);
+
+    if ($alterSerialize) {
+      self::alterSerialize($customField);
+    }
+
     return $customField;
   }
 

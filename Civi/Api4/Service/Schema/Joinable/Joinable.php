@@ -79,11 +79,6 @@ class Joinable {
   protected $entity;
 
   /**
-   * @var array
-   */
-  protected $entityFields;
-
-  /**
    * @param $targetTable
    * @param $targetColumn
    * @param string|null $alias
@@ -268,15 +263,14 @@ class Joinable {
    * @return \Civi\Api4\Service\Spec\FieldSpec[]
    */
   public function getEntityFields() {
-    if (!$this->entityFields) {
-      $bao = AllCoreTables::getClassForTable($this->getTargetTable());
-      if ($bao) {
-        foreach ($bao::fields() as $field) {
-          $this->entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntity());
-        }
+    $entityFields = [];
+    $bao = AllCoreTables::getClassForTable($this->getTargetTable());
+    if ($bao) {
+      foreach ($bao::getSupportedFields() as $field) {
+        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntity());
       }
     }
-    return $this->entityFields;
+    return $entityFields;
   }
 
   /**

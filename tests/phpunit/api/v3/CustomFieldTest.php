@@ -108,22 +108,13 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $htype = CRM_Custom_Form_Field::$_dataToHTML;
 
     // Legacy html types returned by v3
-    foreach ($htype as &$item) {
-      if (isset($item['StateProvince'])) {
-        $item['StateProvince'] = 'Select State/Province';
-      }
-      if (isset($item['Country'])) {
-        $item['Country'] = 'Select Country';
-      }
-    }
+    $htype['StateProvince'] = ['Select State/Province'];
+    $htype['Country'] = ['Select Country'];
 
-    $n = 0;
     foreach ($dtype as $dkey => $dvalue) {
-      foreach ($htype[$n] as $hkey => $hvalue) {
-        //echo $dkey."][".$hvalue."\n";
+      foreach ($htype[$dkey] as $hvalue) {
         $this->_loopingCustomFieldCreateTest($this->_buildParams($gid['id'], $hvalue, $dkey));
       }
-      $n++;
     }
   }
 
