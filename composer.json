@@ -195,6 +195,12 @@
       "es6-promise": {
         "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
       },
+      "ext-greenwich-bootstrap3": {
+        "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
+        "path": "ext/greenwich/extern/bootstrap3",
+        "version": "3.4.1",
+        "ignore": ["test", "tasks", "lib"]
+      },
       "font-awesome": {
         "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
         "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
