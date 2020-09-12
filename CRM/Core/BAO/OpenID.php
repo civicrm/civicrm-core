@@ -61,58 +61,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   }
 
   /**
-   * Get all the openids for a specified contact_id, with the primary openid being first
-   *
-   * @param int $id
-   *   The contact id.
-   *
-   * @param bool $updateBlankLocInfo
-   *
-   * @return array
-   *   the array of openid's
-   */
-  public static function allOpenIDs($id, $updateBlankLocInfo = FALSE) {
-    if (!$id) {
-      return NULL;
-    }
-
-    $query = "
-SELECT civicrm_openid.openid, civicrm_location_type.name as locationType, civicrm_openid.is_primary as is_primary,
-civicrm_openid.allowed_to_login as allowed_to_login, civicrm_openid.id as openid_id,
-civicrm_openid.location_type_id as locationTypeId
-FROM      civicrm_contact
-LEFT JOIN civicrm_openid ON ( civicrm_openid.contact_id = civicrm_contact.id )
-LEFT JOIN civicrm_location_type ON ( civicrm_openid.location_type_id = civicrm_location_type.id )
-WHERE
-  civicrm_contact.id = %1
-ORDER BY
-  civicrm_openid.is_primary DESC,  openid_id ASC ";
-    $params = [1 => [$id, 'Integer']];
-
-    $openids = $values = [];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $count = 1;
-    while ($dao->fetch()) {
-      $values = [
-        'locationType' => $dao->locationType,
-        'is_primary' => $dao->is_primary,
-        'id' => $dao->openid_id,
-        'openid' => $dao->openid,
-        'locationTypeId' => $dao->locationTypeId,
-        'allowed_to_login' => $dao->allowed_to_login,
-      ];
-
-      if ($updateBlankLocInfo) {
-        $openids[$count++] = $values;
-      }
-      else {
-        $openids[$dao->openid_id] = $values;
-      }
-    }
-    return $openids;
-  }
-
-  /**
    * Call common delete function.
    *
    * @param int $id
