@@ -407,13 +407,15 @@ abstract class AbstractAction implements \ArrayAccess {
       'default' => ['administer CiviCRM'],
     ];
     $action = $this->getActionName();
-    if (isset($permissions[$action])) {
-      return $permissions[$action];
-    }
-    elseif (in_array($action, ['getActions', 'getFields'])) {
-      return $permissions['meta'];
-    }
-    return $permissions['default'];
+    // Map specific action names to more generic versions
+    $map = [
+      'getActions' => 'meta',
+      'getFields' => 'meta',
+      'replace' => 'delete',
+      'save' => 'create',
+    ];
+    $generic = $map[$action] ?? 'default';
+    return $permissions[$action] ?? $permissions[$generic] ?? $permissions['default'];
   }
 
   /**
