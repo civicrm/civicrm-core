@@ -673,7 +673,7 @@ WHERE  id = %1";
         continue;
       }
 
-      list($params, $lineItem) = self::getLine($params, $lineItem, $priceSetID, $field, $id, $totalPrice);
+      list($params, $lineItem) = self::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
 
     $amount_level = [];
@@ -1694,11 +1694,10 @@ WHERE     ct.id = cp.financial_type_id AND
    * @param int $priceSetID
    * @param array $field
    * @param int $id
-   * @param float $totalPrice
    *
    * @return array
    */
-  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id, $totalPrice): array {
+  public static function getLine(&$params, &$lineItem, $priceSetID, $field, $id): array {
     $totalTax = 0;
     switch ($field['html_type']) {
       case 'Text':
@@ -1718,7 +1717,6 @@ WHERE     ct.id = cp.financial_type_id AND
         if (!empty($field['options'][$optionValueId]['tax_rate'])) {
           $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
         }
-        $totalPrice += $lineItem[$firstOption['id']]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[key($field['options'])]);
         break;
 
       case 'Radio':
@@ -1748,7 +1746,6 @@ WHERE     ct.id = cp.financial_type_id AND
             $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
           }
         }
-        $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
         break;
 
       case 'Select':
@@ -1759,7 +1756,6 @@ WHERE     ct.id = cp.financial_type_id AND
         if (!empty($field['options'][$optionValueId]['tax_rate'])) {
           $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
         }
-        $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
         break;
 
       case 'CheckBox':
@@ -1769,7 +1765,6 @@ WHERE     ct.id = cp.financial_type_id AND
           if (!empty($field['options'][$optionId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
           }
-          $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);
         }
         break;
     }
