@@ -239,7 +239,7 @@ class Container {
       ))
         ->setFactory([$class, 'singleton'])->setPublic(TRUE);
     }
-    $container->setAlias('cache.short', 'cache.default');
+    $container->setAlias('cache.short', 'cache.default')->setPublic(TRUE);
 
     $container->setDefinition('resources', new Definition(
       'CRM_Core_Resources',
