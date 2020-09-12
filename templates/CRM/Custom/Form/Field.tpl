@@ -277,7 +277,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select');
+      $(".crm-custom-field-form-block-serialize", $form).toggle((htmlType === 'Select' || htmlType === 'Autocomplete-Select') && dataType !== 'ContactReference');
     }
 
     function makeDefaultValueField(dataType) {
@@ -308,7 +308,7 @@
     $form.submit(function() {
       var htmlType = $('#html_type', $form).val(),
         serialize = $("#serialize", $form).is(':checked'),
-        htmlTypeLabel = (serialize && htmlType === 'Select') ? ts('Multi-Select') : _.find(htmlTypes, {key: htmlType}).value;
+        htmlTypeLabel = (serialize && _.includes(['Select', 'Autocomplete-Select'], htmlType)) ? ts('Multi-Select') : _.find(htmlTypes, {key: htmlType}).value;
       if (originalHtmlType && (originalHtmlType !== htmlType || originalSerialize !== serialize)) {
         var origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : _.find(htmlTypes, {key: originalHtmlType}).value;
         if (originalSerialize && !serialize && existingMultiValueCount) {

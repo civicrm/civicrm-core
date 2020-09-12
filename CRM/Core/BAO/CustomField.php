@@ -918,7 +918,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $attributes += [
             'entity' => 'OptionValue',
             'placeholder' => $placeholder,
-            'multiple' => $search,
+            'multiple' => $search ? TRUE : !empty($field->serialize),
             'api' => [
               'params' => ['option_group_id' => $field->option_group_id, 'is_active' => 1],
             ],
@@ -1456,6 +1456,11 @@ SELECT id
       }
     }
     elseif (self::isSerialized($customFields[$customFieldId])) {
+      // Select2 v3 returns a comma-separated string.
+      if ($customFields[$customFieldId]['html_type'] == 'Autocomplete-Select' && is_string($value)) {
+        $value = explode(',', $value);
+      }
+
       $value = $value ? CRM_Utils_Array::implodePadded($value) : '';
     }
 

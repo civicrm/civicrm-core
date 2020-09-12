@@ -844,7 +844,7 @@ AND    option_group_id = %2";
       $params['is_search_range'] = 0;
     }
 
-    if ($params['html_type'] === 'Select') {
+    if ($params['data_type'] !== 'ContactReference' && ($params['html_type'] === 'Select' || $params['html_type'] === 'Autocomplete-Select')) {
       $params['serialize'] = $params['serialize'] ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
     }
     else {
