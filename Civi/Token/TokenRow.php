@@ -404,6 +404,20 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
   }
 
   /**
+   * Register a string for which we'll need to merge in tokens.
+   *
+   * @param string $name
+   *   Ex: 'subject', 'body_html'.
+   * @param string $value
+   *   Ex: '<p>Hello {contact.name}</p>'.
+   * @param string $format
+   *   Ex: 'text/html'.
+   */
+  public function addMessage($name, $value, $format) {
+    $this->tokenProcessor->addMessage($name, $value, $format);
+  }
+
+  /**
    * Create merged array.
    *
    * @return array
