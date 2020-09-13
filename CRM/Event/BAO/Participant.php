@@ -191,7 +191,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     ) {
       // Default status if not specified
       $participant->status_id = $participant->status_id ?: self::fields()['participant_status_id']['default'];
-      CRM_Activity_BAO_Activity::addActivity($participant);
+      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration');
     }
 
     //CRM-5403
