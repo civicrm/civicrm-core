@@ -1020,7 +1020,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     // create an activity record
     if ($contribution) {
-      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID, $actParams);
+      CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID, $actParams);
     }
 
     $transaction->commit();
