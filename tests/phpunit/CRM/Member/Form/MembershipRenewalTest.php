@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+
 /**
  *  Test CRM_Member_Form_Membership functions.
  *
@@ -132,7 +134,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $form = $this->getForm();
-    $this->createLoggedInUser();
+    $loggedInUserID = $this->createLoggedInUser();
+    $loggedInUserDisplayName = Contact::get()->addWhere('id', '=', $loggedInUserID)->addSelect('display_name')->execute()->first()['display_name'];
     $params = $this->getBaseSubmitParams();
     $form->_contactID = $this->_individualId;
 
@@ -140,10 +143,12 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->setRenewalMessage();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->_individualId], 0);
-    $contribution = $this->callAPISuccess('Contribution', 'get', [
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
       'is_test' => TRUE,
     ]);
+    $expectedContributionSource = 'AnnualFixed Membership: Offline membership renewal (by ' . $loggedInUserDisplayName . ')';
+    $this->assertEquals($expectedContributionSource, $contribution['contribution_source']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -234,7 +239,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $params = [
       'cid' => $this->_individualId,
       'price_set_id' => 0,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('m/d/Y'),
       'start_date' => '',
       'end_date' => '',
       'campaign_id' => '',
@@ -443,7 +448,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
     $params = [
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('m/d/Y'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -554,7 +559,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
     $params = [
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('m/d/Y'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
