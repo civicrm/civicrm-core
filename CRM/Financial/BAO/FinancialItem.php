@@ -74,7 +74,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = [
-      'transaction_date' => CRM_Utils_Date::isoToMysql($contribution->receive_date),
+      'transaction_date' => $contribution->receive_date,
       'contact_id' => $contribution->contact_id,
       'amount' => $lineItem->line_total,
       'currency' => $contribution->currency,
