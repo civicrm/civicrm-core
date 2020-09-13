@@ -178,7 +178,7 @@ class CRM_Core_BAO_ConfigSetting {
        * If the language is specified via "lcMessages" we skip this, since the
        * intention of the URL query var is to override all other sources.
        */
-      if ($settings->get('inheritLocale') && empty($chosenLocale)) {
+      if ($settings->get('inheritLocale')) {
 
         /*
          * FIXME: On multi-language installs, CRM_Utils_System::getUFLocale() in
