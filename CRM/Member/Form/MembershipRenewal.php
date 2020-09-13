@@ -589,11 +589,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
 
-    $membership = $this->processMembership(
-      $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
-      $renewalDate, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,
-      $pending,
-      $contributionRecurID, $this->_params['is_pay_later']);
+    $membershipParams = [
+      'id' => $this->_membershipId,
+      'membership_type_id' => $this->_params['membership_type_id'][1],
+      'modified_id' => $this->_contactID,
+      'custom' => $customFieldsFormatted,
+      'membership_activity_status' => ($pending || $this->_params['is_pay_later']) ? 'Scheduled' : 'Completed',
+      // Since we are renewing, make status override false.
+      'is_override' => FALSE,
+    ];
+    if ($contributionRecurID) {
+      $membershipParams['contribution_recur_id'] = $contributionRecurID;
+    }
+    $membership = $this->processMembership($membershipParams, $renewalDate, $numRenewTerms, $pending);
 
     $this->endDate = CRM_Utils_Date::processDate($membership->end_date);
 
@@ -731,38 +739,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * This is duplicated from the BAO class - on the basis that it's actually easier to divide & conquer when
    * it comes to clearing up really bad code.
    *
-   * @param int $contactID
-   * @param int $membershipTypeID
-   * @param bool $is_test
-   * @param string $changeToday
-   * @param $customFieldsFormatted
+   * @param array $memParams
+   * @param bool $changeToday
    * @param $numRenewTerms
-   * @param int $membershipID
-   * @param $pending
-   * @param int $contributionRecurID
-   * @param $isPayLater
+   * @param bool $pending
    *
    * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $isPayLater) {
+  public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $ids = [];
-    $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $membershipID]);
-    $memParams = [
-      'id' => $currentMembership['id'],
-      'membership_type_id' => $membershipTypeID,
-      'join_date' => $currentMembership['join_date'],
-      'modified_id' => $contactID,
-      'custom' => $customFieldsFormatted,
-      'membership_activity_status' => ($pending || $isPayLater) ? 'Scheduled' : 'Completed',
-      // Since we are renewing, make status override false.
-      'is_override' => FALSE,
-    ];
-    if ($contributionRecurID) {
-      $memParams['contribution_recur_id'] = $contributionRecurID;
-    }
+    $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $memParams['id']]);
+
+    $memParams['join_date'] = $currentMembership['join_date'];
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
     //2. Paylater/IPN renew. CRM-4556.
@@ -787,7 +778,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
     $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
       $changeToday,
-      $membershipTypeID,
+      $memParams['membership_type_id'],
       $numRenewTerms
     );
     $memParams = array_merge($memParams, [
