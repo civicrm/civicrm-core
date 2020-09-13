@@ -1158,6 +1158,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   private static function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, array $inputParams, bool $isARefund, $trxnIds, $fieldId): array {
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
+      throw new CRM_Core_Exception('is this line tested');
       $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
       if ($params['contribution']->receive_date) {
         $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);

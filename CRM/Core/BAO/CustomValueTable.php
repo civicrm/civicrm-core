@@ -174,8 +174,7 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'Date':
-              $value = CRM_Utils_Date::isoToMysql($value);
-              break;
+              throw new CRM_Core_Exception('is this line tested');
 
             case 'Int':
               if (is_numeric($value)) {

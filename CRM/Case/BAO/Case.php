@@ -2070,6 +2070,7 @@ SELECT  id
         CRM_Core_DAO::storeValues($otherActivity, $mainActVals);
         $mainActivity->copyValues($mainActVals);
         $mainActivity->id = NULL;
+        throw new CRM_Core_Exception('is this line tested');
         $mainActivity->activity_date_time = CRM_Utils_Date::isoToMysql($otherActivity->activity_date_time);
         $mainActivity->source_record_id = CRM_Utils_Array::value($mainActivity->source_record_id,
           $activityMappingIds
@@ -2194,6 +2195,7 @@ SELECT  id
               $mainRelationship->contact_id_b = ($currentUserId) ? $currentUserId : $mainContactId;
             }
           }
+          throw new CRM_Core_Exception('is this line tested');
           $mainRelationship->end_date = CRM_Utils_Date::isoToMysql($otherRelationship->end_date);
           $mainRelationship->start_date = CRM_Utils_Date::isoToMysql($otherRelationship->start_date);
 

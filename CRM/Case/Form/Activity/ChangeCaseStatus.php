@@ -153,6 +153,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
     if (CRM_Utils_Array::value($params['case_status_id'], $groupingValues) == 'Closed' && !empty($params['activity_date_time'])) {
+      throw new CRM_Core_Exception('is this line tested');
       $params['end_date'] = CRM_Utils_Date::isoToMysql($params['activity_date_time']);
 
       // End case-specific relationships (roles)

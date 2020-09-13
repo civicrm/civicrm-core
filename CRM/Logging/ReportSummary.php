@@ -268,6 +268,7 @@ SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
 SELECT {$this->_logTables[$entity]['bracket_info']['column']}
 FROM  `{$this->loggingDB}`.{$this->_logTables[$entity]['bracket_info']['table']}
 WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
+        throw new CRM_Core_Exception('is this line tested');
         return CRM_Core_DAO::singleValueQuery($sql, [
           1 => [CRM_Utils_Date::isoToMysql($logDate), 'Timestamp'],
           2 => [$entityID, 'Integer'],

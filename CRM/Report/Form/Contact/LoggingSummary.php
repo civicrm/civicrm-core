@@ -255,7 +255,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
       }
 
       $row['log_civicrm_entity_log_type'] = $this->getLogType($row['log_civicrm_entity_log_type']);
-
+      throw new CRM_Core_Exception('is this line tested');
       $date = CRM_Utils_Date::isoToMysql($row['log_civicrm_entity_log_date']);
 
       if (in_array(($row['log_civicrm_entity_log_action'] ?? NULL), ['Update', 'Delete'])) {

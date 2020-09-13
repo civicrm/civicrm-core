@@ -179,6 +179,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     foreach ($dates as $date) {
       $name = "{$date}_date";
       if ($recur->$name) {
+        throw new CRM_Core_Exception('is this line tested');
         $recur->$name = CRM_Utils_Date::isoToMysql($recur->$name);
       }
     }

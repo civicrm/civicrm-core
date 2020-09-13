@@ -1589,6 +1589,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     while ($dao->fetch()) {
       $relationshipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $dao->membership_type_id, 'relationship_type_id', 'id');
       if ($relationshipTypeId) {
+        throw new CRM_Core_Exception('is this line tested');
         $membershipParams = [
           'id' => $dao->id,
           'contact_id' => $dao->contact_id,

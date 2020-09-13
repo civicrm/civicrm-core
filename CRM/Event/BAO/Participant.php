@@ -73,6 +73,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     // converting dates to mysql format
     if (!empty($params['register_date'])) {
+      throw new CRM_Core_Exception('is this line tested');
       $params['register_date'] = CRM_Utils_Date::isoToMysql($params['register_date']);
     }
 

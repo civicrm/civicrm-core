@@ -280,6 +280,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       $contact->birth_date = CRM_Utils_Date::processDate($date);
     }
     elseif ($contact->birth_date) {
+      throw new CRM_Core_Exception('is this line tested');
       $contact->birth_date = CRM_Utils_Date::isoToMysql($contact->birth_date);
     }
 
@@ -313,6 +314,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       $contact->deceased_date = CRM_Utils_Date::processDate($date);
     }
     elseif ($contact->deceased_date) {
+      throw new CRM_Core_Exception('is this line tested');
       $contact->deceased_date = CRM_Utils_Date::isoToMysql($contact->deceased_date);
     }
 

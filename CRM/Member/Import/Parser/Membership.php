@@ -587,9 +587,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       if (isset($formatted[$d]) &&
         !CRM_Utils_System::isNull($formatted[$d])
       ) {
+        throw new CRM_Core_Exception('is this line tested');
         $formatted[$d] = CRM_Utils_Date::isoToMysql($formatted[$d]);
       }
       elseif (isset($calcDates[$d])) {
+        throw new CRM_Core_Exception('is this line tested');
         $formatted[$d] = CRM_Utils_Date::isoToMysql($calcDates[$d]);
       }
     }
