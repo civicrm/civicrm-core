@@ -34,7 +34,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     /** @var \Drupal\user\Entity\User $account */
-    $account = entity_create('user');
+    $account = \Drupal::entityTypeManager()->getStorage('user')->create();
     $account->setUsername($params['cms_name'])->setEmail($params[$mail]);
 
     // Allow user to set password only if they are an admin or if
@@ -109,7 +109,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    $user = entity_load('user', $ufID);
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($ufID);
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -134,7 +134,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!empty($params['name'])) {
       $name = $params['name'];
 
-      $user = entity_create('user');
+      $user = \Drupal::entityTypeManager()->getStorage('user')->create();
       $user->setUsername($name);
 
       // This checks for both username uniqueness and validity.
@@ -152,7 +152,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!empty($params['mail'])) {
       $mail = $params['mail'];
 
-      $user = entity_create('user');
+      $user = \Drupal::entityTypeManager()->getStorage('user')->create();
       $user->setEmail($mail);
 
       // This checks for both email uniqueness.
@@ -172,7 +172,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    return \Drupal::url('user.login', [], ['query' => $query]);
+    return \Drupal\Core\Url::fromRoute('user.login', [], ['query' => $query])->toString();
   }
 
   /**
@@ -430,7 +430,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     CRM_Utils_Hook::config($config);
 
     if ($loadUser) {
-      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getUsername()) {
+      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getAccountName()) {
         $this->loadUser($username);
       }
       elseif (!empty($params['name']) && !empty($params['pass']) && \Drupal::service('user.auth')->authenticate($params['name'], $params['pass'])) {
