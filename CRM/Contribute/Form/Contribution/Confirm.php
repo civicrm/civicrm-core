@@ -485,7 +485,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
       $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
-    $this->assign('receiptFromEmail', $this->_values['receipt_from_email']);
+    $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
     $amount_block_is_active = $this->get('amount_block_is_active');
     $this->assign('amount_block_is_active', $amount_block_is_active);
 
