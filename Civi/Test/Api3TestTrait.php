@@ -260,7 +260,6 @@ trait Api3TestTrait {
   public function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += [
       'version' => $this->_apiversion,
-      'debug' => 1,
     ];
     $result = $this->civicrm_api($entity, 'getvalue', $params);
     if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
