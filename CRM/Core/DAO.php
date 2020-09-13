@@ -121,11 +121,12 @@ class CRM_Core_DAO extends DB_DataObject {
 
   /**
    * Returns localized title of this entity.
+   *
    * @return string
    */
   public static function getEntityTitle() {
     $className = static::class;
-    Civi::log()->warning("$className needs to be regeneraged. Missing getEntityTitle method.", ['civi.tag' => 'deprecated']);
+    Civi::log()->warning("$className needs to be regenerated. Missing getEntityTitle method.", ['civi.tag' => 'deprecated']);
     return CRM_Core_DAO_AllCoreTables::getBriefName($className);
   }
 

@@ -81,9 +81,11 @@ abstract class AbstractEntity {
   /**
    * Overridable function to return a localized title for this entity.
    *
+   * @param bool $plural
+   *   Whether to return a plural title.
    * @return string
    */
-  protected static function getEntityTitle() {
+  protected static function getEntityTitle($plural = FALSE) {
     return static::getEntityName();
   }
 
@@ -121,6 +123,7 @@ abstract class AbstractEntity {
     $info = [
       'name' => static::getEntityName(),
       'title' => static::getEntityTitle(),
+      'titlePlural' => static::getEntityTitle(TRUE),
       'type' => self::stripNamespace(get_parent_class(static::class)),
     ];
     $reflection = new \ReflectionClass(static::class);

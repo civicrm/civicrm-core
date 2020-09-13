@@ -12,7 +12,7 @@
     templateUrl: '~/search/crmSearchActions.html',
     controller: function($scope, crmApi4, dialogService, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
-        entityTitle = searchMeta.getEntity(this.entity).title,
+        entityTitle = searchMeta.getEntity(this.entity).titlePlural,
         ctrl = this;
 
       this.init = function() {
