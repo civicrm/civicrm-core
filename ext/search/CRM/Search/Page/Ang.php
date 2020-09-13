@@ -83,9 +83,9 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
    */
   private function getSchema() {
     $schema = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'description', 'icon')
+      ->addSelect('name', 'titlePlural', 'description', 'icon')
       ->addWhere('name', '!=', 'Entity')
-      ->addOrderBy('title')
+      ->addOrderBy('titlePlural')
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();

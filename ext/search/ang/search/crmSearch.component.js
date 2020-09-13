@@ -23,7 +23,7 @@
 
       $scope.controls = {};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
-      $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'title', ['description', 'icon']);
+      $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'titlePlural', ['description', 'icon']);
       this.perm = {
         editGroups: CRM.checkPerm('edit groups')
       };
@@ -40,7 +40,7 @@
           if (entity) {
             joinEntities.push({
               id: link.entity + ' AS ' + link.alias,
-              text: entity.title,
+              text: entity.titlePlural,
               description: '(' + link.alias + ')',
               icon: entity.icon
             });
@@ -408,7 +408,7 @@
 
         var mainEntity = searchMeta.getEntity(ctrl.entity),
           result = [{
-            text: mainEntity.title,
+            text: mainEntity.titlePlural,
             icon: mainEntity.icon,
             children: formatFields(ctrl.entity, '')
           }];
@@ -416,7 +416,7 @@
           var joinName = join[0].split(' AS '),
             joinEntity = searchMeta.getEntity(joinName[0]);
           result.push({
-            text: joinEntity.title + ' (' + joinName[1] + ')',
+            text: joinEntity.titlePlural + ' (' + joinName[1] + ')',
             icon: joinEntity.icon,
             children: formatFields(joinEntity.name, joinName[1] + '.')
           });
@@ -529,7 +529,7 @@
       $scope.saveGroup = function() {
         var selectField = ctrl.entity === 'Contact' ? 'id' : 'contact_id';
         if (ctrl.entity !== 'Contact' && !searchMeta.getField('contact_id')) {
-          CRM.alert(ts('Cannot create smart group from %1.', {1: searchMeta.getEntity(true).title}), ts('Missing contact_id'), 'error', {expires: 5000});
+          CRM.alert(ts('Cannot create smart group from %1.', {1: searchMeta.getEntity(true).titlePlural}), ts('Missing contact_id'), 'error', {expires: 5000});
           return;
         }
         var model = {
