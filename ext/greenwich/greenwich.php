@@ -33,8 +33,29 @@ function greenwich_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 }
 
 /**
- * Implements hook_civicrm_thems().
+ * Implements hook_civicrm_themes().
  */
 function greenwich_civicrm_themes(&$themes) {
-  _greenwich_civix_civicrm_themes($themes);
+  // _greenwich_civix_civicrm_themes($themes);
+  $themes['greenwich'] = [
+    'ext' => 'civicrm',
+    'title' => 'Greenwich',
+    'help' => ts('CiviCRM 4.x look-and-feel'),
+  ];
+}
+
+/**
+ * Implements hook_civicrm_alterBundle().
+ */
+function greenwich_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
+  $theme = Civi::service('themes')->getActiveThemeKey();
+  switch ($theme . ':' . $bundle->name) {
+    case 'greenwich:bootstrap3':
+      $bundle->clear();
+      $bundle->addStyleFile('greenwich', 'dist/bootstrap3.css');
+      $bundle->addScriptFile('greenwich', 'extern/bootstrap3/assets/javascripts/bootstrap.min.js', [
+        'translate' => FALSE,
+      ]);
+      break;
+  }
 }
