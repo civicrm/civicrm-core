@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Email;
+
 /**
  * This class provides the functionality to email a group of
  * contacts.
