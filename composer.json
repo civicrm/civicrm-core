@@ -79,7 +79,10 @@
     "brick/money": "~0.4",
     "ext-intl": "*",
     "pear/mail_mime": "~1.10",
-    "pear/db": "1.10"
+    "pear/db": "1.10",
+    "scssphp/scssphp": "~1.2",
+    "padaliyajay/php-autoprefixer": "~1.2",
+    "civicrm/composer-compile-plugin": "~0.5"
   },
   "scripts": {
     "post-install-cmd": [
