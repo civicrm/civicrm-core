@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f79e56e87de0eb48bf9336b368a467ab",
+    "content-hash": "0a66565129698ff5013c06514c11c6a5",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -299,16 +299,16 @@
         },
         {
             "name": "civicrm/composer-compile-plugin",
-            "version": "v0.5",
+            "version": "v0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-compile-plugin.git",
-                "reference": "8650ca03bbb094bc88a966651a623fbd09ca19ab"
+                "reference": "2f6925745d9d4b3857cc23b2842a2c3db6d66c57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/8650ca03bbb094bc88a966651a623fbd09ca19ab",
-                "reference": "8650ca03bbb094bc88a966651a623fbd09ca19ab",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/2f6925745d9d4b3857cc23b2842a2c3db6d66c57",
+                "reference": "2f6925745d9d4b3857cc23b2842a2c3db6d66c57",
                 "shasum": ""
             },
             "require": {
@@ -340,7 +340,7 @@
                 }
             ],
             "description": "Define a 'compile' event for all packages in the dependency-graph",
-            "time": "2020-09-14T07:52:16+00:00"
+            "time": "2020-09-14T10:26:03+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
