@@ -2284,21 +2284,6 @@ WHERE {$whereClause}";
     while ($dao2->fetch()) {
       $processCount++;
 
-      // Put common parameters into array for easy access
-      $memberParams = [
-        'id' => $dao2->membership_id,
-        'status_id' => $dao2->status_id,
-        'contact_id' => $dao2->contact_id,
-        'membership_type_id' => $dao2->membership_type_id,
-        'membership_type' => $allMembershipTypes[$dao2->membership_type_id]['name'],
-        'join_date' => $dao2->join_date,
-        'start_date' => $dao2->start_date,
-        'end_date' => $dao2->end_date,
-        'source' => $dao2->source,
-        'skipStatusCal' => TRUE,
-        'skipRecentView' => TRUE,
-      ];
-
       // CRM-7248: added excludeIsAdmin param to the following fn call to prevent moving to admin statuses
       //get the membership status as per id.
       $newStatus = civicrm_api3('membership_status', 'calc',
@@ -2313,27 +2298,16 @@ WHERE {$whereClause}";
       if ($statusId &&
         $statusId != $dao2->status_id
       ) {
-        //take all params that need to save.
-        $memParams = $memberParams;
-        $memParams['status_id'] = $statusId;
-        $memParams['createActivity'] = TRUE;
-
-        // Unset columns which should remain unchanged from their current saved
-        // values. This avoids race condition in which these values may have
-        // been changed by other processes.
-        unset(
-          $memParams['contact_id'],
-          $memParams['membership_type_id'],
-          $memParams['membership_type'],
-          $memParams['join_date'],
-          $memParams['start_date'],
-          $memParams['end_date'],
-          $memParams['source']
-        );
-        //since there is change in status.
+        $memberParams = [
+          'id' => $dao2->membership_id,
+          'skipStatusCal' => TRUE,
+          'skipRecentView' => TRUE,
+          'status_id' => $statusId,
+          'createActivity' => TRUE,
+        ];
 
         //process member record.
-        civicrm_api3('membership', 'create', $memParams);
+        civicrm_api3('membership', 'create', $memberParams);
         $updateCount++;
       }
     }
