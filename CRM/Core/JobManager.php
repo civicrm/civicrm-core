@@ -40,9 +40,6 @@ class CRM_Core_JobManager {
    * Class constructor.
    */
   public function __construct() {
-    $config = CRM_Core_Config::singleton();
-    $config->fatalErrorHandler = 'CRM_Core_JobManager_scheduledJobFatalErrorHandler';
-
     $this->jobs = $this->_getJobs();
   }
 
@@ -275,13 +272,4 @@ class CRM_Core_JobManager {
     return $status . $message;
   }
 
-}
-
-/**
- * @param $message
- *
- * @throws Exception
- */
-function CRM_Core_JobManager_scheduledJobFatalErrorHandler($message) {
-  throw new Exception("{$message['message']}: {$message['code']}");
 }
