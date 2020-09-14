@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Email;
 /**
  * This class provides the functionality to email a group of
  * contacts.
@@ -144,7 +145,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     }
 
     $attributes = ['class' => 'huge'];
-    $this->add('text', 'cc_id', ts('CC'), $attributes);
+    $this->addEntityRef('cc_id', ts('CC'), [
+      'entity' => 'Email',
+      'multiple' => TRUE,
+    ]);
     $this->add('text', 'subject', ts('Subject'), $attributes + ['placeholder' => ts('Optional')]);
     $this->add('wysiwyg', 'email_comment', ts('If you would like to add personal message to email please add it here. (If sending to more then one receipient the same message will be sent to each contact.)'), [
       'rows' => 2,
@@ -417,7 +421,27 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       // from email address
       $fromEmailAddress = $params['from_email_address'] ?? NULL;
       if (!empty($params['cc_id'])) {
-        $values['cc_receipt'] = $params['cc_id'];
+        // get contacts and their emails from email id
+        $emailIDs = $params['cc_id'] ? explode(',', $params['cc_id']) : [];
+        $emails = Email::get()
+          ->addWhere('id', 'IN', $emailIDs)
+          ->setCheckPermissions(FALSE)
+          ->setSelect(['contact_id', 'email', 'contact.sort_name', 'contact.display_name'])->execute();
+        $emailStrings = $contactUrlStrings = [];
+        foreach ($emails as $email) {
+          $emailStrings[] = '"' . $email['contact.sort_name'] . '" <' . $email['email'] . '>';
+          // generate the contact url to put in Activity
+          $contactURL = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $email['contact_id']], TRUE);
+          $contactUrlStrings[] = "<a href='{$contactURL}'>" . $email['contact.display_name'] . '</a>';
+        }
+        $cc_emails = implode(',', $emailStrings);
+        $values['cc_receipt'] = $cc_emails;
+        $ccContactsDetails = implode(',', $contactUrlStrings);
+        // add CC emails as activity details
+        $params['activity_details'] = "\ncc : " . $ccContactsDetails;
+
+        // unset bcc to avoid unknown email come from online page configuration.
+        unset($values['bcc_receipt']);
       }
 
       // get subject from UI
@@ -456,7 +480,12 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
         list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         // functions call for adding activity with attachment
-        $fileName = self::putFile($html, $pdfFileName);
+        // make sure page layout is same for email and download invoices.
+        $fileName = self::putFile($html, $pdfFileName, [
+          'margin_top' => 10,
+          'margin_left' => 65,
+          'metric' => 'px',
+        ]);
         self::addActivities($subject, $contribution->contact_id, $fileName, $params, $contribution->id);
       }
       elseif ($contribution->_component == 'event') {
@@ -546,6 +575,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       'target_contact_id' => $contactIds,
       'activity_type_id' => $activityType,
       'activity_date_time' => date('YmdHis'),
+      'details' => $params['activity_details'] ?? NULL,
       'attachFile_1' => [
         'uri' => $fileName,
         'type' => 'application/pdf',
