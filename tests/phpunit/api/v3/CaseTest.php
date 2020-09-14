@@ -1003,19 +1003,17 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test the case merge function.
    *
    * 2 cases should be mergeable into 1
-   *
-   * @throws \Exception
    */
   public function testCaseMerge() {
     $contact1 = $this->individualCreate([], 1);
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $contact1,
-      'subject' => "Test case 1",
+      'subject' => 'Test case 1',
       'case_type_id' => $this->caseTypeId,
     ]);
     $case2 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $contact1,
-      'subject' => "Test case 2",
+      'subject' => 'Test case 2',
       'case_type_id' => $this->caseTypeId,
     ]);
     $result = $this->callAPISuccess('Case', 'getcount', ['contact_id' => $contact1]);
