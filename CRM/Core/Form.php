@@ -436,7 +436,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Add placeholder option for select
       if (isset($extra['placeholder'])) {
         if ($extra['placeholder'] === TRUE) {
-          $extra['placeholder'] = $required ? ts('- select -') : ts('- none -');
+          $extra['placeholder'] = ts('- select %1 -', [1 => $label]);
         }
         if (($extra['placeholder'] || $extra['placeholder'] === '') && empty($extra['multiple']) && is_array($attributes) && !isset($attributes[''])) {
           $attributes = ['' => $extra['placeholder']] + $attributes;
@@ -1498,8 +1498,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $info = civicrm_api3($props['entity'], 'getoptions', $props);
       $options = $info['values'];
     }
-    if (!array_key_exists('placeholder', $props)) {
-      $props['placeholder'] = $required ? ts('- select -') : (CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -'));
+    if (!array_key_exists('placeholder', $props) && $placeholder = self::selectOrAnyPlaceholder($props, $required)) {
+      $props['placeholder'] = $placeholder;
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
@@ -1532,6 +1532,34 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-api-field'] = $props['field'];
     CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options', 'context');
     return $this->add('select', $name, $label, $options, $required, $props);
+  }
+
+  /**
+   * Handles a repeated bit supplying a placeholder for entity selection
+   *
+   * @param string $props
+   *   The field properties, including the entity and context.
+   * @param bool $required
+   *   If the field is required.
+   * @return string
+   *   The placeholder text.
+   */
+  private static function selectOrAnyPlaceholder($props, $required) {
+    if (empty($props['entity'])) {
+      return NULL;
+    }
+    $daoToClass = CRM_Core_DAO_AllCoreTables::daoToClass();
+    if (array_key_exists($props['entity'], $daoToClass)) {
+      $daoClass = $daoToClass[$props['entity']];
+      $tsPlaceholder = $daoClass::getEntityTitle();
+    }
+    else {
+      $tsPlaceholder = ts('option');
+    }
+    if (($props['context'] ?? '') == 'search' && !$required) {
+      return ts('- any %1 -', [1 => $tsPlaceholder]);
+    }
+    return ts('- select %1 -', [1 => $tsPlaceholder]);
   }
 
   /**
@@ -1690,8 +1718,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Select':
       case 'Select2':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
-        if (!array_key_exists('placeholder', $props)) {
-          $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
+        if (!array_key_exists('placeholder', $props) && $placeholder = self::selectOrAnyPlaceholder($props, $required)) {
+          $props['placeholder'] = $placeholder;
         }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
@@ -2061,14 +2089,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, []);
-    $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
+    $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($props['entity'] ?? 'Contact');
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-entityref');
 
     if (array_key_exists('create', $props) && empty($props['create'])) {
       unset($props['create']);
     }
 
-    $props['placeholder'] = CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', [1 => ts(str_replace('_', ' ', $props['entity']))]) : ts('- none -'));
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
 
     $defaults = [];
     if (!empty($props['multiple'])) {
@@ -2400,6 +2428,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addChainSelect($elementName, $settings = []) {
+    $label = strpos($elementName, 'rovince') ? CRM_Core_DAO_StateProvince::getEntityTitle() : CRM_Core_DAO_County::getEntityTitle();
     $props = $settings += [
       'control_field' => str_replace(['state_province', 'StateProvince', 'county', 'County'], [
         'country',
@@ -2408,12 +2437,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'StateProvince',
       ], $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
-      'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
+      'label' => $label,
       'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
       'data-none-prompt' => ts('- N/A -'),
       'multiple' => FALSE,
       'required' => FALSE,
-      'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
+      'placeholder' => ts('- select %1 -', [1 => $label]),
     ];
     CRM_Utils_Array::remove($props, 'label', 'required', 'control_field', 'context');
     $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';

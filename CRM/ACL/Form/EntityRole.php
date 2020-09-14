@@ -26,9 +26,8 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
       return;
     }
 
-    $aclRoles = ['' => ts('- select -')] + CRM_Core_OptionGroup::values('acl_role');
     $this->add('select', 'acl_role_id', ts('ACL Role'),
-      $aclRoles, TRUE
+      CRM_Core_OptionGroup::values('acl_role'), TRUE, ['placeholder' => TRUE]
     );
 
     $label = ts('Assigned to');

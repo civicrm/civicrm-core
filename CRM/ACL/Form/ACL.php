@@ -96,11 +96,12 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
     $this->add('text', 'name', ts('Description'), CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL', 'name'), TRUE);
 
-    $operations = ['' => ts('- select -')] + CRM_ACL_BAO_ACL::operation();
     $this->add('select',
       'operation',
       ts('Operation'),
-      $operations, TRUE
+      CRM_ACL_BAO_ACL::operation(),
+      TRUE,
+      ['placeholder' => TRUE]
     );
 
     $objTypes = [
@@ -129,22 +130,22 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $this->add('select', 'entity_id', $label, $role, TRUE);
 
     $group = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select group -'),
       '0' => ts('All Groups'),
     ] + CRM_Core_PseudoConstant::group();
 
     $customGroup = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select set of custom fields -'),
       '0' => ts('All Custom Groups'),
     ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
 
     $ufGroup = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select profile -'),
       '0' => ts('All Profiles'),
     ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     $event = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select event -'),
       '0' => ts('All Events'),
     ] + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 

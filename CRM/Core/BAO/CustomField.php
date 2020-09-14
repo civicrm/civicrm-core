@@ -667,6 +667,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $element = NULL;
     $customFieldAttributes = [];
 
+    if (!isset($label)) {
+      $label = $field->label;
+    }
+
     // DAO stores attributes as a string, but it's hard to manipulate and
     // CRM_Core_Form::add() wants them as an array.
     $fieldAttributes = self::attributesFromString($field->attributes);
@@ -680,7 +684,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $widget = 'Text';
     }
 
-    $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
+    $placeholder = $search ? ts('- any %1 -', [1 => $label]) : ts('- select %1 -', [1 => $label]);
 
     if (in_array($widget, [
       'Select',
@@ -714,10 +718,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     $rangeDataTypes = ['Int', 'Float', 'Money'];
-
-    if (!isset($label)) {
-      $label = $field->label;
-    }
 
     // at some point in time we might want to split the below into small functions
 
