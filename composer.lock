@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "46e891da51f0683373d9a6e62fb6f868",
+    "content-hash": "f79e56e87de0eb48bf9336b368a467ab",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -296,6 +296,51 @@
             ],
             "description": "RPC library for CiviConnect",
             "time": "2020-02-05T03:24:26+00:00"
+        },
+        {
+            "name": "civicrm/composer-compile-plugin",
+            "version": "v0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/civicrm/composer-compile-plugin.git",
+                "reference": "8650ca03bbb094bc88a966651a623fbd09ca19ab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/8650ca03bbb094bc88a966651a623fbd09ca19ab",
+                "reference": "8650ca03bbb094bc88a966651a623fbd09ca19ab",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1 || ^2.0",
+                "php": ">=7.1",
+                "totten/lurkerlite": "^1.3"
+            },
+            "require-dev": {
+                "composer/composer": "~1.0",
+                "totten/process-helper": "^1.0.1"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Civi\\CompilePlugin\\CompilePlugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Civi\\CompilePlugin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tim Otten",
+                    "email": "info@civicrm.org"
+                }
+            ],
+            "description": "Define a 'compile' event for all packages in the dependency-graph",
+            "time": "2020-09-14T07:52:16+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
@@ -860,6 +905,41 @@
                 "topsort"
             ],
             "time": "2016-11-19T14:58:11+00:00"
+        },
+        {
+            "name": "padaliyajay/php-autoprefixer",
+            "version": "1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/padaliyajay/php-autoprefixer.git",
+                "reference": "0f36b7cfbd71d25836bcb9f4b58c09252ca4e9ec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/padaliyajay/php-autoprefixer/zipball/0f36b7cfbd71d25836bcb9f4b58c09252ca4e9ec",
+                "reference": "0f36b7cfbd71d25836bcb9f4b58c09252ca4e9ec",
+                "shasum": ""
+            },
+            "require": {
+                "sabberworm/php-css-parser": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Padaliyajay\\PHPAutoprefixer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jay padaliya"
+                }
+            ],
+            "description": "CSS Autoprefixer written in pure PHP.",
+            "time": "2019-03-06T12:49:40+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -2160,6 +2240,68 @@
             "time": "2020-06-01T09:10:00+00:00"
         },
         {
+            "name": "scssphp/scssphp",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/scssphp/scssphp.git",
+                "reference": "a05ea68160b7286ebbfd6e5fd7ae9e1a946ad6e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/scssphp/scssphp/zipball/a05ea68160b7286ebbfd6e5fd7ae9e1a946ad6e1",
+                "reference": "a05ea68160b7286ebbfd6e5fd7ae9e1a946ad6e1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ctype": "*",
+                "ext-json": "*",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7 || ^6.5 || ^7.5 || ^8.3",
+                "sass/sass-spec": "2020.08.10",
+                "squizlabs/php_codesniffer": "~3.5",
+                "twbs/bootstrap": "~4.3",
+                "zurb/foundation": "~6.5"
+            },
+            "bin": [
+                "bin/pscss"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ScssPhp\\ScssPhp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anthon Pang",
+                    "email": "apang@softwaredevelopment.ca",
+                    "homepage": "https://github.com/robocoder"
+                },
+                {
+                    "name": "Cédric Morin",
+                    "email": "cedric@yterium.com",
+                    "homepage": "https://github.com/Cerdic"
+                }
+            ],
+            "description": "scssphp is a compiler for SCSS written in PHP.",
+            "homepage": "http://scssphp.github.io/scssphp/",
+            "keywords": [
+                "css",
+                "less",
+                "sass",
+                "scss",
+                "stylesheet"
+            ],
+            "time": "2020-09-07T21:15:42+00:00"
+        },
+        {
             "name": "symfony/config",
             "version": "v3.4.40",
             "source": {
@@ -2943,6 +3085,66 @@
             "description": "Default configuration for certificate authorities",
             "homepage": "https://github.com/totten/ca_config",
             "time": "2017-05-10T20:08:17+00:00"
+        },
+        {
+            "name": "totten/lurkerlite",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/totten/Lurker.git",
+                "reference": "a20c47142b486415b9117c76aa4c2117ff95b49a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/totten/Lurker/zipball/a20c47142b486415b9117c76aa4c2117ff95b49a",
+                "reference": "a20c47142b486415b9117c76aa4c2117ff95b49a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "replace": {
+                "henrikbjorn/lurker": "*"
+            },
+            "suggest": {
+                "ext-inotify": ">=0.1.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Lurker": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Konstantin Kudryashov",
+                    "email": "ever.zet@gmail.com"
+                },
+                {
+                    "name": "Yaroslav Kiliba",
+                    "email": "om.dattaya@gmail.com"
+                },
+                {
+                    "name": "Henrik Bjrnskov",
+                    "email": "henrik@bjrnskov.dk"
+                }
+            ],
+            "description": "Resource Watcher - Lightweight edition of henrikbjorn/lurker with no dependencies",
+            "keywords": [
+                "filesystem",
+                "resource",
+                "watching"
+            ],
+            "time": "2020-09-01T10:01:01+00:00"
         },
         {
             "name": "tplaner/when",
