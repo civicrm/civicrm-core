@@ -154,8 +154,18 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_action;
 
   /**
-   * Contribution mode e.g express for payment express, notify for off-site + notification back to CiviCRM
+   * Contribution mode.
+   *
+   * In general we are trying to deprecate this parameter but some templates and processors still
+   * require it to denote whether the processor redirects offsite (notify) or not.
+   *
+   * The intent is that this knowledge should not be required and all contributions should
+   * be created in a pending state and updated based on the payment result without needing to be
+   * aware of the processor workings.
+   *
    * @var string
+   *
+   * @deprecated
    */
   public $_contributeMode;
 
@@ -179,8 +189,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_emailExists = FALSE;
 
   /**
-   * Is this a backoffice form
-   * (this will affect whether paypal express code is displayed)
+   * Is this a backoffice form.
+   *
+   * Processors may display different options to backoffice users.
+   *
    * @var bool
    */
   public $isBackOffice = FALSE;
