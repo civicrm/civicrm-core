@@ -283,14 +283,6 @@
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
       }
     },
-    "compile": [
-      {
-        "title": "Greenwich SCSS (<comment>ext/greenwich/dist/bootstrap3.css</comment>)",
-        "php-method": "\\Civi\\Compile\\Scss::build",
-        "watch-files": ["ext/greenwich/scss"],
-        "scss-files": {"ext/greenwich/scss/main.scss": "ext/greenwich/dist/bootstrap3.css"},
-        "scss-includes": ["ext/greenwich/scss", "ext/greenwich/extern/bootstrap3/assets/stylesheets"]
-      }
-    ]
+    "compile-includes": ["ext/greenwich/composer.compile.json"]
   }
 }

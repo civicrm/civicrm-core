@@ -1,0 +1,11 @@
+{
+  "compile": [
+    {
+      "title": "Greenwich CSS (<comment>dist/bootstrap3.css</comment>)",
+      "php-method": "\\Civi\\Compile\\Scss::build",
+      "watch-files": ["scss"],
+      "scss-files": {"scss/main.scss": "dist/bootstrap3.css"},
+      "scss-includes": ["scss", "extern/bootstrap3/assets/stylesheets"]
+    }
+  ]
+}
