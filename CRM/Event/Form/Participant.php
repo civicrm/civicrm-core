@@ -99,11 +99,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Are we operating in "single mode", i.e. adding / editing only
-   * one participant record, or is this a batch add operation
+   * one participant record, or is this a batch add operation.
+   *
+   * Note the goal is to disentangle all the non-single stuff
+   * to CRM_Event_Form_Task_Register and discontinue this param.
    *
    * @var bool
    */
-  public $_single = FALSE;
+  public $_single = TRUE;
 
   /**
    * If event is paid or unpaid.
@@ -337,8 +340,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
     //check the mode when this form is called either single or as
     //search task action
-    if ($this->_id || $this->_contactId || $this->_context == 'standalone') {
-      $this->_single = TRUE;
+    if ($this->_single) {
       $this->assign('urlPath', 'civicrm/contact/view/participant');
       if (!$this->_id && !$this->_contactId) {
         $breadCrumbs = [
@@ -379,7 +381,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       CRM_Contact_Form_Task::preProcessCommon($this);
 
-      $this->_single = FALSE;
       $this->_contactId = NULL;
 
       //set ajax path, this used for custom data building
