@@ -499,7 +499,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $swapLang = CRM_Utils_AutoClean::swap('global://dbLocale?getter', 'call://i18n/setLocale', $mailing->language);
     }
 
-    $job_date = CRM_Utils_Date::isoToMysql($this->scheduled_date);
+    $job_date = $this->scheduled_date;
     $fields = [];
 
     if (!empty($testParams)) {

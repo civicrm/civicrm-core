@@ -745,7 +745,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     //Create and send test mail first and change the mail job to live,
     //because stats api only works on live mail
-    $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $mail = $this->callAPISuccess('Mailing', 'create', $this->_params);
     $params = ['mailing_id' => $mail['id'], 'test_email' => NULL, 'test_group' => $this->_groupID];
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
     $deliveredIds = implode(',', array_keys($deliveredInfo['values']));
@@ -761,7 +761,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
          ORDER BY RAND() LIMIT 0,20");
       $temporaryTableName = $temporaryTable->getName();
 
-      if ($type == 'unsubscribe') {
+      if ($type === 'unsubscribe') {
         $sql = "INSERT INTO civicrm_mailing_event_{$type} (event_queue_id, time_stamp, org_unsubscribe)
 SELECT event_queue_id, time_stamp, 1 FROM {$temporaryTableName}";
       }
@@ -801,8 +801,8 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
    * Test Mailing.gettokens.
    */
   public function testMailGetTokens() {
-    $description = "Demonstrates fetching tokens for one or more entities (in this case \"Contact\" and \"Mailing\").
-      Optionally pass sequential=1 to have output ready-formatted for the select2 widget.";
+    $description = 'Demonstrates fetching tokens for one or more entities (in this case "Contact" and "Mailing").
+      Optionally pass sequential=1 to have output ready-formatted for the select2 widget.';
     $result = $this->callAPIAndDocument($this->_entity, 'gettokens', ['entity' => ['Contact', 'Mailing']], __FUNCTION__, __FILE__, $description);
     $this->assertContains('Contact Type', $result['values']);
 
@@ -838,14 +838,14 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     // END SAMPLE DATA
 
     $create = $this->callAPISuccess('Mailing', 'create', $params);
-    $created = $this->callAPISuccess('Mailing', 'get', []);
+    $this->callAPISuccess('Mailing', 'get');
     $createId = $create['id'];
     $this->createLoggedInUser();
     $clone = $this->callAPIAndDocument('Mailing', 'clone', ['id' => $create['id']], __FUNCTION__, __FILE__);
     $cloneId = $clone['id'];
 
     $this->assertNotEquals($createId, $cloneId, 'Create and clone should return different records');
-    $this->assertTrue(is_numeric($cloneId));
+    $this->assertInternalType('numeric', $cloneId);
 
     $this->assertNotEmpty($clone['values'][$cloneId]['subject']);
     $this->assertEquals($params['subject'], $clone['values'][$cloneId]['subject'], "Cloned subject should match");
@@ -953,12 +953,14 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
   /**
    * @param array $params
    *   Extra parameters for the draft mailing.
+   *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   public function createDraftMailing($params = []) {
     $createParams = array_merge($this->_params, $params);
     $createResult = $this->callAPISuccess('mailing', 'create', $createParams, __FUNCTION__, __FILE__);
-    $this->assertTrue(is_numeric($createResult['id']));
+    $this->assertInternalType('numeric', $createResult['id']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
       1 => [$createResult['id'], 'Integer'],
     ]);
