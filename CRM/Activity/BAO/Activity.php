@@ -1732,7 +1732,7 @@ WHERE      activity.id IN ($activityIds)";
         $params['campaign_id'] = $activity->campaign_id;
       }
 
-      $date = CRM_Utils_Date::isoToMysql($activity->receive_date);
+      $date = $activity->receive_date;
     }
 
     $activityParams = [
