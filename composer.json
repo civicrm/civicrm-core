@@ -82,7 +82,7 @@
     "pear/db": "1.10",
     "scssphp/scssphp": "~1.2",
     "padaliyajay/php-autoprefixer": "~1.2",
-    "civicrm/composer-compile-plugin": "~0.5"
+    "civicrm/composer-compile-plugin": "~0.6"
   },
   "scripts": {
     "post-install-cmd": [
