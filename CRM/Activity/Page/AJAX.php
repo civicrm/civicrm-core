@@ -275,7 +275,7 @@ class CRM_Activity_Page_AJAX {
     if (!$otherActivity->find(TRUE)) {
       return (['error_msg' => 'activity record is missing.']);
     }
-    $actDateTime = CRM_Utils_Date::isoToMysql($otherActivity->activity_date_time);
+    $actDateTime = $otherActivity->activity_date_time;
 
     // Create new activity record.
     $mainActivity = new CRM_Activity_DAO_Activity();
