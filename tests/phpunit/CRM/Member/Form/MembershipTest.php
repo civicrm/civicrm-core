@@ -288,7 +288,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRulePermanentOverrideWithNoStatus() {
     $params = [
       'join_date' => date('Y-m-d'),
-      'membership_type_id' => [$this->ids['contact']['organization'], '$this->membershipTypeAnnualFixedID'],
+      'membership_type_id' => [$this->ids['contact']['organization'], $this->membershipTypeAnnualFixedID],
       'is_override' => TRUE,
     ];
     $files = [];
@@ -301,7 +301,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRuleUntilDateOverrideWithValidOverrideEndDate() {
     $params = [
       'join_date' => date('Y-m-d'),
-      'membership_type_id' => [$this->ids['contact']['organization'], '$this->membershipTypeAnnualFixedID'],
+      'membership_type_id' => [$this->ids['contact']['organization'], $this->membershipTypeAnnualFixedID],
       'is_override' => TRUE,
       'status_id' => 1,
       'status_override_end_date' => date('Y-m-d'),
