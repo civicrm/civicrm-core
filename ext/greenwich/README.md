@@ -1,44 +1,20 @@
 # greenwich
 
-![Screenshot](/images/screenshot.png)
+The `greenwich` theme-extension is bundled into `civicrm-core`.
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+## Development
 
-The extension is licensed under [AGPL-3.0](LICENSE.txt).
+This extension includes compiled (S)CSS content. It is compiled automatically via `composer`.
+Compiled files should *not* be committed to git. They will be generated during `composer install`.
 
-## Requirements
-
-* PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
-
-## Installation (Web UI)
-
-This extension has not yet been published for installation via the web UI.
-
-## Installation (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
+These commands will help during development:
 
 ```bash
-cd <extension-dir>
-cv dl greenwich@https://github.com/FIXME/greenwich/archive/master.zip
+cd /path/to/my/composer/root
+
+## Compile (S)CSS - one time
+composer compile
+
+## Compile (S)CSS - and continue watching for changes
+composer compile:watch
 ```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://github.com/FIXME/greenwich.git
-cv en greenwich
-```
-
-## Usage
-
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
-
-## Known Issues
-
-(* FIXME *)
