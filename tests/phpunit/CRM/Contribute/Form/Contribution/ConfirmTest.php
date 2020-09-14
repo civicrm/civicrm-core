@@ -28,9 +28,10 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   /**
    * CRM-21200: Test that making online payment for pending contribution doesn't overwite the contribution details
    */
-  public function testPaynowPayment() {
+  public function testPayNowPayment() {
     $contactID = $this->individualCreate();
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
 
     // create a contribution page which is later used to make pay-later contribution
     $result = $this->callAPISuccess('ContributionPage', 'create', [
@@ -80,7 +81,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit card'),
     ];
     $form->_params = [
-      'qfKey' => 'donotcare',
+      'qfKey' => 'do not care',
       'contribution_id' => $contribution['id'],
       'credit_card_number' => 4111111111111111,
       'cvv2' => 234,
@@ -154,7 +155,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'relationship_type_id' => 5,
       'is_current_employer' => 1,
     ]);
-    $processConfirmResult = CRM_Contribute_BAO_Contribution_Utils::processConfirm($form,
+    CRM_Contribute_BAO_Contribution_Utils::processConfirm($form,
       $form->_params,
       $form->_params['onbehalf_contact_id'],
       $form->_values['financial_type_id'],
@@ -169,7 +170,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'sequential' => 1,
       'source_record_id' => $contribution['id'],
       'contact_id' => $form->_params['onbehalf_contact_id'],
-      'activity_type_id' => "Contribution",
+      'activity_type_id' => 'Contribution',
     ]);
     $this->assertEquals(1, $activity['count']);
   }
