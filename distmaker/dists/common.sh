@@ -10,6 +10,18 @@ function dm_reset_dirs() {
   mkdir -p "$@"
 }
 
+## Assert that a folder contains no symlinks
+##
+## ex: dev/core#1393, dev/core#1990
+## usage: dm_assert_no_symlinks <basedir>
+function dm_assert_no_symlinks() {
+  local SYMLINKS=$( find "$1" -type l )
+  if [ -n "$SYMLINKS" ]; then
+    echo "ERROR: Folder $1 contains unexpected symlink(s): $SYMLINKS"
+    exit 10
+  fi
+}
+
 ## Copy files from one dir into another dir
 ## usage: dm_install_dir <from-dir> <to-dir>
 function dm_install_dir() {

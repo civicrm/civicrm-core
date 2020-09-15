@@ -36,6 +36,7 @@ rm -rf $TRG/packages/tinymce
 
 # gen tarball
 cd $TRG/..
+dm_assert_no_symlinks civicrm
 tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-starterkit.tgz civicrm
 
 # clean up
