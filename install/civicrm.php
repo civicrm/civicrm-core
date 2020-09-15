@@ -131,8 +131,6 @@ function civicrm_main(&$config) {
 function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   global $crmPath;
 
-  require_once "$crmPath/packages/DB.php";
-
   // CRM-19699 See also CRM_Core_DAO for PHP7 mysqli compatiblity.
   // Duplicated here because this is not using CRM_Core_DAO directly
   // and this function may be called directly from Drush.
