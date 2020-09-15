@@ -264,6 +264,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       $dueDate = date('F j, Y', strtotime($contributionReceiveDate . "+" . $dueDateSetting . "" . $dueDatePeriodSetting));
 
       $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
+      if ($amountPaid >= $input['amount']) {
+        $invoicePaidDate = date('F j, Y', strtotime($singlePayment['trxn_date']));
+      }
       $amountDue = ($input['amount'] - $amountPaid);
 
       // retrieving the subtotal and sum of same tax_rate
@@ -358,9 +361,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'amountDue' => $amountDue,
         'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
+        'invoice_paid_date' => $invoicePaidDate,
         'dueDate' => $dueDate,
         'notes' => $invoiceNotes,
         'display_name' => $contribution->_relatedObjects['contact']->display_name,
+        'external_identifier' => $contribution->_relatedObjects['contact']->external_identifier,
         'lineItem' => $lineItem,
         'dataArray' => $dataArray,
         'refundedStatusId' => $refundedStatusId,
@@ -573,3 +578,4 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
 }
+
