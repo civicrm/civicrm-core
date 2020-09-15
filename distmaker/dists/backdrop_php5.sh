@@ -28,6 +28,7 @@ dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
 
 # gen tarball
 cd $TRG/..
+dm_assert_no_symlinks civicrm
 tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-backdrop.tar.gz civicrm
 
 # clean up
