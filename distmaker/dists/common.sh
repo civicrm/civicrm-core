@@ -200,7 +200,7 @@ function dm_install_vendor() {
 
   local excludes_rsync=""
   ## CRM-21729 - .idea test-cases unit-test come from phpquery package.
-  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} .idea test-cases unit-test; do
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} .idea test-cases unit-test README.rst; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
