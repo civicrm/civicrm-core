@@ -257,6 +257,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
     $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
     $args['version'] = '56.0';
+    $args['SOLUTIONTYPE'] = 'Sole';
 
     //LCD if recurring, collect additional data and set some values
     if (!empty($params['is_recur'])) {
@@ -326,9 +327,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'token' => 'token',
       'payer_status' => 'payerstatus',
       'payer_id' => 'payerid',
-      'first_name' => 'firstname',
-      'middle_name' => 'middlename',
-      'last_name' => 'lastname',
+      'billing_first_name' => 'firstname',
+      'billing_middle_name' => 'middlename',
+      'biling_last_name' => 'lastname',
       'street_address' => 'shiptostreet',
       'supplemental_address_1' => 'shiptostreet2',
       'city' => 'shiptocity',
