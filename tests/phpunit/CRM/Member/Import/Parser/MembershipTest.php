@@ -31,6 +31,8 @@
  * @group headless
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
+
   /**
    * Membership type name used in test function.
    *
@@ -45,6 +47,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    */
   protected $_membershipTypeID = NULL;
 
+  /**
+   * Set up for test.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp() {
     parent::setUp();
 
@@ -73,8 +81,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'fixed_period_start_day' => 101,
       'fixed_period_rollover_day' => 1231,
     ];
-    $ids = [];
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+
+    $membershipType = CRM_Member_BAO_MembershipType::add($params);
     $this->_membershipTypeID = $membershipType->id;
 
     $this->_mebershipStatusID = $this->membershipStatusCreate('test status');
@@ -96,14 +104,16 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'civicrm_membership_payment',
       'civicrm_contact',
     ];
-    $this->quickCleanup($tablesToTruncate, TRUE);
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->membershipStatusDelete($this->_mebershipStatusID);
+    $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
   /**
    *  Test Import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImport() {
     $this->individualCreate();
@@ -119,33 +129,31 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $this->individualCreate($contact2Params);
     $year = date('Y') - 1;
-    $startDate2 = date('Y-m-d', mktime(0, 0, 0, 9, 10, $year));
+    $startDate2 = $year . '-10-09';
+    $joinDate2 = $year . '-10-10';
     $params = [
       [
         'anthony_anderson@civicrm.org',
         $this->_membershipTypeID,
+        date('Y-m-d'),
         date('Y-m-d'),
       ],
       [
         $contact2Params['email'],
         $this->_membershipTypeName,
         $startDate2,
+        $joinDate2,
       ],
     ];
-    $fieldMapper = [
-      'mapper[0][0]' => 'email',
-      'mapper[1][0]' => 'membership_type_id',
-      'mapper[2][0]' => 'membership_start_date',
-    ];
 
-    $importObject = new CRM_Member_Import_Parser_Membership($fieldMapper);
-    $importObject->init();
-    $importObject->_contactType = 'Individual';
+    $importObject = $this->createImportObject(['email', 'membership_type_id', 'membership_start_date', 'membership_join_date']);
     foreach ($params as $values) {
       $this->assertEquals(CRM_Import_Parser::VALID, $importObject->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), $values[0]);
     }
-    $result = $this->callAPISuccess('membership', 'get', []);
-    $this->assertEquals(2, $result['count']);
+    $result = $this->callAPISuccess('membership', 'get', ['sequential' => 1])['values'];
+    $this->assertCount(2, $result);
+    $this->assertEquals($startDate2, $result[1]['start_date']);
+    $this->assertEquals($joinDate2, $result[1]['join_date']);
   }
 
   /**
@@ -320,6 +328,37 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $membershipImporter->init();
     $membershipImporter->_contactType = 'Individual';
     return $membershipImporter;
+  }
+
+  /**
+   * Test importing to a custom field.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportCustomData() {
+    $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
+    $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Membership']);
+    $membershipImporter = $this->createImportObject([
+      'membership_contact_id',
+      'membership_type_id',
+      'membership_start_date',
+      $this->getCustomFieldName('text'),
+      $this->getCustomFieldName('select_string'),
+    ]);
+    $importValues = [
+      $donaldDuckID,
+      $this->_membershipTypeID,
+      date('Y-m-d'),
+      'blah',
+      'Red',
+    ];
+
+    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $this->assertEquals('blah', $membership[$this->getCustomFieldName('text')]);
+    $this->assertEquals('R', $membership[$this->getCustomFieldName('select_string')]);
   }
 
 }

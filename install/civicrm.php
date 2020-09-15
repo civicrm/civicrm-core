@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This code is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @param $filesDirectory
  */
 function civicrm_setup($filesDirectory) {
@@ -83,7 +66,7 @@ function civicrm_main(&$config) {
   global $sqlPath, $crmPath, $cmsPath, $installType;
 
   if ($installType == 'drupal') {
-    $siteDir = isset($config['site_dir']) ? $config['site_dir'] : getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
+    $siteDir = $config['site_dir'] ?? getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
     civicrm_setup($cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . $siteDir . DIRECTORY_SEPARATOR . 'files'
     );
   }
@@ -161,9 +144,7 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   if (PEAR::isError($db)) {
     die("Cannot open $dsn: " . $db->getMessage());
   }
-  $db->query("SET NAMES utf8");
-
-  $db->query("SET NAMES utf8");
+  $db->query('SET NAMES utf8mb4');
 
   if (!$lineMode) {
     $string = file_get_contents($fileName);
@@ -216,7 +197,7 @@ function civicrm_config(&$config) {
   global $tplPath, $installType;
 
   // Ex: $extraSettings[] = '$civicrm_settings["domain"]["foo"] = "bar";';
-  $extraSettings = array();
+  $extraSettings = [];
 
   $params = array(
     'crmRoot' => $crmPath,
@@ -228,7 +209,7 @@ function civicrm_config(&$config) {
     'dbName' => addslashes($config['mysql']['database']),
   );
 
-  $params['baseURL'] = isset($config['base_url']) ? $config['base_url'] : civicrm_cms_base();
+  $params['baseURL'] = $config['base_url'] ?? civicrm_cms_base();
   if ($installType == 'drupal' && defined('VERSION')) {
     if (version_compare(VERSION, '8.0') >= 0) {
       $params['cms'] = 'Drupal';

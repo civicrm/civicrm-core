@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -91,6 +75,52 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
+  /**
+   * If you give workflow_id, then workflow_name should also be set.
+   */
+  public function testWorkflowIdToName() {
+    $wfName = 'uf_notify';
+    $wfId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE name = %1', [
+      1 => [$wfName, 'String'],
+    ]);
+
+    $created = $this->callAPISuccess('MessageTemplate', 'create', [
+      'msg_title' => __FUNCTION__,
+      'msg_subject' => __FUNCTION__,
+      'msg_text' => __FUNCTION__,
+      'msg_html' => __FUNCTION__,
+      'workflow_id' => $wfId,
+    ]);
+    $this->assertEquals($wfName, $created['values'][$created['id']]['workflow_name']);
+    $this->assertEquals($wfId, $created['values'][$created['id']]['workflow_id']);
+    $get = $this->callAPISuccess('MessageTemplate', 'getsingle', ['id' => $created['id']]);
+    $this->assertEquals($wfName, $get['workflow_name']);
+    $this->assertEquals($wfId, $get['workflow_id']);
+  }
+
+  /**
+   * If you give workflow_name, then workflow_id should also be set.
+   */
+  public function testWorkflowNameToId() {
+    $wfName = 'petition_sign';
+    $wfId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE name = %1', [
+      1 => [$wfName, 'String'],
+    ]);
+
+    $created = $this->callAPISuccess('MessageTemplate', 'create', [
+      'msg_title' => __FUNCTION__,
+      'msg_subject' => __FUNCTION__,
+      'msg_text' => __FUNCTION__,
+      'msg_html' => __FUNCTION__,
+      'workflow_name' => $wfName,
+    ]);
+    $this->assertEquals($wfName, $created['values'][$created['id']]['workflow_name']);
+    $this->assertEquals($wfId, $created['values'][$created['id']]['workflow_id']);
+    $get = $this->callAPISuccess('MessageTemplate', 'getsingle', ['id' => $created['id']]);
+    $this->assertEquals($wfName, $get['workflow_name']);
+    $this->assertEquals($wfId, $get['workflow_id']);
+  }
+
   public function testPermissionChecks() {
     $entity = $this->createTestEntity();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['edit user-driven message templates'];
@@ -104,6 +134,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     unset($testUserEntity['id']);
     $testUserEntity['msg_subject'] = 'Test user message template';
     unset($testUserEntity['workflow_id']);
+    unset($testUserEntity['workflow_name']);
     $testuserEntity['check_permissions'] = TRUE;
     // ensure that it can create user templates;
     $userEntity = $this->callAPISuccess('MessageTemplate', 'create', $testUserEntity);
@@ -119,6 +150,10 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'msg_subject' => 'test msg permission subject',
       'check_permissions' => TRUE,
     ]);
+    $newEntityParams = $entity['values'][$entity['id']];
+    unset($newEntityParams['id']);
+    $newEntityParams['check_permissions'] = TRUE;
+    $this->callAPISuccess('MessageTemplate', 'create', $newEntityParams);
     // verify with all 3 permissions someone can do everything.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'edit system workflow message templates',

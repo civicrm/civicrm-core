@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -135,9 +119,17 @@ class CRM_Core_Permission {
       }
       else {
         // This is an individual permission
-        $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permission, $userId);
-        // Call the permission_check hook to permit dynamic escalation (CRM-19256)
-        CRM_Utils_Hook::permission_check($permission, $granted, $contactId);
+        $impliedPermissions = self::getImpliedPermissionsFor($permission);
+        $impliedPermissions[] = $permission;
+        foreach ($impliedPermissions as $permissionOption) {
+          $granted = CRM_Core_Config::singleton()->userPermissionClass->check($permissionOption, $userId);
+          // Call the permission_check hook to permit dynamic escalation (CRM-19256)
+          CRM_Utils_Hook::permission_check($permissionOption, $granted, $contactId);
+          if ($granted) {
+            break;
+          }
+        }
+
         if (
           !$granted
           && !($tempPerm && $tempPerm->check($permission))
@@ -294,7 +286,7 @@ class CRM_Core_Permission {
     }
 
     $groups = self::ufGroup($type);
-    return !empty($groups) && in_array($gid, $groups) ? TRUE : FALSE;
+    return !empty($groups) && in_array($gid, $groups);
   }
 
   /**
@@ -481,7 +473,7 @@ class CRM_Core_Permission {
         'CiviMail' => 'access CiviMail',
         'CiviAuction' => 'add auction items',
       ];
-      $permissionName = CRM_Utils_Array::value($module, $editPermissions);
+      $permissionName = $editPermissions[$module] ?? NULL;
     }
 
     if ($module == 'CiviCase' && !$permissionName) {
@@ -524,7 +516,7 @@ class CRM_Core_Permission {
   public static function checkMenuItem(&$item) {
     if (!array_key_exists('access_callback', $item)) {
       CRM_Core_Error::backtrace();
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Missing Access Callback key in menu item');
     }
 
     // if component_id is present, ensure it is enabled
@@ -547,7 +539,7 @@ class CRM_Core_Permission {
     if (empty($item['access_callback']) ||
       is_numeric($item['access_callback'])
     ) {
-      return (boolean ) $item['access_callback'];
+      return (bool) $item['access_callback'];
     }
 
     // check whether the following Ajax requests submitted the right key
@@ -909,9 +901,51 @@ class CRM_Core_Permission {
         $prefix . ts('send SMS'),
         ts('Send an SMS'),
       ],
+      'administer CiviCRM system' => [
+        'label' => $prefix . ts('administer CiviCRM System'),
+        'description' => ts('Perform all system administration tasks in CiviCRM:'),
+      ],
+      'administer CiviCRM data' => [
+        'label' => $prefix . ts('administer CiviCRM Data'),
+        'description' => ts('Perform all system administration tasks in CiviCRM:'),
+      ],
     ];
-
+    foreach (self::getImpliedPermissions() as $name => $includes) {
+      foreach ($includes as $permission) {
+        $permissions[$name][] = $permissions[$permission];
+      }
+    }
     return $permissions;
+  }
+
+  /**
+   * Get permissions implied by 'superset' permissions.
+   *
+   * @return array
+   */
+  public static function getImpliedPermissions() {
+    return [
+      'administer CiviCRM' => ['administer CiviCRM system', 'administer CiviCRM data'],
+      'administer CiviCRM data' => ['edit message templates', 'administer dedupe rules'],
+      'administer CiviCRM system' => ['edit system workflow message templates'],
+    ];
+  }
+
+  /**
+   * Get any super-permissions that imply the given permission.
+   *
+   * @param string $permission
+   *
+   * @return array
+   */
+  public static function getImpliedPermissionsFor(string $permission) {
+    $return = [];
+    foreach (self::getImpliedPermissions() as $superPermission => $components) {
+      if (in_array($permission, $components, TRUE)) {
+        $return[$superPermission] = $superPermission;
+      }
+    }
+    return $return;
   }
 
   /**
@@ -1643,7 +1677,7 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function isMultisiteEnabled() {
-    return Civi::settings()->get('is_enabled') ? TRUE : FALSE;
+    return (bool) Civi::settings()->get('is_enabled');
   }
 
   /**

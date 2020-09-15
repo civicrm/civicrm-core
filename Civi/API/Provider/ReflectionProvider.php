@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -40,11 +24,11 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         // TODO decide if we really want to override others
         ['onApiResolve', Events::W_EARLY],
       ],
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         // TODO decide if we really want to override others
         ['onApiAuthorize', Events::W_EARLY],
       ],
@@ -57,7 +41,11 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   private $apiKernel;
 
   /**
-   * @var array (string $entityName => array(string $actionName))
+   * List of all entities and their supported actions
+   *
+   * array(string $entityName => string[] $actionNames).
+   *
+   * @var array
    */
   private $actions;
 
@@ -146,7 +134,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public function getActionNames($version, $entity) {
     $entity = _civicrm_api_get_camel_name($entity, $version);
-    return isset($this->actions[$entity]) ? $this->actions[$entity] : $this->actions['*'];
+    return $this->actions[$entity] ?? $this->actions['*'];
   }
 
 }

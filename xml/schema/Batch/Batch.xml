@@ -36,15 +36,6 @@
     <add>4.2</add>
   </index>
   <field>
-    <name>label</name>
-    <type>varchar</type>
-    <length>64</length>
-    <localizable>true</localizable>
-    <comment>Friendly Name.</comment>
-    <add>3.3</add>
-    <drop>4.2</drop>
-  </field>
-  <field>
     <name>title</name>
     <title>Batch Title</title>
     <type>varchar</type>
@@ -91,6 +82,7 @@
     <add>3.3</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>

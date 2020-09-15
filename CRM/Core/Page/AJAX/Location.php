@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -44,6 +27,8 @@ class CRM_Core_Page_AJAX_Location {
    * obtain the location of given contact-id.
    * This method is used by on-behalf-of form to dynamically generate poulate the
    * location field values for selected permissioned contact.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getPermissionedLocation() {
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
@@ -159,7 +144,7 @@ class CRM_Core_Page_AJAX_Location {
     if (!empty($defaults)) {
       foreach ($profileFields as $key => $val) {
         if (array_key_exists($key, $defaults)) {
-          $htmlType = CRM_Utils_Array::value('html_type', $val);
+          $htmlType = $val['html_type'] ?? NULL;
           if ($htmlType == 'Radio') {
             $elements["onbehalf_{$key}"]['type'] = $htmlType;
             $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
@@ -240,7 +225,7 @@ class CRM_Core_Page_AJAX_Location {
           $element = 'name';
         }
         $fld = "address[1][{$element}]";
-        $value = CRM_Utils_Array::value($element, $location['address'][1]);
+        $value = $location['address'][1][$element] ?? NULL;
         $value = $value ? $value : "";
         $result[str_replace([
           '][',
@@ -258,7 +243,7 @@ class CRM_Core_Page_AJAX_Location {
       $block = ($element == 'phone_type_id') ? 'phone' : $element;
       for ($i = 1; $i < 3; $i++) {
         $fld = "{$block}[{$i}][{$element}]";
-        $value = CRM_Utils_Array::value($element, $location[$block][$i]);
+        $value = $location[$block][$i][$element] ?? NULL;
         $value = $value ? $value : "";
         $result[str_replace([
           '][',

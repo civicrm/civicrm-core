@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_Contact_Utils {
 
@@ -45,6 +29,7 @@ class CRM_Contact_BAO_Contact_Utils {
    *   If profile overlay class should be added.
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   public static function getImage($contactType, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE) {
     static $imageInfo = [];
@@ -70,15 +55,11 @@ class CRM_Contact_BAO_Contact_Utils {
         $imageInfo[$contactType]['url'] = $imageUrl;
       }
       else {
-        $isSubtype = (array_key_exists('parent_id', $typeInfo) &&
-          $typeInfo['parent_id']
-        ) ? TRUE : FALSE;
-
-        if ($isSubtype) {
+        if (!empty($typeInfo['parent_id'])) {
           $type = CRM_Contact_BAO_ContactType::getBasicType($typeInfo['name']) . '-subtype';
         }
         else {
-          $type = CRM_Utils_Array::value('name', $typeInfo);
+          $type = $typeInfo['name'] ?? NULL;
         }
 
         // do not add title since it hides contact name
@@ -133,7 +114,7 @@ FROM   civicrm_contact
 WHERE  id IN ( $idString )
 ";
     $count = CRM_Core_DAO::singleValueQuery($query);
-    return $count > 1 ? TRUE : FALSE;
+    return $count > 1;
   }
 
   /**
@@ -152,6 +133,7 @@ WHERE  id IN ( $idString )
    *
    * @return array
    *   ( $cs, $ts, $live )
+   * @throws \CRM_Core_Exception
    */
   public static function generateChecksum($entityId, $ts = NULL, $live = NULL, $hash = NULL, $entityType = 'contact', $hashSize = NULL) {
     // return a warning message if we dont get a entityId
@@ -216,14 +198,16 @@ WHERE  id IN ( $idString )
    *
    * @return bool
    *   true if valid, else false
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function validChecksum($contactID, $inputCheck) {
 
     $input = CRM_Utils_System::explode('_', $inputCheck, 3);
 
-    $inputCS = CRM_Utils_Array::value(0, $input);
-    $inputTS = CRM_Utils_Array::value(1, $input);
-    $inputLF = CRM_Utils_Array::value(2, $input);
+    $inputCS = $input[0] ?? NULL;
+    $inputTS = $input[1] ?? NULL;
+    $inputLF = $input[2] ?? NULL;
 
     $check = self::generateChecksum($contactID, $inputTS, $inputLF);
     // Joomla_11 - If $inputcheck is null without explicitly casting to a string
@@ -252,6 +236,8 @@ WHERE  id IN ( $idString )
    * @param int $previousEmployerID
    * @param bool $newContact
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
     //if organization name is passed. CRM-15368,CRM-15547
@@ -282,7 +268,7 @@ WHERE  id IN ( $idString )
       // get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
       if (!$relTypeId) {
-        CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Employee of'"));
+        throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
       }
 
       // create employee of relationship
@@ -328,6 +314,7 @@ WHERE  id IN ( $idString )
    * @param int $previousEmpID
    *
    * @throws CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = [];
@@ -380,7 +367,7 @@ WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
 SET contact_a.organization_name=contact_b.organization_name
 WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query);
   }
 
   /**
@@ -390,6 +377,9 @@ WHERE contact_a.employer_id=contact_b.id AND contact_b.id={$organizationId}; ";
    *   Contact id ( mostly individual contact id).
    * @param int $employerId
    *   Contact id ( mostly organization contact id).
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function clearCurrentEmployer($contactId, $employerId = NULL) {
     $query = "UPDATE civicrm_contact
@@ -406,7 +396,7 @@ WHERE id={$contactId}; ";
       //get the relationship type id of "Employee of"
       $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Employee of', 'id', 'name_a_b');
       if (!$relTypeId) {
-        CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Employee of'"));
+        throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Employee of'"));
       }
       $relMembershipParams['relationship_type_id'] = $relTypeId . '_a_b';
       $relMembershipParams['contact_check'][$employerId] = 1;
@@ -440,6 +430,7 @@ WHERE id={$contactId}; ";
    * @param string $title
    *   fieldset title.
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
     $form->assign('contact_type', $contactType);
@@ -589,7 +580,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
       $contactLinks['rows'][$i]['primary_email'] = $dao->email;
 
       // get the permission for current contact id.
-      $hasPermissions = CRM_Utils_Array::value($dao->id, $permissionedContactIds);
+      $hasPermissions = $permissionedContactIds[$dao->id] ?? NULL;
       if (!is_array($hasPermissions) || empty($hasPermissions)) {
         $i++;
         continue;
@@ -788,7 +779,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     // Normal update process will automatically create new address with submitted values
 
     // 1. loop through entire submitted address array
-    $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'master_id', 'update_current_employer'];
+    $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'master_id', 'add_relationship', 'id', 'contact_id'];
     foreach ($address as & $values) {
       // 2. check if "Use another contact's address" is checked, if not continue
       // Additionally, if master_id is set (address was shared), set master_id to empty value.
@@ -799,32 +790,29 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
         continue;
       }
 
-      // Set update_current_employer checkbox value
-      $values['update_current_employer'] = !empty($values['update_current_employer']);
+      // Set add_relationship checkbox value
+      $values['add_relationship'] = !empty($values['add_relationship']);
 
       // 3. get the address details for master_id
       $masterAddress = new CRM_Core_BAO_Address();
-      $masterAddress->id = CRM_Utils_Array::value('master_id', $values);
+      $masterAddress->id = $values['master_id'] ?? NULL;
       $masterAddress->find(TRUE);
 
-      // 4. modify submitted params and update it with shared contact address
-      // make sure you preserve specific form values like location type, is_primary_ is_billing, master_id
-      // CRM-10336: Also empty any fields from the existing address block if they don't exist in master (otherwise they will persist)
+      // 4. CRM-10336: Empty all fields (execept the fields to skip)
       foreach ($values as $field => $submittedValue) {
+        if (!in_array($field, $skipFields)) {
+          $values[$field] = '';
+        }
+      }
+
+      // 5. update address params to match shared address
+      // make sure you preserve specific form values like location type, is_primary_ is_billing, master_id
+      foreach ($masterAddress as $field => $value) {
         if (!in_array($field, $skipFields)) {
           if (isset($masterAddress->$field)) {
             $values[$field] = $masterAddress->$field;
           }
-          else {
-            $values[$field] = '';
-          }
         }
-      }
-
-      //5. modify the params to include county_id if it exist in master contact.
-      // CRM-16152: This is a hack since QF does not submit disabled field.
-      if (!empty($masterAddress->county_id) && empty($values['county_id'])) {
-        $values['county_id'] = $masterAddress->county_id;
       }
     }
   }
@@ -901,9 +889,9 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
   public static function updateGreeting($params) {
     $contactType = $params['ct'];
     $greeting = $params['gt'];
-    $valueID = $id = CRM_Utils_Array::value('id', $params);
-    $force = CRM_Utils_Array::value('force', $params);
-    $limit = CRM_Utils_Array::value('limit', $params);
+    $valueID = $id = $params['id'] ?? NULL;
+    $force = $params['force'] ?? NULL;
+    $limit = $params['limit'] ?? NULL;
 
     // if valueID is not passed use default value
     if (!$valueID) {
@@ -916,14 +904,14 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     ];
 
     $allGreetings = CRM_Core_PseudoConstant::greeting($filter);
-    $originalGreetingString = $greetingString = CRM_Utils_Array::value($valueID, $allGreetings);
+    $originalGreetingString = $greetingString = $allGreetings[$valueID] ?? NULL;
     if (!$greetingString) {
-      CRM_Core_Error::fatal(ts('Incorrect greeting value id %1, or no default greeting for this contact type and greeting type.', [1 => $valueID]));
+      throw new CRM_Core_Exception(ts('Incorrect greeting value id %1, or no default greeting for this contact type and greeting type.', [1 => $valueID]));
     }
 
     // build return properties based on tokens
     $greetingTokens = CRM_Utils_Token::getTokens($greetingString);
-    $tokens = CRM_Utils_Array::value('contact', $greetingTokens);
+    $tokens = $greetingTokens['contact'] ?? NULL;
     $greetingsReturnProperties = [];
     if (is_array($tokens)) {
       $greetingsReturnProperties = array_fill_keys(array_values($tokens), 1);
@@ -1089,7 +1077,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
       if (!empty($contactParams[$greeting . '_id'])) {
         $string = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $greeting . '_id', $contactParams[$greeting . '_id']);
       }
-      $string = isset($contactParams[$greeting . '_custom']) ? $contactParams[$greeting . '_custom'] : $string;
+      $string = $contactParams[$greeting . '_custom'] ?? $string;
       if (empty($string)) {
         $tokens[$greeting] = [];
       }
@@ -1125,9 +1113,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
-
-    $smarty = CRM_Core_Smarty::singleton();
-    $templateString = $smarty->fetch("string:$templateString");
+    $templateString = CRM_Utils_String::parseOneOffStringThroughSmarty($templateString);
   }
 
   /**
@@ -1135,7 +1121,9 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    *
    * @param int $contactId
    *   The hypothetical contact ID
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public static function isContactId($contactId) {
     if ($contactId) {

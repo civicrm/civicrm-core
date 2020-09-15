@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -39,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
 use Civi\Api4\Activity;
+use Civi\Api4\Contact;
 
 /**
  * @group headless
@@ -64,18 +47,35 @@ class ComplexQueryTest extends UnitTestCase {
    * Expects at least one activity loaded from the data set.
    */
   public function testGetAllHousingSupportActivities() {
-    $results = Activity::get()
-      ->setCheckPermissions(FALSE)
-      ->addWhere('activity_type.name', '=', 'Phone Call')
+    $results = Activity::get(FALSE)
+      ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();
 
     $this->assertGreaterThan(0, count($results));
   }
 
   /**
-   * Fetch all activities with a blue tag; and return all tags on the activities
+   *
    */
-  public function testGetAllTagsForBlueTaggedActivities() {
+  public function testGetWithCount() {
+    $myName = uniqid('count');
+    for ($i = 1; $i <= 20; ++$i) {
+      Contact::create()
+        ->addValue('first_name', "Contact $i")
+        ->addValue('last_name', $myName)
+        ->setCheckPermissions(FALSE)->execute();
+    }
+
+    $get1 = Contact::get()
+      ->addWhere('last_name', '=', $myName)
+      ->selectRowCount()
+      ->addSelect('first_name')
+      ->setLimit(10)
+      ->setDebug(TRUE)
+      ->setCheckPermissions(FALSE)->execute();
+
+    $this->assertEquals(20, $get1->count());
+    $this->assertCount(10, (array) $get1);
 
   }
 

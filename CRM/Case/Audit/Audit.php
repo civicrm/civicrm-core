@@ -58,6 +58,9 @@ class CRM_Case_Audit_Audit {
           $datatype_elements = $field->getElementsByTagName("Type");
           $datatype = $datatype_elements->item(0)->nodeValue;
 
+          $name_elements = $field->getElementsByTagName("Name");
+          $name = $name_elements->item(0)->nodeValue;
+
           $label_elements = $field->getElementsByTagName("Label");
           $label = $label_elements->item(0)->nodeValue;
 
@@ -89,6 +92,7 @@ class CRM_Case_Audit_Audit {
 
             if ($this->auditConfig->includeInRegion($label, $region)) {
               $retval[$activityindex][$region][$fieldindex] = [];
+              $retval[$activityindex][$region][$fieldindex]['name'] = $name;
               $retval[$activityindex][$region][$fieldindex]['label'] = $label;
               $retval[$activityindex][$region][$fieldindex]['datatype'] = $datatype;
               $retval[$activityindex][$region][$fieldindex]['value'] = $value;
@@ -104,12 +108,14 @@ class CRM_Case_Audit_Audit {
                 ])
                 ) {
                   $caseActivities[$activityindex][$fieldindex] = [];
+                  $caseActivities[$activityindex][$fieldindex]['name'] = $name;
                   $caseActivities[$activityindex][$fieldindex]['label'] = $label;
                   $caseActivities[$activityindex][$fieldindex]['datatype'] = $datatype;
                   $caseActivities[$activityindex][$fieldindex]['value'] = $value;
                 }
                 else {
                   $activityStatusType[$activityindex][$fieldindex] = [];
+                  $activityStatusType[$activityindex][$fieldindex]['name'] = $name;
                   $activityStatusType[$activityindex][$fieldindex]['label'] = $label;
                   $activityStatusType[$activityindex][$fieldindex]['datatype'] = $datatype;
                   $activityStatusType[$activityindex][$fieldindex]['value'] = $value;
@@ -215,31 +221,20 @@ class CRM_Case_Audit_Audit {
    * @param string $xmlString
    * @param int $clientID
    * @param int $caseID
-   * @param bool $printReport
    *
    * @return mixed
    */
-  public static function run($xmlString, $clientID, $caseID, $printReport = FALSE) {
-    /*
-    $fh = fopen('C:/temp/audit2.xml', 'w');
-    fwrite($fh, $xmlString);
-    fclose($fh);
-     */
-
+  public static function run($xmlString, $clientID, $caseID) {
     $audit = new CRM_Case_Audit_Audit($xmlString, 'audit.conf.xml');
-    $activities = $audit->getActivities($printReport);
+    $activities = $audit->getActivities(TRUE);
 
     $template = CRM_Core_Smarty::singleton();
     $template->assign_by_ref('activities', $activities);
 
-    if ($printReport) {
-      $reportDate = CRM_Utils_Date::customFormat(date('Y-m-d H:i'));
-      $template->assign('reportDate', $reportDate);
-      $contents = $template->fetch('CRM/Case/Audit/Report.tpl');
-    }
-    else {
-      $contents = $template->fetch('CRM/Case/Audit/Audit.tpl');
-    }
+    $reportDate = CRM_Utils_Date::customFormat(date('Y-m-d H:i'));
+    $template->assign('reportDate', $reportDate);
+    $contents = $template->fetch('CRM/Case/Audit/Report.tpl');
+
     return $contents;
   }
 

@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -40,16 +22,16 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * Create a new object from supplied values.
+ * Create a new $ENTITY from supplied values.
  *
- * This function will create 1 new object. It cannot be used to update existing objects. Use the Update or Replace actions for that.
+ * This action will create 1 new $ENTITY.
+ * It cannot be used to update existing $ENTITIES; use the `Update` or `Replace` actions for that.
  */
 class BasicCreateAction extends AbstractCreateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicCreateAction $thisAction) => array
+   *   Function(array $item, BasicCreateAction $thisAction): array
    */
   private $setter;
 
@@ -59,7 +41,6 @@ class BasicCreateAction extends AbstractCreateAction {
    * @param string $entityName
    * @param string $actionName
    * @param callable $setter
-   *   Function(array $item, BasicCreateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $setter = NULL) {
     parent::__construct($entityName, $actionName);
@@ -73,6 +54,7 @@ class BasicCreateAction extends AbstractCreateAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    $this->formatWriteValues($this->values);
     $this->validateValues();
     $result->exchangeArray([$this->writeRecord($this->values)]);
   }
@@ -91,6 +73,7 @@ class BasicCreateAction extends AbstractCreateAction {
    */
   protected function writeRecord($item) {
     if (is_callable($this->setter)) {
+      $this->addCallbackToDebugOutput($this->setter);
       return call_user_func($this->setter, $item, $this);
     }
     throw new NotImplementedException('Setter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());

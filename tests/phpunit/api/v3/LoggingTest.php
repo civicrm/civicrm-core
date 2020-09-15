@@ -1,28 +1,12 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 5                                                  |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -371,8 +355,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     // To protect against the modified date not changing due to the updates being too close together.
     sleep(1);
     $loggings = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);
-    $this->assertEquals('civicrm_address', $loggings['values'][0]['table'], CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray());
-    $this->assertEquals(1, $loggings['count'], CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray());
+    $this->assertEquals('civicrm_address', $loggings['values'][0]['table'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
+    $this->assertEquals(1, $loggings['count'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
     $this->assertEquals('27 Cool way', $loggings['values'][0]['from']);
     $this->assertEquals('25 Dorky way', $loggings['values'][0]['to']);
     $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);

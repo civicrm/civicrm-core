@@ -12,7 +12,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   private $callbackLog;
 
   /**
-   * @var array (int $idx => int $contactId) list of contact IDs that have been created (in order of creation)
+   * @var array
+   * (int $idx => int $contactId) list of contact IDs that have been created (in order of creation)
    *
    * Note that ID this is all IDs created by the test-case -- even if the creation was subsequently rolled back
    */

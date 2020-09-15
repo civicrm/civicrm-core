@@ -248,7 +248,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);
     $this->assertEquals($existing_contact->id, $contact->id);
     $deleted_contact_id = $existing_contact->id;
-    CRM_Contact_BAO_Contact::deleteContact($contact->id, FALSE, TRUE);
+    $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
       $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
@@ -296,21 +296,14 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals(1, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_my_isam');
 
-    // A temp table should not raise flag (static naming).
-    $tempName = CRM_Core_DAO::createTempTableName('civicrm', FALSE);
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
-    CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
-    // Ignore temp tables
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
-    CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
-
+    // A temp table should not raise flag.
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('myisam')->getName();
     // A temp table should not raise flag (randomized naming).
-    $tempName = CRM_Core_DAO::createTempTableName('civicrm', TRUE);
     $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
-    CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
+    CRM_Core_DAO::executeQuery("CREATE TABLE $tempTableName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
     // Ignore temp tables
     $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
-    CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
+    CRM_Core_DAO::executeQuery("DROP TABLE $tempTableName");
   }
 
   /**
@@ -521,6 +514,45 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     Civi::dispatcher()->removeListener('civi.db.query', $listener);
     $this->fail('String not altered');
+  }
+
+  public function testSupportedFields() {
+    // Hack a different db version which will trigger getSupportedFields to filter out newer fields
+    CRM_Core_BAO_Domain::getDomain()->version = '5.26.0';
+
+    $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
+    // 'icon' was added in 5.28
+    $this->assertArrayNotHasKey('icon', $customGroupFields);
+
+    // Remove domain version override:
+    CRM_Core_BAO_Domain::version(TRUE);
+
+    $activityFields = CRM_Activity_DAO_Activity::getSupportedFields();
+    // Fields should be indexed by name not unique_name (which is "activity_id")
+    $this->assertEquals('id', $activityFields['id']['name']);
+
+    $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
+    $this->assertArrayHasKey('icon', $customGroupFields);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $contactFields = CRM_Contact_DAO_Contact::getSupportedFields();
+    $this->assertArrayHasKey('api_key', $contactFields);
+
+    $permissionedContactFields = CRM_Contact_DAO_Contact::getSupportedFields(TRUE);
+    $this->assertArrayNotHasKey('api_key', $permissionedContactFields);
+  }
+
+  public function testTableHasBeenAdded() {
+    // Hack a different db version
+    CRM_Core_BAO_Domain::getDomain()->version = '5.28.0';
+
+    // Table was added in 5.29
+    $this->assertFalse(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
+
+    // Remove domain version override:
+    CRM_Core_BAO_Domain::version(TRUE);
+
+    $this->assertTrue(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
   }
 
 }

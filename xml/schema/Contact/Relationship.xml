@@ -7,6 +7,7 @@
   <comment>Relationship between any 2 types of contacts.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-handshake-o</icon>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -72,6 +73,7 @@
   </foreignKey>
   <field>
     <name>start_date</name>
+    <uniqueName>relationship_start_date</uniqueName>
     <type>date</type>
     <title>Relationship Start Date</title>
     <comment>date when the relationship started</comment>
@@ -83,6 +85,7 @@
   </field>
   <field>
     <name>end_date</name>
+    <uniqueName>relationship_end_date</uniqueName>
     <type>date</type>
     <title>Relationship End Date</title>
     <comment>date when the relationship ended</comment>

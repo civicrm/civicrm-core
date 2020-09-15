@@ -61,10 +61,14 @@
   function reloadBlock(el) {
     return $(el).each(function() {
       var data = $(this).data('edit-params');
-      data.snippet = data.reset = 1;
-      data.class_name = data.class_name.replace('Form', 'Page');
-      data.type = 'page';
-      $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {$(this).trigger('crmLoad');});
+      if (data) {
+        data.snippet = data.reset = 1;
+        data.class_name = data.class_name.replace('Form', 'Page');
+        data.type = 'page';
+        $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {
+          $(this).trigger('crmLoad');
+        });
+      }
     });
   }
 
@@ -192,7 +196,7 @@
       document.title = $('title').html().replace(oldName, contactName);
       oldName = contactName;
     }
-    $('#contactname-block').load(refreshTitle);
+    $('#contactname-block').on('load', refreshTitle);
     refreshTitle();
 
     var clicking;

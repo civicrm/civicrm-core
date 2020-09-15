@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
@@ -47,10 +31,14 @@
         <td>
           {$form.logging.html}<br />
         {if $validTriggerPermission}
-          <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
+          {if $isMultilingual}
+            <p class="description">{ts}Logging is not supported in multilingual environments.{/ts}</p>
+          {else}
+            <p class="description">{ts}If enabled, all actions will be logged with a complete record of changes.{/ts}</p>
+          {/if}
         {else}
           <p class="description">{ts}In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.{/ts}&nbsp;{ts}This functionality cannot be enabled on multilingual installations.{/ts}</p>
-         {/if}
+        {/if}
         </td>
       </tr>
       <tr class="crm-miscellaneous-form-block-doNotAttachPDFReceipt">
@@ -93,10 +81,10 @@
       </tr>
     </table>
 
-    <h3>{ts}reCAPTCHA Keys{/ts}</h3>
-
+    <h3>{ts}reCAPTCHA v2{/ts}</h3>
     <div class="description">
-      {ts 1="https://www.google.com/recaptcha"}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use reCAPTCHA on public-facing CiviCRM forms: sign up at <a href="%1" "target=_blank">Google's reCaptcha site</a>; enter the provided public and private reCAPTCHA keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
+      {ts 1='href="https://www.google.com/recaptcha" target="_blank"'}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use it on public-facing CiviCRM forms: sign up at <a %1>Google's reCaptcha site</a>; enter the provided public and private keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
+      <br/><strong>{ts}Only the reCAPTCHA v2 checkbox type is supported.{/ts}</strong>
     </div>
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-recaptchaPublicKey">
@@ -113,7 +101,7 @@
           <span class="description">
             {ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).{/ts}
             <br />
-            {ts 1='href="https://developers.google.com/recaptcha/docs/display#config" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
+            {ts 1='href="https://developers.google.com/recaptcha/docs/display#configuration" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
           </span>
         </td>
       </tr>

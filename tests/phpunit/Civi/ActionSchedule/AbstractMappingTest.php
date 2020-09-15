@@ -71,9 +71,9 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
 
   /**
    * When comparing timestamps, treat them as the same if they
-   * occur within a certain distance of each other.
+   * occur within a certain distance (seconds) of each other.
    *
-   * @var int seconds
+   * @var int
    */
   public $dateTolerance = 120;
 
@@ -226,6 +226,39 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
       'first_name' => 'Carol',
       'last_name' => 'Exemplar',
       'email' => 'carol@example.org',
+    ]);
+    $this->contacts['dave'] = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Dave',
+      'last_name' => 'Exemplar',
+      'email' => 'dave@example.org',
+      'do_not_email' => 1,
+    ]);
+    $this->contacts['edith'] = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Edith',
+      'last_name' => 'Exemplar',
+      'email' => 'edith@example.org',
+      'is_deceased' => 1,
+    ]);
+    $this->contacts['francis'] = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Francis',
+      'last_name' => 'Exemplar',
+      'api.Email.create' => [
+        'email' => 'frances@example.org',
+        'on_hold' => 1,
+      ],
+    ]);
+    $this->contacts['gretchen'] = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Gretchen',
+      'last_name' => 'Exemplar',
+      'email' => 'gretchen@example.org',
+      'api.Email.create' => [
+        'email' => 'gratchen@example.org',
+        'on_hold' => 1,
+      ],
     ]);
   }
 

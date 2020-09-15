@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* template for handling share address functionality*}
@@ -30,10 +14,10 @@
     <div id="shared-address-{$blockId}" class="form-layout-compressed">
       {$form.address.$blockId.master_contact_id.label}
       {$form.address.$blockId.master_contact_id.html}
-      <div class="shared-address-update-employer" style="display: none;">
-        {$form.address.$blockId.update_current_employer.html}
-        {$form.address.$blockId.update_current_employer.label}
-        {help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}
+      <div class="shared-address-add-relationship" style="display: none;">
+        {$form.address.$blockId.add_relationship.html}
+        {$form.address.$blockId.add_relationship.label}
+        <span class="employer">{help id="id-sharedAddress-updateRelationships" file="CRM/Contact/Form/Contact"}</span>
       </div>
       <div class="shared-address-list">
         {if !empty($sharedAddresses.$blockId.shared_address_display)}
@@ -55,7 +39,10 @@
   CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal},
       contactType = {/literal}{$contactType|@json_encode}{literal},
-      $employerSection = $('#shared-address-' + blockNo + ' .shared-address-update-employer'),
+      $addRelationshipSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship'),
+      $employerSection = $('#shared-address-' + blockNo + ' .shared-address-add-relationship .employer'),
+      $employerLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-employer'),
+      $householdLabel = $('#shared-address-' + blockNo + ' .shared-address-add-relationship label .addrel-household'),
       $contentArea = $('#shared-address-' + blockNo + ' .shared-address-list'),
       $masterElement = $('input[name="address[' + blockNo + '][master_id]"]');
 
@@ -84,11 +71,20 @@
 
       if (!sharedContactId || isNaN(sharedContactId)) {
         $employerSection.hide();
+        $addRelationshipSection.hide();
+        $employerLabel.hide();
+        $householdLabel.hide();
         return;
       }
 
       var otherContactType = $el.select2('data').extra.contact_type;
+      $addRelationshipSection.toggle(contactType === 'Individual' && (otherContactType === 'Organization' || otherContactType === 'Household'));
       $employerSection.toggle(contactType === 'Individual' && otherContactType === 'Organization');
+
+      // use the appropriate label
+      $employerLabel.toggle(contactType === 'Individual' && otherContactType === 'Organization');
+      $householdLabel.toggle(contactType === 'Individual' && otherContactType === 'Household');
+
 
       $.post(CRM.url('civicrm/ajax/inline'), {
           'contact_id': sharedContactId,
@@ -114,7 +110,7 @@
             });
 
             if (!addressHTML) {
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please edit that contact to add an address, or select a different contact.{/ts}"{literal};
+              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts}"{literal} + ' <a target="_blank" href="' + CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId) + '">{/literal}{ts}Edit Contact Details{/ts}{literal}</a>';
             }
 
             $contentArea.html(addressHTML);
@@ -124,5 +120,3 @@
   });
 </script>
 {/literal}
-
-

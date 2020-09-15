@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<extension key="org.civicrm.search" type="module">
+  <file>search</file>
+  <name>Search</name>
+  <description>Build searches for a wide variety of CiviCRM entities</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Coleman Watts</author>
+    <email>coleman@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2020-07-08</releaseDate>
+  <version>1.0</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>5.28</ver>
+  </compatibility>
+  <comments>Distributed with CiviCRM core</comments>
+  <classloader>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/Search</namespace>
+  </civix>
+</extension>

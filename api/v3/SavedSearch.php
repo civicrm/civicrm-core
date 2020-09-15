@@ -37,33 +37,28 @@
  *
  * @param array $params
  *   Associative array of property name-value pairs to insert in new saved search.
- * @example SavedSearch/Create.php Std create example.
+ *
  * @return array
  *   api result array
  *   {@getfields saved_search_create}
+ *
+ * @throws \API_Exception
+ *
+ * @example SavedSearch/Create.php Std create example.
  * @access public
  */
 function civicrm_api3_saved_search_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, ['form_values', 'where_clause']);
-  // The create function of the dao expects a 'formValues' that is
-  // not serialized. The get function returns form_values, that is
-  // serialized.
-  // So for the create API, I guess it should work for serialized and
-  // unserialized form_values.
-
-  if (isset($params["form_values"])) {
-    if (is_array($params["form_values"])) {
-      $params["formValues"] = $params["form_values"];
-    }
-    else {
-      // Assume that form_values is serialized.
-      $params["formValues"] = unserialize($params["form_values"]);
-    }
-  }
-
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'SavedSearch');
   _civicrm_api3_saved_search_result_cleanup($result);
   return $result;
+}
+
+/**
+ * @param array $fields
+ */
+function _civicrm_api3_saved_search_create_spec(&$fields) {
+  $fields['form_values']['api.aliases'][] = 'formValues';
+  $fields['form_values']['api.required'] = TRUE;
 }
 
 /**
@@ -72,10 +67,15 @@ function civicrm_api3_saved_search_create($params) {
  * @param array $params
  *   Associative array of property name-value pairs. $params['id'] should be
  *   the ID of the saved search to be deleted.
- * @example SavedSearch/Delete.php Std delete example.
+ *
  * @return array
  *   api result array
  *   {@getfields saved_search_delete}
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
+ *
+ * @example SavedSearch/Delete.php Std delete example.
  * @access public
  */
 function civicrm_api3_saved_search_delete($params) {
@@ -100,16 +100,19 @@ function civicrm_api3_saved_search_get($params) {
 }
 
 /**
- * This function unserializes the form_values in an SavedSearch API result.
+ * Unserialize the form_values field in SavedSearch API results.
+ *
+ * Note: APIv4 handles serialization automatically based on metadata.
  *
  * @param array $result API result to be cleaned up.
  */
 function _civicrm_api3_saved_search_result_cleanup(&$result) {
   if (isset($result['values']) && is_array($result['values'])) {
-    // Only clean up the values if there are values. (A getCount operation
-    // for example does not return values.)
+    // Only run if there are values (getCount for example does not return values).
     foreach ($result['values'] as $key => $value) {
-      $result['values'][$key]['form_values'] = unserialize($value['form_values']);
+      if (isset($value['form_values'])) {
+        $result['values'][$key]['form_values'] = CRM_Utils_String::unserialize($value['form_values']);
+      }
     }
   }
 }

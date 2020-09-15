@@ -18,7 +18,7 @@
           name="location_type_id"
           ng-model="model.mailing.location_type_id"
           >
-          <option value="">{{ts('Automatic')}}</option>
+          <option value="">{{:: ts('Automatic') }}</option>
           <option ng-repeat="locType in model.fields.location_type_id.options"
                   ng-value="locType.key">{{locType.value}}</option>
         </select>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -43,7 +27,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    */
   public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
-      CRM_Core_Error::fatal(ts('Case Id not found.'));
+      CRM_Core_Error::statusBounce(ts('Case Id not found.'));
     }
 
     $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, ['class' => 'select-row']);
@@ -143,7 +127,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
-    $params['id'] = CRM_Utils_Array::value('case_id', $params);
+    $params['id'] = $params['case_id'] ?? NULL;
 
     if (CRM_Utils_Array::value('updateLinkedCases', $params) === '1') {
       $caseID = CRM_Utils_Array::first($form->_caseId);
@@ -210,8 +194,8 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     foreach ($form->_oldCaseStatus as $statuskey => $statusval) {
       if ($activity->subject == 'null') {
         $activity->subject = ts('Case status changed from %1 to %2', [
-          1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
-          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
+          1 => $form->_caseStatus[$statusval] ?? NULL,
+          2 => $form->_caseStatus[$params['case_status_id']] ?? NULL,
         ]);
         $activity->save();
       }

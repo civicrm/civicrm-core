@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Member_Page_Tab extends CRM_Core_Page {
 
@@ -85,12 +67,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       CRM_Core_DAO::storeValues($dao, $membership[$dao->id]);
 
       //carry campaign.
-      $membership[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
+      $membership[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
 
       //get the membership status and type values.
       $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
       foreach (['status', 'membership_type'] as $fld) {
-        $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
+        $membership[$dao->id][$fld] = $statusANDType[$dao->id][$fld] ?? NULL;
       }
       if (!empty($statusANDType[$dao->id]['is_current_member'])) {
         $membership[$dao->id]['active'] = TRUE;
@@ -166,8 +148,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       }
 
       // if relevant--membership is active and type allows inheritance--count related memberships
-      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])
-        && CRM_Utils_Array::value('relationship_type_id', $statusANDType[$dao->id])
+      if (!empty($statusANDType[$dao->id]['is_current_member'])
+        && !empty($statusANDType[$dao->id]['relationship_type_id'])
         && empty($dao->owner_membership_id)
       ) {
         // not an related membership
@@ -178,7 +160,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
      LEFT JOIN civicrm_contact ct ON ct.id = m.contact_id
   WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1 AND ct.is_deleted = 0";
         $num_related = CRM_Core_DAO::singleValueQuery($query);
-        $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
+        $max_related = $membership[$dao->id]['max_related'] ?? NULL;
         $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', [1 => $num_related]) : ts('%1 out of %2', [
           1 => $num_related,
           2 => $max_related,
@@ -197,7 +179,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'limit' => 0,
       ],
     ]);
-    $membershipTypes = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
+    $membershipTypes = $membershipTypesResult['values'] ?? NULL;
 
     foreach ($membershipTypes as $key => $value) {
       $membershipTypes[$key]['action'] = CRM_Core_Action::formLink(self::membershipTypeslinks(),
@@ -491,7 +473,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $isCancelSupported = FALSE,
     $isUpdateBilling = FALSE
   ) {
-    if (!CRM_Utils_Array::value('view', self::$_links)) {
+    if (empty(self::$_links['view'])) {
       self::$_links['view'] = [
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
@@ -502,7 +484,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       ];
     }
 
-    if (!CRM_Utils_Array::value('all', self::$_links)) {
+    if (empty(self::$_links['all'])) {
       $extraLinks = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -61,7 +45,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $caseTypeDAO = new CRM_Case_DAO_CaseType();
 
     // form the name only if missing: CRM-627
-    $nameParam = CRM_Utils_Array::value('name', $params, NULL);
+    $nameParam = $params['name'] ?? NULL;
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
@@ -112,50 +96,87 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *   XML
    */
   public static function convertDefinitionToXML($name, $definition) {
-    $xmlFile = '<?xml version="1.0" encoding="utf-8" ?>' . "\n\n<CaseType>\n";
-    $xmlFile .= "<name>" . self::encodeXmlString($name) . "</name>\n";
+
+    $xw = new XMLWriter();
+    $xw->openMemory();
+    $xw->setIndent(TRUE);
+    $xw->setIndentString(' ');
+    $xw->startDocument("1.0", 'UTF-8');
+
+    $xw->startElement('CaseType');
+
+    $xw->startElement('name');
+    $xw->text($name);
+    $xw->fullEndElement();
 
     if (array_key_exists('forkable', $definition)) {
-      $xmlFile .= "<forkable>" . ((int) $definition['forkable']) . "</forkable>\n";
+      $xw->startElement('forkable');
+      $xw->text((int) $definition['forkable']);
+      $xw->fullEndElement();
     }
 
     if (isset($definition['activityTypes'])) {
-      $xmlFile .= "<ActivityTypes>\n";
+      $xw->startElement('ActivityTypes');
+
       foreach ($definition['activityTypes'] as $values) {
-        $xmlFile .= "<ActivityType>\n";
+        $xw->startElement('ActivityType');
         foreach ($values as $key => $value) {
-          $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
+          $xw->startElement($key);
+          $xw->text($value);
+          $xw->fullEndElement();
         }
-        $xmlFile .= "</ActivityType>\n";
+        // ActivityType
+        $xw->fullEndElement();
       }
-      $xmlFile .= "</ActivityTypes>\n";
+      // ActivityTypes
+      $xw->fullEndElement();
     }
 
     if (!empty($definition['statuses'])) {
-      $xmlFile .= "<Statuses>\n";
+      $xw->startElement('Statuses');
+
       foreach ($definition['statuses'] as $value) {
-        $xmlFile .= "<Status>$value</Status>\n";
+        $xw->startElement('Status');
+        $xw->text($value);
+        $xw->fullEndElement();
       }
-      $xmlFile .= "</Statuses>\n";
+      // Statuses
+      $xw->fullEndElement();
     }
 
     if (isset($definition['activitySets'])) {
-      $xmlFile .= "<ActivitySets>\n";
+
+      $xw->startElement('ActivitySets');
       foreach ($definition['activitySets'] as $k => $val) {
-        $xmlFile .= "<ActivitySet>\n";
+
+        $xw->startElement('ActivitySet');
         foreach ($val as $index => $setVal) {
           switch ($index) {
             case 'activityTypes':
               if (!empty($setVal)) {
-                $xmlFile .= "<ActivityTypes>\n";
+                $xw->startElement('ActivityTypes');
                 foreach ($setVal as $values) {
-                  $xmlFile .= "<ActivityType>\n";
+                  $xw->startElement('ActivityType');
                   foreach ($values as $key => $value) {
-                    $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
+                    // Some parameters here may be arrays of values.
+                    // Also, the tests expect an empty array to be represented as an empty value.
+                    $value = (array) $value;
+                    if (count($value) === 0) {
+                      // Create an empty value.
+                      $value[] = '';
+                    }
+
+                    foreach ($value as $val) {
+                      $xw->startElement($key);
+                      $xw->text($val);
+                      $xw->fullEndElement();
+                    }
                   }
-                  $xmlFile .= "</ActivityType>\n";
+                  // ActivityType
+                  $xw->fullEndElement();
                 }
-                $xmlFile .= "</ActivityTypes>\n";
+                // ActivityTypes
+                $xw->fullEndElement();
               }
               break;
 
@@ -163,63 +184,68 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
             case 'sequence':
             case 'timeline':
               if ($setVal) {
-                $xmlFile .= "<{$index}>true</{$index}>\n";
+                $xw->startElement($index);
+                $xw->text('true');
+                $xw->fullEndElement();
               }
               break;
 
             default:
-              $xmlFile .= "<{$index}>" . self::encodeXmlString($setVal) . "</{$index}>\n";
+              $xw->startElement($index);
+              $xw->text($setVal);
+              $xw->fullEndElement();
           }
         }
-
-        $xmlFile .= "</ActivitySet>\n";
+        // ActivitySet
+        $xw->fullEndElement();
       }
-
-      $xmlFile .= "</ActivitySets>\n";
+      // ActivitySets
+      $xw->fullEndElement();
     }
 
     if (isset($definition['caseRoles'])) {
-      $xmlFile .= "<CaseRoles>\n";
+      $xw->startElement('CaseRoles');
       foreach ($definition['caseRoles'] as $values) {
-        $xmlFile .= "<RelationshipType>\n";
+        $xw->startElement('RelationshipType');
         foreach ($values as $key => $value) {
-          $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
+          $xw->startElement($key);
+          if ($key == 'groups') {
+            $xw->text(implode(',', (array) $value));
+          }
+          else {
+            $xw->text($value);
+          }
+          // $key
+          $xw->fullEndElement();
         }
-        $xmlFile .= "</RelationshipType>\n";
+        // RelationshipType
+        $xw->fullEndElement();
       }
-      $xmlFile .= "</CaseRoles>\n";
+      // CaseRoles
+      $xw->fullEndElement();
     }
 
     if (array_key_exists('restrictActivityAsgmtToCmsUser', $definition)) {
-      $xmlFile .= "<RestrictActivityAsgmtToCmsUser>" . $definition['restrictActivityAsgmtToCmsUser'] . "</RestrictActivityAsgmtToCmsUser>\n";
+      $xw->startElement('RestrictActivityAsgmtToCmsUser');
+      $xw->text($definition['restrictActivityAsgmtToCmsUser']);
+      $xw->fullEndElement();
     }
-
     if (!empty($definition['activityAsgmtGrps'])) {
-      $xmlFile .= "<ActivityAsgmtGrps>\n";
-      foreach ($definition['activityAsgmtGrps'] as $value) {
-        $xmlFile .= "<Group>$value</Group>\n";
+      $xw->startElement('ActivityAsgmtGrps');
+      foreach ((array) $definition['activityAsgmtGrps'] as $value) {
+        $xw->startElement('Group');
+        $xw->text($value);
+        $xw->fullEndElement();
       }
-      $xmlFile .= "</ActivityAsgmtGrps>\n";
+      // ActivityAsgmtGrps
+      $xw->fullEndElement();
     }
 
-    $xmlFile .= '</CaseType>';
+    // CaseType
+    $xw->fullEndElement();
+    $xw->endDocument();
 
-    return $xmlFile;
-  }
-
-  /**
-   * Ugh. This shouldn't exist. Use a real XML-encoder.
-   *
-   * Escape a string for use in XML.
-   *
-   * @param string $str
-   *   A string which should outputted to XML.
-   * @return string
-   * @deprecated
-   */
-  protected static function encodeXmlString($str) {
-    // PHP 5.4: return htmlspecialchars($str, ENT_XML1, 'UTF-8')
-    return htmlspecialchars($str);
+    return $xw->outputMemory();
   }
 
   /**
@@ -245,6 +271,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     if (isset($xml->ActivityAsgmtGrps)) {
       $definition['activityAsgmtGrps'] = (array) $xml->ActivityAsgmtGrps->Group;
+      // Backwards compat - convert group ids to group names if ids are supplied
+      if (array_filter($definition['activityAsgmtGrps'], ['\CRM_Utils_Rule', 'integer']) === $definition['activityAsgmtGrps']) {
+        foreach ($definition['activityAsgmtGrps'] as $idx => $group) {
+          $definition['activityAsgmtGrps'][$idx] = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_Group', $group);
+        }
+      }
     }
 
     // set activity types
@@ -295,7 +327,11 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     if (isset($xml->CaseRoles)) {
       $definition['caseRoles'] = [];
       foreach ($xml->CaseRoles->RelationshipType as $caseRoleXml) {
-        $definition['caseRoles'][] = json_decode(json_encode($caseRoleXml), TRUE);
+        $caseRole = json_decode(json_encode($caseRoleXml), TRUE);
+        if (!empty($caseRole['groups'])) {
+          $caseRole['groups'] = explode(',', $caseRole['groups']);
+        }
+        $definition['caseRoles'][] = $caseRole;
       }
     }
 

@@ -1,36 +1,19 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
+ * Add static functions to include some common functionality used across location sub object BAO classes.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
- * Add static functions to include some common functionality used across location sub object BAO classes.
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_Block {
 
@@ -56,6 +39,7 @@ class CRM_Core_BAO_Block {
    *
    * @return array
    *   Array of $block objects.
+   * @throws CRM_Core_Exception
    */
   public static function &getValues($blockName, $params) {
     if (empty($params)) {
@@ -68,7 +52,7 @@ class CRM_Core_BAO_Block {
     if (!isset($params['entity_table'])) {
       $block->contact_id = $params['contact_id'];
       if (!$block->contact_id) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Invalid Contact ID parameter passed');
       }
       $blocks = self::retrieveBlock($block, $blockName);
     }
@@ -247,7 +231,7 @@ class CRM_Core_BAO_Block {
     //get existing block ids.
     $blockIds = self::getBlockIds($blockName, $contactId, $entityElements);
     foreach ($params[$blockName] as $count => $value) {
-      $blockId = CRM_Utils_Array::value('id', $value);
+      $blockId = $value['id'] ?? NULL;
       if ($blockId) {
         if (is_array($blockIds) && array_key_exists($blockId, $blockIds)) {
           unset($blockIds[$blockId]);
@@ -291,13 +275,13 @@ class CRM_Core_BAO_Block {
         if (empty($value['id']) && $blockValue['locationTypeId'] == CRM_Utils_Array::value('location_type_id', $value) && !$isIdSet) {
           $valueId = FALSE;
           if ($blockName == 'phone') {
-            $phoneTypeBlockValue = CRM_Utils_Array::value('phoneTypeId', $blockValue);
+            $phoneTypeBlockValue = $blockValue['phoneTypeId'] ?? NULL;
             if ($phoneTypeBlockValue == CRM_Utils_Array::value('phone_type_id', $value)) {
               $valueId = TRUE;
             }
           }
           elseif ($blockName == 'im') {
-            $providerBlockValue = CRM_Utils_Array::value('providerId', $blockValue);
+            $providerBlockValue = $blockValue['providerId'] ?? NULL;
             if (!empty($value['provider_id']) && $providerBlockValue == $value['provider_id']) {
               $valueId = TRUE;
             }
@@ -328,7 +312,7 @@ class CRM_Core_BAO_Block {
       }
       $contactFields = [
         'contact_id' => $contactId,
-        'location_type_id' => CRM_Utils_Array::value('location_type_id', $value),
+        'location_type_id' => $value['location_type_id'] ?? NULL,
       ];
 
       $contactFields['is_primary'] = 0;
@@ -415,7 +399,7 @@ class CRM_Core_BAO_Block {
     }
 
     // contact_id in params might be empty or the string 'null' so cast to integer
-    $contactId = (int) CRM_Utils_Array::value('contact_id', $params);
+    $contactId = (int) ($params['contact_id'] ?? 0);
     // If id is set & we haven't been passed a contact_id, retrieve it
     if (!empty($params['id']) && !isset($params['contact_id'])) {
       $entity = new $class();
@@ -455,7 +439,7 @@ class CRM_Core_BAO_Block {
       /*
        * If the only existing email is the one we are editing then we must set
        * is_primary to 1
-       * CRM-10451
+       * @see https://issues.civicrm.org/jira/browse/CRM-10451
        */
       if ($existingEntities->N == 1 && $existingEntities->id == CRM_Utils_Array::value('id', $params)) {
         $params['is_primary'] = 1;
@@ -490,8 +474,8 @@ class CRM_Core_BAO_Block {
    * @return int
    */
   public static function primaryComparison($location1, $location2) {
-    $l1 = CRM_Utils_Array::value('is_primary', $location1);
-    $l2 = CRM_Utils_Array::value('is_primary', $location2);
+    $l1 = $location1['is_primary'] ?? NULL;
+    $l2 = $location2['is_primary'] ?? NULL;
     if ($l1 == $l2) {
       return 0;
     }

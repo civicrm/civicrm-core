@@ -8,12 +8,12 @@ namespace Civi\Angular;
  * The AngularLoader stops short of bootstrapping AngularJS. You may
  * need to `<div ng-app="..."></div>` or `angular.bootstrap(...)`.
  *
- * @code
+ * ```
  * $loader = new AngularLoader();
  * $loader->setPageName('civicrm/case/a');
  * $loader->setModules(array('crmApp'));
  * $loader->load();
- * @endCode
+ * ```
  *
  * @link https://docs.angularjs.org/guide/bootstrap
  */
@@ -73,7 +73,7 @@ class AngularLoader {
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = \Civi::service('angular');
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
-    $this->pageName = isset($_GET['q']) ? $_GET['q'] : NULL;
+    $this->pageName = $_GET['q'] ?? NULL;
     $this->modules = [];
   }
 

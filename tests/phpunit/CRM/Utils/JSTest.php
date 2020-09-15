@@ -1,28 +1,12 @@
 <?php
 /*
-+--------------------------------------------------------------------+
-| CiviCRM version 5                                                  |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -123,8 +107,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
 
   public function dedupeClosureExamples() {
     // Each example string here is named for its body, eg the body of $a calls "a()".
-    $a = "(function (angular, $, _) {\na();\n})(angular, CRM.$, CRM._);";
-    $b = "(function(angular,$,_){\nb();\n})(angular,CRM.$,CRM._);";
+    $a = "(function (angular, $, _) {\n  'use strict';\n  a();\n})(angular, CRM.$, CRM._);";
+    $b = "(function(angular,$,_){\n  \"use strict\";\n  b();\n})(angular,CRM.$,CRM._);";
     $c = "(function( angular, $,_) {\nc();\n})(angular,CRM.$, CRM._);";
     $d = "(function (angular, $, _, whiz) {\nd();\n})(angular, CRM.$, CRM._, CRM.whizbang);";
     $m = "alert('i is the trickster (function( angular, $,_) {\nm();\n})(angular,CRM.$, CRM._);)'";
@@ -132,9 +116,10 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
 
     // Each example string here is a deduped combination of others,
     // eg "$ab" is the deduping of $a+$b.
-    $ab = "(function (angular, $, _) {\na();\n\nb();\n})(angular,CRM.$,CRM._);";
-    $abc = "(function (angular, $, _) {\na();\n\nb();\n\nc();\n})(angular,CRM.$, CRM._);";
-    $cb = "(function( angular, $,_) {\nc();\n\nb();\n})(angular,CRM.$,CRM._);";
+    $ab = "(function (angular, $, _) {\n  'use strict';\n  a();\n  b();\n})(angular,CRM.$,CRM._);";
+    $ba = "(function(angular,$,_){\n  \"use strict\";\n  b();\n  a();\n})(angular, CRM.$, CRM._);";
+    $abc = "(function (angular, $, _) {\n  'use strict';\n  a();\n  b();\nc();\n})(angular,CRM.$, CRM._);";
+    $cb = "(function( angular, $,_) {\nc();\n  b();\n})(angular,CRM.$,CRM._);";
 
     $cases = [];
     $cases[] = [[$a], "$a"];
@@ -143,6 +128,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $cases[] = [[$d], "$d"];
     $cases[] = [[$m], "$m"];
     $cases[] = [[$a, $b], "$ab"];
+    $cases[] = [[$b, $a], "$ba"];
     $cases[] = [[$a, $m, $b], "$a$m$b"];
     $cases[] = [[$a, $d], "$a$d"];
     $cases[] = [[$a, $d, $b], "$a$d$b"];
@@ -169,11 +155,15 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $cases = [];
     $cases[] = [
       "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
-      "a();\n\nb();",
+      "a();\nb();",
     ];
     $cases[] = [
       "// foo\na();",
-      "\na();",
+      "a();",
+    ];
+    $cases[] = [
+      "// foo\n //\na();",
+      "a();",
     ];
     $cases[] = [
       "b();\n  // foo",
@@ -181,11 +171,11 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     ];
     $cases[] = [
       "/// foo\na();\n\t \t//bar\nb();\n// whiz",
-      "\na();\n\nb();\n",
+      "a();\nb();\n",
     ];
     $cases[] = [
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
-      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n\na();",
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\na();",
     ];
     return $cases;
   }
@@ -225,6 +215,9 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         ' [{a: {aa: true}, b: [false, null, {x: 1, y: 2, z: 3}] , "c": -1}, ["fee", "fie", \'foe\']]',
         [['a' => ['aa' => TRUE], 'b' => [FALSE, NULL, ['x' => 1, 'y' => 2, 'z' => 3]], "c" => -1], ["fee", "fie", "foe"]],
       ],
+      ["'Hi\&'", 'Hi&'],
+      ['"Hello " + alert("XSS") + " sucker"', NULL],
+      ["'Hello ' + alert('XSS') + ' sucker'", NULL],
     ];
   }
 
@@ -244,8 +237,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
       ],
       [
-        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\\\'oo", '"bar"'], 'b' => []]]],
-        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\\\\\'oo', '\"bar\"'], b: {}}}}",
+        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\'oo", '"bar"'], 'b' => []]]],
+        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\'oo', '\"bar\"'], b: {}}}}",
       ],
       [TRUE, 'true'],
       [' ', "' '"],
@@ -309,7 +302,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
         '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', "foo&": getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
       ],
       [
-        '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\\\&\\/" : 0}',
+        '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\&\\/" : 0}',
         ['some"key' => 'typeof foo === \'number\' ? true : false', "O'Really?" => '",((,"', 'A"quote"' => '1 + 1', '\\&/' => '0'],
         '{\'some"key\': typeof foo === \'number\' ? true : false, "O\'Really?": ",((,", \'A"quote"\': 1 + 1, "\\\\&/": 0}',
       ],

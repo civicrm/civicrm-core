@@ -14,7 +14,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * @throws \Exception
    */
   public function run() {
-    CRM_Core_Error::fatal('This is not a real page!');
+    throw new CRM_Core_Exception('This is not a real page!');
   }
 
   /**
@@ -54,17 +54,17 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
         ];
       })
-      ->addScriptFile('civicrm', 'packages/backbone/json2.js', 100, 'html-header', FALSE)
-      ->addScriptFile('civicrm', 'packages/backbone/backbone.js', 120, 'html-header')
-      ->addScriptFile('civicrm', 'packages/backbone/backbone.marionette.js', 125, 'html-header', FALSE)
-      ->addScriptFile('civicrm', 'packages/backbone/backbone.collectionsubset.js', 125, 'html-header', FALSE)
-      ->addScriptFile('civicrm', 'packages/backbone-forms/distribution/backbone-forms.js', 130, 'html-header', FALSE)
-      ->addScriptFile('civicrm', 'packages/backbone-forms/distribution/adapters/backbone.bootstrap-modal.min.js', 140, 'html-header', FALSE)
-      ->addScriptFile('civicrm', 'packages/backbone-forms/distribution/editors/list.min.js', 140, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'packages/backbone-forms/distribution/templates/default.css', 140, 'html-header')
+      ->addScriptFile('civicrm.packages', 'backbone/json2.js', 100, 'html-header', FALSE)
+      ->addScriptFile('civicrm.packages', 'backbone/backbone.js', 120, 'html-header')
+      ->addScriptFile('civicrm.packages', 'backbone/backbone.marionette.js', 125, 'html-header', FALSE)
+      ->addScriptFile('civicrm.packages', 'backbone/backbone.collectionsubset.js', 125, 'html-header', FALSE)
+      ->addScriptFile('civicrm.packages', 'backbone-forms/distribution/backbone-forms.js', 130, 'html-header', FALSE)
+      ->addScriptFile('civicrm.packages', 'backbone-forms/distribution/adapters/backbone.bootstrap-modal.min.js', 140, 'html-header', FALSE)
+      ->addScriptFile('civicrm.packages', 'backbone-forms/distribution/editors/list.min.js', 140, 'html-header', FALSE)
+      ->addStyleFile('civicrm.packages', 'backbone-forms/distribution/templates/default.css', 140, 'html-header')
       ->addScript('CRM.BB = Backbone.noConflict();', 300, 'html-header')
-      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
-      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header')
+      ->addScriptFile('civicrm.packages', 'jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+      ->addStyleFile('civicrm.packages', 'jquery/plugins/jstree/themes/default/style.css', 0, 'html-header')
       ->addStyleFile('civicrm', 'css/crm.designer.css', 140, 'html-header')
       ->addScriptFile('civicrm', 'js/crm.backbone.js', 150)
       ->addScriptFile('civicrm', 'js/model/crm.schema-mapped.js', 200)
@@ -192,7 +192,20 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           break;
 
         default:
-          throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
+          if (strpos($entityType, 'Model') !== FALSE) {
+            $entity = str_replace('Model', '', $entityType);
+            $backboneModel = self::convertCiviModelToBackboneModel(
+              $entity,
+              ts('%1', [1 => $entity]),
+              $availableFields
+            );
+            if (!empty($backboneModel['schema'])) {
+              $civiSchema[$entityType] = $backboneModel;
+            }
+          }
+          if (!isset($civiSchema[$entityType])) {
+            throw new CRM_Core_Exception("Unrecognized entity type: $entityType");
+          }
       }
     }
 
@@ -295,11 +308,11 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       $sectionName = 'cg_' . $customGroup->id;
       $section = [
         'title' => ts('%1: %2', [1 => $title, 2 => $customGroup->title]),
-        'is_addable' => $customGroup->is_reserved ? FALSE : TRUE,
+        'is_addable' => !$customGroup->is_reserved,
         'custom_group_id' => $customGroup->id,
         'extends_entity_column_id' => $customGroup->extends_entity_column_id,
         'extends_entity_column_value' => CRM_Utils_Array::explodePadded($customGroup->extends_entity_column_value),
-        'is_reserved' => $customGroup->is_reserved ? TRUE : FALSE,
+        'is_reserved' => (bool) $customGroup->is_reserved,
       ];
       $result['sections'][$sectionName] = $section;
     }

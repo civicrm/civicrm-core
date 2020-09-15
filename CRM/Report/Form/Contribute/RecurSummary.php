@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
@@ -182,8 +164,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
             }
           }
         }
@@ -238,9 +220,9 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
     $entryFound = FALSE;
 
-    $startDateFrom = CRM_Utils_Array::value("start_date_to", $this->_params);
-    $startDateTo = CRM_Utils_Array::value("start_date_from", $this->_params);
-    $startDateRelative = CRM_Utils_Array::value("start_date_relative", $this->_params);
+    $startDateFrom = $this->_params["start_date_to"] ?? NULL;
+    $startDateTo = $this->_params["start_date_from"] ?? NULL;
+    $startDateRelative = $this->_params["start_date_relative"] ?? NULL;
 
     $startedDateSql = $this->dateClause('start_date', $startDateRelative, $startDateFrom, $startDateTo);
     $startedDateSql = $startedDateSql ? $startedDateSql : " ( 1 ) ";
@@ -252,7 +234,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
     foreach ($rows as $rowNum => $row) {
 
-      $paymentInstrumentId = CRM_Utils_Array::value('civicrm_contribution_recur_payment_instrument_id', $row);
+      $paymentInstrumentId = $row['civicrm_contribution_recur_payment_instrument_id'] ?? NULL;
 
       $rows[$rowNum]['civicrm_contribution_recur_start_date'] = 0;
       $rows[$rowNum]['civicrm_contribution_recur_cancel_date'] = 0;

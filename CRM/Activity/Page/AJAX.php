@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -72,7 +55,7 @@ class CRM_Activity_Page_AJAX {
     // get the total row count
     CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, NULL, FALSE, TRUE, NULL, NULL);
     // limit the rows
-    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $params['sortBy'], $showLinks = TRUE, FALSE, $params['offset'], $params['rp']);
+    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo, $params['sortBy'] ?? NULL, $showLinks = TRUE, FALSE, $params['offset'], $params['rp']);
 
     $relationships = [];
     // after sort we can update username fields to be a url
@@ -117,11 +100,14 @@ class CRM_Activity_Page_AJAX {
     }
 
     // sort clientRelationships array using jquery call params
-    foreach ($clientRelationships as $key => $row) {
-      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+    $sortArray = [];
+    if (!empty($params['_raw_values']['sort'])) {
+      foreach ($clientRelationships as $key => $row) {
+        $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+      }
+      $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
+      array_multisort($sortArray, constant($sort_type), $clientRelationships);
     }
-    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
-    array_multisort($sortArray, constant($sort_type), $clientRelationships);
 
     $relationships = [];
     // after sort we can update username fields to be a url
@@ -197,11 +183,14 @@ class CRM_Activity_Page_AJAX {
     }
 
     // sort clientRelationships array using jquery call params
-    foreach ($caseRelationships as $key => $row) {
-      $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+    $sortArray = [];
+    if (!empty($params['_raw_values']['sort'])) {
+      foreach ($caseRelationships as $key => $row) {
+        $sortArray[$key] = $row[$params['_raw_values']['sort'][0]];
+      }
+      $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
+      array_multisort($sortArray, constant($sort_type), $caseRelationships);
     }
-    $sort_type = "SORT_" . strtoupper($params['_raw_values']['order'][0]);
-    array_multisort($sortArray, constant($sort_type), $caseRelationships);
 
     $relationships = [];
 
@@ -219,7 +208,7 @@ class CRM_Activity_Page_AJAX {
       }
       // email column links/icon
       if ($row['email']) {
-        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope"></i></a>';
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope" aria-hidden="true"></i></a>';
       }
       // edit links
       $row['actions'] = '';
@@ -229,7 +218,7 @@ class CRM_Activity_Page_AJAX {
         switch ($row['source']) {
           case 'caseRel':
             $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil"></i>' .
+              '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
               '</a>' .
               '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
               '<span class="icon delete-icon"></span>' .
@@ -238,7 +227,7 @@ class CRM_Activity_Page_AJAX {
 
           case 'caseRoles':
             $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_a_b" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil"></i>' .
+              '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
               '</a>';
             break;
         }
@@ -265,7 +254,7 @@ class CRM_Activity_Page_AJAX {
     $params = ['caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode'];
     $vals = [];
     foreach ($params as $param) {
-      $vals[$param] = CRM_Utils_Array::value($param, $_POST);
+      $vals[$param] = $_POST[$param] ?? NULL;
     }
 
     CRM_Utils_JSON::output(self::_convertToCaseActivity($vals));
@@ -363,7 +352,7 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['assigneeContactIds'])) {
       $assigneeContacts = array_unique(explode(',', $params['assigneeContactIds']));
     }
-    foreach ($assigneeContacts as $key => $value) {
+    foreach ($assigneeContacts as $value) {
       $assigneeParams = [
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
@@ -389,7 +378,7 @@ class CRM_Activity_Page_AJAX {
   /**
    * Get activities for the contact.
    *
-   * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getContactActivity() {
     $requiredParameters = [
@@ -430,10 +419,10 @@ class CRM_Activity_Page_AJAX {
       unset($optionalParameters['context']);
       foreach ($optionalParameters as $searchField => $dataType) {
         $formSearchField = $searchField;
-        if ($searchField == 'activity_type_id') {
+        if ($searchField === 'activity_type_id') {
           $formSearchField = 'activity_type_filter_id';
         }
-        elseif ($searchField == 'activity_type_exclude_id') {
+        elseif ($searchField === 'activity_type_exclude_id') {
           $formSearchField = 'activity_type_exclude_filter_id';
         }
         if (!empty($params[$searchField])) {
@@ -441,16 +430,13 @@ class CRM_Activity_Page_AJAX {
           if (in_array($searchField, ['activity_date_time_low', 'activity_date_time_high'])) {
             $activityFilter['activity_date_time_relative'] = 0;
           }
-          elseif ($searchField == 'activity_status_id') {
+          elseif ($searchField === 'activity_status_id') {
             $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
           }
         }
       }
 
       Civi::contactSettings()->set('activity_tab_filter', $activityFilter);
-    }
-    if (!empty($_GET['is_unit_test'])) {
-      return [$activities, $activityFilter];
     }
 
     CRM_Utils_JSON::output($activities);

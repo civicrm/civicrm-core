@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
@@ -186,7 +170,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
     if ($id) {
       if (!$this->checkPermission($id, NULL)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to make changes to the record'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to make changes to the record'));
       }
     }
 
@@ -322,7 +306,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $object_type = get_class($object);
 
     if (!$forceAction) {
-      if (array_key_exists('is_reserved', $object) && $object->is_reserved) {
+      if (property_exists($object, 'is_reserved') && $object->is_reserved) {
         $values['class'] = 'reserved';
         // check if object is relationship type
 
@@ -342,7 +326,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         }
       }
       else {
-        if (array_key_exists('is_active', $object)) {
+        if (property_exists($object, 'is_active')) {
           if ($object->is_active) {
             if ($hasDisable) {
               $newAction += CRM_Core_Action::DISABLE;

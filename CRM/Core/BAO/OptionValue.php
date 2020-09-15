@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
 
@@ -47,17 +31,14 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    *   Input parameters.
    *
-   * @return object
+   * @return CRM_Core_DAO_OptionValue
+   * @throws \CRM_Core_Exception
    */
   public static function create($params) {
     if (empty($params['id'])) {
       self::setDefaults($params);
     }
-    $ids = [];
-    if (!empty($params['id'])) {
-      $ids = ['optionValue' => $params['id']];
-    }
-    return CRM_Core_BAO_OptionValue::add($params, $ids);
+    return CRM_Core_BAO_OptionValue::add($params);
   }
 
   /**
@@ -74,18 +55,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    */
   public static function setDefaults(&$params) {
-    if (CRM_Utils_Array::value('label', $params, NULL) === NULL) {
-      $params['label'] = $params['name'];
-    }
-    if (CRM_Utils_Array::value('name', $params, NULL) === NULL) {
-      $params['name'] = $params['label'];
-    }
-    if (CRM_Utils_Array::value('weight', $params, NULL) === NULL) {
-      $params['weight'] = self::getDefaultWeight($params);
-    }
-    if (CRM_Utils_Array::value('value', $params, NULL) === NULL) {
-      $params['value'] = self::getDefaultValue($params);
-    }
+    $params['label'] = $params['label'] ?? $params['name'];
+    $params['name'] = $params['name'] ?? CRM_Utils_String::titleToVar($params['label']);
+    $params['weight'] = $params['weight'] ?? self::getDefaultWeight($params);
+    $params['value'] = $params['value'] ?? self::getDefaultValue($params);
   }
 
   /**
@@ -167,23 +140,18 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    *   deprecated Reference array contains the id.
    *
    * @return \CRM_Core_DAO_OptionValue
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('optionValue', $ids));
-    // CRM-10921: do not reset attributes to default if this is an update
-    //@todo consider if defaults are being set in the right place. 'dumb' defaults like
-    // these would be usefully set @ the api layer so they are visible to api users
-    // complex defaults like the domain id below would make sense in the setDefauls function
-    // but unclear what other ways this function is being used
-    if (!$id) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-      $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
-      $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
+    if (!empty($ids['optionValue']) && empty($params['id'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('$params[\'id\'] should be set, $ids is deprecated');
     }
+    $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
+
     // Update custom field data to reflect the new value
-    elseif (isset($params['value'])) {
+    if ($id && isset($params['value'])) {
       CRM_Core_BAO_CustomOption::updateValue($id, $params['value']);
     }
 

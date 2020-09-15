@@ -30,7 +30,7 @@ class CRM_Contact_DAO_Factory {
    * @return mixed
    */
   public static function create($className) {
-    $type = CRM_Utils_Array::value($className, self::$_classes);
+    $type = self::$_classes[$className] ?? NULL;
     if (!$type) {
       return CRM_Core_DAO_Factory::create($className);
     }

@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -62,8 +44,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Participant Listing
-   *
    * @var array
+   * @deprecated
    */
   private static $participantListing;
 
@@ -83,6 +65,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Personal campaign pages
    * @var array
+   * @deprecated
    */
   private static $pcPage;
 
@@ -141,7 +124,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
     $index = $cond ? $cond : 'No Condition';
     $index = "{$index}_{$retColumn}";
-    if (!CRM_Utils_Array::value($index, self::$participantStatus)) {
+    if (empty(self::$participantStatus[$index])) {
       self::$participantStatus[$index] = [];
       CRM_Core_PseudoConstant::populate(self::$participantStatus[$index],
         'CRM_Event_DAO_ParticipantStatusType',
@@ -198,7 +181,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &participantRole($id = NULL, $cond = NULL) {
     $index = $cond ? $cond : 'No Condition';
-    if (!CRM_Utils_Array::value($index, self::$participantRole)) {
+    if (empty(self::$participantRole[$index])) {
       self::$participantRole[$index] = [];
 
       $condition = NULL;
@@ -221,13 +204,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the participant listings.
    *
-   *
+   * @deprecated
    * @param int $id
-   *
    * @return array|string
    *   array reference of all participant listings if any
    */
   public static function &participantListing($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Function participantListing will be removed');
     if (!self::$participantListing) {
       self::$participantListing = [];
       self::$participantListing = CRM_Core_OptionGroup::values('participant_listing');
@@ -301,12 +284,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Get all the Personal campaign pages.
    *
-   *
+   * @deprecated
    * @param int $id
    * @return array
    *   array reference of all pcp if any
    */
   public static function &pcPage($id = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Function pcPage will be removed');
     if (!self::$pcPage) {
       CRM_Core_PseudoConstant::populate(self::$pcPage,
         'CRM_PCP_DAO_PCP',
@@ -314,7 +298,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
       );
     }
     if ($id) {
-      return CRM_Utils_Array::value($id, self::$pcPage);
+      return self::$pcPage[$id] ?? NULL;
     }
     return self::$pcPage;
   }

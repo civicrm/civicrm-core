@@ -1,0 +1,27 @@
+<form class="crm-export-ui-save-mapping-dialog">
+  <div class="crm-form-block">
+    <div ng-if="model.mapping_id">
+      <label><input type="radio" ng-model="model.overwrite" value="1"> {{ model.ts('Update %1', {1: model.mapping_names[model.mapping_id]}) }}</label>
+      <label><input type="radio" ng-model="model.overwrite" value="0"> {{ model.ts('Save new mapping') }}</label>
+    </div>
+    <div>
+      <label for="export_save_mapping_name">{{ model.ts('Name this field mapping:') }} <span class="crm-marker">*</span></label>
+      <input class="crm-form-text" ng-model="model.new_name" id="export_save_mapping_name" />
+      <span class="crm-error" ng-show="!model.nameIsUnique()">
+        {{ model.ts('That name is already taken') }}
+      </span>
+    </div>
+    <div>
+      <label for="export_save_mapping_description">{{ model.ts('Description:') }}</label>
+      <input class="crm-form-text huge" ng-model="model.description" id="export_save_mapping_description" />
+    </div>
+  </div>
+  <div class="ui-dialog-buttonpane ui-widget-content">
+    <div class="ui-dialog-buttonset">
+      <button type="button" class="crm-button" ng-click="model.saveMapping()" ng-disabled="!model.new_name || model.saving || !model.nameIsUnique()">
+        <i class="crm-i" ng-class="{'fa-check': !model.saving, 'fa-spinner fa-pulse': model.saving}"></i>
+        {{ model.ts('Save Fields') }}
+      </button>
+    </div>
+  </div>
+</form>

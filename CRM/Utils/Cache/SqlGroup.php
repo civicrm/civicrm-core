@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -115,7 +99,12 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @param string $key
    * @param mixed $value
    * @param null|int|\DateInterval $ttl
+   *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Utils_Cache_CacheException
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   public function set($key, $value, $ttl = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
@@ -143,18 +132,18 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
         2 => [time(), 'Positive'],
         3 => [$expires, 'Positive'],
       ];
-      $dao = CRM_Core_DAO::executeQuery($sql, $args, FALSE, NULL, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery($sql, $args, TRUE, NULL, FALSE, FALSE);
     }
     else {
       $sql = "INSERT INTO {$this->table} (group_name,path,data,created_date,expired_date) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5))";
       $args = [
-        1 => [$this->group, 'String'],
+        1 => [(string) $this->group, 'String'],
         2 => [$key, 'String'],
         3 => [$dataSerialized, 'String'],
         4 => [time(), 'Positive'],
         5 => [$expires, 'Positive'],
       ];
-      $dao = CRM_Core_DAO::executeQuery($sql, $args, FALSE, NULL, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery($sql, $args, TRUE, NULL, FALSE, FALSE);
     }
 
     $lock->release();
@@ -169,6 +158,8 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @param mixed $default
    *
    * @return mixed
+   *
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
@@ -183,12 +174,17 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     return (isset($this->expiresCache[$key]) && time() < $this->expiresCache[$key]) ? $this->reobjectify($this->valueCache[$key]) : $default;
   }
 
+  /**
+   * @param mixed $value
+   *
+   * @return object
+   */
   private function reobjectify($value) {
     return is_object($value) ? unserialize(serialize($value)) : $value;
   }
 
   /**
-   * @param $key
+   * @param string $key
    * @param null $default
    *
    * @return mixed
@@ -209,7 +205,9 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   *
    * @return bool
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
@@ -227,8 +225,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   public function flush() {
     if ($this->group == CRM_Utils_Cache::cleanKey('CiviCRM Search PrevNextCache') &&
       Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
-      // Use the standard PrevNextCache cleanup function here not just delete from civicrm_cache
-      CRM_Core_BAO_PrevNextCache::cleanupCache();
+      Civi::service('prevnext')->cleanup();
     }
     else {
       CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where()}");

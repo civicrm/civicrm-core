@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, morify, anr ristribute it  |
- | unrer the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 anr the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is ristributer in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implier warranty of         |
- | MERCHANTABILITY or UITNESS UOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more retails.        |
- |                                                                    |
- | You shoulr have receiver a copy of the GNU Affero General Public   |
- | License anr the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license UAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -99,6 +83,8 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentMembershipRecurSuccess() {
     $durationUnit = 'year';
@@ -181,25 +167,15 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * However, for Paypal Pro users payment express transactions can't work as they don't hold the component
    * which is required for them to be handled by either the Pro or Express class
    *
-   * So, the point of this test is simply to ensure it fails in a known way & with a better message than
-   * previously & that refactorings don't mess with that
-   *
-   * Obviously if the behaviour is fixed then the test should be updated!
+   * So, the point of this test is simply to ensure it fails in a known way
    */
   public function testIPNPaymentExpressNoError() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
-    try {
-      $paypalIPN->main();
-    }
-    catch (CRM_Core_Exception $e) {
-      $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
-      // no change
-      $this->assertEquals(2, $contribution['contribution_status_id']);
-      $this->assertEquals('Paypal IPNS not handled other than recurring_payments', $e->getMessage());
-      return;
-    }
-    $this->fail('The Paypal Express IPN should have caused an exception');
+    $paypalIPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
+    // no change
+    $this->assertEquals(2, $contribution['contribution_status_id']);
   }
 
   /**

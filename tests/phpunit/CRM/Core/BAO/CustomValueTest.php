@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -113,28 +97,60 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     }
   }
 
-  public function fixCustomFieldValue() {
+  public function testFixCustomFieldValue() {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
-
-    $fields = [
-      'custom_group_id' => $customGroup['id'],
-      'data_type' => 'Memo',
-      'html_type' => 'TextArea',
-      'default_value' => '',
-    ];
-
-    $customField = $this->customFieldCreate($fields);
-
-    $custom = 'custom_' . $customField['id'];
     $params = [
-      'email' => 'abc@webaccess.co.in',
-      $custom => 'note',
+      'email' => 'abc@example.com',
     ];
 
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
-    $this->assertEquals($params[$custom], '%note%', 'Checking the returned value of type Memo.');
+    foreach ([
+      [
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => 'Memo',
+        'html_type' => 'TextArea',
+        'default_value' => '',
+        'search_value' => '%note%',
+        'expected_value' => ['LIKE' => '%note%'],
+      ],
+      [
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => 'String',
+        'html_type' => 'Autocomplete-Select',
+        'default_value' => '',
+        'search_value' => 'R,Y',
+        'expected_value' => ['IN' => ['R', 'Y']],
+        'option_values' => [
+          [
+            'label' => 'Red',
+            'value' => 'R',
+            'weight' => 1,
+            'is_active' => 1,
+          ],
+          [
+            'label' => 'Yellow',
+            'value' => 'Y',
+            'weight' => 2,
+            'is_active' => 1,
+          ],
+          [
+            'label' => 'Green',
+            'value' => 'G',
+            'weight' => 3,
+            'is_active' => 1,
+          ],
+        ],
+      ],
+    ] as $field) {
+      $id = $this->customFieldCreate($field)['id'];
+      $customKey = 'custom_' . $id;
+      $params[$customKey] = $field['search_value'];
+      CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
+      $this->assertEquals($params[$customKey], $field['expected_value'], 'Checking the returned value of type ' . $field['data_type']);
 
-    $this->customFieldDelete($customField['id']);
+      // delete created custom field
+      $this->customFieldDelete($id);
+    }
+
     $this->customGroupDelete($customGroup['id']);
   }
 

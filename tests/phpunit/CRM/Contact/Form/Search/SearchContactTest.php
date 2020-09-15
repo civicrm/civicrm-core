@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -35,6 +19,8 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
 
   /**
    * Test contact sub type search.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactSubtype() {
     foreach (['Contact_sub_type', 'Contact2__sub__type'] as $contactSubType) {
@@ -42,7 +28,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
         'name' => $contactSubType,
         'label' => $contactSubType,
         'is_active' => 1,
-        'parent_id' => "Individual",
+        'parent_id' => 'Individual',
       ]);
       // Contact Type api munge name in create mode
       // Therefore updating the name in update mode
@@ -55,6 +41,11 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $this->searchContacts('Contact2__sub__type');
   }
 
+  /**
+   * @param string $contactSubType
+   *
+   * @throws \CRM_Core_Exception
+   */
   protected function searchContacts($contactSubType) {
     // create contact
     $params = [
@@ -94,11 +85,13 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
   /**
    * Test to search based on Group type.
    * https://lab.civicrm.org/dev/core/issues/726
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContactSearchOnGroupType() {
     $groupTypes = $this->callAPISuccess('OptionValue', 'get', [
-      'return' => ["id", "name"],
-      'option_group_id' => "group_type",
+      'return' => ['id', 'name'],
+      'option_group_id' => 'group_type',
     ])['values'];
     $groupTypes = array_column($groupTypes, 'id', 'name');
 

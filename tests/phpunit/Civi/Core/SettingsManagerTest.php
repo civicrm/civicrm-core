@@ -143,4 +143,17 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     return $manager;
   }
 
+  /**
+   * Test passing in an array to Civi::settings facade
+   */
+  public function testArraySetting() {
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+
+    $manager = $this->createManager()->useDefaults();
+    $dSettings = $manager->getBagByDomain($domain->id);
+    $dSettings->set('test_setting', ['hello' => 'World']);
+    $test_setting = $dSettings->get('test_setting');
+    $this->assertEquals(['hello' => 'World'], $test_setting);
+  }
+
 }

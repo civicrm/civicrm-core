@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {htxt id="id-email_settings-title"}
@@ -31,7 +15,7 @@
   {ts}A copy of this report can be automatically generated and delivered via email to specified recipients. Use the settings in this section to control Subject of the email containing the report, as well as the recipient list (To and Cc fields). Separate multiple 'To' or 'CC' email addresses with commas.{/ts}
 </p>
 <p>
-  {ts}Your site administrator will need to setup an instance of the Scheduled Job "Mail Reports" to trigger creation and delivery of each report. When invoked, this job will deliver email to the recipients specified for the report. The report can be attached to the email as a PDF file (default), as a CSV file, or included in HTML format.{/ts} {docURL page="Managing Scheduled Jobs" resource="wiki"}
+  {ts}Your site administrator will need to setup an instance of the Scheduled Job "Mail Reports" to trigger creation and delivery of each report. When invoked, this job will deliver email to the recipients specified for the report. The report can be attached to the email as a PDF file (default), as a CSV file, or included in HTML format.{/ts} {docURL page="user/initial-set-up/scheduled-jobs"}
 </p>
 {/htxt}
 

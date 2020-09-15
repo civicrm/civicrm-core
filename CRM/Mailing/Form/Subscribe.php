@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
   protected $_groupID = NULL;
@@ -115,38 +99,17 @@ ORDER BY title";
         $rows[] = $row;
       }
       if (empty($rows)) {
-        CRM_Core_Error::fatal(ts('There are no public mailing list groups to display.'));
+        throw new CRM_Core_Exception(ts('There are no public mailing list groups to display.'));
       }
       $this->assign('rows', $rows);
       $this->addFormRule(['CRM_Mailing_Form_Subscribe', 'formRule']);
     }
 
-    $addCaptcha = TRUE;
-
-    // if recaptcha is not configured, then dont add it
-    // CRM-11316 Only enable ReCAPTCHA for anonymous visitors
-    $config = CRM_Core_Config::singleton();
+    // CRM-11316 Enable ReCAPTCHA for anonymous visitors
     $session = CRM_Core_Session::singleton();
     $contactID = $session->get('userID');
 
-    if (empty($config->recaptchaPublicKey) ||
-      empty($config->recaptchaPrivateKey) ||
-      $contactID
-    ) {
-      $addCaptcha = FALSE;
-    }
-    else {
-      // If this is POST request and came from a block,
-      // lets add recaptcha only if already present.
-      // Gross hack for now.
-      if (!empty($_POST) &&
-        !array_key_exists('recaptcha_challenge_field', $_POST)
-      ) {
-        $addCaptcha = FALSE;
-      }
-    }
-
-    if ($addCaptcha) {
+    if (!$contactID) {
       CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
 

@@ -9,21 +9,12 @@
    +---------------------------------------------------------------------------+
   */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * Class CRM_Core_Payment_PayflowPro.
  */
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
-  // (not used, implicit in the API, might need to convert?)
-  const
-    CHARSET = 'UFT-8';
-
-  /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
 
   /**
    * Constructor
@@ -36,7 +27,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Payflow Pro');
   }
 
   /*
@@ -58,7 +48,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   public function doDirectPayment(&$params) {
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('Payflow Pro requires curl with SSL support'));
+      throw new PaymentProcessorException(ts('Payflow Pro requires curl with SSL support'));
     }
 
     /*
@@ -257,7 +247,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      * Check to see if we have a duplicate before we send
      */
     if ($this->checkDupe($params['invoiceID'], CRM_Utils_Array::value('contributionID', $params))) {
-      return self::errorExit(9003, 'It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.');
+      throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9003);
     }
 
     // ie. url at payment processor to submit to.
@@ -268,9 +258,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     /*
      * Payment successfully sent to gateway - process the response now
      */
-    $result = strstr($responseData, "RESULT");
+    $result = strstr($responseData, 'RESULT');
     if (empty($result)) {
-      return self::errorExit(9016, "No RESULT code from PayPal.");
+      throw new PaymentProcessorException('No RESULT code from PayPal.', 9016);
     }
 
     $nvpArray = [];
@@ -321,59 +311,26 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         return $params;
 
       case 1:
-        return self::errorExit(9008, "There is a payment processor configuration problem. This is usually due to invalid account information or ip restrictions on the account.  You can verify ip restriction by logging         // into Manager.  See Service Settings >> Allowed IP Addresses.   ");
+        throw new PaymentProcessorException('There is a payment processor configuration problem. This is usually due to invalid account information or ip restrictions on the account.  You can verify ip restriction by logging         // into Manager.  See Service Settings >> Allowed IP Addresses.   ', 9003);
 
       case 12:
         // Hard decline from bank.
-        return self::errorExit(9009, "Your transaction was declined   ");
+        throw new PaymentProcessorException('Your transaction was declined   ', 9009);
 
       case 13:
         // Voice authorization required.
-        return self::errorExit(9010, "Your Transaction is pending. Contact Customer Service to complete your order.");
+        throw new PaymentProcessorException('Your Transaction is pending. Contact Customer Service to complete your order.', 9010);
 
       case 23:
         // Issue with credit card number or expiration date.
-        return self::errorExit(9011, "Invalid credit card information. Please re-enter.");
+        throw new PaymentProcessorException('Invalid credit card information. Please re-enter.', 9011);
 
       case 26:
-        return self::errorExit(9012, "You have not configured your payment processor with the correct credentials. Make sure you have provided both the <vendor> and the <user> variables ");
+        throw new PaymentProcessorException('You have not configured your payment processor with the correct credentials. Make sure you have provided both the <vendor> and the <user> variables ', 9012);
 
       default:
-        return self::errorExit(9013, "Error - from payment processor: [" . $result_code . " " . $nvpArray['RESPMSG'] . "] ");
+        throw new PaymentProcessorException('Error - from payment processor: [' . $result_code . " " . $nvpArray['RESPMSG'] . "] ", 9013);
     }
-
-    return self::errorExit(9014, "Check the code - all transactions should have been headed off before they got here. Something slipped through the net");
-  }
-
-  /**
-   * Produces error message and returns from class
-   *
-   * @param null $errorCode
-   * @param null $errorMessage
-   *
-   * @return object
-   */
-  public function &errorExit($errorCode = NULL, $errorMessage = NULL) {
-    $e = CRM_Core_Error::singleton();
-    if ($errorCode) {
-      $e->push($errorCode, 0, NULL, $errorMessage);
-    }
-    else {
-      $e->push(9000, 0, NULL, 'Unknown System Error.');
-    }
-    return $e;
-  }
-
-  /**
-   * NOTE: 'doTransferCheckout' not implemented
-   *
-   * @param array $params
-   * @param $component
-   *
-   * @throws Exception
-   */
-  public function doTransferCheckout(&$params, $component) {
-    CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
   /**
@@ -398,9 +355,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     if (!empty($errorMsg)) {
       return implode('<p>', $errorMsg);
     }
-    else {
-      return NULL;
-    }
+    return NULL;
   }
 
   /**
@@ -423,9 +378,10 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * Submit transaction using cURL
    *
    * @param string $submiturl Url to direct HTTPS GET to
-   * @param $payflow_query value string to be posted
+   * @param string $payflow_query value string to be posted
    *
    * @return mixed|object
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function submit_transaction($submiturl, $payflow_query) {
     // get data ready for API
@@ -504,7 +460,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       }
     }
     if ($responseHeaders['http_code'] != 200) {
-      return self::errorExit(9015, "Error connecting to the Payflow Pro API server.");
+      throw new PaymentProcessorException('Error connecting to the Payflow Pro API server.', 9015);
     }
 
     /*
@@ -529,14 +485,13 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
         $errorDesc = "Connection to payment gateway failed";
       }
       if ($errorNum = 60) {
-        return self::errorExit($errorNum, "Curl error - " . $errorDesc .
-          " Try this link for more information http://curl.haxx.se/d
-                                         ocs/sslcerts.html"
-        );
+        throw new PaymentProcessorException('Curl error - ' . $errorDesc .
+          ' Try this link for more information http://curl.haxx.se/d
+                                         ocs/sslcerts.html', $errorNum);
       }
 
-      return self::errorExit($errorNum, "Curl error - " . $errorDesc .
-        "  processor response = " . $processorResponse
+      throw new PaymentProcessorException("Curl error - " . $errorDesc .
+        "  processor response = " . $processorResponse, $errorNum
       );
     }
 
@@ -548,8 +503,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      */
     if (($responseData === FALSE) || (strlen($responseData) == 0)) {
       curl_close($ch);
-      return self::errorExit(9006, "Error: Connection to payment gateway failed - no data
-                                           returned. Gateway url set to $submiturl");
+      throw new PaymentProcessorException("Error: Connection to payment gateway failed - no data
+                                           returned. Gateway url set to $submiturl", 9006);
     }
 
     /*
@@ -557,7 +512,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      */
     if (empty($responseData)) {
       curl_close($ch);
-      return self::errorExit(9007, "Error: No data returned from payment gateway.");
+      throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
 
     /*

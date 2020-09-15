@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 require_once 'CRM/Utils/DeprecatedUtils.php';
@@ -30,7 +14,7 @@ require_once 'api/v3/utils.php';
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -317,7 +301,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         }
       }
 
-      $email = CRM_Utils_Array::value($this->_emailIndex, $values);
+      $email = $values[$this->_emailIndex] ?? NULL;
       if ($email) {
         /* If the email address isn't valid, bail */
 
@@ -355,7 +339,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     //check for duplicate external Identifier
-    $externalID = CRM_Utils_Array::value($this->_externalIdentifierIndex, $values);
+    $externalID = $values[$this->_externalIdentifierIndex] ?? NULL;
     if ($externalID) {
       /* If it's a dupe,external Identifier  */
 
@@ -1137,7 +1121,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $dateType = CRM_Core_Session::singleton()->get("dateTypes");
 
     if (!empty($params['contact_sub_type'])) {
-      $csType = CRM_Utils_Array::value('contact_sub_type', $params);
+      $csType = $params['contact_sub_type'] ?? NULL;
     }
 
     if (empty($params['contact_type'])) {
@@ -1183,7 +1167,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         /* validate the data against the CF type */
 
         if ($value) {
-          if ($customFields[$customFieldID]['data_type'] == 'Date') {
+          $dataType = $customFields[$customFieldID]['data_type'];
+          $htmlType = $customFields[$customFieldID]['html_type'];
+          $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID]);
+          if ($dataType == 'Date') {
             if (array_key_exists($customFieldID, $addressCustomFields) && CRM_Utils_Date::convertToDefaultDate($params[$key][0], $dateType, $key)) {
               $value = $params[$key][0][$key];
             }
@@ -1194,29 +1181,26 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
             }
           }
-          elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+          elseif ($dataType == 'Boolean') {
             if (CRM_Utils_String::strtoboolstr($value) === FALSE) {
               self::addToErrorMsg($customFields[$customFieldID]['label'] . '::' . $customFields[$customFieldID]['groupTitle'], $errorMessage);
             }
           }
           // need not check for label filed import
-          $htmlType = [
+          $selectHtmlTypes = [
             'CheckBox',
-            'Multi-Select',
             'Select',
             'Radio',
-            'Multi-Select State/Province',
-            'Multi-Select Country',
           ];
-          if (!in_array($customFields[$customFieldID]['html_type'], $htmlType) || $customFields[$customFieldID]['data_type'] == 'Boolean' || $customFields[$customFieldID]['data_type'] == 'ContactReference') {
-            $valid = CRM_Core_BAO_CustomValue::typecheck($customFields[$customFieldID]['data_type'], $value);
+          if ((!$isSerialized && !in_array($htmlType, $selectHtmlTypes)) || $dataType == 'Boolean' || $dataType == 'ContactReference') {
+            $valid = CRM_Core_BAO_CustomValue::typecheck($dataType, $value);
             if (!$valid) {
               self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
             }
           }
 
           // check for values for custom fields for checkboxes and multiselect
-          if ($customFields[$customFieldID]['html_type'] == 'CheckBox' || $customFields[$customFieldID]['html_type'] == 'Multi-Select') {
+          if ($isSerialized) {
             $value = trim($value);
             $value = str_replace('|', ',', $value);
             $mulValues = explode(',', $value);
@@ -1238,7 +1222,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               }
             }
           }
-          elseif ($customFields[$customFieldID]['html_type'] == 'Select' || ($customFields[$customFieldID]['html_type'] == 'Radio' && $customFields[$customFieldID]['data_type'] != 'Boolean')) {
+          elseif ($htmlType == 'Select' || ($htmlType == 'Radio' && $dataType != 'Boolean')) {
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
             $flag = FALSE;
             foreach ($customOption as $v2) {
@@ -1250,7 +1234,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               self::addToErrorMsg($customFields[$customFieldID]['label'], $errorMessage);
             }
           }
-          elseif ($customFields[$customFieldID]['html_type'] == 'Multi-Select State/Province') {
+          elseif ($isSerialized && $dataType === 'StateProvince') {
             $mulValues = explode(',', $value);
             foreach ($mulValues as $stateValue) {
               if ($stateValue) {
@@ -1263,7 +1247,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               }
             }
           }
-          elseif ($customFields[$customFieldID]['html_type'] == 'Multi-Select Country') {
+          elseif ($isSerialized && $dataType == 'Country') {
             $mulValues = explode(',', $value);
             foreach ($mulValues as $countryValue) {
               if ($countryValue) {
@@ -1823,7 +1807,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     foreach ($locationFields as $locKeys) {
-      if (is_array(CRM_Utils_Array::value($locKeys, $params))) {
+      if (isset($params[$locKeys]) && is_array($params[$locKeys])) {
         foreach ($params[$locKeys] as $key => $value) {
           if ($modeFill) {
             $getValue = CRM_Utils_Array::retrieveValueRecursive($contact, $locKeys);
@@ -1924,7 +1908,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         if (!empty($relatedContactFields[$name]) && !is_array($relatedContactFields[$name])) {
           $relatedContactFields[$name] = [];
         }
-        $fldName = CRM_Utils_Array::value($key, $this->_mapperRelatedContactDetails);
+        $fldName = $this->_mapperRelatedContactDetails[$key] ?? NULL;
         if ($fldName == 'url') {
           $fldName = 'website';
         }
@@ -1971,7 +1955,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * 1) the chosen dedupe rule falling back to
    * 2) a check for the external ID.
    *
-   * CRM-17275
+   * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @param array $params
    *

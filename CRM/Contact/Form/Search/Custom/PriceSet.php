@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -71,11 +55,7 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $randomNum = md5(uniqid());
-    $this->_tableName = "civicrm_temp_custom_{$randomNum}";
-    $sql = "
-CREATE TEMPORARY TABLE {$this->_tableName} (
-  id int unsigned NOT NULL AUTO_INCREMENT,
+    $sql = "id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
   participant_id int unsigned NOT NULL,
 ";
@@ -92,12 +72,10 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
     }
 
     $sql .= "
-PRIMARY KEY ( id ),
-UNIQUE INDEX unique_participant_id ( participant_id )
-) ENGINE=HEAP
-";
+      PRIMARY KEY ( id ),
+      UNIQUE INDEX unique_participant_id ( participant_id )";
 
-    CRM_Core_DAO::executeQuery($sql);
+    $this->_tableName = CRM_Utils_SQL_TempTable::build()->setCategory('priceset')->setMemory()->createWithColumns($sql)->getName();
   }
 
   public function fillTable() {
@@ -109,28 +87,33 @@ FROM   civicrm_contact c,
        civicrm_participant p
 WHERE  p.contact_id = c.id
   AND  p.is_test    = 0
-  AND  p.event_id = {$this->_eventID}
+  AND  p.event_id = %1
   AND  p.status_id NOT IN (4,11,12)
   AND  ( c.is_deleted = 0 OR c.is_deleted IS NULL )
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql, [1 => [$this->_eventID, 'Positive']]);
 
     $sql = "
-SELECT c.id as contact_id,
-       p.id as participant_id,
-       l.price_field_value_id as price_field_value_id,
-       l.qty
-FROM   civicrm_contact c,
-       civicrm_participant  p,
-       civicrm_line_item    l
-WHERE  c.id = p.contact_id
-AND    p.event_id = {$this->_eventID}
-AND    p.id = l.entity_id
-AND    l.entity_table ='civicrm_participant'
-ORDER BY c.id, l.price_field_value_id;
-";
+      SELECT c.id as contact_id,
+        p.id as participant_id,
+        l.price_field_value_id AS price_field_value_id,
+        l.qty
+      FROM civicrm_contact c
+        INNER JOIN civicrm_participant p
+          ON p.contact_id = c.id AND c.is_deleted = 0
+        INNER JOIN civicrm_line_item l
+          ON p.id = l.entity_id AND l.entity_table ='civicrm_participant'
+        INNER JOIN civicrm_price_field_value cpfv
+          ON cpfv.id = l.price_field_value_id AND cpfv.is_active = 1
+        INNER JOIN civicrm_price_field cpf
+          ON cpf.id = l.price_field_id AND cpf.is_active = 1
+        INNER JOIN civicrm_price_set cps
+          ON cps.id = cpf.price_set_id AND cps.is_active = 1
+      WHERE  p.event_id = %1
+      ORDER BY c.id, l.price_field_value_id;
+    ";
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$this->_eventID, 'Positive']]);
 
     // first store all the information by option value id
     $rows = [];
@@ -202,7 +185,7 @@ AND    p.entity_id    = e.id
     }
 
     if (empty($event)) {
-      CRM_Core_Error::fatal(ts('There are no events with Price Sets'));
+      CRM_Core_Error::statusBounce(ts('There are no events with Price Sets'));
     }
 
     $form->add('select',
@@ -242,7 +225,7 @@ AND    p.entity_id    = e.id
     if ($dao->fetch() &&
       !$dao->price_set_id
     ) {
-      CRM_Core_Error::fatal(ts('There are no events with Price Sets'));
+      throw new CRM_Core_Exception(ts('There are no events with Price Sets'));
     }
 
     // get all the fields and all the option values associated with it
@@ -251,7 +234,7 @@ AND    p.entity_id    = e.id
       foreach ($priceSet[$dao->price_set_id]['fields'] as $key => $value) {
         if (is_array($value['options'])) {
           foreach ($value['options'] as $oKey => $oValue) {
-            $columnHeader = CRM_Utils_Array::value('label', $value);
+            $columnHeader = $value['label'] ?? NULL;
             if (CRM_Utils_Array::value('html_type', $value) != 'Text') {
               $columnHeader .= ' - ' . $oValue['label'];
             }

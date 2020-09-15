@@ -1,31 +1,15 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 5                                                  |
--- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2019                                |
--- +--------------------------------------------------------------------+
--- | This file is a part of CiviCRM.                                    |
+-- | Copyright CiviCRM LLC. All rights reserved.                        |
 -- |                                                                    |
--- | CiviCRM is free software; you can copy, modify, and distribute it  |
--- | under the terms of the GNU Affero General Public License           |
--- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
--- |                                                                    |
--- | CiviCRM is distributed in the hope that it will be useful, but     |
--- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
--- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
--- | See the GNU Affero General Public License for more details.        |
--- |                                                                    |
--- | You should have received a copy of the GNU Affero General Public   |
--- | License and the CiviCRM Licensing Exception along                  |
--- | with this program; if not, contact CiviCRM LLC                     |
--- | at info[AT]civicrm[DOT]org. If you have questions about the        |
--- | GNU Affero General Public License or the licensing of CiviCRM,     |
--- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+-- | This work is published under the GNU AGPLv3 license with some      |
+-- | permitted exceptions and without any warranty. For full license    |
+-- | and copyright information, see https://civicrm.org/licensing       |
 -- +--------------------------------------------------------------------+
 --
 -- Generated from {$smarty.template}
 -- {$generated}
 --
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1000, 1228, "AL", "Alabama"),
@@ -135,6 +119,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1231, 1101, "DL", "Delhi"),
 (1232, 1101, "LD", "Lakshadweep"),
 (1233, 1101, "PY", "Pondicherry"),
+-- Note we believe all lower-case is correct for Poland. See https://github.com/civicrm/civicrm-core/pull/17107
 (1300, 1172, "MZ", "mazowieckie"),
 (1301, 1172, "PM", "pomorskie"),
 (1302, 1172, "DS", "dolnośląskie"),
@@ -2582,23 +2567,23 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4126, 1173, "01", "Aveiro"),
 (4127, 1173, "02", "Beja"),
 (4128, 1173, "03", "Braga"),
-(4129, 1173, "04", "Braganca"),
+(4129, 1173, "04", "Bragança"),
 (4130, 1173, "05", "Castelo Branco"),
-(4131, 1173, "06", "Colmbra"),
-(4132, 1173, "07", "Ovora"),
+(4131, 1173, "06", "Coimbra"),
+(4132, 1173, "07", "Évora"),
 (4133, 1173, "08", "Faro"),
 (4134, 1173, "09", "Guarda"),
 (4135, 1173, "10", "Leiria"),
 (4136, 1173, "11", "Lisboa"),
 (4137, 1173, "12", "Portalegre"),
 (4138, 1173, "13", "Porto"),
-(4139, 1173, "14", "Santarem"),
-(4140, 1173, "15", "Setubal"),
+(4139, 1173, "14", "Santarém"),
+(4140, 1173, "15", "Setúbal"),
 (4141, 1173, "16", "Viana do Castelo"),
 (4142, 1173, "17", "Vila Real"),
 (4143, 1173, "18", "Viseu"),
-(4144, 1173, "20", "Regiao Autonoma dos Acores"),
-(4145, 1173, "30", "Regiao Autonoma da Madeira"),
+(4144, 1173, "20", "Região Autónoma dos Açores"),
+(4145, 1173, "30", "Região Autónoma da Madeira"),
 (4146, 1168, "ASU", "Asuncion"),
 (4147, 1168, "16", "Alto Paraguay"),
 (4148, 1168, "10", "Alto Parana"),

@@ -1,12 +1,13 @@
 (function(angular, $, _) {
 
-  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp) {
+  angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp, mailingFields) {
     var APPROVAL_STATUSES = {'Approved': 1, 'Rejected': 2, 'None': 3};
 
     $scope.mailing = selectedMail;
     $scope.attachments = attachments;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.checkPerm = CRM.checkPerm;
+    $scope.mailingFields = mailingFields;
 
     var ts = $scope.ts = CRM.ts(null);
     $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});

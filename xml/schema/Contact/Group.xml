@@ -7,6 +7,7 @@
   <comment>Provide grouping of related contacts</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-users</icon>
   <field>
     <name>id</name>
     <type>int unsigned</type>

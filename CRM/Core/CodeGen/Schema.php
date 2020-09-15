@@ -18,24 +18,38 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   public function run() {
     CRM_Core_CodeGen_Util_File::createDir($this->config->sqlCodePath);
 
-    $this->generateCreateSql();
-    $this->generateDropSql();
+    $put = function ($files) {
+      foreach ($files as $file => $content) {
+        if (substr($content, -1) !== "\n") {
+          $content .= "\n";
+        }
+        file_put_contents($this->config->sqlCodePath . $file, $content);
+      }
+    };
 
-    $this->generateLocaleDataSql();
+    echo "Generating sql file\n";
+    $put($this->generateCreateSql());
+
+    echo "Generating sql drop tables file\n";
+    $put($this->generateDropSql());
+
+    foreach ($this->locales as $locale) {
+      echo "Generating data files for $locale\n";
+      $put($this->generateLocaleDataSql($locale));
+    }
 
     // also create the archive tables
     // $this->generateCreateSql('civicrm_archive.mysql' );
     // $this->generateDropSql('civicrm_archive_drop.mysql');
 
-    $this->generateNavigation();
-    $this->generateSample();
+    echo "Generating navigation file\n";
+    $put($this->generateNavigation());
+
+    echo "Generating sample file\n";
+    $put($this->generateSample());
   }
 
-  /**
-   * @param string $fileName
-   */
-  public function generateCreateSql($fileName = 'civicrm.mysql') {
-    echo "Generating sql file\n";
+  public function generateCreateSql() {
     $template = new CRM_Core_CodeGen_Util_Template('sql');
 
     $template->assign('database', $this->config->database);
@@ -44,33 +58,34 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $template->assign('dropOrder', $dropOrder);
     $template->assign('mysql', 'modern');
 
-    $template->run('schema.tpl', $this->config->sqlCodePath . $fileName);
+    return ['civicrm.mysql' => $template->fetch('schema.tpl')];
   }
 
-  /**
-   * @param string $fileName
-   */
-  public function generateDropSql($fileName = 'civicrm_drop.mysql') {
-    echo "Generating sql drop tables file\n";
+  public function generateDropSql() {
     $dropOrder = array_reverse(array_keys($this->tables));
     $template = new CRM_Core_CodeGen_Util_Template('sql');
     $template->assign('dropOrder', $dropOrder);
-    $template->run('drop.tpl', $this->config->sqlCodePath . $fileName);
+    return ['civicrm_drop.mysql' => $template->fetch('drop.tpl')];
   }
 
   public function generateNavigation() {
-    echo "Generating navigation file\n";
     $template = new CRM_Core_CodeGen_Util_Template('sql');
-    $template->run('civicrm_navigation.tpl', $this->config->sqlCodePath . "civicrm_navigation.mysql");
+    return ['civicrm_navigation.mysql' => $template->fetch('civicrm_navigation.tpl')];
   }
 
-  public function generateLocaleDataSql() {
+  /**
+   * @param string $locale
+   *   Ex: en_US, fr_FR
+   * @return array
+   */
+  public function generateLocaleDataSql($locale) {
     $template = new CRM_Core_CodeGen_Util_Template('sql');
 
     global $tsLocale;
     $oldTsLocale = $tsLocale;
-    foreach ($this->locales as $locale) {
-      echo "Generating data files for $locale\n";
+
+    try {
+
       $tsLocale = $locale;
       $template->assign('locale', $locale);
       $template->assign('db_version', $this->config->db_version);
@@ -85,24 +100,32 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
       ];
 
       $ext = ($locale != 'en_US' ? ".$locale" : '');
-      // write the initialize base-data sql script
-      $template->runConcat($sections, $this->config->sqlCodePath . "civicrm_data$ext.mysql");
 
-      // write the acl sql script
-      $template->run('civicrm_acl.tpl', $this->config->sqlCodePath . "civicrm_acl$ext.mysql");
+      return [
+        "civicrm_data$ext.mysql" => $template->fetchConcat($sections),
+        "civicrm_acl$ext.mysql" => $template->fetch('civicrm_acl.tpl'),
+      ];
     }
-    $tsLocale = $oldTsLocale;
+    finally {
+      $tsLocale = $oldTsLocale;
+    }
   }
 
+  /**
+   * @return array
+   *   Array(string $fileName => string $fileContent).
+   *   List of files
+   */
   public function generateSample() {
     $template = new CRM_Core_CodeGen_Util_Template('sql');
     $sections = [
       'civicrm_sample.tpl',
       'civicrm_acl.tpl',
     ];
-    $template->runConcat($sections, $this->config->sqlCodePath . 'civicrm_sample.mysql');
-
-    $template->run('case_sample.tpl', $this->config->sqlCodePath . 'case_sample.mysql');
+    return [
+      'civicrm_sample.mysql' => $template->fetchConcat($sections),
+      'case_sample.mysql' => $template->fetch('case_sample.tpl'),
+    ];
   }
 
   /**

@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
@@ -34,7 +18,7 @@
 
   {if $action eq 8 or $action eq 32768 }
   <div class="messages status no-popup">
-    <i class="crm-i fa-info-circle"></i> &nbsp;
+    <i class="crm-i fa-info-circle" aria-hidden="true"></i> &nbsp;
     {if $action eq 8}
       {* activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label) *}
       {ts 1=$activityTypeName}Click Delete to move this &quot;%1&quot; activity to the Trash.{/ts}
@@ -91,7 +75,7 @@
 
                     {if $action eq 1 or $action eq 2}
                       <br />
-                      <a href="#" class="crm-with-contact">&raquo; {ts}With other contact(s){/ts}</a>
+                      <a href="#" class="crm-with-contact"><i class="crm-i fa-user-plus" aria-hidden="true"></i> {ts}With other contact(s){/ts}</a>
                     {/if}
                   </td>
                 </tr>
@@ -103,7 +87,7 @@
                       {$form.target_contact_id.html}
                       <br/>
                       <a href="#" class="crm-with-contact">
-                        &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
+                        <i class="crm-i fa-user" aria-hidden="true"></i> {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
                       </a>
                     </td>
                   </tr>
@@ -126,7 +110,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span id="notify_assignee_msg" class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span id="notify_assignee_msg" class="description"><i class="crm-i fa-paper-plane" aria-hidden="true"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>

@@ -1,0 +1,153 @@
+.crm-flex-box {
+  display: flex;
+}
+.crm-flex-box > * {
+  flex: 1;
+}
+.crm-flex-box > .crm-flex-2 {
+  flex: 2;
+}
+.crm-flex-box > .crm-flex-3 {
+  flex: 3;
+}
+.crm-flex-box > .crm-flex-4 {
+  flex: 4;
+}
+#bootstrap-theme #crm-search-results-page-size {
+  width: 5em;
+}
+#bootstrap-theme .crm-search-results {
+  min-height: 200px;
+}
+.crm-search-results thead th[ng-repeat] {
+  cursor: pointer;
+}
+.crm-search-results thead th[ng-repeat] > span {
+  cursor: move;
+}
+
+#bootstrap-theme.crm-search fieldset {
+  padding: 6px;
+  border-top: 1px solid lightgrey;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+#bootstrap-theme.crm-search fieldset fieldset {
+  padding-top: 0;
+  border-left: 1px solid lightgrey;
+  border-right: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+}
+
+#bootstrap-theme.crm-search fieldset legend {
+  background-color: white;
+  font-size: 13px;
+  margin: 0;
+  width: auto;
+  border: 0 none;
+  padding: 2px 5px;
+  text-transform: capitalize;
+}
+#bootstrap-theme.crm-search fieldset > .btn-group {
+  position: absolute;
+  right: 0;
+  top: 11px;
+}
+#bootstrap-theme.crm-search fieldset > .btn-group .btn {
+  border: 0 none;
+}
+
+#bootstrap-theme.crm-search fieldset div.api4-input {
+  margin-bottom: 10px;
+}
+
+#bootstrap-theme.crm-search fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+#bootstrap-theme.crm-search fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+
+#bootstrap-theme.crm-search div.api4-input.form-inline label.form-control {
+  margin-right: 6px;
+}
+#bootstrap-theme.crm-search div.api4-input.form-inline label.form-control input[type=checkbox] {
+  margin: 0 2px 0 0;
+}
+
+#bootstrap-theme.crm-search div.api4-input.form-inline label.form-control:not(.api4-option-selected) {
+  transition: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  font-weight: normal;
+}
+
+#bootstrap-theme.crm-search div.api4-input.form-inline .form-control label {
+  font-weight: normal;
+  position: relative;
+  top: -2px;
+}
+#bootstrap-theme.crm-search .api4-clause-fieldset fieldset {
+  float: right;
+  width: calc(100% - 58px);
+  margin-top: -8px;
+}
+
+#bootstrap-theme.crm-search .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
+  min-height: 3.5em;
+}
+
+#bootstrap-theme.crm-search .api4-input-group {
+  display: inline-block;
+}
+
+#bootstrap-theme.crm-search i.fa-arrows {
+  cursor: move;
+}
+
+#bootstrap-theme.crm-search .api4-clause-badge {
+  width: 55px;
+  display: inline-block;
+  cursor: move;
+}
+#bootstrap-theme.crm-search .api4-clause-badge .badge {
+  opacity: .5;
+  position: relative;
+}
+#bootstrap-theme.crm-search .api4-clause-badge .caret {
+  margin: 0;
+}
+#bootstrap-theme.crm-search .api4-clause-badge .crm-i {
+  display: none;
+  padding: 0 6px;
+}
+#bootstrap-theme.crm-search .ui-sortable-helper .api4-clause-badge .badge span {
+  display: none;
+}
+#bootstrap-theme.crm-search .ui-sortable-helper .api4-clause-badge .crm-i {
+  display: inline-block;
+}
+
+#bootstrap-theme.crm-search .api4-operator {
+  width: 110px;
+}
+
+#bootstrap-theme.crm-search .api4-add-where-group-menu {
+  min-width: 80px;
+  background-color: rgba(186, 225, 251, 0.94);
+}
+#bootstrap-theme.crm-search .api4-add-where-group-menu a {
+  padding: 5px 10px;
+}
+
+#bootstrap-theme.crm-search .btn.form-control {
+  height: 36px;
+}
+
+#bootstrap-theme.crm-search th.crm-search-result-select {
+  padding-right: 10px;
+}

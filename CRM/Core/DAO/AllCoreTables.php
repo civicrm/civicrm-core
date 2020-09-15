@@ -2,34 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_DAO_AllCoreTables {
 
@@ -61,8 +45,8 @@ class CRM_Core_DAO_AllCoreTables {
         $entityType['name'],
         $entityType['class'],
         $entityType['table'],
-        isset($entityType['fields_callback']) ? $entityType['fields_callback'] : NULL,
-        isset($entityType['links_callback']) ? $entityType['links_callback'] : NULL
+        $entityType['fields_callback'] ?? NULL,
+        $entityType['links_callback'] ?? NULL
       );
     }
 
@@ -133,10 +117,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   index definitions after localization
    */
   public static function multilingualize($class, $originalIndices) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-    if (CRM_Utils_System::isNull($locales)) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return $originalIndices;
     }
     $classFields = $class::fields();
@@ -202,14 +184,86 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * Get the DAO for the class.
+   * Get the DAO for a BAO class.
    *
-   * @param string $className
+   * @param string $baoName
+   *
+   * @return string|CRM_Core_DAO
+   */
+  public static function getCanonicalClassName($baoName) {
+    return str_replace('_BAO_', '_DAO_', $baoName);
+  }
+
+  /**
+   * Get the BAO for a DAO class.
+   *
+   * @param string $daoName
+   *
+   * @return string|CRM_Core_DAO
+   */
+  public static function getBAOClassName($daoName) {
+    $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    return class_exists($baoName) ? $baoName : $daoName;
+  }
+
+  /**
+   * Convert possibly underscore separated words to camel case with special handling for 'UF'
+   * e.g membership_payment returns MembershipPayment
+   *
+   * @param string $name
+   * @param bool $legacyV3
+   * @return string
+   */
+  public static function convertEntityNameToCamel(string $name, $legacyV3 = FALSE): string {
+    // This map only applies to APIv3
+    $map = [
+      'acl' => 'Acl',
+      'ACL' => 'Acl',
+      'im' => 'Im',
+      'IM' => 'Im',
+    ];
+    if ($legacyV3 && isset($map[$name])) {
+      return $map[$name];
+    }
+
+    $fragments = explode('_', $name);
+    foreach ($fragments as & $fragment) {
+      $fragment = ucfirst($fragment);
+      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
+      if (strpos($fragment, 'Uf') === 0 && strlen($name) > 2) {
+        $fragment = 'UF' . ucfirst(substr($fragment, 2));
+      }
+    }
+    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
+    if ($fragments[0] === 'Uf') {
+      $fragments[0] = 'UF';
+    }
+    return implode('', $fragments);
+  }
+
+  /**
+   * Convert CamelCase to snake_case, with special handling for some entity names.
+   *
+   * Eg. Activity returns activity
+   *     UFGroup returns uf_group
+   *     OptionValue returns option_value
+   *
+   * @param string $name
    *
    * @return string
    */
-  public static function getCanonicalClassName($className) {
-    return str_replace('_BAO_', '_DAO_', $className);
+  public static function convertEntityNameToLower(string $name): string {
+    if ($name === strtolower($name)) {
+      return $name;
+    }
+    if ($name === 'PCP' || $name === 'IM' || $name === 'ACL') {
+      return strtolower($name);
+    }
+    return strtolower(ltrim(str_replace('U_F',
+      'uf',
+      // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
+      preg_replace('/(?=[A-Z])/', '_$0', $name)
+    ), '_'));
   }
 
   /**
@@ -226,7 +280,7 @@ class CRM_Core_DAO_AllCoreTables {
    * Get the classname for the table.
    *
    * @param string $tableName
-   * @return string
+   * @return string|CRM_Core_DAO|NULL
    */
   public static function getClassForTable($tableName) {
     //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
@@ -242,7 +296,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $daoName
    *   Ex: 'Contact'.
-   * @return string|NULL
+   * @return string|CRM_Core_DAO|NULL
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getFullName($daoName) {
@@ -258,7 +312,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'Contact'.
    */
   public static function getBriefName($className) {
-    return CRM_Utils_Array::value($className, array_flip(self::daoToClass()));
+    $className = self::getCanonicalClassName($className);
+    return array_search($className, self::daoToClass(), TRUE) ?: NULL;
   }
 
   /**
@@ -268,6 +323,17 @@ class CRM_Core_DAO_AllCoreTables {
   public static function getTableForClass($className) {
     return array_search(self::getCanonicalClassName($className),
       self::tables());
+  }
+
+  /**
+   * Convert the entity name into a table name.
+   *
+   * @param string $entityBriefName
+   *
+   * @return FALSE|string
+   */
+  public static function getTableForEntityName($entityBriefName) {
+    return self::getTableForClass(self::getFullName($entityBriefName));
   }
 
   /**

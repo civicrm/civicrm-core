@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,7 +14,7 @@
  * system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Browser {
 
@@ -110,10 +94,10 @@ class CRM_Extension_Browser {
    */
   public function checkRequirements() {
     if (!$this->isEnabled()) {
-      return array();
+      return [];
     }
 
-    $errors = array();
+    $errors = [];
 
     if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
@@ -140,10 +124,10 @@ class CRM_Extension_Browser {
    */
   public function getExtensions() {
     if (!$this->isEnabled() || count($this->checkRequirements())) {
-      return array();
+      return [];
     }
 
-    $exts = array();
+    $exts = [];
 
     $remote = $this->_discoverRemote();
     if (is_array($remote)) {
@@ -196,7 +180,7 @@ class CRM_Extension_Browser {
       $remotes = json_decode($this->grabCachedJson(), TRUE);
     }
 
-    $this->_remotesDiscovered = array();
+    $this->_remotesDiscovered = [];
     foreach ((array) $remotes as $id => $xml) {
       $ext = CRM_Extension_Info::loadFromString($xml);
       $this->_remotesDiscovered[] = $ext;
@@ -246,7 +230,7 @@ class CRM_Extension_Browser {
     if (FALSE === $this->getRepositoryUrl()) {
       // don't check if the user has configured civi not to check an external
       // url for extensions. See CRM-10575.
-      return array();
+      return [];
     }
 
     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());

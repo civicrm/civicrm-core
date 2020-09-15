@@ -242,7 +242,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $allFields = civicrm_api3('custom_field', 'get', $params);
     $fields = $allFields['values'];
     foreach ($fields as $id => $values) {
-      $datatype = CRM_Utils_Array::value('data_type', $values);
+      $datatype = $values['data_type'] ?? NULL;
       if ($datatype == 'File') {
         continue;
       }
@@ -251,18 +251,18 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
       $regexp = preg_replace('/[.,;:!?]/', '', CRM_Utils_Array::value(0, $values));
       $importableFields[$key] = [
         'name' => $key,
-        'title' => CRM_Utils_Array::value('label', $values),
+        'title' => $values['label'] ?? NULL,
         'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
         'import' => 1,
         'custom_field_id' => $id,
-        'options_per_line' => CRM_Utils_Array::value('options_per_line', $values),
-        'data_type' => CRM_Utils_Array::value('data_type', $values),
-        'html_type' => CRM_Utils_Array::value('html_type', $values),
-        'is_search_range' => CRM_Utils_Array::value('is_search_range', $values),
+        'options_per_line' => $values['options_per_line'] ?? NULL,
+        'data_type' => $values['data_type'] ?? NULL,
+        'html_type' => $values['html_type'] ?? NULL,
+        'is_search_range' => $values['is_search_range'] ?? NULL,
       ];
       if (CRM_Utils_Array::value('html_type', $values) == 'Select Date') {
-        $importableFields[$key]['date_format'] = CRM_Utils_Array::value('date_format', $values);
-        $importableFields[$key]['time_format'] = CRM_Utils_Array::value('time_format', $values);
+        $importableFields[$key]['date_format'] = $values['date_format'] ?? NULL;
+        $importableFields[$key]['time_format'] = $values['time_format'] ?? NULL;
         $this->_dateFields[] = $key;
       }
     }

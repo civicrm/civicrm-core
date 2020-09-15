@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
@@ -52,9 +36,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -64,7 +47,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   public function __construct() {
     $this->_columns = [
       'civicrm_membership' => [
-        'dao' => 'CRM_Member_DAO_MembershipType',
+        'dao' => 'CRM_Member_DAO_Membership',
         'grouping' => 'member-fields',
         'fields' => [
           'membership_type_id' => [
@@ -165,7 +148,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
           ],
         ],
         'grouping' => 'member-fields',
@@ -288,12 +271,12 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
                 $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
               }
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['operatorType'] = CRM_Utils_Array::value('operatorType', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['operatorType'] = $field['operatorType'] ?? NULL;
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['operatorType'] = CRM_Utils_Array::value('operatorType', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['operatorType'] = $field['operatorType'] ?? NULL;
             }
           }
         }
@@ -462,8 +445,8 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     $graphRows = [];
     $count = 0;
     $membershipTypeValues = CRM_Member_PseudoConstant::membershipType();
-    $isMembershipType = CRM_Utils_Array::value('membership_type_id', $this->_params['group_bys']);
-    $isJoiningDate = CRM_Utils_Array::value('join_date', $this->_params['group_bys']);
+    $isMembershipType = $this->_params['group_bys']['membership_type_id'] ?? NULL;
+    $isJoiningDate = $this->_params['group_bys']['join_date'] ?? NULL;
     if (!empty($this->_params['charts'])) {
       foreach ($rows as $key => $row) {
         if (!($row['civicrm_membership_join_date_subtotal'] &&
@@ -473,8 +456,8 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           continue;
         }
         if ($isMembershipType) {
-          $join_date = CRM_Utils_Array::value('civicrm_membership_join_date_start', $row);
-          $displayInterval = CRM_Utils_Array::value('civicrm_membership_join_date_interval', $row);
+          $join_date = $row['civicrm_membership_join_date_start'] ?? NULL;
+          $displayInterval = $row['civicrm_membership_join_date_interval'] ?? NULL;
           if ($join_date) {
             list($year, $month) = explode('-', $join_date);
           }
@@ -509,8 +492,8 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           $display[$membershipType] = $row['civicrm_contribution_total_amount_sum'];
         }
         else {
-          $graphRows['receive_date'][] = CRM_Utils_Array::value('civicrm_membership_join_date_start', $row);
-          $graphRows[$this->_interval][] = CRM_Utils_Array::value('civicrm_membership_join_date_interval', $row);
+          $graphRows['receive_date'][] = $row['civicrm_membership_join_date_start'] ?? NULL;
+          $graphRows[$this->_interval][] = $row['civicrm_membership_join_date_interval'] ?? NULL;
           $graphRows['value'][] = $row['civicrm_contribution_total_amount_sum'];
           $count++;
         }
@@ -524,10 +507,10 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           'xname' => ts('Member Since / Member Type'),
           'yname' => ts('Fees'),
         ];
-        CRM_Utils_OpenFlashChart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
+        CRM_Utils_Chart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
       }
       else {
-        CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+        CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
       }
     }
     $this->assign('chartType', $this->_params['charts']);

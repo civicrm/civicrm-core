@@ -213,4 +213,9 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Core_DAO_AllCoreTables::isCoreTable('civicrm_invalid_table'), 'civicrm_invalid_table should NOT be a core table');
   }
 
+  public function testGetBriefName() {
+    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_BAO_Contact'));
+    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_DAO_Contact'));
+  }
+
 }

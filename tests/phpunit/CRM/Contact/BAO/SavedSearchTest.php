@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -32,6 +16,8 @@
  * @group headless
  */
 class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
+
+  use CRMTraits_Custom_CustomDataTrait;
 
   /**
    * Sets up the fixture, for example, opens a network connection.
@@ -48,37 +34,85 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   protected function tearDown() {
+    if (!empty($this->ids['CustomField'])) {
+      foreach ($this->ids['CustomField'] as $type => $id) {
+        $field = civicrm_api3('CustomField', 'getsingle', ['id' => $id]);
+        $group = civicrm_api3('CustomGroup', 'getsingle', ['id' => $field['custom_group_id']]);
+        CRM_Core_DAO::executeQuery("DROP TABLE IF Exists {$group['table_name']}");
+      }
+    }
     $this->quickCleanup([
       'civicrm_mapping_field',
       'civicrm_mapping',
       'civicrm_group',
       'civicrm_saved_search',
+      'civicrm_custom_field',
+      'civicrm_custom_group',
     ]);
   }
 
   /**
    * Test setDefaults for privacy radio buttons.
+   *
+   * @throws \Exception
    */
   public function testDefaultValues() {
+    $this->createCustomGroupWithFieldOfType([], 'int');
     $sg = new CRM_Contact_Form_Search_Advanced();
     $sg->controller = new CRM_Core_Controller();
-    $sg->_formValues = [
+    $formValues = [
       'group_search_selected' => 'group',
       'privacy_options' => ['do_not_email'],
       'privacy_operator' => 'OR',
       'privacy_toggle' => 2,
       'operator' => 'AND',
       'component_mode' => 1,
+      'custom_' . $this->ids['CustomField']['int'] . '_from' => 0,
+      'custom_' . $this->ids['CustomField']['int'] . '_to' => '',
     ];
     CRM_Core_DAO::executeQuery(
-      "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($sg->_formValues) . "')"
+      "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($formValues) . "')"
     );
     $ssID = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
     $sg->set('ssID', $ssID);
+    $sg->set('formValues', $formValues);
 
     $defaults = $sg->setDefaultValues();
 
-    $this->checkArrayEquals($defaults, $sg->_formValues);
+    $this->checkArrayEquals($defaults, $formValues);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['int']]);
+    unset($this->ids['CustomField']['int']);
+    $defaults = $sg->setDefaultValues();
+    $this->checkArrayEquals($defaults, $formValues);
+  }
+
+  /**
+   * Test setDefaults for privacy radio buttons.
+   *
+   * @throws \Exception
+   */
+  public function testGetFormValuesWithCustomFields() {
+    $this->createCustomGroupWithFieldsOfAllTypes();
+    $sg = new CRM_Contact_Form_Search_Advanced();
+    $sg->controller = new CRM_Core_Controller();
+    $formValues = [
+      'group_search_selected' => 'group',
+      'privacy_options' => ['do_not_email'],
+      'privacy_operator' => 'OR',
+      'privacy_toggle' => 2,
+      'operator' => 'AND',
+      'component_mode' => 1,
+      'custom_' . $this->ids['CustomField']['int'] . '_from' => 0,
+      'custom_' . $this->ids['CustomField']['int'] . '_to' => '',
+      'custom_' . $this->ids['CustomField']['select_date'] . '_high' => '2019-06-30',
+      'custom_' . $this->ids['CustomField']['select_date'] . '_low' => '2019-06-30',
+    ];
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_saved_search (form_values) VALUES('" . serialize($formValues) . "')"
+    );
+    $returnedFormValues = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $checkFormValues = $formValues + ['custom_' . $this->ids['CustomField']['select_date'] . '_relative' => 0];
+    $this->checkArrayEquals($returnedFormValues, $checkFormValues);
   }
 
   /**
@@ -95,53 +129,6 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     foreach ($result as $key => $value) {
       $this->assertEquals($expectedResult, $value, 'failure on set ' . $searchDescription);
     }
-  }
-
-  /**
-   * Test if dates ranges are stored correctly
-   * in civicrm_saved_search table and are
-   * extracted properly.
-   */
-  public function testDateRange() {
-    $savedSearch = new CRM_Contact_BAO_SavedSearch();
-    $formValues = [
-      'hidden_basic' => 1,
-      'group_search_selected' => 'group',
-      'component_mode' => 1,
-      'operator' => 'AND',
-      'privacy_operator' => 'OR',
-      'privacy_toggle' => 1,
-      'participant_register_date_low' => '01/01/2009',
-      'participant_register_date_high' => '01/01/2018',
-      'radio_ts' => 'ts_all',
-      'title' => 'bah bah bah',
-    ];
-
-    $queryParams = [
-      0 => [
-        0 => 'participant_register_date_low',
-        1 => '=',
-        2 => '01/01/2009',
-        3 => 0,
-        4 => 0,
-      ],
-      1 => [
-        0 => 'participant_register_date_high',
-        1 => '=',
-        2 => '01/01/2018',
-        3 => 0,
-        4 => 0,
-      ],
-    ];
-
-    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
-    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
-    $savedSearch->form_values = serialize($queryParams);
-    $savedSearch->save();
-
-    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
-    $this->assertEquals('01/01/2009', $result['participant_register_date_low']);
-    $this->assertEquals('01/01/2018', $result['participant_register_date_high']);
   }
 
   /**
@@ -172,109 +159,6 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'uf_group_id' => 1,
     ];
     $this->checkArrayEquals($result, $expectedResult);
-  }
-
-  /**
-   * Test if relative dates are stored correctly
-   * in civicrm_saved_search table.
-   */
-  public function testRelativeDateValues() {
-    $savedSearch = new CRM_Contact_BAO_SavedSearch();
-    $formValues = [
-      'operator' => 'AND',
-      'event_relative' => 'this.month',
-      'participant_relative' => 'today',
-      'participant_test' => 0,
-      'title' => 'testsmart',
-      'radio_ts' => 'ts_all',
-    ];
-    $queryParams = [];
-    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
-    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
-    $savedSearch->form_values = serialize($queryParams);
-    $savedSearch->save();
-
-    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
-    $expectedResult = [
-      'event' => 'this.month',
-      'participant' => 'today',
-    ];
-    $this->checkArrayEquals($result['relative_dates'], $expectedResult);
-  }
-
-  /**
-   * Test if change log relative dates are stored correctly
-   * in civicrm_saved_search table.
-   */
-  public function testRelativeDateChangeLog() {
-    $savedSearch = new CRM_Contact_BAO_SavedSearch();
-    $formValues = [
-      'operator' => 'AND',
-      'log_date_relative' => 'this.month',
-      'radio_ts' => 'ts_all',
-    ];
-    $queryParams = [];
-    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
-    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
-    $savedSearch->form_values = serialize($queryParams);
-    $savedSearch->save();
-
-    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
-    $expectedResult = [
-      'log' => 'this.month',
-    ];
-    $this->checkArrayEquals($result['relative_dates'], $expectedResult);
-  }
-
-  /**
-   * Test relative dates
-   *
-   * This is a slightly odd test because it was originally created to test that we DO create a
-   * special 'relative_dates' key but the new favoured format is not to do that and to
-   * save (eg) custom_1_relative = this.day.
-   *
-   * It still presumably provides useful 'this does not fatal or give enotice' coverage.
-   */
-  public function testCustomFieldRelativeDates() {
-    // Create a custom field.
-    $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'relative_date_test_group']);
-    $params = [
-      'custom_group_id' => $customGroup['id'],
-      'name' => 'test_datefield',
-      'label' => 'Date Field for Testing',
-      'html_type' => 'Select Date',
-      'data_type' => 'Date',
-      'default_value' => NULL,
-      'weight' => 4,
-      'is_required' => 1,
-      'is_searchable' => 1,
-      'date_format' => 'mm/dd/yy',
-      'is_active' => 1,
-    ];
-    $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
-    $id = $customField['id'];
-
-    $queryParams = [
-      0 => [
-        0 => "custom_${id}_low",
-        1 => '=',
-        2 => '20170425000000',
-      ],
-      1 => [
-        0 => "custom_${id}_high",
-        1 => '=',
-        2 => '20170501235959',
-      ],
-    ];
-    $formValues = [
-      "custom_${id}_relative" => 'ending.week',
-    ];
-    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
-    // Since custom_13 doesn't have the word 'date' in it, the key is
-    // set to 0, rather than the field name.
-    $this->assertArrayNotHasKey('relative_dates', $queryParams, 'Relative date in custom field smart group creation failed.');
-    $dropCustomValueTables = TRUE;
-    $this->quickCleanup(['civicrm_saved_search'], $dropCustomValueTables);
   }
 
   /**

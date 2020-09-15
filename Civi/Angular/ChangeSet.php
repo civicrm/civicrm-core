@@ -150,7 +150,7 @@ class ChangeSet implements ChangeSetInterface {
    */
   public function alterHtml($file, $callback) {
     $this->htmlFilters[] = [
-      'regex' => ($file{0} === ';') ? $file : $this->createRegex($file),
+      'regex' => ($file[0] === ';') ? $file : $this->createRegex($file),
       'callback' => $callback,
     ];
     return $this;

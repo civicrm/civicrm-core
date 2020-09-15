@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -217,6 +201,8 @@ function _civicrm_api3_activity_create_spec(&$params) {
     'FKClassName' => 'CRM_Case_DAO_Case',
     'FKApiName' => 'Case',
   ];
+
+  $params['activity_date_time']['api.default'] = 'now';
 
 }
 
@@ -572,7 +558,7 @@ function _civicrm_api3_activity_get_formatResult($params, $activities, $options)
     ]);
     foreach ($activities as &$activity) {
       if (!empty($activity['case_id'])) {
-        $case = CRM_Utils_Array::value($activity['case_id'][0], $cases['values']);
+        $case = $cases['values'][$activity['case_id'][0]] ?? NULL;
         if ($case) {
           foreach ($case as $key => $value) {
             if ($key != 'id') {
@@ -660,13 +646,13 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
     $recordType = $typeMap[$activityContact['record_type_id']];
     if (in_array($recordType, ['target', 'assignee'])) {
       $activities[$activityContact['activity_id']][$recordType . '_contact_id'][] = $contactID;
-      $activities[$activityContact['activity_id']][$recordType . '_contact_name'][$contactID] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
-      $activities[$activityContact['activity_id']][$recordType . '_contact_sort_name'][$contactID] = isset($activityContact['contact_id.sort_name']) ? $activityContact['contact_id.sort_name'] : '';
+      $activities[$activityContact['activity_id']][$recordType . '_contact_name'][$contactID] = $activityContact['contact_id.display_name'] ?? '';
+      $activities[$activityContact['activity_id']][$recordType . '_contact_sort_name'][$contactID] = $activityContact['contact_id.sort_name'] ?? '';
     }
     else {
       $activities[$activityContact['activity_id']]['source_contact_id'] = $contactID;
-      $activities[$activityContact['activity_id']]['source_contact_name'] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
-      $activities[$activityContact['activity_id']]['source_contact_sort_name'] = isset($activityContact['contact_id.sort_name']) ? $activityContact['contact_id.sort_name'] : '';
+      $activities[$activityContact['activity_id']]['source_contact_name'] = $activityContact['contact_id.display_name'] ?? '';
+      $activities[$activityContact['activity_id']]['source_contact_sort_name'] = $activityContact['contact_id.sort_name'] ?? '';
     }
   }
 }
@@ -705,9 +691,9 @@ function civicrm_api3_activity_delete($params) {
  */
 function _civicrm_api3_activity_check_params(&$params) {
   $activityIds = [
-    'activity' => CRM_Utils_Array::value('id', $params),
-    'parent' => CRM_Utils_Array::value('parent_id', $params),
-    'original' => CRM_Utils_Array::value('original_id', $params),
+    'activity' => $params['id'] ?? NULL,
+    'parent' => $params['parent_id'] ?? NULL,
+    'original' => $params['original_id'] ?? NULL,
   ];
 
   foreach ($activityIds as $id => $value) {
@@ -721,14 +707,14 @@ function _civicrm_api3_activity_check_params(&$params) {
   //correctly by doing pseudoconstant validation
   // needs testing
   $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
-  $activityName = CRM_Utils_Array::value('activity_name', $params);
+  $activityName = $params['activity_name'] ?? NULL;
   $activityName = ucfirst($activityName);
-  $activityLabel = CRM_Utils_Array::value('activity_label', $params);
+  $activityLabel = $params['activity_label'] ?? NULL;
   if ($activityLabel) {
     $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');
   }
 
-  $activityTypeId = CRM_Utils_Array::value('activity_type_id', $params);
+  $activityTypeId = $params['activity_type_id'] ?? NULL;
 
   if ($activityName || $activityLabel) {
     $activityTypeIdInList = array_search(($activityName ? $activityName : $activityLabel), $activityTypes);
@@ -753,13 +739,6 @@ function _civicrm_api3_activity_check_params(&$params) {
   // needs testing
   if (isset($params['duration_minutes']) && !is_numeric($params['duration_minutes'])) {
     throw new API_Exception('Invalid Activity Duration (in minutes)');
-  }
-
-  //if adding a new activity & date_time not set make it now
-  // this should be managed by the wrapper layer & setting ['api.default'] in speces
-  // needs testing
-  if (empty($params['id']) && empty($params['activity_date_time'])) {
-    $params['activity_date_time'] = CRM_Utils_Date::processDate(date('Y-m-d H:i:s'));
   }
 
   return NULL;

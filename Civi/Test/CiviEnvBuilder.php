@@ -2,6 +2,7 @@
 namespace Civi\Test;
 
 use Civi\Test\CiviEnvBuilder\CallbackStep;
+use Civi\Test\CiviEnvBuilder\CoreSchemaStep;
 use Civi\Test\CiviEnvBuilder\ExtensionsStep;
 use Civi\Test\CiviEnvBuilder\SqlFileStep;
 use Civi\Test\CiviEnvBuilder\SqlStep;
@@ -39,6 +40,15 @@ class CiviEnvBuilder {
 
   public function callback($callback, $signature = NULL) {
     return $this->addStep(new CallbackStep($callback, $signature));
+  }
+
+  /**
+   * Generate the core SQL tables.
+   *
+   * @return \Civi\Test\CiviEnvBuilder
+   */
+  public function coreSchema() {
+    return $this->addStep(new CoreSchemaStep());
   }
 
   public function sql($sql) {
@@ -168,24 +178,26 @@ class CiviEnvBuilder {
    * @return CiviEnvBuilder
    */
   public function apply($force = FALSE) {
-    $dbName = \Civi\Test::dsn('database');
-    $query = "USE {$dbName};"
-      . "CREATE TABLE IF NOT EXISTS civitest_revs (name VARCHAR(64) PRIMARY KEY, rev VARCHAR(64));";
+    return \Civi\Test::asPreInstall(function() use ($force) {
+      $dbName = \Civi\Test::dsn('database');
+      $query = "USE {$dbName};"
+        . "CREATE TABLE IF NOT EXISTS civitest_revs (name VARCHAR(64) PRIMARY KEY, rev VARCHAR(64));";
 
-    if (\Civi\Test::execute($query) === FALSE) {
-      throw new \RuntimeException("Failed to flag schema version: $query");
-    }
+      if (\Civi\Test::execute($query) === FALSE) {
+        throw new \RuntimeException("Failed to flag schema version: $query");
+      }
 
-    $this->assertValid();
+      $this->assertValid();
 
-    if (!$force && $this->getSavedSignature() === $this->getTargetSignature()) {
+      if (!$force && $this->getSavedSignature() === $this->getTargetSignature()) {
+        return $this;
+      }
+      foreach ($this->steps as $step) {
+        $step->run($this);
+      }
+      $this->setSavedSignature($this->getTargetSignature());
       return $this;
-    }
-    foreach ($this->steps as $step) {
-      $step->run($this);
-    }
-    $this->setSavedSignature($this->getTargetSignature());
-    return $this;
+    });
   }
 
   /**

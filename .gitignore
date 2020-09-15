@@ -1,7 +1,13 @@
 *~
 *.bak
 .use-civicrm-setup
-/ext/
+/ext/*
+!/ext/sequentialcreditnotes
+!/ext/flexmailer
+!/ext/eventcart
+!/ext/ewaysingle
+!/ext/search
+!/ext/financialacls
 backdrop/
 bower_components
 CRM/Case/xml/configuration

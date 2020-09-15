@@ -56,20 +56,6 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
   }
 
   /**
-   *  Test suite setup.
-   */
-  protected function setUp() {
-    //print __METHOD__ . "\n";
-  }
-
-  /**
-   *  Test suite teardown.
-   */
-  protected function tearDown() {
-    //print __METHOD__ . "\n";
-  }
-
-  /**
    *  suppress failed test error issued by phpunit when it finds.
    *  a test suite with no tests
    */
@@ -120,7 +106,7 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
 
     //  Pass 1:  Check all *Tests.php files
     // array(callable)
-    $addTests = array();
+    $addTests = [];
     //echo "start Pass 1 on {$dirInfo->getRealPath()}\n";
     $dir = new DirectoryIterator($dirInfo->getRealPath());
     foreach ($dir as $fileInfo) {
@@ -157,7 +143,7 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
 
     //  Pass 2:  Scan all subdirectories
     // array(array(0 => $suite, 1 => $file, 2 => SplFileinfo))
-    $addAllTests = array();
+    $addAllTests = [];
     $dir = new DirectoryIterator($dirInfo->getRealPath());
     //echo "start Pass 2 on {$dirInfo->getRealPath()}\n";
     foreach ($dir as $fileInfo) {
@@ -179,7 +165,7 @@ class CiviTestSuite extends PHPUnit\Framework\TestSuite {
     //  Pass 3:  Check all *Test.php files in this directory
     //echo "start Pass 3 on {$dirInfo->getRealPath()}\n";
     // array(className)
-    $addTestSuites = array();
+    $addTestSuites = [];
     $dir = new DirectoryIterator($dirInfo->getRealPath());
     foreach ($dir as $fileInfo) {
       if ($fileInfo->isReadable() && $fileInfo->isFile()

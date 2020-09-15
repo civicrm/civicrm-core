@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2009 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -54,9 +38,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     //Test database user privilege to create table(Temporary) CRM-4725
     $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $daoTestPrivilege = new CRM_Core_DAO();
-    $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_one(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("CREATE TEMPORARY TABLE import_job_permission_two(test int) ENGINE=InnoDB");
-    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS import_job_permission_one, import_job_permission_two");
+    $tempTable1 = CRM_Utils_SQL_TempTable::build()->getName();
+    $tempTable2 = CRM_Utils_SQL_TempTable::build()->getName();
+    $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable1} (test int) ENGINE=InnoDB");
+    $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable2} (test int) ENGINE=InnoDB");
+    $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS {$tempTable1}, {$tempTable2}");
     unset($errorScope);
 
     if ($daoTestPrivilege->_lastError) {
@@ -69,7 +55,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $errorFiles = ['sqlImport.errors', 'sqlImport.conflicts', 'sqlImport.duplicates', 'sqlImport.mismatch'];
 
     // check for post max size avoid when called twice
-    $snippet = CRM_Utils_Array::value('snippet', $_GET, 0);
+    $snippet = $_GET['snippet'] ?? 0;
     if (empty($snippet)) {
       CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     }
@@ -151,23 +137,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     );
 
     // duplicate handling options
-    $duplicateOptions = [];
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update'), CRM_Import_Parser::DUPLICATE_UPDATE
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Fill'), CRM_Import_Parser::DUPLICATE_FILL
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK
-    );
-
-    $this->addGroup($duplicateOptions, 'onDuplicate',
-      ts('For Duplicate Contacts')
-    );
+    $this->addRadio('onDuplicate', ts('For Duplicate Contacts'), [
+      CRM_Import_Parser::DUPLICATE_SKIP => ts('Skip'),
+      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
+      CRM_Import_Parser::DUPLICATE_FILL => ts('Fill'),
+      CRM_Import_Parser::DUPLICATE_NOCHECK => ts('No Duplicate Checking'),
+    ]);
 
     $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
 
@@ -176,26 +151,20 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
-    $contactOptions = [];
+    $contactTypeOptions = $contactTypeAttributes = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL, $js
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_INDIVIDUAL] = ts('Individual');
+      $contactTypeAttributes[CRM_Import_Parser::CONTACT_INDIVIDUAL] = $js;
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD, $js
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_HOUSEHOLD] = ts('Household');
+      $contactTypeAttributes[CRM_Import_Parser::CONTACT_HOUSEHOLD] = $js;
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION, $js
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_ORGANIZATION] = ts('Organization');
+      $contactTypeAttributes[CRM_Import_Parser::CONTACT_ORGANIZATION] = $js;
     }
-
-    $this->addGroup($contactOptions, 'contactType',
-      ts('Contact Type')
-    );
+    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
 
     $this->addElement('select', 'subType', ts('Subtype'));
     $this->addElement('select', 'dedupe', ts('Dedupe Rule'));

@@ -1,40 +1,24 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for Financial Type Account
  */
-class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
+class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
 
   /**
    * The financial type id saved to the session for an update.
@@ -118,6 +102,28 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
+    }
+    else {
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
     $this->setPageTitle(ts('Financial Type Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -159,7 +165,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::ADD) {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-        $financialAccountType = CRM_Utils_Array::value($this->_submitValues['account_relationship'], $financialAccountType);
+        $financialAccountType = $financialAccountType[$this->_submitValues['account_relationship']] ?? NULL;
         $result = CRM_Contribute_PseudoConstant::financialAccount(NULL, $financialAccountType);
 
         $financialAccountSelect = ['' => ts('- select -')] + $result;
@@ -185,22 +191,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       TRUE
     );
 
-    $this->addButtons([
-      [
-        'type' => 'next',
-        'name' => ts('Save'),
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'next',
-        'name' => ts('Save and New'),
-        'subName' => 'new',
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
     $this->addFormRule(['CRM_Financial_Form_FinancialTypeAccount', 'formRule'], $this);
   }
 
@@ -244,6 +234,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
       ];
       $defaults = [];
       if ($self->_action == CRM_Core_Action::ADD) {
+        // @todo replace with call to CRM_Financial_BAO_FinancialAccount getSalesTaxFinancialAccount
         $relationshipId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Sales Tax Account is' "));
         $isTax = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $values['financial_account_id'], 'is_tax');
         if ($values['account_relationship'] == $relationshipId) {

@@ -9,7 +9,7 @@
  */
 function contribution_create_example() {
   $params = [
-    'contact_id' => 12,
+    'contact_id' => 13,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -73,7 +73,7 @@ function contribution_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '12',
+        'contact_id' => '13',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '1',
@@ -102,6 +102,7 @@ function contribution_create_expectedresult() {
         'creditnote_id' => '',
         'tax_amount' => 0,
         'revenue_recognition_date' => '',
+        'is_template' => '',
         'contribution_type_id' => '1',
         'api.line_item.create' => [
           '0' => [

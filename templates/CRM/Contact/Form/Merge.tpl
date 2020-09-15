@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-contact-merge-form-block">
@@ -29,13 +13,13 @@
   </div>
 
   <div class="message status">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <strong>{ts}WARNING: The duplicate contact record WILL BE DELETED after the merge is complete.{/ts}</strong>
   </div>
 
   {if $user}
     <div class="message status">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       <strong>{ts 1=$config->userFramework}WARNING: There are %1 user accounts associated with both the original and duplicate contacts. Ensure that the %1 user you want to retain is on the right - if necessary use the 'Flip between original and duplicate contacts.' option at top to swap the positions of the two records before doing the merge.
   The user record associated with the duplicate contact will not be deleted, but will be unlinked from the associated contact record (which will be deleted).
   You will need to manually delete that user (click on the link to open the %1 user account in new screen). You may need to give thought to how you handle any content or contents associated with that user.{/ts}</strong>
@@ -47,24 +31,24 @@
   </div>
 
   <div class="action-link">
-    {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><i class="crm-i fa-chevron-left"></i> {ts}Previous{/ts}</a>{/if}
-    {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <i class="crm-i fa-chevron-right"></i></a>{/if}
+    {if $prev}<a href="{$prev}" class="crm-hover-button action-item"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Previous{/ts}</a>{/if}
+    {if $next}<a href="{$next}" class="crm-hover-button action-item">{ts}Next{/ts} <i class="crm-i fa-chevron-right" aria-hidden="true"></i></a>{/if}
     <a href="{$flip}" class="action-item crm-hover-button">
-      <i class="crm-i fa-random"></i>
+      <i class="crm-i fa-random" aria-hidden="true"></i>
       {ts}Flip between original and duplicate contacts.{/ts}
     </a>
   </div>
 
   <div class="action-link">
     <a href="#" class="action-item crm-hover-button crm-notDuplicate" title={ts}Mark this pair as not a duplicate.{/ts} onClick="processDupes( {$main_cid|escape}, {$other_cid|escape}, 'dupe-nondupe', 'merge-contact', '{$browseUrl}' );return false;">
-      <i class="crm-i fa-times-circle"></i>
+      <i class="crm-i fa-times-circle" aria-hidden="true"></i>
       {ts}Mark this pair as not a duplicate.{/ts}
     </a>
   </div>
 
   <div class="action-link">
     <a href="javascript:void(0);" class="action-item crm-hover-button toggle_equal_rows">
-      <i class="crm-i fa-eye-slash"></i>
+      <i class="crm-i fa-eye-slash" aria-hidden="true"></i>
       {ts}Show/hide rows with the same data on each contact record.{/ts}
     </a>
   </div>

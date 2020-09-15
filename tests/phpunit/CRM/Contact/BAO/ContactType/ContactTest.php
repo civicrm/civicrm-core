@@ -77,7 +77,7 @@ DELETE FROM civicrm_contact_type
     }
     $this->assertEquals($contact->first_name, 'Anne');
     $this->assertEquals($contact->contact_type, 'Individual');
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     //check for Type:Organization
     $params = [
@@ -91,7 +91,7 @@ DELETE FROM civicrm_contact_type
     }
     $this->assertEquals($contact->organization_name, 'Compumentor');
     $this->assertEquals($contact->contact_type, 'Organization');
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     //check for Type:Household
     $params = [
@@ -105,7 +105,7 @@ DELETE FROM civicrm_contact_type
     }
     $this->assertEquals($contact->household_name, 'John Does home');
     $this->assertEquals($contact->contact_type, 'Household');
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     //check for Type:Individual, Subtype:Student
     $params = [
@@ -122,7 +122,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($contact->first_name, 'Bill');
     $this->assertEquals($contact->contact_type, 'Individual');
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $contact->contact_sub_type), $this->student);
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     //check for Type:Organization, Subtype:Sponsor
     $params = [
@@ -138,7 +138,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($contact->organization_name, 'Conservation Corp');
     $this->assertEquals($contact->contact_type, 'Organization');
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $contact->contact_sub_type), $this->sponsor);
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
   }
 
   /**
@@ -170,7 +170,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Individual');
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->student);
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     $params = [
       'organization_name' => 'Compumentor',
@@ -195,7 +195,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Organization');
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->sponsor);
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
   }
 
   /**
@@ -228,7 +228,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Individual');
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->parent);
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     $params = [
       'organization_name' => 'Compumentor',
@@ -255,7 +255,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Organization');
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->team);
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
 
     $params = [
       'first_name' => 'Anne',
@@ -283,7 +283,7 @@ DELETE FROM civicrm_contact_type
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Individual');
     $this->assertEquals($updatedContact->contact_sub_type, 'null');
-    CRM_Contact_BAO_Contact::deleteContact($contact->id);
+    $this->contactDelete($contact->id);
   }
 
   /**

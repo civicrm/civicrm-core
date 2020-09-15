@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -92,7 +74,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
     }
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
+      CRM_Core_Error::statusBounce("You cannot add or edit muliple choice options in a reserved custom field-set.");
     }
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
@@ -219,10 +201,14 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
           'reset=1&action=browse&fid=' . $this->_fid . '&gid=' . $this->_gid,
           TRUE, NULL, FALSE
         );
-        $this->addElement('button',
+        $this->addElement('xbutton',
           'done',
-          ts('Done'),
-          ['onclick' => "location.href='$url'", 'class' => 'crm-form-submit cancel', 'crm-icon' => 'fa-times']
+          CRM_Core_Page::crmIcon('fa-times') . ' ' . ts('Done'),
+          [
+            'type' => 'button',
+            'onclick' => "location.href='$url'",
+            'class' => 'crm-form-submit cancel',
+          ]
         );
       }
     }
@@ -403,17 +389,19 @@ SELECT count(*)
     // set values for custom field properties and save
     $customOption = new CRM_Core_DAO_OptionValue();
     $customOption->label = $params['label'];
-    $customOption->name = CRM_Utils_String::titleToVar($params['label']);
     $customOption->weight = $params['weight'];
     $customOption->description = $params['description'];
     $customOption->value = $params['value'];
-    $customOption->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $customOption->is_active = $params['is_active'] ?? FALSE;
 
     $oldWeight = NULL;
     if ($this->_id) {
       $customOption->id = $this->_id;
       CRM_Core_BAO_CustomOption::updateCustomValues($params);
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'weight', 'id');
+    }
+    else {
+      $customOption->name = CRM_Utils_String::titleToVar($params['label']);
     }
 
     $fieldValues = ['option_group_id' => $this->_optionGroupID];

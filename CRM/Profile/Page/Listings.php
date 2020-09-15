@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -116,7 +99,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
       // check if we are rendering mixed profiles
       if (CRM_Core_BAO_UFGroup::checkForMixProfiles($this->_profileIds)) {
-        CRM_Core_Error::fatal(ts('You cannot combine profiles of multiple types.'));
+        CRM_Core_Error::statusBounce(ts('You cannot combine profiles of multiple types.'));
       }
 
       $this->_gid = $this->_profileIds[0];
@@ -221,7 +204,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         }
       }
 
-      $customField = CRM_Utils_Array::value($name, $this->_customFields);
+      $customField = $this->_customFields[$name] ?? NULL;
 
       if (!empty($_POST) && empty($_POST[$name])) {
         if ($customField) {
@@ -298,7 +281,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();
       $ufgroupDAO->id = $this->_gid;
       if (!$ufgroupDAO->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        CRM_Core_Error::statusBounce('Unable to find matching UF Group');
       }
     }
 
@@ -426,7 +409,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       CRM_Core_Error::statusBounce(ts('This profile does not have the map feature turned on.'));
     }
 
-    $groupId = CRM_Utils_Array::value('limit_listings_group_id', $details);
+    $groupId = $details['limit_listings_group_id'] ?? NULL;
 
     // add group id to params if a uf group belong to a any group
     if ($groupId) {

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -320,7 +304,7 @@ class CRM_Utils_File {
     if (FALSE === file_get_contents($fileName)) {
       // Our file cannot be found.
       // Using 'die' here breaks this on extension upgrade.
-      throw new CRM_Exception('Could not find the SQL file.');
+      throw new CRM_Core_Exception('Could not find the SQL file.');
     }
 
     self::runSqlQuery($dsn, file_get_contents($fileName), $prefix, $dieOnErrors);
@@ -341,6 +325,7 @@ class CRM_Utils_File {
     }
     else {
       require_once 'DB.php';
+      $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
       $db = DB::connect($dsn);
     }
 
@@ -350,7 +335,7 @@ class CRM_Utils_File {
     if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
       $db->query('SET SESSION sql_mode = STRICT_TRANS_TABLES');
     }
-    $db->query('SET NAMES utf8');
+    $db->query('SET NAMES utf8mb4');
     $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
     $db->query('SET @uniqueID = ' . "'$transactionId'");
 
@@ -415,7 +400,7 @@ class CRM_Utils_File {
       }
     }
     // support lower and uppercase file extensions
-    return isset($extensions[strtolower($ext)]) ? TRUE : FALSE;
+    return (bool) isset($extensions[strtolower($ext)]);
   }
 
   /**
@@ -769,9 +754,16 @@ HTACCESS;
    * @return array(string)
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
-    if (!is_dir($dir)) {
+    if (!is_dir($dir) || !is_readable($dir)) {
       return [];
     }
+    // Which dirs should we exclude from our searches?
+    // If not defined, we default to excluding any dirname that begins
+    // with a . which is the old behaviour and therefore excludes .git/
+    $excludeDirsPattern = defined('CIVICRM_EXCLUDE_DIRS_PATTERN')
+      ? constant('CIVICRM_EXCLUDE_DIRS_PATTERN')
+      : '@' . preg_quote(DIRECTORY_SEPARATOR) . '\.@';
+
     $dir = rtrim($dir, '/');
     $todos = [$dir];
     $result = [];
@@ -785,13 +777,21 @@ HTACCESS;
           }
         }
       }
+      // Find subdirs to recurse into.
       if ($dh = opendir($subdir)) {
         while (FALSE !== ($entry = readdir($dh))) {
           $path = $subdir . DIRECTORY_SEPARATOR . $entry;
-          if ($entry{0} == '.') {
-            // ignore
-          }
-          elseif (is_dir($path)) {
+          // Exclude . (self) and .. (parent) to avoid infinite loop.
+          // Exclude configured exclude dirs.
+          // Exclude dirs we can't read.
+          // Exclude anything that's not a dir.
+          if (
+            $entry !== '.'
+            && $entry !== '..'
+            && (empty($excludeDirsPattern) || !preg_match($excludeDirsPattern, $path))
+            && is_dir($path)
+            && is_readable($path)
+          ) {
             $todos[] = $path;
           }
         }
@@ -1082,7 +1082,7 @@ HTACCESS;
    */
   public static function isValidFileName($fileName = NULL) {
     if ($fileName) {
-      $check = $fileName !== basename($fileName) ? FALSE : TRUE;
+      $check = ($fileName === basename($fileName));
       if ($check) {
         if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
           $check = FALSE;
@@ -1098,15 +1098,9 @@ HTACCESS;
    * @param string $mimeType the mime-type we want extensions for
    * @return array
    */
-  public static function getAcceptableExtensionsForMimeType($mimeType = NULL) {
-    $mapping = \MimeType\Mapping::$types;
-    $extensions = [];
-    foreach ($mapping as $extension => $type) {
-      if ($mimeType == $type) {
-        $extensions[] = $extension;
-      }
-    }
-    return $extensions;
+  public static function getAcceptableExtensionsForMimeType($mimeType = []) {
+    $mimeRepostory = new \MimeTyper\Repository\ExtendedRepository();
+    return $mimeRepostory->findExtensions($mimeType);
   }
 
   /**

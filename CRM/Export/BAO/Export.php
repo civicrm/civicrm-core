@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -40,6 +24,30 @@ class CRM_Export_BAO_Export {
   // LIMIT is not much faster than a no LIMIT query
   // CRM-7675
   const EXPORT_ROW_COUNT = 100000;
+
+  /**
+   * Returns a list of exportable entities and their associated component.
+   *
+   * Note: Some entities like Contact & Activity are not in components, so
+   * the export form seems to fudge things and accept the entity name instead of
+   * component name in those cases.
+   *
+   * TODO: Hardcoded list bad. Needs to support extension export pages.
+   *
+   * @var string[]
+   */
+  public static function getComponents() {
+    return [
+      'Contact' => 'Contact',
+      'Contribution' => 'Contribute',
+      'Membership' => 'Member',
+      'Participant' => 'Event',
+      'Pledge' => 'Pledge',
+      'Case' => 'Case',
+      'Grant' => 'Grant',
+      'Activity' => 'Activity',
+    ];
+  }
 
   /**
    * Get the list the export fields.
@@ -124,7 +132,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $addPaymentHeader = FALSE;
 
-    list($outputColumns, $metadata) = $processor->getExportStructureArrays();
+    list($outputColumns) = $processor->getExportStructureArrays();
 
     if ($processor->isMergeSameAddress()) {
       foreach (array_keys($processor->getAdditionalFieldsForSameAddressMerge()) as $field) {
@@ -177,7 +185,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       while ($iterationDAO->fetch()) {
         $count++;
         $rowsThisIteration++;
-        $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader);
+        $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $paymentDetails, $addPaymentHeader);
         if ($row === FALSE) {
           continue;
         }
@@ -346,7 +354,7 @@ FROM   $tableName
       $sqlClause[] = '(' . implode(',', $valueString) . ')';
     }
     $sqlColumns = array_merge(['id' => 1], $processor->getSQLColumns());
-    $sqlColumnString = '(' . implode(',', array_keys($sqlColumns)) . ')';
+    $sqlColumnString = '(`' . implode('`, `', array_keys($sqlColumns)) . '`)';
 
     $sqlValueString = implode(",\n", $sqlClause);
 

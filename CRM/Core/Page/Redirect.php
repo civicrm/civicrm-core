@@ -3,13 +3,13 @@
 /**
  * Placeholder page which generates a redirect
  *
- * @code
+ * ```
  * <item>
  *   <path>civicrm/admin/options/case_type</path>
  *   <page_callback>CRM_Core_Page_Redirect</page_callback>
  *   <page_arguments>url=civicrm/foo/bar?whiz=bang&amp;passthru=%%passthru%%</page_arguments>
  * </item>
- * @endcoe
+ * ```
  */
 class CRM_Core_Page_Redirect extends CRM_Core_Page {
 
@@ -38,7 +38,7 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
    */
   public static function createUrl($requestPath, $requestArgs, $pageArgs, $absolute) {
     if (empty($pageArgs['url'])) {
-      CRM_Core_Error::fatal('This page is configured as a redirect, but it does not have a target.');
+      CRM_Core_Error::statusBounce('This page is configured as a redirect, but it does not have a target.');
     }
 
     $vars = [];

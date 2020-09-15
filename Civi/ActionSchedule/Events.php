@@ -4,15 +4,14 @@ namespace Civi\ActionSchedule;
 class Events {
 
   /**
-   * Register any available mappings.
-   *
-   * @see EntityListEvent
+   * @see \Civi\ActionSchedule\Event\MappingRegisterEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const MAPPINGS = 'civi.actionSchedule.getMappings';
 
   /**
-   * Prepare the pre-mailing query. This query loads details about
-   * the contact/entity so that they're available for mail-merge.
+   * @see \Civi\ActionSchedule\Event\MailingQueryEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const MAILING_QUERY = 'civi.actionSchedule.prepareMailingQuery';
 

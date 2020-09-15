@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -45,6 +29,14 @@
  *   API success array
  */
 function civicrm_api3_custom_field_create($params) {
+
+  // Legacy handling for old way of naming serialized fields
+  if (!empty($params['html_type'])) {
+    if ($params['html_type'] == 'CheckBox' || strpos($params['html_type'], 'Multi-') === 0) {
+      $params['serialize'] = 1;
+    }
+    $params['html_type'] = str_replace(['Multi-Select', 'Select Country', 'Select State/Province'], 'Select', $params['html_type']);
+  }
 
   // Array created for passing options in params.
   if (isset($params['option_values']) && is_array($params['option_values'])) {
@@ -132,7 +124,69 @@ function civicrm_api3_custom_field_delete($params) {
  * @return array
  */
 function civicrm_api3_custom_field_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  // Legacy handling for serialize property
+  $handleLegacy = (($params['legacy_html_type'] ?? !isset($params['serialize'])) && CRM_Core_BAO_Domain::isDBVersionAtLeast('5.27.alpha1'));
+  if ($handleLegacy && !empty($params['return'])) {
+    if (!is_array($params['return'])) {
+      $params['return'] = explode(',', str_replace(' ', '', $params['return']));
+    }
+    if (!in_array('serialize', $params['return'])) {
+      $params['return'][] = 'serialize';
+    }
+    if (!in_array('data_type', $params['return'])) {
+      $params['return'][] = 'data_type';
+    }
+  }
+  $legacyDataTypes = [
+    'Select State/Province' => 'StateProvince',
+    'Select Country' => 'Country',
+  ];
+  if ($handleLegacy && !empty($params['html_type'])) {
+    $serializedTypes = ['CheckBox', 'Multi-Select', 'Multi-Select Country', 'Multi-Select State/Province'];
+    if (is_string($params['html_type'])) {
+      if (strpos($params['html_type'], 'Multi-Select') === 0) {
+        $params['html_type'] = str_replace('Multi-Select', 'Select', $params['html_type']);
+        $params['serialize'] = 1;
+      }
+      elseif (!in_array($params['html_type'], $serializedTypes)) {
+        $params['serialize'] = 0;
+      }
+      if (isset($legacyDataTypes[$params['html_type']])) {
+        $params['data_type'] = $legacyDataTypes[$params['html_type']];
+        unset($params['html_type']);
+      }
+    }
+    elseif (is_array($params['html_type']) && !empty($params['html_type']['IN'])) {
+      $excludeNonSerialized = !array_diff($params['html_type']['IN'], $serializedTypes);
+      $onlyNonSerialized = !array_intersect($params['html_type']['IN'], $serializedTypes);
+      $params['html_type']['IN'] = array_map(function($val) {
+        return str_replace(['Multi-Select', 'Select Country', 'Select State/Province'], 'Select', $val);
+      }, $params['html_type']['IN']);
+      if ($excludeNonSerialized) {
+        $params['serialize'] = 1;
+      }
+      if ($onlyNonSerialized) {
+        $params['serialize'] = 0;
+      }
+    }
+  }
+
+  $results = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+
+  if ($handleLegacy && !empty($results['values']) && is_array($results['values'])) {
+    foreach ($results['values'] as $id => &$result) {
+      if (!empty($result['html_type'])) {
+        if (in_array($result['data_type'], $legacyDataTypes)) {
+          $result['html_type'] = array_search($result['data_type'], $legacyDataTypes);
+        }
+        if (!empty($result['serialize'])) {
+          $result['html_type'] = str_replace('Select', 'Multi-Select', $result['html_type']);
+        }
+      }
+    }
+  }
+
+  return $results;
 }
 
 /**

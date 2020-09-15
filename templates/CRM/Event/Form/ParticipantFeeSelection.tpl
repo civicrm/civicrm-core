@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used to change selections of fees for a participant *}
@@ -34,7 +18,7 @@ function display(totalfee) {
   // go as a float - CRM-13491
   totalfee = Math.round(totalfee*100)/100;
   // note : some variables used used here are global variables defined inside Calculate.tpl
-  var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
+  var totalEventFee  = formatMoney( totalfee, 2, separator, thousandMarker);
   cj('#pricevalue').html("<b>"+symbol+"</b> "+totalEventFee);
   scriptfee   = totalfee;
   scriptarray = price;
@@ -83,7 +67,7 @@ function populatebalanceFee(updatedAmt, onlyStatusUpdate) {
   }
 
   if (!onlyStatusUpdate) {
-    balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
+    balanceAmt = formatMoney(balanceAmt, 2, separator, thousandMarker);
     cj('#balance-fee').text(symbol+" "+balanceAmt);
   }
 }
@@ -103,7 +87,7 @@ CRM.$(function($) {
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if !$email}
   <div class="messages status no-popup">
-    <i class="crm-i fa-info-circle"></i>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+    <i class="crm-i fa-info-circle" aria-hidden="true"></i> {ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
   </div>
   {/if}
   <table class="form-layout">
@@ -139,7 +123,7 @@ CRM.$(function($) {
          <div class='label'>{ts}Total Paid{/ts}</div>
          <div class='content'>
            {$paymentInfo.paid|crmMoney}<br/>
-           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt"></i> {ts}view payments{/ts}</a>
+           <a class="crm-hover-button action-item crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'><i class="crm-i fa-list-alt" aria-hidden="true"></i> {ts}view payments{/ts}</a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>

@@ -8,7 +8,7 @@ namespace Civi\Token\Event;
  * The TokenRegisterEvent is fired when constructing a list of available
  * tokens. Listeners may register by specifying the entity/field/label for the token.
  *
- * @code
+ * ```
  * $ev->entity('profile')
  *    ->register('viewUrl', ts('Default Profile URL (View Mode)')
  *    ->register('editUrl', ts('Default Profile URL (Edit Mode)');
@@ -17,7 +17,9 @@ namespace Civi\Token\Event;
  *   'field' => 'viewUrl',
  *   'label' => ts('Default Profile URL (View Mode)'),
  * ));
- * @endcode
+ * ```
+ *
+ * Event name: 'civi.token.list'
  */
 class TokenRegisterEvent extends TokenEvent {
 

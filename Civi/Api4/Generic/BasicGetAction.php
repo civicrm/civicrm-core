@@ -2,55 +2,37 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\FormattingUtil;
 
 /**
- * Retrieve items based on criteria specified in the 'where' param.
+ * Retrieve $ENTITIES based on criteria specified in the `where` parameter.
  *
- * Use the 'select' param to determine which fields are returned, defaults to *.
+ * Use the `select` param to determine which fields are returned, defaults to `[*]`.
  */
 class BasicGetAction extends AbstractGetAction {
   use Traits\ArrayQueryActionTrait;
 
   /**
    * @var callable
-   *
-   * Function(BasicGetAction $thisAction) => array<array>
+   *   Function(BasicGetAction $thisAction): array[]
    */
   private $getter;
 
@@ -73,19 +55,22 @@ class BasicGetAction extends AbstractGetAction {
    */
   public function _run(Result $result) {
     $this->setDefaultWhereClause();
+    $this->expandSelectClauseWildcards();
     $values = $this->getRecords();
-    $result->exchangeArray($this->queryArray($values));
+    $this->formatRawValues($values);
+    $this->queryArray($values, $result);
   }
 
   /**
-   * This Basic Get class is a general-purpose api for non-DAO-based entities.
+   * BasicGet is a general-purpose get action for non-DAO-based entities.
    *
    * Useful for fetching records from files or other places.
-   * You can specify any php function to retrieve the records, and this class will
-   * automatically filter, sort, select & limit the raw data from your callback.
+   * Specify any php function to retrieve the records, and this class will
+   * automatically filter, sort, select & limit the raw data from the callback.
    *
-   * You can implement this action in one of two ways:
-   * 1. Use this class directly by passing a callable ($getter) to the constructor.
+   * This action is implemented in one of two ways:
+   * 1. Invoke this class directly by passing a callable ($getter) to the constructor. BasicEntity does this by default.
+   *    The function is passed a copy of $this action as it's first argument.
    * 2. Extend this class and override this function.
    *
    * Either way, this function should return an array of arrays, each representing one retrieved object.
@@ -111,9 +96,37 @@ class BasicGetAction extends AbstractGetAction {
    */
   protected function getRecords() {
     if (is_callable($this->getter)) {
+      $this->addCallbackToDebugOutput($this->getter);
       return call_user_func($this->getter, $this);
     }
     throw new NotImplementedException('Getter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());
+  }
+
+  /**
+   * Evaluate :pseudoconstant suffix expressions and replace raw values with option values
+   *
+   * @param $records
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function formatRawValues(&$records) {
+    // Pad $records and $fields with pseudofields
+    $fields = $this->entityFields();
+    foreach ($records as &$values) {
+      foreach ($this->entityFields() as $field) {
+        if (!empty($field['options'])) {
+          foreach (FormattingUtil::$pseudoConstantSuffixes as $suffix) {
+            $pseudofield = $field['name'] . ':' . $suffix;
+            if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
+              $values[$pseudofield] = $values[$field['name']];
+              $fields[$pseudofield] = $field;
+            }
+          }
+        }
+      }
+    }
+    // Swap raw values with pseudoconstants
+    FormattingUtil::formatOutputValues($records, $fields, $this->getEntityName(), $this->getActionName());
   }
 
 }

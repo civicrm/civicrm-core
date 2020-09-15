@@ -23,20 +23,4 @@ function safe_delete() {
   done
 }
 
-
-##############################################################################
-# Add in CiviCRM custom error message for CRM-8744.
-if ! grep -q 'CRM-8744' vendor/pear/net_smtp/Net/SMTP.php; then
-  patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-patch.txt
-fi
-if ! grep -q '@STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT' vendor/pear/net_smtp/Net/SMTP.php; then
-  patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-tls-patch.txt
-fi
-if ! grep -q 'function __construct' vendor/pear/net_smtp/Net/SMTP.php; then
-  patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-php7-patch.txt
-fi
-if grep -q '&Auth_SASL::factory' vendor/pear/net_smtp/Net/SMTP.php; then
-  patch vendor/pear/net_smtp/Net/SMTP.php < tools/scripts/composer/patches/net-smtp-ref-patch.txt
-fi
-
 safe_delete vendor/pear/net_smtp/{README.rst,examples,phpdoc.sh,tests}

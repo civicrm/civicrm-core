@@ -14,9 +14,9 @@
  *
  * To ensure that they throw exceptions, use:
  *
- * @code
+ * ```
  * $errorScope = CRM_Core_TemporaryErrorScope::useException();
- * @endcode
+ * ```
  *
  * Note that relying on this is a code-smell: it can be
  * safe to temporarily switch to exception

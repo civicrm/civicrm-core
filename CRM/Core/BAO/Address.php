@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -82,8 +66,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       $addressExists = self::dataExists($value);
       if (empty($value['id'])) {
-        if (!empty($addresses) && array_key_exists(CRM_Utils_Array::value('location_type_id', $value), $addresses)) {
-          $value['id'] = $addresses[CRM_Utils_Array::value('location_type_id', $value)];
+        if (!empty($addresses) && !empty($value['location_type_id']) && array_key_exists($value['location_type_id'], $addresses)) {
+          $value['id'] = $addresses[$value['location_type_id']];
         }
       }
 
@@ -137,7 +121,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
   public static function add(&$params, $fixAddress = FALSE) {
 
     $address = new CRM_Core_DAO_Address();
-    $checkPermissions = isset($params['check_permissions']) ? $params['check_permissions'] : TRUE;
+    $checkPermissions = $params['check_permissions'] ?? TRUE;
 
     // fixAddress mode to be done
     if ($fixAddress) {
@@ -158,10 +142,14 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     }
 
     $address->copyValues($params);
-
     $address->save();
 
     if ($address->id) {
+      // first get custom field from master address if any
+      if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
+        $address->copyCustomFields($params['master_id'], $address->id);
+      }
+
       if (isset($params['custom'])) {
         $addressCustom = $params['custom'];
       }
@@ -369,7 +357,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         unset($params[$fld]);
       }
       // main parse string.
-      $parseString = CRM_Utils_Array::value('street_address', $params);
+      $parseString = $params['street_address'] ?? NULL;
       $parsedFields = CRM_Core_BAO_Address::parseStreetAddress($parseString);
 
       // merge parse address in to main address block.
@@ -466,7 +454,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $address = new CRM_Core_BAO_Address();
 
     if (empty($entityBlock['entity_table'])) {
-      $address->$fieldName = CRM_Utils_Array::value($fieldName, $entityBlock);
+      $address->$fieldName = $entityBlock[$fieldName] ?? NULL;
     }
     else {
       $addressIds = [];
@@ -506,20 +494,22 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       // add state and country information: CRM-369
       if (!empty($address->location_type_id)) {
-        $values['location_type'] = CRM_Utils_Array::value($address->location_type_id, $locationTypes);
+        $values['location_type'] = $locationTypes[$address->location_type_id] ?? NULL;
       }
       if (!empty($address->state_province_id)) {
         $address->state = CRM_Core_PseudoConstant::stateProvinceAbbreviation($address->state_province_id, FALSE);
         $address->state_name = CRM_Core_PseudoConstant::stateProvince($address->state_province_id, FALSE);
+        $values['state_province_abbreviation'] = $address->state;
+        $values['state_province'] = $address->state_name;
       }
 
       if (!empty($address->country_id)) {
         $address->country = CRM_Core_PseudoConstant::country($address->country_id);
+        $values['country'] = $address->country;
 
         //get world region
         $regionId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $address->country_id, 'region_id');
-
-        $address->world_region = CRM_Core_PseudoConstant::worldregion($regionId);
+        $values['world_region'] = CRM_Core_PseudoConstant::worldregion($regionId);
       }
 
       $address->addDisplay($microformat);
@@ -562,12 +552,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       'supplemental_address_2' => $this->supplemental_address_2,
       'supplemental_address_3' => $this->supplemental_address_3,
       'city' => $this->city,
-      'state_province_name' => isset($this->state_name) ? $this->state_name : "",
-      'state_province' => isset($this->state) ? $this->state : "",
-      'postal_code' => isset($this->postal_code) ? $this->postal_code : "",
-      'postal_code_suffix' => isset($this->postal_code_suffix) ? $this->postal_code_suffix : "",
-      'country' => isset($this->country) ? $this->country : "",
-      'world_region' => isset($this->world_region) ? $this->world_region : "",
+      'state_province_name' => $this->state_name ?? "",
+      'state_province' => $this->state ?? "",
+      'postal_code' => $this->postal_code ?? "",
+      'postal_code_suffix' => $this->postal_code_suffix ?? "",
+      'country' => $this->country ?? "",
+      'world_region' => $this->world_region ?? "",
     ];
 
     if (isset($this->county_id) && $this->county_id) {
@@ -992,8 +982,8 @@ SELECT is_primary,
       }
 
       $nameVal = explode('-', $values['name']);
-      $fldName = CRM_Utils_Array::value(0, $nameVal);
-      $locType = CRM_Utils_Array::value(1, $nameVal);
+      $fldName = $nameVal[0] ?? NULL;
+      $locType = $nameVal[1] ?? NULL;
       if (!empty($values['location_type_id'])) {
         $locType = $values['location_type_id'];
       }
@@ -1039,8 +1029,15 @@ SELECT is_primary,
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
 
+    // legacy - for api backward compatibility
+    if (!isset($params['add_relationship']) && isset($params['update_current_employer'])) {
+      // warning
+      CRM_Core_Error::deprecatedFunctionWarning('update_current_employer is deprecated, use add_relationship instead');
+      $params['add_relationship'] = $params['update_current_employer'];
+    }
+
     // Default to TRUE if not set to maintain api backward compatibility.
-    $createRelationship = isset($params['update_current_employer']) ? $params['update_current_employer'] : TRUE;
+    $createRelationship = $params['add_relationship'] ?? TRUE;
 
     // unset contact id
     $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'contact_id'];
@@ -1067,6 +1064,7 @@ SELECT is_primary,
       $addressDAO->copyValues($params);
       $addressDAO->id = $dao->id;
       $addressDAO->save();
+      $addressDAO->copyCustomFields($addressId, $addressDAO->id);
     }
   }
 
@@ -1188,7 +1186,7 @@ SELECT is_primary,
     $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', 'Household Member of', 'id', 'name_a_b');
 
     if (!$relTypeId) {
-      CRM_Core_Error::fatal(ts("You seem to have deleted the relationship type 'Household Member of'"));
+      throw new CRM_Core_Exception(ts("You seem to have deleted the relationship type 'Household Member of'"));
     }
 
     $relParam = [

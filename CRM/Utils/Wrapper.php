@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -33,7 +17,7 @@
  * run method as explained below.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Wrapper {
 
@@ -41,7 +25,7 @@ class CRM_Utils_Wrapper {
    * Simple Controller.
    *
    * The controller which will handle the display and processing of this page.
-   * @var \CRM_Core_Controller_Simple object
+   * @var \CRM_Core_Controller_Simple
    */
   protected $_controller;
 
@@ -62,7 +46,7 @@ class CRM_Utils_Wrapper {
    */
   public function run($formName, $formLabel = NULL, $arguments = NULL) {
     if (is_array($arguments)) {
-      $mode = CRM_Utils_Array::value('mode', $arguments);
+      $mode = $arguments['mode'] ?? NULL;
       $imageUpload = !empty($arguments['imageUpload']);
       $addSequence = !empty($arguments['addSequence']);
       $attachUpload = !empty($arguments['attachUpload']);
@@ -87,10 +71,10 @@ class CRM_Utils_Wrapper {
     if (array_key_exists('urlToSession', $arguments)) {
       if (is_array($arguments['urlToSession'])) {
         foreach ($arguments['urlToSession'] as $params) {
-          $urlVar = CRM_Utils_Array::value('urlVar', $params);
-          $sessionVar = CRM_Utils_Array::value('sessionVar', $params);
-          $type = CRM_Utils_Array::value('type', $params);
-          $default = CRM_Utils_Array::value('default', $params);
+          $urlVar = $params['urlVar'] ?? NULL;
+          $sessionVar = $params['sessionVar'] ?? NULL;
+          $type = $params['type'] ?? NULL;
+          $default = $params['default'] ?? NULL;
           $abort = CRM_Utils_Array::value('abort', $params, FALSE);
 
           $value = NULL;

@@ -78,6 +78,7 @@ class CRM_Core_CodeGen_Util_Template {
         '=> true,' => '=> TRUE,',
         '=> false,' => '=> FALSE,',
         'static ::' => 'static::',
+        'use\\' => 'use \\',
       ];
       $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
       $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
@@ -103,6 +104,23 @@ class CRM_Core_CodeGen_Util_Template {
    */
   public function fetch($infile) {
     return $this->smarty->fetch($infile);
+  }
+
+  /**
+   * Fetch multiple templates - and concatenate them.
+   *
+   * @see runConcat
+   * @param array $inputs
+   *   Template filenames.
+   * @return string
+   */
+  public function fetchConcat($inputs) {
+    $buf = '';
+    foreach ($inputs as $infile) {
+      $buf .= $this->smarty->fetch($infile);
+      $buf .= "\n";
+    }
+    return $buf;
   }
 
   /**

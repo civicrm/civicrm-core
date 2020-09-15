@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {capture assign=docLink}{docURL page="user/initial-set-up/permissions-and-access-control/" text="Access Control Documentation"}{/capture}
@@ -34,20 +18,20 @@
 
     <table class="report">
         <tr>
-            <td class="nowrap"><a href="{$ufAccessURL}" {$jAccessParams} id="adminAccess">&raquo; {ts 1=$config->userFramework}%1 Access Control{/ts}</a></td>
+            <td class="nowrap"><a href="{$ufAccessURL}" {$jAccessParams} id="adminAccess"><i class="crm-i fa-chevron-right fa-fw" aria-hidden="true"></i> {ts 1=$config->userFramework}%1 Access Control{/ts}</a></td>
             <td>{ts}Grant access to CiviCRM components and other CiviCRM permissions.{/ts}</td>
         </tr>
         <tr><td colspan="2" class="separator"><strong>{ts}Use following steps if you need to control View and/or Edit permissions for specific contact groups, specific profiles or specific custom data fields.{/ts}</strong></td></tr>
     <tr>
-        <td class="nowrap"><a href="{crmURL p='civicrm/admin/options/acl_role' q="reset=1"}" id="editACLRoles">&raquo; {ts}1. Manage Roles{/ts}</a></td>
+        <td class="nowrap"><a href="{crmURL p='civicrm/admin/options/acl_role' q="reset=1"}" id="editACLRoles"><i class="crm-i fa-users fa-fw" aria-hidden="true"></i> {ts}1. Manage Roles{/ts}</a></td>
         <td>{ts}Each CiviCRM ACL Role is assigned a set of permissions. Use this link to create or edit the different roles needed for your site.{/ts}</td>
     </tr>
     <tr>
-        <td class="nowrap"><a href="{crmURL p='civicrm/acl/entityrole' q="reset=1"}" id="editRoleAssignments">&raquo; {ts}2. Assign Users to CiviCRM ACL Roles{/ts}</a></td>
+        <td class="nowrap"><a href="{crmURL p='civicrm/acl/entityrole' q="reset=1"}" id="editRoleAssignments"><i class="crm-i fa-user-plus fa-fw" aria-hidden="true"></i> {ts}2. Assign Users to CiviCRM ACL Roles{/ts}</a></td>
         <td>{ts}Once you have defined CiviCRM ACL Roles and granted ACLs to those Roles, use this link to assign users to role(s).{/ts}</td>
     </tr>
     <tr>
-        <td class="nowrap"><a href="{crmURL p='civicrm/acl' q="reset=1"}" id="editACLs">&raquo; {ts}3. Manage ACLs{/ts}</a></td>
+        <td class="nowrap"><a href="{crmURL p='civicrm/acl' q="reset=1"}" id="editACLs"><i class="crm-i fa-id-card-o fa-fw" aria-hidden="true"></i> {ts}3. Manage ACLs{/ts}</a></td>
         <td>{ts}ACLs define permission to do an operation on a set of data, and grant that permission to a CiviCRM ACL Role. Use this link to create or edit the ACLs for your site.{/ts}</td>
     </tr>
     </table>

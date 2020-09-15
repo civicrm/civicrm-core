@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
@@ -38,27 +22,20 @@ namespace Civi\API;
 class Events {
 
   /**
-   * Determine whether the API request is allowed for the current user.
-   * For successful execution, at least one listener must invoke
-   * $event->authorize().
-   *
    * @see AuthorizeEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const AUTHORIZE = 'civi.api.authorize';
 
   /**
-   * Determine which API provider executes the given request. For successful
-   * execution, at least one listener must invoke
-   * $event->setProvider($provider).
-   *
    * @see ResolveEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const RESOLVE = 'civi.api.resolve';
 
   /**
-   * Apply pre-execution logic
-   *
    * @see PrepareEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const PREPARE = 'civi.api.prepare';
 
@@ -66,6 +43,7 @@ class Events {
    * Apply post-execution logic
    *
    * @see RespondEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const RESPOND = 'civi.api.respond';
 
@@ -73,6 +51,7 @@ class Events {
    * Handle any exceptions.
    *
    * @see ExceptionEvent
+   * @deprecated - You may simply use the event name directly. dev/core#1744
    */
   const EXCEPTION = 'civi.api.exception';
 
@@ -96,11 +75,11 @@ class Events {
    */
   public static function allEvents() {
     return [
-      self::AUTHORIZE,
-      self::EXCEPTION,
-      self::PREPARE,
-      self::RESOLVE,
-      self::RESPOND,
+      'civi.api.authorize',
+      'civi.api.exception',
+      'civi.api.prepare',
+      'civi.api.resolve',
+      'civi.api.respond',
     ];
   }
 
@@ -109,11 +88,11 @@ class Events {
    * @see \CRM_Utils_Hook::eventDefs
    */
   public static function hookEventDefs($e) {
-    $e->inspector->addEventClass(self::AUTHORIZE, 'Civi\API\Event\AuthorizeEvent');
-    $e->inspector->addEventClass(self::EXCEPTION, 'Civi\API\Event\ExceptionEvent');
-    $e->inspector->addEventClass(self::PREPARE, 'Civi\API\Event\PrepareEvent');
-    $e->inspector->addEventClass(self::RESOLVE, 'Civi\API\Event\ResolveEvent');
-    $e->inspector->addEventClass(self::RESPOND, 'Civi\API\Event\RespondEvent');
+    $e->inspector->addEventClass('civi.api.authorize', 'Civi\API\Event\AuthorizeEvent');
+    $e->inspector->addEventClass('civi.api.exception', 'Civi\API\Event\ExceptionEvent');
+    $e->inspector->addEventClass('civi.api.prepare', 'Civi\API\Event\PrepareEvent');
+    $e->inspector->addEventClass('civi.api.resolve', 'Civi\API\Event\ResolveEvent');
+    $e->inspector->addEventClass('civi.api.respond', 'Civi\API\Event\RespondEvent');
   }
 
 }

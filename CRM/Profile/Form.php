@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -66,7 +49,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_gid;
 
   /**
-   * @var array details of the UFGroup used on this page
+   * @var array
+   * Details of the UFGroup used on this page
    */
   protected $_ufGroup = ['name' => 'unknown'];
 
@@ -321,7 +305,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_multiRecord &&
         !in_array($this->_multiRecord, [CRM_Core_Action::UPDATE, CRM_Core_Action::ADD, CRM_Core_Action::DELETE])
       ) {
-        CRM_Core_Error::fatal(ts('Proper action not specified for this custom value record profile'));
+        CRM_Core_Error::statusBounce(ts('Proper action not specified for this custom value record profile'));
       }
     }
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
@@ -337,7 +321,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
       // check if we are rendering mixed profiles
       if (CRM_Core_BAO_UFGroup::checkForMixProfiles($this->_profileIds)) {
-        CRM_Core_Error::fatal(ts('You cannot combine profiles of multiple types.'));
+        CRM_Core_Error::statusBounce(ts('You cannot combine profiles of multiple types.'));
       }
 
       // for now consider 1'st profile as primary profile and validate it
@@ -372,8 +356,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $this->_ufGroup = (array) $dao;
       }
 
-      if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
-        CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', [
+      if (empty($this->_ufGroup['is_active'])) {
+        CRM_Core_Error::statusBounce(ts('The requested profile (gid=%1) is inactive or does not exist.', [
           1 => $this->_gid,
         ]));
       }
@@ -422,12 +406,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if (!$this->_recordId
             && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)
           ) {
-            CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) requires record id while performing this action',
+            CRM_Core_Error::statusBounce(ts('The requested Profile (gid=%1) requires record id while performing this action',
               [1 => $this->_gid]
             ));
           }
           elseif (empty($this->_multiRecordFields)) {
-            CRM_Core_Error::fatal(ts('No Multi-Record Fields configured for this profile (gid=%1)',
+            CRM_Core_Error::statusBounce(ts('No Multi-Record Fields configured for this profile (gid=%1)',
               [1 => $this->_gid]
             ));
           }
@@ -856,7 +840,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $addCaptcha[$field['group_id']] = $field['add_captcha'];
       }
 
-      if (($name == 'email-Primary') || ($name == 'email-' . isset($primaryLocationType) ? $primaryLocationType : "")) {
+      if (($name == 'email-Primary') || ($name == 'email-' . ($primaryLocationType ?? ""))) {
         $emailPresent = TRUE;
         $this->_mail = $name;
       }
@@ -920,9 +904,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     if ($this->_context == 'dialog') {
       $this->addElement(
-        'submit',
+        'xbutton',
         $this->_duplicateButtonName,
-        ts('Save Matching Contact')
+        ts('Save Matching Contact'),
+        [
+          'type' => 'submit',
+          'class' => 'crm-button',
+        ]
       );
     }
   }
@@ -1009,7 +997,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     if (!$register && empty($fields['_qf_Edit_upload_duplicate'])) {
       // fix for CRM-3240
       if (!empty($fields['email-Primary'])) {
-        $fields['email'] = CRM_Utils_Array::value('email-Primary', $fields);
+        $fields['email'] = $fields['email-Primary'] ?? NULL;
       }
 
       // fix for CRM-6141
@@ -1119,10 +1107,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $contactDetails = CRM_Contact_BAO_Contact::getHierContactDetails($this->_id,
         $greetingTypes
       );
-      $details = $contactDetails[0][$this->_id];
+      $details = $contactDetails[$this->_id];
     }
     if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
-      CRM_Utils_Array::value('postal_greeting_id', $details)
+      !empty($details['postal_greeting_id'])
     )
     ) {
 
@@ -1202,7 +1190,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $addToGroupId = CRM_Utils_Array::value('add_to_group_id', $this->_ufGroup);
+    $addToGroupId = $this->_ufGroup['add_to_group_id'] ?? NULL;
     if (!empty($addToGroupId)) {
       //run same check whether group is a mailing list
       $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',

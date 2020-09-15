@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/search</path>
+    <page_callback>CRM_Search_Page_Ang</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

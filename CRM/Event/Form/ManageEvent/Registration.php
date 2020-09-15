@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -118,7 +102,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
       // Set event registration as the default profile if none selected
       if (!$defaults['custom_pre_id'] && count($defaults['custom_post']) == 0) {
-        $defaults['custom_pre_id'] = CRM_Utils_Array::value('id', $eventRegistrationIdDefaults);
+        $defaults['custom_pre_id'] = $eventRegistrationIdDefaults['id'] ?? NULL;
       }
       if (isset($defaults['custom_post']) && is_numeric($defaults['custom_post'])) {
         $defaults['custom_post_id'] = $defaults['custom_post'];
@@ -515,7 +499,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
 
         //check for additional custom pre profile
-        $additionalCustomPreId = CRM_Utils_Array::value('additional_custom_pre_id', $values);
+        $additionalCustomPreId = $values['additional_custom_pre_id'] ?? NULL;
         if (!empty($additionalCustomPreId)) {
           if (!($additionalCustomPreId == 'none')) {
             $customPreId = $additionalCustomPreId;
@@ -543,7 +527,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
         // We don't have required Individual fields in the pre-custom profile, so now check the post-custom profile
         if ($isPreError) {
-          $additionalCustomPostId = CRM_Utils_Array::value('additional_custom_post_id', $values);
+          $additionalCustomPostId = $values['additional_custom_post_id'] ?? NULL;
           if (!empty($additionalCustomPostId)) {
             if (!($additionalCustomPostId == 'none')) {
               $customPostId = $additionalCustomPostId;

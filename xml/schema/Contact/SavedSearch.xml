@@ -19,15 +19,6 @@
     <autoincrement>false</autoincrement>
   </primaryKey>
   <field>
-    <name>query</name>
-    <title>SQL Query</title>
-    <type>text</type>
-    <import>true</import>
-    <comment>SQL query for this search</comment>
-    <add>1.1</add>
-    <drop>1.5</drop>
-  </field>
-  <field>
     <name>form_values</name>
     <title>Submitted Form Values</title>
     <type>text</type>
@@ -35,14 +26,6 @@
     <comment>Submitted form values for this search</comment>
     <serialize>PHP</serialize>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>is_active</name>
-    <type>boolean</type>
-    <title>Saved Search Enabled</title>
-    <comment>Is this entry active?</comment>
-    <add>1.1</add>
-    <drop>1.5</drop>
   </field>
   <field>
     <name>mapping_id</name>
@@ -71,6 +54,7 @@
     <title>Where Clause</title>
     <comment>the sql where clause if a saved search acl</comment>
     <add>1.6</add>
+    <drop>5.24</drop>
   </field>
   <field>
     <name>select_tables</name>
@@ -79,6 +63,7 @@
     <comment>the tables to be included in a select data</comment>
     <serialize>PHP</serialize>
     <add>1.6</add>
+    <drop>5.24</drop>
   </field>
   <field>
     <name>where_tables</name>
@@ -87,5 +72,22 @@
     <comment>the tables to be included in the count statement</comment>
     <serialize>PHP</serialize>
     <add>1.6</add>
+    <drop>5.24</drop>
+  </field>
+  <field>
+    <name>api_entity</name>
+    <type>varchar</type>
+    <title>Entity Name</title>
+    <length>255</length>
+    <comment>Entity name for API based search</comment>
+    <add>5.24</add>
+  </field>
+  <field>
+    <name>api_params</name>
+    <type>text</type>
+    <title>API Parameters</title>
+    <comment>Parameters for API based search</comment>
+    <serialize>JSON</serialize>
+    <add>5.24</add>
   </field>
 </table>

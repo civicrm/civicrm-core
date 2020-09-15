@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Logging_Differ {
   private $db;
@@ -46,7 +28,8 @@ class CRM_Logging_Differ {
    * @param string $interval
    */
   public function __construct($log_conn_id, $log_date, $interval = '10 SECOND') {
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
+    $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+    $dsn = DB::parseDSN($dsn);
     $this->db = $dsn['database'];
     $this->log_conn_id = $log_conn_id;
     $this->log_date = $log_date;
@@ -247,7 +230,7 @@ WHERE lt.log_conn_id = %1
             if (!empty(${$var[$diff]})) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);
-              $holder[$diff] = CRM_Utils_Array::value(1, $val);
+              $holder[$diff] = $val[1] ?? NULL;
             }
           }
         }
@@ -256,8 +239,8 @@ WHERE lt.log_conn_id = %1
           'action' => $changed['log_action'],
           'id' => $id,
           'field' => $diff,
-          'from' => CRM_Utils_Array::value($diff, $original),
-          'to' => CRM_Utils_Array::value($diff, $changed),
+          'from' => $original[$diff] ?? NULL,
+          'to' => $changed[$diff] ?? NULL,
           'table' => $table,
           'log_date' => $changed['log_date'],
           'log_conn_id' => $changed['log_conn_id'],
@@ -322,7 +305,7 @@ WHERE lt.log_conn_id = %1
 
         $dao = new $tableDAO();
         foreach ($dao->fields() as $field) {
-          $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
+          $titles[$table][$field['name']] = $field['title'] ?? NULL;
 
           if ($field['type'] == CRM_Utils_Type::T_BOOLEAN) {
             $values[$table][$field['name']] = ['0' => ts('false'), '1' => ts('true')];

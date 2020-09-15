@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -122,13 +106,20 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $xmlProcessor = new CRM_Case_XMLProcessor_Report();
-    $contents = $xmlProcessor->run($this->_clientID,
-      $this->_caseID,
-      $this->_activitySetName,
-      $params
+    // this is either a 1 or a 2, but the url expects a 1 or 0
+    $all = ($params['include_activities'] == 1) ? 1 : 0;
+
+    // similar but comes from a checkbox that's either 1 or not present
+    $is_redact = empty($params['is_redact']) ? 0 : 1;
+
+    $asn = rawurlencode($this->_activitySetName);
+
+    CRM_Utils_System::redirect(
+      CRM_Utils_System::url(
+        'civicrm/case/report/print',
+        "caseID={$this->_caseID}&cid={$this->_clientID}&asn={$asn}&redact={$is_redact}&all={$all}"
+      )
     );
-    $this->set('report', $contents);
   }
 
 }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be usefusul, but   |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -92,13 +76,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @var CRM_Core_Payment
    */
   protected $_paymentObject;
-
-  /**
-   * The id of the contribution that we are processing.
-   *
-   * @var int
-   */
-  public $_id;
 
   /**
    * Entity that $this->_id relates to.
@@ -172,13 +149,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   public $_honorID = NULL;
 
   /**
-   * Store the financial Type ID
-   *
-   * @var array
-   */
-  public $_contributionType;
-
-  /**
    * The contribution values if an existing contribution
    * @var array
    */
@@ -248,6 +218,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Pre process function with common actions.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
     $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -296,10 +269,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     // Also don't allow user to update some fields for recurring contributions.
     if (!$this->_online) {
-      $this->_online = CRM_Utils_Array::value('contribution_recur_id', $values);
+      $this->_online = $values['contribution_recur_id'] ?? NULL;
     }
 
-    $this->assign('isOnline', $this->_online ? TRUE : FALSE);
+    $this->assign('isOnline', (bool) $this->_online);
 
     //to get note id
     $daoNote = new CRM_Core_BAO_Note();
@@ -309,7 +282,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       $this->_noteID = $daoNote->id;
       $values['note'] = $daoNote->note;
     }
-    $this->_contributionType = $values['financial_type_id'];
   }
 
   /**
@@ -385,19 +357,12 @@ WHERE  contribution_id = {$id}
     }
     $this->_processors = [];
     foreach ($this->_paymentProcessors as $id => $processor) {
-      // @todo review this. The inclusion of this IF was to address test processors being incorrectly loaded.
-      // However the function $this->getValidProcessors() is expected to only return the processors relevant
-      // to the mode (using the actual id - ie. the id of the test processor for the test processor).
-      // for some reason there was a need to filter here per commit history - but this indicates a problem
-      // somewhere else.
-      if ($processor['is_test'] == ($this->_mode == 'test')) {
-        $this->_processors[$id] = $processor['name'];
-        if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . $processor['description'];
-        }
-        if ($processor['is_recur']) {
-          $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
-        }
+      $this->_processors[$id] = $processor['name'];
+      if (!empty($processor['description'])) {
+        $this->_processors[$id] .= ' : ' . $processor['description'];
+      }
+      if ($this->_paymentProcessors[$id]['object']->supportsRecurring()) {
+        $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
       }
     }
     // CRM-21002: pass the default payment processor ID whose credit card type icons should be populated first
@@ -442,14 +407,14 @@ WHERE  contribution_id = {$id}
       $payParams = ['id' => $this->_ppID];
 
       CRM_Pledge_BAO_PledgePayment::retrieve($payParams, $this->_pledgeValues['pledgePayment']);
-      $this->_pledgeID = CRM_Utils_Array::value('pledge_id', $this->_pledgeValues['pledgePayment']);
-      $paymentStatusID = CRM_Utils_Array::value('status_id', $this->_pledgeValues['pledgePayment']);
-      $this->_id = CRM_Utils_Array::value('contribution_id', $this->_pledgeValues['pledgePayment']);
+      $this->_pledgeID = $this->_pledgeValues['pledgePayment']['pledge_id'] ?? NULL;
+      $paymentStatusID = $this->_pledgeValues['pledgePayment']['status_id'] ?? NULL;
+      $this->_id = $this->_pledgeValues['pledgePayment']['contribution_id'] ?? NULL;
 
       //get all status
       $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (!($paymentStatusID == array_search('Pending', $allStatus) || $paymentStatusID == array_search('Overdue', $allStatus))) {
-        CRM_Core_Error::fatal(ts("Pledge payment status should be 'Pending' or  'Overdue'."));
+        CRM_Core_Error::statusBounce(ts("Pledge payment status should be 'Pending' or  'Overdue'."));
       }
 
       //get the pledge values associated with given pledge payment.
@@ -546,7 +511,6 @@ WHERE  contribution_id = {$id}
 
   /**
    * Common block for setting up the parts of a form that relate to credit / debit card
-   * @throws Exception
    */
   protected function assignPaymentRelatedVariables() {
     try {
@@ -573,19 +537,12 @@ WHERE  contribution_id = {$id}
         $this->_params['payment_processor_id'],
         ($this->_mode == 'test')
       );
-      if (in_array('credit_card_exp_date', array_keys($this->_params))) {
-        $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
-        $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
-      }
-      $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
-      $this->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
-      );
-      $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
 
-    self::formatCreditCardDetails($this->_params);
+    $valuesForForm = self::formatCreditCardDetails($this->_params);
+    $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+
     foreach ($this->submittableMoneyFields as $moneyField) {
       if (isset($this->_params[$moneyField])) {
         $this->_params[$moneyField] = CRM_Utils_Rule::cleanMoney($this->_params[$moneyField]);
@@ -605,15 +562,28 @@ WHERE  contribution_id = {$id}
    *
    * @param array $params
    *
-   * @return void
+   * @return array An array of params suitable for assigning to the form/tpl
    */
   public static function formatCreditCardDetails(&$params) {
+    if (!empty($params['credit_card_exp_date'])) {
+      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
+      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
+    }
     if (!empty($params['credit_card_type'])) {
       $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
     }
     if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {
       $params['pan_truncation'] = substr($params['credit_card_number'], -4);
     }
+    if (!empty($params['credit_card_exp_date'])) {
+      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
+      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
+    }
+
+    $tplParams['credit_card_exp_date'] = isset($params['credit_card_exp_date']) ? CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($params['credit_card_exp_date'])) : NULL;
+    $tplParams['credit_card_type'] = CRM_Utils_Array::value('credit_card_type', $params);
+    $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $params));
+    return $tplParams;
   }
 
   /**
@@ -691,14 +661,15 @@ WHERE  contribution_id = {$id}
   /**
    * Get the default payment instrument id.
    *
+   * This priortises the submitted value, if any and falls back on the processor.
+   *
    * @return int
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getDefaultPaymentInstrumentId() {
     $paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer');
-    if ($paymentInstrumentID) {
-      return $paymentInstrumentID;
-    }
-    return key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+    return (int) ($paymentInstrumentID ?? $this->_paymentProcessor['payment_instrument_id']);
   }
 
   /**
@@ -747,7 +718,7 @@ WHERE  contribution_id = {$id}
       $title .= " - {$info['title']}";
     }
     $this->assign('transaction', TRUE);
-    $this->assign('payments', $paymentInfo['transaction']);
+    $this->assign('payments', $paymentInfo['transaction'] ?? NULL);
     $this->assign('paymentLinks', $paymentInfo['payment_links']);
     return $title;
   }

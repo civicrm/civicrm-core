@@ -1,1 +1,1 @@
-{ts}Recurring Contribution Cancellation Notification{/ts}
+{ts}Recurring Contribution Cancellation Notification{/ts} - {contact.display_name}

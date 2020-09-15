@@ -1,1 +1,1 @@
-{ts}Contribution Receipt{/ts}
+{ts}Contribution Receipt{/ts} - {contact.display_name}

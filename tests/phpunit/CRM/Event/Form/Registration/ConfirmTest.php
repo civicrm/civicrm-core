@@ -50,8 +50,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'billing_state_province_id-5' => '1061',
           'billing_postal_code-5' => '7',
           'billing_country_id-5' => '1228',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'priceSetId' => '6',
           'price_7' => [
             13 => 1,
@@ -78,9 +76,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         ],
       ],
     ]);
+
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $mut->checkMailLog([
-      'Dear Logged In,  Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
+      'Dear Logged In,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -94,12 +93,14 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @dataProvider getThousandSeparators
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    *
-   * @throws \Exception
+   * @dataProvider getThousandSeparators
    */
   public function testPaidSubmit($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
+    $mut = new CiviMailUtils($this);
     $paymentProcessorID = $this->processorCreate();
     /* @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
@@ -125,7 +126,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'cvv2' => '123',
           'credit_card_exp_date' => [
             'M' => '1',
-            'Y' => '2019',
+            'Y' => date('Y') + 1,
           ],
           'credit_card_type' => 'Visa',
           'billing_first_name' => 'p',
@@ -136,15 +137,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'billing_state_province_id-5' => '1061',
           'billing_postal_code-5' => '7',
           'billing_country_id-5' => '1228',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'priceSetId' => '6',
           'price_7' => [
             13 => 1,
           ],
           'payment_processor_id' => $paymentProcessorID,
           'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
           'is_primary' => 1,
           'is_pay_later' => 0,
           'campaign_id' => NULL,
@@ -169,6 +167,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(8000.67, $contribution['total_amount']);
     $this->assertEquals(1.67, $contribution['fee_amount']);
     $this->assertEquals(7999, $contribution['net_amount']);
+    $this->assertNotEmpty($contribution['receipt_date']);
+    $this->assertNotContains(' (multiple participants)', $contribution['amount_level']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -209,16 +209,27 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'financial_trxn_id' => $financialTrxn['id'] + 1,
       'amount' => '1.67',
     ], $entityFinancialTrxns[2], ['id', 'entity_id']);
+    $mut->checkMailLog([
+      'Event Information and Location', 'Registration Confirmation - Annual CiviCRM meet',
+      'Expires: January ' . (date('Y') + 1),
+      'Visa',
+      '************1111',
+      'This is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',
+    ]);
+    $mut->clearMessages();
   }
 
   /**
    * Test for Tax amount for multiple participant.
    *
+   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   public function testTaxMultipleParticipant() {
+    $mut = new CiviMailUtils($this);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
     $event = $this->eventCreate($params);
+    $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
     CRM_Event_Form_Registration_Confirm::testSubmit([
       'id' => $event['id'],
       'contributeMode' => 'direct',
@@ -232,12 +243,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'first_name' => 'Participant1',
           'last_name' => 'LastName',
           'email-Primary' => 'participant1@example.com',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'additional_participants' => 2,
           'payment_processor_id' => 0,
           'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
           'is_primary' => 1,
           'is_pay_later' => 1,
           'campaign_id' => NULL,
@@ -258,8 +266,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'first_name' => 'Participant2',
           'last_name' => 'LastName',
           'email-Primary' => 'participant2@example.com',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'campaign_id' => NULL,
           'is_pay_later' => 1,
           'participant_role_id' => '1',
@@ -274,8 +280,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'first_name' => 'Participant3',
           'last_name' => 'LastName',
           'email-Primary' => 'participant3@example.com',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'campaign_id' => NULL,
           'is_pay_later' => 1,
           'participant_role_id' => '1',
@@ -286,22 +290,40 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->callAPISuccessGetCount('Participant', [], 3);
+    $participants = $this->callAPISuccess('Participant', 'get', [])['values'];
+    $this->assertCount(3, $participants);
     $contribution = $this->callAPISuccessGetSingle(
       'Contribution',
       [
-        'return' => ['tax_amount', 'total_amount'],
+        'return' => ['tax_amount', 'total_amount', 'amount_level'],
       ]
     );
+    $this->assertContains(' (multiple participants)', $contribution['amount_level']);
     $this->assertEquals($contribution['tax_amount'], 40, 'Invalid Tax amount.');
     $this->assertEquals($contribution['total_amount'], 440, 'Invalid Tax amount.');
+    $mailSent = $mut->getAllMessages();
+    $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
+    $this->assertContains('contactID:::' . $contribution['contact_id'], $mailSent[0]);
+    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]);
+
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => 100, 'payment_type_id' => 'Cash', 'contribution_id' => $contribution['id']]);
+    $mailSent = $mut->getAllMessages();
+    $this->assertCount(6, $mailSent);
+
+    $this->assertContains('participant_status:::Registered', $mailSent[3]);
+    $this->assertContains('Dear Participant2', $mailSent[3]);
+
+    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[3]);
+    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[4]);
+    $this->assertContains('contactID:::' . $contribution['contact_id'], $mailSent[5]);
+    $this->revertTemplateToReservedTemplate('event_online_receipt', 'text');
   }
 
   /**
    * Test online registration for event with no price options selected as per CRM-19964.
    */
   public function testOnlineRegNoPrice() {
-    $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => FALSE]);
+    $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => FALSE]);
     $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => TRUE]);
     $params = [
       'start_date' => date('YmdHis', strtotime('+ 1 week')),
@@ -353,8 +375,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'ip_address' => '127.0.0.1',
           'invoiceID' => '57adc34957a29171948e8643ce906332',
           'button' => '_qf_Register_upload',
-          'scriptFee' => '',
-          'scriptArray' => '',
         ],
       ],
     ]);
@@ -396,9 +416,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Submit event registration with a note field
    *
-   * @param  array $event
+   * @param array $event
    * @param int $contact_id
    *
+   * @return array
    * @throws \Exception
    */
   private function submitWithNote($event, $contact_id) {
@@ -434,8 +455,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'billing_state_province_id-5' => '1061',
           'billing_postal_code-5' => '7',
           'billing_country_id-5' => '1228',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'priceSetId' => '6',
           'price_7' => [
             13 => 1,
@@ -515,8 +534,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param string $field_name
    * @param string $field_type
    * @param string $field_label
+   *
    * @return array
    *   API result array
+   * @throws \CRM_Core_Exception
    */
   private function uf_field_add($uf_group_id, $field_name, $field_type, $field_label) {
     $params = [
@@ -529,8 +550,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'is_active' => 1,
       'uf_group_id' => $uf_group_id,
     ];
-    $result = civicrm_api3('UFField', 'create', $params);
-    return $result;
+    return $this->callAPISuccess('UFField', 'create', $params);
   }
 
   /**
@@ -542,7 +562,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     //create an event with an attached profile containing a note
     $event = $this->creatEventWithProfile(NULL);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
-    $event['note'] = "This is note 1";
+    $event['note'] = 'This is note 1';
     list($contact_id, $participant_id) = $this->submitWithNote($event, NULL);
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
@@ -550,15 +570,15 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     //and confirm that the note shown in the email is the current one
     $event = $this->creatEventWithProfile($event);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
-    $event['note'] = "This is note 2";
+    $event['note'] = 'This is note 2';
     list($contact_id, $participant_id) = $this->submitWithNote($event, $contact_id);
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
     //finally, submit a blank note and confirm that the note shown in the email is blank
     $event = $this->creatEventWithProfile($event);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
-    $event['note'] = "";
-    list($contact_id, $participant_id) = $this->submitWithNote($event, $contact_id);
+    $event['note'] = '';
+    $this->submitWithNote($event, $contact_id);
   }
 
 }

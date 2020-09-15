@@ -1,0 +1,56 @@
+/* "fade-out" effect */
+div.crm-export-field-selector-outer {
+  position: relative;
+  overflow-x: hidden;
+}
+div.crm-export-field-selector-outer:after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 20%;
+  content: ' ';
+  background-image: linear-gradient(to right, transparent, #efefe5);
+}
+table.crm-export-field-selector tbody tr {
+  background-color: #FAFAFA;
+}
+table.crm-export-field-selector tbody tr:nth-child(odd) {
+  background-color: #EFEFEF;
+}
+table.crm-export-field-selector tfoot tr {
+  background-color: white;
+  border-top: 2px solid #CFCEC3;
+}
+table.crm-export-field-selector tfoot tr td > span {
+  margin-left: 18px;
+}
+.crm-export-field-selector tbody td {
+  cursor: move;
+  width: 18%
+}
+.crm-export-field-selector tbody td:first-child {
+  width: 28%;
+  min-width: 230px;
+}
+.crm-export-field-selector tbody td:first-child > div + div {
+  margin-left: 17px;
+}
+.crm-export-field-selector .crm-export-add-field {
+  width: 16em;
+}
+.crm-export-ui-save-mapping-dialog .crm-form-block > div {
+  padding: 5px;
+}
+.crm-export-ui-save-mapping-dialog .ui-dialog-buttonpane {
+  position: absolute;
+  bottom: 20px;
+  height: 20px;
+  width: calc(100% - 3em);
+}
+.crm-export-row-handle {
+  opacity: .5;
+}
+.crm-export-field-selector tr:hover .crm-export-row-handle {
+  opacity: 1;
+}

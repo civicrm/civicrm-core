@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $context ne 'caseActivity'}
@@ -58,15 +42,17 @@
       var caseStatusLabels = {/literal}{$caseStatusLabels.values|@json_encode}{literal};
       var caseStatusNames = {/literal}{$caseStatusNames.values|@json_encode}{literal};
       if ($('#case_type_id, #status_id', $form).length === 2) {
-        $('#case_type_id', $form).change(function() {
-          if ($(this).val()) {
-            var definition = caseTypes[$(this).val()].definition;
+        updateCaseStatusOptions();
+        $('#case_type_id', $form).change(updateCaseStatusOptions);
+        function updateCaseStatusOptions() {
+          if ($('#case_type_id', $form).val()) {
+            var definition = caseTypes[$('#case_type_id', $form).val()].definition;
             var newOptions = CRM._.filter(caseStatusLabels, function(opt) {
               return !definition.statuses || !definition.statuses.length || definition.statuses.indexOf(caseStatusNames[opt.key]) > -1;
             });
             CRM.utils.setOptions($('#status_id', $form), newOptions);
           }
-        })
+        }
       }
     });
   </script>

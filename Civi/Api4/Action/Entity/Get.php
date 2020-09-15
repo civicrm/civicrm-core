@@ -2,46 +2,31 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
 namespace Civi\Api4\Action\Entity;
 
 use Civi\Api4\CustomGroup;
-use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * Get entities
+ * Get the names & docblocks of all APIv4 entities.
+ *
+ * Scans for api entities in core + enabled extensions.
+ *
+ * Also includes pseudo-entities from multi-record custom groups by default.
  *
  * @method $this setIncludeCustom(bool $value)
  * @method bool getIncludeCustom()
@@ -60,6 +45,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   protected function getRecords() {
     $entities = [];
+    $toGet = $this->_itemsToGet('name');
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
@@ -68,18 +54,21 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       if (is_dir($dir)) {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];
-          preg_match('/(\w*).php/', $file, $matches);
-          $entity = ['name' => $matches[1]];
-          if ($this->_isFieldSelected('description') || $this->_isFieldSelected('comment')) {
-            $this->addDocs($entity);
+          preg_match('/(\w*)\.php$/', $file, $matches);
+          $entity = '\Civi\Api4\\' . $matches[1];
+          if (
+            (!$toGet || in_array($matches[1], $toGet))
+            && is_a($entity, '\Civi\Api4\Generic\AbstractEntity', TRUE)
+          ) {
+            $info = $entity::getInfo();
+            $entities[$info['name']] = $info;
           }
-          $entities[$matches[1]] = $entity;
         }
       }
     }
-    unset($entities['CustomValue']);
 
-    if ($this->includeCustom) {
+    // Fetch custom entities unless we've already fetched everything requested
+    if ($this->includeCustom && (!$toGet || array_diff($toGet, array_keys($entities)))) {
       $this->addCustomEntities($entities);
     }
 
@@ -97,14 +86,20 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $customEntities = CustomGroup::get()
       ->addWhere('is_multiple', '=', 1)
       ->addWhere('is_active', '=', 1)
-      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends'])
+      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'icon'])
       ->setCheckPermissions(FALSE)
       ->execute();
     foreach ($customEntities as $customEntity) {
       $fieldName = 'Custom_' . $customEntity['name'];
       $entities[$fieldName] = [
         'name' => $fieldName,
-        'description' => $customEntity['title'] . ' custom group - extends ' . $customEntity['extends'],
+        'title' => $customEntity['title'],
+        'description' => 'Custom group - extends ' . $customEntity['extends'],
+        'see' => [
+          'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
+          '\\Civi\\Api4\\CustomGroup',
+        ],
+        'icon' => $customEntity['icon'],
       ];
       if (!empty($customEntity['help_pre'])) {
         $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);
@@ -124,17 +119,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   private function plainTextify($input) {
     return html_entity_decode(strip_tags($input), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-  }
-
-  /**
-   * Add info from code docblock.
-   *
-   * @param $entity
-   */
-  private function addDocs(&$entity) {
-    $reflection = new \ReflectionClass("\\Civi\\Api4\\" . $entity['name']);
-    $entity += ReflectionUtils::getCodeDocs($reflection);
-    unset($entity['package'], $entity['method']);
   }
 
 }

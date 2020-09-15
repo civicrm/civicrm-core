@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -242,10 +226,9 @@ WHERE e.id = %1";
    * @param array $entityBlock
    * @param bool $microformat
    *
-   * @return array
-   *   array of objects(CRM_Core_BAO_Location)
+   * @return CRM_Core_BAO_Location[]|NULL
    */
-  public static function &getValues($entityBlock, $microformat = FALSE) {
+  public static function getValues($entityBlock, $microformat = FALSE) {
     if (empty($entityBlock)) {
       return NULL;
     }
@@ -276,13 +259,14 @@ WHERE e.id = %1";
    *   Contact id.
    * @param int $locationTypeId
    *   Id of the location to delete.
+   * @throws CRM_Core_Exception
    */
   public static function deleteLocationBlocks($contactId, $locationTypeId) {
     // ensure that contactId has a value
     if (empty($contactId) ||
       !CRM_Utils_Rule::positiveInteger($contactId)
     ) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Incorrect contact id parameter passed to deleteLocationBlocks');
     }
 
     if (empty($locationTypeId) ||
@@ -299,57 +283,6 @@ WHERE e.id = %1";
     foreach ($blocks as $name) {
       CRM_Core_BAO_Block::blockDelete($name, $params);
     }
-  }
-
-  /**
-   * Copy or update location block.
-   *
-   * @param int $locBlockId
-   *   Location block id.
-   * @param int $updateLocBlockId
-   *   Update location block id.
-   *
-   * @return int
-   *   newly created/updated location block id.
-   */
-  public static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function which will be removed');
-    //get the location info.
-    $defaults = $updateValues = [];
-    $locBlock = ['id' => $locBlockId];
-    CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_LocBlock', $locBlock, $defaults);
-
-    if ($updateLocBlockId) {
-      //get the location info for update.
-      $copyLocationParams = ['id' => $updateLocBlockId];
-      CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_LocBlock', $copyLocationParams, $updateValues);
-      foreach ($updateValues as $key => $value) {
-        if ($key != 'id') {
-          $copyLocationParams[$key] = 'null';
-        }
-      }
-    }
-
-    //copy all location blocks (email, phone, address, etc)
-    foreach ($defaults as $key => $value) {
-      if ($key != 'id') {
-        $tbl = explode("_", $key);
-        $name = ucfirst($tbl[0]);
-        $updateParams = NULL;
-        if ($updateId = CRM_Utils_Array::value($key, $updateValues)) {
-          $updateParams = ['id' => $updateId];
-        }
-
-        $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_' . $name, ['id' => $value], $updateParams);
-        $copyLocationParams[$key] = $copy->id;
-      }
-    }
-
-    $copyLocation = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_LocBlock',
-      ['id' => $locBlock['id']],
-      $copyLocationParams
-    );
-    return $copyLocation->id;
   }
 
   /**

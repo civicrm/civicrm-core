@@ -1,28 +1,13 @@
 <?php
-/**
- * +--------------------------------------------------------------------+
- * | CiviCRM version 5                                                  |
- * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2019                                |
- * +--------------------------------------------------------------------+
- * | This file is a part of CiviCRM.                                    |
- * |                                                                    |
- * | CiviCRM is free software; you can copy, modify, and distribute it  |
- * | under the terms of the GNU Affero General Public License           |
- * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- * |                                                                    |
- * | CiviCRM is distributed in the hope that it will be useful, but     |
- * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- * | See the GNU Affero General Public License for more details.        |
- * |                                                                    |
- * | You should have received a copy of the GNU Affero General Public   |
- * | License and the CiviCRM Licensing Exception along                  |
- * | with this program; if not, contact CiviCRM LLC                     |
- * | at info[AT]civicrm[DOT]org. If you have questions about the        |
- * | GNU Affero General Public License or the licensing of CiviCRM,     |
- * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- * +--------------------------------------------------------------------+
+
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -109,12 +94,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->_customFieldID = $this->_customField['id'];
 
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
-    $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
-    $count = 0;
-    $optionSupportingHTMLTypes = ['Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Multi-Select'];
+    $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
+    $optionSupportingHTMLTypes = CRM_Custom_Form_Field::$htmlTypesWithOptions;
 
     foreach ($customFieldDataType as $dataType => $label) {
       switch ($dataType) {
+        // skipping File data-type & state province due to caching issues
         // case 'Country':
         // case 'StateProvince':
         case 'String':
@@ -154,7 +139,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           }
 
           //Create custom field of $dataType and html-type $html
-          foreach ($dataToHtmlTypes[$count] as $html) {
+          foreach ($dataToHtmlTypes[$dataType] as $html) {
             // per CRM-18568 the like operator does not currently work for fields with options.
             // the LIKE operator could potentially bypass ACLs (as could IS NOT NULL) and some thought needs to be given
             // to it.
@@ -175,13 +160,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             //Now test with $validSQLOperator SQL operators against its custom value(s)
             $this->_testCustomValue($customField['values'][$customField['id']], $validSQLOperators, $type);
           }
-          $count++;
-          break;
 
-        default:
-          // skipping File data-type & state province due to caching issues
-          $count++;
-          break;
       }
     }
   }
@@ -282,7 +261,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         case '>=':
         case '<=':
           if ($isSerialized) {
-            continue;
+            break;
           }
           // To be precise in for these operator we can't just rely on one contact,
           // hence creating multiple contact with custom value less/more then $selectedValue respectively
@@ -412,9 +391,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->callAPISuccess('OptionValue', 'create', [
       'value' => 'one-modified',
       'option_group_id' => $selectField['option_group_id'],
-      'name' => 'string 1',
+      'label' => 'string 1',
       'options' => [
-        'match-mandatory' => ['option_group_id', 'name'],
+        'match-mandatory' => ['option_group_id', 'label'],
       ],
     ]);
 

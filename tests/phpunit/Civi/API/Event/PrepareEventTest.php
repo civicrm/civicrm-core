@@ -2,7 +2,6 @@
 namespace Civi\API\Event;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Civi\API\Events;
 use Civi\API\Kernel;
 
 /**
@@ -45,9 +44,9 @@ class PrepareEventTest extends \CiviUnitTestCase {
    * @dataProvider getPrepareExamples
    */
   public function testOnPrepare($onPrepare, $inputApiCall, $expectResult) {
-    $this->dispatcher->addListener(Events::PREPARE, [$this, $onPrepare]);
+    $this->dispatcher->addListener('civi.api.prepare', [$this, $onPrepare]);
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
-    $result = call_user_func_array([$this->kernel, 'run'], $inputApiCall);
+    $result = call_user_func_array([$this->kernel, 'runSafe'], $inputApiCall);
     $this->assertEquals($expectResult, $result['values']);
   }
 

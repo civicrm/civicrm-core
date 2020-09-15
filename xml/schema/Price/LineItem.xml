@@ -68,15 +68,6 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
-    <name>option_group_id</name>
-    <title>Line Item Option Group</title>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>FK to option group</comment>
-    <add>1.7</add>
-    <drop>3.3</drop>
-  </field>
-  <field>
     <name>label</name>
     <title>Line Item Label</title>
     <type>varchar</type>

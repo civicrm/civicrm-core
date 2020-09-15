@@ -44,9 +44,13 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function testDashboardContactCreate() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDashboardContactCreate($version) {
+    $this->_apiversion = $version;
     $dashParams = [
-      'version' => 3,
       'label' => 'New Dashlet element',
       'name' => 'New Dashlet element',
       'url' => 'civicrm/report/list&compid=99&reset=1',
@@ -61,12 +65,11 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
     ]);
     $oldCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
     $params = [
-      'version' => 3,
       'contact_id' => $contact['id'],
       'dashboard_id' => $dashresult['id'],
       'is_active' => 1,
     ];
-    $dashboradContact = $this->callAPISuccess('dashboard_contact', 'create', $params);
+    $this->callAPISuccess('dashboard_contact', 'create', $params);
     $newCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
     $this->assertEquals($oldCount + 1, $newCount);
   }

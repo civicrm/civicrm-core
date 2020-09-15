@@ -1,35 +1,22 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+
+use function xKerman\Restricted\unserialize;
+use xKerman\Restricted\UnserializeFailedException;
 
 require_once 'HTML/QuickForm/Rule/Email.php';
 
@@ -99,37 +86,17 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * Convert possibly underscore separated words to camel case.
    *
-   * @param string $string
-   *
+   * @param string $str
+   * @param bool $ucFirst
+   *   Should the first letter be capitalized like `CamelCase` or lower like `camelCase`
    * @return string
    */
-  public static function convertStringToCamel($string) {
-    $map = [
-      'acl' => 'Acl',
-      'ACL' => 'Acl',
-      'im' => 'Im',
-      'IM' => 'Im',
-    ];
-    if (isset($map[$string])) {
-      return $map[$string];
-    }
-
-    $fragments = explode('_', $string);
-    foreach ($fragments as & $fragment) {
-      $fragment = ucfirst($fragment);
-      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
-      if (strpos($fragment, 'Uf') === 0 && strlen($string) > 2) {
-        $fragment = 'UF' . ucfirst(substr($fragment, 2));
-      }
-    }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
-    }
-    return implode('', $fragments);
+  public static function convertStringToCamel($str, $ucFirst = TRUE) {
+    $fragments = explode('_', $str);
+    $camel = implode('', array_map('ucfirst', $fragments));
+    return $ucFirst ? $camel : lcfirst($camel);
   }
 
   /**
@@ -446,7 +413,7 @@ class CRM_Utils_String {
    *   the converted string
    */
   public static function htmlToText($html) {
-    require_once 'packages/html2text/rcube_html2text.php';
+    require_once 'html2text/rcube_html2text.php';
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
     $converter = new rcube_html2text($token_html);
     $token_text = $converter->get_text();
@@ -849,9 +816,9 @@ class CRM_Utils_String {
    */
   public static function simpleParseUrl($url) {
     $parts = parse_url($url);
-    $host = isset($parts['host']) ? $parts['host'] : '';
+    $host = $parts['host'] ?? '';
     $port = isset($parts['port']) ? ':' . $parts['port'] : '';
-    $path = isset($parts['path']) ? $parts['path'] : '';
+    $path = $parts['path'] ?? '';
     $query = isset($parts['query']) ? '?' . $parts['query'] : '';
     return [
       'host+port' => "$host$port",
@@ -934,6 +901,112 @@ class CRM_Utils_String {
       }
     }
     return array_values(array_unique($result));
+  }
+
+  /**
+   * Safely unserialize a string of scalar or array values (but not objects!)
+   *
+   * Use `xkerman/restricted-unserialize` to unserialize strings using PHP's
+   * serialization format. `restricted-unserialize` works like PHP's built-in
+   * `unserialize` function except that it does not deserialize object instances,
+   * making it immune to PHP Object Injection {@see https://www.owasp.org/index.php/PHP_Object_Injection}
+   * vulnerabilities.
+   *
+   * Note: When dealing with user inputs, it is generally recommended to use
+   * safe, standard data interchange formats such as JSON rather than PHP's
+   * serialization format when dealing with user input.
+   *
+   * @param string|NULL $string
+   *
+   * @return mixed
+   */
+  public static function unserialize($string) {
+    if (!is_string($string)) {
+      return FALSE;
+    }
+    try {
+      return unserialize($string);
+    }
+    catch (UnserializeFailedException $e) {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Returns the plural form of an English word.
+   *
+   * @param string $str
+   * @return string
+   */
+  public static function pluralize($str) {
+    $lastLetter = substr($str, -1);
+    $lastTwo = substr($str, -2);
+    if ($lastLetter == 's' || $lastLetter == 'x' || $lastTwo == 'ch') {
+      return $str . 'es';
+    }
+    if ($lastLetter == 'y' && $lastTwo != 'ey') {
+      return substr($str, 0, -1) . 'ies';
+    }
+    return $str . 's';
+  }
+
+  /**
+   * Generic check as to whether any tokens are in the given string.
+   *
+   * It might be a smarty token OR a CiviCRM token. In both cases the
+   * absence of a '{' indicates no token is present.
+   *
+   * @param string $string
+   *
+   * @return bool
+   */
+  public static function stringContainsTokens(string $string) {
+    return strpos($string, '{') !== FALSE;
+  }
+
+  /**
+   * Parse a string through smarty without creating a smarty template file per string.
+   *
+   * This function is for swapping out any smarty tokens that appear in a string
+   * and are not re-used much if at all. For example parsing a contact's greeting
+   * does not need to be cached are there are some minor security / data privacy benefits
+   * to not caching them per file. We also save disk space, reduce I/O and disk clearing time.
+   *
+   * Doing this is cleaning in Smarty3 which we are alas not using
+   * https://www.smarty.net/docs/en/resources.string.tpl
+   *
+   * However, it highlights that smarty-eval is not evil-eval and still have the security applied.
+   *
+   * In order to replicate that in Smarty2 I'm using {eval} per
+   * https://www.smarty.net/docsv2/en/language.function.eval.tpl#id2820446
+   * From the above:
+   * - Evaluated variables are treated the same as templates. They follow the same escapement and security features just as if they were templates.
+   * - Evaluated variables are compiled on every invocation, the compiled versions are not saved! However if you have caching enabled, the output
+   *   will be cached with the rest of the template.
+   *
+   * Our set up does not have caching enabled and my testing suggests this still works fine with it
+   * enabled so turning it off before running this is out of caution based on the above.
+   *
+   * When this function is run only one template file is created (for the eval) tag no matter how
+   * many times it is run. This compares to it otherwise creating one file for every parsed string.
+   *
+   * @param string $templateString
+   *
+   * @return string
+   */
+  public static function parseOneOffStringThroughSmarty($templateString) {
+    if (!CRM_Utils_String::stringContainsTokens($templateString)) {
+      // Skip expensive smarty processing.
+      return $templateString;
+    }
+    $smarty = CRM_Core_Smarty::singleton();
+    $cachingValue = $smarty->caching;
+    $smarty->caching = 0;
+    $smarty->assign('smartySingleUseString', $templateString);
+    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
+    $smarty->caching = $cachingValue;
+    $smarty->assign('smartySingleUseString', NULL);
+    return $templateString;
   }
 
 }

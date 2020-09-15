@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2016                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -32,7 +16,7 @@ use Civi;
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2016
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class Themes {
 
@@ -94,7 +78,7 @@ class Themes {
 
       \CRM_Utils_Hook::activeTheme($themeKey, [
         'themes' => $this,
-        'page' => \CRM_Utils_Array::value(\CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET),
+        'page' => \CRM_Utils_System::currentPath(),
       ]);
 
       $themes = $this->getAll();
@@ -113,7 +97,7 @@ class Themes {
    */
   public function get($themeKey) {
     $all = $this->getAll();
-    return isset($all[$themeKey]) ? $all[$themeKey] : NULL;
+    return $all[$themeKey] ?? NULL;
   }
 
   /**
@@ -149,9 +133,9 @@ class Themes {
    * @see CRM_Utils_Hook::themes
    */
   public function getAvailable() {
-    $result = array();
+    $result = [];
     foreach ($this->getAll() as $key => $theme) {
-      if ($key{0} !== '_') {
+      if ($key[0] !== '_') {
         $result[$key] = $theme['title'];
       }
     }
@@ -180,14 +164,14 @@ class Themes {
   public function resolveUrls($active, $cssExt, $cssFile) {
     $all = $this->getAll();
     if (!isset($all[$active])) {
-      return array();
+      return [];
     }
 
     $cssId = $this->cssId($cssExt, $cssFile);
 
     foreach ($all[$active]['search_order'] as $themeKey) {
       if (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
-        $result = array();
+        $result = [];
       }
       else {
         $result = Civi\Core\Resolver::singleton()

@@ -1,0 +1,30 @@
+<table class="crm-export-field-selector">
+  <thead>
+    <tr>
+      <th colspan="6">
+        <label>{{:: ts('Contact Type') }}</label>
+        <input class="twelve" crm-ui-select="{data: contact_types, placeholder: ts('All'), allowClear: true}" ng-model="data.contact_type" />
+      </th>
+    </tr>
+  </thead>
+  <tbody ui-sortable="{axis: 'y'}" ng-model="data.columns">
+    <tr ng-repeat="field in data.columns">
+      <td ng-include="'~/exportui/exportField.html'"></td>
+      <td ng-repeat="row in data.preview">
+        {{ showPreview(row, field) }}
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="6">
+        <input class="crm-action-menu fa-plus crm-export-add-field" crm-ui-select="{data: getFields, placeholder: ts('Add field')}" ng-model="new.col" />
+        <span ng-if="data.columns.length">
+          <button type="button" ng-click="saveMappingDialog()" crm-icon="fa-save">
+            {{:: ts('Save Fields') }}
+          </button>
+        </span>
+      </td>
+    </tr>
+  </tfoot>
+</table>

@@ -36,8 +36,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($formValues['email_options'])) {
       $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
       $emailParams = [
-        'subject' => CRM_Utils_Array::value('subject', $formValues),
-        'from' => CRM_Utils_Array::value('from_email_address', $formValues),
+        'subject' => $formValues['subject'] ?? NULL,
+        'from' => $formValues['from_email_address'] ?? NULL,
       ];
 
       $emailParams['from'] = CRM_Utils_Mail::formatFromAddress($emailParams['from']);
@@ -49,8 +49,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       }
     }
     // update dates ?
-    $receipt_update = isset($formValues['receipt_update']) ? $formValues['receipt_update'] : FALSE;
-    $thankyou_update = isset($formValues['thankyou_update']) ? $formValues['thankyou_update'] : FALSE;
+    $receipt_update = $formValues['receipt_update'] ?? FALSE;
+    $thankyou_update = $formValues['thankyou_update'] ?? FALSE;
     $nowDate = date('YmdHis');
     $receipts = $thanks = $emailed = 0;
     $updateStatus = '';
@@ -75,8 +75,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $groupBy = $formValues['group_by'];
 
     // skip some contacts ?
-    $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
-    $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
+    $skipOnHold = $form->skipOnHold ?? FALSE;
+    $skipDeceased = $form->skipDeceased ?? TRUE;
     $contributionIDs = $form->getVar('_contributionIds');
     if ($form->_includesSoftCredits) {
       //@todo - comment on what is stored there
@@ -220,7 +220,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    */
   private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator) {
     $categories = self::getTokenCategories();
-    $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact, TRUE, $messageToken);
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $tokenHtml = CRM_Utils_Token::replaceDomainTokens($html_message, $domain, TRUE, $messageToken);
+    $tokenHtml = CRM_Utils_Token::replaceContactTokens($tokenHtml, $contact, TRUE, $messageToken);
     if ($grouped) {
       $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
     }
@@ -258,7 +260,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $contributions = $contacts = [];
     foreach ($contributionIDs as $item => $contributionId) {
       $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
-      $contribution['campaign'] = CRM_Utils_Array::value('contribution_campaign_title', $contribution);
+      $contribution['campaign'] = $contribution['contribution_campaign_title'] ?? NULL;
       $contributions[$contributionId] = $contribution;
 
       if ($isIncludeSoftCredits) {

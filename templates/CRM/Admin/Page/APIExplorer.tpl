@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <style>
@@ -226,13 +210,13 @@
 <div id="mainTabContainer">
   <ul>
     <li class="ui-corner-all" title="GUI to build and execute API calls">
-      <a href="#explorer-tab"><i class="crm-i fa-search"></i> {ts}Explorer{/ts}</a>
+      <a href="#explorer-tab"><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
     </li>
     <li class="ui-corner-all" title="Auto-generated examples from the test suite">
-      <a href="#examples-tab"><i class="crm-i fa-book"></i> {ts}Examples{/ts}</a>
+      <a href="#examples-tab"><i class="crm-i fa-book" aria-hidden="true"></i> {ts}Examples{/ts}</a>
     </li>
     <li class="ui-corner-all" title="API source-code and code-level documentation">
-      <a href="#docs-tab"><i class="crm-i fa-code"></i> {ts}Code Docs{/ts}</a>
+      <a href="#docs-tab"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
     </li>
   </ul>
 
@@ -279,9 +263,9 @@
         <tbody id="api-params"></tbody>
       </table>
       <div id="api-param-buttons" style="display: none;">
-        <a href="#" class="crm-hover-button" id="api-params-add"><i class="crm-i fa-plus"></i> {ts}Add Parameter{/ts}</a>
-        <a href="#" class="crm-hover-button" id="api-option-add"><i class="crm-i fa-cog"></i> {ts}Add Option{/ts}</a>
-        <a href="#" class="crm-hover-button" id="api-chain-add"><i class="crm-i fa-link"></i> {ts}Chain API Call{/ts}</a>
+        <a href="#" class="crm-hover-button" id="api-params-add"><i class="crm-i fa-plus" aria-hidden="true"></i> {ts}Add Parameter{/ts}</a>
+        <a href="#" class="crm-hover-button" id="api-option-add"><i class="crm-i fa-cog" aria-hidden="true"></i> {ts}Add Option{/ts}</a>
+        <a href="#" class="crm-hover-button" id="api-chain-add"><i class="crm-i fa-link" aria-hidden="true"></i> {ts}Chain API Call{/ts}</a>
         {help id="api-chain"}
       </div>
       <div id="api-generated-wraper">
@@ -301,9 +285,9 @@
         </table>
       </div>
       <div class="crm-submit-buttons">
-        <span class="crm-button crm-i-button">
-          <i class="crm-i fa-bolt"></i><input type="submit" value="{ts}Execute{/ts}" class="crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}"/>
-        </span>
+        <button type="submit" class="crm-button crm-form-submit" accesskey="S" title="{ts}Execute API call and display results{/ts}">
+          <i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Execute{/ts}
+        </button>
       </div>
 
 <pre id="api-result" class="linenums">
@@ -366,9 +350,9 @@
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
     <td>
-      <i class="crm-i api-sort-handle fa-arrows"></i>
+      <i class="crm-i api-sort-handle fa-arrows" aria-hidden="true"></i>
       <input style="width: 90%;" class="crm-form-text api-param-name api-input" value="<%= name %>" placeholder="{ts}Parameter{/ts}" />
-      <div class="api-and-or"><span><span class="api-and">{ts}AND{/ts}</span> <i class="crm-i fa-toggle-on"></i> <span class="api-or">{ts}OR{/ts}</span></span></div>
+      <div class="api-and-or"><span><span class="api-and">{ts}AND{/ts}</span> <i class="crm-i fa-toggle-on" aria-hidden="true"></i> <span class="api-or">{ts}OR{/ts}</span></span></div>
     </td>
     <td>
       {literal}
@@ -387,7 +371,7 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts}Value{/ts}"/>
-      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times"></i></a>
+      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </td>
   </tr>
 </script>
@@ -415,7 +399,7 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-option-value api-input" placeholder="{ts}Value{/ts}"/>
-      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times"></i></a>
+      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </td>
   </tr>
 </script>
@@ -423,7 +407,7 @@
 <script type="text/template" id="api-chain-tpl">
   <tr class="api-chain-row">
     <td>
-      <i class="crm-i api-sort-handle fa-arrows"></i>
+      <i class="crm-i api-sort-handle fa-arrows" aria-hidden="true"></i>
       <select style="width: 90%;" class="crm-form-select api-chain-entity">
         <option value=""></option>
         {foreach from=$entities.values item=entity}
@@ -440,7 +424,7 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" value="{ldelim}{rdelim}" placeholder="{ts}API Params{/ts}"/>
-      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times"></i></a>
+      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </td>
   </tr>
 </script>
@@ -460,7 +444,7 @@
   <ul class="fa-ul">
     <% _.forEach(joins, function(join, name) { %>
       <li <% if(join.checked) { %>class="join-enabled"<% } if(join.disabled) { %>class="join-not-available"<% }%>>
-        <i class="fa-li crm-i fa-reply fa-rotate-180"></i>
+        <i class="fa-li crm-i fa-reply fa-rotate-180" aria-hidden="true"></i>
         <label for="select-join-<%= name %>" class="api-checkbox-label">
           <input type="checkbox" id="select-join-<%= name %>" value="<%= name %>" data-entity="<%= join.entity %>" <% if(join.checked) { %>checked<% } if(join.disabled) { %>disabled<% } %>/>
           <%- join.title %>

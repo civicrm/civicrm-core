@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_I18n_Schema {
 
@@ -36,13 +20,11 @@ class CRM_Core_I18n_Schema {
    * Drop all views (for use by CRM_Core_DAO::dropAllTables() mostly).
    */
   public static function dropAllViews() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if (!$domain->locales) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return;
     }
 
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
     $tables = CRM_Core_I18n_SchemaStructure::tables();
 
     foreach ($locales as $locale) {
@@ -60,56 +42,32 @@ class CRM_Core_I18n_Schema {
    *   the first locale to create (migrate to).
    */
   public static function makeMultilingual($locale) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-
-    // break early if the db is already multi-lang
-    if ($domain->locales) {
-      return;
+    $isUpdateDone = FALSE;
+    $domain = new CRM_Core_BAO_Domain();
+    $domain->find();
+    $domains = [];
+    while ($domain->fetch()) {
+      // We need to build an array to iterate through here as something later down clears
+      // the cache on the fetch results & causes only the first to be retrieved.
+      $domains[] = clone $domain;
     }
-
-    $dao = new CRM_Core_DAO();
-
-    // build the column-adding SQL queries
-    $columns = CRM_Core_I18n_SchemaStructure::columns();
-    $indices = CRM_Core_I18n_SchemaStructure::indices();
-    $queries = [];
-    foreach ($columns as $table => $hash) {
-      // drop old indices
-      if (isset($indices[$table])) {
-        foreach ($indices[$table] as $index) {
-          if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
-            $queries[] = "DROP INDEX {$index['name']} ON {$table}";
-          }
-        }
-      }
-      // deal with columns
-      foreach ($hash as $column => $type) {
-        $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
-        if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
-          $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
-          $queries[] = "ALTER TABLE {$table} DROP {$column}";
-        }
+    foreach ($domains as $domain) {
+      // skip if the domain is already multi-lang.
+      if ($domain->locales) {
+        continue;
       }
 
-      // add view
-      $queries[] = self::createViewQuery($locale, $table, $dao);
+      if (!$isUpdateDone) {
+        $isUpdateDone = self::alterTablesToSupportMultilingual($locale);
+      }
 
-      // add new indices
-      $queries = array_merge($queries, array_values(self::createIndexQueries($locale, $table)));
+      // update civicrm_domain.locales
+      $domain->locales = $locale;
+      $domain->save();
+
+      // CRM-21627 Updates the $dbLocale
+      CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
     }
-
-    // execute the queries without i18n rewriting
-    foreach ($queries as $query) {
-      $dao->query($query, FALSE);
-    }
-
-    // update civicrm_domain.locales
-    $domain->locales = $locale;
-    $domain->save();
-
-    // CRM-21627 Updates the $dbLocale
-    CRM_Core_BAO_ConfigSetting::applyLocale(Civi::settings($domain->id), $domain->locales);
   }
 
   /**
@@ -121,6 +79,7 @@ class CRM_Core_I18n_Schema {
    */
   public static function makeSinglelingual($retain) {
     $domain = new CRM_Core_DAO_Domain();
+    $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -170,6 +129,7 @@ class CRM_Core_I18n_Schema {
     $triggers = []
   ) {
     $domain = new CRM_Core_DAO_Domain();
+    $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -247,6 +207,7 @@ class CRM_Core_I18n_Schema {
   public static function addLocale($locale, $source) {
     // get the current supported locales
     $domain = new CRM_Core_DAO_Domain();
+    $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
     $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
 
@@ -503,17 +464,17 @@ class CRM_Core_I18n_Schema {
       if (!in_array($dao->Field, array_keys($columns[$table])) and
         !preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $dao->Field)
       ) {
-        $cols[] = $dao->Field;
+        $cols[] = '`' . $dao->Field . '`';
       }
       $tableCols[] = $dao->Field;
     }
     // view intrernationalized columns through an alias
     foreach ($columns[$table] as $column => $_) {
       if (!$isUpgradeMode) {
-        $cols[] = "{$column}_{$locale} {$column}";
+        $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
       elseif (in_array("{$column}_{$locale}", $tableCols)) {
-        $cols[] = "{$column}_{$locale} {$column}";
+        $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
     }
     return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
@@ -525,13 +486,11 @@ class CRM_Core_I18n_Schema {
    */
   public static function triggerInfo(&$info, $tableName = NULL) {
     // get the current supported locales
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if (empty($domain->locales)) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return;
     }
 
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
     $locale = array_pop($locales);
 
     // CRM-10027
@@ -620,6 +579,55 @@ class CRM_Core_I18n_Schema {
         'sql' => $sql,
       ];
     }
+  }
+
+  /**
+   * Alter tables to the structure to support multilingual.
+   *
+   * This alters the db structure to use language specific field names for
+   * localised fields and adds the relevant views.
+   *
+   * @param string $locale
+   *
+   * @return bool
+   */
+  protected static function alterTablesToSupportMultilingual($locale): bool {
+    $dao = new CRM_Core_DAO();
+
+    // build the column-adding SQL queries
+    $columns = CRM_Core_I18n_SchemaStructure::columns();
+    $indices = CRM_Core_I18n_SchemaStructure::indices();
+    $queries = [];
+    foreach ($columns as $table => $hash) {
+      // drop old indices
+      if (isset($indices[$table])) {
+        foreach ($indices[$table] as $index) {
+          if (CRM_Core_BAO_SchemaHandler::checkIfIndexExists($table, $index['name'])) {
+            $queries[] = "DROP INDEX {$index['name']} ON {$table}";
+          }
+        }
+      }
+      // deal with columns
+      foreach ($hash as $column => $type) {
+        $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
+        if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+          $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
+          $queries[] = "ALTER TABLE {$table} DROP {$column}";
+        }
+      }
+
+      // add view
+      $queries[] = self::createViewQuery($locale, $table, $dao);
+
+      // add new indices
+      $queries = array_merge($queries, array_values(self::createIndexQueries($locale, $table)));
+    }
+
+    // execute the queries without i18n rewriting
+    foreach ($queries as $query) {
+      $dao->query($query, FALSE);
+    }
+    return TRUE;
   }
 
 }

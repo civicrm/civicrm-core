@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
@@ -349,10 +333,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $allTags[$id] = [
         'text' => $tag['name'],
         'id' => $id,
-        'description' => CRM_Utils_Array::value('description', $tag),
-        'parent_id' => CRM_Utils_Array::value('parent_id', $tag),
-        'used_for' => CRM_Utils_Array::value('used_for', $tag),
-        'color' => CRM_Utils_Array::value('color', $tag),
+        'description' => $tag['description'] ?? NULL,
+        'parent_id' => $tag['parent_id'] ?? NULL,
+        'used_for' => $tag['used_for'] ?? NULL,
+        'color' => $tag['color'] ?? NULL,
       ];
       if (!$allowSelectingNonSelectable && empty($tag['is_selectable'])) {
         $allTags[$id]['disabled'] = TRUE;
@@ -409,7 +393,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *   object on success, otherwise null
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    $id = $params['id'] ?? $ids['tag'] ?? NULL;
     if (!$id && !self::dataExists($params)) {
       return NULL;
     }
@@ -428,8 +412,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       }
     }
 
-    $tag = new CRM_Core_DAO_Tag();
-
     // if parent id is set then inherit used for and is hidden properties
     if (!empty($params['parent_id'])) {
       // get parent details
@@ -439,35 +421,31 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $params['used_for'] = implode(',', $params['used_for']);
     }
 
+    // Hack to make white null, because html5 color widget can't be empty
     if (isset($params['color']) && strtolower($params['color']) === '#ffffff') {
       $params['color'] = '';
     }
 
-    $tag->copyValues($params);
-    $tag->id = $id;
-    $hook = !$id ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Tag', $tag->id, $params);
-
     // save creator id and time
-    if (!$tag->id) {
-      $session = CRM_Core_Session::singleton();
-      $tag->created_id = $session->get('userID');
-      $tag->created_date = date('YmdHis');
+    if (!$id) {
+      $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
+      $params['created_date'] = $params['created_date'] ?? date('YmdHis');
     }
 
-    $tag->save();
-    CRM_Utils_Hook::post($hook, 'Tag', $tag->id, $tag);
+    $tag = self::writeRecord($params);
 
     // if we modify parent tag, then we need to update all children
-    $tag->find(TRUE);
-    if (!$tag->parent_id && $tag->used_for) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2",
-        [
+    if ($id) {
+      $tag->find(TRUE);
+      if (!$tag->parent_id && $tag->used_for) {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_tag SET used_for=%1 WHERE parent_id = %2", [
           1 => [$tag->used_for, 'String'],
           2 => [$tag->id, 'Integer'],
-        ]
-      );
+        ]);
+      }
     }
+
+    CRM_Core_PseudoConstant::flush();
 
     return $tag;
   }
@@ -476,11 +454,10 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * Check if there is data to create the object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return bool
    */
-  public static function dataExists(&$params) {
+  public static function dataExists($params) {
     // Disallow empty values except for the number zero.
     // TODO: create a utility for this since it's needed in many places
     if (!empty($params['name']) || (string) $params['name'] === '0') {

@@ -5,13 +5,15 @@ namespace Civi\Token\Event;
  * Class TokenRenderEvent
  * @package Civi\Token\Event
  *
- * A TokenRenderEvent is fired after the TokenProcessor has rendered
- * a message.
+ * Perform post-processing on a rendered message. A TokenRenderEvent is fired
+ * after the TokenProcessor has rendered a message.
  *
- * The render event may be used for post-processing the text, but
+ * WARNING: The render event may be used for post-processing the text, but
  * it's very difficult to do substantive work in a secure, robust
  * way within this event. The event primarily exists to facilitate
  * a transition of some legacy code.
+ *
+ * Event name: 'civi.token.render'
  */
 class TokenRenderEvent extends TokenEvent {
 

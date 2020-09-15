@@ -34,7 +34,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       'rowCount' => 50,
       'sort' => NULL,
       'parentsOnly' => FALSE,
-      'is_unit_test' => TRUE,
     ];
     $this->hookClass = CRM_Utils_Hook::singleton();
     $this->createLoggedInUser();
@@ -90,15 +89,45 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $obj = new CRM_Group_Page_AJAX();
 
     //filter with title
-    $_GET['title'] = "not-me-active";
-    $groups = $obj->getGroupList();
+    $_GET['title'] = 'not-me-active';
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
+    $this->assertEquals(1, $groups['recordsTotal']);
+    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    // Search on just smart groups keeping the title filter
+    $_GET['savedSearch'] = 1;
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
+    $this->assertEquals(0, $groups['recordsTotal']);
+    // Now search on just normal groups keeping the title filter
+    $_GET['savedSearch'] = 2;
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
     $this->assertEquals(1, $groups['recordsTotal']);
     $this->assertEquals('not-me-active', $groups['data'][0]['title']);
     unset($_GET['title']);
+    unset($_GET['savedSearch']);
 
     // check on status
     $_GET['status'] = 2;
-    $groups = $obj->getGroupList();
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
     foreach ($groups['data'] as $key => $val) {
       $this->assertEquals('crm-entity disabled', $val['DT_RowClass']);
     }
@@ -544,8 +573,14 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     // Load the Manage Group page code and we should get a count from our
     // group because the cache is fresh.
     $_GET = $this->_params;
-    $obj = new CRM_Group_Page_AJAX();
-    $groups = $obj->getGroupList();
+    // look for Smart Group only
+    $_GET['savedSearch'] = 1;
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
 
     // Make sure we returned our smart group and ensure the count is accurate.
     $found = FALSE;
@@ -566,8 +601,12 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
     // Load the Manage Group page code.
     $_GET = $this->_params;
-    $obj = new CRM_Group_Page_AJAX();
-    $groups = $obj->getGroupList();
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $groups = $e->errorData;
+    }
 
     // Make sure the smart group reports unknown count.
     $count_is_unknown = FALSE;
@@ -607,8 +646,12 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
     // Load the Manage Group page code.
     $_GET = $this->_params;
-    $obj = new CRM_Group_Page_AJAX();
-    $groups = $obj->getGroupList();
+    try {
+      CRM_Group_Page_AJAX::getGroupList();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Perhaps this was just testing valid sql...
+    }
 
     // Ensure we did not regenerate the cache.
     $sql = 'SELECT DATE_FORMAT(cache_date, "%Y%m%d%H%i%s") AS cache_date ' .

@@ -104,22 +104,6 @@
     <add>3.2</add>
   </field>
   <field>
-    <name>is_registration</name>
-    <type>boolean</type>
-    <default>0</default>
-    <comment>Is this field included in new user registration forms?</comment>
-    <add>1.1</add>
-    <drop>1.3</drop>
-  </field>
-  <field>
-    <name>is_match</name>
-    <type>boolean</type>
-    <default>0</default>
-    <comment>Is this field part of the key for matching users to contacts?</comment>
-    <add>1.1</add>
-    <drop>1.3</drop>
-  </field>
-  <field>
     <name>visibility</name>
     <title>Profile Field Visibility</title>
     <type>varchar</type>
@@ -133,14 +117,6 @@
     <html>
       <type>Select</type>
     </html>
-  </field>
-  <field>
-    <name>listings_title</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>Page title for listings page (users who share a common value for this property).</comment>
-    <add>1.1</add>
-    <drop>1.2</drop>
   </field>
   <field>
     <name>in_selector</name>
@@ -172,14 +148,6 @@
     <add>1.3</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>
-    <name>phone_type</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>Phone type, if required</comment>
-    <add>1.3</add>
-    <drop>2.2</drop>
-  </field>
   <field>
     <name>phone_type_id</name>
     <title>Profile Field Phone Type</title>

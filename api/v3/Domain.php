@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -41,20 +25,26 @@
  */
 function civicrm_api3_domain_get($params) {
 
-  $params['version'] = CRM_Utils_Array::value('domain_version', $params);
+  $params['version'] = $params['domain_version'] ?? NULL;
   unset($params['version']);
 
-  $bao = new CRM_Core_BAO_Domain();
   if (!empty($params['current_domain'])) {
-    $domainBAO = CRM_Core_Config::domainID();
-    $params['id'] = $domainBAO;
+    $params['id'] = CRM_Core_Config::domainID();
   }
   if (!empty($params['options']) && !empty($params['options']['is_count'])) {
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE);
-  $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Domain');
+  // If requesting current domain, read from cache
+  if (!empty($params['id']) && $params['id'] == CRM_Core_Config::domainID()) {
+    $bao = CRM_Core_BAO_Domain::getDomain();
+    $domains = [$params['id'] => $bao->toArray()];
+  }
+  else {
+    $bao = new CRM_Core_BAO_Domain();
+    _civicrm_api3_dao_set_filter($bao, $params, TRUE);
+    $domains = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Domain');
+  }
 
   foreach ($domains as $domain) {
     if (!empty($domain['contact_id'])) {
@@ -70,14 +60,14 @@ function civicrm_api3_domain_get($params) {
       ];
 
       if (!empty($values['location']['email'])) {
-        $domain['domain_email'] = CRM_Utils_Array::value('email', $values['location']['email'][1]);
+        $domain['domain_email'] = $values['location']['email'][1]['email'] ?? NULL;
       }
 
       if (!empty($values['location']['phone'])) {
         $domain['domain_phone'] = [
           'phone_type' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id',
             CRM_Utils_Array::value('phone_type_id', $values['location']['phone'][1])),
-          'phone' => CRM_Utils_Array::value('phone', $values['location']['phone'][1]),
+          'phone' => $values['location']['phone'][1]['phone'] ?? NULL,
         ];
       }
 

@@ -19,11 +19,11 @@ class Civi {
   /**
    * A central location for static variable storage.
    * @var array
-   * @code
+   * ```
    * `Civi::$statics[__CLASS__]['foo'] = 'bar';
-   * @endcode
+   * ```
    */
-  public static $statics = array();
+  public static $statics = [];
 
   /**
    * Retrieve a named cache instance.
@@ -64,7 +64,14 @@ class Civi {
    * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
    */
   public static function dispatcher() {
-    return Civi\Core\Container::singleton()->get('dispatcher');
+    // NOTE: The dispatcher object is initially created as a boot service
+    // (ie `dispatcher.boot`). For compatibility with the container (eg
+    // `RegisterListenersPass` and `createEventDispatcher` addons),
+    // it is also available as the `dispatcher` service.
+    //
+    // The 'dispatcher.boot' and 'dispatcher' services are the same object,
+    // but 'dispatcher.boot' is resolvable earlier during bootstrap.
+    return Civi\Core\Container::getBootService('dispatcher.boot');
   }
 
   /**
@@ -75,7 +82,7 @@ class Civi {
   }
 
   /**
-   * @return \Psr\Log\LoggerInterface
+   * @return \CRM_Core_Error_Log
    */
   public static function log() {
     return Civi\Core\Container::singleton()->get('psr_log');
@@ -106,7 +113,7 @@ class Civi {
    * singletons, containers.
    */
   public static function reset() {
-    self::$statics = array();
+    self::$statics = [];
     Civi\Core\Container::singleton();
   }
 

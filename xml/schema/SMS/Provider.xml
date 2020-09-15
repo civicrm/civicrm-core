@@ -63,6 +63,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>points to value in civicrm_option_value for group sms_api_type</comment>
+    <pseudoconstant>
+      <optionGroupName>sms_api_type</optionGroupName>
+    </pseudoconstant>
     <html>
       <type>Select</type>
     </html>

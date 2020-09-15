@@ -145,32 +145,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 var submitcount = 0;
-/**
- * Old submit-once function. Will be removed soon.
- * @deprecated
- */
-function submitOnce(obj, formId, procText) {
-  // if named button clicked, change text
-  if (obj.value != null) {
-    cj('input[name=' + obj.name + ']').val(procText + " ...");
-  }
-  cj(obj).closest('form').attr('data-warn-changes', 'false');
-  if (document.getElementById) { // disable submit button for newer browsers
-    cj('input[name=' + obj.name + ']').attr("disabled", true);
-    document.getElementById(formId).submit();
-    return true;
-  }
-  else { // for older browsers
-    if (submitcount == 0) {
-      submitcount++;
-      return true;
-    }
-    else {
-      alert("Your request is currently being processed ... Please wait.");
-      return false;
-    }
-  }
-}
 
 /**
  * Function to show / hide the row in optionFields
@@ -218,7 +192,7 @@ if (!CRM.vars) CRM.vars = {};
   $.propHooks.disabled = {
     set: function (el, value, name) {
       // Sync button enabled status with wrapper css
-      if ($(el).is('span.crm-button > input.crm-form-submit')) {
+      if ($(el).is('.crm-button.crm-form-submit')) {
         $(el).parent().toggleClass('crm-button-disabled', !!value);
       }
       // Sync button enabled status with dialog button
@@ -315,6 +289,17 @@ if (!CRM.vars) CRM.vars = {};
     return rendered;
   };
 
+  CRM.utils.getOptions = function(select) {
+    var options = [];
+    $('option', select).each(function() {
+      var option = {key: $(this).attr('value'), value: $(this).text()};
+      if (option.key !== '') {
+        options.push(option);
+      }
+    });
+    return options;
+  };
+
   function chainSelect() {
     var $form = $(this).closest('form'),
       $target = $('select[data-name="' + $(this).data('target') + '"]', $form),
@@ -387,13 +372,42 @@ if (!CRM.vars) CRM.vars = {};
       description = row.description || $(row.element).data('description'),
       ret = '';
     if (icon) {
-      ret += '<i class="crm-i ' + icon + '"></i> ';
+      ret += '<i class="crm-i ' + icon + '" aria-hidden="true"></i> ';
     }
     if (color) {
       ret += '<span class="crm-select-item-color" style="background-color: ' + color + '"></span> ';
     }
     return ret + _.escape(row.text) + (description ? '<div class="crm-select2-row-description"><p>' + _.escape(description) + '</p></div>' : '');
   }
+
+  /**
+   * Helper to generate an icon with alt text.
+   *
+   * See also smarty `{icon}` and CRM_Core_Page::crmIcon() functions
+   *
+   * @param string icon
+   *   The Font Awesome icon class to use.
+   * @param string text
+   *   Alt text to display.
+   * @param mixed condition
+   *   This will only display if this is truthy.
+   *
+   * @return string
+   *   The formatted icon markup.
+   */
+  CRM.utils.formatIcon = function (icon, text, condition) {
+    if (typeof condition !== 'undefined' && !condition) {
+      return '';
+    }
+    var title = '';
+    var sr = '';
+    if (text) {
+      text = _.escape(text);
+      title = ' title="' + text + '"';
+      sr = '<span class="sr-only">' + text + '</span>';
+    }
+    return '<i class="crm-i ' + icon + '"' + title + ' aria-hidden="true"></i>' + sr;
+  };
 
   /**
    * Wrapper for select2 initialization function; supplies defaults
@@ -404,6 +418,7 @@ if (!CRM.vars) CRM.vars = {};
       return $(this).each(function() {
         $(this)
           .removeClass('crm-ajax-select')
+          .off('.crmSelect2')
           .select2('destroy');
       });
     }
@@ -433,11 +448,18 @@ if (!CRM.vars) CRM.vars = {};
             placeholder = settings.placeholder || $el.data('placeholder') || $el.attr('placeholder') || $('option[value=""]', $el).text();
           if (m.length && placeholder === m) {
             iconClass = $el.attr('class').match(/(fa-\S*)/)[1];
-            out = '<i class="crm-i ' + iconClass + '"></i> ' + out;
+            out = '<i class="crm-i ' + iconClass + '" aria-hidden="true"></i> ' + out;
           }
           return out;
         };
       }
+
+      // Use description as title for each option
+      $el.on('select2-loaded.crmSelect2', function() {
+        $('.crm-select2-row-description', '#select2-drop').each(function() {
+          $(this).closest('.select2-result-label').attr('title', $(this).text());
+        });
+      });
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
@@ -671,7 +693,7 @@ if (!CRM.vars) CRM.vars = {};
       '</div>' +
       '<div class="crm-select2-row-description">';
     $.each(row.description || [], function(k, text) {
-      markup += '<p>' + _.escape(text) + '</p>';
+      markup += '<p>' + _.escape(text) + '</p> ';
     });
     markup += '</div></div></div>';
     return markup;
@@ -696,7 +718,7 @@ if (!CRM.vars) CRM.vars = {};
     }
     _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">' +
-        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '"></i> ' +
+        '<i class="crm-i ' + (link.icon || 'fa-plus-circle') + '" aria-hidden="true"></i> ' +
         _.escape(link.label) + '</a>';
     });
     markup += '</div>';
@@ -842,9 +864,11 @@ if (!CRM.vars) CRM.vars = {};
    */
   $.fn.crmValidate = function(params) {
     return $(this).each(function () {
-      var that = this,
-        settings = $.extend({}, CRM.validate._defaults, CRM.validate.params);
-      $(this).validate(settings);
+      var validator = $(this).validate();
+      var that = this;
+      validator.settings = $.extend({}, validator.settings, CRM.validate._defaults, CRM.validate.params);
+      // Call our custom validation handler.
+      $(validator.currentForm).on("invalid-form.validate", validator.settings.invalidHandler);
       // Call any post-initialization callbacks
       if (CRM.validate.functions && CRM.validate.functions.length) {
         $.each(CRM.validate.functions, function(i, func) {
@@ -928,7 +952,7 @@ if (!CRM.vars) CRM.vars = {};
           });
         }
       });
-      if ($("input:radio[name=radio_ts]").size() == 1) {
+      if ($("input:radio[name=radio_ts]").length == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
       }
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
@@ -958,7 +982,7 @@ if (!CRM.vars) CRM.vars = {};
       $('form[data-submit-once]', e.target)
         .submit(submitOnceForm)
         .on('invalid-form', submitFormInvalid);
-      $('form[data-submit-once] input[type=submit]', e.target).click(function(e) {
+      $('form[data-submit-once] button[type=submit]', e.target).click(function(e) {
         submitButton = e.target;
       });
     })
@@ -1077,7 +1101,7 @@ if (!CRM.vars) CRM.vars = {};
     }
   };
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.status = function(options, deferred) {
     // For simple usage without async operations you can pass in a string. 2nd param is optional string 'error' if this is not a success msg.
@@ -1141,7 +1165,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.alert = function (text, title, type, options) {
     type = type || 'alert';
@@ -1189,7 +1213,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   CRM.confirm = function (options) {
     var dialog, url, msg, buttons = [], settings = {
@@ -1267,7 +1291,7 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
-   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#notifications-and-confirmations
    */
   $.fn.crmError = function (text, title, options) {
     title = title || '';
@@ -1483,27 +1507,42 @@ if (!CRM.vars) CRM.vars = {};
    */
   var currencyTemplate;
   CRM.formatMoney = function(value, onlyNumber, format) {
-    var decimal, separator, sign, i, j, result;
+    var precision, decimal, separator, sign, i, j, result;
     if (value === 'init' && format) {
       currencyTemplate = format;
       return;
     }
     format = format || currencyTemplate;
-    result = /1(.?)234(.?)56/.exec(format);
-    if (result === null) {
+    if ((result = /1(.?)234(.?)56/.exec(format)) !== null) { // If value is formatted to 2 decimals
+      precision = 2;
+    }
+    else if ((result = /1(.?)234(.?)6/.exec(format)) !== null) { // If value is formatted to 1 decimal
+      precision = 1;
+    }
+    else if ((result = /1(.?)235/.exec(format)) !== null) { // If value is formatted to zero decimals
+      precision = false;
+    }
+    else {
       return 'Invalid format passed to CRM.formatMoney';
     }
     separator = result[1];
-    decimal = result[2];
+    decimal = precision ? result[2] : false;
     sign = (value < 0) ? '-' : '';
     //extracting the absolute value of the integer part of the number and converting to string
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
     j = ((j = i.length) > 3) ? j % 3 : 0;
-    result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
-    if ( onlyNumber ) {
+    result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (precision ? decimal + Math.abs(value - i).toFixed(precision).slice(2) : '');
+    if (onlyNumber) {
       return result;
     }
-    return format.replace(/1.*234.*56/, result);
+    switch (precision) {
+      case 2:
+        return format.replace(/1.*234.*56/, result);
+      case 1:
+        return format.replace(/1.*234.*6/, result);
+      case false:
+        return format.replace(/1.*235/, result);
+    }
   };
 
   CRM.angRequires = function(name) {
@@ -1561,7 +1600,11 @@ if (!CRM.vars) CRM.vars = {};
     return Math.round(n / scale) * scale;
   };
 
-  // Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+  /**
+   * Create a js Date object from a unix timestamp or a yyyy-mm-dd string
+   * @param input
+   * @returns {Date}
+   */
   CRM.utils.makeDate = function(input) {
     switch (typeof input) {
       case 'object':
@@ -1570,10 +1613,16 @@ if (!CRM.vars) CRM.vars = {};
 
       case 'string':
         // convert iso format with or without dashes
-        if (input.indexOf('-') > 0) {
-          return $.datepicker.parseDate('yy-mm-dd', input.substr(0, 10));
+        input = input.replace(/[- :]/g, '');
+        var output = $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+        if (input.length === 14) {
+          output.setHours(
+            parseInt(input.substr(8, 2), 10),
+            parseInt(input.substr(10, 2), 10),
+            parseInt(input.substr(12, 2), 10)
+          );
         }
-        return $.datepicker.parseDate('yymmdd', input.substr(0, 8));
+        return output;
 
       case 'number':
         // convert unix timestamp
@@ -1582,10 +1631,39 @@ if (!CRM.vars) CRM.vars = {};
     throw 'Invalid input passed to CRM.utils.makeDate';
   };
 
-  // Format a date for output to the user
-  // Input may be a js Date object, a unix timestamp or a yyyy-mm-dd string
-  CRM.utils.formatDate = function(input, outputFormat) {
-    return input ? $.datepicker.formatDate(outputFormat || CRM.config.dateInputFormat, CRM.utils.makeDate(input)) : '';
+  /**
+   * Format a date (and optionally time) for output to the user
+   *
+   * @param {string|int|Date} input
+   *   Input may be a js Date object, a unix timestamp or a 'yyyy-mm-dd' string
+   * @param {string|null} dateFormat
+   *   A string like 'yy-mm-dd' or null to use the system default
+   * @param {int|bool} timeFormat
+   *   Leave empty to omit time from the output (default)
+   *   Or pass 12, 24, or true to use the system default for 12/24hr format
+   * @returns {string}
+   */
+  CRM.utils.formatDate = function(input, dateFormat, timeFormat) {
+    if (!input) {
+      return '';
+    }
+    var date = CRM.utils.makeDate(input),
+      output = $.datepicker.formatDate(dateFormat || CRM.config.dateInputFormat, date);
+    if (timeFormat) {
+      var hour = date.getHours(),
+        min = date.getMinutes(),
+        suf = '';
+      if (timeFormat === 12 || (timeFormat === true && !CRM.config.timeIs24Hr)) {
+        suf = ' ' + (hour < 12 ? ts('AM') : ts('PM'));
+        if (hour === 0 || hour > 12) {
+          hour = Math.abs(hour - 12);
+        }
+      } else if (hour < 10) {
+        hour = '0' + hour;
+      }
+      output += ' ' + hour + ':' + (min < 10 ? '0' : '') + min + suf;
+    }
+    return output;
   };
 
   // Used to set appropriate text color for a given background
@@ -1604,5 +1682,93 @@ if (!CRM.vars) CRM.vars = {};
       s.contents.script = false;
     }
   });
+
+  // CVE-2020-11022 and CVE-2020-11023  Passing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. .html(), .append(), and others) may execute untrusted code.
+  $.htmlPrefilter = function(html) {
+    // Prior to jQuery 3.5, jQuery converted XHTML-style self-closing tags to
+    // their XML equivalent: e.g., "<div />" to "<div></div>". This is
+    // problematic for several reasons, including that it's vulnerable to XSS
+    // attacks. However, since this was jQuery's behavior for many years, many
+    // Drupal modules and jQuery plugins may be relying on it. Therefore, we
+    // preserve that behavior, but for a limited set of tags only, that we believe
+    // to not be vulnerable. This is the set of HTML tags that satisfy all of the
+    // following conditions:
+    // - In DOMPurify's list of HTML tags. If an HTML tag isn't safe enough to
+    //   appear in that list, then we don't want to mess with it here either.
+    //   @see https://github.com/cure53/DOMPurify/blob/2.0.11/dist/purify.js#L128
+    // - A normal element (not a void, template, text, or foreign element).
+    //   @see https://html.spec.whatwg.org/multipage/syntax.html#elements-2
+    // - An element that is still defined by the current HTML specification
+    //   (not a deprecated element), because we do not want to rely on how
+    //   browsers parse deprecated elements.
+    //   @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+    // - Not 'html', 'head', or 'body', because this pseudo-XHTML expansion is
+    //   designed for fragments, not entire documents.
+    // - Not 'colgroup', because due to an idiosyncrasy of jQuery's original
+    //   regular expression, it didn't match on colgroup, and we don't want to
+    //   introduce a behavior change for that.
+    var selfClosingTagsToReplace = [
+      'a', 'abbr', 'address', 'article', 'aside', 'audio', 'b', 'bdi', 'bdo',
+      'blockquote', 'button', 'canvas', 'caption', 'cite', 'code', 'data',
+      'datalist', 'dd', 'del', 'details', 'dfn', 'div', 'dl', 'dt', 'em',
+      'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3',
+      'h4', 'h5', 'h6', 'header', 'hgroup', 'i', 'ins', 'kbd', 'label', 'legend',
+      'li', 'main', 'map', 'mark', 'menu', 'meter', 'nav', 'ol', 'optgroup',
+      'option', 'output', 'p', 'picture', 'pre', 'progress', 'q', 'rp', 'rt',
+      'ruby', 's', 'samp', 'section', 'select', 'small', 'source', 'span',
+      'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'tfoot', 'th',
+      'thead', 'time', 'tr', 'u', 'ul', 'var', 'video'
+    ];
+
+    // Define regular expressions for <TAG/> and <TAG ATTRIBUTES/>. Doing this as
+    // two expressions makes it easier to target <a/> without also targeting
+    // every tag that starts with "a".
+    var xhtmlRegExpGroup = '(' + selfClosingTagsToReplace.join('|') + ')';
+    var whitespace = '[\\x20\\t\\r\\n\\f]';
+    var rxhtmlTagWithoutSpaceOrAttributes = new RegExp('<' + xhtmlRegExpGroup + '\\/>', 'gi');
+    var rxhtmlTagWithSpaceAndMaybeAttributes = new RegExp('<' + xhtmlRegExpGroup + '(' + whitespace + '[^>]*)\\/>', 'gi');
+
+    // jQuery 3.5 also fixed a vulnerability for when </select> appears within
+    // an <option> or <optgroup>, but it did that in local code that we can't
+    // backport directly. Instead, we filter such cases out. To do so, we need to
+    // determine when jQuery would otherwise invoke the vulnerable code, which it
+    // uses this regular expression to determine. The regular expression changed
+    // for version 3.0.0 and changed again for 3.4.0.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L4958
+    // @see https://github.com/jquery/jquery/blob/3.0.0/dist/jquery.js#L4584
+    // @see https://github.com/jquery/jquery/blob/3.4.0/dist/jquery.js#L4712
+    var rtagName = /<([\w:]+)/;
+
+    // The regular expression that jQuery uses to determine which self-closing
+    // tags to expand to open and close tags. This is vulnerable, because it
+    // matches all tag names except the few excluded ones. We only use this
+    // expression for determining vulnerability. The expression changed for
+    // version 3, but we only need to check for vulnerability in versions 1 and 2,
+    // so we use the expression from those versions.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L4957
+    var rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/gi;
+
+    // This is how jQuery determines the first tag in the HTML.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5521
+    var tag = ( rtagName.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase();
+
+    // It is not valid HTML for <option> or <optgroup> to have <select> as
+    // either a descendant or sibling, and attempts to inject one can cause
+    // XSS on jQuery versions before 3.5. Since this is invalid HTML and a
+    // possible XSS attack, reject the entire string.
+    // @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11023
+    if ((tag === 'option' || tag === 'optgroup') && html.match(/<\/?select/i)) {
+      html = '';
+    }
+
+    // Retain jQuery's prior to 3.5 conversion of pseudo-XHTML, but for only
+    // the tags in the `selfClosingTagsToReplace` list defined above.
+    // @see https://github.com/jquery/jquery/blob/1.5/jquery.js#L5518
+    // @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-11022
+    html = html.replace(rxhtmlTagWithoutSpaceOrAttributes, "<$1></$1>");
+    html = html.replace(rxhtmlTagWithSpaceAndMaybeAttributes, "<$1$2></$1>");
+
+    return html;
+  };
 
 })(jQuery, _);

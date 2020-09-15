@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -237,7 +221,7 @@ class SettingsManager {
       ]);
       $defaults = [];
       foreach ($specs as $key => $spec) {
-        $defaults[$key] = \CRM_Utils_Array::value('default', $spec);
+        $defaults[$key] = $spec['default'] ?? NULL;
       }
       \CRM_Utils_Array::extend($defaults, self::getSystemDefaults($entity));
       $this->cache->set($cacheKey, $defaults);
@@ -307,7 +291,7 @@ class SettingsManager {
 
     if (is_array($civicrm_setting)) {
       foreach ($civicrm_setting as $oldGroup => $values) {
-        $newGroup = isset($rewriteGroups[$oldGroup]) ? $rewriteGroups[$oldGroup] : 'domain';
+        $newGroup = $rewriteGroups[$oldGroup] ?? 'domain';
         $result[$newGroup] = array_merge($result[$newGroup], $values);
       }
     }

@@ -2,48 +2,51 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
  */
 
 namespace Civi\Api4\Action\System;
 
 /**
  * Retrieve system notices, warnings, errors, etc.
+ * @method bool getIncludeDisabled()
  */
 class Check extends \Civi\Api4\Generic\BasicGetAction {
 
+  /**
+   * Run checks that have been explicitly disabled (default false)
+   * @var bool
+   */
+  protected $includeDisabled = FALSE;
+
+  /**
+   * @param bool $includeDisabled
+   * @return Check
+   */
+  public function setIncludeDisabled(bool $includeDisabled): Check {
+    $this->includeDisabled = $includeDisabled;
+    return $this;
+  }
+
   protected function getRecords() {
-    $messages = [];
-    foreach (\CRM_Utils_Check::checkAll() as $message) {
+    $messages = $names = [];
+
+    // Filtering by name relies on the component check rather than the api arrayQuery
+    // @see \CRM_Utils_Check_Component::isCheckable
+    foreach ($this->where as $i => $clause) {
+      if ($clause[0] == 'name' && !empty($clause[2]) && in_array($clause[1], ['=', 'IN'], TRUE)) {
+        $names = (array) $clause[2];
+        unset($this->where[$i]);
+        break;
+      }
+    }
+
+    foreach (\CRM_Utils_Check::checkStatus($names, $this->includeDisabled) as $message) {
       $messages[] = $message->toArray();
     }
     return $messages;

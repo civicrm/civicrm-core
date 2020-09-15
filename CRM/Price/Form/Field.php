@@ -1,40 +1,49 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * form to process actions on the field aspect of Price
  */
 class CRM_Price_Form_Field extends CRM_Core_Form {
+
+  use CRM_Core_Form_EntityFormTrait;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'PriceField';
+  }
+
+  /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_fid;
+  }
 
   /**
    * Constants for number of options for data types of multiple option.
@@ -69,12 +78,19 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   protected $_useForMember;
 
   /**
+   * Set the price Set Id (only used in tests)
+   */
+  public function setPriceSetId($priceSetId) {
+    $this->_sid = $priceSetId;
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
 
-    $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive', $this, FALSE, NULL, 'REQUEST');
-    $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this, FALSE, NULL, 'REQUEST');
+    $this->_sid = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
+    $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive', $this);
     $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
     $breadCrumb = [['title' => ts('Price Set Fields'), 'url' => $url]];
 
@@ -94,20 +110,21 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    *
    * @return array
    *   array of default values
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
     // is it an edit operation ?
-    if (isset($this->_fid)) {
-      $params = ['id' => $this->_fid];
-      $this->assign('fid', $this->_fid);
+    if ($this->getEntityId()) {
+      $params = ['id' => $this->getEntityId()];
+      $this->assign('fid', $this->getEntityId());
       CRM_Price_BAO_PriceField::retrieve($params, $defaults);
       $this->_sid = $defaults['price_set_id'];
 
       // if text, retrieve price
       if ($defaults['html_type'] == 'Text') {
         $isActive = $defaults['is_active'];
-        $valueParams = ['price_field_id' => $this->_fid];
+        $valueParams = ['price_field_id' => $this->getEntityId()];
 
         CRM_Price_BAO_PriceFieldValue::retrieve($valueParams, $defaults);
 
@@ -158,7 +175,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // add a hidden field to remember the price set id
     // this get around the browser tab issue
     $this->add('hidden', 'sid', $this->_sid);
-    $this->add('hidden', 'fid', $this->_fid);
+    $this->add('hidden', 'fid', $this->getEntityId());
 
     // label
     $this->add('text', 'label', ts('Field Label'), CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'label'), TRUE);
@@ -366,10 +383,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
       $url = CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid);
-      $this->addElement('button',
+      $this->addElement('xbutton',
         'done',
         ts('Done'),
-        ['onclick' => "location.href='$url'"]
+        [
+          'type' => 'button',
+          'onclick' => "location.href='$url'",
+        ]
       );
     }
   }
@@ -380,8 +400,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @param $files
-   * @param CRM_Core_Form $form
+   * @param array $files
+   * @param self $form
    *
    * @return array
    *   if errors then list of errors to be posted back to the form,
@@ -397,7 +417,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
      *  Incomplete row checking is also required.
      */
     if (($form->_action & CRM_Core_Action::ADD || $form->_action & CRM_Core_Action::UPDATE) &&
-      $fields['html_type'] == 'Text'
+      $fields['html_type'] === 'Text'
     ) {
       if ($fields['price'] == NULL) {
         $errors['price'] = ts('Price is a required field');
@@ -413,7 +433,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $priceFieldLabel->price_set_id = $form->_sid;
 
     $dupeLabel = FALSE;
-    if ($priceFieldLabel->find(TRUE) && $form->_fid != $priceFieldLabel->id) {
+    if ($priceFieldLabel->find(TRUE) && $form->getEntityId() != $priceFieldLabel->id) {
       $dupeLabel = TRUE;
     }
 
@@ -435,7 +455,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $publicOptionCount = $_flagOption = $_rowError = 0;
 
         $_showHide = new CRM_Core_ShowHideBlocks('', '');
-        $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, ['labelColumn' => 'name']);
+        $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', 'validate');
 
         for ($index = 1; $index <= self::NUM_OPTION; $index++) {
 
@@ -590,7 +610,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           for ($index = 1; $index <= self::NUM_OPTION; $index++) {
 
             $isOptionSet = !empty($fields['option_label'][$index]) || !empty($fields['option_amount'][$index]);
-            $currentOptionVisibility = CRM_Utils_Array::value($fields['option_visibility_id'][$index], $visibilityOptions);
+            $currentOptionVisibility = $visibilityOptions[$fields['option_visibility_id'][$index]] ?? NULL;
 
             if ($isOptionSet && $currentOptionVisibility == 'public') {
               $errors["option_visibility_id[{$index}]"] = ts('\'Admin\' field should only have \'Admin\' visibility options.');
@@ -624,10 +644,36 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
   /**
    * Process the form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
+    $params['id'] = $this->getEntityId();
+    $priceField = $this->submit($params);
+    if (!is_a($priceField, 'CRM_Core_Error')) {
+      // Required by extensions implementing the postProcess hook (to get the ID of new entities)
+      $this->setEntityId($priceField->id);
+      CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
+    }
+    $buttonName = $this->controller->getButtonName();
+    $session = CRM_Core_Session::singleton();
+    if ($buttonName == $this->getButtonName('next', 'new')) {
+      CRM_Core_Session::setStatus(ts(' You can add another price set field.'), '', 'info');
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=add&sid=' . $this->_sid));
+    }
+    else {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));
+    }
+  }
+
+  public function submit($params) {
+    $params['price'] = CRM_Utils_Rule::cleanMoney($params['price']);
+    foreach ($params['option_amount'] as $key => $amount) {
+      $params['option_amount'][$key] = CRM_Utils_Rule::cleanMoney($amount);
+    }
 
     $params['is_display_amounts'] = CRM_Utils_Array::value('is_display_amounts', $params, FALSE);
     $params['is_required'] = CRM_Utils_Array::value('is_required', $params, FALSE);
@@ -642,8 +688,8 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       $fieldValues = ['price_set_id' => $this->_sid];
       $oldWeight = NULL;
-      if ($this->_fid) {
-        $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'weight', 'id');
+      if ($this->getEntityId()) {
+        $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->getEntityId(), 'weight', 'id');
       }
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceField', $oldWeight, $params['weight'], $fieldValues);
     }
@@ -654,7 +700,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
     $params['is_enter_qty'] = CRM_Utils_Array::value('is_enter_qty', $params, FALSE);
 
-    if ($params['html_type'] == 'Text') {
+    if ($params['html_type'] === 'Text') {
       // if html type is Text, force is_enter_qty on
       $params['is_enter_qty'] = 1;
       // modify params values as per the option group and option
@@ -669,26 +715,10 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_visibility_id'] = [1 => CRM_Utils_Array::value('visibility_id', $params)];
     }
 
-    if ($this->_fid) {
-      $params['id'] = $this->_fid;
-    }
-
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
 
     $priceField = CRM_Price_BAO_PriceField::create($params);
-
-    if (!is_a($priceField, 'CRM_Core_Error')) {
-      CRM_Core_Session::setStatus(ts('Price Field \'%1\' has been saved.', [1 => $priceField->label]), ts('Saved'), 'success');
-    }
-    $buttonName = $this->controller->getButtonName();
-    $session = CRM_Core_Session::singleton();
-    if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another price set field.'), '', 'info');
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=add&sid=' . $this->_sid));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&action=browse&sid=' . $this->_sid));
-    }
+    return $priceField;
   }
 
 }

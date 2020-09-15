@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -122,7 +106,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $mappingId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'mapping_id');
     }
 
-    CRM_Core_BAO_Mapping::buildMappingForm($this, 'Search Builder', $mappingId, $this->_columnCount, $this->_blockCount);
+    CRM_Core_BAO_Mapping::buildMappingForm($this, $mappingId, $this->_columnCount, $this->_blockCount);
 
     parent::buildQuickForm();
   }
@@ -206,8 +190,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
               $fldName = substr($v[0], 13);
             }
 
-            $fldValue = CRM_Utils_Array::value($fldName, $fields);
-            $fldType = CRM_Utils_Array::value('type', $fldValue);
+            $fldValue = $fields[$fldName] ?? NULL;
+            $fldType = $fldValue['type'] ?? NULL;
             $type = CRM_Utils_Type::typeToString($fldType);
 
             if (strstr($v[1], 'IN')) {
@@ -344,7 +328,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         return;
       }
       // Add another field
-      $addMore = CRM_Utils_Array::value('addMore', $params);
+      $addMore = $params['addMore'] ?? NULL;
       for ($x = 1; $x <= $this->_blockCount; $x++) {
         if (!empty($addMore[$x])) {
           $this->set('newBlock', $x);

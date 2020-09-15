@@ -41,6 +41,7 @@
       <type>Text</type>
     </html>
     <add>3.3</add>
+    <default>NULL</default>
   </field>
   <field>
     <name>label</name>
@@ -53,6 +54,7 @@
       <type>Text</type>
     </html>
     <add>3.3</add>
+    <default>NULL</default>
   </field>
   <field>
     <name>description</name>

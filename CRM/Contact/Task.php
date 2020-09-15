@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -64,21 +48,25 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'title' => ts('Group - add contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToGroup',
           'url' => 'civicrm/task/add-to-group',
+          'icon' => 'fa-user-plus',
         ),
         self::GROUP_REMOVE => array(
           'title' => ts('Group - remove contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromGroup',
           'url' => 'civicrm/task/remove-from-group',
+          'icon' => 'fa-user-plus',
         ),
         self::TAG_ADD => array(
           'title' => ts('Tag - add to contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToTag',
           'url' => 'civicrm/task/add-to-tag',
+          'icon' => 'fa-tags',
         ),
         self::TAG_REMOVE => array(
           'title' => ts('Tag - remove from contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromTag',
           'url' => 'civicrm/task/remove-from-tag',
+          'icon' => 'fa-tag',
         ),
         self::TASK_EXPORT => array(
           'title' => ts('Export contacts'),
@@ -96,12 +84,14 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
           'url' => 'civicrm/task/send-email',
+          'icon' => 'fa-paper-plane-o',
         ),
         self::TASK_DELETE => array(
           'title' => ts('Delete contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
           'result' => FALSE,
           'url' => 'civicrm/task/delete-contact',
+          'icon' => 'fa-trash',
         ),
         self::RECORD_CONTACTS => array(
           'title' => ts('Add activity'),
@@ -127,6 +117,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'class' => 'CRM_Contact_Form_Task_Label',
           'result' => TRUE,
           'url' => 'civicrm/task/make-mailing-label',
+          'icon' => 'fa-print',
         ),
         self::BATCH_UPDATE => array(
           'title' => ts('Update multiple contacts'),
@@ -136,22 +127,26 @@ class CRM_Contact_Task extends CRM_Core_Task {
           ),
           'result' => TRUE,
           'url' => 'civicrm/task/pick-profile',
+          'icon' => 'fa-pencil',
         ),
         self::PDF_LETTER => array(
           'title' => ts('Print/merge document'),
           'class' => 'CRM_Contact_Form_Task_PDF',
           'result' => TRUE,
           'url' => 'civicrm/task/print-document',
+          'icon' => 'fa-file-pdf-o',
         ),
         self::EMAIL_UNHOLD => array(
           'title' => ts('Email - unhold addresses'),
           'class' => 'CRM_Contact_Form_Task_Unhold',
           'url' => 'civicrm/task/unhold-email',
+          'icon' => 'fa-unlock',
         ),
         self::COMMUNICATION_PREFS => array(
           'title' => ts('Communication preferences - alter'),
           'class' => 'CRM_Contact_Form_Task_AlterPreferences',
           'url' => 'civicrm/task/alter-contact-preference',
+          'icon' => 'fa-check-square-o',
         ),
         self::RESTORE => array(
           'title' => ts('Restore contacts from trash'),
@@ -176,7 +171,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
       }
 
       if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('individual');
+        $label = CRM_Contact_BAO_ContactType::getLabel('Individual');
         self::$_tasks[self::INDIVIDUAL_CONTACTS] = array(
           'title' => ts('Add relationship - to %1',
             array(1 => $label)
@@ -186,7 +181,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
       }
 
       if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('household');
+        $label = CRM_Contact_BAO_ContactType::getLabel('Household');
         self::$_tasks[self::HOUSEHOLD_CONTACTS] = array(
           'title' => ts('Add relationship - to %1',
             array(1 => $label)
@@ -196,7 +191,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
       }
 
       if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('organization');
+        $label = CRM_Contact_BAO_ContactType::getLabel('Organization');
         self::$_tasks[self::ORGANIZATION_CONTACTS] = array(
           'title' => ts('Add relationship - to %1',
             array(1 => $label)
@@ -255,7 +250,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
 
       if (CRM_Core_Permission::access('CiviCase')) {
         self::$_tasks[self::ADD_TO_CASE] = array(
-          'title' => 'Add to case as role',
+          'title' => ts('Add to case as role'),
           'class' => 'CRM_Case_Form_AddToCaseAsRole',
           'result' => FALSE,
         );
@@ -278,12 +273,12 @@ class CRM_Contact_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (!isset($params['deletedContacts'])) {
       $params['deletedContacts'] = FALSE;
     }
     self::tasks();
-    $tasks = array();
+    $tasks = [];
     if ($params['deletedContacts']) {
       if (CRM_Core_Permission::check('access deleted contacts')) {
         $tasks[self::RESTORE] = self::$_tasks[self::RESTORE]['title'];
@@ -327,7 +322,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
   public static function getTask($value) {
     self::tasks();
 
-    if (!CRM_Utils_Array::value($value, self::$_tasks)) {
+    if (empty(self::$_tasks[$value])) {
       // make it the print task by default
       $value = self::TASK_PRINT;
     }

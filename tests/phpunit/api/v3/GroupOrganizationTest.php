@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -100,17 +84,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_group_organization_get with wrong params.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupOrganizationGetWithWrongParams() {
-    $params = 'groupOrg';
-    $result = $this->callAPIFailure('group_organization', 'get', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Test civicrm_group_organization_get invalid keys.
    *
    * @dataProvider versionThreeAndFour
@@ -166,17 +139,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with invalid params.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupOrganizationCreateParamsNotArray() {
-    $params = 'group_org';
-    $result = $this->callAPIFailure('group_organization', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
-
-  /**
    * Check with invalid params keys.
    *
    * @dataProvider versionThreeAndFour
@@ -190,17 +152,6 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_group_organization_remove methods
-
-  /**
-   * Test civicrm_group_organization_remove with params not an array.
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGroupOrganizationDeleteParamsNotArray() {
-    $params = 'delete';
-    $result = $this->callAPIFailure('group_organization', 'delete', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
 
   /**
    * Test civicrm_group_organization_remove with empty params.

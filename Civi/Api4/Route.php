@@ -2,49 +2,41 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 namespace Civi\Api4;
 
-use Civi\Api4\Generic\BasicGetFieldsAction;
-
+/**
+ * CiviCRM menu route.
+ *
+ * Provides page routes registered in the CiviCRM menu system.
+ *
+ * Note: this is a read-only api as routes are set via xml files and hooks.
+ *
+ * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterMenu/
+ *
+ * @package Civi\Api4
+ */
 class Route extends \Civi\Api4\Generic\AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return \Civi\Api4\Generic\BasicGetAction
    */
-  public static function get() {
-    return new \Civi\Api4\Generic\BasicGetAction(__CLASS__, __FUNCTION__, function ($get) {
+  public static function get($checkPermissions = TRUE) {
+    return (new \Civi\Api4\Generic\BasicGetAction(__CLASS__, __FUNCTION__, function ($get) {
       // Pulling from ::items() rather than DB -- because it provides the final/live/altered data.
       $items = \CRM_Core_Menu::items();
       $result = [];
@@ -52,11 +44,15 @@ class Route extends \Civi\Api4\Generic\AbstractEntity {
         $result[] = ['path' => $path] + $item;
       }
       return $result;
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
-  public static function getFields() {
-    return new BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
       return [
         [
           'name' => 'path',
@@ -95,7 +91,7 @@ class Route extends \Civi\Api4\Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
       ];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
   /**

@@ -39,6 +39,10 @@ class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
    *   path to config template
    */
   public function findConfigTemplate($cms) {
+    if (getenv('GENCODE_CONFIG_TEMPLATE')) {
+      return getenv('GENCODE_CONFIG_TEMPLATE');
+    }
+
     $candidates = [];
     switch ($cms) {
       case 'backdrop':

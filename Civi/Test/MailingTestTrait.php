@@ -18,7 +18,7 @@ trait MailingTestTrait {
    *
    * @return int
    */
-  public function createMailing($params = array()) {
+  public function createMailing($params = []) {
     $params = array_merge(array(
       'subject' => 'maild' . rand(),
       'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',

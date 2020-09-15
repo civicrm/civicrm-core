@@ -7,6 +7,7 @@
   <comment>Provides support for flat or hierarchical classification of various types of entities (contacts, groups, actions...).</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-tag</icon>
   <field>
     <name>id</name>
     <title>Tag ID</title>
@@ -42,6 +43,11 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Optional parent id for this tag.</comment>
+    <pseudoconstant>
+      <table>civicrm_tag</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
     <add>1.1</add>
   </field>
   <field>

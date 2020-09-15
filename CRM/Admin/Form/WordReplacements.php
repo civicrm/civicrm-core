@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   protected $_numStrings = 10;
@@ -47,7 +31,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     // should rewrite this UI.
     CRM_Core_BAO_WordReplacement::rebuild(FALSE);
 
-    $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
+    $this->_soInstance = $_GET['instance'] ?? NULL;
     $this->assign('soInstance', $this->_soInstance);
   }
 
@@ -164,10 +148,10 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   public static function formRule($values) {
     $errors = [];
 
-    $oldValues = CRM_Utils_Array::value('old', $values);
-    $newValues = CRM_Utils_Array::value('new', $values);
-    $enabled = CRM_Utils_Array::value('enabled', $values);
-    $exactMatch = CRM_Utils_Array::value('cb', $values);
+    $oldValues = $values['old'] ?? NULL;
+    $newValues = $values['new'] ?? NULL;
+    $enabled = $values['enabled'] ?? NULL;
+    $exactMatch = $values['cb'] ?? NULL;
 
     foreach ($oldValues as $k => $v) {
       if ($v && !$newValues[$k]) {

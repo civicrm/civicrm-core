@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -32,13 +16,11 @@
  */
 class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   protected $_ppTypeID;
-  protected $_apiversion;
 
   public function setUp() {
 
     parent::setUp();
     $this->useTransaction(TRUE);
-    $this->_apiversion = 3;
   }
 
   //  function tearDown() {
@@ -53,21 +35,26 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with no name.
+   * @dataProvider versionThreeAndFour
    */
-  public function testPaymentProcessorTypeCreateWithoutName() {
+  public function testPaymentProcessorTypeCreateWithoutName($version) {
+    $this->_apiversion = $version;
     $payProcParams = [
       'is_active' => 1,
     ];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $payProcParams);
-    $this->assertEquals($result['error_message'],
-      'Mandatory key(s) missing from params array: name, title, class_name, billing_mode'
-    );
+    $this->assertContains('name, title, class_name, billing_mode', $result['error_message']);
   }
 
   /**
    * Create payment processor type.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testPaymentProcessorTypeCreate() {
+  public function testPaymentProcessorTypeCreate($version) {
+    $this->_apiversion = $version;
     $params = [
       'sequential' => 1,
       'name' => 'API_Test_PP',
@@ -76,7 +63,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'billing_mode' => 'form',
       'is_recur' => 0,
     ];
-    $result = $this->callAPIAndDocument('payment_processor_type', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('PaymentProcessorType', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['values'][0]['id']);
 
     // mutate $params to match expected return value
@@ -100,23 +87,25 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with empty array.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testPaymentProcessorTypeDeleteEmpty() {
-    $params = [];
-    $result = $this->callAPIFailure('payment_processor_type', 'delete', $params);
-  }
-
-  /**
-   * Check with No array.
-   */
-  public function testPaymentProcessorTypeDeleteParamsNotArray() {
-    $result = $this->callAPIFailure('payment_processor_type', 'delete', 'string');
+  public function testPaymentProcessorTypeDeleteEmpty($version) {
+    $this->_apiversion = $version;
+    $this->callAPIFailure('PaymentProcessorType', 'delete', []);
   }
 
   /**
    * Check if required fields are not passed.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testPaymentProcessorTypeDeleteWithoutRequired() {
+  public function testPaymentProcessorTypeDeleteWithoutRequired($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor',
@@ -124,53 +113,59 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPIFailure('payment_processor_type', 'delete', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
+    $this->assertEquals(($version === 4 ? 'Parameter "where" is required.' : 'Mandatory key(s) missing from params array: id'), $result['error_message']);
   }
 
   /**
    * Check with incorrect required fields.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testPaymentProcessorTypeDeleteWithIncorrectData() {
-    $result = $this->callAPIFailure('payment_processor_type', 'delete', ['id' => 'abcd']);
+  public function testPaymentProcessorTypeDeleteWithIncorrectData($version) {
+    $this->_apiversion = $version;
+    $this->callAPIFailure('payment_processor_type', 'delete', ['id' => 'abcd']);
   }
 
   /**
    * Check payment processor type delete.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param $version
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testPaymentProcessorTypeDelete() {
-    $payProcType = $this->paymentProcessorTypeCreate();
-    $params = [
-      'id' => $payProcType,
-    ];
-
-    $result = $this->callAPIAndDocument('payment_processor_type', 'delete', $params, __FUNCTION__, __FILE__);
+  public function testPaymentProcessorTypeDelete($version) {
+    $this->_apiversion = $version;
+    $this->callAPIAndDocument('PaymentProcessorType', 'delete', ['id' => $this->paymentProcessorTypeCreate()], __FUNCTION__, __FILE__);
   }
 
   ///////////////// civicrm_payment_processor_type_update
 
   /**
    * Check with empty array.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
    */
-  public function testPaymentProcessorTypeUpdateEmpty() {
+  public function testPaymentProcessorTypeUpdateEmpty($version) {
+    $this->_apiversion = $version;
     $params = [];
-    $result = $this->callAPIFailure('payment_processor_type', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: name, title, class_name, billing_mode');
-  }
-
-  /**
-   * Check with No array.
-   */
-  public function testPaymentProcessorTypeUpdateParamsNotArray() {
-    $result = $this->callAPIFailure('payment_processor_type', 'create', 'string');
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
+    $result = $this->callAPIFailure('PaymentProcessorType', 'create', $params);
+    $this->assertContains('name, title, class_name, billing_mode', $result['error_message']);
   }
 
   /**
    * Check with all parameters.
+   * @dataProvider versionThreeAndFour
    */
-  public function testPaymentProcessorTypeUpdate() {
+  public function testPaymentProcessorTypeUpdate($version) {
+    $this->_apiversion = $version;
     // create sample payment processor type.
-    $this->_ppTypeID = $this->paymentProcessorTypeCreate(NULL);
+    $this->_ppTypeID = $this->paymentProcessorTypeCreate();
 
     $params = [
       'id' => $this->_ppTypeID,
@@ -192,8 +187,10 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with empty array.
+   * @dataProvider versionThreeAndFour
    */
-  public function testPaymentProcessorTypesGetEmptyParams() {
+  public function testPaymentProcessorTypesGetEmptyParams($version) {
+    $this->_apiversion = $version;
     $results = $this->callAPISuccess('payment_processor_type', 'get', []);
     $baselineCount = $results['count'];
 
@@ -223,8 +220,10 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with valid params array.
+   * @dataProvider versionThreeAndFour
    */
-  public function testPaymentProcessorTypesGet() {
+  public function testPaymentProcessorTypesGet($version) {
+    $this->_apiversion = $version;
     $firstRelTypeParams = [
       'name' => 'API_Test_PP_11',
       'title' => 'API Test Payment Processor 11',

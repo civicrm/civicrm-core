@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -32,7 +16,7 @@
  * The default values in general, should reflect production values (minimizes chances of screwing up)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Log.php';
@@ -212,10 +196,13 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Reset the serialized array and recompute.
    * use with care
+   *
+   * @deprecated
    */
   public function reset() {
-    $query = "UPDATE civicrm_domain SET config_backend = null";
-    CRM_Core_DAO::executeQuery($query);
+    // This is what it used to do. However, it hasn't meant anything since 4.6.
+    // $query = "UPDATE civicrm_domain SET config_backend = null";
+    // CRM_Core_DAO::executeQuery($query);
   }
 
   /**
@@ -258,7 +245,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $domain = defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1;
     }
 
-    return $domain;
+    return (int) $domain;
   }
 
   /**
@@ -284,7 +271,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
   /**
    * Do general cleanup of caches, temp directories and temp tables
-   * CRM-8739
+   * @see https://issues.civicrm.org/jira/browse/CRM-8739
    *
    * @param bool $sessionReset
    */
@@ -362,10 +349,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       CRM_Core_DAO::executeQuery($query);
     }
 
-    if ($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) {
-      return $adapter::clearDBCache();
-    }
-
     // also delete all the import and export temp tables
     self::clearTempTables();
   }
@@ -434,7 +417,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         $urlVar = 'task';
       }
 
-      $path = CRM_Utils_Array::value($urlVar, $_GET);
+      $path = $_GET[$urlVar] ?? NULL;
     }
 
     if ($path && preg_match('/^civicrm\/upgrade(\/.*)?$/', $path)) {
@@ -565,7 +548,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       WHERE is_domain = 1 AND name = "installed"
     ');
     while ($dao->fetch()) {
-      $value = unserialize($dao->value);
+      $value = CRM_Utils_String::unserialize($dao->value);
       if (!empty($value)) {
         Civi::settings()->set('installed', 1);
         return;
@@ -573,7 +556,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
 
     // OK, this looks new.
-    Civi::service('dispatcher')->dispatch(\Civi\Core\Event\SystemInstallEvent::EVENT_NAME, new \Civi\Core\Event\SystemInstallEvent());
+    Civi::dispatcher()->dispatch('civi.core.install', new \Civi\Core\Event\SystemInstallEvent());
     Civi::settings()->set('installed', 1);
   }
 

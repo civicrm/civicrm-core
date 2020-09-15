@@ -191,11 +191,11 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
   /**
    * Get the value of a SQL parameter.
    *
-   * @code
+   * ```
    *   $select['cid'] = 123;
    *   $select->where('contact.id = #cid');
    *   echo $select['cid'];
-   * @endCode
+   * ```
    *
    * @param string $offset
    * @return mixed
@@ -209,11 +209,11 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
   /**
    * Set the value of a SQL parameter.
    *
-   * @code
+   * ```
    *   $select['cid'] = 123;
    *   $select->where('contact.id = #cid');
    *   echo $select['cid'];
-   * @endCode
+   * ```
    *
    * @param string $offset
    * @param mixed $value

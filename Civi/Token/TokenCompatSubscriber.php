@@ -25,8 +25,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::TOKEN_EVALUATE => 'onEvaluate',
-      Events::TOKEN_RENDER => 'onRender',
+      'civi.token.eval' => 'onEvaluate',
+      'civi.token.render' => 'onRender',
     ];
   }
 
@@ -63,7 +63,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = reset($contact);
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
-          throw new TokenException("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
+          \Civi::log()->debug("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
+          continue;
         }
 
         //update value of custom field token
@@ -88,12 +89,9 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = array_merge($contact, $row->context['tmpTokenParams']);
       }
 
-      $contactArray = !is_array($contactId) ? [$contactId => $contact] : $contact;
-
-      // Note: This is a small contract change from the past; data should be missing
-      // less randomly.
+      $contactArray = [$contactId => $contact];
       \CRM_Utils_Hook::tokenValues($contactArray,
-        (array) $contactId,
+        [$contactId],
         empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
         $messageTokens,
         $row->context['controller']
@@ -120,12 +118,11 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, $domain, $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
+      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
       $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);
 
       // FIXME: This may depend on $contact being merged with hook values.
       $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
-
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
     }
 
     if ($useSmarty) {

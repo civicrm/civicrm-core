@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
 
@@ -326,50 +310,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Recursively check child menus.
-   *
-   * @param array $value
-   * @param string $navigationString
-   * @param array $skipMenuItems
-   *
-   * @return string
-   */
-  public static function recurseNavigation(&$value, &$navigationString, $skipMenuItems) {
-    if (!empty($value['child'])) {
-      $navigationString .= '<ul>';
-    }
-    else {
-      $navigationString .= '</li>';
-      //locate separator after
-      if (isset($value['attributes']['separator']) && $value['attributes']['separator'] == 1) {
-        $navigationString .= '<li class="menu-separator"></li>';
-      }
-    }
-
-    if (!empty($value['child'])) {
-      foreach ($value['child'] as $val) {
-        $name = self::getMenuName($val, $skipMenuItems);
-        if ($name) {
-          //locate separator before
-          if (isset($val['attributes']['separator']) && $val['attributes']['separator'] == 2) {
-            $navigationString .= '<li class="menu-separator"></li>';
-          }
-          $removeCharacters = ['/', '!', '&', '*', ' ', '(', ')', '.'];
-          $navigationString .= '<li class="crm-' . str_replace($removeCharacters, '_', $val['attributes']['label']) . '">' . $name;
-          self::recurseNavigation($val, $navigationString, $skipMenuItems);
-        }
-      }
-    }
-    if (!empty($value['child'])) {
-      $navigationString .= '</ul></li>';
-      if (isset($value['attributes']['separator']) && $value['attributes']['separator'] == 1) {
-        $navigationString .= '<li class="menu-separator"></li>';
-      }
-    }
-    return $navigationString;
-  }
-
-  /**
    * Given a navigation menu, generate navIDs for any items which are
    * missing them.
    *
@@ -418,55 +358,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   }
 
   /**
-   * Check permissions and format menu item as html.
-   *
-   * @param $value
-   * @param array $skipMenuItems
-   *
-   * @return bool|string
-   */
-  public static function getMenuName(&$value, &$skipMenuItems) {
-    // we need to localise the menu labels (CRM-5456) and don’t
-    // want to use ts() as it would throw the ts-extractor off
-    $i18n = CRM_Core_I18n::singleton();
-
-    $name = $i18n->crm_translate($value['attributes']['label'], ['context' => 'menu']);
-    $url = CRM_Utils_Array::value('url', $value['attributes']);
-    $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
-    $navID = CRM_Utils_Array::value('navID', $value['attributes']);
-    $active = CRM_Utils_Array::value('active', $value['attributes']);
-    $target = CRM_Utils_Array::value('target', $value['attributes']);
-
-    if (in_array($parentID, $skipMenuItems) || !$active || !self::checkPermission($value['attributes'])) {
-      $skipMenuItems[] = $navID;
-      return FALSE;
-    }
-
-    $makeLink = FALSE;
-    if (!empty($url)) {
-      $url = self::makeFullyFormedUrl($url);
-      $makeLink = TRUE;
-    }
-
-    if (!empty($value['attributes']['icon'])) {
-      $menuIcon = sprintf('<i class="%s"></i>', $value['attributes']['icon']);
-      $name = $menuIcon . $name;
-    }
-
-    if ($makeLink) {
-      $url = CRM_Utils_System::evalUrl($url);
-      if ($target) {
-        $name = "<a href=\"{$url}\" target=\"{$target}\">{$name}</a>";
-      }
-      else {
-        $name = "<a href=\"{$url}\">{$name}</a>";
-      }
-    }
-
-    return $name;
-  }
-
-  /**
    * Check if a menu item should be visible based on permissions and component.
    *
    * @param $item
@@ -475,7 +366,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
   public static function checkPermission($item) {
     if (!empty($item['permission'])) {
       $permissions = explode(',', $item['permission']);
-      $operator = CRM_Utils_Array::value('operator', $item);
+      $operator = $item['operator'] ?? NULL;
       $hasPermission = FALSE;
       foreach ($permissions as $key) {
         $key = trim($key);
@@ -577,14 +468,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $contactID;
       if ($contact->find(TRUE)) {
-        CRM_Core_BAO_Setting::setItem(
-          $newKey,
-          CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-          'navigation',
-          NULL,
-          $contactID,
-          $contactID
-        );
+        Civi::contactSettings($contactID)->set('navigation', $newKey);
       }
     }
 
@@ -602,7 +486,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $referenceID = (int) str_replace("node_", "", $params['ref_id']);
     $position = $params['ps'];
     $type = $params['type'];
-    $label = CRM_Utils_Array::value('data', $params);
+    $label = $params['data'] ?? NULL;
 
     switch ($type) {
       case "move":

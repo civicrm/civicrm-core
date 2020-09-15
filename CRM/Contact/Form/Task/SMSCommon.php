@@ -1,34 +1,18 @@
 <?php
 /*
-   +--------------------------------------------------------------------+
-   | CiviCRM version 5                                                  |
-   +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2019                                |
-   +--------------------------------------------------------------------+
-   | This file is a part of CiviCRM.                                    |
-   |                                                                    |
-   | CiviCRM is free software; you can copy, modify, and distribute it  |
-   | under the terms of the GNU Affero General Public License           |
-   | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-   |                                                                    |
-   | CiviCRM is distributed in the hope that it will be useful, but     |
-   | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-   | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-   | See the GNU Affero General Public License for more details.        |
-   |                                                                    |
-   | You should have received a copy of the GNU Affero General Public   |
-   | License and the CiviCRM Licensing Exception along                  |
-   | with this program; if not, contact CiviCRM LLC                     |
-   | at info[AT]civicrm[DOT]org. If you have questions about the        |
-   | GNU Affero General Public License or the licensing of CiviCRM,     |
-   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-   +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
   */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -220,7 +204,7 @@ class CRM_Contact_Form_Task_SMSCommon {
               $mobilePhone = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'phone');
               $form->_contactDetails[$contactId]['phone_id'] = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'id');
               $form->_contactDetails[$contactId]['phone'] = $mobilePhone;
-              $form->_contactDetails[$contactId]['phone_type_id'] = CRM_Utils_Array::value('Mobile', $phoneTypes);
+              $form->_contactDetails[$contactId]['phone_type_id'] = $phoneTypes['Mobile'] ?? NULL;
             }
             else {
               $suppressedSms++;
@@ -242,7 +226,7 @@ class CRM_Contact_Form_Task_SMSCommon {
           $phone = $value['phone'];
         }
         else {
-          $phone = CRM_Utils_Array::value($key, $form->_toContactPhone);
+          $phone = $form->_toContactPhone[$key] ?? NULL;
         }
 
         if ($phone) {
@@ -318,7 +302,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     }
     else {
       if (!empty($fields['sms_text_message'])) {
-        $messageCheck = CRM_Utils_Array::value('sms_text_message', $fields);
+        $messageCheck = $fields['sms_text_message'] ?? NULL;
         $messageCheck = str_replace("\r\n", "\n", $messageCheck);
         if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
           $errors['sms_text_message'] = ts("You can configure the SMS message body up to %1 characters", [1 => CRM_SMS_Provider::MAX_SMS_CHAR]);

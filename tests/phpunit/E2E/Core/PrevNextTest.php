@@ -48,7 +48,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $prefillLimit = 25;
     $sort = NULL;
 
-    $query = new \CRM_Contact_BAO_Query(array(), NULL, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, NULL, 'AND');
+    $query = new \CRM_Contact_BAO_Query([['sort_name', 'IS NOT NULL', 1, 0, 0]], NULL, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, NULL, 'AND');
     $sql = $query->searchQuery($start, $prefillLimit, $sort, FALSE, $query->_includeContactIds,
       FALSE, TRUE, TRUE);
     $selectSQL = "SELECT DISTINCT %1, contact_a.id, contact_a.sort_name";

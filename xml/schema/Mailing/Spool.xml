@@ -32,7 +32,7 @@
     <name>recipient_email</name>
     <title>Recipient Email</title>
     <type>text</type>
-    <comment>The email of the receipients this mail is to be sent.</comment>
+    <comment>The email of the recipients this mail is to be sent.</comment>
   </field>
   <field>
     <name>headers</name>

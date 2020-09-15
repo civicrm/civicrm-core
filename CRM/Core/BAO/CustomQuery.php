@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_BAO_CustomQuery {
   const PREFIX = 'custom_value_';
@@ -148,7 +132,7 @@ class CRM_Core_BAO_CustomQuery {
    * @param array $locationSpecificFields
    */
   public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = []) {
-    $this->_ids = &$ids;
+    $this->_ids = $ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
     $this->_select = [];
@@ -214,46 +198,31 @@ SELECT f.id, f.label, f.data_type,
     }
 
     foreach (array_keys($this->_ids) as $id) {
+      // Ignore any custom field ids within the ids array that are not present in the fields array.
+      if (empty($this->_fields[$id])) {
+        continue;
+      }
       $field = $this->_fields[$id];
+
+      if ($this->_contactSearch && $field['search_table'] === 'contact_a') {
+        CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
+      }
+
       $name = $field['table_name'];
       $fieldName = 'custom_' . $field['id'];
       $this->_select["{$name}_id"] = "{$name}.id as {$name}_id";
       $this->_element["{$name}_id"] = 1;
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
-      $joinTable = $field['search_table'];
-      // CRM-14265
-      if ($joinTable == 'civicrm_group' || empty($joinTable)) {
-        return;
-      }
 
       $this->joinCustomTableForField($field);
-
-      if ($joinTable) {
-        $joinClause = 1;
-        $joinTableAlias = $joinTable;
-        // Set location-specific query
-        if (isset($this->_locationSpecificCustomFields[$id])) {
-          list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$id];
-          $joinTableAlias = "$locationType-address";
-          $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
-        }
-        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
-        if (!empty($this->_ids[$id])) {
-          $this->_whereTables[$name] = $this->_tables[$name];
-        }
-        if ($joinTable != 'contact_a') {
-          $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
-        }
-        elseif ($this->_contactSearch) {
-          CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
-        }
-      }
     }
   }
 
   /**
    * Generate the where clause and also the english language equivalent.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function where() {
     foreach ($this->_ids as $id => $values) {
@@ -368,7 +337,7 @@ SELECT f.id, f.label, f.data_type,
 
           case 'Int':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);;
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Boolean':
@@ -415,7 +384,9 @@ SELECT f.id, f.label, f.data_type,
             break;
 
           case 'Date':
-            if (substr($name, -9, 9) !== '_relative') {
+            if (substr($name, -9, 9) !== '_relative'
+              && substr($name, -4, 4) !== '_low'
+              && substr($name, -5, 5) !== '_high') {
               // Relative dates are handled in the buildRelativeDateQuery function.
               $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
               list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
@@ -485,6 +456,25 @@ SELECT f.id, f.label, f.data_type,
     $join = "\nLEFT JOIN $name ON $name.entity_id = {$field['search_table']}.id";
     $this->_tables[$name] = $this->_tables[$name] ?? $join;
     $this->_whereTables[$name] = $this->_whereTables[$name] ?? $join;
+
+    $joinTable = $field['search_table'];
+    if ($joinTable) {
+      $joinClause = 1;
+      $joinTableAlias = $joinTable;
+      // Set location-specific query
+      if (isset($this->_locationSpecificCustomFields[$field['id']])) {
+        list($locationType, $locationTypeId) = $this->_locationSpecificCustomFields[$field['id']];
+        $joinTableAlias = "$locationType-address";
+        $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
+      }
+      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
+      if (!empty($this->_ids[$field['id']])) {
+        $this->_whereTables[$name] = $this->_tables[$name];
+      }
+      if ($joinTable !== 'contact_a') {
+        $this->_whereTables[$joinTableAlias] = $this->_tables[$joinTableAlias] = $joinClause;
+      }
+    }
   }
 
 }

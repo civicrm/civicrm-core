@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 abstract class CRM_Import_Parser {
   /**
@@ -351,7 +335,7 @@ abstract class CRM_Import_Parser {
       file_put_contents($statusFile, $contents);
     }
     else {
-      $rowCount = isset($this->_rowCount) ? $this->_rowCount : $this->_lineCount;
+      $rowCount = $this->_rowCount ?? $this->_lineCount;
       $currTimestamp = time();
       $totalTime = ($currTimestamp - $startTimestamp);
       $time = ($currTimestamp - $prevTimestamp);
@@ -581,6 +565,43 @@ abstract class CRM_Import_Parser {
       return array_search($labelOptions[$submittedValue], $nameOptions, TRUE);
     }
     return '';
+  }
+
+  /**
+   * This is code extracted from 4 places where this exact snippet was being duplicated.
+   *
+   * FIXME: Extracting this was a first step, but there's also
+   *  1. Inconsistency in the way other select options are handled.
+   *     Contribution adds handling for Select/Radio/Autocomplete
+   *     Participant/Activity only handles Select/Radio and misses Autocomplete
+   *     Membership is missing all of it
+   *  2. Inconsistency with the way this works vs. how it's implemented in Contact import.
+   *
+   * @param $customFieldID
+   * @param $value
+   * @param $fieldType
+   * @return array
+   */
+  public static function unserializeCustomValue($customFieldID, $value, $fieldType) {
+    $mulValues = explode(',', $value);
+    $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+    $values = [];
+    foreach ($mulValues as $v1) {
+      foreach ($customOption as $customValueID => $customLabel) {
+        $customValue = $customLabel['value'];
+        if ((strtolower(trim($customLabel['label'])) == strtolower(trim($v1))) ||
+          (strtolower(trim($customValue)) == strtolower(trim($v1)))
+        ) {
+          if ($fieldType == 'CheckBox') {
+            $values[$customValue] = 1;
+          }
+          else {
+            $values[] = $customValue;
+          }
+        }
+      }
+    }
+    return $values;
   }
 
 }

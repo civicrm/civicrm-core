@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -136,7 +120,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
           'label' => $item['dashboard_id.label'],
           'url' => $item['dashboard_id.url'],
           'cache_minutes' => $item['dashboard_id.cache_minutes'],
-          'fullscreen_url' => CRM_Utils_Array::value('dashboard_id.fullscreen_url', $item),
+          'fullscreen_url' => $item['dashboard_id.fullscreen_url'] ?? NULL,
         ];
       }
     }
@@ -219,7 +203,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
             'label' => $dashlet['label'],
             'cache_minutes' => $dashlet['cache_minutes'],
             'url' => $dashlet['url'],
-            'fullscreen_url' => CRM_Utils_Array::value('fullscreen_url', $dashlet),
+            'fullscreen_url' => $dashlet['fullscreen_url'] ?? NULL,
           ];
         }
       }
@@ -357,13 +341,39 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       }
     }
 
-    // Disable inactive widgets
-    $dashletClause = $dashletIDs ? "dashboard_id NOT IN  (" . implode(',', $dashletIDs) . ")" : '(1)';
+    // Find dashlets in this domain.
+    $domainDashlets = civicrm_api3('Dashboard', 'get', [
+      'return' => array('id'),
+      'domain_id' => CRM_Core_Config::domainID(),
+      'options' => ['limit' => 0],
+    ]);
+
+    // Get the array of IDs.
+    $domainDashletIDs = [];
+    if ($domainDashlets['is_error'] == 0) {
+      $domainDashletIDs = CRM_Utils_Array::collect('id', $domainDashlets['values']);
+    }
+
+    // Restrict query to Dashlets in this domain.
+    $domainDashletClause = !empty($domainDashletIDs) ? "dashboard_id IN (" . implode(',', $domainDashletIDs) . ")" : '(1)';
+
+    // Target only those Dashlets which are inactive.
+    $dashletClause = $dashletIDs ? "dashboard_id NOT IN (" . implode(',', $dashletIDs) . ")" : '(1)';
+
+    // Build params.
+    $params = [
+      1 => [$contactID, 'Integer'],
+    ];
+
+    // Build query.
     $updateQuery = "UPDATE civicrm_dashboard_contact
                     SET is_active = 0
-                    WHERE $dashletClause AND contact_id = {$contactID}";
+                    WHERE $domainDashletClause
+                    AND $dashletClause
+                    AND contact_id = %1";
 
-    CRM_Core_DAO::executeQuery($updateQuery);
+    // Disable inactive widgets.
+    CRM_Core_DAO::executeQuery($updateQuery, $params);
   }
 
   /**
@@ -377,7 +387,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   public static function addDashlet(&$params) {
 
     // special case to handle duplicate entries for report instances
-    $dashboardID = CRM_Utils_Array::value('id', $params);
+    $dashboardID = $params['id'] ?? NULL;
 
     if (!empty($params['instanceURL'])) {
       $query = "SELECT id
@@ -389,33 +399,20 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlet = new CRM_Core_DAO_Dashboard();
 
     if (!$dashboardID) {
-
       // Assign domain before search to allow identical dashlets in different domains.
-      if (empty($params['domain_id'])) {
-        $dashlet->domain_id = CRM_Core_Config::domainID();
-      }
-      else {
-        $dashlet->domain_id = CRM_Utils_Array::value('domain_id', $params);
-      }
+      $dashlet->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
 
       // Try and find an existing dashlet - it will be updated if found.
-      if (!empty($params['name'])) {
-        $dashlet->name = CRM_Utils_Array::value('name', $params);
+      if (!empty($params['name']) || !empty($params['url'])) {
+        $dashlet->name = $params['name'] ?? NULL;
+        $dashlet->url = $params['url'] ?? NULL;
         $dashlet->find(TRUE);
       }
-      else {
-        $dashlet->url = CRM_Utils_Array::value('url', $params);
-        $dashlet->find(TRUE);
-      }
-
     }
     else {
       $dashlet->id = $dashboardID;
     }
 
-    if (is_array(CRM_Utils_Array::value('permission', $params))) {
-      $params['permission'] = implode(',', $params['permission']);
-    }
     $dashlet->copyValues($params);
     $dashlet->save();
 
@@ -484,9 +481,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $valuesString = NULL;
     $columns = [];
     foreach ($params as $dashboardIDs) {
-      $contactID = CRM_Utils_Array::value('contact_id', $dashboardIDs);
-      $dashboardID = CRM_Utils_Array::value('dashboard_id', $dashboardIDs);
-      $column = CRM_Utils_Array::value('column_no', $dashboardIDs, 0);
+      $contactID = $dashboardIDs['contact_id'] ?? NULL;
+      $dashboardID = $dashboardIDs['dashboard_id'] ?? NULL;
+      $column = $dashboardIDs['column_no'] ?? 0;
       $columns[$column][$dashboardID] = 0;
     }
     self::saveDashletChanges($columns, $contactID);
@@ -494,19 +491,18 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   }
 
   /**
-   * Delete Dashlet.
-   *
+   * @deprecated
    * @param int $dashletID
-   *
    * @return bool
    */
   public static function deleteDashlet($dashletID) {
-    $dashlet = new CRM_Core_DAO_Dashboard();
-    $dashlet->id = $dashletID;
-    if (!$dashlet->find(TRUE)) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_Dashboard::deleteRecord');
+    try {
+      CRM_Core_DAO_Dashboard::deleteRecord(['id' => $dashletID]);
+    }
+    catch (CRM_Core_Exception $e) {
       return FALSE;
     }
-    $dashlet->delete();
     return TRUE;
   }
 

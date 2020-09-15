@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -57,35 +39,40 @@ class CustomValueTest extends BaseCustomValueTest {
 
     $group = uniqid('groupc');
     $colorField = uniqid('colorc');
+    $multiField = uniqid('chkbx');
     $textField = uniqid('txt');
 
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
       ->execute()
       ->first();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $colorField)
-      ->addValue('options', $optionValues)
+      ->addValue('option_values', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Select')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
+      ->addValue('label', $multiField)
+      ->addValue('option_values', $optionValues)
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'CheckBox')
+      ->addValue('data_type', 'String')
+      ->execute();
+
+    CustomField::create(FALSE)
       ->addValue('label', $textField)
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    $this->contactID = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $this->contactID = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -93,25 +80,36 @@ class CustomValueTest extends BaseCustomValueTest {
       ->first()['id'];
 
     // Retrieve and check the fields of CustomValue = Custom_$group
-    $fields = CustomValue::getFields($group)->execute();
+    $fields = CustomValue::getFields($group)->setLoadOptions(TRUE)->setCheckPermissions(FALSE)->execute();
     $expectedResult = [
       [
-        'custom_field_id' => 1,
         'custom_group' => $group,
         'name' => $colorField,
         'title' => $colorField,
         'entity' => "Custom_$group",
         'data_type' => 'String',
         'fk_entity' => NULL,
+        'serialize' => 0,
+        'options' => $optionValues,
       ],
       [
-        'custom_field_id' => 2,
+        'custom_group' => $group,
+        'name' => $multiField,
+        'title' => $multiField,
+        'entity' => "Custom_$group",
+        'data_type' => 'String',
+        'fk_entity' => NULL,
+        'serialize' => 1,
+        'options' => $optionValues,
+      ],
+      [
         'custom_group' => $group,
         'name' => $textField,
         'title' => $textField,
         'entity' => "Custom_$group",
         'data_type' => 'String',
         'fk_entity' => NULL,
+        'serialize' => 0,
       ],
       [
         'name' => 'id',
@@ -137,28 +135,35 @@ class CustomValueTest extends BaseCustomValueTest {
 
     // CASE 1: Test CustomValue::create
     // Create two records for a single contact and using CustomValue::get ensure that two records are created
-    CustomValue::create($group)
-      ->addValue($colorField, 'Green')
-      ->addValue("entity_id", $this->contactID)
-      ->execute();
-    CustomValue::create($group)
-      ->addValue($colorField, 'Red')
-      ->addValue("entity_id", $this->contactID)
-      ->execute();
+    $created = [
+      CustomValue::create($group)
+        ->addValue($colorField, 'g')
+        ->addValue("entity_id", $this->contactID)
+        ->execute()->first(),
+      CustomValue::create($group)
+        ->addValue($colorField . ':label', 'Red')
+        ->addValue("entity_id", $this->contactID)
+        ->execute()->first(),
+    ];
     // fetch custom values using API4 CustomValue::get
-    $result = CustomValue::get($group)->execute();
+    $result = CustomValue::get($group)
+      ->addSelect('id', 'entity_id', $colorField, $colorField . ':label')
+      ->addOrderBy($colorField, 'ASC')
+      ->execute();
 
     // check if two custom values are created
     $this->assertEquals(2, count($result));
     $expectedResult = [
       [
         'id' => 1,
-        $colorField => 'Green',
+        $colorField => 'g',
+        $colorField . ':label' => 'Green',
         'entity_id' => $this->contactID,
       ],
       [
         'id' => 2,
-        $colorField => 'Red',
+        $colorField => 'r',
+        $colorField . ':label' => 'Red',
         'entity_id' => $this->contactID,
       ],
     ];
@@ -166,14 +171,17 @@ class CustomValueTest extends BaseCustomValueTest {
     foreach ($expectedResult as $key => $field) {
       foreach ($field as $attr => $value) {
         $this->assertEquals($expectedResult[$key][$attr], $result[$key][$attr]);
+        if (!strpos($attr, ':')) {
+          $this->assertEquals($expectedResult[$key][$attr], $created[$key][$attr]);
+        }
       }
     }
 
     // CASE 2: Test CustomValue::update
-    // Update a records whose id is 1 and change the custom field (name = Color) value to 'White' from 'Green'
+    // Update a records whose id is 1 and change the custom field (name = Color) value to 'Blue' from 'Green'
     CustomValue::update($group)
       ->addWhere("id", "=", 1)
-      ->addValue($colorField, 'White')
+      ->addValue($colorField . ':label', 'Blue')
       ->execute();
 
     // ensure that the value is changed for id = 1
@@ -181,32 +189,36 @@ class CustomValueTest extends BaseCustomValueTest {
       ->addWhere("id", "=", 1)
       ->execute()
       ->first()[$colorField];
-    $this->assertEquals('White', $color);
+    $this->assertEquals('b', $color);
 
     // CASE 3: Test CustomValue::replace
     // create a second contact which will be used to replace the custom values, created earlier
-    $secondContactID = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $secondContactID = Contact::create(FALSE)
       ->addValue('first_name', 'Adam')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
     // Replace all the records which was created earlier with entity_id = first contact
-    //  with custom record [$colorField => 'Rainbow', 'entity_id' => $secondContactID]
+    //  with custom record [$colorField => 'g', 'entity_id' => $secondContactID]
     CustomValue::replace($group)
-      ->setRecords([[$colorField => 'Rainbow', 'entity_id' => $secondContactID]])
+      ->setRecords([[$colorField => 'g', $multiField . ':label' => ['Red', 'Green'], 'entity_id' => $secondContactID]])
       ->addWhere('entity_id', '=', $this->contactID)
       ->execute();
 
     // Check the two records created earlier is replaced by new contact
-    $result = CustomValue::get($group)->execute();
+    $result = CustomValue::get($group)
+      ->addSelect('id', 'entity_id', $colorField, $colorField . ':label', $multiField, $multiField . ':label')
+      ->execute();
     $this->assertEquals(1, count($result));
 
     $expectedResult = [
       [
         'id' => 3,
-        $colorField => 'Rainbow',
+        $colorField => 'g',
+        $colorField . ':label' => 'Green',
+        $multiField => ['r', 'g'],
+        $multiField . ':label' => ['Red', 'Green'],
         'entity_id' => $secondContactID,
       ],
     ];

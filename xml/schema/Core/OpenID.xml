@@ -35,6 +35,11 @@
     <name>location_type_id</name>
     <title>OpenID Location Type</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
     <comment>Which Location does this email belong to.</comment>
     <add>2.0</add>
   </field>
@@ -73,9 +78,12 @@
   </field>
   <field>
     <name>is_primary</name>
-    <title>Is OpenID Primary?</title>
+    <title>Primary ID</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>Radio</type>
+    </html>
     <comment>Is this the primary email for this contact and location.</comment>
     <add>2.0</add>
   </field>

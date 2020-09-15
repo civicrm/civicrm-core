@@ -46,11 +46,12 @@ class CRM_Core_CodeGen_Util_Smarty {
    */
   public function createSmarty() {
     $base = dirname(dirname(dirname(dirname(__DIR__))));
+    $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
 
     require_once 'Smarty/Smarty.class.php';
     $smarty = new Smarty();
     $smarty->template_dir = "$base/xml/templates";
-    $smarty->plugins_dir = ["$base/packages/Smarty/plugins", "$base/CRM/Core/Smarty/plugins"];
+    $smarty->plugins_dir = ["$pkgs/Smarty/plugins", "$base/CRM/Core/Smarty/plugins"];
     $smarty->compile_dir = $this->getCompileDir();
     $smarty->clear_all_cache();
 
@@ -58,6 +59,8 @@ class CRM_Core_CodeGen_Util_Smarty {
 
     require_once 'CRM/Core/Smarty/plugins/block.localize.php';
     $smarty->register_block('localize', 'smarty_block_localize');
+
+    $smarty->assign('gencodeXmlDir', dirname(dirname(dirname(dirname(__DIR__)))) . '/xml');
 
     return $smarty;
   }

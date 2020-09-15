@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
@@ -122,7 +106,7 @@
           }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
+          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
         }
         else {
           cj('#validate_pricefield').hide( ).html('');
@@ -191,7 +175,7 @@
         {else}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
         {/if}
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card event registration{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
       </div>
     {/if}
     <div class="view-content">
@@ -212,7 +196,7 @@
       {if $action eq 8} {* If action is Delete *}
         <div class="crm-participant-form-block-delete messages status no-popup">
           <div class="crm-content">
-            <div class="icon inform-icon"></div> &nbsp;
+            {icon icon="fa-info-circle"}{/icon}
             {ts}WARNING: Deleting this registration will result in the loss of related payment records (if any).{/ts} {ts}Do you want to continue?{/ts}
           </div>
           {if $additionalParticipant}
@@ -227,17 +211,10 @@
         {else} {* If action is other than Delete *}
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
-          {if $single and $context neq 'standalone'}
-            <tr class="crm-participant-form-block-displayName">
-              <td class="label font-size12pt"><label>{ts}Participant{/ts}</label></td>
-              <td class="font-size12pt view-value">{$displayName}&nbsp;</td>
-            </tr>
-            {else}
-            <tr class="crm-participant-form-contact-id">
-              <td class="label">{$form.contact_id.label}</td>
-              <td>{$form.contact_id.html}</td>
-            </tr>
-          {/if}
+          <tr class="crm-participant-form-contact-id">
+            <td class="label">{$form.contact_id.label}</td>
+            <td>{$form.contact_id.html}</td>
+          </tr>
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
               <tr class="crm-participant-form-block-additionalParticipants">
@@ -395,9 +372,7 @@
           {if $urlPathVar}
           dataUrl += '&' + '{$urlPathVar}';
           {/if}
-          {if $isBackOffice}
-            dataUrl += '&' + 'is_backoffice=1';
-          {/if}
+          dataUrl += '&' + 'is_backoffice=1';
 
           {literal}
           var eventId = $('[name=event_id], #event_id', $form).val();

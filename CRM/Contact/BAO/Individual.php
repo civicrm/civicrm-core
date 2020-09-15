@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -66,9 +50,9 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     $sortName = $displayName = '';
-    $firstName = CRM_Utils_Array::value('first_name', $params, '');
-    $middleName = CRM_Utils_Array::value('middle_name', $params, '');
-    $lastName = CRM_Utils_Array::value('last_name', $params, '');
+    $firstName = trim($params['first_name'] ?? '');
+    $middleName = trim($params['middle_name'] ?? '');
+    $lastName = trim($params['last_name'] ?? '');
     $nickName = CRM_Utils_Array::value('nick_name', $params, '');
     $prefix_id = CRM_Utils_Array::value('prefix_id', $params, '');
     $suffix_id = CRM_Utils_Array::value('suffix_id', $params, '');
@@ -178,11 +162,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       }
     }
 
-    //first trim before further processing.
-    foreach (['lastName', 'firstName', 'middleName'] as $fld) {
-      $$fld = trim($$fld);
-    }
-
     if ($lastName || $firstName || $middleName) {
       // make sure we have values for all the name fields.
       $formatted = $params;
@@ -241,7 +220,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           }
         }
       }
-      $uniqId = CRM_Utils_Array::value('user_unique_id', $params);
+      $uniqId = $params['user_unique_id'] ?? NULL;
       if (!$email && $contact->id) {
         $email = CRM_Contact_BAO_Contact::getPrimaryEmail($contact->id);
       }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
 
@@ -216,8 +200,8 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
           }
         }
       }
@@ -255,16 +239,16 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
 
           $clause = NULL;
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if (($fieldName == 'grant_report_received') &&
               (CRM_Utils_Array::value("{$fieldName}_value", $this->_params) ===
                 0)
@@ -396,7 +380,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (!empty($values['civicrm_grant_grant_type_id'])) {
-        $grantType = CRM_Utils_Array::value($values['civicrm_grant_grant_type_id'], $grantTypes);
+        $grantType = $grantTypes[$values['civicrm_grant_grant_type_id']] ?? NULL;
         $grantStatistics['civicrm_grant_grant_type_id']['title'] = ts('By Grant Type');
         self::getStatistics($grantStatistics['civicrm_grant_grant_type_id'], $grantType, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -404,8 +388,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_worldregion_name', $values)) {
-        $region = CRM_Utils_Array::value('civicrm_worldregion_name', $values);
-        $region = ($region) ? $region : 'Unassigned';
+        $region = $values['civicrm_worldregion_name'] ?: 'Unassigned';
         $grantStatistics['civicrm_worldregion_name']['title'] = ts('By Region');
         self::getStatistics($grantStatistics['civicrm_worldregion_name'], $region, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -413,8 +396,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_address_country_id', $values)) {
-        $country = CRM_Utils_Array::value($values['civicrm_address_country_id'], $countries);
-        $country = ($country) ? $country : 'Unassigned';
+        $country = $countries[$values['civicrm_address_country_id']] ?? 'Unassigned';
         $grantStatistics['civicrm_address_country_id']['title'] = ts('By Country');
         self::getStatistics($grantStatistics['civicrm_address_country_id'], $country, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -430,8 +412,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       }
 
       if (array_key_exists('civicrm_contact_gender_id', $values)) {
-        $genderLabel = CRM_Utils_Array::value($values['civicrm_contact_gender_id'], $gender);
-        $genderLabel = ($genderLabel) ? $genderLabel : 'Unassigned';
+        $genderLabel = $gender[$values['civicrm_contact_gender_id']] ?? 'Unassigned';
         $grantStatistics['civicrm_contact_gender_id']['title'] = ts('By Gender');
         self::getStatistics($grantStatistics['civicrm_contact_gender_id'], $genderLabel, $values,
           $awardedGrants, $awardedGrantsAmount
@@ -440,14 +421,13 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
 
       foreach ($values as $customField => $customValue) {
         if (strstr($customField, 'civicrm_value_')) {
-          $customFieldTitle = CRM_Utils_Array::value('title', $this->_columnHeaders[$customField]);
+          $customFieldTitle = $this->_columnHeaders[$customField]['title'] ?? NULL;
           $customGroupTitle = explode('_custom', strstr($customField, 'civicrm_value_'));
           $customGroupTitle = $this->_columns[$customGroupTitle[0]]['group_title'];
           $grantStatistics[$customGroupTitle]['title'] = ts('By %1', [1 => $customGroupTitle]);
 
-          $customData = ($customValue) ? FALSE : TRUE;
           self::getStatistics($grantStatistics[$customGroupTitle], $customFieldTitle, $values,
-            $awardedGrants, $awardedGrantsAmount, $customData
+            $awardedGrants, $awardedGrantsAmount, !$customValue
           );
         }
       }
@@ -504,7 +484,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
                 "({$values['percentage']}%)";
             }
             $totalAmt = implode(', ', $totalAmount);
-            $count = (boolean) CRM_Utils_Array::value('count', $values, 0) ? $values['count'] . " ({$values['percentage']}%)" : '';
+            $count = empty($values['count']) ? '' : "{$values['count']} ({$values['percentage']}%)";
             $row[] = [
               'civicrm_grant_total_grants' => $field,
               'civicrm_grant_count' => $count,
@@ -533,7 +513,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       return;
     }
 
-    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', ['labelColumn' => 'symbol']);
+    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', ['labelColumn' => 'name']);
     $currency = $currencies[$values['civicrm_grant_currency']];
 
     if (!$customData) {

@@ -1,29 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Contact;
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomValue;
 
 /**
  * This class is intended to test ACL permission using the multisite module
@@ -62,6 +51,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_acl_entity_role',
       'civicrm_acl_contact_cache',
       'civicrm_contribution',
+      'civicrm_line_item',
       'civicrm_participant',
       'civicrm_uf_match',
       'civicrm_activity',
@@ -817,7 +807,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * Test get activities multiple ids with check permissions
-   * CRM-20441
+   * @see https://issues.civicrm.org/jira/browse/CRM-20441
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
@@ -843,7 +833,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   /**
    * Test get activities multiple ids with check permissions
    * Limit access to One contact
-   * CRM-20441
+   * @see https://issues.civicrm.org/jira/browse/CRM-20441
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
@@ -879,7 +869,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   /**
    * Test get activities multiple ids with check permissions
-   * CRM-20441
+   * @see https://issues.civicrm.org/jira/browse/CRM-20441
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
@@ -981,6 +971,99 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $dupes['count']);
 
+  }
+
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testContactGetViaJoin($version) {
+    $this->_apiversion = $version;
+    $this->createLoggedInUser();
+    $main = $this->individualCreate(['first_name' => 'Main']);
+    $other = $this->individualCreate(['first_name' => 'Other'], 1);
+    $tag1 = $this->tagCreate(['name' => uniqid('created'), 'created_id' => $main])['id'];
+    $tag2 = $this->tagCreate(['name' => uniqid('other'), 'created_id' => $other])['id'];
+    $this->setPermissions(['access CiviCRM']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
+    $createdFirstName = $version == 4 ? 'created.first_name' : 'created_id.first_name';
+    $result = $this->callAPISuccess('Tag', 'get', [
+      'check_permissions' => 1,
+      'return' => ['id', $createdFirstName],
+      'id' => ['IN' => [$tag1, $tag2]],
+    ]);
+    $this->assertEquals('Main', $result['values'][$tag1][$createdFirstName]);
+    $this->assertEquals('Other', $result['values'][$tag2][$createdFirstName]);
+    $this->allowedContactId = $main;
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
+    $this->cleanupCachedPermissions();
+    $result = $this->callAPISuccess('Tag', 'get', [
+      'check_permissions' => 1,
+      'return' => ['id', $createdFirstName],
+      'id' => ['IN' => [$tag1, $tag2]],
+    ]);
+    $this->assertEquals('Main', $result['values'][$tag1][$createdFirstName]);
+    $this->assertEquals($tag2, $result['values'][$tag2]['id']);
+    $this->assertFalse(isset($result['values'][$tag2][$createdFirstName]));
+  }
+
+  public function testApi4CustomEntityACL() {
+    $group = uniqid('mg');
+    $textField = uniqid('tx');
+
+    CustomGroup::create(FALSE)
+      ->addValue('name', $group)
+      ->addValue('extends', 'Contact')
+      ->addValue('is_multiple', TRUE)
+      ->addChain('field', CustomField::create()
+        ->addValue('label', $textField)
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String')
+      )
+      ->execute();
+
+    $this->createLoggedInUser();
+    $c1 = $this->individualCreate(['first_name' => 'C1']);
+    $c2 = $this->individualCreate(['first_name' => 'C2', 'is_deleted' => 1], 1);
+
+    CustomValue::save($group)->setCheckPermissions(FALSE)
+      ->addRecord(['entity_id' => $c1, $textField => '1'])
+      ->addRecord(['entity_id' => $c2, $textField => '2'])
+      ->execute();
+
+    $this->setPermissions(['access CiviCRM', 'view debug output']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
+
+    // Without "access deleted contacts" we won't see C2
+    $vals = CustomValue::get($group)->setDebug(TRUE)->execute();
+    $this->assertCount(1, $vals);
+    $this->assertEquals($c1, $vals[0]['entity_id']);
+
+    $this->setPermissions(['access CiviCRM', 'access deleted contacts', 'view debug output']);
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
+    $this->cleanupCachedPermissions();
+
+    $vals = CustomValue::get($group)->execute();
+    $this->assertCount(2, $vals);
+
+    $this->allowedContactId = $c2;
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
+    $this->cleanupCachedPermissions();
+
+    $vals = CustomValue::get($group)->addSelect('*', 'contact.first_name')->execute();
+    $this->assertCount(1, $vals);
+    $this->assertEquals($c2, $vals[0]['entity_id']);
+    $this->assertEquals('C2', $vals[0]['contact.first_name']);
+
+    $vals = Contact::get()
+      ->addJoin('Custom_' . $group . ' AS cf')
+      ->addSelect('first_name', 'cf.' . $textField)
+      ->addWhere('is_deleted', '=', TRUE)
+      ->execute();
+    $this->assertCount(1, $vals);
+    $this->assertEquals('C2', $vals[0]['first_name']);
+    $this->assertEquals('2', $vals[0]['cf.' . $textField]);
   }
 
 }

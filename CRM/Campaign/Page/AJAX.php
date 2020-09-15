@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -50,9 +33,9 @@ class CRM_Campaign_Page_AJAX {
 
     $params = [];
     foreach ($fields as $fld) {
-      $params[$fld] = CRM_Utils_Array::value($fld, $_POST);
+      $params[$fld] = $_POST[$fld] ?? NULL;
     }
-    $params['details'] = CRM_Utils_Array::value('note', $_POST);
+    $params['details'] = $_POST['note'] ?? NULL;
     $voterId = $params['voter_id'];
     $activityId = $params['activity_id'];
 
@@ -122,7 +105,7 @@ class CRM_Campaign_Page_AJAX {
       $survey->result_id = $id;
       if ($survey->find(TRUE)) {
         if ($survey->recontact_interval) {
-          $recontactInterval = unserialize($survey->recontact_interval);
+          $recontactInterval = CRM_Utils_String::unserialize($survey->recontact_interval);
           foreach ($opValues as $opValId => $opVal) {
             if (is_numeric($recontactInterval[$opVal['label']])) {
               $opValues[$opValId]['interval'] = $recontactInterval[$opVal['label']];
@@ -161,7 +144,7 @@ class CRM_Campaign_Page_AJAX {
       'group',
       'contact_type',
     ] as $param) {
-      $paramValue = CRM_Utils_Array::value($param, $params);
+      $paramValue = $params[$param] ?? NULL;
       if ($paramValue) {
         unset($params[$param]);
         $paramValue = explode(',', $paramValue);
@@ -177,7 +160,7 @@ class CRM_Campaign_Page_AJAX {
       'survey_interviewer_id',
       'campaign_search_voter_for',
     ] as $fld) {
-      $voterClauseParams[$fld] = CRM_Utils_Array::value($fld, $params);
+      $voterClauseParams[$fld] = $params[$fld] ?? NULL;
     }
 
     $interviewerId = $surveyTypeId = $surveyId = NULL;
@@ -194,7 +177,7 @@ class CRM_Campaign_Page_AJAX {
         //allow voter search in sub-part of given constituents,
         //but make sure in case user does not select any group.
         //get all associated campaign groups in where filter, CRM-7406
-        $groups = CRM_Utils_Array::value('group', $params);
+        $groups = $params['group'] ?? NULL;
         if ($campaignId && CRM_Utils_System::isNull($groups)) {
           $campaignGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
           foreach ($campaignGroups as $id => $group) {
@@ -408,7 +391,7 @@ class CRM_Campaign_Page_AJAX {
         ];
         $activityParams = [];
         foreach ($ids as $id) {
-          $val = CRM_Utils_Array::value($id, $_POST);
+          $val = $_POST[$id] ?? NULL;
           if (!$val) {
             $createActivity = FALSE;
             break;
@@ -431,7 +414,7 @@ class CRM_Campaign_Page_AJAX {
 
           $activityTypeId = $surveyValues['activity_type_id'];
 
-          $surveytitle = CRM_Utils_Array::value('surveyTitle', $_POST);
+          $surveytitle = $_POST['surveyTitle'] ?? NULL;
           if (!$surveytitle) {
             $surveytitle = $surveyValues['title'];
           }
@@ -442,7 +425,7 @@ class CRM_Campaign_Page_AJAX {
           $activityParams['skipRecentView'] = 1;
           $activityParams['activity_date_time'] = date('YmdHis');
           $activityParams['activity_type_id'] = $activityTypeId;
-          $activityParams['campaign_id'] = isset($surveyValues['campaign_id']) ? $surveyValues['campaign_id'] : NULL;
+          $activityParams['campaign_id'] = $surveyValues['campaign_id'] ?? NULL;
 
           $activity = CRM_Activity_BAO_Activity::create($activityParams);
           if ($activity->id) {
@@ -458,7 +441,7 @@ class CRM_Campaign_Page_AJAX {
             [$scheduledStatusId]
           );
           foreach ($activities as $voterId => $values) {
-            $activityId = CRM_Utils_Array::value('activity_id', $values);
+            $activityId = $values['activity_id'] ?? NULL;
             if ($activityId && ($values['status_id'] == $scheduledStatusId)) {
               CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
                 $activityId,
@@ -620,7 +603,7 @@ class CRM_Campaign_Page_AJAX {
       }
       foreach ($campaigns as $campaignID => $values) {
         foreach ($selectorCols as $col) {
-          $searchRows[$campaignID][$col] = CRM_Utils_Array::value($col, $values);
+          $searchRows[$campaignID][$col] = $values[$col] ?? NULL;
         }
       }
     }
@@ -725,7 +708,7 @@ class CRM_Campaign_Page_AJAX {
       }
       foreach ($surveys as $surveyID => $values) {
         foreach ($selectorCols as $col) {
-          $searchRows[$surveyID][$col] = CRM_Utils_Array::value($col, $values);
+          $searchRows[$surveyID][$col] = $values[$col] ?? NULL;
         }
       }
     }
@@ -825,7 +808,7 @@ class CRM_Campaign_Page_AJAX {
       }
       foreach ($petitions as $petitionID => $values) {
         foreach ($selectorCols as $col) {
-          $searchRows[$petitionID][$col] = CRM_Utils_Array::value($col, $values);
+          $searchRows[$petitionID][$col] = $values[$col] ?? NULL;
         }
       }
     }

@@ -1,35 +1,19 @@
 <?php
 /*
-   +--------------------------------------------------------------------+
-   | CiviCRM version 5                                                  |
-   +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2019                                |
-   +--------------------------------------------------------------------+
-   | This file is a part of CiviCRM.                                    |
-   |                                                                    |
-   | CiviCRM is free software; you can copy, modify, and distribute it  |
-   | under the terms of the GNU Affero General Public License           |
-   | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-   |                                                                    |
-   | CiviCRM is distributed in the hope that it will be useful, but     |
-   | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-   | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-   | See the GNU Affero General Public License for more details.        |
-   |                                                                    |
-   | You should have received a copy of the GNU Affero General Public   |
-   | License and the CiviCRM Licensing Exception along                  |
-   | with this program; if not, contact CiviCRM LLC                     |
-   | at info[AT]civicrm[DOT]org. If you have questions about the        |
-   | GNU Affero General Public License or the licensing of CiviCRM,     |
-   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-   +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  * This class handles all REST client requests.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_REST {
 
@@ -191,13 +175,13 @@ class CRM_Utils_REST {
     $requestParams = CRM_Utils_Request::exportValues();
 
     // Get the function name being called from the q parameter in the query string
-    $q = CRM_Utils_Array::value('q', $requestParams);
+    $q = $requestParams['q'] ?? NULL;
     // or for the rest interface, from fnName
-    $r = CRM_Utils_Array::value('fnName', $requestParams);
+    $r = $requestParams['fnName'] ?? NULL;
     if (!empty($r)) {
       $q = $r;
     }
-    $entity = CRM_Utils_Array::value('entity', $requestParams);
+    $entity = $requestParams['entity'] ?? NULL;
     if (empty($entity) && !empty($q)) {
       $args = explode('/', $q);
       // If the function isn't in the civicrm namespace, reject the request.
@@ -220,16 +204,16 @@ class CRM_Utils_REST {
       // or the api format (entity+action)
       $args = [];
       $args[0] = 'civicrm';
-      $args[1] = CRM_Utils_Array::value('entity', $requestParams);
-      $args[2] = CRM_Utils_Array::value('action', $requestParams);
+      $args[1] = $requestParams['entity'] ?? NULL;
+      $args[2] = $requestParams['action'] ?? NULL;
     }
 
     // Everyone should be required to provide the server key, so the whole
     // interface can be disabled in more change to the configuration file.
     // first check for civicrm site key
     if (!CRM_Utils_System::authenticateKey(FALSE)) {
-      $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", TRUE, NULL, NULL, NULL, "wiki");
-      $key = CRM_Utils_Array::value('key', $requestParams);
+      $docLink = CRM_Utils_System::docURL2('sysadmin/setup/jobs', TRUE);
+      $key = $requestParams['key'] ?? NULL;
       if (empty($key)) {
         return self::error("FATAL: mandatory param 'key' missing. More info at: " . $docLink);
       }
@@ -532,10 +516,10 @@ class CRM_Utils_REST {
       CRM_Utils_JSON::output($error);
     }
 
-    $q = CRM_Utils_Array::value('fnName', $requestParams);
+    $q = $requestParams['fnName'] ?? NULL;
     if (!$q) {
-      $entity = CRM_Utils_Array::value('entity', $requestParams);
-      $action = CRM_Utils_Array::value('action', $requestParams);
+      $entity = $requestParams['entity'] ?? NULL;
+      $action = $requestParams['action'] ?? NULL;
       if (!$entity || !$action) {
         $err = [
           'error_message' => 'missing mandatory params "entity=" or "action="',
@@ -551,7 +535,7 @@ class CRM_Utils_REST {
     }
 
     // get the class name, since all ajax functions pass className
-    $className = CRM_Utils_Array::value('className', $requestParams);
+    $className = $requestParams['className'] ?? NULL;
 
     // If the function isn't in the civicrm namespace, reject the request.
     if (($args[0] != 'civicrm' && count($args) != 3) && !$className) {
@@ -594,7 +578,7 @@ class CRM_Utils_REST {
    */
   public function loadCMSBootstrap() {
     $requestParams = CRM_Utils_Request::exportValues();
-    $q = CRM_Utils_Array::value('q', $requestParams);
+    $q = $requestParams['q'] ?? NULL;
     $args = explode('/', $q);
 
     // Proceed with bootstrap for "?entity=X&action=Y"

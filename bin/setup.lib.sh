@@ -60,10 +60,10 @@ function has_commands() {
 ## usage: cms_eval '<php-code>'
 function cms_eval() {
   case "$GENCODE_CMS" in
-    Drupal*)
+    [Dd]rupal*|[Bb]ackdrop)
       drush ev "$1"
       ;;
-    WordPress*)
+    [Ww]ordPress*)
       wp eval "$1"
       ;;
     *)

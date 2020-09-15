@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -95,7 +77,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this->_componentClause = NULL;
 
     // we need to determine component export
-    $components = ['Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity'];
+    $components = CRM_Export_BAO_Export::getComponents();
 
     // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
     // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
@@ -136,16 +118,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
         break;
 
       default:
-        // FIXME: Code cleanup, we may not need to do this $componentName code here.
-        $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
-        $componentName = explode('_', $formName);
-        if ($formName == 'CRM_Export_StateMachine_Standalone') {
-          $componentName = ['CRM', $this->controller->get('entity')];
-        }
-        // Contact
-        $entityShortname = $componentName[1];
-        $entityDAOName = $entityShortname;
-        break;
+        $entityShortname = $this->getComponentName();
+        $entityDAOName = $this->controller->get('entity') ?? $entityShortname;
     }
 
     if (in_array($entityShortname, $components)) {
@@ -356,7 +330,7 @@ FROM   {$this->_componentTable}
       ];
 
       foreach ($greetings as $key => $value) {
-        $otherOption = CRM_Utils_Array::value($key, $params);
+        $otherOption = $params[$key] ?? NULL;
 
         if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
 
@@ -388,7 +362,7 @@ FROM   {$this->_componentTable}
     // all submitted options or any other argument
     $exportParams = $params;
 
-    $mappingId = CRM_Utils_Array::value('mapping', $params);
+    $mappingId = $params['mapping'] ?? NULL;
     if ($mappingId) {
       $this->set('mappingId', $mappingId);
     }
@@ -506,12 +480,28 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   * Get the query mode (eg. CRM_Contact_BAO_Query::MODE_CASE)
    *
    * @return int
    */
   public function getQueryMode() {
     return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
+  }
+
+  /**
+   * Get the name of the component.
+   *
+   * @return array
+   */
+  protected function getComponentName(): string {
+    // CRM_Export_Controller_Standalone has this method
+    if (method_exists($this->controller, 'getComponent')) {
+      return $this->controller->getComponent();
+    }
+    // For others, just guess based on the name of the controller
+    $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
+    $componentName = explode('_', $formName);
+    return $componentName[1];
   }
 
 }

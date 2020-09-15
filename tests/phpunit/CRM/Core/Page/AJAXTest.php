@@ -49,7 +49,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
 
     foreach ($cases as $case) {
       list ($type, $className, $expectedResult) = $case;
-      $methodName = CRM_Utils_Array::value(3, $case);
+      $methodName = $case[3] ?? NULL;
       $actualResult = CRM_Core_Page_AJAX::checkAuthz($type, $className, $methodName);
       if ($methodName) {
         $this->assertEquals($expectedResult, $actualResult,

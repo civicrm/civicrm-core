@@ -115,6 +115,78 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test extern url.
+   */
+  public function testExternUrl() {
+    $siteKey = mt_rand();
+    $apiKey = mt_rand();
+    $restUrl = CRM_Utils_System::externUrl('extern/rest', "entity=Contact&action=get&key=$siteKey&api_key=$apiKey");
+    $this->assertContains('extern/rest.php', $restUrl);
+    $this->assertContains('?', $restUrl);
+    $this->assertContains('entity=Contact', $restUrl);
+    $this->assertContains('action=get', $restUrl);
+    $this->assertContains("key=$siteKey", $restUrl);
+    $this->assertContains("api_key=$apiKey", $restUrl);
+  }
+
+  /**
+   * Test the alterExternUrl hook.
+   *
+   * @param string $path
+   * @param array $expected
+   *
+   * @dataProvider getExternURLs
+   */
+  public function testAlterExternUrlHook($path, $expected) {
+    Civi::dispatcher()->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
+    $externUrl = CRM_Utils_System::externUrl($path, $expected['query']);
+    $this->assertContains('path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
+    $this->assertContains($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');
+  }
+
+  /**
+   * Hook for alterExternUrl.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   * @param string $hookName
+   */
+  public function hook_civicrm_alterExternUrl(\Civi\Core\Event\GenericHookEvent $event, $hookName) {
+    $this->assertEquals('hook_civicrm_alterExternUrl', $hookName);
+    $this->assertTrue($event->hasField('url'));
+    $this->assertTrue($event->hasField('path'));
+    $this->assertTrue($event->hasField('query'));
+    $this->assertTrue($event->hasField('fragment'));
+    $this->assertTrue($event->hasField('absolute'));
+    $this->assertTrue($event->hasField('isSSL'));
+    $event->url = $event->url->withPath('path/altered/by/hook');
+    $event->url = $event->url->withQuery($event->query . '&thisWas=alteredByHook');
+  }
+
+  /**
+   * Get extern url params for testing.
+   *
+   * @return array
+   */
+  public function getExternURLs() {
+    return [
+      [
+        'extern/url',
+        [
+          'path' => 'extern/url',
+          'query' => 'u=1&qid=1',
+        ],
+      ],
+      [
+        'extern/open',
+        [
+          'path' => 'extern/open',
+          'query' => 'q=1',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Demonstrate the, um, "flexibility" of isNull
    */
   public function testIsNull() {
@@ -176,6 +248,36 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
       3 => 'null',
     ];
     $this->assertTrue(CRM_Utils_System::isNull($arr));
+  }
+
+  /**
+   * Test that flushing cache clears the asset cache.
+   */
+  public function testFlushCacheClearsAssetCache() {
+    // We need to get the file path for the folder and there isn't a public
+    // method to get it, so create a file in the folder using public methods,
+    // then get the path from that, then flush the cache, then check if the
+    // folder is empty.
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'flushCacheClearsAssetCache_buildAsset'));
+    $fakeFile = \Civi::service("asset_builder")->getPath('fakeFile.json');
+
+    CRM_Utils_System::flushCache();
+
+    $fileList = scandir(dirname($fakeFile));
+    // count should be 2, just the standard . and ..
+    $this->assertCount(2, $fileList);
+  }
+
+  /**
+   * Implementation of a hook for civicrm_buildAsset() for testFlushCacheClearsAssetCache.
+   * Awkward wording of above sentence is because phpcs is bugging me about it.
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function flushCacheClearsAssetCache_buildAsset(\Civi\Core\Event\GenericHookEvent $e) {
+    if ($e->asset === 'fakeFile.json') {
+      $e->mimeType = 'application/json';
+      $e->content = '{}';
+    }
   }
 
 }

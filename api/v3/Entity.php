@@ -14,6 +14,8 @@ function _civicrm_api3_entity_deprecation($entities) {
   $deprecated = [];
   if (!empty($entities['values'])) {
     foreach ($entities['values'] as $entity) {
+      $apiFile = "api/v3/$entity.php";
+      @include_once $apiFile;
       if (is_string(_civicrm_api3_deprecation_check($entity))) {
         $deprecated[] = $entity;
       }

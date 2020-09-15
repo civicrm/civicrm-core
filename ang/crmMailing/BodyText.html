@@ -17,7 +17,7 @@ Required vars: mailing, crmMailingConst
         ></textarea>
       <span ng-model="body_text_tokens" crm-ui-validate="hasAllTokens(mailing, 'body_text')"></span>
       <div ng-show="textForm.$error.crmUiValidate" class="crmMailing-error-link">
-        {{ts('Required tokens are missing.')}} <a class="helpicon" ng-click="checkTokens(mailing, 'body_text', 'insert:body_text')"></a>
+        {{:: ts('Required tokens are missing.') }} <a class="helpicon" ng-click="checkTokens(mailing, 'body_text', 'insert:body_text')"></a>
       </div>
     </div>
   </div>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -106,6 +90,16 @@ class CRM_Export_BAO_ExportProcessor {
    * @var array
    */
   protected $ids = [];
+
+  /**
+   * Greeting options mapping to various greeting ids.
+   *
+   * This stores the option values for the addressee, postal_greeting & email_greeting
+   * option groups.
+   *
+   * @var array
+   */
+  protected $greetingOptions = [];
 
   /**
    * Get additional non-visible fields for address merge purposes.
@@ -211,6 +205,13 @@ class CRM_Export_BAO_ExportProcessor {
    * @var array
    */
   protected $exportedHouseholds = [];
+
+  /**
+   * Contacts to be merged by virtue of their shared address.
+   *
+   * @var array
+   */
+  protected $contactsToMerge = [];
 
   /**
    * Households to skip during export as they will be exported via their relationships anyway.
@@ -398,7 +399,7 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setQueryOperator($queryOperator);
     $this->setRequestedFields($requestedFields);
     $this->setRelationshipTypes();
-    $this->setIsMergeSameHousehold($isMergeSameHousehold);
+    $this->setIsMergeSameHousehold($isMergeSameHousehold || $isMergeSameAddress);
     $this->setIsPostalableOnly($isPostalableOnly);
     $this->setIsMergeSameAddress($isMergeSameAddress);
     $this->setReturnProperties($this->determineReturnProperties());
@@ -406,6 +407,17 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setAdditionalFieldsForPostalExport();
     $this->setHouseholdMergeReturnProperties();
     $this->setGreetingStringsForSameAddressMerge($formValues);
+    $this->setGreetingOptions();
+  }
+
+  /**
+   * Set the greeting options, if relevant.
+   */
+  public function setGreetingOptions() {
+    if ($this->isMergeSameAddress()) {
+      $this->greetingOptions['addressee'] = CRM_Core_OptionGroup::values('addressee');
+      $this->greetingOptions['postal_greeting'] = CRM_Core_OptionGroup::values('postal_greeting');
+    }
   }
 
   /**
@@ -486,7 +498,7 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setRelationshipValue($relationshipType, $contactID, $field, $value) {
     $this->relatedContactValues[$relationshipType][$contactID][$field] = $value;
-    if ($field === 'id') {
+    if ($field === 'id' && $this->isHouseholdMergeRelationshipTypeKey($relationshipType)) {
       $this->householdsToSkip[] = $value;
     }
   }
@@ -506,7 +518,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   public function getRelationshipValue($relationshipType, $contactID, $field) {
-    return isset($this->relatedContactValues[$relationshipType][$contactID][$field]) ? $this->relatedContactValues[$relationshipType][$contactID][$field] : '';
+    return $this->relatedContactValues[$relationshipType][$contactID][$field] ?? '';
   }
 
   /**
@@ -627,6 +639,12 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields['world_region']['context'] = 'country';
     $queryFields['state_province']['context'] = 'province';
     $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT];
+    $queryFields['tags']['type'] = CRM_Utils_Type::T_LONGTEXT;
+    $queryFields['groups']['type'] = CRM_Utils_Type::T_LONGTEXT;
+    $queryFields['notes']['type'] = CRM_Utils_Type::T_LONGTEXT;
+    // Set the label to gender for gender_id as we it's ... magic (not in a good way).
+    // In other places the query object offers e.g contribution_status & contribution_status_id
+    $queryFields['gender_id']['title'] = ts('Gender');
     $this->queryFields = $queryFields;
   }
 
@@ -737,12 +755,13 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   public function getHeaderForRow($field) {
-    if (substr($field, -11) == 'campaign_id') {
+    if (substr($field, -11) === 'campaign_id') {
       // @todo - set this correctly in the xml rather than here.
       // This will require a generalised handling cleanup
       return ts('Campaign ID');
     }
-    if ($this->isMergeSameHousehold() && $field === 'id') {
+    if ($this->isMergeSameHousehold() && !$this->isMergeSameAddress() && $field === 'id') {
+      // This is weird - even if we are merging households not every contact in the export is a household so this would not be accurate.
       return ts('Household ID');
     }
     elseif (isset($this->getQueryFields()[$field]['title'])) {
@@ -768,7 +787,8 @@ class CRM_Export_BAO_ExportProcessor {
 
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $this->getQueryMode(),
-      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
+      FALSE, TRUE, TRUE, NULL, $this->getQueryOperator(),
+      NULL, TRUE
     );
 
     //sort by state
@@ -786,7 +806,7 @@ class CRM_Export_BAO_ExportProcessor {
 
     // CRM-13982 - check if is deleted
     foreach ($params as $value) {
-      if ($value[0] == 'contact_is_deleted') {
+      if ($value[0] === 'contact_is_deleted') {
         unset($whereClauses['trash_clause']);
       }
     }
@@ -808,10 +828,10 @@ class CRM_Export_BAO_ExportProcessor {
     }
 
     if (empty($where)) {
-      $where = "WHERE " . implode(' AND ', $whereClauses);
+      $where = 'WHERE ' . implode(' AND ', $whereClauses);
     }
     else {
-      $where .= " AND " . implode(' AND ', $whereClauses);
+      $where .= ' AND ' . implode(' AND ', $whereClauses);
     }
 
     $groupBy = $this->getGroupBy($query);
@@ -856,8 +876,8 @@ class CRM_Export_BAO_ExportProcessor {
     // These oddly constructed keys are for legacy reasons. Altering them will affect test success
     // but in time it may be good to rationalise them.
     $label = $this->getOutputSpecificationLabel($key, $relationshipType, $locationType, $entityLabel);
-    $index = $this->getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel);
-    $fieldKey = $this->getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel);
+    $index = $this->getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityTypeID);
+    $fieldKey = $this->getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityTypeID);
 
     $this->outputSpecification[$index]['header'] = $label;
     $this->outputSpecification[$index]['sql_columns'] = $this->getSqlColumnDefinition($fieldKey, $key);
@@ -947,18 +967,16 @@ class CRM_Export_BAO_ExportProcessor {
    * @param \CRM_Contact_BAO_Query $query
    * @param CRM_Core_DAO $iterationDAO
    * @param array $outputColumns
-   * @param $metadata
    * @param $paymentDetails
    * @param $addPaymentHeader
    *
    * @return array|bool
    */
-  public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader) {
+  public function buildRow($query, $iterationDAO, $outputColumns, $paymentDetails, $addPaymentHeader) {
     $paymentTableId = $this->getPaymentTableID();
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
     }
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
     $row = [];
@@ -989,11 +1007,8 @@ class CRM_Export_BAO_ExportProcessor {
       if (property_exists($iterationDAO, $field)) {
         $fieldValue = $iterationDAO->$field;
         // to get phone type from phone type id
-        if ($field == 'phone_type_id' && isset($phoneTypes[$fieldValue])) {
-          $fieldValue = $phoneTypes[$fieldValue];
-        }
-        elseif ($field == 'provider_id' || $field == 'im_provider') {
-          $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
+        if ($field == 'provider_id' || $field == 'im_provider') {
+          $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
         elseif (strstr($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
@@ -1007,7 +1022,7 @@ class CRM_Export_BAO_ExportProcessor {
         $this->buildRelationshipFieldsForRow($row, $iterationDAO->contact_id, $value, $field);
       }
       else {
-        $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails);
+        $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails);
       }
     }
 
@@ -1018,7 +1033,7 @@ class CRM_Export_BAO_ExportProcessor {
       if (!$this->isExportSpecifiedPaymentFields()) {
         $nullContributionDetails = array_fill_keys(array_keys($this->getPaymentHeaders()), NULL);
         if ($this->isExportPaymentFields()) {
-          $paymentData = CRM_Utils_Array::value($row[$paymentTableId], $paymentDetails);
+          $paymentData = $paymentDetails[$row[$paymentTableId]] ?? NULL;
           if (!is_array($paymentData) || empty($paymentData)) {
             $paymentData = $nullContributionDetails;
           }
@@ -1069,12 +1084,13 @@ class CRM_Export_BAO_ExportProcessor {
    * @param $field
    * @param $iterationDAO
    * @param $fieldValue
-   * @param $metadata
    * @param $paymentDetails
    *
    * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails) {
+  public function getTransformedFieldValue($field, $iterationDAO, $fieldValue, $paymentDetails) {
 
     $i18n = CRM_Core_I18n::singleton();
     if ($field == 'id') {
@@ -1096,9 +1112,16 @@ class CRM_Export_BAO_ExportProcessor {
     ) {
       //check for custom data
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
+        $html_type = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $cfID, 'html_type');
+
+        //need to calculate the link to the file for file custom data
+        if ($html_type === 'File' && $fieldValue) {
+          $result = civicrm_api3('attachment', 'get', ['return' => ['url'], 'id' => $fieldValue]);
+          return $result['values'][$result['id']]['url'];
+        }
+
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
-
       elseif (in_array($field, [
         'email_greeting',
         'postal_greeting',
@@ -1125,31 +1148,26 @@ class CRM_Export_BAO_ExportProcessor {
             return $i18n->crm_translate($fieldValue);
 
           default:
-            if (isset($metadata[$field])) {
-              // No I don't know why we do it this way & whether we could
-              // make better use of pseudoConstants.
-              if (!empty($metadata[$field]['context'])) {
-                return $i18n->crm_translate($fieldValue, $metadata[$field]);
+            $fieldSpec = $this->outputSpecification[$this->getMungedFieldName($field)]['metadata'];
+            // No I don't know why we do it this way & whether we could
+            // make better use of pseudoConstants.
+            if (!empty($fieldSpec['context'])) {
+              return $i18n->crm_translate($fieldValue, $fieldSpec);
+            }
+            if (!empty($fieldSpec['pseudoconstant']) && !empty($fieldSpec['hasLocationType']) && $fieldSpec['name'] !== 'phone_type_id') {
+              if (!empty($fieldSpec['bao'])) {
+                $transformedValue = CRM_Core_PseudoConstant::getLabel($fieldSpec['bao'], $fieldSpec['name'], $fieldValue);
+                if ($transformedValue) {
+                  return $transformedValue;
+                }
+                return $fieldValue;
               }
-              if (!empty($metadata[$field]['pseudoconstant'])) {
-                if (!empty($metadata[$field]['bao'])) {
-                  return CRM_Core_PseudoConstant::getLabel($metadata[$field]['bao'], $metadata[$field]['name'], $fieldValue);
-                }
-                // This is not our normal syntax for pseudoconstants but I am a bit loath to
-                // call an external function until sure it is not increasing php processing given this
-                // may be iterated 100,000 times & we already have the $imProvider var loaded.
-                // That can be next refactor...
-                // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
-                // but I have to reach a stable point....
-                $varName = $metadata[$field]['pseudoconstant']['var'];
-                if ($varName === 'imProviders') {
-                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
-                }
-                if ($varName === 'phoneTypes') {
-                  return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Phone', 'phone_type_id', $fieldValue);
-                }
+              // Yes - definitely feeling hatred for this bit of code - I know you will beat me up over it's awfulness
+              // but I have to reach a stable point....
+              $varName = $fieldSpec['pseudoconstant']['var'];
+              if ($varName === 'imProviders') {
+                return CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $fieldValue);
               }
-
             }
             return $fieldValue;
         }
@@ -1157,7 +1175,7 @@ class CRM_Export_BAO_ExportProcessor {
     }
     elseif ($this->isExportSpecifiedPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
       $paymentTableId = $this->getPaymentTableID();
-      $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
+      $paymentData = $paymentDetails[$iterationDAO->$paymentTableId] ?? NULL;
       $payFieldMapper = [
         'componentPaymentField_total_amount' => 'total_amount',
         'componentPaymentField_contribution_status' => 'contribution_status',
@@ -1344,7 +1362,7 @@ class CRM_Export_BAO_ExportProcessor {
   public function setRelationshipReturnProperties($value, $relationshipKey) {
     $relationField = $value['name'];
     $relIMProviderId = NULL;
-    $relLocTypeId = CRM_Utils_Array::value('location_type_id', $value);
+    $relLocTypeId = $value['location_type_id'] ?? NULL;
     $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $relLocTypeId);
     $relPhoneTypeId = CRM_Utils_Array::value('phone_type_id', $value, ($locationName ? 'Primary' : NULL));
     $relIMProviderId = CRM_Utils_Array::value('im_provider_id', $value, ($locationName ? 'Primary' : NULL));
@@ -1416,41 +1434,51 @@ class CRM_Export_BAO_ExportProcessor {
   public function getSqlColumnDefinition($fieldName, $columnName) {
 
     // early exit for master_id, CRM-12100
-    // in the DB it is an ID, but in the export, we retrive the display_name of the master record
-    // also for current_employer, CRM-16939
-    if ($columnName == 'master_id' || $columnName == 'current_employer') {
-      return "$fieldName varchar(128)";
+    // in the DB it is an ID, but in the export, we retrieve the display_name of the master record
+    if ($columnName === 'master_id') {
+      return "`$fieldName` varchar(128)";
     }
 
     $queryFields = $this->getQueryFields();
-    // @todo remove the enotice avoidance here, ensure all columns are declared.
+    // @todo remove the e-notice avoidance here, ensure all columns are declared.
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
     $fieldSpec = $queryFields[$columnName] ?? [];
-
+    $type = $fieldSpec['type'] ?? ($fieldSpec['data_type'] ?? '');
     // set the sql columns
-    if (isset($fieldSpec['type'])) {
-      switch ($fieldSpec['type']) {
+    if ($type) {
+      switch ($type) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
-            return "$fieldName varchar(255)";
+            return "`$fieldName` varchar(255)";
           }
-          return "$fieldName varchar(16)";
+          return "`$fieldName` varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
-          if (isset($queryFields[$columnName]['maxlength'])) {
-            return "$fieldName varchar({$queryFields[$columnName]['maxlength']})";
+          if (isset($fieldSpec['maxlength'])) {
+            return "`$fieldName` varchar({$fieldSpec['maxlength']})";
           }
-          else {
-            return "$fieldName varchar(255)";
+          $dataType = $fieldSpec['data_type'] ?? '';
+          // set the sql columns for custom data
+          switch ($dataType) {
+            case 'String':
+              // May be option labels, which could be up to 512 characters
+              $length = max(512, CRM_Utils_Array::value('text_length', $fieldSpec));
+              return "`$fieldName` varchar($length)";
+
+            case 'Memo':
+              return "`$fieldName` text";
+
+            default:
+              return "`$fieldName` varchar(255)";
           }
 
         case CRM_Utils_Type::T_TEXT:
         case CRM_Utils_Type::T_LONGTEXT:
         case CRM_Utils_Type::T_BLOB:
         case CRM_Utils_Type::T_MEDIUMBLOB:
-          return "$fieldName longtext";
+          return "`$fieldName` longtext";
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_ENUM:
@@ -1462,51 +1490,14 @@ class CRM_Export_BAO_ExportProcessor {
         case CRM_Utils_Type::T_URL:
         case CRM_Utils_Type::T_CCNUM:
         default:
-          return "$fieldName varchar(32)";
+          return "`$fieldName` varchar(32)";
       }
     }
     else {
-      if (substr($fieldName, -3, 3) == '_id') {
-        return "$fieldName varchar(255)";
+      if (substr($fieldName, -3, 3) === '_id') {
+        return "`$fieldName` varchar(255)";
       }
-      elseif (substr($fieldName, -5, 5) == '_note') {
-        return "$fieldName text";
-      }
-      else {
-        $changeFields = [
-          'groups',
-          'tags',
-          'notes',
-        ];
-
-        if (in_array($fieldName, $changeFields)) {
-          return "$fieldName text";
-        }
-        else {
-          // set the sql columns for custom data
-          if (isset($queryFields[$columnName]['data_type'])) {
-
-            switch ($queryFields[$columnName]['data_type']) {
-              case 'String':
-                // May be option labels, which could be up to 512 characters
-                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
-                return "$fieldName varchar($length)";
-
-              case 'Link':
-                return "$fieldName varchar(255)";
-
-              case 'Memo':
-                return "$fieldName text";
-
-              default:
-                return "$fieldName varchar(255)";
-            }
-          }
-          else {
-            return "$fieldName text";
-          }
-        }
-      }
+      return "`$fieldName` text";
     }
   }
 
@@ -1539,12 +1530,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   protected function getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel) {
-    if ($entityLabel || $key === 'im') {
-      // Just cos that's the history...
-      if ($key !== 'master_id') {
-        $key = $this->getHeaderForRow($key);
-      }
-    }
     if (!$relationshipType || $key !== 'id') {
       $key = $this->getMungedFieldName($key);
     }
@@ -1592,12 +1577,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @return string
    */
   protected function getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel) {
-    if ($entityLabel || $key === 'im') {
-      if ($key !== 'state_province' && $key !== 'id') {
-        // @todo - test removing this - indexing by $key should be fine...
-        $key = $this->getHeaderForRow($key);
-      }
-    }
     if (!$relationshipType || $key !== 'id') {
       $key = $this->getMungedFieldName($key);
     }
@@ -1684,7 +1663,7 @@ class CRM_Export_BAO_ExportProcessor {
    *       yet find a way to comment them for posterity.
    */
   public function getExportStructureArrays() {
-    $outputColumns = $metadata = [];
+    $outputColumns = [];
     $queryFields = $this->getQueryFields();
     foreach ($this->getReturnProperties() as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$this->isRelationshipTypeKey($key)) {
@@ -1721,13 +1700,12 @@ class CRM_Export_BAO_ExportProcessor {
               $daoFieldName .= "-" . $type[1];
             }
             $this->addOutputSpecification($actualDBFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
-            $metadata[$daoFieldName] = $this->getMetaDataForField($actualDBFieldName);
             $outputColumns[$daoFieldName] = TRUE;
           }
         }
       }
     }
-    return [$outputColumns, $metadata];
+    return [$outputColumns];
   }
 
   /**
@@ -1914,49 +1892,21 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Build array for merging same addresses.
    *
-   * @param $sql
-   * @param bool $sharedAddress
-   *
-   * @return array
+   * @param string $sql
    */
-  public function buildMasterCopyArray($sql, $sharedAddress = FALSE) {
+  public function buildMasterCopyArray($sql) {
 
-    $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
-    $postalOptions = CRM_Core_OptionGroup::values('postal_greeting');
-
-    $merge = $parents = [];
+    $parents = [];
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
       $masterID = $dao->master_id;
       $copyID = $dao->copy_id;
-      $masterPostalGreeting = $dao->master_postal_greeting;
-      $masterAddressee = $dao->master_addressee;
-      $copyAddressee = $dao->copy_addressee;
 
-      if (!$sharedAddress) {
-        if (!isset($this->contactGreetingFields[$dao->master_contact_id])) {
-          $this->contactGreetingFields[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id);
-        }
-        $masterPostalGreeting = CRM_Utils_Array::value('postal_greeting',
-          $this->contactGreetingFields[$dao->master_contact_id], $dao->master_postal_greeting
-        );
-        $masterAddressee = CRM_Utils_Array::value('addressee',
-          $this->contactGreetingFields[$dao->master_contact_id], $dao->master_addressee
-        );
+      $this->cacheContactGreetings((int) $dao->master_contact_id);
+      $this->cacheContactGreetings((int) $dao->copy_contact_id);
 
-        if (!isset($contactGreetingTokens[$dao->copy_contact_id])) {
-          $this->contactGreetingFields[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id);
-        }
-        $copyPostalGreeting = CRM_Utils_Array::value('postal_greeting',
-          $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_postal_greeting
-        );
-        $copyAddressee = CRM_Utils_Array::value('addressee',
-          $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_addressee
-        );
-      }
-
-      if (!isset($merge[$masterID])) {
+      if (!isset($this->contactsToMerge[$masterID])) {
         // check if this is an intermediate child
         // this happens if there are 3 or more matches a,b, c
         // the above query will return a, b / a, c / b, c
@@ -1966,40 +1916,34 @@ class CRM_Export_BAO_ExportProcessor {
           $masterID = $parents[$masterID];
         }
         else {
-          $merge[$masterID] = [
-            'addressee' => $masterAddressee,
+          $this->contactsToMerge[$masterID] = [
+            'addressee' => $this->getContactGreeting((int) $dao->master_contact_id, 'addressee', $dao->master_addressee),
             'copy' => [],
-            'postalGreeting' => $masterPostalGreeting,
+            'postalGreeting' => $this->getContactGreeting((int) $dao->master_contact_id, 'postal_greeting', $dao->master_postal_greeting),
           ];
-          $merge[$masterID]['emailGreeting'] = &$merge[$masterID]['postalGreeting'];
+          $this->contactsToMerge[$masterID]['emailGreeting'] = &$this->contactsToMerge[$masterID]['postalGreeting'];
         }
       }
       $parents[$copyID] = $masterID;
 
-      if (!$sharedAddress && !array_key_exists($copyID, $merge[$masterID]['copy'])) {
-
+      if (!array_key_exists($copyID, $this->contactsToMerge[$masterID]['copy'])) {
+        $copyPostalGreeting = $this->getContactPortionOfGreeting((int) $dao->copy_contact_id, (int) $dao->copy_postal_greeting_id, 'postal_greeting', $dao->copy_postal_greeting);
         if ($copyPostalGreeting) {
-          $this->trimNonTokensFromAddressString($copyPostalGreeting,
-            $postalOptions[$dao->copy_postal_greeting_id],
-            $this->getPostalGreetingTemplate()
-          );
-          $merge[$masterID]['postalGreeting'] = "{$merge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
+          $this->contactsToMerge[$masterID]['postalGreeting'] = "{$this->contactsToMerge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
           // if there happens to be a duplicate, remove it
-          $merge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $merge[$masterID]['postalGreeting']);
+          $this->contactsToMerge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $this->contactsToMerge[$masterID]['postalGreeting']);
         }
 
+        $copyAddressee = $this->getContactPortionOfGreeting((int) $dao->copy_contact_id, (int) $dao->copy_addressee_id, 'addressee', $dao->copy_addressee);
         if ($copyAddressee) {
-          $this->trimNonTokensFromAddressString($copyAddressee,
-            $addresseeOptions[$dao->copy_addressee_id],
-            $this->getAddresseeGreetingTemplate()
-          );
-          $merge[$masterID]['addressee'] = "{$merge[$masterID]['addressee']}, " . trim($copyAddressee);
+          $this->contactsToMerge[$masterID]['addressee'] = "{$this->contactsToMerge[$masterID]['addressee']}, " . trim($copyAddressee);
         }
       }
-      $merge[$masterID]['copy'][$copyID] = $copyAddressee;
+      if (!isset($this->contactsToMerge[$masterID]['copy'][$copyID])) {
+        // If it was set in the first run through - share routine, don't subsequently clobber.
+        $this->contactsToMerge[$masterID]['copy'][$copyID] = $copyAddressee ?? $dao->copy_addressee;
+      }
     }
-
-    return $merge;
   }
 
   /**
@@ -2008,26 +1952,6 @@ class CRM_Export_BAO_ExportProcessor {
   public function mergeSameAddress() {
 
     $tableName = $this->getTemporaryTable();
-    // check if any records are present based on if they have used shared address feature,
-    // and not based on if city / state .. matches.
-    $sql = "
-SELECT    r1.id                 as copy_id,
-          r1.civicrm_primary_id as copy_contact_id,
-          r1.addressee          as copy_addressee,
-          r1.addressee_id       as copy_addressee_id,
-          r1.postal_greeting    as copy_postal_greeting,
-          r1.postal_greeting_id as copy_postal_greeting_id,
-          r2.id                 as master_id,
-          r2.civicrm_primary_id as master_contact_id,
-          r2.postal_greeting    as master_postal_greeting,
-          r2.postal_greeting_id as master_postal_greeting_id,
-          r2.addressee          as master_addressee,
-          r2.addressee_id       as master_addressee_id
-FROM      $tableName r1
-INNER JOIN civicrm_address adr ON r1.master_id   = adr.id
-INNER JOIN $tableName      r2  ON adr.contact_id = r2.civicrm_primary_id
-ORDER BY  r1.id";
-    $linkedMerge = $this->buildMasterCopyArray($sql, TRUE);
 
     // find all the records that have the same street address BUT not in a household
     // require match on city and state as well
@@ -2046,36 +1970,15 @@ SELECT    r1.id                 as master_id,
           r2.addressee_id       as copy_addressee_id
 FROM      $tableName r1
 LEFT JOIN $tableName r2 ON ( r1.street_address = r2.street_address AND
-               r1.city = r2.city AND
-               r1.state_province_id = r2.state_province_id )
-WHERE     ( r1.household_name IS NULL OR r1.household_name = '' )
-AND       ( r2.household_name IS NULL OR r2.household_name = '' )
-AND       ( r1.street_address != '' )
+          r1.city = r2.city AND
+          r1.state_province_id = r2.state_province_id )
+WHERE ( r1.street_address != '' )
 AND       r2.id > r1.id
 ORDER BY  r1.id
 ";
-    $merge = $this->buildMasterCopyArray($sql);
+    $this->buildMasterCopyArray($sql);
 
-    // unset ids from $merge already present in $linkedMerge
-    foreach ($linkedMerge as $masterID => $values) {
-      $keys = [$masterID];
-      $keys = array_merge($keys, array_keys($values['copy']));
-      foreach ($merge as $mid => $vals) {
-        if (in_array($mid, $keys)) {
-          unset($merge[$mid]);
-        }
-        else {
-          foreach ($values['copy'] as $copyId) {
-            if (in_array($copyId, $keys)) {
-              unset($merge[$mid]['copy'][$copyId]);
-            }
-          }
-        }
-      }
-    }
-    $merge = $merge + $linkedMerge;
-
-    foreach ($merge as $masterID => $values) {
+    foreach ($this->contactsToMerge as $masterID => $values) {
       $sql = "
 UPDATE $tableName
 SET    addressee = %1, postal_greeting = %2, email_greeting = %3
@@ -2137,13 +2040,13 @@ WHERE  id IN ( $deleteIDString )
    */
   public function getPreview($limit) {
     $rows = [];
-    list($outputColumns, $metadata) = $this->getExportStructureArrays();
+    list($outputColumns) = $this->getExportStructureArrays();
     $query = $this->runQuery([], '');
     CRM_Core_DAO::disableFullGroupByMode();
     $result = CRM_Core_DAO::executeQuery($query[1] . ' LIMIT ' . (int) $limit);
     CRM_Core_DAO::reenableFullGroupByMode();
     while ($result->fetch()) {
-      $rows[] = $this->buildRow($query[0], $result, $outputColumns, $metadata, [], []);
+      $rows[] = $this->buildRow($query[0], $result, $outputColumns, [], []);
     }
     return $rows;
   }
@@ -2166,7 +2069,7 @@ WHERE  id IN ( $deleteIDString )
     if (!empty($greetingOptions)) {
       // Greeting options is keyed by 'postal_greeting' or 'addressee'.
       foreach ($greetingOptions as $key => $value) {
-        $option = CRM_Utils_Array::value($key, $formValues);
+        $option = $formValues[$key] ?? NULL;
         if ($option) {
           if ($greetingOptions[$key][$option] == ts('Other')) {
             $formValues[$key] = $formValues["{$key}_other"];
@@ -2243,11 +2146,8 @@ WHERE  id IN ( $deleteIDString )
     foreach ($value as $relationField => $relationValue) {
       if (is_object($relDAO) && property_exists($relDAO, $relationField)) {
         $fieldValue = $relDAO->$relationField;
-        if ($relationField == 'phone_type_id') {
-          $fieldValue = $phoneTypes[$relationValue];
-        }
-        elseif ($relationField == 'provider_id') {
-          $fieldValue = CRM_Utils_Array::value($relationValue, $imProviders);
+        if ($relationField == 'provider_id') {
+          $fieldValue = $imProviders[$relationValue] ?? NULL;
         }
         // CRM-13995
         elseif (is_object($relDAO) && in_array($relationField, [
@@ -2414,20 +2314,77 @@ LIMIT $offset, $limit
       'csv',
       FALSE
     );
-    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], NULL, TRUE, TRUE);
+    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
+    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
+    // and it continues to work on Libre Office, Numbers, Notes etc.
+    echo "\xEF\xBB\xBF";
+    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], TRUE);
   }
 
   /**
+   * Write rows to the csv.
+   *
    * @param array $headerRows
-   * @param array $componentDetails
+   * @param array $rows
    */
-  protected function writeRows(array $headerRows, array $componentDetails) {
-    CRM_Core_Report_Excel::writeCSVFile($this->getExportFileName(),
-      $headerRows,
-      $componentDetails,
-      NULL,
-      FALSE
+  protected function writeRows(array $headerRows, array $rows) {
+    if (!empty($rows)) {
+      CRM_Core_Report_Excel::makeCSVTable($headerRows, $rows, FALSE);
+    }
+  }
+
+  /**
+   * Cache the greeting fields for the given contact.
+   *
+   * @param int $contactID
+   */
+  protected function cacheContactGreetings(int $contactID) {
+    if (!isset($this->contactGreetingFields[$contactID])) {
+      $this->contactGreetingFields[$contactID] = $this->replaceMergeTokens($contactID);
+    }
+  }
+
+  /**
+   * Get the greeting value for the given contact.
+   *
+   * The values have already been cached so we are grabbing the value at this point.
+   *
+   * @param int $contactID
+   * @param string $type
+   *   postal_greeting|addressee|email_greeting
+   * @param string $default
+   *
+   * @return string
+   */
+  protected function getContactGreeting(int $contactID, string $type, string $default) {
+    return CRM_Utils_Array::value($type,
+      $this->contactGreetingFields[$contactID], $default
     );
+  }
+
+  /**
+   * Get the portion of the greeting string that relates to the contact.
+   *
+   * For example if the greeting id 'Dear Sarah' we are going to combine it with 'Dear Mike'
+   * so we want to strip the 'Dear ' and just get 'Sarah
+   * @param int $contactID
+   * @param int $greetingID
+   * @param string $type
+   *   postal_greeting, addressee (email_greeting not currently implemented for unknown reasons.
+   * @param string $defaultGreeting
+   *
+   * @return mixed|string
+   */
+  protected function getContactPortionOfGreeting(int $contactID, int $greetingID, string $type, string $defaultGreeting) {
+    $copyPostalGreeting = $this->getContactGreeting($contactID, $type, $defaultGreeting);
+    $template = $type === 'postal_greeting' ? $this->getPostalGreetingTemplate() : $this->getAddresseeGreetingTemplate();
+    if ($copyPostalGreeting) {
+      $copyPostalGreeting = $this->trimNonTokensFromAddressString($copyPostalGreeting,
+        $this->greetingOptions[$type][$greetingID],
+        $template
+      );
+    }
+    return $copyPostalGreeting;
   }
 
 }

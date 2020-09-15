@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -60,15 +42,13 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $colorField = uniqid('colora');
     $foodField = uniqid('fooda');
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $colorField)
       ->addValue('name', $colorField)
       ->addValue('option_values', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -77,8 +57,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $foodField)
       ->addValue('name', $foodField)
       ->addValue('option_values', ['1' => 'Corn', '2' => 'Potatoes', '3' => 'Cheese'])
@@ -87,23 +66,20 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Salary')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Number')
       ->addValue('data_type', 'Money')
       ->execute();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Jerome')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -112,19 +88,18 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('FinancialStuff.Salary', 50000)
       ->execute();
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addSelect('first_name')
-      ->addSelect("$group.$colorField.label")
-      ->addSelect("$group.$foodField.label")
+      ->addSelect("$group.$colorField:label")
+      ->addSelect("$group.$foodField:label")
       ->addSelect('FinancialStuff.Salary')
-      ->addWhere("$group.$foodField.label", 'IN', ['Corn', 'Potatoes'])
+      ->addWhere("$group.$foodField:label", 'IN', ['Corn', 'Potatoes'])
       ->addWhere('FinancialStuff.Salary', '>', '10000')
       ->execute()
       ->first();
 
-    $this->assertEquals('Red', $result["$group.$colorField.label"]);
-    $this->assertEquals('Corn', $result["$group.$foodField.label"]);
+    $this->assertEquals('Red', $result["$group.$colorField:label"]);
+    $this->assertEquals('Corn', $result["$group.$foodField:label"]);
     $this->assertEquals(50000, $result['FinancialStuff.Salary']);
   }
 
@@ -133,15 +108,13 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $colorField = uniqid('colorb');
     $foodField = uniqid('foodb');
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $colorField)
       ->addValue('name', $colorField)
       ->addValue('option_values', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -150,8 +123,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', $foodField)
       ->addValue('name', $foodField)
       ->addValue('option_values', ['1' => 'Corn', '2' => 'Potatoes', '3' => 'Cheese'])
@@ -160,23 +132,20 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Salary')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Number')
       ->addValue('data_type', 'Money')
       ->execute();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Red')
       ->addValue('last_name', 'Corn')
       ->addValue('contact_type', 'Individual')
@@ -185,8 +154,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('FinancialStuff.Salary', 10000)
       ->execute();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Blue')
       ->addValue('last_name', 'Cheese')
       ->addValue('contact_type', 'Individual')
@@ -195,14 +163,13 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       ->addValue('FinancialStuff.Salary', 500000)
       ->execute();
 
-    $result = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $result = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('last_name')
-      ->addSelect("$group.$colorField.label")
-      ->addSelect("$group.$foodField.label")
+      ->addSelect("$group.$colorField:label")
+      ->addSelect("$group.$foodField:label")
       ->addSelect('FinancialStuff.Salary')
-      ->addWhere("$group.$foodField.label", 'IN', ['Corn', 'Cheese'])
+      ->addWhere("$group.$foodField:label", 'IN', ['Corn', 'Cheese'])
       ->execute();
 
     $blueCheese = NULL;
@@ -212,8 +179,8 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
       }
     }
 
-    $this->assertEquals('Blue', $blueCheese["$group.$colorField.label"]);
-    $this->assertEquals('Cheese', $blueCheese["$group.$foodField.label"]);
+    $this->assertEquals('Blue', $blueCheese["$group.$colorField:label"]);
+    $this->assertEquals('Cheese', $blueCheese["$group.$foodField:label"]);
     $this->assertEquals(500000, $blueCheese['FinancialStuff.Salary']);
   }
 

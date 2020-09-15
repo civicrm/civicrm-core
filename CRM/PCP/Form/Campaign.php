@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -84,8 +68,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
         $defaults['goal_amount'] = CRM_Utils_Money::format($defaults['goal_amount'], NULL, '%a');
       }
 
-      $defaults['pcp_title'] = CRM_Utils_Array::value('title', $defaults);
-      $defaults['pcp_intro_text'] = CRM_Utils_Array::value('intro_text', $defaults);
+      $defaults['pcp_title'] = $defaults['title'] ?? NULL;
+      $defaults['pcp_intro_text'] = $defaults['intro_text'] ?? NULL;
     }
 
     if ($this->get('action') & CRM_Core_Action::ADD) {
@@ -95,8 +79,8 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $defaults['is_notify'] = 1;
     }
 
-    $this->_contactID = CRM_Utils_Array::value('contact_id', $defaults);
-    $this->_contriPageId = CRM_Utils_Array::value('page_id', $defaults);
+    $this->_contactID = $defaults['contact_id'] ?? NULL;
+    $this->_contriPageId = $defaults['page_id'] ?? NULL;
 
     return $defaults;
   }
@@ -203,7 +187,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       }
     }
     $session = CRM_Core_Session::singleton();
-    $contactID = isset($this->_contactID) ? $this->_contactID : $session->get('userID');
+    $contactID = $this->_contactID ?? $session->get('userID');
     if (!$contactID) {
       $contactID = $this->get('contactID');
     }
@@ -316,7 +300,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
       if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
         $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
-        CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+        CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
       }
 
       //if more than one email present for PCP notification ,

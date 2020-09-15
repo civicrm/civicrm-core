@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Logging_Schema {
 
@@ -88,10 +72,12 @@ class CRM_Logging_Schema {
    * @throws API_Exception
    */
   public static function checkLoggingSupport(&$value, $fieldSpec) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
-      throw new API_Exception("In order to use this functionality, the installation's database user must have privileges to create triggers (in MySQL 5.0 – and in MySQL 5.1 if binary logging is enabled – this means the SUPER privilege). This install either does not seem to have the required privilege enabled.");
+      throw new API_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
+    }
+    // dev/core#1812 Disable logging in a multilingual environment.
+    if (CRM_Core_I18n::isMultilingual() && $value) {
+      throw new API_Exception(ts("Logging is not supported in a multilingual environment!"));
     }
     return TRUE;
   }
@@ -158,6 +144,9 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // do not log civicrm_mailing_event* tables, CRM-12300
     $this->tables = preg_grep('/^civicrm_mailing_event_/', $this->tables, PREG_GREP_INVERT);
 
+    // dev/core#1762 Don't log subscription_history
+    $this->tables = preg_grep('/^civicrm_subscription_history/', $this->tables, PREG_GREP_INVERT);
+
     // do not log civicrm_mailing_recipients table, CRM-16193
     $this->tables = array_diff($this->tables, ['civicrm_mailing_recipients']);
     $this->logTableSpec = array_fill_keys($this->tables, []);
@@ -169,11 +158,13 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     $nonStandardTableNameString = $this->getNonStandardTableNameFilterString();
 
     if (defined('CIVICRM_LOGGING_DSN')) {
-      $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN);
+      $dsn = DB::parseDSN($dsn);
       $this->useDBPrefix = (CIVICRM_LOGGING_DSN != CIVICRM_DSN);
     }
     else {
-      $dsn = DB::parseDSN(CIVICRM_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
       $this->useDBPrefix = FALSE;
     }
     $this->db = $dsn['database'];
@@ -446,6 +437,19 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $cols = $this->columnsWithDiffSpecs($table, "log_$table");
     }
 
+    // If a column that already exists on logging table is being added, we
+    // should treat it as a modification.
+    $this->resetSchemaCacheForTable("log_$table");
+    $logTableSchema = $this->columnSpecsOf("log_$table");
+    if (!empty($cols['ADD'])) {
+      foreach ($cols['ADD'] as $colKey => $col) {
+        if (array_key_exists($col, $logTableSchema)) {
+          $cols['MODIFY'][] = $col;
+          unset($cols['ADD'][$colKey]);
+        }
+      }
+    }
+
     // use the relevant lines from CREATE TABLE to add colums to the log table
     $create = $this->_getCreateQuery($table);
     foreach ((['ADD', 'MODIFY']) as $alterType) {
@@ -467,7 +471,19 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
     }
 
+    $this->resetSchemaCacheForTable("log_$table");
+
     return TRUE;
+  }
+
+  /**
+   * Resets schema cache for the given table.
+   *
+   * @param string $table
+   *   Name of the table.
+   */
+  private function resetSchemaCacheForTable($table) {
+    unset(\Civi::$statics[__CLASS__]['columnSpecs'][$table]);
   }
 
   /**
@@ -767,7 +783,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // rewrite the queries into CREATE TABLE queries for log tables:
     $cols = <<<COLS
             ,
-            log_date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            log_date    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             log_conn_id VARCHAR(17),
             log_user_id INTEGER,
             log_action  ENUM('Initialization', 'Insert', 'Update', 'Delete')
@@ -1034,6 +1050,10 @@ COLS;
    */
   public function getLogTablesForContact() {
     $tables = array_keys(CRM_Core_DAO::getReferencesToContactTable());
+    // This additional hardcoding has been moved from getReferencesToContactTable
+    // to here as it is not needed in the other place where the function is called.
+    // It may not be needed here either...
+    $tables[] = 'civicrm_entity_tag';
     return array_intersect($tables, $this->tables);
   }
 

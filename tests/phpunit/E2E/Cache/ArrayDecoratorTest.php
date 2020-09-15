@@ -1,26 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License along with this program; if not, contact CiviCRM LLC       |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -78,6 +63,31 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
 
     $this->assertFalse($this->a->has('foo'));
     $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
+  }
+
+  public function testSetTtl() {
+    // This test has exhibited some flakiness. It is overridden to
+    // dump more detailed information about failures; however, it should be
+    // substantively the same.
+    if (isset($this->skippedTests[__FUNCTION__])) {
+      $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+    }
+    $result = $this->cache->set('key1', 'value', 1);
+    $this->assertTrue($result, 'set() must return true if success');
+    $this->assertEquals('value', $this->cache->get('key1'));
+    sleep(2);
+    $this->assertNull($this->cache->get('key1'), 'Value must expire after ttl.');
+
+    $this->cache->set('key2', 'value', new \DateInterval('PT1S'));
+    $key2Value = $this->cache->get('key2');
+    if ($key2Value !== 'value') {
+      // dump out contents of cache.
+      var_dump($this->cache);
+      print_r(date('u') . 'Current UNIX timestamp');
+    }
+    $this->assertEquals('value', $key2Value);
+    sleep(2);
+    $this->assertNull($this->cache->get('key2'), 'Value must expire after ttl.');
   }
 
 }

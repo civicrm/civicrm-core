@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -54,7 +36,7 @@ class CRM_Dedupe_Finder {
    * @return array
    *   Array of (cid1, cid2, weight) dupe triples
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
@@ -168,7 +150,8 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
-   * @throws \CiviCRM_API3_Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function dupesInGroup($rgid, $gid, $searchLimit = 0) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, TRUE, $searchLimit));
@@ -245,7 +228,7 @@ class CRM_Dedupe_Finder {
         continue;
       }
       foreach ($cg['fields'] as $cf) {
-        $flat[$cf['column_name']] = CRM_Utils_Array::value('data', $cf['customValue']);
+        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
       }
     }
 
@@ -267,7 +250,7 @@ class CRM_Dedupe_Finder {
     // the -digit to civicrm_address.location_type_id and -Primary to civicrm_address.is_primary
     foreach ($flat as $key => $value) {
       $matches = [];
-      if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+|Primary)$/', $key, $matches)) {
+      if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+-\d+)$|(.*)-(\d+|Primary)$/', $key, $matches)) {
         $return = array_values(array_filter($matches));
         // make sure the first occurrence is kept, not the last
         $flat[$return[1]] = empty($flat[$return[1]]) ? $value : $flat[$return[1]];
@@ -279,7 +262,7 @@ class CRM_Dedupe_Finder {
     $supportedFields = CRM_Dedupe_BAO_RuleGroup::supportedFields($ctype);
     if (is_array($supportedFields)) {
       foreach ($supportedFields as $table => $fields) {
-        if ($table == 'civicrm_address') {
+        if ($table === 'civicrm_address') {
           // for matching on civicrm_address fields, we also need the location_type_id
           $fields['location_type_id'] = '';
           // FIXME: we also need to do some hacking for id and name fields, see CRM-3902’s comments
@@ -355,16 +338,22 @@ class CRM_Dedupe_Finder {
       }
 
       $mainContacts[] = $row = [
-        'dstID' => $dstID,
+        'dstID' => (int) $dstID,
         'dstName' => $displayNames[$dstID],
-        'srcID' => $srcID,
+        'srcID' => (int) $srcID,
         'srcName' => $displayNames[$srcID],
         'weight' => $dupes[2],
         'canMerge' => TRUE,
       ];
 
-      $data = CRM_Core_DAO::escapeString(serialize($row));
-      CRM_Core_BAO_PrevNextCache::setItem('civicrm_contact', $dstID, $srcID, $cacheKeyString, $data);
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
+        ('civicrm_contact', %1, %2, %3, %4)", [
+          1 => [$dstID, 'Integer'],
+          2 => [$srcID, 'Integer'],
+          3 => [$cacheKeyString, 'String'],
+          4 => [serialize($row), 'String'],
+        ]
+      );
     }
     return $mainContacts;
   }

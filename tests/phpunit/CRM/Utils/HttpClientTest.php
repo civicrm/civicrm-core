@@ -14,7 +14,8 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   const SELF_SIGNED_HTTPS_REGEX = '/This is httpclienttest-selfsign\./';
 
   /**
-   * @var string path to which we can store temp file
+   * @var string
+   * Path to which we can store temp file
    */
   protected $tmpFile;
 

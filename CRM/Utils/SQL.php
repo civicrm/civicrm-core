@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,9 +13,41 @@
  * Just another collection of static utils functions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_SQL {
+
+  /**
+   * Given a string like "UPDATE some_table SET !field = @value", replace "!field" and "@value".
+   *
+   * This is syntactic sugar for using CRM_Utils_SQL_*::interpolate() without an OOP representation of the query.
+   *
+   * @param string $expr SQL expression
+   * @param null|array $args a list of values to insert into the SQL expression; keys are prefix-coded:
+   *   prefix '@' => escape SQL
+   *   prefix '#' => literal number, skip escaping but do validation
+   *   prefix '!' => literal, skip escaping and validation
+   *   if a value is an array, then it will be imploded
+   *
+   * PHP NULL's will be treated as SQL NULL's. The PHP string "null" will be treated as a string.
+   *
+   * @return string
+   */
+  public static function interpolate($expr, $args) {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      Civi::$statics[__CLASS__][__FUNCTION__] = new class extends CRM_Utils_SQL_BaseParamQuery {
+
+        public function __construct() {
+          $this->mode = CRM_Utils_SQL_BaseParamQuery::INTERPOLATE_INPUT;
+          $this->strict();
+        }
+
+      };
+    }
+    /** @var \CRM_Utils_SQL_BaseParamQuery $qb */
+    $qb = Civi::$statics[__CLASS__][__FUNCTION__];
+    return $qb->strict()->interpolate($expr, $args);
+  }
 
   /**
    * Helper function for adding the permissioned subquery from one entity onto another
@@ -120,35 +136,15 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Is the Database set up to handle acceents.
-   * @warning This function was introduced in attempt to determine the reason why the test getInternationalStrings was failing on ubu1604 but passing on ubu1204-5
-   * This function should not be used as the basis of further work as the reasoning is not perfact and is giving false failures.
-   * @return bool
-   */
-  public static function supportStorageOfAccents() {
-    $charSetDB = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE 'character_set_database'")->fetchAll();
-    $charSet = $charSetDB[0]['Value'];
-    if ($charSet == 'utf8') {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Does the DB version support mutliple locks per
    *
    * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
-   *
-   * As an interim measure we ALSO require CIVICRM_SUPPORT_MULTIPLE_LOCKS to be defined.
    *
    * This is a conservative measure to introduce the change which we expect to deprecate later.
    *
    * @todo we only check mariadb & mysql right now but maybe can add percona.
    */
   public static function supportsMultipleLocks() {
-    if (!defined('CIVICRM_SUPPORT_MULTIPLE_LOCKS')) {
-      return FALSE;
-    }
     static $isSupportLocks = NULL;
     if (!isset($isSupportLocks)) {
       $version = self::getDatabaseVersion();
@@ -170,6 +166,41 @@ class CRM_Utils_SQL {
    */
   public static function getDatabaseVersion() {
     return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+  }
+
+  /**
+   * Does the DSN indicate the connection should use ssl.
+   *
+   * @param string $dsn
+   *
+   * @return bool
+   */
+  public static function isSSLDSN(string $dsn):bool {
+    // Note that ssl= below is not an official PEAR::DB option. It doesn't know
+    // what to do with it. We made it up because it's not required
+    // to have client-side certificates to use ssl, so here you can specify
+    // you want that by putting ssl=1 in the DSN string.
+    //
+    // Cast to bool in case of error which we interpret as no ssl.
+    return (bool) preg_match('/[\?&](key|cert|ca|capath|cipher|ssl)=/', $dsn);
+  }
+
+  /**
+   * If DB_DSN_MODE is auto then we should replace mysql with mysqli if mysqli is available or the other way around as appropriate
+   * @param string $dsn
+   *
+   * @return string
+   */
+  public static function autoSwitchDSN($dsn) {
+    if (defined('DB_DSN_MODE') && DB_DSN_MODE === 'auto') {
+      if (extension_loaded('mysqli')) {
+        $dsn = preg_replace('/^mysql:/', 'mysqli:', $dsn);
+      }
+      else {
+        $dsn = preg_replace('/^mysqli:/', 'mysql:', $dsn);
+      }
+    }
+    return $dsn;
   }
 
 }

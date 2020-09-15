@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -66,11 +48,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
+
     // current set id
     $this->_id = $this->get('id');
 
     if ($this->_id && $isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot edit the settings of a reserved custom field-set.");
+      CRM_Core_Error::statusBounce("You cannot edit the settings of a reserved custom field-set.");
     }
     // setting title for html page
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -89,7 +73,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $params = ['id' => $this->_id];
       CRM_Core_BAO_CustomGroup::retrieve($params, $this->_defaults);
 
-      $subExtends = CRM_Utils_Array::value('extends_entity_column_value', $this->_defaults);
+      $subExtends = $this->_defaults['extends_entity_column_value'] ?? NULL;
       if (!empty($subExtends)) {
         $this->_subtypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($subExtends, 1, -1));
       }
@@ -271,7 +255,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $sel->_elements[1]->setSize(5);
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $subName = CRM_Utils_Array::value('extends_entity_column_id', $this->_defaults);
+      $subName = $this->_defaults['extends_entity_column_id'] ?? NULL;
       if ($this->_defaults['extends'] == 'Participant') {
         if ($subName == 1) {
           $this->_defaults['extends'] = 'ParticipantRole';
@@ -312,6 +296,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
 
     // display style
     $this->add('select', 'style', ts('Display Style'), CRM_Core_SelectValues::customGroupStyle());
+
+    $this->add('text', 'icon', ts('Tab icon'), ['class' => 'crm-icon-picker', 'allowClear' => TRUE]);
 
     // is this set collapsed or expanded ?
     $this->addElement('advcheckbox', 'collapse_display', ts('Collapse this set on initial display'));
@@ -365,7 +351,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // TODO: Is this condition ever true? Can this code be removed?
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"]);
+      $this->addElement('xbutton', 'done', ts('Done'), [
+        'type' => 'button',
+        'onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'",
+      ]);
     }
   }
 

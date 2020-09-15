@@ -57,11 +57,6 @@ return [
     'class' => 'CRM_Core_DAO_Component',
     'table' => 'civicrm_component',
   ],
-  'CRM_Core_DAO_Persistent' => [
-    'name' => 'Persistent',
-    'class' => 'CRM_Core_DAO_Persistent',
-    'table' => 'civicrm_persistent',
-  ],
   'CRM_Core_DAO_PrevNextCache' => [
     'name' => 'PrevNextCache',
     'class' => 'CRM_Core_DAO_PrevNextCache',
@@ -571,6 +566,11 @@ return [
     'name' => 'Relationship',
     'class' => 'CRM_Contact_DAO_Relationship',
     'table' => 'civicrm_relationship',
+  ],
+  'CRM_Contact_DAO_RelationshipCache' => [
+    'name' => 'RelationshipCache',
+    'class' => 'CRM_Contact_DAO_RelationshipCache',
+    'table' => 'civicrm_relationship_cache',
   ],
   'CRM_Mailing_DAO_Mailing' => [
     'name' => 'Mailing',

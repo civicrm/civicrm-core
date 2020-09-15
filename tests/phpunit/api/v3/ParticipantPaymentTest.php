@@ -1,28 +1,12 @@
 <?php
-/**
- * +--------------------------------------------------------------------+
- * | CiviCRM version 5                                                  |
- * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2019                                |
- * +--------------------------------------------------------------------+
- * | This file is a part of CiviCRM.                                    |
- * |                                                                    |
- * | CiviCRM is free software; you can copy, modify, and distribute it  |
- * | under the terms of the GNU Affero General Public License           |
- * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- * |                                                                    |
- * | CiviCRM is distributed in the hope that it will be useful, but     |
- * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- * | See the GNU Affero General Public License for more details.        |
- * |                                                                    |
- * | You should have received a copy of the GNU Affero General Public   |
- * | License and the CiviCRM Licensing Exception along                  |
- * | with this program; if not, contact CiviCRM LLC                     |
- * | at info[AT]civicrm[DOT]org. If you have questions about the        |
- * | GNU Affero General Public License or the licensing of CiviCRM,     |
- * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- * +--------------------------------------------------------------------+
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -74,14 +58,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contactID' => $this->_contactID3,
       'eventID' => $this->_eventID,
     ]);
-  }
-
-  /**
-   * Test civicrm_participant_payment_create with wrong params type.
-   */
-  public function testPaymentCreateWrongParamsType() {
-    $params = 'a string';
-    $this->callAPIFailure('participant_payment', 'create', $params);
   }
 
   /**
@@ -145,15 +121,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_participant_payment_create methods
-
-  /**
-   * Test civicrm_participant payment create with wrong params type.
-   */
-  public function testPaymentUpdateWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('participant_payment', 'create', $params);
-    $this->assertEquals('Input variable `params` is not an array', $result['error_message']);
-  }
 
   /**
    * Check with empty array.
@@ -282,14 +249,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'id' => $this->_participantPaymentID,
     ];
     $this->callAPISuccess('participant_payment', 'delete', $params);
-  }
-
-  /**
-   * Test civicrm_participant_payment_delete with wrong params type.
-   */
-  public function testPaymentDeleteWrongParamsType() {
-    $params = 'a string';
-    $this->callAPIFailure('participant_payment', 'delete', $params);
   }
 
   /**

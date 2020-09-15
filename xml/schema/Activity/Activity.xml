@@ -6,6 +6,7 @@
   <comment>Other Activity details stored here include contact, location, details.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-tasks</icon>
   <field>
     <name>id</name>
     <uniqueName>activity_id</uniqueName>
@@ -20,30 +21,6 @@
     <name>id</name>
     <autoincrement>true</autoincrement>
   </primaryKey>
-  <field>
-    <name>source_contact_id</name>
-    <type>int unsigned</type>
-    <title>Source Contact</title>
-    <import>true</import>
-    <headerPattern>/(activity.)?source(.contact(.id)?)?/i</headerPattern>
-    <comment>Contact ID of the person scheduling or logging this Activity. Usually the authenticated user.</comment>
-    <add>1.1</add>
-    <drop>4.4</drop>
-  </field>
-  <foreignKey>
-    <name>source_contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>1.1</add>
-    <drop>4.4</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <index>
-    <name>UI_source_contact_id</name>
-    <fieldName>source_contact_id</fieldName>
-    <add>2.0</add>
-    <drop>3.2</drop>
-  </index>
   <field>
     <name>source_record_id</name>
     <type>int unsigned</type>
@@ -72,6 +49,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Activity Type</label>
     </html>
   </field>
   <index>
@@ -79,23 +57,6 @@
     <fieldName>activity_type_id</fieldName>
     <add>1.6</add>
   </index>
-  <field>
-    <name>target_entity_table</name>
-    <type>varchar</type>
-    <length>64</length>
-    <required>true</required>
-    <comment>Name of table where item being referenced is stored.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
-    <name>target_entity_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>Foreign key to the referenced item.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
   <field>
     <name>subject</name>
     <uniqueName>activity_subject</uniqueName>
@@ -112,15 +73,11 @@
     <change>2.0</change>
   </field>
   <field>
-    <name>scheduled_date</name>
-    <type>datetime</type>
-    <comment>Date and time meeting is scheduled to occur.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>activity_date_time</name>
     <import>true</import>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP</default>
     <title>Activity Date</title>
     <type>datetime</type>
     <headerPattern>/(activity.)?date(.time$)?/i</headerPattern>
@@ -137,27 +94,6 @@
     <add>4.7</add>
   </index>
   <field>
-    <name>due_date_time</name>
-    <type>datetime</type>
-    <comment>Date and time this activity is due.</comment>
-    <add>2.0</add>
-    <drop>3.0</drop>
-  </field>
-  <field>
-    <name>duration_hours</name>
-    <type>int unsigned</type>
-    <comment>Planned or actual duration of meeting - hours.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
-    <name>duration_minutes</name>
-    <type>int unsigned</type>
-    <comment>Planned or actual duration of meeting - minutes.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>duration</name>
     <uniqueName>activity_duration</uniqueName>
     <title>Duration</title>
@@ -167,7 +103,7 @@
     <comment>Planned or actual duration of activity expressed in minutes. Conglomerate of former duration_hours and duration_minutes.</comment>
     <add>2.0</add>
     <html>
-      <type>Text</type>
+      <type>Number</type>
     </html>
   </field>
   <field>
@@ -192,6 +128,7 @@
     <add>2.0</add>
     <html>
       <type>EntityRef</type>
+      <label>Phone (called)</label>
     </html>
   </field>
   <foreignKey>
@@ -228,15 +165,6 @@
     <add>1.1</add>
   </field>
   <field>
-    <name>status</name>
-    <type>enum</type>
-    <title>Status</title>
-    <values>Scheduled, Completed</values>
-    <comment>What is the status of this meeting? Completed meeting status results in activity history entry.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>status_id</name>
     <uniqueName>activity_status_id</uniqueName>
     <title>Activity Status</title>
@@ -262,6 +190,8 @@
     <name>priority_id</name>
     <type>int unsigned</type>
     <title>Priority</title>
+    <export>true</export>
+    <import>true</import>
     <comment>ID of the priority given to this activity. Foreign key to civicrm_option_value.</comment>
     <add>2.0</add>
     <pseudoconstant>
@@ -295,7 +225,7 @@
     <headerPattern>/(is.)?test(.activity)?/i</headerPattern>
     <add>2.0</add>
     <html>
-      <type>Select</type>
+      <type>CheckBox</type>
     </html>
   </field>
   <field>
@@ -317,6 +247,7 @@
     <name>index_medium_id</name>
     <fieldName>medium_id</fieldName>
     <add>2.2</add>
+    <drop>5.28</drop>
   </index>
   <field>
     <name>is_auto</name>
@@ -347,9 +278,6 @@
     <import>true</import>
     <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
     <add>2.2</add>
-    <html>
-      <type>CheckBox</type>
-    </html>
   </field>
   <index>
     <name>index_is_current_revision</name>
@@ -370,12 +298,6 @@
     <add>2.2</add>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
-  <index>
-    <name>UI_original_id</name>
-    <fieldName>original_id</fieldName>
-    <add>2.2</add>
-    <drop>3.2</drop>
-  </index>
   <field>
     <name>result</name>
     <uniqueName>activity_result</uniqueName>
@@ -383,9 +305,6 @@
     <title>Result</title>
     <length>255</length>
     <comment>Currently being used to store result id for survey activity, FK to option value.</comment>
-    <html>
-      <type>Text</type>
-    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -398,7 +317,7 @@
     <headerPattern>/(activity.)?(trash|deleted)/i</headerPattern>
     <add>2.2</add>
     <html>
-      <type>Text</type>
+      <type>CheckBox</type>
     </html>
   </field>
   <index>
@@ -420,7 +339,7 @@
     </pseudoconstant>
     <add>3.4</add>
     <html>
-      <type>CheckBox</type>
+      <type>Select</type>
     </html>
   </field>
   <foreignKey>
@@ -449,9 +368,6 @@
     <title>Order</title>
     <type>int</type>
     <add>4.1</add>
-    <html>
-      <type>Text</type>
-    </html>
   </field>
   <field>
     <name>is_star</name>
@@ -462,6 +378,9 @@
     <comment>Activity marked as favorite.</comment>
     <headerPattern>/(activity.)?(star|favorite)/i</headerPattern>
     <add>4.7</add>
+    <html>
+      <type>Checkbox</type>
+    </html>
   </field>
   <field>
     <name>created_date</name>
@@ -470,7 +389,7 @@
     <comment>When was the activity was created.</comment>
     <required>false</required>
     <export>true</export>
-    <default>NULL</default>
+    <default>CURRENT_TIMESTAMP</default>
     <add>4.7</add>
   </field>
   <field>

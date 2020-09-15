@@ -87,7 +87,7 @@
   </field>
   <field>
     <name>color_button</name>
-    <title>Button Colour</title>
+    <title>Button Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>
@@ -108,35 +108,35 @@
   </field>
   <field>
     <name>color_main</name>
-    <title>Main Colour</title>
+    <title>Main Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>
   </field>
   <field>
     <name>color_main_bg</name>
-    <title>Backgroup Color</title>
+    <title>Background Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>
   </field>
   <field>
     <name>color_bg</name>
-    <title>Other Backgroun Colour</title>
+    <title>Other Background Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>
   </field>
   <field>
     <name>color_about_link</name>
-    <title>About Link Colour</title>
+    <title>About Link Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>
   </field>
   <field>
     <name>color_homepage_link</name>
-    <title>Homepage Link Colour</title>
+    <title>Homepage Link Color</title>
     <type>varchar</type>
     <length>10</length>
     <add>2.0</add>

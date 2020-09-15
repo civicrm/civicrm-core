@@ -43,6 +43,11 @@
     <required>true</required>
     <comment>ID of State/Province that County belongs</comment>
     <add>1.1</add>
+    <pseudoconstant>
+      <table>civicrm_state_province</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>state_province_id</name>

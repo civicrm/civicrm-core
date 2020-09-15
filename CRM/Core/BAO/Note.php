@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -51,8 +35,12 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @return string
    *   the note text or NULL if note not found
    *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function getNoteText($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function');
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'note');
   }
 
@@ -65,6 +53,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @return string
    *   the note subject or NULL if note not found
    *
+   * @throws \CRM_Core_Exception
    */
   public static function getNoteSubject($id) {
     return CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'subject');
@@ -85,8 +74,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
       return FALSE;
     }
 
-    $noteValues = array();
-    if (is_object($note) && get_class($note) == 'CRM_Core_DAO_Note') {
+    $noteValues = [];
+    if (is_object($note) && get_class($note) === 'CRM_Core_DAO_Note') {
       CRM_Core_DAO::storeValues($note, $noteValues);
     }
     else {
@@ -100,7 +89,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
     CRM_Utils_Hook::notePrivacy($noteValues);
 
-    if (!$noteValues['privacy']) {
+    if (empty($noteValues['privacy'])) {
       return FALSE;
     }
     elseif (isset($noteValues['notePrivacy_hidden'])) {
@@ -137,7 +126,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *   $note CRM_Core_BAO_Note object
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return NULL;
@@ -151,10 +140,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
     $note = new CRM_Core_BAO_Note();
 
-    if (!isset($params['modified_date'])) {
-      $params['modified_date'] = date("Ymd");
-    }
-
     if (!isset($params['privacy'])) {
       $params['privacy'] = 0;
     }
@@ -165,7 +150,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
         $note->contact_id = $params['entity_id'];
       }
     }
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    $id = $params['id'] ?? $ids['id'] ?? NULL;
     if ($id) {
       $note->id = $id;
     }
@@ -184,7 +169,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
       $noteActions = FALSE;
 
-      $loggedInContactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
       if ($loggedInContactID) {
         if ($loggedInContactID == $note->entity_id) {
           $noteActions = TRUE;
@@ -194,7 +179,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
         }
       }
 
-      $recentOther = array();
+      $recentOther = [];
       if ($noteActions) {
         $recentOther = array(
           'editUrl' => CRM_Utils_System::url('civicrm/contact/view/note',
@@ -249,8 +234,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param int $numNotes
    *   The maximum number of notes to return (0 if all).
    *
-   * @return object
-   *   $notes  Object of CRM_Core_BAO_Note
+   * @return array
    */
   public static function &getValues(&$params, &$values, $numNotes = self::MAX_NOTES) {
     if (empty($params)) {
@@ -268,10 +252,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
     $note->limit($numNotes);
     $note->find();
 
-    $notes = array();
+    $notes = [];
     $count = 0;
     while ($note->fetch()) {
-      $values['note'][$note->id] = array();
+      $values['note'][$note->id] = [];
       CRM_Core_DAO::storeValues($note, $values['note'][$note->id]);
       $notes[] = $note;
 
@@ -366,7 +350,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    */
   public static function &getNote($id, $entityTable = 'civicrm_relationship') {
-    $viewNote = array();
+    $viewNote = [];
 
     $query = "
   SELECT  id,
@@ -469,7 +453,7 @@ ORDER BY  modified_date desc";
    * @return array
    *   Nested associative array beginning with direct children of given note.
    */
-  private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = array(), $depth = 0) {
+  private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = [], $depth = 0) {
     if ($maxDepth && $depth > $maxDepth) {
       return FALSE;
     }
@@ -533,7 +517,7 @@ ORDER BY  modified_date desc";
    * @return array
    *   One-dimensional array containing ids of all desendent notes
    */
-  public static function getDescendentIds($parentId, &$ids = array()) {
+  public static function getDescendentIds($parentId, &$ids = []) {
     // get direct children of given parentId note
     $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';

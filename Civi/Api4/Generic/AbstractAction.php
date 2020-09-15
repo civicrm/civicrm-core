@@ -2,48 +2,40 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\ReflectionUtils;
-use Civi\Api4\Utils\ActionUtil;
 
 /**
  * Base class for all api actions.
  *
- * @method $this setCheckPermissions(bool $value)
+ * An api Action object stores the parameters of the api call, and defines a _run function to execute the action.
+ *
+ * Every `protected` class var is considered a parameter (unless it starts with an underscore).
+ *
+ * Adding a `protected` var to your Action named e.g. `$thing` will automatically:
+ *  - Provide a getter/setter (via `__call` MagicMethod) named `getThing()` and `setThing()`.
+ *  - Expose the param in the Api Explorer (be sure to add a doc-block as it displays in the help panel).
+ *  - Require a value for the param if you add the "@required" annotation.
+ *
  * @method bool getCheckPermissions()
+ * @method $this setDebug(bool $value) Enable/disable debug output
+ * @method bool getDebug()
  * @method $this setChain(array $chain)
  * @method array getChain()
  */
@@ -61,16 +53,21 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * Keys can be any string - this will be the name given to the output.
    *
-   * You can reference other values in the api results in this call by prefixing them with $
+   * You can reference other values in the api results in this call by prefixing them with `$`.
    *
    * For example, you could create a contact and place them in a group by chaining the
-   * GroupContact api to the Contact api:
+   * `GroupContact` api to the `Contact` api:
    *
+   * ```php
    * Contact::create()
    *   ->setValue('first_name', 'Hello')
-   *   ->addChain('add_to_a_group', GroupContact::create()->setValue('contact_id', '$id')->setValue('group_id', 123))
+   *   ->addChain('add_a_group', GroupContact::create()
+   *     ->setValue('contact_id', '$id')
+   *     ->setValue('group_id', 123)
+   *   )
+   * ```
    *
-   * This will substitute the id of the newly created contact with $id.
+   * This will substitute the id of the newly created contact with `$id`.
    *
    * @var array
    */
@@ -85,6 +82,18 @@ abstract class AbstractAction implements \ArrayAccess {
    * @var bool
    */
   protected $checkPermissions = TRUE;
+
+  /**
+   * Add debugging info to the api result.
+   *
+   * When enabled, `$result->debug` will be populated with information about the api call,
+   * including sql queries executed.
+   *
+   * **Note:** with checkPermissions enabled, debug info will only be returned if the user has "view debug output" permission.
+   *
+   * @var bool
+   */
+  protected $debug = FALSE;
 
   /**
    * @var string
@@ -123,6 +132,8 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   private $_id;
 
+  public $_debugOutput = [];
+
   /**
    * Action constructor.
    *
@@ -156,9 +167,18 @@ abstract class AbstractAction implements \ArrayAccess {
    * @throws \API_Exception
    */
   public function setVersion($val) {
-    if ($val != 4) {
+    if ($val !== 4 && $val !== '4') {
       throw new \API_Exception('Cannot modify api version');
     }
+    return $this;
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return $this
+   */
+  public function setCheckPermissions(bool $checkPermissions) {
+    $this->checkPermissions = $checkPermissions;
     return $this;
   }
 
@@ -166,9 +186,8 @@ abstract class AbstractAction implements \ArrayAccess {
    * @param string $name
    *   Unique name for this chained request
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
-   * @param string|int $index
-   *   Either a string for how the results should be indexed e.g. 'name'
-   *   or the index of a single result to return e.g. 0 for the first result.
+   * @param string|int|array $index
+   *   See `civicrm_api4()` for documentation of `$index` param
    * @return $this
    */
   public function addChain($name, AbstractAction $apiRequest, $index = NULL) {
@@ -177,7 +196,7 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
-   * Magic function to provide addFoo, getFoo and setFoo for params.
+   * Magic function to provide automatic getter/setter for params.
    *
    * @param $name
    * @param $arguments
@@ -190,10 +209,6 @@ abstract class AbstractAction implements \ArrayAccess {
       throw new \API_Exception('Unknown api parameter: ' . $name);
     }
     $mode = substr($name, 0, 3);
-    // Handle plural when adding to e.g. $values with "addValue" method.
-    if ($mode == 'add' && $this->paramExists($param . 's')) {
-      $param .= 's';
-    }
     if ($this->paramExists($param)) {
       switch ($mode) {
         case 'get':
@@ -201,18 +216,6 @@ abstract class AbstractAction implements \ArrayAccess {
 
         case 'set':
           $this->$param = $arguments[0];
-          return $this;
-
-        case 'add':
-          if (!is_array($this->$param)) {
-            throw new \API_Exception('Cannot add to non-array param');
-          }
-          if (array_key_exists(1, $arguments)) {
-            $this->{$param}[$arguments[0]] = $arguments[1];
-          }
-          else {
-            $this->{$param}[] = $arguments[0];
-          }
           return $this;
       }
     }
@@ -226,13 +229,21 @@ abstract class AbstractAction implements \ArrayAccess {
    * This is basically the outer wrapper for api v4.
    *
    * @return \Civi\Api4\Generic\Result
+   * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function execute() {
     /** @var \Civi\API\Kernel $kernel */
     $kernel = \Civi::service('civi_api_kernel');
-
-    return $kernel->runRequest($this);
+    $result = $kernel->runRequest($this);
+    if ($this->debug && (!$this->checkPermissions || \CRM_Core_Permission::check('view debug output'))) {
+      $result->debug['actionClass'] = get_class($this);
+      $result->debug = array_merge($result->debug, $this->_debugOutput);
+    }
+    else {
+      $result->debug = NULL;
+    }
+    return $result;
   }
 
   /**
@@ -265,10 +276,19 @@ abstract class AbstractAction implements \ArrayAccess {
   public function getParamInfo($param = NULL) {
     if (!isset($this->_paramInfo)) {
       $defaults = $this->getParamDefaults();
+      $vars = [
+        'entity' => $this->getEntityName(),
+        'action' => $this->getActionName(),
+      ];
+      // For actions like "getFields" and "getActions" they are not getting the entity itself.
+      // So generic docs will make more sense like this:
+      if (substr($vars['action'], 0, 3) === 'get' && substr($vars['action'], -1) === 's') {
+        $vars['entity'] = lcfirst(substr($vars['action'], 3, -1));
+      }
       foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
-          $this->_paramInfo[$name] = ReflectionUtils::getCodeDocs($property, 'Property');
+          $this->_paramInfo[$name] = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
           $this->_paramInfo[$name]['default'] = $defaults[$name];
         }
       }
@@ -387,37 +407,39 @@ abstract class AbstractAction implements \ArrayAccess {
       'default' => ['administer CiviCRM'],
     ];
     $action = $this->getActionName();
-    if (isset($permissions[$action])) {
-      return $permissions[$action];
-    }
-    elseif (in_array($action, ['getActions', 'getFields'])) {
-      return $permissions['meta'];
-    }
-    return $permissions['default'];
+    // Map specific action names to more generic versions
+    $map = [
+      'getActions' => 'meta',
+      'getFields' => 'meta',
+      'replace' => 'delete',
+      'save' => 'create',
+    ];
+    $generic = $map[$action] ?? 'default';
+    return $permissions[$action] ?? $permissions[$generic] ?? $permissions['default'];
   }
 
   /**
    * Returns schema fields for this entity & action.
    *
-   * Here we bypass the api wrapper and execute the getFields action directly.
+   * Here we bypass the api wrapper and run the getFields action directly.
    * This is because we DON'T want the wrapper to check permissions as this is an internal op,
    * but we DO want permissions to be checked inside the getFields request so e.g. the api_key
    * field can be conditionally included.
    * @see \Civi\Api4\Action\Contact\GetFields
    *
+   * @throws \API_Exception
    * @return array
    */
   public function entityFields() {
     if (!$this->_entityFields) {
-      $getFields = ActionUtil::getAction($this->getEntityName(), 'getFields');
+      $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
+        'version' => 4,
+        'checkPermissions' => $this->checkPermissions,
+        'action' => $this->getActionName(),
+        'includeCustom' => FALSE,
+      ]);
       $result = new Result();
-      if (method_exists($this, 'getBaoName')) {
-        $getFields->setIncludeCustom(FALSE);
-      }
-      $getFields
-        ->setCheckPermissions($this->checkPermissions)
-        ->setAction($this->getActionName())
-        ->_run($result);
+      $getFields->_run($result);
       $this->_entityFields = (array) $result->indexBy('name');
     }
     return $this->_entityFields;
@@ -458,6 +480,42 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
+   * Replaces pseudoconstants in input values
+   *
+   * @param array $record
+   * @throws \API_Exception
+   */
+  protected function formatWriteValues(&$record) {
+    $optionFields = [];
+    // Collect fieldnames with a :pseudoconstant suffix & remove them from $record array
+    foreach (array_keys($record) as $expr) {
+      $suffix = strrpos($expr, ':');
+      if ($suffix) {
+        $fieldName = substr($expr, 0, $suffix);
+        $field = $this->entityFields()[$fieldName] ?? NULL;
+        if ($field) {
+          $optionFields[$fieldName] = [
+            'val' => $record[$expr],
+            'field' => $field,
+            'suffix' => substr($expr, $suffix + 1),
+            'depends' => $field['input_attrs']['controlField'] ?? NULL,
+          ];
+          unset($record[$expr]);
+        }
+      }
+    }
+    // Sort option lookups by dependency, so e.g. country_id is processed first, then state_province_id, then county_id
+    uasort($optionFields, function ($a, $b) {
+      return $a['field']['name'] === $b['depends'] ? -1 : 1;
+    });
+    // Replace pseudoconstants. Note this is a reverse lookup as we are evaluating input not output.
+    foreach ($optionFields as $fieldName => $info) {
+      $options = FormattingUtil::getPseudoconstantList($info['field'], $info['suffix'], $record, 'create');
+      $record[$fieldName] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+    }
+  }
+
+  /**
    * This function is used internally for evaluating field annotations.
    *
    * It should never be passed raw user input.
@@ -476,6 +534,27 @@ abstract class AbstractAction implements \ArrayAccess {
     }
     $tpl = "{if $expr}1{else}0{/if}";
     return (bool) trim(\CRM_Core_Smarty::singleton()->fetchWith('string:' . $tpl, $vars));
+  }
+
+  /**
+   * When in debug mode, this logs the callback function being used by a Basic*Action class.
+   *
+   * @param callable $callable
+   */
+  protected function addCallbackToDebugOutput($callable) {
+    if ($this->debug && empty($this->_debugOutput['callback'])) {
+      if (is_scalar($callable)) {
+        $this->_debugOutput['callback'] = (string) $callable;
+      }
+      elseif (is_array($callable)) {
+        foreach ($callable as $key => $unit) {
+          $this->_debugOutput['callback'][$key] = is_object($unit) ? get_class($unit) : (string) $unit;
+        }
+      }
+      elseif (is_object($callable)) {
+        $this->_debugOutput['callback'] = get_class($callable);
+      }
+    }
   }
 
 }

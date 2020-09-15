@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -33,22 +17,23 @@
  * @group headless
  */
 class api_v3_ContributionRecurTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $params;
-  protected $ids = [];
-  protected $_entity = 'contribution_recur';
+  protected $_entity = 'ContributionRecur';
 
   public $DBResetRequired = FALSE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = [
       'contact_id' => $this->ids['contact'][0],
       'installments' => '12',
       'frequency_interval' => '1',
-      'amount' => '500',
+      'amount' => '500.00',
       'contribution_status_id' => 1,
       'start_date' => '2012-01-01 00:00:00',
       'currency' => 'USD',
@@ -56,22 +41,41 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testCreateContributionRecur() {
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count']);
-    $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck($this->params, $result['id'], $this->_entity);
+  /**
+   * Basic create test.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateContributionRecur($version) {
+    $this->basicCreateTest($version);
   }
 
-  public function testGetContributionRecur() {
+  /**
+   * Basic get test.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetContributionRecur($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $getParams = [
-      'amount' => '500',
-    ];
+    $getParams = ['amount' => '500'];
     $result = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
   }
 
+  /**
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testCreateContributionRecurWithToken() {
     // create token
     $this->createLoggedInUser();
@@ -87,14 +91,22 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
-  public function testDeleteContributionRecur() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = ['id' => $result['id']];
-    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+  /**
+   * @dataProvider versionThreeAndFour
+   *
+   * @param $version
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeleteContributionRecur($version) {
+    $this->basicDeleteTest($version);
   }
 
+  /**
+   * Test expected apiv3 outputs.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testGetFieldsContributionRecur() {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertEquals(12, $result['values']['start_date']['type']);
@@ -102,6 +114,8 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
 
   /**
    * Test that we can cancel a contribution and add a cancel_reason via the api.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testContributionRecurCancel() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);

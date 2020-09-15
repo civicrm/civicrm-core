@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -240,7 +224,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       $yearNow = $yearDate + 10000;
 
       $urlString = 'civicrm/contribute/search';
-      $urlParams = 'reset=1&pid=%%id%%&force=1&test=0';
+      $urlParams = 'reset=1&contribution_page_id=%%id%%&force=1&test=0';
 
       self::$_contributionLinks = array(
         CRM_Core_Action::DETACH => array(
@@ -261,7 +245,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'name' => ts('Cumulative'),
           'title' => ts('Cumulative'),
           'url' => $urlString,
-          'qs' => "{$urlParams}&receive_date_low=&receive_date_high=$now",
+          'qs' => "{$urlParams}",
           'uniqueName' => 'cumulative',
         ),
       );
@@ -384,9 +368,18 @@ AND         cp.page_type = 'contribute'
       $this, TRUE, 0, 'GET'
     );
 
-    CRM_Contribute_BAO_ContributionPage::copy($gid);
+    $copy = CRM_Contribute_BAO_ContributionPage::copy($gid);
 
-    CRM_Utils_System::redirect(CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1'));
+    $urlString = CRM_Utils_System::currentPath();
+    $urlParams = 'reset=1';
+
+    // Redirect to copied contribution page
+    if ($copy->id) {
+      $urlString = 'civicrm/admin/contribute/settings';
+      $urlParams .= '&action=update&id=' . $copy->id;
+    }
+
+    CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
   }
 
   /**
@@ -418,14 +411,14 @@ AND         cp.page_type = 'contribute'
 
     $this->search();
 
-    $params = array();
+    $params = [];
 
     $whereClause = $this->whereClause($params, FALSE);
     $config = CRM_Core_Config::singleton();
     if ($config->includeAlphabeticalPager) {
       $this->pagerAToZ($whereClause, $params);
     }
-    $params = array();
+    $params = [];
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);
 
@@ -441,7 +434,7 @@ AND         cp.page_type = 'contribute'
    ORDER BY is_active desc, title asc
    LIMIT  $offset, $rowCount";
     $contribPage = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Contribute_DAO_ContributionPage');
-    $contribPageIds = array();
+    $contribPageIds = [];
     while ($contribPage->fetch()) {
       $contribPageIds[$contribPage->id] = $contribPage->id;
     }
@@ -464,7 +457,7 @@ ORDER BY is_active desc, title asc
     $configureActionLinks = self::configureActionLinks();
 
     while ($dao->fetch()) {
-      $contribution[$dao->id] = array();
+      $contribution[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $contribution[$dao->id]);
 
       // form all action links
@@ -492,7 +485,7 @@ ORDER BY is_active desc, title asc
       }
 
       //build the configure links.
-      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, array());
+      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
       $contribution[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
         array('id' => $dao->id),
@@ -537,7 +530,7 @@ ORDER BY is_active desc, title asc
       );
 
       //show campaigns on selector.
-      $contribution[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
+      $contribution[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
     }
 
     if (isset($contribution)) {
@@ -572,7 +565,7 @@ ORDER BY is_active desc, title asc
    */
   public function whereClause(&$params, $sortBy = TRUE) {
     // @todo Unused local variable can be safely removed.
-    $values = $clauses = array();
+    $values = $clauses = [];
     $title = $this->get('title');
     $createdId = $this->get('cid');
 
@@ -591,7 +584,7 @@ ORDER BY is_active desc, title asc
     }
 
     $value = $this->get('financial_type_id');
-    $val = array();
+    $val = [];
     if ($value) {
       if (is_array($value)) {
         foreach ($value as $k => $v) {
@@ -634,7 +627,7 @@ ORDER BY is_active desc, title asc
   public function getCampaignIds() {
     // The unfiltered value from the session cannot be trusted, it needs to be
     // processed to get a clean array of positive integers.
-    $ids = array();
+    $ids = [];
     foreach ((array) $this->get('campaign_id') as $id) {
       if ((string) (int) $id === (string) $id && $id > 0) {
         $ids[] = $id;
@@ -696,13 +689,13 @@ ORDER BY UPPER(LEFT(title, 1))
     // build the formatted configure links.
     $formattedConfLinks = self::configureActionLinks();
     foreach ($formattedConfLinks as $act => & $link) {
-      $sectionName = CRM_Utils_Array::value('uniqueName', $link);
+      $sectionName = $link['uniqueName'] ?? NULL;
       if (!$sectionName) {
         continue;
       }
 
       if (empty($sectionsInfo[$sectionName])) {
-        $classes = array();
+        $classes = [];
         if (isset($link['class'])) {
           $classes = $link['class'];
         }

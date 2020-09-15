@@ -35,8 +35,8 @@ trait GenericAssertionsTrait {
    * @param array $actual
    */
   public function assertTreeEquals($expected, $actual) {
-    $e = array();
-    $a = array();
+    $e = [];
+    $a = [];
     \CRM_Utils_Array::flatten($expected, $e, '', ':::');
     \CRM_Utils_Array::flatten($actual, $a, '', ':::');
     ksort($e);
@@ -89,7 +89,7 @@ trait GenericAssertionsTrait {
    * @param array $list
    */
   public function assertArrayKeyExists($key, &$list) {
-    $result = isset($list[$key]) ? TRUE : FALSE;
+    $result = isset($list[$key]);
     $this->assertTrue($result, sprintf("%s element exists?", $key));
   }
 
@@ -100,7 +100,7 @@ trait GenericAssertionsTrait {
   public function assertArrayValueNotNull($key, &$list) {
     $this->assertArrayKeyExists($key, $list);
 
-    $value = isset($list[$key]) ? $list[$key] : NULL;
+    $value = $list[$key] ?? NULL;
     $this->assertTrue($value,
       sprintf("%s element not null?", $key)
     );

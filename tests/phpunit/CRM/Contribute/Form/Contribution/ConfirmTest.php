@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -44,9 +28,10 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   /**
    * CRM-21200: Test that making online payment for pending contribution doesn't overwite the contribution details
    */
-  public function testPaynowPayment() {
+  public function testPayNowPayment() {
     $contactID = $this->individualCreate();
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
 
     // create a contribution page which is later used to make pay-later contribution
     $result = $this->callAPISuccess('ContributionPage', 'create', [
@@ -96,7 +81,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit card'),
     ];
     $form->_params = [
-      'qfKey' => 'donotcare',
+      'qfKey' => 'do not care',
       'contribution_id' => $contribution['id'],
       'credit_card_number' => 4111111111111111,
       'cvv2' => 234,
@@ -154,6 +139,40 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertRegExp("/Paid later via page ID: $contributionPageID2/", $contribution['contribution_source']);
     // check that contribution status is changed to 'Completed' from 'Pending'
     $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    //delete contribution.
+    $this->callAPISuccess('contribution', 'delete', [
+      'id' => $processConfirmResult['contribution']->id,
+    ]);
+
+    //Process on behalf contribution.
+    unset($form->_params['contribution_id']);
+    $form->_contactID = $form->_values['related_contact'] = $form->_params['onbehalf_contact_id'] = $contactID;
+    $form->_params['contact_id'] = $this->organizationCreate();
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $form->_params['contact_id'],
+      'relationship_type_id' => 5,
+      'is_current_employer' => 1,
+    ]);
+    CRM_Contribute_BAO_Contribution_Utils::processConfirm($form,
+      $form->_params,
+      $form->_params['onbehalf_contact_id'],
+      $form->_values['financial_type_id'],
+      0, FALSE
+    );
+    //check if contribution is created on org.
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $form->_params['onbehalf_contact_id'],
+    ]);
+
+    $activity = civicrm_api3('Activity', 'get', [
+      'sequential' => 1,
+      'source_record_id' => $contribution['id'],
+      'contact_id' => $form->_params['onbehalf_contact_id'],
+      'activity_type_id' => 'Contribution',
+    ]);
+    $this->assertEquals(1, $activity['count']);
   }
 
 }

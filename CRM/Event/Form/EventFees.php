@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -270,8 +254,8 @@ class CRM_Event_Form_EventFees {
 
       $priceFields = $htmlTypes = $optionValues = [];
       foreach ($lineItems[$participantID] as $lineId => $items) {
-        $priceFieldId = CRM_Utils_Array::value('price_field_id', $items);
-        $priceOptionId = CRM_Utils_Array::value('price_field_value_id', $items);
+        $priceFieldId = $items['price_field_id'] ?? NULL;
+        $priceOptionId = $items['price_field_value_id'] ?? NULL;
         if ($priceFieldId && $priceOptionId) {
           $priceFields[$priceFieldId][] = $priceOptionId;
         }
@@ -293,7 +277,7 @@ SELECT  id, html_type
 
       foreach ($lineItems[$participantID] as $lineId => $items) {
         $fieldId = $items['price_field_id'];
-        $htmlType = CRM_Utils_Array::value($fieldId, $htmlTypes);
+        $htmlType = $htmlTypes[$fieldId] ?? NULL;
         if (!$htmlType) {
           continue;
         }
@@ -302,7 +286,7 @@ SELECT  id, html_type
           $defaults["price_{$fieldId}"] = $items['qty'];
         }
         else {
-          $fieldOptValues = CRM_Utils_Array::value($fieldId, $priceFields);
+          $fieldOptValues = $priceFields[$fieldId] ?? NULL;
           if (!is_array($fieldOptValues)) {
             continue;
           }
@@ -321,169 +305,6 @@ SELECT  id, html_type
     }
 
     return $defaults;
-  }
-
-  /**
-   * Build the form object.
-   *
-   * @param CRM_Core_Form $form
-   */
-  public static function buildQuickForm(&$form) {
-    if ($form->_eventId) {
-      $form->_isPaidEvent = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'is_monetary');
-      if ($form->_isPaidEvent) {
-        $form->addElement('hidden', 'hidden_feeblock', 1);
-      }
-
-      // make sure this is for backoffice registration.
-      if ($form->getName() == 'Participant') {
-        $eventfullMsg = CRM_Event_BAO_Participant::eventFullMessage($form->_eventId, $form->_pId);
-        $form->addElement('hidden', 'hidden_eventFullMsg', $eventfullMsg, ['id' => 'hidden_eventFullMsg']);
-      }
-    }
-
-    if ($form->_pId) {
-      if (CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $form->_pId, 'contribution_id', 'participant_id'
-      )
-      ) {
-        $form->_online = !$form->isBackOffice;
-      }
-    }
-
-    if ($form->_isPaidEvent) {
-      $params = ['id' => $form->_eventId];
-      CRM_Event_BAO_Event::retrieve($params, $event);
-
-      //retrieve custom information
-      $form->_values = [];
-      CRM_Event_Form_Registration::initEventFee($form, $event['id']);
-      CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
-      $lineItem = [];
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      $totalTaxAmount = 0;
-      if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
-        $lineItem[] = $form->_values['line_items'];
-        foreach ($form->_values['line_items'] as $key => $value) {
-          $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
-        }
-      }
-      if ($invoicing) {
-        $form->assign('totalTaxAmount', $totalTaxAmount);
-      }
-      $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
-      $discounts = [];
-      if (!empty($form->_values['discount'])) {
-        foreach ($form->_values['discount'] as $key => $value) {
-          $value = current($value);
-          $discounts[$key] = $value['name'];
-        }
-
-        $element = $form->add('select', 'discount_id',
-          ts('Discount Set'),
-          [
-            0 => ts('- select -'),
-          ] + $discounts,
-          FALSE,
-          ['class' => "crm-select2"]
-        );
-
-        if ($form->_online) {
-          $element->freeze();
-        }
-      }
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-        && !CRM_Utils_Array::value('fee', $form->_values)
-        && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
-      ) {
-        CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
-        return FALSE;
-      }
-
-      CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
-      if (!$form->_mode) {
-        $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
-          ['onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);"]
-        );
-        // Check permissions for financial type first
-        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-          CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $form->_action);
-        }
-        else {
-          $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-        }
-
-        $form->add('select', 'financial_type_id',
-          ts('Financial Type'),
-          ['' => ts('- select -')] + $financialTypes
-        );
-
-        $form->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
-
-        $form->add('select', 'payment_instrument_id',
-          ts('Payment Method'),
-          ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
-          FALSE, ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
-        );
-        // don't show transaction id in batch update mode
-        $path = CRM_Utils_System::currentPath();
-        $form->assign('showTransactionId', FALSE);
-        if ($path != 'civicrm/contact/search/basic') {
-          $form->add('text', 'trxn_id', ts('Transaction ID'));
-          $form->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
-            'objectExists', ['CRM_Contribute_DAO_Contribution', $form->_eventId, 'trxn_id']
-          );
-          $form->assign('showTransactionId', TRUE);
-        }
-
-        $form->add('select', 'contribution_status_id',
-          ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('participant')
-        );
-
-        $form->add('text', 'check_number', ts('Check Number'),
-          CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'check_number')
-        );
-
-        $form->add('text', 'total_amount', ts('Amount'),
-          CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'total_amount')
-        );
-      }
-    }
-    else {
-      $form->add('text', 'amount', ts('Event Fee(s)'));
-    }
-    $form->assign('onlinePendingContributionId', $form->get('onlinePendingContributionId'));
-
-    $form->assign('paid', $form->_isPaidEvent);
-
-    $form->addElement('checkbox',
-      'send_receipt',
-      ts('Send Confirmation?'), NULL,
-      ['onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);"]
-    );
-
-    $form->add('select', 'from_email_address', ts('Receipt From'), $form->_fromEmails['from_email_id']);
-
-    $form->add('textarea', 'receipt_text', ts('Confirmation Message'));
-
-    // Retrieve the name and email of the contact - form will be the TO for receipt email ( only if context is not standalone)
-    if ($form->_context != 'standalone') {
-      if ($form->_contactId) {
-        list($form->_contributorDisplayName,
-          $form->_contributorEmail
-          ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($form->_contactId);
-        $form->assign('email', $form->_contributorEmail);
-      }
-      else {
-        //show email block for batch update for event
-        $form->assign('batchEmail', TRUE);
-      }
-    }
-
-    $mailingInfo = Civi::settings()->get('mailing_backend');
-    $form->assign('outBound_option', $mailingInfo['outBound_option']);
-    $form->assign('hasPayment', $form->_paymentId);
   }
 
   /**

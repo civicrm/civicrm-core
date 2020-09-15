@@ -13,33 +13,101 @@
 {capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
 <center>
- <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
+ <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
 
   <!-- BEGIN HEADER -->
   <!-- You can add table row(s) here with logo or other header elements -->
   <!-- END HEADER -->
 
   <!-- BEGIN CONTENT -->
-   {if $emailGreeting}<tr><td>{$emailGreeting},</td></tr>{/if}
   <tr>
     <td>
+      {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
       {if $isRefund}
-      <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
+        <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
       {else}
-      <p>{ts}A payment has been received.{/ts}</p>
+        <p>{ts}Below you will find a receipt for this payment.{/ts}</p>
+        {if $paymentsComplete}
+          <p>{ts}Thank you for completing this contribution.{/ts}</p>
+        {/if}
       {/if}
     </td>
   </tr>
   <tr>
    <td>
     <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-  {if $isRefund}
+    {if $isRefund}
+      <tr>
+        <th {$headerStyle}>{ts}Refund Details{/ts}</th>
+      </tr>
+      <tr>
+        <td {$labelStyle}>
+        {ts}This Refund Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+        {$refundAmount|crmMoney}
+        </td>
+      </tr>
+    {else}
+      <tr>
+        <th {$headerStyle}>{ts}Payment Details{/ts}</th>
+      </tr>
+      <tr>
+        <td {$labelStyle}>
+        {ts}This Payment Amount{/ts}
+        </td>
+        <td {$valueStyle}>
+        {$paymentAmount|crmMoney}
+        </td>
+      </tr>
+    {/if}
+    {if $receive_date}
+      <tr>
+        <td {$labelStyle}>
+        {ts}Transaction Date{/ts}
+        </td>
+        <td {$valueStyle}>
+        {$receive_date|crmDate}
+        </td>
+      </tr>
+    {/if}
+    {if $trxn_id}
+      <tr>
+        <td {$labelStyle}>
+        {ts}Transaction #{/ts}
+        </td>
+        <td {$valueStyle}>
+        {$trxn_id}
+        </td>
+      </tr>
+    {/if}
+    {if $paidBy}
+      <tr>
+        <td {$labelStyle}>
+        {ts}Paid By{/ts}
+        </td>
+        <td {$valueStyle}>
+        {$paidBy}
+        </td>
+      </tr>
+    {/if}
+    {if $checkNumber}
+      <tr>
+        <td {$labelStyle}>
+        {ts}Check Number{/ts}
+        </td>
+        <td {$valueStyle}>
+        {$checkNumber}
+        </td>
+      </tr>
+    {/if}
+
   <tr>
-    <th {$headerStyle}>{ts}Refund Details{/ts}</th>
+    <th {$headerStyle}>{ts}Contribution Details{/ts}</th>
   </tr>
   <tr>
     <td {$labelStyle}>
-      {ts}Total Amount{/ts}
+      {ts}Total Fee{/ts}
     </td>
     <td {$valueStyle}>
       {$totalAmount|crmMoney}
@@ -47,7 +115,7 @@
   </tr>
   <tr>
     <td {$labelStyle}>
-      {ts}You Paid{/ts}
+      {ts}Total Paid{/ts}
     </td>
     <td {$valueStyle}>
       {$totalPaid|crmMoney}
@@ -55,91 +123,14 @@
   </tr>
   <tr>
     <td {$labelStyle}>
-      {ts}Refund Amount{/ts}
+      {ts}Balance Owed{/ts}
     </td>
     <td {$valueStyle}>
-      {$refundAmount|crmMoney}
-    <td>
+      {$amountOwed|crmMoney}
+    </td> {* This will be zero after final payment. *}
   </tr>
-  {else}
-    <tr>
-      <th {$headerStyle}>{ts}Payment Details{/ts}</th>
-    </tr>
-    <tr>
-      <td {$labelStyle}>
-        {ts}Total Amount{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$totalAmount|crmMoney}
-      </td>
-      </tr>
-      <tr>
-      <td {$labelStyle}>
-        {ts}This Payment Amount{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$paymentAmount|crmMoney}
-      </td>
-      </tr>
-     <tr>
-      <td {$labelStyle}>
-        {ts}Balance Owed{/ts}
-      </td>
-       <td {$valueStyle}>
-         {$amountOwed|crmMoney}
-      </td> {* This will be zero after final payment. *}
-     </tr>
-     <tr> <td {$emptyBlockStyle}></td>
-     <td {$emptyBlockValueStyle}></td></tr>
-      {if $paymentsComplete}
-      <tr>
-      <td colspan='2' {$valueStyle}>
-        {ts}Thank you for completing payment.{/ts}
-      </td>
-     </tr>
-      {/if}
-  {/if}
-  {if $receive_date}
-    <tr>
-      <td {$labelStyle}>
-        {ts}Transaction Date{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$receive_date|crmDate}
-      </td>
-    </tr>
-  {/if}
-  {if $trxn_id}
-    <tr>
-      <td {$labelStyle}>
-  {ts}Transaction #{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$trxn_id}
-      </td>
-    </tr>
-  {/if}
-  {if $paidBy}
-    <tr>
-      <td {$labelStyle}>
-        {ts}Paid By{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$paidBy}
-      </td>
-    </tr>
-  {/if}
-  {if $checkNumber}
-    <tr>
-      <td {$labelStyle}>
-        {ts}Check Number{/ts}
-      </td>
-      <td {$valueStyle}>
-        {$checkNumber}
-      </td>
-    </tr>
-  {/if}
   </table>
+
   </td>
   </tr>
     <tr>

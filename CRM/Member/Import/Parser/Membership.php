@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -141,7 +125,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    */
   public function summary(&$values) {
     $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values, $erroneousField);
 
     $errorRequired = FALSE;
 
@@ -161,7 +145,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $errorMessage = NULL;
 
     //To check whether start date or join date is provided
-    if (empty($params['membership_start_date']) && empty($params['join_date'])) {
+    if (empty($params['membership_start_date']) && empty($params['membership_join_date'])) {
       $errorMessage = 'Membership Start Date is required to create a memberships.';
       CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
@@ -173,7 +157,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
       if ($val) {
         switch ($key) {
-          case 'join_date':
+          case 'membership_join_date':
             if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
               if (!CRM_Utils_Rule::date($params[$key])) {
                 CRM_Contact_Import_Parser_Contact::addToErrorMsg('Member Since', $errorMessage);
@@ -279,12 +263,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $params = $this->getActiveFieldParams();
 
       //assign join date equal to start date if join date is not provided
-      if (empty($params['join_date']) && !empty($params['membership_start_date'])) {
-        $params['join_date'] = $params['membership_start_date'];
+      if (empty($params['membership_join_date']) && !empty($params['membership_start_date'])) {
+        $params['membership_join_date'] = $params['membership_start_date'];
       }
 
       $session = CRM_Core_Session::singleton();
-      $dateType = $session->get('dateTypes');
+      $dateType = CRM_Core_Session::singleton()->get('dateTypes');
       $formatted = [];
       $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
       $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
@@ -292,14 +276,14 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
       $dateLabels = [
-        'join_date' => ts('Member Since'),
+        'membership_join_date' => ts('Member Since'),
         'membership_start_date' => ts('Start Date'),
         'membership_end_date' => ts('End Date'),
       ];
       foreach ($params as $key => $val) {
         if ($val) {
           switch ($key) {
-            case 'join_date':
+            case 'membership_join_date':
             case 'membership_start_date':
             case 'membership_end_date':
               if (CRM_Utils_Date::convertToDefaultDate($params, $dateType, $key)) {
@@ -444,7 +428,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
               $endDate,
               $joinDate,
-              'today',
+              'now',
               $excludeIsAdmin,
               $formatted['membership_type_id'],
               $formatted
@@ -534,13 +518,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
           $endDate,
           $joinDate,
-          'today',
+          'now',
           $excludeIsAdmin,
           $formatted['membership_type_id'],
           $formatted
         );
         if (empty($formatted['status_id'])) {
-          $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
+          $formatted['status_id'] = $calcStatus['id'] ?? NULL;
         }
         elseif (empty($formatted['member_is_override'])) {
           if (empty($calcStatus)) {
@@ -646,25 +630,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
         $values[$key] = $value;
         $type = $customFields[$customFieldID]['html_type'];
-        if ($type == 'CheckBox' || $type == 'Multi-Select') {
-          $mulValues = explode(',', $value);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $customValueID => $customLabel) {
-              $customValue = $customLabel['value'];
-              if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))
-              ) {
-                if ($type == 'CheckBox') {
-                  $values[$key][$customValue] = 1;
-                }
-                else {
-                  $values[$key][] = $customValue;
-                }
-              }
-            }
-          }
+        if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
+          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
         }
       }
 
@@ -686,7 +653,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           break;
 
         case 'membership_type_id':
-          if (!CRM_Utils_Array::value($value, CRM_Member_PseudoConstant::membershipType())) {
+          if (!array_key_exists($value, CRM_Member_PseudoConstant::membershipType())) {
             throw new Exception('Invalid Membership Type Id');
           }
           $values[$key] = $value;
@@ -717,11 +684,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     _civicrm_api3_custom_format_params($params, $values, 'Membership');
 
     if ($create) {
-      // CRM_Member_BAO_Membership::create() handles membership_start_date,
+      // CRM_Member_BAO_Membership::create() handles membership_start_date, membership_join_date,
       // membership_end_date and membership_source. So, if $values contains
-      // membership_start_date, membership_end_date  or membership_source,
-      // convert it to start_date, end_date or source
+      // membership_start_date, membership_end_date, membership_join_date or membership_source,
+      // convert it to start_date, end_date, join_date or source
       $changes = [
+        'membership_join_date' => 'join_date',
         'membership_start_date' => 'start_date',
         'membership_end_date' => 'end_date',
         'membership_source' => 'source',

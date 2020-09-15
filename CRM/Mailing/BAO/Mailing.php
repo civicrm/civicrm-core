@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 require_once 'Mail/mime.php';
 
@@ -136,7 +120,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = $priorMailingIDs = [];
     $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-      ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
+      ->select('GROUP_CONCAT(DISTINCT entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
       ->where('mailing_id = #mailing_id AND entity_table RLIKE "^civicrm_(group.*|mailing)$" ')
       ->groupBy(['group_type', 'entity_table'])
       ->param('!groupTableName', CRM_Contact_BAO_Group::getTableName())
@@ -190,13 +174,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     }
 
     // Create a temp table for contact exclusion.
-    $excludeTempTablename = "excluded_recipients_temp" . substr(sha1(rand()), 0, 4);
-    $includedTempTablename = "included_recipients_temp" . substr(sha1(rand()), 0, 4);
-    $mailingGroup->query(
-      "CREATE TEMPORARY TABLE $excludeTempTablename
-            (contact_id int primary key)
-            ENGINE=HEAP"
-    );
+    $excludeTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('exrecipient')->setMemory()->createWithColumns('contact_id int primary key');
+    $excludeTempTablename = $excludeTempTable->getName();
     // populate exclude temp-table with recipients to be excluded from the list
     //  on basis of selected recipients groups and/or previous mailing
     if (!empty($recipientsGroup['Exclude'])) {
@@ -237,11 +216,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $entityColumn = $isSMSmode ? 'phone_id' : 'email_id';
     $entityTable = $isSMSmode ? CRM_Core_DAO_Phone::getTableName() : CRM_Core_DAO_Email::getTableName();
     // Get all the group contacts we want to include.
-    $mailingGroup->query(
-      "CREATE TEMPORARY TABLE $includedTempTablename
-            (contact_id int primary key, $entityColumn int)
-            ENGINE=HEAP"
-    );
+    $includedTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('inrecipient')->setMemory()->createWithColumns('contact_id int primary key, ' . $entityColumn . ' int');
+    $includedTempTablename = $includedTempTable->getName();
 
     if ($isSMSmode) {
       $criteria = [
@@ -405,8 +381,8 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
     // Delete the temp table.
     $mailingGroup->reset();
-    $mailingGroup->query(" DROP TEMPORARY TABLE $excludeTempTablename ");
-    $mailingGroup->query(" DROP TEMPORARY TABLE $includedTempTablename ");
+    $excludeTempTable->drop();
+    $includedTempTable->drop();
 
     CRM_Utils_Hook::alterMailingRecipients($mailingObj, $criteria, 'post');
   }
@@ -713,6 +689,9 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $this->templates['subject'] = implode("\n", $template);
       }
 
+      $this->templates['mailingID'] = $this->id;
+      $this->templates['campaign_id'] = $this->campaign_id;
+      $this->templates['template_type'] = $this->template_type;
       CRM_Utils_Hook::alterMailContent($this->templates);
     }
     return $this->templates;
@@ -1102,15 +1081,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     elseif ($contactId === 0) {
       //anonymous user
       $contact = [];
-      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
+      CRM_Utils_Hook::tokenValues($contact, [$contactId], $job_id);
     }
     else {
       $params = [['contact_id', '=', $contactId, 0, 0]];
       list($contact) = CRM_Contact_BAO_Query::apiQuery($params);
+      // $contact is an array of [ contactID => contactDetails ]
 
-      //CRM-4524
+      // also call the hook to get contact details
+      CRM_Utils_Hook::tokenValues($contact, [$contactId], $job_id);
+
+      // Don't send if contact doesn't exist
       $contact = reset($contact);
-
       if (!$contact || is_a($contact, 'CRM_Core_Error')) {
         CRM_Core_Error::debug_log_message(ts('CiviMail will not send email to a non-existent contact: %1',
           [1 => $contactId]
@@ -1120,16 +1102,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $res = NULL;
         return $res;
       }
-
-      // also call the hook to get contact details
-      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
     }
 
     $pTemplates = $this->getPreparedTemplates();
     $pEmails = [];
 
     foreach ($pTemplates as $type => $pTemplate) {
-      $html = ($type == 'html') ? TRUE : FALSE;
+      $html = $type == 'html';
       $pEmails[$type] = [];
       $pEmail = &$pEmails[$type];
       $template = &$pTemplates[$type]['template'];
@@ -1163,14 +1142,14 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     // push the tracking url on to the html email if necessary
     if ($this->open_tracking && $html) {
-      array_push($html, "\n" . '<img src="' . $config->userFrameworkResourceURL .
-        "extern/open.php?q=$event_queue_id\" width='1' height='1' alt='' border='0'>"
+      array_push($html, "\n" . '<img src="' . CRM_Utils_System::externUrl('extern/open', "q=$event_queue_id")
+        . '" width="1" height="1" alt="" border="0">'
       );
     }
 
     $message = new Mail_mime("\n");
 
-    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY ? TRUE : FALSE;
+    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
     if ($useSmarty) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the contact tokens to the template
@@ -1213,7 +1192,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $mailParams['attachments'] = $attachments;
 
-    $mailParams['Subject'] = CRM_Utils_Array::value('subject', $pEmails);
+    $mailParams['Subject'] = $pEmails['subject'] ?? NULL;
     if (is_array($mailParams['Subject'])) {
       $mailParams['Subject'] = implode('', $mailParams['Subject']);
     }
@@ -1322,7 +1301,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens(
           $mailing->templates[$type],
           $domain,
-          $type == 'html' ? TRUE : FALSE,
+          $type == 'html',
           $tokens[$type]
         );
         $mailing->templates[$type] = CRM_Utils_Token::replaceMailingTokens($mailing->templates[$type], $mailing, NULL, $tokens[$type]);
@@ -1351,7 +1330,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $token = $token_a['token'];
     $data = $token;
 
-    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY ? TRUE : FALSE;
+    $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
 
     if ($type == 'embedded_url') {
       $embed_data = [];
@@ -1418,7 +1397,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
     }
     else {
-      $data = CRM_Utils_Array::value("{$type}.{$token}", $contact);
+      $data = $contact["{$type}.{$token}"] ?? NULL;
     }
     return $data;
   }
@@ -1464,7 +1443,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @return CRM_Mailing_DAO_Mailing
    */
   public static function add(&$params, $ids = []) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('mailing_id', $ids));
+    $id = $params['id'] ?? $ids['mailing_id'] ?? NULL;
 
     if (empty($params['id']) && !empty($ids)) {
       \Civi::log('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params', ['civi.tag' => 'deprecated']);
@@ -1538,13 +1517,21 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return object
    *   $mailing      The new mailing object
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function create(&$params, $ids = []) {
 
     if (empty($params['id']) && (array_filter($ids) !== [])) {
-      $params['id'] = isset($ids['mailing_id']) ? $ids['mailing_id'] : $ids['id'];
+      $params['id'] = $ids['mailing_id'] ?? $ids['id'];
       \Civi::log('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params', ['civi.tag' => 'deprecated']);
+    }
+
+    // CRM-#1843
+    // If it is a mass sms, set url_tracking to false
+    if (!empty($params['sms_provider_id'])) {
+      $params['url_tracking'] = 0;
     }
 
     // CRM-12430
@@ -1570,8 +1557,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $domain_name = 'EXAMPLE.ORG';
       }
       if (!isset($params['created_id'])) {
-        $session =& CRM_Core_Session::singleton();
-        $params['created_id'] = $session->get('userID');
+        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
       $defaults = [
         // load the default config settings for each
@@ -1579,8 +1565,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         // correct template IDs here
         'override_verp' => TRUE,
         'forward_replies' => FALSE,
-        'open_tracking' => TRUE,
-        'url_tracking' => TRUE,
+        'open_tracking' => Civi::settings()->get('open_tracking_default'),
+        'url_tracking' => Civi::settings()->get('url_tracking_default'),
         'visibility' => 'Public Pages',
         'replyto_email' => $domain_email,
         'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
@@ -1839,9 +1825,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $report['mailing'] = [];
     foreach (array_keys(self::fields()) as $field) {
-      if ($field == 'mailing_modified_date') {
-        $field = 'modified_date';
-      }
+      $field = self::fields()[$field]['name'];
       $report['mailing'][$field] = $mailing->$field;
     }
 
@@ -2028,6 +2012,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['optout'] += $row['optout'];
 
       foreach (array_keys(CRM_Mailing_BAO_MailingJob::fields()) as $field) {
+        // Get the field name from the MailingJob fields as that will not have any prefixing.
+        // dev/mailing#56
+        $field = CRM_Mailing_BAO_MailingJob::fields()[$field]['name'];
         $row[$field] = $mailing->$field;
       }
 
@@ -2122,7 +2109,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'link_unique' => CRM_Utils_System::url($path, "reset=1&event=click&mid=$mailing_id&uid={$mailing->id}&distinct=1"),
         'clicks' => $mailing->clicks,
         'unique' => $mailing->unique_clicks,
-        'rate' => CRM_Utils_Array::value('delivered', $report['event_totals']) ? (100.0 * $mailing->unique_clicks) / $report['event_totals']['delivered'] : 0,
+        'rate' => !empty($report['event_totals']['delivered']) ? (100.0 * $mailing->unique_clicks) / $report['event_totals']['delivered'] : 0,
         'report' => CRM_Report_Utils_Report::getNextUrl('mailing/clicks', "reset=1&mailing_id_value={$mailing_id}&url_value={$mailing->url}", FALSE, TRUE),
       ];
     }
@@ -2251,7 +2238,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!in_array($id, $mailingIDs)) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this mailing report'));
+      throw new CRM_Core_Exception(ts('You do not have permission to access this mailing report'));
     }
   }
 
@@ -2473,7 +2460,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function del($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
     }
 
     CRM_Utils_Hook::pre('delete', 'Mailing', $id, CRM_Core_DAO::$_nullArray);
@@ -2503,7 +2490,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function delJob($id) {
     if (empty($id)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
     }
 
     \Civi::log('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead', ['civi.tag' => 'deprecated']);
@@ -2878,7 +2865,7 @@ ORDER BY civicrm_mailing.name";
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
     $params['caseId'] = NULL;
 
     // get contact mailings
@@ -2971,7 +2958,7 @@ ORDER BY civicrm_mailing.name";
     $params['version'] = 3;
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['limit'] = $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
 
     $result = civicrm_api('MailingContact', 'get', $params);
     return $result['values'];

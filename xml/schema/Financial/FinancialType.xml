@@ -38,16 +38,6 @@
     <add>1.3</add>
   </field>
   <field>
-    <name>accounting_code</name>
-    <title>Accounting Code</title>
-    <type>varchar</type>
-    <length>64</length>
-    <export>true</export>
-    <comment>Optional value for mapping contributions to accounting system codes for each type/category of contribution.</comment>
-    <add>1.3</add>
-    <drop>4.3</drop>
-  </field>
-  <field>
     <name>description</name>
     <type>varchar</type>
     <html>

@@ -73,29 +73,12 @@
             var val = $(this).val();
             $contactField.val('').change().prop('disabled', !val);
             if (val) {
-              var
-                pieces = val.split('_'),
-                rType = pieces[0],
-                target = pieces[2], // b or a
-                contact_type = CRM.vars.relationshipTypes[rType]['contact_type_' + target],
-                contact_sub_type = CRM.vars.relationshipTypes[rType]['contact_sub_type_' + target],
-                api = {params: {}};
-              if (contact_type) {
-                api.params.contact_type = contact_type;
-              }
-              if (contact_sub_type) {
-                api.params.contact_sub_type = contact_sub_type;
-              }
-              $contactField
-                .data('api-params', api)
-                .data('user-filter', {})
-                .attr('placeholder', CRM.vars.relationshipTypes[rType]['placeholder_' + target])
-                .change();
+              prepareRelationshipField(val, $contactField);
             }
           })
           .val('')
           .change();
-        $contactField.val('').crmEntityRef({create: true, api: {params: {contact_type: 'Individual'}}});
+        $contactField.val('').crmEntityRef();
       },
       post: function(data) {
         var contactID = $('[name=add_role_contact_id]', this).val(),
@@ -114,11 +97,7 @@
     },
     '#editCaseRoleDialog': {
       pre: function(data) {
-        var params = {create: true};
-        if (data.contact_type) {
-          params.api = {params: {contact_type: data.contact_type}};
-        }
-        $('[name=edit_role_contact_id]', this).val('').crmEntityRef(params);
+        prepareRelationshipField(data.rel_type, $('[name=edit_role_contact_id]', this));
       },
       post: function(data) {
         data.rel_contact = $('[name=edit_role_contact_id]', this).val();
@@ -163,6 +142,31 @@
     }
   },
     detached = {};
+
+  function prepareRelationshipField(relType, $contactField) {
+    var
+      pieces = relType.split('_'),
+      rType = pieces[0],
+      target = pieces[2], // b or a
+      relationshipType = CRM.vars.relationshipTypes[rType],
+      api = {params: {}};
+    if (relationshipType['contact_type_' + target]) {
+      api.params.contact_type = relationshipType['contact_type_' + target];
+    }
+    if (relationshipType['contact_sub_type_' + target]) {
+      api.params.contact_sub_type = relationshipType['contact_sub_type_' + target];
+    }
+    if (relationshipType['group_' + target]) {
+      api.params.group = {IN: relationshipType['group_' + target]};
+    }
+    $contactField
+      .data('create-links', !relationshipType['group_' + target])
+      .data('api-params', api)
+      .data('user-filter', {})
+      .attr('placeholder', relationshipType['placeholder_' + target])
+      .change()
+      .crmEntityRef();
+  }
 
   function detachMiniForms() {
     detached = {};

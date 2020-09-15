@@ -124,6 +124,11 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     }
   }
 
+  public function testGetKeysByTag() {
+    $this->assertEquals([], $this->mapper->getKeysByTag('big-rock-candy-mountain'));
+    $this->assertEquals(['test.foo.bar'], $this->mapper->getKeysByTag('wakka'));
+  }
+
   /**
    * @param CRM_Utils_Cache_Interface $cache
    * @param null $cacheKey
@@ -143,7 +148,7 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/weird");
     mkdir("$basedir/weird/foobar");
-    file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file></extension>");
+    file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file><tags><tag>wakka</tag></tags></extension>");
     // not needed for now // file_put_contents("$basedir/weird/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
     return [$basedir, $c];

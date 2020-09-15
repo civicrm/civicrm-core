@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_OptionGroup {
   public static $_values = [];
@@ -122,7 +106,12 @@ class CRM_Core_OptionGroup {
     $orderBy = 'weight'
   ) {
     $cache = CRM_Utils_Cache::singleton();
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
+    if (in_array($name, self::$_domainIDGroups)) {
+      $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy, CRM_Core_Config::domainID());
+    }
+    else {
+      $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
+    }
 
     if (!$fresh) {
       // Fetch from static var
@@ -137,7 +126,7 @@ class CRM_Core_OptionGroup {
     }
 
     $query = "
-SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.{$keyColumnName} as value, v.grouping as grouping
+SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.{$keyColumnName} as value, v.grouping as `grouping`
 FROM   civicrm_option_value v,
        civicrm_option_group g
 WHERE  v.option_group_id = g.id
@@ -202,8 +191,7 @@ WHERE  v.option_group_id = g.id
    * @return string
    */
   protected static function createCacheKey($id) {
-    $cacheKey = "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
-    return $cacheKey;
+    return "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
   }
 
   /**
@@ -241,7 +229,7 @@ WHERE  v.option_group_id = g.id
       }
     }
     $query = "
-SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.value as value, v.grouping as grouping
+SELECT  v.{$labelColumnName} as {$labelColumnName} ,v.value as value, v.grouping as `grouping`
 FROM   civicrm_option_value v,
        civicrm_option_group g
 WHERE  v.option_group_id = g.id
@@ -455,8 +443,6 @@ WHERE  v.option_group_id = g.id
 
   /**
    * Creates a new option group with the passed in values.
-   * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
-   * not messed up. Currently deletes the old group
    *
    * @param string $groupName
    *   The name of the option group - make sure there is no conflict.
@@ -480,10 +466,10 @@ WHERE  v.option_group_id = g.id
    *   the option group ID
    */
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
-    self::deleteAssoc($groupName);
     if (!empty($values)) {
       $group = new CRM_Core_DAO_OptionGroup();
       $group->name = $groupName;
+      $group->find(TRUE);
       $group->title = empty($groupTitle) ? $groupName : $groupTitle;
       $group->is_reserved = 1;
       $group->is_active = 1;
@@ -492,13 +478,14 @@ WHERE  v.option_group_id = g.id
       foreach ($values as $v) {
         $value = new CRM_Core_DAO_OptionValue();
         $value->option_group_id = $group->id;
-        $value->label = $v['label'];
         $value->value = $v['value'];
-        $value->name = CRM_Utils_Array::value('name', $v);
-        $value->description = CRM_Utils_Array::value('description', $v);
-        $value->weight = CRM_Utils_Array::value('weight', $v);
-        $value->is_default = CRM_Utils_Array::value('is_default', $v);
-        $value->is_active = CRM_Utils_Array::value('is_active', $v);
+        $value->find(TRUE);
+        $value->label = $v['label'];
+        $value->name = $v['name'] ?? NULL;
+        $value->description = $v['description'] ?? NULL;
+        $value->weight = $v['weight'] ?? NULL;
+        $value->is_default = $v['is_default'] ?? NULL;
+        $value->is_active = $v['is_active'] ?? NULL;
         $value->save();
 
         if ($value->is_default) {
@@ -518,8 +505,11 @@ WHERE  v.option_group_id = g.id
    * @param $values
    * @param bool $flip
    * @param string $field
+   *
+   * @deprecated
    */
   public static function getAssoc($groupName, &$values, $flip = FALSE, $field = 'name') {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function');
     $query = "
 SELECT v.id as amount_id, v.value, v.label, v.name, v.description, v.weight
   FROM civicrm_option_group g,
@@ -562,8 +552,11 @@ ORDER BY v.weight
   /**
    * @param string $groupName
    * @param string $operator
+   *
+   * @deprecated
    */
   public static function deleteAssoc($groupName, $operator = "=") {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function');
     $query = "
 DELETE g, v
   FROM civicrm_option_group g,

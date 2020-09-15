@@ -1,42 +1,31 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * WordPress specific stuff goes here
  */
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
+
+  /**
+   * Get a normalized version of the wpBasePage.
+   */
+  public static function getBasePage() {
+    return rtrim(Civi::settings()->get('wpBasePage'), '/');
+  }
 
   /**
    */
@@ -49,6 +38,118 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
      */
     $this->is_drupal = FALSE;
     $this->is_wordpress = TRUE;
+  }
+
+  public function initialize() {
+    parent::initialize();
+    $this->registerPathVars();
+  }
+
+  /**
+   * Specify the default computation for various paths/URLs.
+   */
+  protected function registerPathVars():void {
+    $isNormalBoot = function_exists('get_option');
+    if ($isNormalBoot) {
+      // Normal mode - CMS boots first, then calls Civi. "Normal" web pages and newer extern routes.
+      // To simplify the code-paths, some items are re-registered with WP-specific functions.
+      $cmsRoot = function() {
+        return [
+          'path' => untrailingslashit(ABSPATH),
+          'url' => home_url(),
+        ];
+      };
+      Civi::paths()->register('cms', $cmsRoot);
+      Civi::paths()->register('cms.root', $cmsRoot);
+      Civi::paths()->register('civicrm.root', function () {
+        return [
+          'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => CIVICRM_PLUGIN_URL . 'civicrm/',
+        ];
+      });
+      Civi::paths()->register('wp.frontend.base', function () {
+        return [
+          'url' => home_url('/'),
+        ];
+      });
+      Civi::paths()->register('wp.frontend', function () {
+        $config = CRM_Core_Config::singleton();
+        $basepage = get_page_by_path($config->wpBasePage);
+        return [
+          'url' => get_permalink($basepage->ID),
+        ];
+      });
+      Civi::paths()->register('wp.backend.base', function () {
+        return [
+          'url' => admin_url(),
+        ];
+      });
+      Civi::paths()->register('wp.backend', function() {
+        return [
+          'url' => admin_url('admin.php'),
+        ];
+      });
+      Civi::paths()->register('civicrm.files', function () {
+        $upload_dir = wp_get_upload_dir();
+
+        $old = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
+        $new = [
+          'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => $upload_dir['baseurl'] . '/civicrm/',
+        ];
+
+        if ($old['path'] === $new['path']) {
+           return $new;
+        }
+
+        $oldExists = file_exists($old['path']);
+        $newExists = file_exists($new['path']);
+
+        if ($oldExists && !$newExists) {
+          return $old;
+        }
+        elseif (!$oldExists && $newExists) {
+          return $new;
+        }
+        elseif (!$oldExists && !$newExists) {
+          // neither exists. but that's ok. we're in one of these two cases:
+          // - we're just starting installation... which will get sorted in a moment
+          //   when someone calls mkdir().
+          // - we're running a bespoke setup... which will get sorted in a moment
+          //   by applying $civicrm_paths.
+          return $new;
+        }
+        elseif ($oldExists && $newExists) {
+          // situation ambiguous. encourage admin to set value explicitly.
+          if (!isset($GLOBALS['civicrm_paths']['civicrm.files'])) {
+            \Civi::log()->warning("The system has data from both old+new conventions. Please use civicrm.settings.php to set civicrm.files explicitly.");
+          }
+          return $new;
+        }
+      });
+    }
+    else {
+      // Legacy support - only relevant for older extern routes.
+      Civi::paths()
+        ->register('wp.frontend.base', function () {
+          return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
+        })
+        ->register('wp.frontend', function () {
+          $config = \CRM_Core_Config::singleton();
+          $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+          return [
+            'url' => Civi::paths()->getVariable('wp.frontend.base', 'url') . $suffix,
+          ];
+        })
+        ->register('wp.backend.base', function () {
+          return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
+        })
+        ->register('wp.backend', function () {
+          return [
+            'url' => Civi::paths()->getVariable('wp.backend.base', 'url') . 'admin.php',
+          ];
+        });
+    }
   }
 
   /**
@@ -77,6 +178,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Moved from CRM_Utils_System_Base
    */
   public function getDefaultFileStorage() {
+    // NOTE: On WordPress, this will be circumvented in the future. However,
+    // should retain it to allow transitional/upgrade code determine the old value.
+
     $config = CRM_Core_Config::singleton();
     $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
     $cmsPath = $this->cmsRootPath();
@@ -200,7 +304,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $config = CRM_Core_Config::singleton();
     $script = '';
@@ -221,9 +326,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if ($config->userFrameworkFrontend) {
       global $post;
       if (get_option('permalink_structure') != '') {
-        $script = get_permalink($post->ID);
+        $script = $post ? get_permalink($post->ID) : "";
       }
-      if ($config->wpBasePage == $post->post_name) {
+      if ($post && $config->wpBasePage == $post->post_name) {
         $basepage = TRUE;
       }
       // when shortcode is included in page
@@ -269,7 +374,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
       // pre-existing logic
       if (isset($path)) {
-        $queryParts[] = 'page=CiviCRM';
+        // Admin URLs still need "page=CiviCRM", front-end URLs do not.
+        if ((is_admin() && !$frontend) || $forceBackend) {
+          $queryParts[] = 'page=CiviCRM';
+        }
+        else {
+          $queryParts[] = 'civiwp=CiviCRM';
+        }
         $queryParts[] = 'q=' . rawurlencode($path);
       }
       if ($wpPageParam) {
@@ -388,9 +499,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
   /**
    * FIXME: Use CMS-native approach
+   * @throws \CRM_Core_Exception
    */
   public function permissionDenied() {
-    CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+    throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
   /**
@@ -424,19 +536,63 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUFLocale() {
-    // Polylang plugin
-    if (function_exists('pll_current_language')) {
-      $language = pll_current_language();
-    }
-    // WPML plugin
-    elseif (defined('ICL_LANGUAGE_CODE')) {
-      $language = ICL_LANGUAGE_CODE;
+    // Bail early if method is called when WordPress isn't bootstrapped.
+    // Additionally, the function checked here is located in pluggable.php
+    // and is required by wp_get_referer() - so this also bails early if it is
+    // called too early in the request lifecycle.
+    // @see https://core.trac.wordpress.org/ticket/25294
+    if (!function_exists('wp_validate_redirect')) {
+      return NULL;
     }
 
-    // TODO: set language variable for others WordPress plugin
+    // Default to WordPress User locale.
+    $locale = get_user_locale();
 
-    if (!empty($language)) {
-      return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
+    // Is this a "back-end" AJAX call?
+    $is_backend = FALSE;
+    if (wp_doing_ajax() && FALSE !== strpos(wp_get_referer(), admin_url())) {
+      $is_backend = TRUE;
+    }
+
+    // Ignore when in WordPress admin or it's a "back-end" AJAX call.
+    if (!(is_admin() || $is_backend)) {
+
+      // Reaching here means it is very likely to be a front-end context.
+
+      // Default to WordPress locale.
+      $locale = get_locale();
+
+      // Maybe override with the locale that Polylang reports.
+      if (function_exists('pll_current_language')) {
+        $pll_locale = pll_current_language('locale');
+        if (!empty($pll_locale)) {
+          $locale = $pll_locale;
+        }
+      }
+
+      // Maybe override with the locale that WPML reports.
+      elseif (defined('ICL_LANGUAGE_CODE')) {
+        $languages = apply_filters('wpml_active_languages', NULL);
+        foreach ($languages as $language) {
+          if ($language['active']) {
+            $locale = $language['default_locale'];
+            break;
+          }
+        }
+      }
+
+      // TODO: Set locale for other WordPress plugins.
+      // @see https://wordpress.org/plugins/tags/multilingual/
+      // A hook would be nice here.
+
+    }
+
+    if (!empty($locale)) {
+      // If for some reason only we get a language code, convert it to a locale.
+      if (2 === strlen($locale)) {
+        $locale = CRM_Core_I18n_PseudoConstant::longForShort($locale);
+      }
+      return $locale;
     }
     else {
       return NULL;
@@ -463,12 +619,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @param mixed $realPath
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
 
-    $name = CRM_Utils_Array::value('name', $params);
-    $pass = CRM_Utils_Array::value('pass', $params);
+    $name = $params['name'] ?? NULL;
+    $pass = $params['pass'] ?? NULL;
 
     if (!defined('WP_USE_THEMES')) {
       define('WP_USE_THEMES', FALSE);
@@ -476,7 +633,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
-      CRM_Core_Error::fatal("Could not find the install directory for WordPress");
+      throw new CRM_Core_Exception("Could not find the install directory for WordPress");
     }
     $path = Civi::settings()->get('wpLoadPhp');
     if (!empty($path)) {
@@ -486,7 +643,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php';
     }
     else {
-      CRM_Core_Error::fatal("Could not find the bootstrap file for WordPress");
+      throw new CRM_Core_Exception("Could not find the bootstrap file for WordPress");
     }
     $wpUserTimezone = get_option('timezone_string');
     if ($wpUserTimezone) {
@@ -494,7 +651,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
     require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
-    $uid = CRM_Utils_Array::value('uid', $params);
+    $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
@@ -545,35 +702,57 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   local file system path to CMS root, or NULL if it cannot be determined
    */
   public function cmsRootPath() {
+
+    // Return early if the path is already set.
     global $civicrm_paths;
     if (!empty($civicrm_paths['cms.root']['path'])) {
       return $civicrm_paths['cms.root']['path'];
     }
 
-    $cmsRoot = $valid = NULL;
+    // Return early if constant has been defined.
     if (defined('CIVICRM_CMSDIR')) {
       if ($this->validInstallDir(CIVICRM_CMSDIR)) {
-        $cmsRoot = CIVICRM_CMSDIR;
-        $valid = TRUE;
+        return CIVICRM_CMSDIR;
       }
     }
-    else {
-      $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
 
-      //might be windows installation.
-      $firstVar = array_shift($pathVars);
-      if ($firstVar) {
-        $cmsRoot = $firstVar;
+    // Return early if path to wp-load.php can be retrieved from settings.
+    $setting = Civi::settings()->get('wpLoadPhp');
+    if (!empty($setting)) {
+      $path = str_replace('wp-load.php', '', $setting);
+      $cmsRoot = rtrim($path, '/\\');
+      if ($this->validInstallDir($cmsRoot)) {
+        return $cmsRoot;
       }
+    }
 
-      //start w/ csm dir search.
-      foreach ($pathVars as $var) {
-        $cmsRoot .= "/$var";
-        if ($this->validInstallDir($cmsRoot)) {
-          //stop as we found bootstrap.
-          $valid = TRUE;
-          break;
-        }
+    /*
+     * Keep previous logic as fallback of last resort.
+     *
+     * At some point, it would be good to remove this because there are serious
+     * problems in correctly locating WordPress in this manner. In summary, it
+     * is impossible to do so reliably.
+     *
+     * @see https://github.com/civicrm/civicrm-wordpress/pull/63#issuecomment-61792328
+     * @see https://github.com/civicrm/civicrm-core/pull/11086#issuecomment-335454992
+     */
+    $cmsRoot = $valid = NULL;
+
+    $pathVars = explode('/', str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME']));
+
+    // Might be Windows installation.
+    $firstVar = array_shift($pathVars);
+    if ($firstVar) {
+      $cmsRoot = $firstVar;
+    }
+
+    // Start with CMS dir search.
+    foreach ($pathVars as $var) {
+      $cmsRoot .= "/$var";
+      if ($this->validInstallDir($cmsRoot)) {
+        // Stop as we found bootstrap.
+        $valid = TRUE;
+        break;
       }
     }
 
@@ -712,7 +891,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function getLoggedInUfID() {
     $ufID = NULL;
     $current_user = $this->getLoggedInUserObject();
-    return isset($current_user->ID) ? $current_user->ID : NULL;
+    return $current_user->ID ?? NULL;
   }
 
   /**
@@ -827,11 +1006,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $contactCreated = 0;
     $contactMatching = 0;
 
-    global $wpdb;
-    $wpUserIds = $wpdb->get_col("SELECT $wpdb->users.ID FROM $wpdb->users");
+    // Previously used the $wpdb global - which means WordPress *must* be bootstrapped.
+    $wpUsers = get_users(array(
+      'blog_id' => get_current_blog_id(),
+      'number' => -1,
+    ));
 
-    foreach ($wpUserIds as $wpUserId) {
-      $wpUserData = get_userdata($wpUserId);
+    foreach ($wpUsers as $wpUserData) {
       $contactCount++;
       if ($match = CRM_Core_BAO_UFMatch::synchronizeUFMatch($wpUserData,
         $wpUserData->$id,
@@ -846,6 +1027,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
       else {
         $contactMatching++;
+      }
+      if (is_object($match)) {
+        $match->free();
       }
     }
 
@@ -869,6 +1053,38 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     echo $response->getBody();
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Start a new session if there's no existing session ID.
+   *
+   * Checks are needed to prevent sessions being started when not necessary.
+   */
+  public function sessionStart() {
+    $session_id = session_id();
+
+    // Check WordPress pseudo-cron.
+    $wp_cron = FALSE;
+    if (function_exists('wp_doing_cron') && wp_doing_cron()) {
+      $wp_cron = TRUE;
+    }
+
+    // Check WP-CLI.
+    $wp_cli = FALSE;
+    if (defined('WP_CLI') && WP_CLI) {
+      $wp_cli = TRUE;
+    }
+
+    // Check PHP on the command line - e.g. `cv`.
+    $php_cli = TRUE;
+    if (PHP_SAPI !== 'cli') {
+      $php_cli = FALSE;
+    }
+
+    // Maybe start session.
+    if (empty($session_id) && !$wp_cron && !$wp_cli && !$php_cli) {
+      session_start();
+    }
   }
 
 }

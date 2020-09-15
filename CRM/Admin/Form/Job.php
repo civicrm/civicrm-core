@@ -1,41 +1,25 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * Class for configuring jobs.
  */
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
-  protected $_id = NULL;
+  public $_id = NULL;
 
   public function preProcess() {
 
@@ -68,6 +52,22 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     parent::buildQuickForm();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
+      return;
+    }
+
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $this->assign('jobName', self::getJobName($this->_id));
+      $this->addButtons([
+        [
+          'type' => 'submit',
+          'name' => ts('Execute'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
@@ -123,7 +123,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     /** @var \Civi\API\Kernel $apiKernel */
     $apiKernel = \Civi::service('civi_api_kernel');
-    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], ['version' => 3], NULL);
+    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], ['version' => 3]);
     try {
       $apiKernel->resolve($apiRequest);
     }
@@ -188,6 +188,16 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       return;
     }
 
+    // using View action for Execute. Doh.
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $jm = new CRM_Core_JobManager();
+      $jm->executeJobById($this->_id);
+      $jobName = self::getJobName($this->_id);
+      CRM_Core_Session::setStatus(ts('%1 Scheduled Job has been executed. See the log for details.', [1 => $jobName]), ts("Executed"), "success");
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
+      return;
+    }
+
     $values = $this->controller->exportValues($this->_name);
     $domainID = CRM_Core_Config::domainID();
 
@@ -231,12 +241,24 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     // CRM-11143 - Give warning message if update_greetings is Enabled (is_active) since it generally should not be run automatically via execute action or runjobs url.
     if ($values['api_action'] == 'update_greeting' && CRM_Utils_Array::value('is_active', $values) == 1) {
-      // pass "wiki" as 6th param to docURL2 if you are linking to a page in wiki.civicrm.org
-      $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", NULL, NULL, NULL, NULL, "wiki");
+      $docLink = CRM_Utils_System::docURL2("user/initial-set-up/scheduled-jobs/#job_update_greeting");
       $msg = ts('The update greeting job can be very resource intensive and is typically not necessary to run on a regular basis. If you do choose to enable the job, we recommend you do not run it with the force=1 option, which would rebuild greetings on all records. Leaving that option absent, or setting it to force=0, will only rebuild greetings for contacts that do not currently have a value stored. %1', [1 => $docLink]);
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 
+  }
+
+  /**
+   * Get the API action aka Job Name for this scheduled job
+   * @param int $id - Id of the stored Job
+   *
+   * @return string
+   */
+  private static function getJobName($id) {
+    $entity = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'api_entity');
+    $action = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'api_action');
+    $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $id, 'name');
+    return $name . ' (' . $entity . '.' . $action . ')';
   }
 
 }

@@ -1,33 +1,20 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing/deleting memberships for a contact  *}
-{if $cancelAutoRenew}
+{if $isRecur}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
-    <p>{ts 1=$cancelAutoRenew}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. You will need to cancel the auto-renew option if you want to modify the Membership Type, End Date or Membership Status. <a href="%1">Click here</a> if you want to cancel the automatic renewal option.{/ts}</p>
+    {icon icon="fa-info-circle"}{/icon}
+    <p>{ts}This membership is set to renew automatically {if $endDate}on {$endDate|crmDate}{/if}. Please be aware that any changes that you make here may not be reflected in the payment processor. Please ensure that you alter the related subscription at the payment processor.{/ts}</p>
+    {if $cancelAutoRenew}<p>{ts 1=$cancelAutoRenew}To stop the automatic renewal:
+      <a href="%1">Cancel auto-renew</a>
+    {/ts}</p>{/if}
   </div>
 {/if}
 <div class="spacer"></div>
@@ -55,7 +42,7 @@
   {/if}
   {if !$emailExists and $action neq 8 and $context neq 'standalone'}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     <p>{ts}You will not be able to send an automatic email receipt for this Membership because there is no email address recorded for this contact. If you want a receipt to be sent when this Membership is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the Membership.{/ts}</p>
   </div>
   {/if}
@@ -72,28 +59,33 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/membership' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card membership{/ts}</a>
+     <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card membership{/ts}</a>
     </div>
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $action eq 8}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
+      {icon icon="fa-info-circle"}{/icon}
       {$deleteMessage}
     </div>
     {else}
       <table class="form-layout-compressed">
-        {if $context neq 'standalone'}
-          <tr>
-            <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
-          </tr>
-        {else}
-          <td class="label">{$form.contact_id.label}</td>
-          <td>{$form.contact_id.html}</td>
-        {/if}
+        <tr class="crm-membership-form-contact-id">
+           <td class="label">{$form.contact_id.label}</td>
+           <td>{$form.contact_id.html}</td>
+        </tr>
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
-          <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>
+          <td id="mem_type_id-readonly">
+            <span id="membership_type_id_0-readonly"></span> : <span id="membership_type_id_1-readonly"></span>
+            <span id="mem-type-override">
+              <a href="#" class="crm-hover-button action-item override-mem-type" id="show-mem-type">
+                {ts}Override organization and type{/ts}
+              </a>
+              {help id="override_membership_type"}
+            </span>
+          </td>
+          <td id="mem_type_id-editable"><span id='mem_type_id'>{$form.membership_type_id.html}</span>
             {if $hasPriceSets}
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>
@@ -110,7 +102,7 @@
         <tr id="maxRelated" class="crm-membership-form-block-max_related">
           <td class="label">{$form.max_related.label}</td>
           <td>{$form.max_related.html}<br />
-            <span class="description">{ts}Maximum number of related memberships (leave blank for unlimited).{/ts}</span>
+            <span class="description">{ts}Maximum number of related memberships (leave blank for unlimited).{/ts} <span id="eligibleRelated"></span></span>
           </td>
         </tr>
         {if $action eq 1}
@@ -141,7 +133,7 @@
           <td id="end-date-readonly">
               {$endDate|crmDate}
               <a href="#" class="crm-hover-button action-item override-date" id="show-end-date">
-                {ts}Over-ride end date{/ts}
+                {ts}Override end date{/ts}
               </a>
               {help id="override_end_date"}
           </td>
@@ -183,15 +175,25 @@
         {include file="CRM/Member/Form/MembershipCommon.tpl"}
         {if $emailExists and $isEmailEnabledForSite}
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
-            <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
-            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+            <td class="label">{$form.send_receipt.label}</td>
+            <td>
+              {$form.send_receipt.html}<br />
+              <span class="description">
+                {ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}
+                <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+              </span>
+            </td>
           </tr>
-          {elseif $context eq 'standalone' and $isEmailEnabledForSite}
+        {elseif $context eq 'standalone' and $isEmailEnabledForSite}
           <tr id="email-receipt" style="display:none;">
-            <td class="label">{$form.send_receipt.label}</td><td>{$form.send_receipt.html}<br />
-            <span class="description">{ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}</span></td>
-            <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+            <td class="label">{$form.send_receipt.label}</td>
+            <td>
+              {$form.send_receipt.html}<br />
+              <span class="description">
+                {ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}
+                <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
+              </span>
+            </td>
           </tr>
         {/if}
         <tr id="fromEmail" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
@@ -299,7 +301,7 @@
         var taxRates = {/literal}{$taxRates}{literal};
         var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
         var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
-        var currency = {/literal}{$currency|@json_encode}{literal};
+        var currency = {/literal}{$currency_symbol|@json_encode}{literal};
         var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if (term) {
@@ -357,6 +359,25 @@
       setDifferentContactBlock();
       cj('#is_different_contribution_contact').change( function() {
         setDifferentContactBlock();
+      });
+
+      // give option to override membership type for auto-renew memberships - dev/core#1331
+      {/literal}
+      {if $isRecur}
+        cj('#membership_type_id_0-readonly').text(cj('#membership_type_id_0 option:selected').text());
+        cj('#membership_type_id_1-readonly').text(cj('#membership_type_id_1 option:selected').text());
+        cj('#mem_type_id-readonly').show();
+        cj('#mem_type_id-editable').hide();
+      {else}
+        cj('#mem_type_id-readonly').hide();
+        cj('#mem_type_id-editable').show();
+      {/if}
+      {literal}
+
+      cj('#show-mem-type').click( function( e ) {
+        e.preventDefault();
+        cj('#mem_type_id-readonly').hide();
+        cj('#mem_type_id-editable').show();
       });
 
       // give option to override end-date for auto-renew memberships
@@ -511,7 +532,7 @@
 
           alert = CRM.alert(
             // Mixing client-side variables with a translated string in smarty is awkward!
-            ts({/literal}'{ts escape='js' 1='%1' 2='%2' 3='%3' 4='%4'}This contact has an existing %1 membership at %2 with %3 status%4.{/ts}'{literal}, {1:memberorgs[selectedorg].membership_type, 2: org, 3: memberorgs[selectedorg].membership_status, 4: andEndDate})
+            ts({/literal}'{ts escape='js'}This contact has an existing %1 membership at %2 with %3 status%4.{/ts}'{literal}, {1:memberorgs[selectedorg].membership_type, 2: org, 3: memberorgs[selectedorg].membership_status, 4: andEndDate})
               + '<ul><li><a href="' + memberorgs[selectedorg].renewUrl + '">'
               + {/literal}'{ts escape='js'}Renew the existing membership instead{/ts}'
               + '</a></li><li><a href="' + memberorgs[selectedorg].membershipTab + '">'
@@ -530,8 +551,8 @@
     {/literal}
 
     {if $membershipMode or $action eq 2}
-
-    buildAutoRenew( null, null, '{$membershipMode}');
+      buildAutoRenew( null, null, '{$membershipMode}');
+    {/if}
     {literal}
     function buildAutoRenew( membershipType, processorId, mode ) {
       var action = {/literal}'{$action}'{literal};
@@ -594,10 +615,6 @@
       }
       showEmailOptions();
     }
-    {/literal}
-    {/if}
-
-    {literal}
 
     var customDataType = {/literal}{$customDataType|@json_encode}{literal};
 
@@ -678,7 +695,7 @@
                 relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
                 relatable = ts(relatable, {1: result});
               }
-              cj('#max_related').siblings('.description').append(' ' + relatable);
+              cj('#eligibleRelated').text(relatable);
             }
           });
         }
