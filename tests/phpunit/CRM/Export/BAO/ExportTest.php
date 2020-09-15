@@ -48,6 +48,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected $locationTypes = [];
 
   /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = TRUE;
+
+  /**
    * Processor generated in test.
    *
    * @var \CRM_Export_BAO_ExportProcessor
