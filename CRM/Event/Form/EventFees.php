@@ -159,6 +159,7 @@ class CRM_Event_Form_EventFees {
       if (in_array(get_class($form),
         [
           'CRM_Event_Form_Participant',
+          'CRM_Event_Form_Task_Register',
           'CRM_Event_Form_Registration_Register',
           'CRM_Event_Form_Registration_AdditionalParticipant',
         ]
@@ -173,7 +174,7 @@ class CRM_Event_Form_EventFees {
         foreach ($form->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             if ($values['is_default']) {
-              if (get_class($form) != 'CRM_Event_Form_Participant' && !empty($values['is_full'])) {
+              if (!in_array(get_class($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register']) && !empty($values['is_full'])) {
                 continue;
               }
 

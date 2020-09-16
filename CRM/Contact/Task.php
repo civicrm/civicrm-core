@@ -234,7 +234,7 @@ class CRM_Contact_Task extends CRM_Core_Task {
       if (CRM_Core_Permission::access('CiviEvent')) {
         self::$_tasks[self::ADD_EVENT] = array(
           'title' => ts('Register participants for event'),
-          'class' => 'CRM_Event_Form_Participant',
+          'class' => 'CRM_Event_Form_Task_Register',
         );
       }
 

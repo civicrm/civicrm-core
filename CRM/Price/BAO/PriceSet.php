@@ -574,7 +574,7 @@ WHERE  id = %1";
         switch ($entityTable) {
           case 'civicrm_event':
             $entity = 'participant';
-            if (CRM_Utils_System::getClassName($form) == 'CRM_Event_Form_Participant') {
+            if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
               $entityId = $form->_id;
             }
             else {
