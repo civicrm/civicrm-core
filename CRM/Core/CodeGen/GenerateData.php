@@ -27,8 +27,9 @@ class CRM_Core_CodeGen_GenerateData {
   /**
    * Class constructor
    */
-  public function __construct() {
+  public function __construct($seed = '123456789') {
     // initialize all the vars
+    $this->seed = $seed;
     $this->numIndividual = self::INDIVIDUAL_PERCENT * self::NUM_CONTACT / 100;
     $this->numHousehold = self::HOUSEHOLD_PERCENT * self::NUM_CONTACT / 100;
     $this->numOrganization = self::ORGANIZATION_PERCENT * self::NUM_CONTACT / 100;
@@ -103,6 +104,11 @@ class CRM_Core_CodeGen_GenerateData {
    * private members
    *
    */
+
+  /**
+   * @var int
+   */
+  private $seed;
 
   /**
    * enum's from database
@@ -201,12 +207,17 @@ class CRM_Core_CodeGen_GenerateData {
    *
    * All other random() functions should derive from this.
    *
+   * This is very weak RNG. The goal is to provide a reproducible sequence of
+   * random-ish values for generating dummy-data.
+   *
    * @param int $min
    * @param int $max
    * @return int
    */
   private function randomInt($min, $max) {
-    return mt_rand($min, $max);
+    $range = min(1 + $max - $min, mt_getrandmax());
+    $this->seed = md5($this->seed . chr(0) . $min . chr(0) . $max);
+    return $min + (hexdec(substr($this->seed, 20, 8)) % $range);
   }
 
   /**
