@@ -194,9 +194,20 @@ class CRM_Core_CodeGen_GenerateData {
   /*********************************
    * private methods
    * *******************************
-   * @param int $size
-   * @return string
    */
+
+  /**
+   * Random number generator.
+   *
+   * All other random() functions should derive from this.
+   *
+   * @param int $min
+   * @param int $max
+   * @return int
+   */
+  private function randomInt($min, $max) {
+    return mt_rand($min, $max);
+  }
 
   /**
    * Get a randomly generated string.
@@ -210,7 +221,7 @@ class CRM_Core_CodeGen_GenerateData {
 
     // get an ascii code for each character
     for ($i = 0; $i < $size; $i++) {
-      $random_int = mt_rand(65, 122);
+      $random_int = $this->randomInt(65, 122);
       if (($random_int < 97) && ($random_int > 90)) {
         // if ascii code between 90 and 97 substitute with space
         $random_int = 32;
@@ -225,7 +236,7 @@ class CRM_Core_CodeGen_GenerateData {
    * @return string
    */
   private function randomChar() {
-    return chr(mt_rand(65, 90));
+    return chr($this->randomInt(65, 90));
   }
 
   /**
@@ -246,7 +257,7 @@ class CRM_Core_CodeGen_GenerateData {
       echo "Error: no items found for '$key'\n";
       return FALSE;
     }
-    return $items[mt_rand(0, count($items) - 1)];
+    return $items[$this->randomInt(0, count($items) - 1)];
   }
 
   /**
@@ -274,7 +285,7 @@ class CRM_Core_CodeGen_GenerateData {
    * @return int
    */
   private function probability($chance) {
-    if (mt_rand(0, 100) < ($chance * 100)) {
+    if ($this->randomInt(0, 100) < ($chance * 100)) {
       return 1;
     }
     return 0;
@@ -311,21 +322,21 @@ class CRM_Core_CodeGen_GenerateData {
 
     // both are defined
     if ($startDate && $endDate) {
-      return date($dateFormat, mt_rand($startDate, $endDate));
+      return date($dateFormat, $this->randomInt($startDate, $endDate));
     }
 
     // only startDate is defined
     if ($startDate) {
-      return date($dateFormat, mt_rand($startDate, $startDate + $numSecond));
+      return date($dateFormat, $this->randomInt($startDate, $startDate + $numSecond));
     }
 
     // only endDate is defined
     if ($startDate) {
-      return date($dateFormat, mt_rand($endDate - $numSecond, $endDate));
+      return date($dateFormat, $this->randomInt($endDate - $numSecond, $endDate));
     }
 
     // none are defined
-    return date($dateFormat, mt_rand($today - $numSecond, $today));
+    return date($dateFormat, $this->randomInt($today - $numSecond, $today));
   }
 
   /**
@@ -493,7 +504,7 @@ class CRM_Core_CodeGen_GenerateData {
     foreach ($this->Individual as $cid) {
       $contact->is_deceased = $contact->gender_id = $contact->birth_date = $contact->deceased_date = $email = NULL;
       list($gender_id, $gender) = $this->randomKeyValue($this->gender);
-      $birth_date = mt_rand($now - 90 * $year, $now - 10 * $year);
+      $birth_date = $this->randomInt($now - 90 * $year, $now - 10 * $year);
 
       $contact->last_name = $this->randomItem('last_name');
 
@@ -526,10 +537,10 @@ class CRM_Core_CodeGen_GenerateData {
           }
         }
         // Sensible ages and genders
-        $offset = mt_rand($now - 40 * $year, $now);
+        $offset = $this->randomInt($now - 40 * $year, $now);
         // Parents
         if ($position < 2) {
-          $birth_date = mt_rand($offset - 35 * $year, $offset - 20 * $year);
+          $birth_date = $this->randomInt($offset - 35 * $year, $offset - 20 * $year);
           if ($this->probability(.8)) {
             $gender_id = 2 - $position;
             $gender = $this->gender[$gender_id];
@@ -537,7 +548,7 @@ class CRM_Core_CodeGen_GenerateData {
         }
         // Kids
         else {
-          $birth_date = mt_rand($offset - 10 * $year, $offset);
+          $birth_date = $this->randomInt($offset - 10 * $year, $offset);
         }
       }
       // Non household people
@@ -583,14 +594,14 @@ class CRM_Core_CodeGen_GenerateData {
       }
 
       // Add 0, 1 or 2 email address
-      $count = mt_rand(0, 2);
+      $count = $this->randomInt(0, 2);
       for ($i = 0; $i < $count; ++$i) {
         $email = $this->_individualEmail($contact);
         $this->_addEmail($cid, $email, self::HOME);
       }
 
       // Add 0, 1 or 2 phones
-      $count = mt_rand(0, 2);
+      $count = $this->randomInt(0, 2);
       for ($i = 0; $i < $count; ++$i) {
         $this->_addPhone($cid);
       }
@@ -817,7 +828,7 @@ class CRM_Core_CodeGen_GenerateData {
       $params = array(
         'contact_id' => $cid,
         'location_type_id' => $this->getContactType($cid) == 'Organization' ? self::MAIN : self::HOME,
-        'street_number' => mt_rand(1, 1000),
+        'street_number' => $this->randomInt(1, 1000),
         'street_number_suffix' => ucfirst($this->randomChar()),
         'street_name' => $this->randomItem('street_name'),
         'street_type' => $this->randomItem('street_type'),
@@ -855,15 +866,15 @@ class CRM_Core_CodeGen_GenerateData {
    * @return array
    */
   private function _addPhone($cid) {
-    $area = $this->probability(.5) ? '' : mt_rand(201, 899);
-    $pre = mt_rand(201, 899);
-    $post = mt_rand(1000, 9999);
+    $area = $this->probability(.5) ? '' : $this->randomInt(201, 899);
+    $pre = $this->randomInt(201, 899);
+    $post = $this->randomInt(1000, 9999);
     $params = array(
       'location_type_id' => $this->getContactType($cid) == 'Organization' ? self::MAIN : self::HOME,
       'contact_id' => $cid,
       'phone' => ($area ? "($area) " : '') . "$pre-$post",
       'phone_numeric' => $area . $pre . $post,
-      'phone_type_id' => mt_rand(1, 2),
+      'phone_type_id' => $this->randomInt(1, 2),
     );
     $this->_addDAO('Phone', $params);
     return $params;
@@ -905,7 +916,7 @@ class CRM_Core_CodeGen_GenerateData {
     }
     else {
       // Common naming patterns
-      switch (mt_rand(1, 3)) {
+      switch ($this->randomInt(1, 3)) {
         case 1:
           $domain = $part[0] . $part[1] . $part[2];
           break;
@@ -945,7 +956,7 @@ class CRM_Core_CodeGen_GenerateData {
     $l = $last[0];
     $m = $contact->middle_name ? $contact->middle_name[0] . '.' : '';
     // Common naming patterns
-    switch (mt_rand(1, 6)) {
+    switch ($this->randomInt(1, 6)) {
       case 1:
         $email = $first . $last;
         break;
@@ -976,7 +987,7 @@ class CRM_Core_CodeGen_GenerateData {
 
     // Some people have numbers in their address
     if ($this->probability(.4)) {
-      $email .= mt_rand(1, 99);
+      $email .= $this->randomInt(1, 99);
     }
     // Generate random domain if not specified
     if (!$domain) {
@@ -998,7 +1009,7 @@ class CRM_Core_CodeGen_GenerateData {
       // echo "org_id = $org_id\n";
       $entity_tag->entity_id = $this->Organization[$i];
       $entity_tag->entity_table = 'civicrm_contact';
-      $entity_tag->tag_id = mt_rand(1, 3);
+      $entity_tag->tag_id = $this->randomInt(1, 3);
       $this->_insert($entity_tag);
     }
 
@@ -1007,7 +1018,7 @@ class CRM_Core_CodeGen_GenerateData {
       $entity_tag->entity_table = 'civicrm_contact';
       $entity_tag->entity_id = $this->Individual[$i];
       if (($entity_tag->entity_id) % 3) {
-        $entity_tag->tag_id = mt_rand(4, 5);
+        $entity_tag->tag_id = $this->randomInt(4, 5);
         $this->_insert($entity_tag);
       }
       else {
@@ -1164,7 +1175,7 @@ class CRM_Core_CodeGen_GenerateData {
         if ($activityTypeID == 9) {
           $activityContactDAO = new CRM_Activity_DAO_ActivityContact();
           $activityContactDAO->activity_id = $activityDAO->id;
-          $activityContactDAO->contact_id = mt_rand(1, 101);
+          $activityContactDAO->contact_id = $this->randomInt(1, 101);
           $activityContactDAO->record_type_id = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           $this->_insert($activityContactDAO);
         }
@@ -1193,7 +1204,7 @@ class CRM_Core_CodeGen_GenerateData {
       $zipCodes = json_decode(file_get_contents(self::getCivicrmDir() . '/sql/zipcodes.json'));
     }
 
-    $zipCode = $zipCodes[mt_rand(0, count($zipCodes))];
+    $zipCode = $zipCodes[$this->randomInt(0, count($zipCodes))];
 
     if ($this->stateMap[$zipCode->state]) {
       $stateID = $this->stateMap[$zipCode->state];
