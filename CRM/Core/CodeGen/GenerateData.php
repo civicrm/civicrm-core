@@ -46,7 +46,37 @@ class CRM_Core_CodeGen_GenerateData {
 
     // Relationship types indexed by name_a_b from the table civicrm_relationship_type
     $this->relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
+  }
 
+  /**
+   * Create a full, standard set of random data.
+   */
+  public function generateAll() {
+    $this->initID();
+    $this->generate('Domain');
+    $this->generate('Contact');
+    $this->generate('Individual');
+    $this->generate('Household');
+    $this->generate('Organization');
+    $this->generate('Relationship');
+    $this->generate('EntityTag');
+    $this->generate('Group');
+    $this->generate('Note');
+    $this->generate('Activity');
+    $this->generate('Event');
+    $this->generate('Contribution');
+    $this->generate('ContributionLineItem');
+    $this->generate('Membership');
+    $this->generate('MembershipPayment');
+    $this->generate('MembershipLog');
+    $this->generate('PCP');
+    $this->generate('SoftContribution');
+    $this->generate('Pledge');
+    $this->generate('PledgePayment');
+    $this->generate('Participant');
+    $this->generate('ParticipantPayment');
+    $this->generate('LineItemParticipants');
+    $this->generate('AccountingEntries');
   }
 
   /**
