@@ -36,21 +36,6 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
 
-    $email = CRM_Core_BAO_Email::add($params);
-
-    return $email;
-  }
-
-  /**
-   * Takes an associative array and adds email.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_BAO_Email object on success, null otherwise
-   */
-  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);
 
@@ -96,6 +81,20 @@ WHERE  contact_id = {$params['contact_id']}
 
     CRM_Utils_Hook::post($hook, 'Email', $email->id, $email);
     return $email;
+  }
+
+  /**
+   * Takes an associative array and adds email.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   * @return object
+   *   CRM_Core_BAO_Email object on success, null otherwise
+   */
+  public static function add(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('apiv4 create');
+    return self::create($params);
   }
 
   /**
