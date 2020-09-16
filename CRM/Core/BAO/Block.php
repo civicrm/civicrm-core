@@ -131,20 +131,15 @@ class CRM_Core_BAO_Block {
    * Check if the current block exits.
    *
    * @param string $blockName
-   *   Bloack name.
+   *   Block name.
    * @param array $params
-   *   Associated array of submitted fields.
+   *   Array of submitted fields.
    *
    * @return bool
-   *   true if the block exits, otherwise false
+   *   true if the block is in the params and is an array
    */
-  public static function blockExists($blockName, &$params) {
-    // return if no data present
-    if (empty($params[$blockName]) || !is_array($params[$blockName])) {
-      return FALSE;
-    }
-
-    return TRUE;
+  public static function blockExists($blockName, $params) {
+    return !empty($params[$blockName]) && is_array($params[$blockName]);
   }
 
   /**
