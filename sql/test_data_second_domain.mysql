@@ -10,13 +10,13 @@ SELECT @addId := id from civicrm_address where street_address = '15 Main St';
 
 INSERT INTO civicrm_email (contact_id, location_type_id, email, is_primary, is_billing, on_hold, hold_date, reset_date)
       VALUES
-      (@contactID, 1, '"Domain Email" <domainemail2@example.org>', 0, 0, 0, NULL, NULL);
+      (@contactID, 1, '"Domain Email" <domainemail2@example.org>', 1, 0, 0, NULL, NULL);
 
 SELECT @emailId := id from civicrm_email where email = 'domainemail2@example.org';
 
 INSERT INTO civicrm_phone (contact_id, location_type_id, is_primary, is_billing, mobile_provider_id, phone, phone_type_id)
       VALUES
-      (@contactID, 1, 0, 0, NULL,'204 555-1001', 1);
+      (@contactID, 1, 1, 0, NULL,'204 555-1001', 1);
 
 SELECT @phoneId := id from civicrm_phone where phone = '204 555-1001';
 
