@@ -160,12 +160,22 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $form->_expressButtonName = $form->getButtonName('upload', 'express');
       }
       $form->assign('expressButtonName', $form->_expressButtonName);
-      $form->add(
-        'image',
-        $form->_expressButtonName,
-        $this->_paymentProcessor['url_button'],
-        ['class' => 'crm-form-submit']
-      );
+      $form->add('xbutton', $form->_expressButtonName, ts('Pay using PayPal'), [
+        'type' => 'submit',
+        'formnovalidate' => 'formnovalidate',
+        'class' => 'crm-form-submit',
+      ]);
+      CRM_Core_Resources::singleton()->addStyle('
+        button#' . $form->_expressButtonName . '{
+         background-image: url(' . $this->_paymentProcessor['url_button'] . ');
+         color: transparent;
+         background-repeat: no-repeat;
+         background-color: transparent;
+         background-position: center;
+         min-width: 150px;
+         min-height: 50px;
+         border: none;
+       ');
     }
   }
 
@@ -1109,7 +1119,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if ($this->isPayPalType($this::PAYPAL_EXPRESS)) {
       return TRUE;
     }
-
     // This would occur postProcess.
     if (!empty($params['token'])) {
       return TRUE;
@@ -1123,6 +1132,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $possibleExpressFields = [
       '_qf_Register_upload_express_x',
       '_qf_Payment_upload_express_x',
+      '_qf_Main_upload_express',
     ];
     if (array_intersect_key($params, array_fill_keys($possibleExpressFields, 1))) {
       return TRUE;
