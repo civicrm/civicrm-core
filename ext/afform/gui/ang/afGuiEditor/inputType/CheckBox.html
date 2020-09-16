@@ -1,0 +1,7 @@
+<ul class="crm-checkbox-list" id="{{ fieldId }}" ng-if="getOptions()">
+  <li ng-repeat="opt in getOptions()" >
+    <input type="checkbox" disabled />
+    <label>{{ opt.label }}</label>
+  </li>
+</ul>
+<input type="checkbox" disabled ng-if="!getOptions()" />

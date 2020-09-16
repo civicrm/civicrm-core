@@ -1,0 +1,15 @@
+{
+  "name": "afform_html",
+  "version": "0.0.1",
+  "description": "![Screenshot](/images/screenshot.png)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "repository": "https://github.com/totten/afform",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "monaco-editor": "^0.16.2"
+  }
+}

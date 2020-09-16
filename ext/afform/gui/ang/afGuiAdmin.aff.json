@@ -1,0 +1,9 @@
+{
+  "title": "Afform Administration",
+  "server_route": "civicrm/admin/afform",
+  "permission": "administer CiviCRM",
+  "requires": [
+    "afGuiEditor",
+    "ui.sortable"
+  ]
+}

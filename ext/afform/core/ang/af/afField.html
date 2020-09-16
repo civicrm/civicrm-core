@@ -1,0 +1,6 @@
+<label class="crm-af-field-label" ng-if="defn.title" for="{{ fieldId }}">
+  {{ defn.title }}
+</label>
+<p class="crm-af-field-help-pre" ng-if="defn.help_pre">{{ defn.help_pre }}</p>
+<div class="crm-af-field" ng-include="'~/af/fields/' + defn.input_type + '.html'"></div>
+<p class="crm-af-field-help-post" ng-if="defn.help_post">{{ defn.help_post }}</p>

@@ -1,0 +1,29 @@
+<li ng-click="$event.stopPropagation()">
+  <div class="af-gui-field-select-in-dropdown">
+    <label>{{ ts('Style:') }}</label>
+    <select class="form-control" ng-model="node['#tag']" title="{{ ts('Text style') }}">
+      <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
+    </select>
+  </div>
+</li>
+<li ng-click="$event.stopPropagation()">
+  <div class="af-gui-field-select-in-dropdown">
+    <div class="btn-group btn-group-sm" role="group">
+      <button type="button" class="btn btn-default" ng-class="{active: opt === getAlign()}" ng-repeat="(opt, label) in alignments" ng-click="setAlign(opt)" title="{{ label }}">
+        <i class="crm-i fa-{{ opt.replace('text', 'align') }}" ></i>
+      </button>
+    </div>
+  </div>
+</li>
+<li ng-click="$event.stopPropagation()">
+  <div class="af-gui-field-select-in-dropdown form-inline" >
+    <label>{{ ts('Color:') }}</label>
+    <select class="form-control {{ getSetStyle().replace('btn', 'text') }}" ng-model="getSetStyle" ng-model-options="{getterSetter: true}" title="{{ ts('Button color scheme') }}">
+      <option ng-repeat="(style, label) in styles" class="{{ style.replace('text', 'bg') }}" value="{{ style }}">{{ label }}</option>
+    </select>
+  </div>
+</li>
+<li role="separator" class="divider"></li>
+<li>
+  <a href ng-click="container.removeElement(node)"><span class="text-danger">{{ ts('Delete this text') }}</span></a>
+</li>
