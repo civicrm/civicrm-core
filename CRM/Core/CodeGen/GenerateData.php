@@ -80,12 +80,21 @@ class CRM_Core_CodeGen_GenerateData {
   }
 
   /**
+   * Write a log message.
+   *
+   * @param string $message
+   */
+  public function write($message) {
+    echo $message;
+  }
+
+  /**
    * Public wrapper for calling private "add" functions
    * Provides user feedback
    * @param $itemName
    */
   public function generate($itemName) {
-    echo "Generating $itemName\n";
+    $this->write("Generating $itemName\n");
     $fn = "add$itemName";
     $this->$fn();
   }
@@ -296,7 +305,7 @@ class CRM_Core_CodeGen_GenerateData {
       $items = $this->sampleData[$key];
     }
     if (!$items) {
-      echo "Error: no items found for '$key'\n";
+      $this->write("Error: no items found for '$key'\n");
       return FALSE;
     }
     return $items[$this->randomInt(0, count($items) - 1)];
@@ -424,11 +433,7 @@ class CRM_Core_CodeGen_GenerateData {
    */
   private function _insert(&$dao) {
     if (self::ADD_TO_DB) {
-      if (!$dao->insert()) {
-        echo "ERROR INSERT: " . mysqli_error($dao->getConnection()->connection) . "\n";
-        print_r($dao);
-        exit(1);
-      }
+      $dao->insert();
     }
   }
 
@@ -438,11 +443,7 @@ class CRM_Core_CodeGen_GenerateData {
    */
   private function _update(&$dao) {
     if (self::ADD_TO_DB) {
-      if (!$dao->update()) {
-        echo "ERROR UPDATE: " . mysqli_error($dao->getConnection()->connection) . "\n";
-        print_r($dao);
-        exit(1);
-      }
+      $dao->update();
     }
   }
 
