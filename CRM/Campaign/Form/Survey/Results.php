@@ -461,6 +461,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       }
       $this->_createNew = TRUE;
       $this->_id = CRM_Report_Utils_Report::getInstanceIDForValue('survey/detail');
+      CRM_Report_Form_Instance::setDefaultValues($this, $this->_defaults);
+      $this->_params = array_merge($this->_params, $this->_defaults);
       CRM_Report_Form_Instance::postProcess($this, FALSE);
 
       $query = "SELECT MAX(id) FROM civicrm_report_instance WHERE name = %1";
