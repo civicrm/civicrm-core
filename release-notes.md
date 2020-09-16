@@ -26,6 +26,15 @@ Released October 7, 2020
 - **[Credits](release-notes/5.30.0.md#credits)**
 - **[Feedback](release-notes/5.30.0.md#feedback)**
 
+## CiviCRM 5.29.1
+
+Released September 15, 2020
+
+- **[Synopsis](release-notes/5.29.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.29.1.md#bugs)**
+- **[Credits](release-notes/5.29.1.md#credits)**
+- **[Feedback](release-notes/5.29.1.md#feedback)**
+
 ## CiviCRM 5.29.0
 
 Released September 2, 2020
