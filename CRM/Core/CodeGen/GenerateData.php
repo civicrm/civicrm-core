@@ -35,7 +35,7 @@ class CRM_Core_CodeGen_GenerateData {
     $this->numStrictIndividual = $this->numIndividual - ($this->numHousehold * self::NUM_INDIVIDUAL_PER_HOUSEHOLD);
 
     // Parse data file
-    foreach ((array) simplexml_load_file(self::DATA_FILENAME) as $key => $val) {
+    foreach ((array) simplexml_load_file(self::getCivicrmDir() . '/sql/' . self::DATA_FILENAME) as $key => $val) {
       $val = (array) $val;
       $this->sampleData[$key] = (array) $val['item'];
     }
@@ -1190,7 +1190,7 @@ class CRM_Core_CodeGen_GenerateData {
 
     static $zipCodes = NULL;
     if ($zipCodes === NULL) {
-      $zipCodes = json_decode(file_get_contents(__DIR__ . '/zipcodes.json'));
+      $zipCodes = json_decode(file_get_contents(self::getCivicrmDir() . '/sql/zipcodes.json'));
     }
 
     $zipCode = $zipCodes[mt_rand(0, count($zipCodes))];
@@ -1914,6 +1914,13 @@ AND    a.source_record_id = c.id
 AND    a.details = 'Participant Payment'
 ";
     $this->_query($sql);
+  }
+
+  /**
+   * @return string
+   */
+  protected static function getCivicrmDir():string {
+    return dirname(dirname(dirname(__DIR__)));
   }
 
 }
