@@ -33,8 +33,14 @@
     <table>civicrm_contact</table>
     <key>id</key>
     <add>1.6</add>
+    <drop>5.31</drop>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
+  <index>
+    <name>index_contact_id</name>
+    <fieldName>contact_id</fieldName>
+    <add>5.31</add>
+  </index>
   <field>
     <name>acl_id</name>
     <title>Cache ACL</title>

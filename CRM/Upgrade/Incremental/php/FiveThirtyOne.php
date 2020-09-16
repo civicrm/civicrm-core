@@ -73,6 +73,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
   public function upgrade_5_31_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Remove Eway Single Currency Payment Processor type if not used or install the new extension for it', 'enableEwaySingleExtension');
+    $this->addTask('dev/core#1486 Remove FKs from ACL Cache tables', 'removeFKsFromACLCacheTables');
   }
 
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
@@ -103,6 +104,13 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
         CRM_Core_DAO::executeQuery("DELETE FROM civicrm_payment_processor_type WHERE id = %1", [1 => [$eWAYPaymentProcessorType, 'Positive']]);
       }
     }
+    return TRUE;
+  }
+
+  public static function removeFKsFromACLCacheTables(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_contact_cache', 'FK_civicrm_acl_contact_cache_contact_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_cache', 'FK_civicrm_acl_cache_contact_id');
+    CRM_Core_BAO_SchemaHandler::createIndexes(['civicrm_acl_cache' => ['contact_id']]);
     return TRUE;
   }
 
