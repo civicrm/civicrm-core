@@ -5230,35 +5230,27 @@ LIMIT 1;";
       'title' => ts('Record Payment'),
     ];
 
-    if ((int) $balance > 0) {
-      // @todo - this should be possible even if not > 0 - test & remove this if.
-      // it is possible to 'overpay' in the real world & we honor that.
-      if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
-        $actionLinks[] = [
-          'url' => CRM_Utils_System::url('civicrm/payment', [
-            'action' => 'add',
-            'reset' => 1,
-            'is_refund' => 0,
-            'id' => $id,
-            'mode' => 'live',
-          ]),
-          'title' => ts('Submit Credit Card payment'),
-        ];
-      }
-    }
-    elseif ((int) $balance < 0) {
-      // @todo - in the future remove this IF - OK to refund money even when not due since
-      // ... life.
+    if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
       $actionLinks[] = [
         'url' => CRM_Utils_System::url('civicrm/payment', [
           'action' => 'add',
           'reset' => 1,
+          'is_refund' => 0,
           'id' => $id,
-          'is_refund' => 1,
+          'mode' => 'live',
         ]),
-        'title' => ts('Record Refund'),
+        'title' => ts('Submit Credit Card payment'),
       ];
     }
+    $actionLinks[] = [
+      'url' => CRM_Utils_System::url('civicrm/payment', [
+        'action' => 'add',
+        'reset' => 1,
+        'id' => $id,
+        'is_refund' => 1,
+      ]),
+      'title' => ts('Record Refund'),
+    ];
     return $actionLinks;
   }
 
