@@ -26,11 +26,16 @@ class CRM_Core_CodeGen_GenerateData {
 
   /**
    * Class constructor
+   *
+   * @param string|int $seed
+   *   Some scalar value used as the starting point for random-number generation.
+   * @param int $time
+   *   A timestamp; some facsimile of "now".
    */
-  public function __construct($seed = '123456789') {
+  public function __construct($seed, $time) {
     // initialize all the vars
     $this->seed = $seed;
-    $this->time = strtotime(date('Y') . '-01-01 02:03:04');
+    $this->time = $time;
     $this->numIndividual = self::INDIVIDUAL_PERCENT * self::NUM_CONTACT / 100;
     $this->numHousehold = self::HOUSEHOLD_PERCENT * self::NUM_CONTACT / 100;
     $this->numOrganization = self::ORGANIZATION_PERCENT * self::NUM_CONTACT / 100;
