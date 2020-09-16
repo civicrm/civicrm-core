@@ -77,12 +77,12 @@ class CRM_Core_CodeGen_GenerateData {
   public function initID() {
     // get the domain and contact id arrays
     $this->domain = range(1, self::NUM_DOMAIN);
-    shuffle($this->domain);
+    $this->domain = $this->shuffle($this->domain);
 
     // Get first contact id
     $this->startCid = $cid = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM civicrm_contact");
     $this->contact = range($cid + 1, $cid + self::NUM_CONTACT);
-    shuffle($this->contact);
+    $this->contact = $this->shuffle($this->contact);
 
     // get the individual, household  and organizaton contacts
     $offset = 0;
@@ -289,6 +289,16 @@ class CRM_Core_CodeGen_GenerateData {
   private function randomKeyValue($items) {
     $key = $this->randomIndex($items);
     return array($key, $items[$key]);
+  }
+
+  private function shuffle($array) {
+    for ($i = count($array) - 1; $i >= 1; $i--) {
+      $j = $this->randomInt(0, $i);
+      $tmp = $array[$i];
+      $array[$i] = $array[$j];
+      $array[$j] = $tmp;
+    }
+    return $array;
   }
 
   /**
@@ -691,7 +701,7 @@ class CRM_Core_CodeGen_GenerateData {
 
     $org = new CRM_Contact_DAO_Contact();
     $employees = $this->Individual;
-    shuffle($employees);
+    $employees = $this->shuffle($employees);
 
     foreach ($this->Organization as $key => $id) {
       $org->primary_contact_id = $website = $email = NULL;
@@ -1170,7 +1180,7 @@ class CRM_Core_CodeGen_GenerateData {
       for ($i = 0; $i < self::NUM_ACTIVITY; $i++) {
         $activityDAO = new CRM_Activity_DAO_Activity();
         $activityId = CRM_Core_OptionGroup::values('activity_type', NULL, NULL, NULL, ' AND v.name IN ("Tell A Friend", "Pledge Acknowledgment")');
-        $activityTypeID = array_rand($activityId);
+        $activityTypeID = $this->randomIndex($activityId);
         $activity = CRM_Core_PseudoConstant::activityType();
         $activityDAO->activity_type_id = $activityTypeID;
         $activityDAO->subject = "Subject for $activity[$activityTypeID]";
@@ -1285,7 +1295,7 @@ class CRM_Core_CodeGen_GenerateData {
     while ($contact->fetch()) {
       $contacts[] = $contact->id;
     }
-    shuffle($contacts);
+    $contacts = $this->shuffle($contacts);
 
     $randomContacts = array_slice($contacts, 20, 30);
 
@@ -1327,7 +1337,7 @@ VALUES
       }
       elseif (($count + 1) % 5 == 0) {
         // Grace or expired, memberhsip type is random of 1 & 2
-        $randIndex = array_rand($membershipTypes);
+        $randIndex = $this->randomIndex($membershipTypes);
         $membershipTypeId = $membershipTypes[$randIndex];
         $membershipStatusId = $statuses[$randIndex];
         $membershipTypeName = $membershipTypeNames[$randIndex];
@@ -1534,7 +1544,7 @@ SELECT  id
     while ($contact->fetch()) {
       $contacts[] = $contact->id;
     }
-    shuffle($contacts);
+    $contacts = $this->shuffle($contacts);
     $randomContacts = array_slice($contacts, 20, 50);
 
     $participant = "
