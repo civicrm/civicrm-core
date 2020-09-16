@@ -1216,7 +1216,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2597, 1226, "AGB", "Argyll and Bute"),
 (2598, 1226, "ARM", "Co Armagh"),
 (2606, 1226, "BDF", "Bedfordshire"),
-(2612, 1226, "BGW", "Gwent"),
+(2612, 1226, "BGW", "Blaenau Gwent"),
 (2620, 1226, "BST", "Bristol, City of"),
 (2622, 1226, "BKM", "Buckinghamshire"),
 (2626, 1226, "CAM", "Cambridgeshire"),
@@ -1285,7 +1285,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2786, 1226, "STG", "Stirling"),
 (2791, 1226, "SFK", "Suffolk"),
 (2793, 1226, "SRY", "Surrey"),
-(2804, 1226, "VGL", "Mid Glamorgan"),
+(2804, 1226, "VGL", "Vale of Glamorgan, The"),
 (2811, 1226, "WAR", "Warwickshire"),
 (2813, 1226, "WDU", "West Dunbartonshire"),
 (2814, 1226, "WLN", "West Lothian"),
@@ -3689,7 +3689,6 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 
 -- new UK provinces (CRM-5224)
 (10013, 1226, "CWD", "Clwyd"),
-(10014, 1226, "DFD", "Dyfed"),
 (10015, 1226, "SGM", "South Glamorgan"),
 
 -- Haiti (CRM-5628)
@@ -4108,4 +4107,35 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1080, "09", "Woleu-Ntem"),
 
 -- dev/Core#131 Missing UK State
-(NULL, 1226, "MON", "Monmouthshire");
+(NULL, 1226, "MON", "Monmouthshire"),
+
+-- dev/core#2027 Missing subdivisions for Northern Ireland and Wales
+(NULL, 1226, "ANN", "Antrim and Newtownabbey"),
+(NULL, 1226, "AND", "Ards and North Down"),
+(NULL, 1226, "ABC", "Armagh City, Banbridge and Craigavon"),
+(NULL, 1226, "BFS", "Belfast"),
+(NULL, 1226, "CCG", "Causeway Coast and Glens"),
+(NULL, 1226, "DRS", "Derry City and Strabane"),
+(NULL, 1226, "FMO", "Fermanagh and Omagh"),
+(NULL, 1226, "LBC", "Lisburn and Castlereagh"),
+(NULL, 1226, "MEA", "Mid and East Antrim"),
+(NULL, 1226, "MUL", "Mid Ulster"),
+(NULL, 1226, "NMD", "Newry, Mourne and Down"),
+
+(NULL, 1226, "BGE", "Bridgend"),
+(NULL, 1226, "CAY", "Caerphilly"),
+(NULL, 1226, "CRF", "Cardiff"),
+(NULL, 1226, "CRF", "Carmarthenshire"),
+(NULL, 1226, "CGN", "Ceredigion"),
+(NULL, 1226, "CWY", "Conwy"),
+(NULL, 1226, "DEN", "Denbighshire"),
+(NULL, 1226, "FLN", "Flintshire"),
+(NULL, 1226, "AGY", "Isle of Anglesey"),
+(NULL, 1226, "MTY", "Merthyr Tydfil"),
+(NULL, 1226, "NTL", "Neath Port Talbot"),
+(NULL, 1226, "NWP", "Newport"),
+(NULL, 1226, "PEM", "Pembrokeshire"),
+(NULL, 1226, "RCT", "Rhondda, Cynon, Taff"),
+(NULL, 1226, "SWA", "Swansea"),
+(NULL, 1226, "TOF", "Torfaen"),
+(NULL, 1226, "WRX", "Wrexham");
