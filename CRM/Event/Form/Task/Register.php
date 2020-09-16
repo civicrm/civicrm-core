@@ -37,4 +37,42 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
    */
   public $_single = FALSE;
 
+  /**
+   * Assign the url path to the template.
+   */
+  protected function assignUrlPath() {
+    //set the appropriate action
+    $context = $this->get('context');
+    $urlString = 'civicrm/contact/search';
+    $this->_action = CRM_Core_Action::BASIC;
+    switch ($context) {
+      case 'advanced':
+        $urlString = 'civicrm/contact/search/advanced';
+        $this->_action = CRM_Core_Action::ADVANCED;
+        break;
+
+      case 'builder':
+        $urlString = 'civicrm/contact/search/builder';
+        $this->_action = CRM_Core_Action::PROFILE;
+        break;
+
+      case 'basic':
+        $urlString = 'civicrm/contact/search/basic';
+        $this->_action = CRM_Core_Action::BASIC;
+        break;
+
+      case 'custom':
+        $urlString = 'civicrm/contact/search/custom';
+        $this->_action = CRM_Core_Action::COPY;
+        break;
+    }
+    CRM_Contact_Form_Task::preProcessCommon($this);
+
+    $this->_contactId = NULL;
+
+    //set ajax path, this used for custom data building
+    $this->assign('urlPath', $urlString);
+    $this->assign('urlPathVar', "_qf_Participant_display=true&qfKey={$this->controller->_key}");
+  }
+
 }
