@@ -39,8 +39,9 @@ class LineItemTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
 
   /**
    * Test api applies permissions on line item actions (delete & get).
+   * @dataProvider versionThreeAndFour
    */
-  public function testLineItemApiPermissions() {
+  public function testLineItemApiPermissions($version) {
     $contact1 = $this->individualCreate();
     $defaultPriceFieldID = $this->getDefaultPriceFieldID();
     $order = $this->callAPISuccess('Order', 'create', [
@@ -65,6 +66,7 @@ class LineItemTest extends \PHPUnit\Framework\TestCase implements HeadlessInterf
         ],
       ],
     ]);
+    $this->_apiversion = $version;
 
     $this->setPermissions([
       'access CiviCRM',
