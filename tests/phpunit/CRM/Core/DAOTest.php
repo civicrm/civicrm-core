@@ -19,7 +19,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $contactRef = $refsByTarget['civicrm_contact'];
     $this->assertEquals('contact_id', $contactRef->getReferenceKey());
     $this->assertEquals('id', $contactRef->getTargetKey());
-    $this->assertEquals('CRM_Core_Reference_Basic', get_class($contactRef));
+    $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $contactRef);
   }
 
   public function testGetReferencesToTable() {
@@ -43,18 +43,19 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ];
 
-    $contact = CRM_Contact_BAO_Contact::add($params);
-    $this->assertNotNull($contact->id);
+    $contactID = $this->callAPISuccess('Contact', 'create', $params)['id'];
 
     $params = [
       'email' => 'spam@dev.null',
-      'contact_id' => $contact->id,
+      'contact_id' => $contactID,
       'is_primary' => 0,
       'location_type_id' => 1,
     ];
 
-    $email = CRM_Core_BAO_Email::add($params);
+    $this->callAPISuccess('Email', 'create', $params);
 
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $contactID;
     $refs = $contact->findReferences();
     $refsByTable = [];
     foreach ($refs as $refObj) {
@@ -64,7 +65,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('civicrm_email', $refsByTable));
     $refDao = $refsByTable['civicrm_email'];
     $refDao->find(TRUE);
-    $this->assertEquals($contact->id, $refDao->contact_id);
+    $this->assertEquals($contactID, $refDao->contact_id);
   }
 
   /**
@@ -164,7 +165,6 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @param $expectSql
    */
   public function testComposeQuery($inputSql, $inputParams, $expectSql) {
-    $scope = CRM_Core_TemporaryErrorScope::useException();
     try {
       $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     }
@@ -244,14 +244,15 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   public function testFindById() {
     $params = $this->sampleContact('Individual', 4);
-    $existing_contact = CRM_Contact_BAO_Contact::add($params);
-    $contact = CRM_Contact_BAO_Contact::findById($existing_contact->id);
-    $this->assertEquals($existing_contact->id, $contact->id);
-    $deleted_contact_id = $existing_contact->id;
+    $existing_contact = $this->callAPISuccess('Contact', 'create', $params);
+    /* @var CRM_Contact_DAO_Contact $contact */
+    $contact = CRM_Contact_BAO_Contact::findById($existing_contact['id']);
+    $this->assertEquals($existing_contact['id'], $contact->id);
+    $deleted_contact_id = $existing_contact['id'];
     $this->contactDelete($contact->id);
     $exception_thrown = FALSE;
     try {
-      $deleted_contact = CRM_Contact_BAO_Contact::findById($deleted_contact_id);
+      CRM_Contact_BAO_Contact::findById($deleted_contact_id);
     }
     catch (Exception $e) {
       $exception_thrown = TRUE;
@@ -317,8 +318,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ];
 
-    $dao = CRM_Contact_BAO_Contact::add($params);
-    $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$dao->id}";
+    $contact = $this->callAPISuccess('Contact', 'create', $params);
+    $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$contact['id']}";
     $toArray = [
       'contact_type' => 'Individual',
       'display_name' => 'Testy McScallion',
@@ -387,6 +388,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   /**
    * @return array
+   * @throws \ReflectionException
    */
   public function serializationMethods() {
     $constants = [];
@@ -405,7 +407,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     ];
     $daoInfo = new ReflectionClass('CRM_Core_DAO');
     foreach ($daoInfo->getConstants() as $constant => $val) {
-      if ($constant == 'SERIALIZE_JSON' || $constant == 'SERIALIZE_PHP') {
+      if ($constant === 'SERIALIZE_JSON' || $constant === 'SERIALIZE_PHP') {
         $constants[] = [$val, array_merge($simpleData, $complexData)];
       }
       elseif (strpos($constant, 'SERIALIZE_') === 0) {
