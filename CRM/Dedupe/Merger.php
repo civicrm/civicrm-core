@@ -1799,14 +1799,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // @todo Handle OpenID (not currently in API).
     if (!empty($locBlocks)) {
-      $locationBlocks = self::getLocationBlockInfo();
 
       $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mergeHandler->getToKeepID(), ['is_primary' => 1]);
       $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mergeHandler->getToKeepID(), ['is_billing' => 1]);
 
       foreach ($locBlocks as $name => $block) {
         $blocksDAO[$name] = ['delete' => [], 'update' => []];
-        $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
         $changePrimary = FALSE;
         $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
         $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
