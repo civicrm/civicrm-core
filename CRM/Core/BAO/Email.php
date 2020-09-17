@@ -39,10 +39,6 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);
 
-    if (isset($params['is_bulkmail']) && $params['is_bulkmail'] === 'null') {
-      CRM_Core_Error::deprecatedFunctionWarning('It is not valid to set bulkmail to null, it is boolean');
-      $params['bulkmail'] = 0;
-    }
     $email = new CRM_Core_DAO_Email();
     $email->copyValues($params);
     if (!empty($email->email)) {
