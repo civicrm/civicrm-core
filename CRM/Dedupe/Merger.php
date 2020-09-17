@@ -1806,9 +1806,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       foreach ($locBlocks as $name => $block) {
         $blocksDAO[$name] = ['delete' => [], 'update' => []];
-        if (!is_array($block) || CRM_Utils_System::isNull($block)) {
-          continue;
-        }
         $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
         $changePrimary = FALSE;
         $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
