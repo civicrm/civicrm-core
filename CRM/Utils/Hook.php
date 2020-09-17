@@ -826,23 +826,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when rendering the tabs for a contact (q=civicrm/contact/view)c
-   *
-   * @param array $tabs
-   *   The array of tabs that will be displayed.
-   * @param int $contactID
-   *   The contactID for whom the dashboard is being rendered.
-   *
-   * @return null
-   * @deprecated Use tabset() instead.
-   */
-  public static function tabs(&$tabs, $contactID) {
-    return self::singleton()->invoke(['tabs', 'contactID'], $tabs, $contactID,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tabs'
-    );
-  }
-
-  /**
    * This hook is called when rendering the tabs used for events and potentially
    * contribution pages, etc.
    *
