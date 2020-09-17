@@ -1820,23 +1820,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if (!$otherBlockId) {
             continue;
           }
-
-          // For the block which belongs to other-contact, link the location block to main-contact
-          $otherBlockDAO = new $daoName();
-          $otherBlockDAO->contact_id = $mergeHandler->getToKeepID();
-
-          // Get the ID of this block on the 'other' contact, otherwise skip
-          $otherBlockDAO->id = $otherBlockId;
-
-          // Add/update location and type information from the form, if applicable
-          if ($locationBlocks[$name]['hasLocation']) {
-            $locTypeId = $migrationInfo['location_blocks'][$name][$blkCount]['locTypeId'] ?? NULL;
-            $otherBlockDAO->location_type_id = $locTypeId;
-          }
-          if ($locationBlocks[$name]['hasType']) {
-            $typeTypeId = $migrationInfo['location_blocks'][$name][$blkCount]['typeTypeId'] ?? NULL;
-            $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
-          }
+          $otherBlockDAO = $mergeHandler->copyDataToNewBlockDAO($daoName, $otherBlockId, $name, $blkCount);
 
           // If we're deliberately setting this as primary then add the flag
           // and remove it from the current primary location (if there is one).

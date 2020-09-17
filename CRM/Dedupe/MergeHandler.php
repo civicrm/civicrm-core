@@ -190,4 +190,39 @@ class CRM_Dedupe_MergeHandler {
     return $locBlocks;
   }
 
+  /**
+   * Copy the data to be moved to a new DAO object.
+   *
+   * This is intended as a refactoring step - not the long term function. Do not
+   * call from any function other than the one it is taken from (Merger::mergeLocations).
+   *
+   * @param string $daoName
+   * @param int $otherBlockId
+   * @param string $name
+   * @param int $blkCount
+   *
+   * @return mixed
+   */
+  public function copyDataToNewBlockDAO(string $daoName, $otherBlockId, $name, $blkCount) {
+    $locationBlocks = CRM_Dedupe_Merger::getLocationBlockInfo();
+    $migrationInfo = $this->getMigrationInfo();
+    // For the block which belongs to other-contact, link the location block to main-contact
+    $otherBlockDAO = new $daoName();
+    $otherBlockDAO->contact_id = $this->getToKeepID();
+
+    // Get the ID of this block on the 'other' contact, otherwise skip
+    $otherBlockDAO->id = $otherBlockId;
+
+    // Add/update location and type information from the form, if applicable
+    if ($locationBlocks[$name]['hasLocation']) {
+      $locTypeId = $migrationInfo['location_blocks'][$name][$blkCount]['locTypeId'] ?? NULL;
+      $otherBlockDAO->location_type_id = $locTypeId;
+    }
+    if ($locationBlocks[$name]['hasType']) {
+      $typeTypeId = $migrationInfo['location_blocks'][$name][$blkCount]['typeTypeId'] ?? NULL;
+      $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
+    }
+    return $otherBlockDAO;
+  }
+
 }
