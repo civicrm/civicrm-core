@@ -33,7 +33,7 @@ function afform_civicrm_container($container) {
   $container->setDefinition('afform_scanner', new \Symfony\Component\DependencyInjection\Definition(
     'CRM_Afform_AfformScanner',
     []
-  ));
+  ))->setPublic(TRUE);
 }
 
 /**
