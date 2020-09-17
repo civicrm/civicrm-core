@@ -1820,7 +1820,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if (!$otherBlockId) {
             continue;
           }
-          $otherBlockDAO = $mergeHandler->copyDataToNewBlockDAO($daoName, $otherBlockId, $name, $blkCount);
+          $otherBlockDAO = $mergeHandler->copyDataToNewBlockDAO($otherBlockId, $name, $blkCount);
 
           // If we're deliberately setting this as primary then add the flag
           // and remove it from the current primary location (if there is one).
@@ -1829,7 +1829,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if (!$changePrimary && $set_primary == "1") {
             $otherBlockDAO->is_primary = 1;
             if ($primaryDAOId) {
-              $removePrimaryDAO = new $daoName();
+              $removePrimaryDAO = $mergeHandler->getDAOForLocationEntity($name);
               $removePrimaryDAO->id = $primaryDAOId;
               $removePrimaryDAO->is_primary = 0;
               $blocksDAO[$name]['update'][$primaryDAOId] = $removePrimaryDAO;
@@ -1848,7 +1848,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
           // overwrite - need to delete block which belongs to main-contact.
           if (!empty($mainBlockId) && $values['is_replace']) {
-            $deleteDAO = new $daoName();
+            $deleteDAO = $mergeHandler->getDAOForLocationEntity($name);
             $deleteDAO->id = $mainBlockId;
             $deleteDAO->find(TRUE);
 
