@@ -31,7 +31,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge', [], 1, 0);
-    CRM_Core_DAO::createTestObject('CRM_Core_BAO_Phone', [], 1, 0);
+    $this->callAPISuccess('Phone', 'create', ['id' => $this->individualCreate(['email' => '']), 'phone' => '911', 'location_type_id' => 'Home']);
     $this->prepareForACLs();
   }
 
