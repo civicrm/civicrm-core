@@ -208,17 +208,13 @@ class CRM_Dedupe_MergeHandler {
     $locationBlocks = CRM_Dedupe_Merger::getLocationBlockInfo();
     $migrationInfo = $this->getMigrationInfo();
     // For the block which belongs to other-contact, link the location block to main-contact
-    $otherBlockDAO = $this->getDAOForLocationEntity($name);
+    $otherBlockDAO = $this->getDAOForLocationEntity($name, $this->getSelectedLocationType($name, $blkCount));
     $otherBlockDAO->contact_id = $this->getToKeepID();
 
     // Get the ID of this block on the 'other' contact, otherwise skip
     $otherBlockDAO->id = $otherBlockId;
 
     // Add/update location and type information from the form, if applicable
-    if ($locationBlocks[$name]['hasLocation']) {
-      $locTypeId = $migrationInfo['location_blocks'][$name][$blkCount]['locTypeId'] ?? NULL;
-      $otherBlockDAO->location_type_id = $locTypeId;
-    }
     if ($locationBlocks[$name]['hasType']) {
       $typeTypeId = $migrationInfo['location_blocks'][$name][$blkCount]['typeTypeId'] ?? NULL;
       $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
@@ -231,30 +227,54 @@ class CRM_Dedupe_MergeHandler {
    *
    * @param string $entity
    *
+   * @param null $locationTypeID
+   *
    * @return CRM_Core_DAO_Address|CRM_Core_DAO_Email|CRM_Core_DAO_IM|CRM_Core_DAO_Phone|CRM_Core_DAO_Website
    * @throws \CRM_Core_Exception
    */
-  public function getDAOForLocationEntity($entity) {
+  public function getDAOForLocationEntity($entity, $locationTypeID = NULL) {
     switch ($entity) {
       case 'email':
-        return new CRM_Core_DAO_Email();
+        $dao = new CRM_Core_DAO_Email();
+        $dao->location_type_id = $locationTypeID;
+        return $dao;
 
       case 'address':
-        return new CRM_Core_DAO_Address();
+        $dao = new CRM_Core_DAO_Address();
+        $dao->location_type_id = $locationTypeID;
+        return $dao;
 
       case 'phone':
-        return new CRM_Core_DAO_Phone();
+        $dao = new CRM_Core_DAO_Phone();
+        $dao->location_type_id = $locationTypeID;
+        return $dao;
 
       case 'website':
         return new CRM_Core_DAO_Website();
 
       case 'im':
-        return new CRM_Core_DAO_IM();
+        $dao = new CRM_Core_DAO_IM();
+        $dao->location_type_id = $locationTypeID;
+        return $dao;
 
       default:
         // Mostly here, along with the switch over a more concise format, to help IDEs understand the possibilities.
         throw new CRM_Core_Exception('Unsupported entity');
     }
+  }
+
+  /**
+   * Get the selected location type for the given location block.
+   *
+   * This will retrieve any user selection if they specified which location to move a block to.
+   *
+   * @param string $entity
+   * @param int $blockIndex
+   *
+   * @return int|null
+   */
+  protected function getSelectedLocationType($entity, $blockIndex) {
+    return $this->getMigrationInfo()['location_blocks'][$entity][$blockIndex]['locTypeId'] ?? NULL;
   }
 
 }
