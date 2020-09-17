@@ -24,9 +24,15 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * Create or update IM record.
    *
    * @param array $params
-   * @return CRM_Core_DAO_IM
+   *
+   * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public static function add($params) {
+    if (empty($params['id']) || is_numeric($params['is_primary'] ?? NULL)) {
+      CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
+    }
     return self::writeRecord($params);
   }
 
