@@ -45,15 +45,22 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     $context = $this->get('context');
     $urlString = 'civicrm/contact/search';
     $this->_action = CRM_Core_Action::BASIC;
+    $fragment = 'search';
+    self::$_searchFormValues = $this->controller->exportValues('Basic');
+
     switch ($context) {
       case 'advanced':
         $urlString = 'civicrm/contact/search/advanced';
         $this->_action = CRM_Core_Action::ADVANCED;
+        self::$_searchFormValues = $this->controller->exportValues('Advanced');
+        $fragment .= '/advanced';
         break;
 
       case 'builder':
         $urlString = 'civicrm/contact/search/builder';
         $this->_action = CRM_Core_Action::PROFILE;
+        self::$_searchFormValues = $this->controller->exportValues('Builder');
+        $fragment .= '/builder';
         break;
 
       case 'basic':
@@ -64,12 +71,22 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
       case 'custom':
         $urlString = 'civicrm/contact/search/custom';
         $this->_action = CRM_Core_Action::COPY;
+        self::$_searchFormValues = $this->controller->exportValues('Custom');
+        $fragment .= '/custom';
         break;
     }
     self::preProcessCommonCopy($this);
 
     $this->_contactId = NULL;
-
+    //set the user context for redirection of task actions
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
+    $urlParams = 'force=1';
+    if (CRM_Utils_Rule::qfKey($qfKey)) {
+      $urlParams .= "&qfKey=$qfKey";
+    }
+    $url = CRM_Utils_System::url('civicrm/contact/' . $fragment, $urlParams);
+    $session = CRM_Core_Session::singleton();
+    $session->replaceUserContext($url);
     //set ajax path, this used for custom data building
     $this->assign('urlPath', $urlString);
     $this->assign('urlPathVar', "_qf_Participant_display=true&qfKey={$this->controller->_key}");
@@ -86,42 +103,11 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     $form->_contactIds = [];
     $form->_contactTypes = [];
 
-    // get the submitted values of the search form
-    // we'll need to get fv from either search or adv search in the future
-    $fragment = 'search';
-    if ($form->_action == CRM_Core_Action::ADVANCED) {
-      self::$_searchFormValues = $form->controller->exportValues('Advanced');
-      $fragment .= '/advanced';
-    }
-    elseif ($form->_action == CRM_Core_Action::PROFILE) {
-      self::$_searchFormValues = $form->controller->exportValues('Builder');
-      $fragment .= '/builder';
-    }
-    elseif ($form->_action == CRM_Core_Action::COPY) {
-      self::$_searchFormValues = $form->controller->exportValues('Custom');
-      $fragment .= '/custom';
-    }
-    else {
-      self::$_searchFormValues = $form->controller->exportValues('Basic');
-    }
-
-    //set the user context for redirection of task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $cacheKey = "civicrm search {$qfKey}";
-
-    $url = CRM_Utils_System::url('civicrm/contact/' . $fragment, $urlParams);
-    $session = CRM_Core_Session::singleton();
-    $session->replaceUserContext($url);
-
     $form->_task = self::$_searchFormValues['task'] ?? NULL;
     $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
-
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
+    $cacheKey = "civicrm search {$qfKey}";
     // all contacts or action = save a search
     if ((CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_all') ||
       ($form->_task == CRM_Contact_Task::SAVE_SEARCH)
