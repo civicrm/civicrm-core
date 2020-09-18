@@ -452,6 +452,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     if ($required) {
+      $element->setAttribute('required');
       if ($type == 'file') {
         $error = $this->addRule($name, ts('%1 is a required field.', [1 => $label]), 'uploadedfile');
       }
@@ -684,11 +685,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       if (in_array($button['type'], ['upload', 'next', 'submit', 'done', 'process', 'refresh'])) {
-        $attrs['class'] .= ' validate';
         $defaultIcon = 'fa-check';
       }
       else {
-        $attrs['class'] .= ' cancel';
+        $attrs['formnovalidate'] = 'formnovalidate';
         $defaultIcon = $button['type'] == 'back' ? 'fa-chevron-left' : 'fa-times';
       }
 
@@ -1215,7 +1215,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // We use a class here to avoid html5 issues with collapsed cutsomfield sets.
       $optAttributes['class'] = $optAttributes['class'] ?? '';
       if ($required) {
-        $optAttributes['class'] .= ' required';
+        $optAttributes['required'] = TRUE;
       }
       $element = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
       $options[] = $element;
