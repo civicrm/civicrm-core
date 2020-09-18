@@ -90,46 +90,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
 
     // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
     // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
-    switch ($this->getQueryMode()) {
-      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
-        $entityShortname = 'Contribute';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_MEMBER:
-        $entityShortname = 'Member';
-        $entityDAOName = 'Membership';
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_EVENT:
-        $entityShortname = 'Event';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_PLEDGE:
-        $entityShortname = 'Pledge';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_CASE:
-        $entityShortname = 'Case';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_GRANT:
-        $entityShortname = 'Grant';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
-        $entityShortname = 'Activity';
-        $entityDAOName = $entityShortname;
-        break;
-
-      default:
-        $entityShortname = $this->getComponentName();
-        $entityDAOName = $this->controller->get('entity') ?? $entityShortname;
-    }
+    $entityShortname = $this->getEntityShortName();
 
     if (in_array($entityShortname, $components)) {
       $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
@@ -143,7 +104,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       }
       else {
         $this::$entityShortname = $entityShortname;
-        $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entityDAOName));
+        $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
       }
     }
 
@@ -511,6 +472,72 @@ FROM   {$this->_componentTable}
     $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
     $componentName = explode('_', $formName);
     return $componentName[1];
+  }
+
+  /**
+   * Get the DAO name for the given export.
+   *
+   * @return string
+   */
+  protected function getDAOName(): string {
+    switch ($this->getQueryMode()) {
+      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
+        return 'Contribute';
+
+      case CRM_Contact_BAO_Query::MODE_MEMBER:
+        return 'Membership';
+
+      case CRM_Contact_BAO_Query::MODE_EVENT:
+        return 'Event';
+
+      case CRM_Contact_BAO_Query::MODE_PLEDGE:
+        return 'Pledge';
+
+      case CRM_Contact_BAO_Query::MODE_CASE:
+        return 'Case';
+
+      case CRM_Contact_BAO_Query::MODE_GRANT:
+        return 'Grant';
+
+      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
+        return 'Activity';
+
+      default:
+        return $this->controller->get('entity') ?? $this->getComponentName();
+    }
+  }
+
+  /**
+   * Get the entity short name for a given export.
+   *
+   * @return string
+   */
+  protected function getEntityShortName(): string {
+    switch ($this->getQueryMode()) {
+      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
+        return 'Contribute';
+
+      case CRM_Contact_BAO_Query::MODE_MEMBER:
+        return 'Member';
+
+      case CRM_Contact_BAO_Query::MODE_EVENT:
+        return 'Event';
+
+      case CRM_Contact_BAO_Query::MODE_PLEDGE:
+        return 'Pledge';
+
+      case CRM_Contact_BAO_Query::MODE_CASE:
+        return 'Case';
+
+      case CRM_Contact_BAO_Query::MODE_GRANT:
+        return 'Grant';
+
+      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
+        return 'Activity';
+
+      default:
+        return $this->getComponentName();
+    }
   }
 
 }
