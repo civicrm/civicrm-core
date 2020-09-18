@@ -129,12 +129,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     // $component is used on CRM/Export/Form/Select.tpl to display extra information for contact export
     ($this->_exportMode == self::CONTACT_EXPORT) ? $component = FALSE : $component = TRUE;
     $this->assign('component', $component);
-
-    // Set the task title
-    $componentTasks = $taskClassName::taskTitles();
-    $this->_task = $values['task'];
-    $taskName = $componentTasks[$this->_task];
-    $this->assign('taskName', $taskName);
+    $this->assignTaskName($values);
 
     if ($this->_componentTable) {
       $query = "
@@ -594,6 +589,27 @@ FROM   {$this->_componentTable}
   protected function callPreProcessing(): void {
     $formTaskClassName = $this->getFormTaskName();
     $formTaskClassName::preProcessCommon($this);
+  }
+
+  /**
+   * Set the task title
+   */
+  protected function assignTaskName(): void {
+    $componentTasks = $this->getTaskTitles();
+    $this->_task = $this->getFormValues()['task'];
+    $taskName = $componentTasks[$this->_task];
+    $this->assign('taskName', $taskName);
+  }
+
+  /**
+   * Get the task titles.
+   *
+   * @return array
+   */
+  protected function getTaskTitles() {
+    $taskClassName = $this->getFormTaskName();
+    $componentTasks = $taskClassName::taskTitles();
+    return $componentTasks;
   }
 
 }
