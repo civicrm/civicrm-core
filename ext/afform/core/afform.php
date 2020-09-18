@@ -514,10 +514,7 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
 function _afform_clear() {
   $container = \Civi::container();
   $container->get('afform_scanner')->clear();
-
-  // Civi\Angular\Manager doesn't currently have a way to clear its in-memory
-  // data, so we just reset the whole object.
-  $container->set('angular', NULL);
+  $container->get('angular')->clear();
 }
 
 /**
