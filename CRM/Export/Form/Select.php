@@ -95,7 +95,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       throw new CRM_Core_Exception('Unreachable code');
     }
     $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
-    $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
+    $formTaskClassName = $this->getFormTaskName();
     $taskClassName = "CRM_{$entityShortname}_Task";
     if (isset($formTaskClassName::$entityShortname)) {
       $this::$entityShortname = $formTaskClassName::$entityShortname;
@@ -538,6 +538,15 @@ FROM   {$this->_componentTable}
       default:
         return $this->getComponentName();
     }
+  }
+
+  /**
+   * Get the name of the relevant form task class.
+   *
+   * @return string
+   */
+  protected function getFormTaskName(): string {
+    return "CRM_" . $this->getEntityShortName() . "_Form_Task";
   }
 
 }
