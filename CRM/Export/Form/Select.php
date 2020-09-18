@@ -76,27 +76,27 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this->_componentIds = [];
     $this->_componentClause = NULL;
 
-    // we need to determine component export
-    $components = CRM_Export_BAO_Export::getComponents();
-
     // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
     // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
     $entityShortname = $this->getEntityShortName();
 
-    if (in_array($entityShortname, $components)) {
-      $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
-      $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
-      $taskClassName = "CRM_{$entityShortname}_Task";
-      if (isset($formTaskClassName::$entityShortname)) {
-        $this::$entityShortname = $formTaskClassName::$entityShortname;
-        if (isset($formTaskClassName::$tableName)) {
-          $this::$tableName = $formTaskClassName::$tableName;
-        }
+    if (!in_array($entityShortname, ['Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity'], TRUE)) {
+      // This is never reached - the exception here is just to clarify that entityShortName MUST be one of the above
+      // to save future refactorers & reviewers from asking that question.
+      throw new CRM_Core_Exception('Unreachable code');
+    }
+    $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
+    $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
+    $taskClassName = "CRM_{$entityShortname}_Task";
+    if (isset($formTaskClassName::$entityShortname)) {
+      $this::$entityShortname = $formTaskClassName::$entityShortname;
+      if (isset($formTaskClassName::$tableName)) {
+        $this::$tableName = $formTaskClassName::$tableName;
       }
-      else {
-        $this::$entityShortname = $entityShortname;
-        $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
-      }
+    }
+    else {
+      $this::$entityShortname = $entityShortname;
+      $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
     }
 
     // get the submitted values based on search
@@ -110,7 +110,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       $values = $this->controller->exportValues('Custom');
     }
     else {
-      if (in_array($entityShortname, $components) && $entityShortname !== 'Contact') {
+      if ($entityShortname !== 'Contact') {
         $values = $this->controller->exportValues('Search');
       }
       else {
