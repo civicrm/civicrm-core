@@ -9,6 +9,9 @@
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
+
+      this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
+
       this.selectedRows = [];
       this.limit = CRM.cache.get('searchPageSize', 30);
       this.page = 1;
@@ -74,6 +77,17 @@
         if (!ctrl.params.groupBy[idx]) {
           ctrl.clearParam('groupBy', idx);
         }
+        // Remove aggregate functions when no grouping
+        if (!ctrl.params.groupBy.length) {
+          _.each(ctrl.params.select, function(col, pos) {
+            if (_.contains(col, '(')) {
+              var info = searchMeta.parseExpr(col);
+              if (info.fn.category === 'aggregate') {
+                ctrl.params.select[pos] = info.path + info.suffix;
+              }
+            }
+          });
+        }
       };
 
       /**
@@ -133,6 +147,17 @@
         $('.crm-search-results', $element).css('height', '');
       }
 
+      // Ensure all non-grouped columns are aggregated if using GROUP BY
+      function aggregateGroupByColumns() {
+        if (ctrl.params.groupBy.length) {
+          _.each(ctrl.params.select, function(col, pos) {
+            if (!_.contains(col, '(') && ctrl.canAggregate(col)) {
+              ctrl.params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(' + col + ')';
+            }
+          });
+        }
+      }
+
       // Debounced callback for loadResults
       function _loadResultsCallback() {
         // Multiply limit to read 2 pages at once & save ajax requests
@@ -181,6 +206,7 @@
 
       function loadResults() {
         $scope.loading = true;
+        aggregateGroupByColumns();
         _loadResults();
       }
 
