@@ -416,7 +416,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    *   NOTE: These are raw values from the DB. In current data-model, that means
    *   they are pre-encoded HTML.
    */
-  private static function getSelectedContactNames() {
+  protected static function getSelectedContactNames() {
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
     $cacheKey = "civicrm search {$qfKey}";
 
