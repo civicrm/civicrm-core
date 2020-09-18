@@ -9,6 +9,9 @@
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
+
+      this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
+
       this.selectedRows = [];
       this.limit = CRM.cache.get('searchPageSize', 30);
       this.page = 1;
@@ -74,6 +77,17 @@
         if (!ctrl.params.groupBy[idx]) {
           ctrl.clearParam('groupBy', idx);
         }
+        // Remove aggregate functions when no grouping
+        if (!ctrl.params.groupBy.length) {
+          _.each(ctrl.params.select, function(col, pos) {
+            if (_.contains(col, '(')) {
+              var info = searchMeta.parseExpr(col);
+              if (info.fn.category === 'aggregate') {
+                ctrl.params.select[pos] = info.path + info.suffix;
+              }
+            }
+          });
+        }
       };
 
       /**
@@ -87,6 +101,9 @@
           ctrl.params.orderBy = {};
         }
         ctrl.params.orderBy[col] = dir;
+        if (ctrl.results) {
+          ctrl.refreshPage();
+        }
       };
 
       /**
@@ -128,6 +145,17 @@
 
       function unlockTableHeight() {
         $('.crm-search-results', $element).css('height', '');
+      }
+
+      // Ensure all non-grouped columns are aggregated if using GROUP BY
+      function aggregateGroupByColumns() {
+        if (ctrl.params.groupBy.length) {
+          _.each(ctrl.params.select, function(col, pos) {
+            if (!_.contains(col, '(') && ctrl.canAggregate(col)) {
+              ctrl.params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(' + col + ')';
+            }
+          });
+        }
       }
 
       // Debounced callback for loadResults
@@ -178,6 +206,7 @@
 
       function loadResults() {
         $scope.loading = true;
+        aggregateGroupByColumns();
         _loadResults();
       }
 
@@ -233,6 +262,10 @@
       };
 
       function onChangeSelect(newSelect, oldSelect) {
+        // When removing a column from SELECT, also remove from ORDER BY
+        _.each(_.difference(_.keys(ctrl.params.orderBy), newSelect), function(col) {
+          delete ctrl.params.orderBy[col];
+        });
         // Re-arranging or removing columns doesn't merit a refresh, only adding columns does
         if (!oldSelect || _.difference(newSelect, oldSelect).length) {
           if (ctrl.autoSearch) {
@@ -240,12 +273,6 @@
           } else {
             ctrl.stale = true;
           }
-        }
-      }
-
-      function onChangeOrderBy() {
-        if (ctrl.results) {
-          ctrl.refreshPage();
         }
       }
 
@@ -480,7 +507,6 @@
           format: 'json',
           default: {}
         });
-        $scope.$watchCollection('$ctrl.params.orderBy', onChangeOrderBy);
 
         $scope.$bindToRoute({
           expr: '$ctrl.params.where',
