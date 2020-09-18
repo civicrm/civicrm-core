@@ -207,9 +207,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ];
     $files = [];
     $obj = new CRM_Member_Form_Membership();
-    $rc = call_user_func(['CRM_Member_Form_Membership', 'formRule'],
-      $params, $files, $obj
-    );
+    $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
     $this->assertType('array', $rc);
     $this->assertTrue(array_key_exists('start_date', $rc));
   }
@@ -450,8 +448,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test CRM_Member_Form_Membership::formRule() with a join date
-   *  of six months ago and a fixed membership type
+   *  Test CRM_Member_Form_Membership::formRule() with a current status.
+   *
+   * The setup is a join date of six months ago and a fixed membership type.
    */
   public function testFormRuleFixedJoin6MonthsAgo() {
     $unixNow = time();
@@ -460,7 +459,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('Y-m-d', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
-      'membership_type_id' => [$this->ids['contact']['organization'], '7'],
+      'membership_type_id' => [$this->ids['contact']['organization'], $this->membershipTypeAnnualFixedID],
     ];
     $files = [];
     $obj = new CRM_Member_Form_Membership();
@@ -752,6 +751,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitRecur() {
     CRM_Core_Session::singleton()->getStatus(TRUE);
