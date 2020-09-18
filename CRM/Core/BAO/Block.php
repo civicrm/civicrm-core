@@ -192,14 +192,14 @@ class CRM_Core_BAO_Block {
    * @param string $blockName
    *   Block name.
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param null $entity
+   *   Array of name/value pairs.
+   * @param string $entity
    * @param int $contactId
    *
-   * @return object
-   *   CRM_Core_BAO_Block object on success, null otherwise
+   * @return array|null
+   *   Array of created location entities or NULL if none to create.
    */
-  public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
+  public static function create($blockName, $params, $entity = NULL, $contactId = NULL) {
     if (!self::blockExists($blockName, $params)) {
       return NULL;
     }
