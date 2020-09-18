@@ -87,6 +87,9 @@
           ctrl.params.orderBy = {};
         }
         ctrl.params.orderBy[col] = dir;
+        if (ctrl.results) {
+          ctrl.refreshPage();
+        }
       };
 
       /**
@@ -233,6 +236,10 @@
       };
 
       function onChangeSelect(newSelect, oldSelect) {
+        // When removing a column from SELECT, also remove from ORDER BY
+        _.each(_.difference(_.keys(ctrl.params.orderBy), newSelect), function(col) {
+          delete ctrl.params.orderBy[col];
+        });
         // Re-arranging or removing columns doesn't merit a refresh, only adding columns does
         if (!oldSelect || _.difference(newSelect, oldSelect).length) {
           if (ctrl.autoSearch) {
@@ -240,12 +247,6 @@
           } else {
             ctrl.stale = true;
           }
-        }
-      }
-
-      function onChangeOrderBy() {
-        if (ctrl.results) {
-          ctrl.refreshPage();
         }
       }
 
@@ -480,7 +481,6 @@
           format: 'json',
           default: {}
         });
-        $scope.$watchCollection('$ctrl.params.orderBy', onChangeOrderBy);
 
         $scope.$bindToRoute({
           expr: '$ctrl.params.where',
