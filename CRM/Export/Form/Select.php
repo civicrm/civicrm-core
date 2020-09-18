@@ -124,7 +124,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       }
     }
 
-    $formTaskClassName::preProcessCommon($this);
+    $this->callPreProcessing();
 
     // $component is used on CRM/Export/Form/Select.tpl to display extra information for contact export
     ($this->_exportMode == self::CONTACT_EXPORT) ? $component = FALSE : $component = TRUE;
@@ -586,6 +586,14 @@ FROM   {$this->_componentTable}
       }
     }
     return $values;
+  }
+
+  /**
+   * Call the preprocessing function.
+   */
+  protected function callPreProcessing(): void {
+    $formTaskClassName = $this->getFormTaskName();
+    $formTaskClassName::preProcessCommon($this);
   }
 
 }
