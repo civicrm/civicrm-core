@@ -78,7 +78,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   /**
    * Common pre-processing function.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -88,7 +88,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
     $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
     if ($isStandAlone) {
-      list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
+      [$form->_task, $title] = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
       if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
@@ -103,19 +103,16 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     // we'll need to get fv from either search or adv search in the future
     $fragment = 'search';
     if ($form->_action == CRM_Core_Action::ADVANCED) {
-      self::$_searchFormValues = $form->controller->exportValues('Advanced');
       $fragment .= '/advanced';
     }
     elseif ($form->_action == CRM_Core_Action::PROFILE) {
-      self::$_searchFormValues = $form->controller->exportValues('Builder');
       $fragment .= '/builder';
     }
     elseif ($form->_action == CRM_Core_Action::COPY) {
-      self::$_searchFormValues = $form->controller->exportValues('Custom');
       $fragment .= '/custom';
     }
-    elseif (!$isStandAlone) {
-      self::$_searchFormValues = $form->controller->exportValues('Basic');
+    if (!$isStandAlone) {
+      self::$_searchFormValues = $form->getFormValues();
     }
 
     //set the user context for redirection of task actions
@@ -125,11 +122,11 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       $urlParams .= "&qfKey=$qfKey";
     }
 
-    $cacheKey = "civicrm search {$qfKey}";
-
     $url = CRM_Utils_System::url('civicrm/contact/' . $fragment, $urlParams);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext($url);
+
+    $cacheKey = "civicrm search {$qfKey}";
 
     $form->_task = self::$_searchFormValues['task'] ?? NULL;
     $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
