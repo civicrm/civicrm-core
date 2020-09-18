@@ -54,6 +54,20 @@ class Manager {
   }
 
   /**
+   * Clear out any runtime-cached metadata.
+   *
+   * This is useful if, eg, you have recently added or destroyed Angular modules.
+   *
+   * @return static
+   */
+  public function clear() {
+    $this->cache->clear();
+    $this->modules = NULL;
+    $this->changeSets = NULL;
+    return $this;
+  }
+
+  /**
    * Get a list of AngularJS modules which should be autoloaded.
    *
    * @return array
