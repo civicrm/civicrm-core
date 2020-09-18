@@ -86,19 +86,6 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     $form->_contactIds = [];
     $form->_contactTypes = [];
 
-    $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
-    if ($isStandAlone) {
-      list($form->_task, $title) = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
-      if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-      $form->_contactIds = explode(',', CRM_Utils_Request::retrieve('cids', 'CommaSeparatedIntegers', $form, TRUE));
-      if (empty($form->_contactIds)) {
-        CRM_Core_Error::statusBounce(ts('No Contacts Selected'));
-      }
-      $form->setTitle($title);
-    }
-
     // get the submitted values of the search form
     // we'll need to get fv from either search or adv search in the future
     $fragment = 'search';
@@ -114,7 +101,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
       self::$_searchFormValues = $form->controller->exportValues('Custom');
       $fragment .= '/custom';
     }
-    elseif (!$isStandAlone) {
+    else {
       self::$_searchFormValues = $form->controller->exportValues('Basic');
     }
 
