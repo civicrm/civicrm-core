@@ -55,8 +55,8 @@ class CRM_Member_Task extends CRM_Core_Task {
         self::TASK_EXPORT => [
           'title' => ts('Export members'),
           'class' => [
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Member_Export_Form_Select',
+            'CRM_Member_Export_Form_Map',
           ],
           'result' => FALSE,
         ],

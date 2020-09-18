@@ -18,11 +18,6 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Export_Form_Select_Case extends CRM_Export_Form_Select {
-
-  /**
-   * @var int
-   */
-  protected $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
+class CRM_Member_Export_Form_Map extends CRM_Export_Form_Map {
 
 }
