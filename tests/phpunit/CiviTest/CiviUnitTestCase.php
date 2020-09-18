@@ -3268,6 +3268,7 @@ VALUES
    */
   public function getFormObject($class, $formValues = [], $pageName = '') {
     $_POST = $formValues;
+    /* @var CRM_Core_Form $form */
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     switch ($class) {
@@ -3280,8 +3281,7 @@ VALUES
         $form->controller = new CRM_Core_Controller();
     }
     if (!$pageName) {
-      $formParts = explode('_', $class);
-      $pageName = array_pop($formParts);
+      $pageName = $form->getName();
     }
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
     $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
