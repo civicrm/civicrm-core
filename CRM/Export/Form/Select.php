@@ -108,15 +108,15 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $formTaskClassName = $this->getFormTaskName();
     $taskClassName = "CRM_{$entityShortname}_Task";
     if (isset($formTaskClassName::$entityShortname)) {
-      $this::$entityShortname = $formTaskClassName::$entityShortname;
       if (isset($formTaskClassName::$tableName)) {
         $this::$tableName = $formTaskClassName::$tableName;
       }
     }
     else {
-      $this::$entityShortname = $entityShortname;
       $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
     }
+
+    $this::$entityShortname = $this->getEntityShortNameForThis();
 
     // get the submitted values based on search
     if ($this->_action == CRM_Core_Action::ADVANCED) {
@@ -557,6 +557,21 @@ FROM   {$this->_componentTable}
    */
   protected function getFormTaskName(): string {
     return "CRM_" . $this->getEntityShortName() . "_Form_Task";
+  }
+
+  /**
+   * Legacy code extracted - kinda confusing why it's not just getEntityShortName().
+   *
+   * Case related? -https://github.com/civicrm/civicrm-core/pull/12110
+   *
+   * @return string
+   */
+  protected function getEntityShortNameForThis() {
+    $formTaskClassName = $this->getFormTaskName();
+    if ($formTaskClassName::$entityShortname) {
+      return $formTaskClassName::$entityShortname;
+    }
+    return $this->getEntityShortName();
   }
 
 }
