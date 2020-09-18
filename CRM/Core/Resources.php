@@ -206,8 +206,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     if (is_iterable($bundle)) {
       foreach ($bundle as $b) {
         $this->addBundle($b);
-        return $this;
       }
+      return $this;
     }
 
     if (is_string($bundle)) {

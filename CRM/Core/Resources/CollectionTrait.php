@@ -327,8 +327,8 @@ trait CRM_Core_Resources_CollectionTrait {
     if (is_iterable($bundle)) {
       foreach ($bundle as $b) {
         $this->addBundle($b);
-        return $this;
       }
+      return $this;
     }
     if (is_string($bundle)) {
       $bundle = Civi::service('bundle.' . $bundle);
