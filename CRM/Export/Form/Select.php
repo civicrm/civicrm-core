@@ -108,25 +108,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this::$tableName = $this->getTableName();
 
     $this::$entityShortname = $this->getEntityShortNameForThis();
-
-    // get the submitted values based on search
-    if ($this->_action == CRM_Core_Action::ADVANCED) {
-      $values = $this->controller->exportValues('Advanced');
-    }
-    elseif ($this->_action == CRM_Core_Action::PROFILE) {
-      $values = $this->controller->exportValues('Builder');
-    }
-    elseif ($this->_action == CRM_Core_Action::COPY) {
-      $values = $this->controller->exportValues('Custom');
-    }
-    else {
-      if ($entityShortname !== 'Contact') {
-        $values = $this->controller->exportValues('Search');
-      }
-      else {
-        $values = $this->controller->exportValues('Basic');
-      }
-    }
+    $values = $this->getFormValues();
 
     $count = 0;
     $this->_matchingContacts = FALSE;
@@ -578,6 +560,32 @@ FROM   {$this->_componentTable}
       }
     }
     return CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
+  }
+
+  /**
+   * Get the submitted values based on search.
+   *
+   * @return array
+   */
+  protected function getFormValues(): array {
+    if ($this->_action == CRM_Core_Action::ADVANCED) {
+      $values = $this->controller->exportValues('Advanced');
+    }
+    elseif ($this->_action == CRM_Core_Action::PROFILE) {
+      $values = $this->controller->exportValues('Builder');
+    }
+    elseif ($this->_action == CRM_Core_Action::COPY) {
+      $values = $this->controller->exportValues('Custom');
+    }
+    else {
+      if ($this->getEntityShortName() !== 'Contact') {
+        $values = $this->controller->exportValues('Search');
+      }
+      else {
+        $values = $this->controller->exportValues('Basic');
+      }
+    }
+    return $values;
   }
 
 }
