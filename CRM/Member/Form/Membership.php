@@ -225,7 +225,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $cMemTypes[] = $mem['membership_type_id'];
         }
         if (count($cMemTypes) > 0) {
-          $memberorgs = CRM_Member_BAO_MembershipType::getMemberOfContactByMemTypes($cMemTypes);
+          foreach ($cMemTypes as $memTypeID) {
+            $memberorgs[$memTypeID] = CRM_Member_BAO_MembershipType::getMembershipType($memTypeID)['member_of_contact_id'];
+          }
           $mems_by_org = [];
           foreach ($contactMemberships as $mem) {
             $mem['member_of_contact_id'] = $memberorgs[$mem['membership_type_id']] ?? NULL;
@@ -759,8 +761,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $endDate = CRM_Utils_Date::processDate($params['end_date']);
         }
 
-        $membershipDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
-
+        $membershipDetails = CRM_Member_BAO_MembershipType::getMembershipType($memType);
         if ($startDate && CRM_Utils_Array::value('period_type', $membershipDetails) === 'rolling') {
           if ($startDate < $joinDate) {
             $errors['start_date'] = ts('Start date must be the same or later than Member since.');
