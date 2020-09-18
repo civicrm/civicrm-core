@@ -52,16 +52,6 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
 
   public $_componentTable;
 
-
-  /**
-   * Use the form name to create the tpl file name.
-   *
-   * @return string
-   */
-  public function getTemplateFileName() {
-    return 'CRM/Export/Form/Select.tpl';
-  }
-
   /**
    * Use the form name to create the tpl file name.
    *
@@ -129,7 +119,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     // $component is used on CRM/Export/Form/Select.tpl to display extra information for contact export
     ($this->_exportMode == self::CONTACT_EXPORT) ? $component = FALSE : $component = TRUE;
     $this->assign('component', $component);
-    $this->assignTaskName($values);
+    $this->assignTaskName();
 
     if ($this->_componentTable) {
       $query = "
@@ -462,9 +452,6 @@ FROM   {$this->_componentTable}
       case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
         return 'Contribute';
 
-      case CRM_Contact_BAO_Query::MODE_MEMBER:
-        return 'Membership';
-
       case CRM_Contact_BAO_Query::MODE_EVENT:
         return 'Event';
 
@@ -494,9 +481,6 @@ FROM   {$this->_componentTable}
     switch ($this->getQueryMode()) {
       case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
         return 'Contribute';
-
-      case CRM_Contact_BAO_Query::MODE_MEMBER:
-        return 'Member';
 
       case CRM_Contact_BAO_Query::MODE_EVENT:
         return 'Event';
