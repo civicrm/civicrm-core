@@ -105,16 +105,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       throw new CRM_Core_Exception('Unreachable code');
     }
     $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
-    $formTaskClassName = $this->getFormTaskName();
-    $taskClassName = "CRM_{$entityShortname}_Task";
-    if (isset($formTaskClassName::$entityShortname)) {
-      if (isset($formTaskClassName::$tableName)) {
-        $this::$tableName = $formTaskClassName::$tableName;
-      }
-    }
-    else {
-      $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
-    }
+    $this::$tableName = $this->getTableName();
 
     $this::$entityShortname = $this->getEntityShortNameForThis();
 
@@ -572,6 +563,21 @@ FROM   {$this->_componentTable}
       return $formTaskClassName::$entityShortname;
     }
     return $this->getEntityShortName();
+  }
+
+  /**
+   * Get the table name for the entity to export.
+   *
+   * @return string
+   */
+  protected function getTableName(): string {
+    $formTaskClassName = $this->getFormTaskName();
+    if (isset($formTaskClassName::$entityShortname)) {
+      if (isset($formTaskClassName::$tableName)) {
+        return $formTaskClassName::$tableName;
+      }
+    }
+    return CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
   }
 
 }
