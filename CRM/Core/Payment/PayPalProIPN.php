@@ -471,6 +471,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         return;
       }
 
+      $input['payment_processor_id'] = $paymentProcessorID;
+
       self::$_paymentProcessor = &$objects['paymentProcessor'];
       //?? how on earth would we not have component be one of these?
       // they are the only valid settings & this IPN file can't even be called without one of them

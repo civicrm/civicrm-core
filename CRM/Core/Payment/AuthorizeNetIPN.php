@@ -86,6 +86,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
           if ($objects['contribution']->contribution_status_id == 1) {
             $first = FALSE;
           }
+          $input['payment_processor_id'] = $paymentProcessorID;
           return $this->recur($input, $ids, $objects, $first);
         }
       }

@@ -345,6 +345,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
 
+      $input['payment_processor_id'] = $paymentProcessorID;
+
       self::$_paymentProcessor = &$objects['paymentProcessor'];
       if ($component == 'contribute') {
         if ($ids['contributionRecur']) {
