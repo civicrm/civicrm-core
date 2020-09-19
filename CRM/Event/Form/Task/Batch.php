@@ -312,43 +312,15 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    *
    */
   public static function updateContributionStatus($params) {
-    // get minimum required values.
-    $componentId = $params['component_id'] ?? NULL;
-    $contributionId = $params['contribution_id'] ?? NULL;
-
-    $input = $ids = $objects = [];
-
-    //get the required ids.
-    $ids['contribution'] = $contributionId;
-    $ids['participant'] = $params['component_id'];
-
-    if (!$ids['contact'] = CRM_Utils_Array::value('contact_id', $params)) {
-      $ids['contact'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-        $contributionId,
-        'contact_id'
-      );
-    }
-
-    if (!$ids['event'] = CRM_Utils_Array::value('event_id', $params)) {
-      $ids['event'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-        $componentId,
-        'event_id'
-      );
-    }
-
-    $input['component'] = 'event';
-
-    $baseIPN = new CRM_Core_Payment_BaseIPN();
+    $input = ['component' => 'event'];
 
     // reset template values.
     $template = CRM_Core_Smarty::singleton();
     $template->clearTemplateVars();
 
-    if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-      throw new CRM_Core_Exception('validation error');
-    }
-
-    $contribution = &$objects['contribution'];
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $params['contribution_id'];
+    $contribution->fetch();
 
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
       'labelColumn' => 'name',
@@ -387,10 +359,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
     // as this method is not preferred / supported.
     CRM_Contribute_BAO_Contribution::completeOrder($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
-      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+      'related_contact' => NULL,
+      'participant' => $params['component_id'],
       'contributionRecur' => NULL,
-    ], $objects);
+    ], ['contribution' => $contribution]);
 
     // reset template values before processing next transactions
     $template->clearTemplateVars();
