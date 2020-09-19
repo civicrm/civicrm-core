@@ -4204,7 +4204,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     // New Contribution and update of contribution with tax rate financial type
-    if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) &&
+    if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) && $taxRates[$params['financial_type_id']] > 0 &&
       empty($params['skipLineItem']) && !$isLineItem
     ) {
       $taxRateParams = $taxRates[$params['financial_type_id']];
