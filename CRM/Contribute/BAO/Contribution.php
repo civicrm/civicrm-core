@@ -4448,7 +4448,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
     $contributionID = (int) $contribution->id;
 
-    if ($input['component'] == 'contribute') {
+    if ($input['component'] === 'contribute') {
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
         self::updateMembershipBasedOnCompletionOfContribution(
           $contributionID,
@@ -4457,7 +4457,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     else {
-      if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
+      if (empty($input['skipParticipantUpdate'])) {
         $participantParams['id'] = $participantID;
         $participantParams['status_id'] = 'Registered';
         civicrm_api3('Participant', 'create', $participantParams);

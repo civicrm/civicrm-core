@@ -278,13 +278,11 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
     $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     if (array_key_exists($statusId, $positiveStatuses)) {
       $params = [
         'component_id' => $participantId,
         'contribution_id' => $contributionId,
-        'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
       ];
 
       //change related contribution status.
@@ -326,7 +324,8 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'labelColumn' => 'name',
       'flip' => 1,
     ]);
-    $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = $params['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] ?? NULL;
+
+    $input['skipParticipantUpdate'] = TRUE;
 
     // status is not pending
     if ($contribution->contribution_status_id != $contributionStatuses['Pending']) {
