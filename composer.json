@@ -79,7 +79,10 @@
     "brick/money": "~0.4",
     "ext-intl": "*",
     "pear/mail_mime": "~1.10",
-    "pear/db": "1.10"
+    "pear/db": "1.10",
+    "scssphp/scssphp": "~1.2",
+    "padaliyajay/php-autoprefixer": "~1.2",
+    "civicrm/composer-compile-plugin": "~0.6"
   },
   "scripts": {
     "post-install-cmd": [
@@ -195,6 +198,12 @@
       "es6-promise": {
         "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
       },
+      "ext-greenwich-bootstrap3": {
+        "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
+        "path": "ext/greenwich/extern/bootstrap3",
+        "version": "3.4.1",
+        "ignore": ["test", "tasks", "lib"]
+      },
       "font-awesome": {
         "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
         "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
@@ -273,6 +282,7 @@
       "zetacomponents/mail": {
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
       }
-    }
+    },
+    "compile-includes": ["ext/greenwich/composer.compile.json"]
   }
 }

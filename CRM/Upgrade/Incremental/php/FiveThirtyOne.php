@@ -52,19 +52,6 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
   /**
    * Upgrade function.
    *
@@ -74,6 +61,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Remove Eway Single Currency Payment Processor type if not used or install the new extension for it', 'enableEwaySingleExtension');
     $this->addTask('dev/core#1486 Remove FKs from ACL Cache tables', 'removeFKsFromACLCacheTables');
+    $this->addTask('Activate core extension "Greenwich"', 'installGreenwich');
   }
 
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
@@ -111,6 +99,37 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
     CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_contact_cache', 'FK_civicrm_acl_contact_cache_contact_id');
     CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_cache', 'FK_civicrm_acl_cache_contact_id');
     CRM_Core_BAO_SchemaHandler::createIndexes(['civicrm_acl_cache' => ['contact_id']]);
+    return TRUE;
+  }
+
+  /**
+   * Install greenwich extensions.
+   *
+   * This feature is restructured as a core extension - which is primarily a code cleanup step.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function installGreenwich(CRM_Queue_TaskContext $ctx) {
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic.
+    // (2) On new installs, the extension is activated purely via default SQL INSERT.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'greenwich',
+      'name' => 'Theme: Greenwich',
+      'label' => 'Theme: Greenwich',
+      'file' => 'greenwich',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+
     return TRUE;
   }
 

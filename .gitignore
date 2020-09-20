@@ -6,6 +6,9 @@
 !/ext/flexmailer
 !/ext/eventcart
 !/ext/ewaysingle
+!/ext/greenwich
+/ext/greenwich/dist
+/ext/greenwich/extern
 !/ext/search
 !/ext/financialacls
 backdrop/
