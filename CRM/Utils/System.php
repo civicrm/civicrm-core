@@ -1915,4 +1915,12 @@ class CRM_Utils_System {
     $config = CRM_Core_Config::singleton()->userSystem->sendResponse($response);
   }
 
+  /**
+   * Perform any necessary actions prior to redirecting via POST.
+   */
+  public static function prePostRedirect() {
+    $config = CRM_Core_Config::singleton();
+    $config->userSystem->paypalBeforeRedirect();
+  }
+
 }

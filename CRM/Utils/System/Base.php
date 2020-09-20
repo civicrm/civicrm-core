@@ -998,4 +998,10 @@ abstract class CRM_Utils_System_Base {
     return FALSE;
   }
 
+  /**
+   * Perform any necessary actions prior to redirecting via POST.
+   */
+  public function prePostRedirect() {
+  }
+
 }
