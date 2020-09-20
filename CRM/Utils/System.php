@@ -511,7 +511,7 @@ class CRM_Utils_System {
     }
 
     self::setHttpHeader('Location', $url);
-    self::civiExit();
+    self::civiExit(0, ['url' => $url, 'context' => 'redirect']);
   }
 
   /**
@@ -1919,8 +1919,7 @@ class CRM_Utils_System {
    * Perform any necessary actions prior to redirecting via POST.
    */
   public static function prePostRedirect() {
-    $config = CRM_Core_Config::singleton();
-    $config->userSystem->paypalBeforeRedirect();
+    CRM_Core_Config::singleton()->userSystem->prePostRedirect();
   }
 
 }
