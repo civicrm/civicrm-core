@@ -28,6 +28,8 @@
       payment_processor.hide();
       payment_information.hide();
       billing_block.hide();
+      // Ensure that jquery validation doesn't block submission when we don't need to fill in the billing details section
+      cj('#billing-payment-block select.crm-select2').addClass('crm-no-validate');
       // also unset selected payment methods
       cj('input[name="payment_processor_id"]').removeProp('checked');
     }
@@ -36,6 +38,7 @@
       payment_processor.show();
       payment_information.show();
       billing_block.show();
+      cj('#billing-payment-block select.crm-select2').removeClass('crm-no-validate');
       // also set selected payment methods
       cj('input[name="payment_processor_id"][checked=checked]').prop('checked', true);
     }

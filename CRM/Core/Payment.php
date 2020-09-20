@@ -1131,7 +1131,7 @@ abstract class CRM_Core_Payment {
         '' => ts('- select -'),
       ] + CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
-      'extra' => ['class' => 'required'],
+      'extra' => ['class' => 'required crm-form-select2 crm-select2'],
     ];
     return $metadata;
   }
