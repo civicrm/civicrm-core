@@ -488,7 +488,7 @@ function afform_civicrm_alterMenu(&$items) {
  * @see CRM_Utils_Hook::permission_check()
  */
 function afform_civicrm_permission_check($permission, &$granted, $contactId) {
-  if ($permission{0} !== '@') {
+  if ($permission[0] !== '@') {
     // Micro-optimization - this function may get hit a lot.
     return;
   }
@@ -533,7 +533,7 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
       foreach (preg_split('/[-_ ]/', $fileBaseName, NULL, PREG_SPLIT_NO_EMPTY) as $shortNamePart) {
         $camelCase .= ucfirst($shortNamePart);
       }
-      return strtolower($camelCase{0}) . substr($camelCase, 1);
+      return strtolower($camelCase[0]) . substr($camelCase, 1);
 
     case 'dash':
       return strtolower(implode('-', preg_split('/[-_ ]|(?=[A-Z])/', $fileBaseName, NULL, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE)));
