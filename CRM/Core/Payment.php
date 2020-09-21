@@ -1688,7 +1688,8 @@ abstract class CRM_Core_Payment {
    * @param null $entity
    * @param string $action
    *
-   * @return string
+   * @return string|null
+   * @throws \CRM_Core_Exception
    */
   public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     // Set URL
