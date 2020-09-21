@@ -4155,11 +4155,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Get the tax amount (misnamed function).
    *
    * @param array $params
-   * @param bool $isLineItem
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function checkTaxAmount($params, $isLineItem = FALSE) {
+  protected static function checkTaxAmount($params) {
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
 
     // Update contribution.
@@ -4205,8 +4205,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     // New Contribution and update of contribution with tax rate financial type
     if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) &&
-      empty($params['skipLineItem']) && !$isLineItem
-    ) {
+      empty($params['skipLineItem'])) {
       $taxRateParams = $taxRates[$params['financial_type_id']];
       $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams);
       $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
