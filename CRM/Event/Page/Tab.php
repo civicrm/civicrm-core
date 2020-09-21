@@ -287,7 +287,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       );
       $controller->setEmbedded(TRUE);
       $controller->set('force', 1);
-      $controller->set('cid', $this->_contactId);
+      $controller->set('skip_cid', TRUE);
       $controller->set('participantId', $this->_id);
       $controller->set('context', 'contribution');
       $controller->process();

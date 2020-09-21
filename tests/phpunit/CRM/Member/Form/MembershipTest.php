@@ -1558,4 +1558,77 @@ Expires: ',
     $this->assertCount(1, $contribution['values'], 'Completed contribution should be fetched.');
   }
 
+  /**
+   * Test Membership Payment owned by other contact, membership view should show all contribution records in listing.
+   * is other contact.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
+  public function testMembershipViewContributionOwnerDifferent() {
+    // Membership Owner
+    $contactId1 = $this->individualCreate();
+
+    // Contribution Onwer
+    $contactId2 = $this->individualCreate();
+
+    // create new membership type
+    $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', [
+      'domain_id' => 1,
+      'name' => 'AnnualFixed 2',
+      'member_of_contact_id' => 23,
+      'duration_unit' => 'year',
+      'minimum_fee' => 50,
+      'duration_interval' => 1,
+      'period_type' => 'fixed',
+      'fixed_period_start_day' => '101',
+      'fixed_period_rollover_day' => '1231',
+      'financial_type_id' => 2,
+    ]);
+
+    // create Membership
+    $membershipId = $this->contactMembershipCreate([
+      'contact_id' => $contactId1,
+      'membership_type_id' => $membershipTypeAnnualFixed['id'],
+      'status_id' => 'New',
+    ]);
+
+    // 1st Payment
+    $contriParams = [
+      'membership_id' => $membershipId,
+      'total_amount' => 25,
+      'financial_type_id' => 2,
+      'contact_id' => $contactId2,
+    ];
+    $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
+
+    // 2nd Payment
+    $contriParams = [
+      'membership_id' => $membershipId,
+      'total_amount' => 25,
+      'financial_type_id' => 2,
+      'contact_id' => $contactId2,
+    ];
+    $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
+
+    // View Membership record
+    $membershipViewForm = new CRM_Member_Form_MembershipView();
+    $membershipViewForm->controller = new CRM_Core_Controller_Simple('CRM_Member_Form_MembershipView', 'View Membership');
+    $membershipViewForm->set('id', $membershipId);
+    $membershipViewForm->set('context', 'membership');
+    $membershipViewForm->controller->setEmbedded(TRUE);
+    $membershipViewForm->preProcess();
+
+    // get contribution rows related to membership payments
+    $templateVar = $membershipViewForm->getTemplate()->get_template_vars('rows');
+
+    $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
+    $this->assertEquals($templateVar[0]['contact_id'], $contactId2);
+
+    $this->assertEquals($templateVar[1]['contribution_id'], $contribution2->id);
+    $this->assertEquals($templateVar[1]['contact_id'], $contactId2);
+    $this->assertEquals(count($templateVar), 2);
+  }
+
 }
