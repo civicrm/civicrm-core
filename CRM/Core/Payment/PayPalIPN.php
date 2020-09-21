@@ -248,24 +248,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->total_amount = $input['amount'];
     }
 
-    $status = $input['paymentStatus'];
-    if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
-      $this->failed($objects);
-      return;
-    }
-    if ($status === 'Pending') {
-      Civi::log()->debug('Returning since contribution status is Pending');
-      return;
-    }
-    elseif ($status === 'Refunded' || $status === 'Reversed') {
-      $this->cancelled($objects);
-      return;
-    }
-    elseif ($status !== 'Completed') {
-      Civi::log()->debug('Returning since contribution status is not handled');
-      return;
-    }
-
     // check if contribution is already completed, if so we ignore this ipn
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     if ($contribution->contribution_status_id == $completedStatusId) {
@@ -365,6 +347,23 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           $this->recur($input, $ids, $objects, $first);
           return;
         }
+      }
+      $status = $input['paymentStatus'];
+      if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
+        $this->failed($objects);
+        return;
+      }
+      if ($status === 'Pending') {
+        Civi::log()->debug('Returning since contribution status is Pending');
+        return;
+      }
+      if ($status === 'Refunded' || $status === 'Reversed') {
+        $this->cancelled($objects);
+        return;
+      }
+      if ($status !== 'Completed') {
+        Civi::log()->debug('Returning since contribution status is not handled');
+        return;
       }
       $this->single($input, $ids, $objects);
     }
