@@ -437,7 +437,7 @@
     notificationStatusIds = notificationStatusIds.split(',');
     if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
       cj("#notify").show();
-      cj("#is_notify").prop('checked', true);
+      cj("#is_notify").prop('checked', false);
     }
     else {
       cj("#notify").hide();
