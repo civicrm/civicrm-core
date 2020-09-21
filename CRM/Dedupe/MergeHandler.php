@@ -198,15 +198,15 @@ class CRM_Dedupe_MergeHandler {
    *
    * @param int $otherBlockId
    * @param string $name
-   * @param int $blkCount
+   * @param int $blockIndex
    *
    * @return CRM_Core_DAO_Address|CRM_Core_DAO_Email|CRM_Core_DAO_IM|CRM_Core_DAO_Phone|CRM_Core_DAO_Website
    *
    * @throws \CRM_Core_Exception
    */
-  public function copyDataToNewBlockDAO($otherBlockId, $name, $blkCount) {
+  public function copyDataToNewBlockDAO($otherBlockId, $name, $blockIndex) {
     // For the block which belongs to other-contact, link the location block to main-contact
-    $otherBlockDAO = $this->getDAOForLocationEntity($name, $this->getSelectedLocationType($name, $blkCount), $this->getSelectedType($name, $blkCount));
+    $otherBlockDAO = $this->getDAOForLocationEntity($name, $this->getSelectedLocationType($name, $blockIndex), $this->getSelectedType($name, $blockIndex));
     $otherBlockDAO->contact_id = $this->getToKeepID();
     // Get the ID of this block on the 'other' contact, otherwise skip
     $otherBlockDAO->id = $otherBlockId;
