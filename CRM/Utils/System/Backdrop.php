@@ -525,7 +525,7 @@ AND    u.status = 1
     // load Backdrop bootstrap
     chdir($cmsPath);
     if (!defined('BACKDROP_ROOT')) {
-        define('BACKDROP_ROOT', $cmsPath);
+      define('BACKDROP_ROOT', $cmsPath);
     }
 
     // For Backdrop multi-site CRM-11313
