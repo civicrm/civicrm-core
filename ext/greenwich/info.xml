@@ -19,9 +19,9 @@
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.31</ver>
   </compatibility>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
