@@ -277,7 +277,7 @@ ORDER BY id
       AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
     ";
     $params = [
-      1 => [CRM_Core_BAO_Cache::cleanKey('CiviCRM Search PrevNextCache'), 'String'],
+      1 => [CRM_Utils_Cache::cleanKey('CiviCRM Search PrevNextCache'), 'String'],
       2 => [self::cacheDays, 'Integer'],
     ];
     CRM_Core_DAO::executeQuery($sql, $params);
