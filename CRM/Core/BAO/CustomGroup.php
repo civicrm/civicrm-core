@@ -1121,53 +1121,16 @@ ORDER BY civicrm_custom_group.weight,
    * @see _apachesolr_civiAttachments_dereference_file_parent
    */
   public static function getTableNameByEntityName($entityType) {
-    $tableName = '';
     switch ($entityType) {
       case 'Contact':
       case 'Individual':
       case 'Household':
       case 'Organization':
-        $tableName = 'civicrm_contact';
-        break;
+        return 'civicrm_contact';
 
-      case 'Contribution':
-        $tableName = 'civicrm_contribution';
-        break;
-
-      case 'Group':
-        $tableName = 'civicrm_group';
-        break;
-
-      // DRAFTING: Verify if we cannot make it pluggable
-
-      case 'Activity':
-        $tableName = 'civicrm_activity';
-        break;
-
-      case 'Relationship':
-        $tableName = 'civicrm_relationship';
-        break;
-
-      case 'Membership':
-        $tableName = 'civicrm_membership';
-        break;
-
-      case 'Participant':
-        $tableName = 'civicrm_participant';
-        break;
-
-      case 'Event':
-        $tableName = 'civicrm_event';
-        break;
-
-      case 'Grant':
-        $tableName = 'civicrm_grant';
-        break;
-
-      // need to add cases for Location, Address
+      default:
+        return CRM_Core_DAO_AllCoreTables::getTableForEntityName($entityType);
     }
-
-    return $tableName;
   }
 
   /**
