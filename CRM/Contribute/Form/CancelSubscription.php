@@ -179,7 +179,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
    */
   public function setDefaultValues() {
     return [
-      'is_notify' => 1,
       'send_cancel_request' => 1,
     ];
   }
