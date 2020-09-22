@@ -60,7 +60,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       'send_later' => ['id' => 'send_later'],
     ]);
 
-    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => time()]);
+    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => date('Y-m-d')]);
 
     $this->addFormRule(['CRM_SMS_Form_Schedule', 'formRule'], $this);
 

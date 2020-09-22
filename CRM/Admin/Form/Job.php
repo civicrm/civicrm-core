@@ -97,7 +97,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
 
     // CRM-17686
-    $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, ['minDate' => time()]);
+    $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, ['minDate' => date('Y-m-d')]);
 
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"
