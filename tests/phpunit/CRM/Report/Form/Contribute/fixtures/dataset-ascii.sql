@@ -76,7 +76,7 @@ INSERT INTO `civicrm_contribution` (`id`, `contact_id`, `financial_type_id`, `co
 --
 
 INSERT INTO `civicrm_email` (`id`, `contact_id`, `location_type_id`, `email`, `is_primary`, `is_billing`, `on_hold`, `is_bulkmail`, `hold_date`, `reset_date`, `signature_text`, `signature_html`) VALUES
-(1, 1, 1, 'fixme.domainemail@example.org', 0, 0, 0, 0, NULL, NULL, NULL, NULL),
+(1, 1, 1, 'fixme.domainemail@example.org', 1, 0, 0, 0, NULL, NULL, NULL, NULL),
 (7, 71, 1, 'grantm@fishmail.net', 1, 0, 0, 0, NULL, NULL, NULL, NULL),
 (41, 2, 1, 'merrie@testmail.co.nz', 1, 0, 0, 0, NULL, NULL, NULL, NULL),
 (42, 2, 1, 'merriechowski95@notmail.info', 0, 0, 0, 0, NULL, NULL, NULL, NULL),
