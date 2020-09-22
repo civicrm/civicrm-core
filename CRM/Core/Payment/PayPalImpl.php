@@ -991,7 +991,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $paypalURL = "{$url}{$sub}?$uri";
 
     // Allow each CMS to do a pre-flight check before redirecting to PayPal.
-    CRM_Utils_System::prePostRedirect();
+    CRM_Core_Config::singleton()->userSystem->prePostRedirect();
 
     CRM_Utils_System::redirect($paypalURL);
   }
