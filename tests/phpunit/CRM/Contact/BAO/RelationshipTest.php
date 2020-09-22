@@ -224,11 +224,13 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals([$orgToPersonTypeId1, $orgToPersonTypeId2], $membershipType['relationship_type_id']);
     $this->assertEquals(['b_a', 'b_a'], $membershipType['relationship_direction']);
 
+    $startDate = date('Y-m') . '-19';
+    $joinDate = date('Y-m', strtotime('1 month ago')) . '-19';
     $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $membershipType['id'],
       'contact_id' => $organisationID,
-      'start_date' => '2019-08-19',
-      'join_date' => '2019-07-19',
+      'start_date' => $startDate,
+      'join_date' => $joinDate,
     ]);
 
     $relationshipOne = $this->callAPISuccess('Relationship', 'create', [
@@ -245,8 +247,8 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
 
     $inheritedMembership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $individualID]);
-    $this->assertEquals('2019-08-19', $inheritedMembership['start_date']);
-    $this->assertEquals('2019-07-19', $inheritedMembership['join_date']);
+    $this->assertEquals($startDate, $inheritedMembership['start_date']);
+    $this->assertEquals($joinDate, $inheritedMembership['join_date']);
 
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $organisationID], 1);
     // Disable the relationship & check the membership is not removed because the other relationship is still valid.
