@@ -332,7 +332,12 @@ class PrevNextTest extends \CiviEndToEndTestCase {
       $cacheKey = $this->cacheKey;
     }
     $selected = $this->prevNext->getSelection($cacheKey, $action)[$cacheKey];
-    $this->assertEquals($ids, array_keys($selected), 'selected cache not correct for ' . $cacheKey . 'defined keys are ' . $this->cacheKey . 'and ' . $this->cacheKeyB);
+    $this->assertEquals($ids, array_keys($selected), 'selected cache not correct for ' . $cacheKey
+      . ' defined keys are ' . $this->cacheKey . 'and ' . $this->cacheKeyB
+      . ' result from getall is ' . print_r($this->prevNext->getSelection($cacheKey, 'getall'), 1)
+      . ' and the prevNext cache is ' . print_r($this->prevNext, TRUE)
+    );
+
     $this->assertCount(count($ids), $selected);
   }
 
