@@ -1864,6 +1864,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
           $blocksDAO[$name]['update'][$otherBlockDAO->id] = $otherBlockDAO;
         }
+        $blocksDAO[$name]['update'] += $mergeHandler->getBlocksToUpdateForDeletedContact($name);
       }
     }
 

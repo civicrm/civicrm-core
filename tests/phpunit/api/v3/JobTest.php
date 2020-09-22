@@ -45,6 +45,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
   private $report_instance;
 
   /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = TRUE;
+
+  /**
    * Set up for tests.
    */
   public function setUp() {
