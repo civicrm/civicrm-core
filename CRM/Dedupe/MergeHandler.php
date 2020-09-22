@@ -196,18 +196,19 @@ class CRM_Dedupe_MergeHandler {
    * This is intended as a refactoring step - not the long term function. Do not
    * call from any function other than the one it is taken from (Merger::mergeLocations).
    *
-   * @param string $daoName
    * @param int $otherBlockId
    * @param string $name
    * @param int $blkCount
    *
-   * @return mixed
+   * @return CRM_Core_DAO_Address|CRM_Core_DAO_Email|CRM_Core_DAO_IM|CRM_Core_DAO_Phone|CRM_Core_DAO_Website
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function copyDataToNewBlockDAO(string $daoName, $otherBlockId, $name, $blkCount) {
+  public function copyDataToNewBlockDAO($otherBlockId, $name, $blkCount) {
     $locationBlocks = CRM_Dedupe_Merger::getLocationBlockInfo();
     $migrationInfo = $this->getMigrationInfo();
     // For the block which belongs to other-contact, link the location block to main-contact
-    $otherBlockDAO = new $daoName();
+    $otherBlockDAO = $this->getDAOForLocationEntity($name);
     $otherBlockDAO->contact_id = $this->getToKeepID();
 
     // Get the ID of this block on the 'other' contact, otherwise skip
@@ -223,6 +224,37 @@ class CRM_Dedupe_MergeHandler {
       $otherBlockDAO->{$locationBlocks[$name]['hasType']} = $typeTypeId;
     }
     return $otherBlockDAO;
+  }
+
+  /**
+   * Get the DAO object appropriate to the location entity.
+   *
+   * @param string $entity
+   *
+   * @return CRM_Core_DAO_Address|CRM_Core_DAO_Email|CRM_Core_DAO_IM|CRM_Core_DAO_Phone|CRM_Core_DAO_Website
+   * @throws \CRM_Core_Exception
+   */
+  public function getDAOForLocationEntity($entity) {
+    switch ($entity) {
+      case 'email':
+        return new CRM_Core_DAO_Email();
+
+      case 'address':
+        return new CRM_Core_DAO_Address();
+
+      case 'phone':
+        return new CRM_Core_DAO_Phone();
+
+      case 'website':
+        return new CRM_Core_DAO_Website();
+
+      case 'im':
+        return new CRM_Core_DAO_IM();
+
+      default:
+        // Mostly here, along with the switch over a more concise format, to help IDEs understand the possibilities.
+        throw new CRM_Core_Exception('Unsupported entity');
+    }
   }
 
 }
