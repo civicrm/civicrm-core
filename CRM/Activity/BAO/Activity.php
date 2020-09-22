@@ -1694,14 +1694,11 @@ WHERE      activity.id IN ($activityIds)";
    */
   public static function addActivity(
     $activity,
-    $activityType = 'Membership Signup',
+    $activityType,
     $targetContactID = NULL,
     $params = []
   ) {
     $date = date('YmdHis');
-    if ($activity->__table === 'civicrm_participant' && $activityType !== 'Email') {
-      $activityType = 'Event Registration';
-    }
     if ($activity->__table == 'civicrm_contribution') {
       // create activity record only for Completed Contributions
       $contributionCompletedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
@@ -1712,7 +1709,6 @@ WHERE      activity.id IN ($activityIds)";
         }
         $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
       }
-      $activityType = 'Contribution';
 
       // retrieve existing activity based on source_record_id and activity_type
       if (empty($params['id'])) {
