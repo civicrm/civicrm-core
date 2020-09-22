@@ -4167,6 +4167,30 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test retrieving merged contacts.
+   *
+   * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergedGetWithPermanentlyDeletedContact() {
+    $this->contactIDs[] = $this->individualCreate();
+    $this->contactIDs[] = $this->individualCreate();
+    $this->contactIDs[] = $this->individualCreate();
+    $this->contactIDs[] = $this->individualCreate();
+
+    // First do an 'unnatural merge' - they 'like to merge into the lowest but this will mean that contact 0 merged to contact [3].
+    // When the batch merge runs.... the new lowest contact is contact[1]. All contacts will merge into that contact,
+    // including contact[3], resulting in only 3 existing at the end. For each contact the correct answer to 'who did I eventually
+    // wind up being should be [1]
+    $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $this->contactIDs[0], 'to_keep_id' => $this->contactIDs[3]]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $this->contactIDs[3], 'skip_undelete' => TRUE]);
+    $this->callAPIFailure('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $this->contactIDs[0]]);
+    $title = CRM_Contact_Page_View::setTitle($this->contactIDs[0], TRUE);
+    $this->assertContains('civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4', $title);
+  }
+
+  /**
    * Test merging 2 contacts with delete to trash off.
    *
    * We are checking that there is no error due to attempting to add an activity for the
