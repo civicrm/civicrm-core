@@ -2657,4 +2657,22 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is invoked when processing reminder.
+   *
+   * @param object $tokenRow
+   * @param object $actionSchedule
+   * @param int $contactID
+   * @param array $errors
+   *
+   * @return mixed
+   */
+  public static function sendReminder($tokenRow, $actionSchedule, $contactID, &$errors) {
+    return self::singleton()->invoke(
+      ['tokenRow', 'actionSchedule', 'contactID', 'errors'],
+      $tokenRow, $actionSchedule, $contactID, $errors, self::$_nullObject,
+      self::$_nullObject, 'civicrm_sendReminder'
+    );
+  }
+
 }
