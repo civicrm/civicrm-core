@@ -445,8 +445,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   The array that holds all the db ids.
    *
    * @return CRM_Contribute_BAO_Contribution
    *
@@ -454,15 +452,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function create(&$params, $ids = []) {
+  public static function create(&$params) {
 
     $transaction = new CRM_Core_Transaction();
 
     try {
-      if (!isset($params['id']) && isset($ids['contribution'])) {
-        CRM_Core_Error::deprecatedFunctionWarning('ids should not be used for contribution create');
-        $params['id'] = $ids['contribution'];
-      }
       $contribution = self::add($params);
     }
     catch (CRM_Core_Exception $e) {
