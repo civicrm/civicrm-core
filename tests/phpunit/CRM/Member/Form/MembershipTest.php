@@ -1574,10 +1574,10 @@ Expires: ',
     $contactId2 = $this->individualCreate();
 
     // create new membership type
-    $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', [
+    $membershipTypeAnnualFixed = $this->callAPISuccess('MembershipType', 'create', [
       'domain_id' => 1,
       'name' => 'AnnualFixed 2',
-      'member_of_contact_id' => 23,
+      'member_of_contact_id' => $this->organizationCreate(),
       'duration_unit' => 'year',
       'minimum_fee' => 50,
       'duration_interval' => 1,
@@ -1600,6 +1600,7 @@ Expires: ',
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
+      'receive_date' => '2020-08-08',
     ];
     $contribution1 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
 
@@ -1609,6 +1610,7 @@ Expires: ',
       'total_amount' => 25,
       'financial_type_id' => 2,
       'contact_id' => $contactId2,
+      'receive_date' => '2020-07-08',
     ];
     $contribution2 = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
 
@@ -1621,7 +1623,7 @@ Expires: ',
     $membershipViewForm->preProcess();
 
     // get contribution rows related to membership payments
-    $templateVar = $membershipViewForm->getTemplate()->get_template_vars('rows');
+    $templateVar = $membershipViewForm::getTemplate()->get_template_vars('rows');
 
     $this->assertEquals($templateVar[0]['contribution_id'], $contribution1->id);
     $this->assertEquals($templateVar[0]['contact_id'], $contactId2);
