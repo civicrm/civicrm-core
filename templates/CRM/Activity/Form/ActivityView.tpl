@@ -119,7 +119,7 @@
             </tr>
         {else}
              <tr>
-                 <td class="label">{ts}Details{/ts}</td><td class="view-value report">{$values.details|crmStripAlternatives|nl2br}</td>
+                 <td class="label">{ts}Details{/ts}</td><td class="view-value report">{$values.details|crmStripAlternatives|purify|nl2br}</td>
              </tr>
         {/if}
 {if $values.attachment}

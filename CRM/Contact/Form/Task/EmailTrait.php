@@ -558,12 +558,12 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *   e.g. <a href='{$contactURL}'>Bob Smith</a>'
    */
   protected function getEmailUrlString(array $emailIDs): string {
-    $urlString = '';
+    $urls = [];
     foreach ($emailIDs as $email) {
-      $contactURL = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $this->contactEmails[$email]['contact_id']], TRUE);
-      $urlString .= "<a href='{$contactURL}'>" . $this->contactEmails[$email]['contact.display_name'] . '</a>';
+      $contactURL = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->contactEmails[$email]['contact_id']], TRUE);
+      $urls[] = "<a href='{$contactURL}'>" . $this->contactEmails[$email]['contact.display_name'] . '</a>';
     }
-    return $urlString;
+    return implode(', ', $urls);
   }
 
   /**
