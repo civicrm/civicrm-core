@@ -606,7 +606,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
     );
   }
 
-  $input['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+  $input['payment_processor_id'] = $params['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
     'id' => $contribution->contribution_recur_id,
   ]);
@@ -626,6 +626,7 @@ function civicrm_api3_contribution_repeattransaction($params) {
       'financial_type_id',
       'contribution_status_id',
       'membership_id',
+      'payment_processor_id',
     ];
     $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
 
