@@ -39,6 +39,7 @@
     <title>Email Location Type</title>
     <type>int unsigned</type>
     <comment>Which Location does this email belong to.</comment>
+    <required>true</required>
     <add>2.0</add>
     <pseudoconstant>
       <table>civicrm_location_type</table>

@@ -42,6 +42,7 @@
     <type>int unsigned</type>
     <comment>Which Location does this address belong to.</comment>
     <add>2.0</add>
+    <required>true</required>
     <pseudoconstant>
       <table>civicrm_location_type</table>
       <keyColumn>id</keyColumn>
