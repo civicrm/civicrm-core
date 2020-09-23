@@ -42,6 +42,7 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
 
     Civi::resources()
       ->addPermissions(['edit groups', 'administer reserved groups'])
+      ->addBundle('bootstrap3')
       ->addVars('search', $vars);
 
     // Load angular module
