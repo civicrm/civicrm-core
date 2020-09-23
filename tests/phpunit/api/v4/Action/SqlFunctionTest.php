@@ -39,14 +39,16 @@ class SqlFunctionTest extends UnitTestCase {
   public function testGroupAggregates() {
     $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
     Contribution::save(FALSE)
-      ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
+      ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
       ->setRecords([
         ['total_amount' => 100, 'receive_date' => '2020-01-01'],
         ['total_amount' => 200, 'receive_date' => '2020-01-01'],
-        ['total_amount' => 300, 'receive_date' => '2020-01-01'],
-        ['total_amount' => 400, 'receive_date' => '2020-01-01'],
+        ['total_amount' => 300, 'receive_date' => '2020-01-01', 'financial_type_id:name' => 'Member Dues'],
+        ['total_amount' => 400, 'receive_date' => '2020-01-01', 'financial_type_id:name' => 'Event Fee'],
       ])
       ->execute();
+
+    // Test AVG, SUM, MAX, MIN, COUNT
     $agg = Contribution::get(FALSE)
       ->addGroupBy('contact_id')
       ->addWhere('contact_id', '=', $cid)
@@ -57,11 +59,23 @@ class SqlFunctionTest extends UnitTestCase {
       ->addSelect('COUNT(*) AS count')
       ->execute()
       ->first();
-    $this->assertEquals(250, $agg['average']);
-    $this->assertEquals(1000, $agg['SUM:total_amount']);
-    $this->assertEquals(400, $agg['MAX:total_amount']);
-    $this->assertEquals(100, $agg['MIN:total_amount']);
-    $this->assertEquals(4, $agg['count']);
+    $this->assertTrue(250.0 === $agg['average']);
+    $this->assertTrue(1000.0 === $agg['SUM:total_amount']);
+    $this->assertTrue(400.0 === $agg['MAX:total_amount']);
+    $this->assertTrue(100.0 === $agg['MIN:total_amount']);
+    $this->assertTrue(4 === $agg['count']);
+
+    // Test GROUP_CONCAT
+    $agg = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect('GROUP_CONCAT(financial_type_id:name)')
+      ->addSelect('COUNT(*) AS count')
+      ->execute()
+      ->first();
+
+    $this->assertTrue(4 === $agg['count']);
+    $this->assertContains('Donation', $agg['GROUP_CONCAT:financial_type_id:name']);
   }
 
   public function testGroupHaving() {

@@ -28,6 +28,17 @@ class SqlFunctionCOUNT extends SqlFunction {
   ];
 
   /**
+   * Reformat result as array if using default separator
+   *
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   * @param string $value
+   * @return string|array
+   */
+  public function formatOutputValue($value) {
+    return (int) $value;
+  }
+
+  /**
    * @return string
    */
   public static function getTitle(): string {

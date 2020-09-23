@@ -14,7 +14,7 @@
 
       this.$onInit = function() {
         var fieldInfo = searchMeta.parseExpr(ctrl.expr);
-        ctrl.path = fieldInfo.path;
+        ctrl.path = fieldInfo.path + fieldInfo.suffix;
         ctrl.field = fieldInfo.field;
         ctrl.fn = !fieldInfo.fn ? '' : fieldInfo.fn.name;
       };

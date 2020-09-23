@@ -38,6 +38,14 @@ abstract class SqlExpression {
   public $expr = '';
 
   /**
+   * Whether or not pseudoconstant suffixes should be evaluated during output.
+   *
+   * @var bool
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   */
+  public $supportsExpansion = FALSE;
+
+  /**
    * SqlFunction constructor.
    * @param string $expr
    * @param string|null $alias
