@@ -27,7 +27,6 @@ class EmailCreationSpecProvider implements Generic\SpecProviderInterface {
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('contact_id')->setRequired(TRUE);
     $spec->getFieldByName('email')->setRequired(TRUE);
     $spec->getFieldByName('on_hold')->setRequired(FALSE);
     $spec->getFieldByName('is_bulkmail')->setRequired(FALSE);
