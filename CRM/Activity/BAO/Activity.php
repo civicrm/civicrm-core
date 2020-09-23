@@ -411,11 +411,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     // attempt to save activity targets
-    $resultTarget = NULL;
     if (!empty($params['target_contact_id'])) {
 
       $targetParams = ['activity_id' => $activityId];
-      $resultTarget = [];
       if (is_array($params['target_contact_id'])) {
         // first delete existing targets if any
         self::deleteActivityContact($activityId, $targetID);
@@ -442,11 +440,11 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
           if ($target->contact_id != $params['target_contact_id']) {
             $targetParams['id'] = $target->id;
-            $resultTarget = CRM_Activity_BAO_ActivityContact::create($targetParams);
+            CRM_Activity_BAO_ActivityContact::create($targetParams);
           }
         }
         else {
-          $resultTarget = CRM_Activity_BAO_ActivityContact::create($targetParams);
+          CRM_Activity_BAO_ActivityContact::create($targetParams);
         }
       }
     }
