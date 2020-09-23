@@ -93,7 +93,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $pledgeParams['frequency_interval'] = $params['pledge_frequency_interval'];
       $pledgeParams['installments'] = $params['pledge_installments'];
       $pledgeParams['frequency_unit'] = $params['pledge_frequency_unit'];
-      if ($pledgeParams['frequency_unit'] == 'month') {
+      if ($pledgeParams['frequency_unit'] === 'month') {
         $pledgeParams['frequency_day'] = intval(date("d"));
       }
       else {
@@ -149,6 +149,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $recurringContributionID
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionParams(
     $params, $financialTypeID,
@@ -235,7 +236,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
         // if there is a product - compare the value to the contribution amount
         if (isset($selectProduct) &&
-          $selectProduct != 'no_thanks'
+          $selectProduct !== 'no_thanks'
         ) {
           $productDAO = new CRM_Contribute_DAO_Product();
           $productDAO->id = $selectProduct;
@@ -332,15 +333,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         if (in_array($field, $addressBlocks)) {
-          if ($locType == 'Primary') {
+          if ($locType === 'Primary') {
             $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
             $locType = $defaultLocationType->id;
           }
 
-          if ($field == 'country') {
+          if ($field === 'country') {
             $value = CRM_Core_PseudoConstant::countryIsoCode($value);
           }
-          elseif ($field == 'state_province') {
+          elseif ($field === 'state_province') {
             $value = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
           }
 
@@ -361,7 +362,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           if (!$typeId || is_numeric($typeId)) {
             $blockName = $fieldName = $field;
             $locationType = 'location_type_id';
-            if ($locType == 'Primary') {
+            if ($locType === 'Primary') {
               $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
               $locationValue = $defaultLocationType->id;
             }
@@ -423,7 +424,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_params['onbehalf_location']["{$loc}"] = $value;
         }
         else {
-          if ($loc == 'contact_sub_type') {
+          if ($loc === 'contact_sub_type') {
             $this->_params['onbehalf_location'][$loc] = $value;
           }
           else {
@@ -510,7 +511,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['is_quick_config'] = 1;
     }
 
-    if (!empty($params['selectProduct']) && $params['selectProduct'] != 'no_thanks') {
+    if (!empty($params['selectProduct']) && $params['selectProduct'] !== 'no_thanks') {
       $option = $params['options_' . $params['selectProduct']] ?? NULL;
       $productID = $params['selectProduct'];
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE,
@@ -522,7 +523,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviMember', $config->enableComponents) && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
-        $params['selectMembership'] != 'no_thanks'
+        $params['selectMembership'] !== 'no_thanks'
       ) {
         $this->buildMembershipBlock(
           $this->_membershipContactID,
