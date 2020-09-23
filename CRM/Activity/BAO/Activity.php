@@ -315,13 +315,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $params['assignee_contact_id'] = array_unique($params['assignee_contact_id']);
     }
 
-    // CRM-9137
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Activity', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Activity', NULL, $params);
-    }
+    $action = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($action, 'Activity', $params['id'] ?? NULL, $params);
 
     $activity->copyValues($params);
     if (isset($params['case_id'])) {
@@ -597,13 +592,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         self::logActivityAction($activity, "Case details for {$matches[1]} not found while recording an activity on case.");
       }
     }
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Activity', $activity->id, $activity);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Activity', $activity->id, $activity);
-    }
-
+    CRM_Utils_Hook::post($action, 'Activity', $activity->id, $activity);
     return $result;
   }
 
