@@ -206,9 +206,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    $this->single($input, $ids, $objects,
-      TRUE, $first
-    );
+    $this->single($input, $ids, $objects, TRUE);
   }
 
   /**
@@ -216,25 +214,19 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $ids
    * @param array $objects
    * @param bool $recur
-   * @param bool $first
    *
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function single($input, $ids, $objects, $recur = FALSE, $first = FALSE) {
+  public function single($input, $ids, $objects, $recur = FALSE) {
     $contribution = &$objects['contribution'];
 
     // make sure the invoice is valid and matches what we have in the contribution record
-    if ((!$recur) || ($recur && $first)) {
-      if ($contribution->invoice_id != $input['invoice']) {
-        Civi::log()->debug('PayPalIPN: Invoice values dont match between database and IPN request. (ID: ' . $contribution->id . ').');
-        echo "Failure: Invoice values dont match between database and IPN request<p>";
-        return;
-      }
-    }
-    else {
-      $contribution->invoice_id = md5(uniqid(rand(), TRUE));
+    if ($contribution->invoice_id != $input['invoice']) {
+      Civi::log()->debug('PayPalIPN: Invoice values dont match between database and IPN request. (ID: ' . $contribution->id . ').');
+      echo "Failure: Invoice values dont match between database and IPN request<p>";
+      return;
     }
 
     if (!$recur) {
