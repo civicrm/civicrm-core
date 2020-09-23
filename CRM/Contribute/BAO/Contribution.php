@@ -4487,7 +4487,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $targetContactID = $contribution->contact_id;
         $contribution->contact_id = $contributionContactID;
       }
-      CRM_Activity_BAO_Activity::addActivity($contribution, NULL, $targetContactID);
+      CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID);
     }
 
     if (self::isEmailReceipt($input, $contribution->contribution_page_id, $recurringContributionID)) {
