@@ -124,6 +124,52 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that hook_civicrm_links is called.
+   */
+  public function testPcpInfoLinksHook() {
+    Civi::dispatcher()->addListener('hook_civicrm_links', [$this, 'hookLinks']);
+
+    // Reset the cache otherwise our hook will not be called
+    CRM_PCP_BAO_PCP::$_pcpLinks = NULL;
+
+    $block = CRM_PCP_BAO_PCPBlock::create($this->pcpBlockParams());
+    $contactID = $this->individualCreate();
+    $contributionPage = $this->callAPISuccessGetSingle('ContributionPage', []);
+    $pcp = $this->callAPISuccess('Pcp', 'create', ['contact_id' => $contactID, 'title' => 'pcp', 'page_id' => $contributionPage['id'], 'pcp_block_id' => $block->id, 'is_active' => TRUE, 'status_id' => 'Approved']);
+
+    $links = CRM_PCP_BAO_PCP::pcplinks($pcp['id']);
+
+    foreach ($links['all'] as $link) {
+      if ($link['name'] == 'URL for this Page') {
+        $found = TRUE;
+        $this->assertEquals($link['url'], 'https://civicrm.org/mih');
+      }
+    }
+
+    $this->assertEquals($found, TRUE);
+  }
+
+  /**
+   * This is the listener for hook_civicrm_links
+   *
+   * Replaces the "URL for this Page" link by a hardcoded link.
+   * This is the listener for hook_civicrm_alterReportVar
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   *   Should contain 'op', 'links', and other members corresponding
+   *   to the hook parameters.
+   */
+  public function hookLinks(\Civi\Core\Event\GenericHookEvent $e) {
+    if ($e->op == 'pcp.user.actions') {
+      foreach ($e->links['all'] as $key => &$link) {
+        if ($link['name'] == 'URL for this Page') {
+          $e->links['all'][$key]['url'] = 'https://civicrm.org/mih';
+        }
+      }
+    }
+  }
+
+  /**
    * Test that CRM_Contribute_BAO_Contribution::_gatherMessageValues() works
    * with PCP.
    */
