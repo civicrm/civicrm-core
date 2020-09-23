@@ -74,7 +74,7 @@ trait ContactTestTrait {
    * @return int
    *   id of Individual created
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function individualCreate($params = [], $seq = 0, $random = FALSE) {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
