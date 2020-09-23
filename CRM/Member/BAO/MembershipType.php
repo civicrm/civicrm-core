@@ -635,7 +635,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * The function returns all the Organization for  all membershipTypes .
+   * The function returns all the Organization for all membershipTypes .
    *
    * @param int $membershipTypeId
    *
@@ -814,6 +814,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Caching is by domain - if that hits any issues we should add a new function getDomainMembershipTypes
    * or similar rather than 'just add another param'! but this is closer to earlier behaviour so 'should' be OK.
    *
+   * @return array
+   *   List of membershipType details keyed by membershipTypeID
    * @throws \CiviCRM_API3_Exception
    */
   public static function getAllMembershipTypes() {

@@ -282,7 +282,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     else {
       // if membership allows related, default max_related to value in membership_type
       if (!array_key_exists('max_related', $params) && !empty($params['membership_type_id'])) {
-        $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($params['membership_type_id']);
+        $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($params['membership_type_id']);
         if (isset($membershipType['relationship_type_id'])) {
           $params['max_related'] = $membershipType['max_related'] ?? NULL;
         }
@@ -439,7 +439,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
   public static function checkMembershipRelationship($membershipTypeID, $contactId, $action = CRM_Core_Action::ADD) {
     $contacts = [];
 
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
+
     $relationships = [];
     if (isset($membershipType['relationship_type_id'])) {
       $relationships = CRM_Contact_BAO_Relationship::getRelationship($contactId,
@@ -462,11 +463,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         CRM_Contact_BAO_RelationshipType::retrieve($relType, $relValues);
         // Check if contact's relationship type exists in membership type
         $relTypeDirs = [];
-        $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
-        $relDirections = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
         $bidirectional = FALSE;
-        foreach ($relTypeIds as $key => $value) {
-          $relTypeDirs[] = $value . '_' . $relDirections[$key];
+        foreach ($membershipType['relationship_type_id'] as $key => $value) {
+          $relTypeDirs[] = $value . '_' . $membershipType['relationship_direction'][$key];
           if (in_array($value, $relType) &&
             $relValues['name_a_b'] == $relValues['name_b_a']
           ) {
@@ -1771,7 +1770,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
     $statusFormat = '%Y-%m-%d';
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $dates = [];
     $ids = [];
 
