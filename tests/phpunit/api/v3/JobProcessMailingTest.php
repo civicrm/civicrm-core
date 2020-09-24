@@ -471,6 +471,49 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that the earlier iterations's activity targets on the recorded
+   * BulkEmail activity don't get wiped out by subsequent iterations when
+   * using batches.
+   */
+  public function testBatchActivityTargets() {
+    $loggedInUserId = $this->createLoggedInUser();
+
+    \Civi::settings()->set('mailerBatchLimit', 2);
+
+    // We have such small batches we need to lower this interval to get it
+    // to create the activity.
+    $old_sync_interval = \Civi::settings()->get('civimail_sync_interval');
+    \Civi::settings()->set('civimail_sync_interval', 1);
+
+    $this->createContactsInGroup(6, $this->_groupID);
+    $mailing = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_id' => $loggedInUserId]);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
+      'source_record_id' => $mailing['id'],
+      'activity_type_id' => 'Bulk Email',
+      'return' => ['target_contact_id'],
+    ]);
+    // After first batch, should have two targets
+    $this->assertCount(2, $bulkEmailActivity['target_contact_id']);
+
+    // Because we're running in script mode need to reset this static
+    // to get it to process the other batches.
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+
+    $this->callAPISuccess('job', 'process_mailing', []);
+    $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
+      'source_record_id' => $mailing['id'],
+      'activity_type_id' => 'Bulk Email',
+      'return' => ['target_contact_id'],
+    ]);
+    // After second batch, should have four targets
+    $this->assertCount(4, $bulkEmailActivity['target_contact_id']);
+
+    // restore setting
+    \Civi::settings()->set('civimail_sync_interval', $old_sync_interval);
+  }
+
+  /**
    * Create contacts in group.
    *
    * @param int $count
