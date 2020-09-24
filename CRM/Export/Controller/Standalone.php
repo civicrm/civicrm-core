@@ -72,7 +72,7 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
     $className = 'CRM_' . $this->getComponent($this->get('entity')) . '_Task';
     foreach ($className::tasks() as $taskId => $task) {
       $taskForm = (array) $task['class'];
-      if ($taskForm[0] == 'CRM_Export_Form_Select') {
+      if (strpos($taskForm[0], 'CRM_Export_Form_Select') === 0) {
         $values['task'] = $taskId;
       }
     }
