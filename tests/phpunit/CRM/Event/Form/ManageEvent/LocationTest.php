@@ -20,20 +20,94 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $eventID = (int) $this->eventCreate()['id'];
-    $form = $this->getFormObject('CRM_Event_Form_ManageEvent_Location', $this->getFormValues());
-    $form->set('id', $eventID);
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->postProcess();
+    $this->submitForm([], $eventID);
     $this->assertCorrectEmails($eventID);
 
     // Now do it again to see if it gets messed with.
-    $form = $this->getFormObject('CRM_Event_Form_ManageEvent_Location', array_merge($this->getFormValues(), ['loc_event_id' => $this->ids['LocBlock'][0]]));
-    $form->set('id', $eventID);
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->postProcess();
+    $this->submitForm(['loc_event_id' => $this->ids['LocBlock'][0]], $eventID);
     $this->assertCorrectEmails($eventID);
+  }
+
+  /**
+   * Create() method
+   * create various elements of location block
+   * with civicrm_loc_block
+   */
+  public function testCreateWithLocBlock() {
+    $eventID = (int) $this->eventCreate()['id'];
+    $this->submitForm([
+      'address' => [
+        '1' => [
+          'street_address' => 'Saint Helier St',
+          'supplemental_address_1' => 'Hallmark Ct',
+          'supplemental_address_2' => 'Jersey Village',
+          'supplemental_address_3' => 'My Town',
+          'city' => 'Newark',
+          'postal_code' => '01903',
+          'country_id' => 1228,
+          'state_province_id' => 1029,
+          'geo_code_1' => '18.219023',
+          'geo_code_2' => '-105.00973',
+          'is_primary' => 1,
+          'location_type_id' => 1,
+        ],
+      ],
+      'email' => [
+        '1' => [
+          'email' => 'john.smith@example.org',
+          'is_primary' => 1,
+          'location_type_id' => 1,
+        ],
+      ],
+      'phone' => [
+        '1' => [
+          'phone_type_id' => 1,
+          'phone' => '303443689',
+          'is_primary' => 1,
+          'location_type_id' => 1,
+        ],
+        '2' => [
+          'phone_type_id' => 2,
+          'phone' => '9833910234',
+          'location_type_id' => 1,
+        ],
+      ],
+    ], $eventID);
+
+    //Now check DB for location block
+
+    $locationBlock = Event::get()
+      ->addWhere('id', '=', $eventID)
+      ->setSelect(['loc_block.*', 'loc_block_id'])
+      ->execute()->first();
+
+    $address = $this->callAPISuccessGetSingle('Address', ['id' => $locationBlock['loc_block.address_id']]);
+
+    $this->assertEquals([
+      'id' => $address['id'],
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'is_billing' => '0',
+      'street_address' => 'Saint Helier St',
+      'supplemental_address_1' => 'Hallmark Ct',
+      'supplemental_address_2' => 'Jersey Village',
+      'supplemental_address_3' => 'My Town',
+      'city' => 'Newark',
+      'postal_code' => '01903',
+      'country_id' => 1228,
+      'state_province_id' => 1029,
+      'geo_code_1' => '18.219023',
+      'geo_code_2' => '-105.00973',
+      'manual_geo_code' => '0',
+    ], $address);
+
+    $this->callAPISuccessGetSingle('Email', ['id' => $locationBlock['loc_block.email_id'], 'email' => 'john.smith@example.org']);
+    $this->callAPISuccessGetSingle('Phone', ['id' => $locationBlock['loc_block.phone_id'], 'phone' => '303443689']);
+    $this->callAPISuccessGetSingle('Phone', ['id' => $locationBlock['loc_block.phone_2_id'], 'phone' => '9833910234']);
+
+    // Cleanup.
+    CRM_Core_BAO_Location::deleteLocBlock($locationBlock['loc_block_id']);
+    $this->eventDelete($eventID);
   }
 
   /**
@@ -118,6 +192,20 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
     $secondEmail = $emails->last();
     $this->assertEquals($secondEmail['id'], $locationBlock['loc_block.email_2_id']);
     return $emails;
+  }
+
+  /**
+   * @param array $formValues
+   * @param int $eventID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function submitForm(array $formValues, int $eventID): void {
+    $form = $this->getFormObject('CRM_Event_Form_ManageEvent_Location', array_merge($this->getFormValues(), $formValues));
+    $form->set('id', $eventID);
+    $form->preProcess();
+    $form->buildQuickForm();
+    $form->postProcess();
   }
 
 }

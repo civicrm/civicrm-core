@@ -73,6 +73,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
    * @return int
    */
   public static function createLocBlock($location, $entityElements) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use LocBlock api');
     $locId = self::findExisting($entityElements);
     $locBlock = [];
 

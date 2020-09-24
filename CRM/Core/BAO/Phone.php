@@ -28,6 +28,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return object
    * @throws API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function create($params) {
     // Ensure mysql phone function exists
