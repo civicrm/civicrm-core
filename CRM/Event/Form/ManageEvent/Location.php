@@ -234,11 +234,13 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $isUpdateToExistingLocationBlock = !empty($params['loc_event_id']) && (int) $params['loc_event_id'] === $this->locationBlock['loc_block_id'];
     // It should be impossible for there to be no default location type. Consider removing this handling
     $defaultLocationTypeID = CRM_Core_BAO_LocationType::getDefault()->id ?? 1;
+    $location = [];
     foreach ([
       'address' => $params['address'],
       'phone' => $params['phone'],
       'email' => $params['email'],
     ] as $block => $locationEntities) {
+
       $params[$block][1]['is_primary'] = 1;
       foreach ($locationEntities as $index => $locationEntity) {
         $params[$block][$index]['location_type_id'] = $defaultLocationTypeID;
@@ -247,10 +249,18 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
           $params[$block][$index]['id'] = $this->locationBlock['loc_block.' . $block . $fieldKey];
         }
       }
+      if ($block !== 'address') {
+        $location[$block] = CRM_Core_BAO_Block::create($block, $params, 'event');
+      }
+      else {
+        $location[$block] = CRM_Core_BAO_Address::create($params, TRUE, 'event');
+      }
     }
 
-    // create/update event location
-    $params['loc_block_id'] = CRM_Core_BAO_Location::create($params, TRUE, 'event')['id'];
+    $params['loc_block_id'] = CRM_Core_BAO_Location::createLocBlock($location, [
+      'entity_table' => $params['entity_table'],
+      'entity_id' => $params['entity_id'],
+    ]);
 
     // finally update event params
     $params['id'] = $this->_id;

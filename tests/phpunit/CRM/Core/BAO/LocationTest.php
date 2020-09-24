@@ -245,12 +245,22 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //create location block.
     //with various element of location block
     //like address, phone, email, im.
-    $locBlockId = CRM_Core_BAO_Location::create($params, NULL, TRUE)['id'];
+    foreach (['phone', 'email', 'im', 'openid', 'address'] as $block) {
+      if ($block !== 'address') {
+        $location[$block] = CRM_Core_BAO_Block::create($block, $params, 'event');
+      }
+      else {
+        $location[$block] = CRM_Core_BAO_Address::create($params, TRUE, 'event');
+      }
+    }
 
     //update event record with location block id
     $eventParams = [
       'id' => $event['id'],
-      'loc_block_id' => $locBlockId,
+      'loc_block_id' => CRM_Core_BAO_Location::createLocBlock($location, [
+        'entity_id' => $event['id'],
+        'entity_table' => 'civicrm_event',
+      ]),
     ];
 
     CRM_Event_BAO_Event::add($eventParams);
@@ -261,11 +271,11 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
       $event['id'],
       'loc_block_id',
       'id',
-      $locBlockId,
+      $eventParams['loc_block_id'],
       'Checking database for the record.'
     );
     $locElementIds = [];
-    $locParams = ['id' => $locBlockId];
+    $locParams = ['id' => $eventParams['loc_block_id']];
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_LocBlock',
       $locParams,
       $locElementIds
@@ -328,7 +338,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Core_DAO_IM', $searchParams, $compareParams);
 
     // Cleanup.
-    CRM_Core_BAO_Location::deleteLocBlock($locBlockId);
+    CRM_Core_BAO_Location::deleteLocBlock($eventParams['loc_block_id']);
     $this->eventDelete($event['id']);
     $this->contactDelete($this->_contactId);
   }
