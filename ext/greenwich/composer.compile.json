@@ -1,11 +1,16 @@
 {
   "compile": [
     {
+      "title": "Greenwich (Coerce <comment>select2-bootstrap</comment> to SCSS)",
+      "shell": "set -e ; mkdir -p extern/select2 ; cp ../../bower_components/select2/select2-bootstrap.css extern/select2/select2-bootstrap.scss",
+      "watch-files": ["../../bower_components/select2/"]
+    },
+    {
       "title": "Greenwich CSS (<comment>dist/bootstrap3.css</comment>)",
       "php-method": "\\Civi\\Compile\\Scss::build",
-      "watch-files": ["scss"],
+      "watch-files": ["scss", "extern/select2"],
       "scss-files": {"scss/main.scss": "dist/bootstrap3.css"},
-      "scss-includes": ["scss", "extern/bootstrap3/assets/stylesheets", "../../bower_components/select2"]
+      "scss-includes": ["scss", "extern/bootstrap3/assets/stylesheets", "extern/select2"]
     }
   ]
 }
