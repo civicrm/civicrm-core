@@ -431,7 +431,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    */
   public static function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
     $numTerms = CRM_Core_DAO::singleValueQuery("
-      SELECT membership_num_terms FROM civicrm_line_item li
+      SELECT (CONVERT(qty,SIGNED) * membership_num_terms)
+      FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
       WHERE contribution_id = %1 AND membership_type_id = %2",
       [1 => [$contributionID, 'Integer'], 2 => [$membershipTypeID, 'Integer']]
@@ -3802,6 +3803,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
+
+      if ($params['membership_num_terms']) {
+
+        $membership_num_terms = $params['membership_num_terms'];
+        $callback = function (&$value, $key) use ($membership_num_terms) {
+          if ($key == 'membership_num_terms' || $key == 'qty') {
+            $value = $membership_num_terms;
+          }
+          elseif ($key == 'unit_price') {
+            $value = $value / $membership_num_terms;
+          }
+        };
+        array_walk_recursive($params['line_item'], $callback);
+      }
+
       CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $isUpdate);
     }
 

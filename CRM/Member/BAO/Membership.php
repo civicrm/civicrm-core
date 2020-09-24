@@ -2415,6 +2415,7 @@ WHERE {$whereClause}";
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
     $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
+    $contributionParams['membership_num_terms'] = $params['num_terms'];
     $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
       'contact_id',
