@@ -556,12 +556,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
             $foundDuplicate = FALSE;
             $orgIds = [];
             foreach ($memTypesIDS as $key => $val) {
-              $org = CRM_Member_BAO_MembershipType::getMembershipTypeOrganization($val);
-              if (in_array($org[$val], $orgIds)) {
+              $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($val);
+              if (in_array($memTypeDetails['member_of_contact_id'], $orgIds)) {
                 $foundDuplicate = TRUE;
                 break;
               }
-              $orgIds[$val] = $org[$val];
+              $orgIds[$val] = $memTypeDetails['member_of_contact_id'];
 
             }
             if ($foundDuplicate) {
@@ -573,7 +573,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           $foundAutorenew = FALSE;
           foreach ($memTypesIDS as $key => $val) {
             // see if any price field option values in this price field are for memberships with autorenew
-            $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($val);
+            $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($val);
             if (!empty($memTypeDetails['auto_renew'])) {
               $foundAutorenew = TRUE;
               break;
