@@ -150,8 +150,7 @@ function afform_civicrm_caseTypes(&$caseTypes) {
 function afform_civicrm_angularModules(&$angularModules) {
   _afform_civix_civicrm_angularModules($angularModules);
 
-  $afforms = \Civi\Api4\Afform::get()
-    ->setCheckPermissions(FALSE)
+  $afforms = \Civi\Api4\Afform::get(FALSE)
     ->setSelect(['name', 'requires', 'module_name', 'directive_name'])
     ->execute();
 
