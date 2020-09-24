@@ -14,13 +14,31 @@
 
       this.$onInit = function() {
         var fieldInfo = searchMeta.parseExpr(ctrl.expr);
-        ctrl.path = fieldInfo.path;
+        ctrl.path = fieldInfo.path + fieldInfo.suffix;
         ctrl.field = fieldInfo.field;
         ctrl.fn = !fieldInfo.fn ? '' : fieldInfo.fn.name;
+        ctrl.modifier = fieldInfo.modifier || null;
+        initFunction();
       };
 
+      function initFunction() {
+        ctrl.fnInfo = _.find(CRM.vars.search.functions, {name: ctrl.fn});
+        if (ctrl.fnInfo && _.includes(ctrl.fnInfo.params[0].prefix, 'DISTINCT')) {
+          ctrl.modifierAllowed = true;
+        }
+        else {
+          ctrl.modifierAllowed = false;
+          ctrl.modifier = null;
+        }
+      }
+
       this.selectFunction = function() {
-        ctrl.expr = ctrl.fn ? (ctrl.fn + '(' + ctrl.path + ')') : ctrl.path;
+        initFunction();
+        ctrl.writeExpr();
+      };
+
+      this.writeExpr = function() {
+        ctrl.expr = ctrl.fn ? (ctrl.fn + '(' + (ctrl.modifier ? ctrl.modifier + ' ' : '') + ctrl.path + ')') : ctrl.path;
       };
     }
   });

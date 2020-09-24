@@ -356,11 +356,7 @@
         var info = searchMeta.parseExpr(col),
           key = info.fn ? (info.fn.name + ':' + info.path + info.suffix) : col,
           value = row[key];
-        // Handle grouped results
-        if (info.fn && info.fn.name === 'GROUP_CONCAT' && value) {
-          return formatGroupConcatValues(info, value);
-        }
-        else if (info.fn && info.fn.name === 'COUNT') {
+        if (info.fn && info.fn.name === 'COUNT') {
           return value;
         }
         return formatFieldValue(info.field, value);
@@ -368,29 +364,21 @@
 
       function formatFieldValue(field, value) {
         var type = field.data_type;
+        if (_.isArray(value)) {
+          return _.map(value, function(val) {
+            return formatFieldValue(field, val);
+          }).join(', ');
+        }
         if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
           return CRM.utils.formatDate(value, null, type === 'Timestamp');
         }
         else if (type === 'Boolean' && typeof value === 'boolean') {
           return value ? ts('Yes') : ts('No');
         }
-        else if (type === 'Money') {
+        else if (type === 'Money' && typeof value === 'number') {
           return CRM.formatMoney(value);
         }
-        if (_.isArray(value)) {
-          return value.join(', ');
-        }
         return value;
-      }
-
-      function formatGroupConcatValues(info, values) {
-        return _.transform(values.split(','), function(result, val) {
-          if (info.field.options && !info.suffix) {
-            result.push(_.result(getOption(info.field, val), 'label'));
-          } else {
-            result.push(formatFieldValue(info.field, val));
-          }
-        }).join(', ');
       }
 
       function getOption(field, value) {

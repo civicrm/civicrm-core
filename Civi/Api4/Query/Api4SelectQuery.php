@@ -138,7 +138,7 @@ class Api4SelectQuery {
       }
       $results[] = $result;
     }
-    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, $this->getEntity());
+    FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, $this->getEntity(), 'get', $this->selectAliases);
     return $results;
   }
 

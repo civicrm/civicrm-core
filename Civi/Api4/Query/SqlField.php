@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlField extends SqlExpression {
 
+  public $supportsExpansion = TRUE;
+
   protected function initialize() {
     if ($this->alias && $this->alias !== $this->expr) {
       throw new \API_Exception("Aliasing field names is not allowed, only expressions can have an alias.");

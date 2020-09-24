@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionGROUP_CONCAT extends SqlFunction {
 
+  public $supportsExpansion = TRUE;
+
   protected static $category = self::CATEGORY_AGGREGATE;
 
   protected static $params = [
@@ -37,8 +39,27 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
       'expr' => 1,
       'must_be' => ['SqlString'],
       'optional' => TRUE,
+      // @see self::formatOutput()
+      'api_default' => [
+        'expr' => ['"' . \CRM_Core_DAO::VALUE_SEPARATOR . '"'],
+      ],
     ],
   ];
+
+  /**
+   * Reformat result as array if using default separator
+   *
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   * @param string $value
+   * @return string|array
+   */
+  public function formatOutputValue($value) {
+    $exprArgs = $this->getArgs();
+    if (!$exprArgs[2]['prefix']) {
+      $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
+    }
+    return $value;
+  }
 
   /**
    * @return string

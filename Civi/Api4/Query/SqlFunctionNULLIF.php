@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionNULLIF extends SqlFunction {
 
+  public $supportsExpansion = TRUE;
+
   protected static $category = self::CATEGORY_COMPARISON;
 
   protected static $params = [

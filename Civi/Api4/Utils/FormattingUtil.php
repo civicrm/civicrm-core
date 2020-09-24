@@ -19,6 +19,8 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Api4\Query\SqlExpression;
+
 require_once 'api/v3/utils.php';
 
 class FormattingUtil {
@@ -134,38 +136,47 @@ class FormattingUtil {
    * @param array $fields
    * @param string $entity
    * @param string $action
+   * @param array $selectAliases
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatOutputValues(&$results, $fields, $entity, $action = 'get') {
+  public static function formatOutputValues(&$results, $fields, $entity, $action = 'get', $selectAliases = []) {
     $fieldOptions = [];
     foreach ($results as &$result) {
       $contactTypePaths = [];
-      foreach ($result as $fieldExpr => $value) {
-        $field = $fields[$fieldExpr] ?? NULL;
-        $dataType = $field['data_type'] ?? ($fieldExpr == 'id' ? 'Integer' : NULL);
-        if ($field) {
-          // Evaluate pseudoconstant suffixes
-          $suffix = strrpos($fieldExpr, ':');
-          if ($suffix) {
-            $fieldOptions[$fieldExpr] = $fieldOptions[$fieldExpr] ?? self::getPseudoconstantList($field, substr($fieldExpr, $suffix + 1), $result, $action);
-            $dataType = NULL;
+      foreach ($result as $key => $value) {
+        $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
+        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
+        $field = $fieldName && isset($fields[$fieldName]) ? $fields[$fieldName] : NULL;
+        $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
+        // If Sql Function e.g. GROUP_CONCAT or COUNT wants to do its own formatting, apply and skip dataType conversion
+        if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
+          $result[$key] = $value = $fieldExpr->formatOutputValue($value);
+          $dataType = NULL;
+        }
+        if (!$field) {
+          continue;
+        }
+        // Evaluate pseudoconstant suffixes
+        $suffix = strrpos($fieldName, ':');
+        if ($suffix) {
+          $fieldOptions[$fieldName] = $fieldOptions[$fieldName] ?? self::getPseudoconstantList($field, substr($fieldName, $suffix + 1), $result, $action);
+          $dataType = NULL;
+        }
+        if ($fieldExpr->supportsExpansion) {
+          if (!empty($field['serialize']) && is_string($value)) {
+            $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
           }
-          if (!empty($field['serialize'])) {
-            if (is_string($value)) {
-              $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
-            }
-          }
-          if (isset($fieldOptions[$fieldExpr])) {
-            $value = self::replacePseudoconstant($fieldOptions[$fieldExpr], $value);
-          }
-          // Keep track of contact types for self::contactFieldsToRemove
-          if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
-            $prefix = strrpos($fieldExpr, '.');
-            $contactTypePaths[$prefix ? substr($fieldExpr, 0, $prefix + 1) : ''] = $value;
+          if (isset($fieldOptions[$fieldName])) {
+            $value = self::replacePseudoconstant($fieldOptions[$fieldName], $value);
           }
         }
-        $result[$fieldExpr] = self::convertDataType($value, $dataType);
+        // Keep track of contact types for self::contactFieldsToRemove
+        if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
+          $prefix = strrpos($fieldName, '.');
+          $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
+        }
+        $result[$key] = self::convertDataType($value, $dataType);
       }
       // Remove inapplicable contact fields
       foreach ($contactTypePaths as $prefix => $contactType) {

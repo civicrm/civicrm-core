@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionMIN extends SqlFunction {
 
+  public $supportsExpansion = TRUE;
+
   protected static $category = self::CATEGORY_AGGREGATE;
 
   protected static $params = [

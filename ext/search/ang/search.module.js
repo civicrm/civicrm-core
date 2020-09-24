@@ -100,12 +100,14 @@
         getEntity: getEntity,
         getField: getField,
         parseExpr: function(expr) {
-          var result = {},
+          var result = {fn: null, modifier: ''},
             fieldName = expr,
             bracketPos = expr.indexOf('(');
           if (bracketPos >= 0) {
-            fieldName = expr.match(/[A-Z( _]*([\w.:]+)/)[1];
+            var parsed = expr.substr(bracketPos).match(/[ ]?([A-Z]+[ ]+)?([\w.:]+)/);
+            fieldName = parsed[2];
             result.fn = _.find(CRM.vars.search.functions, {name: expr.substring(0, bracketPos)});
+            result.modifier = _.trim(parsed[1]);
           }
           result.field = getField(fieldName);
           var split = fieldName.split(':'),
