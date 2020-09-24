@@ -1099,10 +1099,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $entities = array_keys($entities['values']);
     $totalEntities = count($entities);
     if ($totalEntities < 3) {
-      $ids = [];
       for ($i = 0; $i < 3 - $totalEntities; $i++) {
         $baoObj = CRM_Core_DAO::createTestObject($baoString, ['currency' => 'USD']);
-        $ids[] = $baoObj->id;
+        $this->deletableTestObjects[$baoString][] = $baoObj->id;
       }
       $totalEntities = 3;
     }
