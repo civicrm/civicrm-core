@@ -331,6 +331,9 @@ class CRM_Core_BAO_Block {
         // and the primary handling is otherwise bypassed on importing an email update.
         $blocks[] = CRM_Core_BAO_Email::create($blockFields);
       }
+      elseif ($name === 'Phone') {
+        $blocks[] = CRM_Core_BAO_Phone::create($blockFields);
+      }
       else {
         $baoString = 'CRM_Core_BAO_' . $name;
         $blocks[] = $baoString::add($blockFields);
