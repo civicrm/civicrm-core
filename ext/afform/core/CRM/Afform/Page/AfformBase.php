@@ -21,7 +21,9 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
       'afform' => [
         'open' => $afform['directive_name'],
       ],
-    ]);
+    ])
+      // TODO: Allow afforms to declare their own theming requirements
+      ->addBundle('bootstrap3');
     $loader->load();
 
     if (!empty($afform['title'])) {

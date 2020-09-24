@@ -10,10 +10,11 @@ class CRM_AfformGui_Upgrader extends CRM_AfformGui_Upgrader_Base {
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 
   /**
-   * Setup navigation item on new installs
+   * Setup navigation item on new installs.
+   *
+   * Note: this path is not in the menu.xml because it is handled by afform
    */
   public function install() {
-    // $this->executeSqlFile('sql/myinstall.sql');
     try {
       $existing = civicrm_api3('Navigation', 'getcount', [
         'name' => 'afform_gui',
