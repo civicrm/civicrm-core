@@ -57,12 +57,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
     if ($entity) {
       // this is a special case for adding values in location block table
-      $entityElements = [
+
+      $location['id'] = self::createLocBlock($location, [
         'entity_table' => $params['entity_table'],
         'entity_id' => $params['entity_id'],
-      ];
-
-      $location['id'] = self::createLocBlock($location, $entityElements);
+      ]);
     }
     else {
       // when we come from a form which displays all the location elements (like the edit form or the inline block
@@ -80,12 +79,12 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Creates the entry in the civicrm_loc_block.
    *
-   * @param string $location
+   * @param array $location
    * @param array $entityElements
    *
    * @return int
    */
-  public static function createLocBlock(&$location, &$entityElements) {
+  public static function createLocBlock($location, $entityElements) {
     $locId = self::findExisting($entityElements);
     $locBlock = [];
 
@@ -116,8 +115,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
       return NULL;
     }
 
-    $locBlockInfo = self::addLocBlock($locBlock);
-    return $locBlockInfo->id;
+    return self::addLocBlock($locBlock)->id;
   }
 
   /**
@@ -147,12 +145,11 @@ WHERE e.id = %1";
    * Takes an associative array and adds location block.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_locBlock
+   * @return CRM_Core_DAO_LocBlock
    *   Object on success, null otherwise
    */
-  public static function addLocBlock(&$params) {
+  public static function addLocBlock($params) {
     $locBlock = new CRM_Core_DAO_LocBlock();
 
     $locBlock->copyValues($params);
