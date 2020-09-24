@@ -28,11 +28,30 @@ if (!defined('CIVI_SETUP')) {
       $e->addInfo('system', 'settingsPath', sprintf('The settingsPath is defined.'));
     }
 
+    // If Civi is already installed, Drupal 8's status report page also calls us
+    // and so we need to modify the check slightly since we want the reverse
+    // conditions.
+    $installed = \Civi\Setup::instance()->checkInstalled();
+    $alreadyInstalled = $installed->isSettingInstalled() || $installed->isDatabaseInstalled();
+
     if (!\Civi\Setup\FileUtil::isCreateable($m->settingsPath)) {
-      $e->addError('system', 'settingsWritable', sprintf('The settings file "%s" cannot be created. Ensure the parent folder is writable.', $m->settingsPath));
+      if ($alreadyInstalled) {
+        $e->addInfo('system', 'settingsWritable', sprintf('The settings file "%s" is protected from writing.', $m->settingsPath));
+      }
+      else {
+        $e->addError('system', 'settingsWritable', sprintf('The settings file "%s" cannot be created. Ensure the parent folder is writable.', $m->settingsPath));
+      }
     }
     else {
-      $e->addInfo('system', 'settingsWritable', sprintf('The settings file "%s" can be created.', $m->settingsPath));
+      if ($alreadyInstalled) {
+        // Note if we were to output an error, we wouldn't be able to use
+        // `cv core:install` to do an in-place reinstall since it would fail
+        // requirements checks.
+        $e->addWarning('system', 'settingsWritable', sprintf('The settings file "%s" should not be writable.', $m->settingsPath));
+      }
+      else {
+        $e->addInfo('system', 'settingsWritable', sprintf('The settings file "%s" can be created.', $m->settingsPath));
+      }
     }
   });
 
