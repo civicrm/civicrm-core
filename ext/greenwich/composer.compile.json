@@ -5,7 +5,7 @@
       "php-method": "\\Civi\\Compile\\Scss::build",
       "watch-files": ["scss"],
       "scss-files": {"scss/main.scss": "dist/bootstrap3.css"},
-      "scss-includes": ["scss", "extern/bootstrap3/assets/stylesheets"]
+      "scss-includes": ["scss", "extern/bootstrap3/assets/stylesheets", "../../bower_components/select2"]
     }
   ]
 }
