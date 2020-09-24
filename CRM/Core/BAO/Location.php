@@ -35,11 +35,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
    *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
-   * @param null $entity
-   *
    * @return array
    */
-  public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
+  public static function create(&$params, $fixAddress = TRUE) {
     $location = [];
     if (!self::dataExists($params)) {
       return $location;
@@ -48,30 +46,19 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
     // create location blocks.
     foreach (self::$blocks as $block) {
       if ($block != 'address') {
-        $location[$block] = CRM_Core_BAO_Block::create($block, $params, $entity);
+        $location[$block] = CRM_Core_BAO_Block::create($block, $params);
       }
       else {
-        $location[$block] = CRM_Core_BAO_Address::create($params, $fixAddress, $entity);
+        $location[$block] = CRM_Core_BAO_Address::create($params, $fixAddress);
       }
     }
 
-    if ($entity) {
-      // this is a special case for adding values in location block table
-      $entityElements = [
-        'entity_table' => $params['entity_table'],
-        'entity_id' => $params['entity_id'],
-      ];
-
-      $location['id'] = self::createLocBlock($location, $entityElements);
-    }
-    else {
-      // when we come from a form which displays all the location elements (like the edit form or the inline block
-      // elements, we can skip the below check. The below check adds quite a feq queries to an already overloaded
-      // form
-      if (empty($params['updateBlankLocInfo'])) {
-        // make sure contact should have only one primary block, CRM-5051
-        self::checkPrimaryBlocks(CRM_Utils_Array::value('contact_id', $params));
-      }
+    // when we come from a form which displays all the location elements (like the edit form or the inline block
+    // elements, we can skip the below check. The below check adds quite a feq queries to an already overloaded
+    // form
+    if (empty($params['updateBlankLocInfo'])) {
+      // make sure contact should have only one primary block, CRM-5051
+      self::checkPrimaryBlocks(CRM_Utils_Array::value('contact_id', $params));
     }
 
     return $location;
@@ -80,12 +67,12 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Creates the entry in the civicrm_loc_block.
    *
-   * @param string $location
+   * @param array $location
    * @param array $entityElements
    *
    * @return int
    */
-  public static function createLocBlock(&$location, &$entityElements) {
+  public static function createLocBlock($location, $entityElements) {
     $locId = self::findExisting($entityElements);
     $locBlock = [];
 
@@ -116,8 +103,7 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
       return NULL;
     }
 
-    $locBlockInfo = self::addLocBlock($locBlock);
-    return $locBlockInfo->id;
+    return self::addLocBlock($locBlock)->id;
   }
 
   /**
@@ -147,17 +133,15 @@ WHERE e.id = %1";
    * Takes an associative array and adds location block.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Core_BAO_locBlock
+   * @return CRM_Core_DAO_LocBlock
    *   Object on success, null otherwise
    */
-  public static function addLocBlock(&$params) {
+  public static function addLocBlock($params) {
     $locBlock = new CRM_Core_DAO_LocBlock();
-
     $locBlock->copyValues($params);
-
-    return $locBlock->save();
+    $locBlock->save();
+    return $locBlock;
   }
 
   /**
