@@ -95,9 +95,6 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     $searchFormValues = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = $searchFormValues['task'];
-    $className = 'CRM_' . ucfirst($form::$entityShortname) . '_Task';
-    $entityTasks = $className::tasks();
-    $form->assign('taskName', $entityTasks[$form->_task]);
 
     $entityIds = [];
     if ($searchFormValues['radio_ts'] == 'ts_sel') {

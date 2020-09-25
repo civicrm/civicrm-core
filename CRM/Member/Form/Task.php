@@ -55,7 +55,6 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
     if (!array_key_exists($form->_task, $tasks)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
-    $form->assign('taskName', $tasks[$form->_task]);
 
     $ids = [];
     if ($values['radio_ts'] === 'ts_sel') {
