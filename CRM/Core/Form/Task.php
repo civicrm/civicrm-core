@@ -251,4 +251,22 @@ SELECT contact_id
     return '';
   }
 
+  /**
+   * Get the submitted values for the form.
+   *
+   * @return array
+   */
+  public function getFormValues() {
+    if ($this->_action === CRM_Core_Action::ADVANCED) {
+      return $this->controller->exportValues('Advanced');
+    }
+    if ($this->_action === CRM_Core_Action::PROFILE) {
+      return $this->controller->exportValues('Builder');
+    }
+    if ($this->_action == CRM_Core_Action::COPY) {
+      return $this->controller->exportValues('Custom');
+    }
+    return $this->controller->exportValues('Basic');
+  }
+
 }
