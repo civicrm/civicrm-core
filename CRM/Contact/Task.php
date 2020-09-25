@@ -71,8 +71,8 @@ class CRM_Contact_Task extends CRM_Core_Task {
         self::TASK_EXPORT => array(
           'title' => ts('Export contacts'),
           'class' => array(
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Contact_Export_Form_Select',
+            'CRM_Contact_Export_Form_Map',
           ),
           'result' => FALSE,
         ),

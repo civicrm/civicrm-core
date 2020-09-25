@@ -44,8 +44,8 @@ class CRM_Activity_Task extends CRM_Core_Task {
         self::TASK_EXPORT => [
           'title' => ts('Export activities'),
           'class' => [
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Activity_Export_Form_Select',
+            'CRM_Activity_Export_Form_Map',
           ],
           'result' => FALSE,
         ],
