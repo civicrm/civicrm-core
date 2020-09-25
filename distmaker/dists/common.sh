@@ -124,6 +124,8 @@ function dm_core_exts() {
   echo ext/eventcart
   echo ext/ewaysingle
   echo ext/financialacls
+  echo ext/afform
+  echo ext/greenwich
 }
 
 ## Copy all packages
