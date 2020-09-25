@@ -96,7 +96,7 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     }
     $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
     $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
-    $taskClassName = "CRM_{$entityShortname}_Task";
+
     if (isset($formTaskClassName::$entityShortname)) {
       $this::$entityShortname = $formTaskClassName::$entityShortname;
       if (isset($formTaskClassName::$tableName)) {
@@ -124,17 +124,13 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       }
     }
 
-    $formTaskClassName::preProcessCommon($this);
+    $this->callPreProcessing();
 
     // $component is used on CRM/Export/Form/Select.tpl to display extra information for contact export
     ($this->_exportMode == self::CONTACT_EXPORT) ? $component = FALSE : $component = TRUE;
     $this->assign('component', $component);
 
-    // Set the task title
-    $componentTasks = $taskClassName::taskTitles();
-    $this->_task = $values['task'];
-    $taskName = $componentTasks[$this->_task];
-    $this->assign('taskName', $taskName);
+    $this->assign('isShowMergeOptions', $this->isShowContactMergeOptions());
 
     if ($this->_componentTable) {
       $query = "
@@ -439,6 +435,20 @@ FROM   {$this->_componentTable}
    */
   public function getQueryMode() {
     return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
+  }
+
+  /**
+   * Call the pre-processing function.
+   */
+  protected function callPreProcessing(): void {
+    throw new CRM_Core_Exception('This must be over-ridden');
+  }
+
+  /**
+   * Assign the title of the task to the tpl.
+   */
+  protected function isShowContactMergeOptions() {
+    throw new CRM_Core_Exception('This must be over-ridden');
   }
 
   /**
