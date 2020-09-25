@@ -34,7 +34,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_Phone::add($params);
+    CRM_Core_BAO_Phone::create($params);
 
     $phoneId = $this->assertDBNotNull('CRM_Core_DAO_Phone', $contactId, 'id', 'contact_id',
       'Database check for created phone record.'
@@ -44,16 +44,15 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
       "Check if phone field has expected value in new record ( civicrm_phone.id={$phoneId} )."
     );
 
-    // Now call add() to modify the existing phone number
+    // Now call create() to modify the existing phone number
 
-    $params = [];
     $params = [
       'id' => $phoneId,
       'contact_id' => $contactId,
       'phone' => '(415) 222-5432',
     ];
 
-    CRM_Core_BAO_Phone::add($params);
+    CRM_Core_BAO_Phone::create($params);
 
     $this->assertDBCompareValue('CRM_Core_DAO_Phone', $phoneId, 'phone', 'id', '(415) 222-5432',
       "Check if phone field has expected value in updated record ( civicrm_phone.id={$phoneId} )."

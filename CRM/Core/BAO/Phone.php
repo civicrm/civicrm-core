@@ -39,25 +39,26 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
     ) {
       CRM_Core_BAO_Block::handlePrimary($params, get_class());
     }
-    $phone = self::add($params);
-
-    return $phone;
+    return self::writeRecord($params);
   }
 
   /**
    * Takes an associative array and adds phone.
+   *
+   * @deprecated use create.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return object
    *   CRM_Core_BAO_Phone object on success, null otherwise
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function add(&$params) {
-    // Ensure mysql phone function exists
-    CRM_Core_DAO::checkSqlFunctionsExist();
-
-    return self::writeRecord($params);
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use the v4 api');
+    return self::create($params);
   }
 
   /**
