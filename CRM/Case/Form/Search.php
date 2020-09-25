@@ -58,6 +58,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     //check for civicase access.

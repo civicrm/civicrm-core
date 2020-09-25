@@ -38,6 +38,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * Build the form object.
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Builder');
 
     $this->set('context', 'builder');

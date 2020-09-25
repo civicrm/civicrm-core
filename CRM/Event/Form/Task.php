@@ -40,12 +40,12 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Core_Form_Task $form
    */
   public static function preProcessCommon(&$form) {
     $form->_participantIds = [];
 
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'];
     $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
