@@ -27,4 +27,13 @@ class CRM_Contribute_Export_Form_Select extends CRM_Export_Form_Select {
     CRM_Contribute_Form_Task::preProcessCommon($this);
   }
 
+  /**
+   * Does this export offer contact merging.
+   *
+   * @return bool
+   */
+  protected function isShowContactMergeOptions() {
+    return FALSE;
+  }
+
 }

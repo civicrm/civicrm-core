@@ -27,4 +27,13 @@ class CRM_Grant_Export_Form_Select extends CRM_Export_Form_Select {
     CRM_Grant_Form_Task::preProcessCommon($this);
   }
 
+  /**
+   * Does this export offer contact merging.
+   *
+   * @return bool
+   */
+  protected function isShowContactMergeOptions() {
+    return FALSE;
+  }
+
 }
