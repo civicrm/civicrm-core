@@ -124,6 +124,21 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
           $first = TRUE;
           if ($objects['contribution']->contribution_status_id == 1) {
             $first = FALSE;
+            //load new contribution object if required.
+            // create a contribution and then get it processed
+            $contribution = new CRM_Contribute_BAO_Contribution();
+            $contribution->contact_id = $ids['contact'];
+            $contribution->financial_type_id = $objects['contributionType']->id;
+            $contribution->contribution_page_id = $ids['contributionPage'];
+            $contribution->contribution_recur_id = $ids['contributionRecur'];
+            $contribution->receive_date = $input['receive_date'];
+            $contribution->currency = $objects['contribution']->currency;
+            $contribution->amount_level = $objects['contribution']->amount_level;
+            $contribution->address_id = $objects['contribution']->address_id;
+            $contribution->campaign_id = $objects['contribution']->campaign_id;
+            $contribution->_relatedObjects = $objects['contribution']->_relatedObjects;
+
+            $objects['contribution'] = &$contribution;
           }
           $input['payment_processor_id'] = $paymentProcessorID;
           return $this->recur($input, $ids, $objects, $first);
@@ -144,11 +159,11 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @param $first
    *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function recur($input, $ids, $objects, $first) {
-    $this->_isRecurring = TRUE;
     $recur = &$objects['contributionRecur'];
-    $paymentProcessorObject = $objects['contribution']->_relatedObjects['paymentProcessor']['object'];
 
     // do a subscription check
     if ($recur->processor_id != $input['subscription_id']) {
@@ -159,24 +174,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $now = date('YmdHis');
 
-    //load new contribution object if required.
-    if (!$first) {
-      // create a contribution and then get it processed
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->contact_id = $ids['contact'];
-      $contribution->financial_type_id = $objects['contributionType']->id;
-      $contribution->contribution_page_id = $ids['contributionPage'];
-      $contribution->contribution_recur_id = $ids['contributionRecur'];
-      $contribution->receive_date = $input['receive_date'];
-      $contribution->currency = $objects['contribution']->currency;
-      $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
-      $contribution->amount_level = $objects['contribution']->amount_level;
-      $contribution->address_id = $objects['contribution']->address_id;
-      $contribution->campaign_id = $objects['contribution']->campaign_id;
-      $contribution->_relatedObjects = $objects['contribution']->_relatedObjects;
-
-      $objects['contribution'] = &$contribution;
-    }
     $objects['contribution']->invoice_id = md5(uniqid(rand(), TRUE));
     $objects['contribution']->total_amount = $input['amount'];
     $objects['contribution']->trxn_id = $input['trxn_id'];
@@ -229,7 +226,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
       'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], $objects);
+    ], ['contribution' => $objects['contribution']]);
 
     // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
     // to do this we should make it available via the api, e.g as a parameter, changing the nuance
