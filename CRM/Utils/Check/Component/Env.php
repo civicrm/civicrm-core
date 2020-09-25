@@ -600,20 +600,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    if (!$remotes) {
-      // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notice.
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %1. If you want to install an extension which is not marked as compatible, you may be able to download and install extensions manually (depending on access to your web server).', [
-          1 => CRM_Utils_System::majorVersion(),
-        ]) . '<br />' . CRM_Utils_System::docURL2('sysadmin/customize/extensions/#installing-a-new-extension'),
-        ts('No Extensions Available for this Version'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-plug'
-      );
-      return $messages;
-    }
-
     $keys = array_keys($manager->getStatuses());
     sort($keys);
     $updates = $errors = $okextensions = [];
