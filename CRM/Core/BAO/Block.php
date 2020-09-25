@@ -391,6 +391,10 @@ class CRM_Core_BAO_Block {
    * @throws API_Exception
    */
   public static function handlePrimary(&$params, $class) {
+    if (isset($params['id']) && CRM_Utils_System::isNull($params['is_primary'] ?? NULL)) {
+      // if id is set & is_primary isn't we can assume no change)
+      return;
+    }
     $table = CRM_Core_DAO_AllCoreTables::getTableForClass($class);
     if (!$table) {
       throw new API_Exception("Failed to locate table for class [$class]");

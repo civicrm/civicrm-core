@@ -31,10 +31,7 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * @return object
    */
   public static function create($params) {
-    // if id is set & is_primary isn't we can assume no change
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
-      CRM_Core_BAO_Block::handlePrimary($params, get_class());
-    }
+    CRM_Core_BAO_Block::handlePrimary($params, get_class());
 
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);

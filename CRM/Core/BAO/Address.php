@@ -131,10 +131,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Address', CRM_Utils_Array::value('id', $params), $params);
 
-    // if id is set & is_primary isn't we can assume no change
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
-      CRM_Core_BAO_Block::handlePrimary($params, get_class());
-    }
+    CRM_Core_BAO_Block::handlePrimary($params, get_class());
 
     // (prevent chaining 1 and 3) CRM-21214
     if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
