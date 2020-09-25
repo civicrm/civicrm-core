@@ -610,31 +610,27 @@ function civicrm_api3_contribution_repeattransaction($params) {
     'return' => 'payment_processor_id',
     'id' => $contribution->contribution_recur_id,
   ]);
-  try {
-    if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
-      throw new API_Exception('failed to load related objects');
-    }
 
-    unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
-    $contribution->receive_date = $params['receive_date'];
-
-    $passThroughParams = [
-      'trxn_id',
-      'total_amount',
-      'campaign_id',
-      'fee_amount',
-      'financial_type_id',
-      'contribution_status_id',
-      'membership_id',
-      'payment_processor_id',
-    ];
-    $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
-
-    return _ipn_process_transaction($params, $contribution, $input, $ids);
+  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
+    throw new API_Exception('failed to load related objects');
   }
-  catch (Exception $e) {
-    throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
-  }
+
+  unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
+  $contribution->receive_date = $params['receive_date'];
+
+  $passThroughParams = [
+    'trxn_id',
+    'total_amount',
+    'campaign_id',
+    'fee_amount',
+    'financial_type_id',
+    'contribution_status_id',
+    'membership_id',
+    'payment_processor_id',
+  ];
+  $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+
+  return _ipn_process_transaction($params, $contribution, $input, $ids);
 }
 
 /**
