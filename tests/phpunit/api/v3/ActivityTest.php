@@ -370,8 +370,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test get returns target and assignee contacts.
+   *
    * @dataProvider versionThreeAndFour
    * @var int $version
+   * @throws \CRM_Core_Exception
    */
   public function testActivityReturnTargetAssignee($version) {
     $this->_apiversion = $version;
@@ -1010,50 +1012,69 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_activity_update() to update an existing activity
+   * Test api updates an existing activity, including removing activity contacts in apiv3 style.
    */
   public function testActivityUpdate() {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
-    $this->_contactID2 = $this->individualCreate();
 
     $params = [
       'id' => $result['id'],
       'subject' => 'Make-it-Happen Meeting',
-      'activity_date_time' => '20091011123456',
+      'activity_date_time' => '2009-10-11 12:34:56',
       'duration' => 120,
       'location' => '21, Park Avenue',
       'details' => 'Lets update Meeting',
       'status_id' => 1,
       'source_contact_id' => $this->_contactID,
-      'assignee_contact_id' => $this->_contactID2,
+      'assignee_contact_id' => $this->individualCreate(),
+      'target_contact_id' => $this->individualCreate(),
       'priority_id' => 1,
     ];
 
     $result = $this->callAPISuccess('activity', 'create', $params);
-    //hack on date comparison - really we should make getAndCheck smarter to handle dates
-    $params['activity_date_time'] = '2009-10-11 12:34:56';
+
     // we also unset source_contact_id since it is stored in an aux table
     unset($params['source_contact_id']);
-    //Check if assignee created.
-    $assignee = $this->callAPISuccess('ActivityContact', 'get', [
+    //Check if assignee & target created.
+    $this->callAPISuccessGetCount('ActivityContact', [
       'activity_id' => $result['id'],
-      'return' => ["contact_id"],
-      'record_type_id' => "Activity Assignees",
+      'record_type_id' => ['IN' => ['Activity Assignees', 'Activity Targets']],
+    ], 2);
+
+    // Replace the existing 1 per type with 3 per type.
+    $this->callAPISuccess('Activity', 'create', [
+      'id' => $result['id'],
+      'assignee_contact_id' => [$this->individualCreate(), $this->individualCreate(), $this->individualCreate()],
+      'target_contact_id' => [$this->individualCreate(), $this->individualCreate(), $this->individualCreate()],
     ]);
-    $this->assertNotEmpty($assignee['values']);
+
+    //Check if assignee & target created.
+    $this->callAPISuccessGetCount('ActivityContact', [
+      'activity_id' => $result['id'],
+      'record_type_id' => ['IN' => ['Activity Assignees', 'Activity Targets']],
+    ], 6);
+
+    // Do a blank update - no deletes?
+    $this->callAPISuccess('Activity', 'create', [
+      'id' => $result['id'],
+    ]);
+    $this->callAPISuccessGetCount('ActivityContact', [
+      'activity_id' => $result['id'],
+      'record_type_id' => ['IN' => ['Activity Assignees', 'Activity Targets']],
+    ], 6);
 
     //clear assignee contacts.
-    $updateParams = [
+    $this->callAPISuccess('Activity', 'create', [
       'id' => $result['id'],
       'assignee_contact_id' => [],
-    ];
-    $activity = $this->callAPISuccess('activity', 'create', $updateParams);
-    $assignee = $this->callAPISuccess('ActivityContact', 'get', [
-      'activity_id' => $activity['id'],
-      'return' => ["contact_id"],
-      'record_type_id' => "Activity Assignees",
+      'target_contact_id' => [],
     ]);
-    $this->assertEmpty($assignee['values']);
+    $this->callAPISuccessGetCount('ActivityContact', [
+      'activity_id' => $result['id'],
+      'record_type_id' => ['IN' => ['Activity Assignees', 'Activity Targets']],
+    ], 0);
+
+    unset($params['source_contact_id']);
     $this->getAndCheck($params, $result['id'], 'activity');
   }
 
@@ -1284,8 +1305,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'priority_id' => 1,
     ];
 
-    $result = $this->callAPISuccess('activity', 'create', $params);
-    $findactivity = $this->callAPISuccess('Activity', 'Get', ['id' => $activity['id']]);
+    $this->callAPISuccess('Activity', 'create', $params);
+    $this->callAPISuccessGetSingle('Activity', ['id' => $activity['id']]);
   }
 
   /**

@@ -276,9 +276,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for deleteActivityTarget() method.
-   *
-   * deleteActivityTarget($activityId) method deletes activity target for given activity id.
+   * Test case for deleteActivityContact() method.
    */
   public function testDeleteActivityTarget() {
     $contactId = $this->individualCreate();

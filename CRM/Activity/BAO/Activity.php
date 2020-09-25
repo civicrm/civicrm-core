@@ -368,10 +368,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $assignmentParams = ['activity_id' => $activityId];
 
       if (is_array($params['assignee_contact_id'])) {
-        if (CRM_Utils_Array::value('deleteActivityAssignment', $params, TRUE)) {
-          // first delete existing assignments if any
-          self::deleteActivityContact($activityId, $assigneeID);
-        }
+        // first delete existing assignments if any
+        self::deleteActivityContact($activityId, $assigneeID);
 
         foreach ($params['assignee_contact_id'] as $acID) {
           if ($acID) {
@@ -403,10 +401,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
     }
-    else {
-      if (CRM_Utils_Array::value('deleteActivityAssignment', $params, TRUE)) {
-        self::deleteActivityContact($activityId, $assigneeID);
-      }
+    elseif (isset($params['assignee_contact_id'])) {
+      self::deleteActivityContact($activityId, $assigneeID);
     }
 
     if (is_a($resultAssignment, 'CRM_Core_Error')) {
@@ -421,10 +417,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $targetParams = ['activity_id' => $activityId];
       $resultTarget = [];
       if (is_array($params['target_contact_id'])) {
-        if (CRM_Utils_Array::value('deleteActivityTarget', $params, TRUE)) {
-          // first delete existing targets if any
-          self::deleteActivityContact($activityId, $targetID);
-        }
+        // first delete existing targets if any
+        self::deleteActivityContact($activityId, $targetID);
 
         foreach ($params['target_contact_id'] as $tid) {
           if ($tid) {
@@ -456,10 +450,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
     }
-    else {
-      if (CRM_Utils_Array::value('deleteActivityTarget', $params, TRUE)) {
-        self::deleteActivityContact($activityId, $targetID);
-      }
+    elseif (isset($params['target_contact_id'])) {
+      self::deleteActivityContact($activityId, $targetID);
     }
 
     // write to changelog before transaction is committed/rolled

@@ -86,6 +86,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     //$this->_mut->clearMessages();
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
+    $this->quickCleanup(['civicrm_activity_contact', 'civicrm_activity']);
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     //$this->cleanupMailingTest();
@@ -474,11 +475,18 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * Check that the earlier iterations's activity targets on the recorded
    * BulkEmail activity don't get wiped out by subsequent iterations when
    * using batches.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isBulk
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBatchActivityTargets() {
+  public function testBatchActivityTargets($isBulk) {
     $loggedInUserId = $this->createLoggedInUser();
 
     \Civi::settings()->set('mailerBatchLimit', 2);
+    \Civi::settings()->set('civimail_multiple_bulk_emails', $isBulk);
 
     // We have such small batches we need to lower this interval to get it
     // to create the activity.
