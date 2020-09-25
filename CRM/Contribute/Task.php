@@ -50,11 +50,18 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'title' => ts('Delete contributions'),
           'class' => 'CRM_Contribute_Form_Task_Delete',
           'result' => FALSE,
+          'key' => 'delete',
+          'is_support_standalone' => TRUE,
+          'is_single_mode' => FALSE,
         ],
         self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Contribute_Form_Task_Print',
           'result' => FALSE,
+          'key' => 'print',
+          'is_support_standalone' => TRUE,
+          // It works - just seems a bit odd.
+          'is_single_mode' => FALSE,
         ],
         self::TASK_EXPORT => [
           'title' => ts('Export contributions'),
@@ -62,7 +69,9 @@ class CRM_Contribute_Task extends CRM_Core_Task {
             'CRM_Contribute_Export_Form_Select',
             'CRM_Contribute_Export_Form_Map',
           ],
+          'key' => 'export',
           'result' => FALSE,
+          'is_single_mode' => FALSE,
         ],
         self::BATCH_UPDATE => [
           'title' => ts('Update multiple contributions'),
@@ -70,35 +79,68 @@ class CRM_Contribute_Task extends CRM_Core_Task {
             'CRM_Contribute_Form_Task_PickProfile',
             'CRM_Contribute_Form_Task_Batch',
           ],
+          'key' => 'batch_update',
           'result' => TRUE,
+          'is_support_standalone' => FALSE,
+          'is_single_mode' => FALSE,
         ],
         self::TASK_EMAIL => [
           'title' => ts('Email - send now (to %1 or less)', [
             1 => Civi::settings()
               ->get('simple_mail_limit'),
           ]),
+          'title_single_mode' => ts('Email'),
+          'key' => 'email',
+          'name' => ts('Email'),
           'class' => 'CRM_Contribute_Form_Task_Email',
           'result' => TRUE,
+          // Not yet!
+          'is_support_standalone' => FALSE,
+          'is_single_mode' => FALSE,
         ],
         self::UPDATE_STATUS => [
           'title' => ts('Record payments for contributions'),
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
+          'key' => 'update_status',
+          'is_support_standalone' => TRUE,
+          // We have a better link we can use for a single.
+          'is_single_mode' => FALSE,
         ],
         self::PDF_RECEIPT => [
           'title' => ts('Receipts - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
+          'name' => ts('Receipt'),
+          'is_support_standalone' => TRUE,
+          'key' => 'receipt',
+          'filters' => ['contribution_status_id' => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]],
+          'is_single_mode' => TRUE,
         ],
         self::PDF_THANKYOU => [
           'title' => ts('Thank-you letters - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
+          'name' => ts('Thank'),
+          'key' => 'thankyou',
+          'is_support_standalone' => TRUE,
+          'is_single_mode' => TRUE,
+          'filters' => ['contribution_status_id' => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]],
         ],
         self::PDF_INVOICE => [
           'title' => ts('Invoices - print or email'),
           'class' => 'CRM_Contribute_Form_Task_Invoice',
+          'name' => ts('Invoice'),
           'result' => FALSE,
+          'key' => 'invoice',
+          'is_support_standalone' => TRUE,
+          'is_single_mode' => TRUE,
+          'filters' => [
+            'contribution_status_id' => [
+              CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+              CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+            ],
+          ],
         ],
       ];
 
@@ -121,6 +163,35 @@ class CRM_Contribute_Task extends CRM_Core_Task {
     }
 
     return self::$_tasks;
+  }
+
+  /**
+   * Get links appropriate to the context of the row.
+   *
+   * @param $row
+   *
+   * @return array
+   */
+  public static function getContextualLinks($row) {
+    $tasks = self::tasks();
+    foreach ($tasks as $key => $task) {
+      if (empty($task['is_single_mode'])) {
+        unset($tasks[$key]);
+        continue;
+      }
+      if (!empty($task['filters'])) {
+        foreach ($task['filters'] as $filter => $values) {
+          if (!in_array($row[$filter], $values, FALSE)) {
+            unset($tasks[$key]);
+            continue 2;
+          }
+        }
+      }
+      $tasks[$key]['url'] = 'civicrm/contribute/task';
+      $tasks[$key]['qs'] = ['reset' => 1, 'id' => $row['contribution_id'], 'task' => $task['key']];
+      $tasks[$key]['title'] = $task['title_single_mode'] ?? $task['title'];
+    }
+    return $tasks;
   }
 
   /**

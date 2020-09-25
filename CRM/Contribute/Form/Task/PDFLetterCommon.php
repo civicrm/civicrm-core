@@ -77,7 +77,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     // skip some contacts ?
     $skipOnHold = $form->skipOnHold ?? FALSE;
     $skipDeceased = $form->skipDeceased ?? TRUE;
-    $contributionIDs = $form->getVar('_contributionIds');
+    $contributionIDs = $form->getIDs();
     if ($form->_includesSoftCredits) {
       //@todo - comment on what is stored there
       $contributionIDs = $form->getVar('_contributionContactIds');

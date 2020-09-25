@@ -39,11 +39,11 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
       $this, FALSE
     );
 
-    if ($id) {
-      $this->_contributionIds = [$id];
-      $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
-      $this->_single = TRUE;
-      $this->assign('totalSelectedContributions', 1);
+    if ($this->getIDs()) {
+      $this->_contributionIds = $this->getIDs();
+      $this->_componentClause = ' civicrm_contribution.id IN ( ' . implode(',', $this->getIDs()) . ' ) ';
+      $this->_single = count($this->getIDs()) === 1;
+      $this->assign('totalSelectedContributions', count($this->getIDs()));
     }
     else {
       parent::preProcess();
@@ -139,7 +139,7 @@ AND    {$this->_componentClause}";
     $template = CRM_Core_Smarty::singleton();
 
     $params = $this->controller->exportValues($this->_name);
-    $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
+    $elements = self::getElements($this->getIDs(), $params, $this->_contactIds);
 
     foreach ($elements['details'] as $contribID => $detail) {
       $input = $ids = [];

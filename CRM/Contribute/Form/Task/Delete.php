@@ -88,7 +88,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $deleted = $failed = 0;
-    foreach ($this->_contributionIds as $contributionId) {
+    foreach ($this->getIDs() as $contributionId) {
       if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionId)) {
         $deleted++;
       }

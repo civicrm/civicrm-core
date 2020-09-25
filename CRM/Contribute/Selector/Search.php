@@ -445,6 +445,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           'title' => $buttonName,
         ];
       }
+      $links += CRM_Contribute_Task::getContextualLinks($row);
 
       $row['action'] = CRM_Core_Action::formLink(
         $links,

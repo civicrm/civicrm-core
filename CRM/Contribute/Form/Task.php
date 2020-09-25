@@ -50,7 +50,19 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param \CRM_Core_Form_Task $form
+   * Get the contribution ids to act on.
+   *
+   * @return array
+   */
+  public function getIDs() {
+    if ($this->controller->get('id')) {
+      return (array) $this->controller->get('id');
+    }
+    return array_keys($this->_contributionIds);
+  }
+
+  /**
+   * @param \CRM_Contribute_Form_Task $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -63,15 +75,14 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     $contributeTasks = CRM_Contribute_Task::tasks();
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 
-    $ids = [];
     if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
+          $form->_contributionIds[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
         }
       }
     }
-    else {
+    elseif (!$form->getIDs()) {
       $queryParams = $form->get('queryParams');
       $isTest = FALSE;
       if (is_array($queryParams)) {
@@ -117,7 +128,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
       }
       $result = $query->searchQuery(0, 0, $sortOrder);
       while ($result->fetch()) {
-        $ids[] = $result->contribution_id;
+        $form->_contributionIds[] = $result->contribution_id;
         if ($form->_includesSoftCredits) {
           $contactIds[$result->contact_id] = $result->contact_id;
           $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
@@ -125,18 +136,18 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
       }
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
+    $form->_componentIds = $form->_contributionIds;
 
-    if (!empty($ids)) {
-      $form->_componentClause = ' civicrm_contribution.id IN ( ' . implode(',', $ids) . ' ) ';
+    if (!empty($form->getIDs())) {
+      $form->_componentClause = ' civicrm_contribution.id IN ( ' . implode(',', $form->getIDs()) . ' ) ';
 
-      $form->assign('totalSelectedContributions', count($ids));
+      $form->assign('totalSelectedContributions', count($form->getIDs()));
     }
     if (!empty($form->_includesSoftCredits) && !empty($contactIds)) {
       $form->_contactIds = $contactIds;
       $form->_contributionContactIds = $contributionContactIds;
     }
 
-    $form->_contributionIds = $form->_componentIds = $ids;
     $form->set('contributionIds', $form->_contributionIds);
 
     //set the context for redirection for any task actions

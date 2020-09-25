@@ -329,4 +329,10 @@
     <page_callback>CRM_Member_Page_RecurringContributions</page_callback>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
+  <item>
+    <path>civicrm/contribute/task</path>
+    <title>Contribution Task</title>
+    <page_callback>CRM_Contribute_Controller_Task</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
 </menu>
