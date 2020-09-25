@@ -8,6 +8,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+use Civi\Api4\ActivityContact;
 
 /**
  *
@@ -985,14 +986,11 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
 
       $activity = [
         'source_contact_id' => $mailing->scheduled_id,
-        // CRM-9519
-        'target_contact_id' => array_unique($targetParams),
         'activity_type_id' => $activityTypeID,
         'source_record_id' => $this->mailing_id,
         'activity_date_time' => $job_date,
         'subject' => $mailing->subject,
         'status_id' => 'Completed',
-        'deleteActivityTarget' => FALSE,
         'campaign_id' => $mailing->campaign_id,
       ];
 
@@ -1010,36 +1008,37 @@ AND    civicrm_activity.source_record_id = %2
         2 => [$this->mailing_id, 'Integer'],
       ];
       $activityID = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      $targetRecordID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');
 
+      $activityTargets = [];
+      foreach ($targetParams as $id) {
+        $activityTargets[$id] = ['contact_id' => (int) $id];
+      }
       if ($activityID) {
         $activity['id'] = $activityID;
 
         // CRM-9519
         if (CRM_Core_BAO_Email::isMultipleBulkMail()) {
-          static $targetRecordID = NULL;
-          if (!$targetRecordID) {
-            $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-            $targetRecordID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-          }
-
           // make sure we don't attempt to duplicate the target activity
-          foreach ($activity['target_contact_id'] as $key => $targetID) {
+          // @todo - we don't have to do one contact at a time....
+          foreach ($activityTargets as $key => $target) {
             $sql = "
 SELECT id
 FROM   civicrm_activity_contact
 WHERE  activity_id = $activityID
-AND    contact_id = $targetID
+AND    contact_id = {$target['contact_id']}
 AND    record_type_id = $targetRecordID
 ";
             if (CRM_Core_DAO::singleValueQuery($sql)) {
-              unset($activity['target_contact_id'][$key]);
+              unset($activityTargets[$key]);
             }
           }
         }
       }
 
       try {
-        civicrm_api3('Activity', 'create', $activity);
+        $activity = civicrm_api3('Activity', 'create', $activity);
+        ActivityContact::save(FALSE)->setRecords($activityTargets)->setDefaults(['activity_id' => $activity['id'], 'record_type_id' => $targetRecordID])->execute();
       }
       catch (Exception $e) {
         $result = FALSE;
