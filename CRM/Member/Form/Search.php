@@ -63,6 +63,9 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    * @throws \CiviCRM_API3_Exception
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     $this->_actionButtonName = $this->getButtonName('next', 'action');

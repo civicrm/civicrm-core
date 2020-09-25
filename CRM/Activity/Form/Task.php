@@ -38,14 +38,14 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
   /**
    * Common pre-process function.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
    *
    * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
     $form->_activityHolderIds = [];
 
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'];
     $activityTasks = CRM_Activity_Task::tasks();

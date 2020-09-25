@@ -19,6 +19,9 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
   protected $_customClass = NULL;
 
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Custom');
 
     $this->set('context', 'custom');

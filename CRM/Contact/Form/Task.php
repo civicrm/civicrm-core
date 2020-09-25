@@ -112,7 +112,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       $fragment .= '/custom';
     }
     if (!$isStandAlone) {
-      self::$_searchFormValues = $form->getFormValues();
+      self::$_searchFormValues = $form->getSearchFormValues();
     }
 
     //set the user context for redirection of task actions

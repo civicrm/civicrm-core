@@ -41,14 +41,14 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
    *
    * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
     $form->_memberIds = [];
 
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'];
     $tasks = CRM_Member_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
