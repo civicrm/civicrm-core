@@ -136,10 +136,11 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $properties
    * @param bool $localizable is this a field that should be localized
    * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   * @param bool $triggerRebuild should we trigger the rebuild of the multilingual schema
    *
    * @return bool
    */
-  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL) {
+  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL, $triggerRebuild = TRUE) {
     $locales = CRM_Core_I18n::getMultilingual();
     $queries = [];
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
@@ -162,7 +163,7 @@ class CRM_Upgrade_Incremental_Base {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
       }
     }
-    if ($locales) {
+    if ($locales && $triggerRebuild) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version, TRUE);
     }
     return TRUE;
