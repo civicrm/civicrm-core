@@ -24,6 +24,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   public function preProcess() {
 
     parent::preProcess();
+    $this->setContext();
 
     CRM_Utils_System::setTitle(ts('Manage - Scheduled Jobs'));
 
@@ -194,7 +195,15 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $jm->executeJobById($this->_id);
       $jobName = self::getJobName($this->_id);
       CRM_Core_Session::setStatus(ts('%1 Scheduled Job has been executed. See the log for details.', [1 => $jobName]), ts("Executed"), "success");
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
+
+      if ($this->getContext() === 'joblog') {
+        // If we were triggered via the joblog form redirect back there when we finish
+        $redirectUrl = CRM_Utils_System::url('civicrm/admin/joblog', 'reset=1&jid=' . $this->_id);
+      }
+      else {
+        $redirectUrl = CRM_Utils_System::url('civicrm/admin/job', 'reset=1');
+      }
+      CRM_Utils_System::redirect($redirectUrl);
       return;
     }
 

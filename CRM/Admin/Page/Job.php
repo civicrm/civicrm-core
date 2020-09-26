@@ -117,6 +117,9 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 0
     );
+    $this->_context = CRM_Utils_Request::retrieve('context', 'String',
+      $this, FALSE, 0
+    );
 
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
       try {
