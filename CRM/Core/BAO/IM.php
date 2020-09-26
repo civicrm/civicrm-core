@@ -30,9 +30,7 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * @throws \API_Exception
    */
   public static function add($params) {
-    if (empty($params['id']) || is_numeric($params['is_primary'] ?? NULL)) {
-      CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
-    }
+    CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
     return self::writeRecord($params);
   }
 

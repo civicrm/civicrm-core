@@ -26,19 +26,15 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param array $params
    *
-   * @return object
+   * @return \CRM_Core_DAO_Phone
+   *
    * @throws API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function create($params) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
-
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) ||
-      // if id is set & is_primary isn't we can assume no change
-      empty($params['id'])
-    ) {
-      CRM_Core_BAO_Block::handlePrimary($params, get_class());
-    }
+    CRM_Core_BAO_Block::handlePrimary($params, get_class());
     return self::writeRecord($params);
   }
 
@@ -69,6 +65,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return array
    *   array of phone objects
+   * @throws \CRM_Core_Exception
    */
   public static function &getValues($entityBlock) {
     $getValues = CRM_Core_BAO_Block::getValues('phone', $entityBlock);
