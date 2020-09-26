@@ -225,7 +225,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'text'],
         ],
       ],
-
+      [
+        'version' => '5.31.alpha1',
+        'upgrade_descriptor' => ts('Fix Smarty syntax on contribution receipt text'),
+        'templates' => [
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+        ],
+      ],
     ];
   }
 
