@@ -42,7 +42,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   private $_mut;
 
   public function setUp() {
-    $this->cleanupMailingTest();
     parent::setUp();
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
@@ -83,13 +82,10 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    */
   public function tearDown() {
-    //$this->_mut->clearMessages();
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
-    $this->quickCleanup(['civicrm_activity_contact', 'civicrm_activity']);
-    // DGW
+    $this->cleanupMailingTest();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    //$this->cleanupMailingTest();
     parent::tearDown();
   }
 
@@ -572,6 +568,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'civicrm_group',
       'civicrm_group_contact',
       'civicrm_contact',
+      'civicrm_activity_contact',
+      'civicrm_activity',
     ]);
   }
 
