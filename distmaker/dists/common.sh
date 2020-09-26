@@ -53,7 +53,7 @@ function dm_remove_files() {
   shift
 
   for file in "$@" ; do
-    [ -f "$tgt/$file" ] && rm -f "$tgt/$file"
+    [ -f "$tgt/$file" -o -L "$tgt/$file" ] && rm -f "$tgt/$file"
   done
 }
 
@@ -208,6 +208,8 @@ function dm_install_vendor() {
 
   [ ! -d "$to" ] && mkdir "$to"
   ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+  ## We don't this use CLI script in production, and the symlink breaks D7/BD URL installs
+  dm_remove_files "$to" "bin/pscss"
 }
 
 ##  usage: dm_install_wordpress <wp_repo_path> <to_path>
