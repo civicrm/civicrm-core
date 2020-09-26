@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ActivityContact;
+
 /**
  *
  * @package CRM
@@ -343,13 +345,37 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $assigneeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees');
     $targetID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');
 
+    $activityRecordTypes = [
+      'source_contact_id' => 'Activity Source',
+      'assignee_contact_id' => 'Activity Assignees',
+      'target_contact_id' => 'Activity Targets',
+    ];
+    $activityContacts = array_intersect_key($params, $activityRecordTypes);
+
+    // Unset any which are a single id - this is just because they have traditionally been updated as
+    // opposed to delete + possible create for the others.
+    // Potentially we should nuance it for the others too....
+    foreach ($activityContacts as $index => $value) {
+      if ($value && !is_array($value)) {
+        unset($activityContacts[$index]);
+      }
+    }
+
+    if ($action === 'edit' && !empty($activityContacts)) {
+      $wheres = [['activity_id', '=', $params['id']], ['record_type_id:name', 'IN', array_intersect_key($activityRecordTypes, $activityContacts)]];
+      // Delete all existing records for the types to be updated. Do a quick check to make sure there
+      // is at least one to avoid a delete query if not necessary (delete queries are more likely to cause contention).
+      if (ActivityContact::get($params['check_permissions'] ?? FALSE)->setLimit(1)->setWhere($wheres)->selectRowCount()->execute()) {
+        ActivityContact::delete($params['check_permissions'] ?? FALSE)->setWhere($wheres)->execute();
+      }
+    }
+
     if (isset($params['source_contact_id'])) {
       $acParams = [
         'activity_id' => $activityId,
         'contact_id' => $params['source_contact_id'],
         'record_type_id' => $sourceID,
       ];
-      self::deleteActivityContact($activityId, $sourceID);
       CRM_Activity_BAO_ActivityContact::create($acParams);
     }
 
@@ -363,9 +389,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $assignmentParams = ['activity_id' => $activityId];
 
       if (is_array($params['assignee_contact_id'])) {
-        // first delete existing assignments if any
-        self::deleteActivityContact($activityId, $assigneeID);
-
         foreach ($params['assignee_contact_id'] as $acID) {
           if ($acID) {
             $assigneeParams = [
@@ -396,9 +419,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         }
       }
     }
-    elseif (isset($params['assignee_contact_id'])) {
-      self::deleteActivityContact($activityId, $assigneeID);
-    }
 
     if (is_a($resultAssignment, 'CRM_Core_Error')) {
       $transaction->rollback();
@@ -410,8 +430,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
       $targetParams = ['activity_id' => $activityId];
       if (is_array($params['target_contact_id'])) {
-        // first delete existing targets if any
-        self::deleteActivityContact($activityId, $targetID);
 
         foreach ($params['target_contact_id'] as $tid) {
           if ($tid) {
@@ -442,9 +460,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           CRM_Activity_BAO_ActivityContact::create($targetParams);
         }
       }
-    }
-    elseif (isset($params['target_contact_id'])) {
-      self::deleteActivityContact($activityId, $targetID);
     }
 
     // write to changelog before transaction is committed/rolled
