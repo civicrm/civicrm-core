@@ -29,33 +29,20 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
-   * @param null $entity
-   *
    * @return array|NULL
    *   array of created address
    */
-  public static function create(&$params, $fixAddress = TRUE, $entity = NULL) {
+  public static function create(&$params, $fixAddress = TRUE) {
     if (!isset($params['address']) || !is_array($params['address'])) {
       return NULL;
     }
     CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
-    $addresses = [];
     $contactId = NULL;
 
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-    if (!$entity) {
-      $contactId = $params['contact_id'];
-      //get all the addresses for this contact
-      $addresses = self::allAddress($contactId);
-    }
-    else {
-      // get all address from location block
-      $entityElements = [
-        'entity_table' => $params['entity_table'],
-        'entity_id' => $params['entity_id'],
-      ];
-      $addresses = self::allEntityAddress($entityElements);
-    }
+    $contactId = $params['contact_id'];
+    //get all the addresses for this contact
+    $addresses = self::allAddress($contactId);
 
     $isPrimary = $isBilling = TRUE;
     $blocks = [];
