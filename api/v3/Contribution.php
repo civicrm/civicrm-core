@@ -471,23 +471,15 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws \Exception
  */
 function civicrm_api3_contribution_completetransaction($params) {
-  $input = $ids = [];
-
   $contribution = new CRM_Contribute_BAO_Contribution();
   $contribution->id = $params['id'];
   if (!$contribution->find(TRUE)) {
     throw new API_Exception('A valid contribution ID is required', 'invalid_data');
   }
-
-  if (isset($params['payment_processor_id'])) {
-    $input['payment_processor_id'] = $params['payment_processor_id'];
-  }
-  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
-    throw new API_Exception('failed to load related objects');
-  }
-  elseif ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+  if ($contribution->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
     throw new API_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
+
   $params['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
 
   $passThroughParams = [
@@ -496,6 +488,11 @@ function civicrm_api3_contribution_completetransaction($params) {
     'trxn_id',
   ];
   $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+
+  $ids = [];
+  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $input['payment_processor_id'] ?? NULL], $ids, TRUE)) {
+    throw new API_Exception('failed to load related objects');
+  }
 
   return _ipn_process_transaction($params, $contribution, $input, $ids);
 }
@@ -580,7 +577,6 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  * @throws API_Exception
  */
 function civicrm_api3_contribution_repeattransaction($params) {
-  $input = $ids = [];
   civicrm_api3_verify_one_mandatory($params, NULL, ['contribution_recur_id', 'original_contribution_id']);
   if (empty($params['original_contribution_id'])) {
     //  CRM-19873 call with test mode.
@@ -606,17 +602,10 @@ function civicrm_api3_contribution_repeattransaction($params) {
     );
   }
 
-  $input['payment_processor_id'] = $params['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
+  $params['payment_processor_id'] = civicrm_api3('contributionRecur', 'getvalue', [
     'return' => 'payment_processor_id',
     'id' => $contribution->contribution_recur_id,
   ]);
-
-  if (!$contribution->loadRelatedObjects($input, $ids, TRUE)) {
-    throw new API_Exception('failed to load related objects');
-  }
-
-  unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
-  $contribution->receive_date = $params['receive_date'];
 
   $passThroughParams = [
     'trxn_id',
@@ -629,6 +618,13 @@ function civicrm_api3_contribution_repeattransaction($params) {
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_fill_keys($passThroughParams, NULL));
+
+  $ids = [];
+  if (!$contribution->loadRelatedObjects(['payment_processor_id' => $input['payment_processor_id']], $ids, TRUE)) {
+    throw new API_Exception('failed to load related objects');
+  }
+  unset($contribution->id, $contribution->receive_date, $contribution->invoice_id);
+  $contribution->receive_date = $params['receive_date'];
 
   return _ipn_process_transaction($params, $contribution, $input, $ids);
 }
