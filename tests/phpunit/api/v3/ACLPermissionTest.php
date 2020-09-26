@@ -43,6 +43,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->cleanUpAfterACLs();
     $tablesToTruncate = [
       'civicrm_contact',
+      'civicrm_address',
       'civicrm_group_contact',
       'civicrm_group',
       'civicrm_acl',
