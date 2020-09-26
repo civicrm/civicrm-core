@@ -323,21 +323,8 @@ class CRM_Core_BAO_Block {
       }
 
       $blockFields = array_merge($value, $contactFields);
-      if ($name === 'Email') {
-        // @todo ideally all would call the api which is our main tested function,
-        // and towards that call the create rather than add which is preferred by the
-        // api. In order to be careful with change only email is swapped over here because it
-        // is specifically tested in testImportParserWithUpdateWithContactID
-        // and the primary handling is otherwise bypassed on importing an email update.
-        $blocks[] = CRM_Core_BAO_Email::create($blockFields);
-      }
-      elseif ($name === 'Phone') {
-        $blocks[] = CRM_Core_BAO_Phone::create($blockFields);
-      }
-      else {
-        $baoString = 'CRM_Core_BAO_' . $name;
-        $blocks[] = $baoString::add($blockFields);
-      }
+      $baoString = 'CRM_Core_BAO_' . $name;
+      $blocks[] = $baoString::create($blockFields);
     }
 
     return $blocks;
