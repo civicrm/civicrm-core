@@ -67,6 +67,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         'required' => TRUE,
       ],
       'description' => ['name' => 'description'],
+      'frontend_title' => ['name' => 'frontend_title'],
+      'frontend_description' => ['name' => 'frontend_description'],
     ];
   }
 
