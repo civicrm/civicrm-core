@@ -62,6 +62,30 @@ class CRM_Financial_BAO_Order {
   protected $overrideTotalAmount;
 
   /**
+   * Override for quantity.
+   *
+   * This would be used in the context of membership where we have a
+   * total amount override and a number of terms.
+   *
+   * @var int
+   */
+  protected $overrideQuantity;
+
+  /**
+   * @return int
+   */
+  public function getOverrideQuantity(): int {
+    return $this->overrideQuantity;
+  }
+
+  /**
+   * @param int $overrideQuantity
+   */
+  public function setOverrideQuantity(int $overrideQuantity): void {
+    $this->overrideQuantity = $overrideQuantity;
+  }
+
+  /**
    * Line items in the order.
    *
    * @var array
@@ -255,11 +279,13 @@ class CRM_Financial_BAO_Order {
         if ($taxRate) {
           // Total is tax inclusive.
           $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
-          $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+          $lineItem['line_total'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
         }
         else {
-          $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount();
+          $lineItem['line_total'] = $this->getOverrideTotalAmount();
         }
+        $lineItem['qty'] = $this->getOverrideQuantity() ?? 1;
+        $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
       }
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];

@@ -811,6 +811,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $order->setPriceSetID(self::getPriceSetID($this->_params));
     $order->setOverrideTotalAmount($this->_params['total_amount']);
     $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
+    $numRenewTerms = $this->_params['num_terms'] ?? 1;
+    if ($numRenewTerms > 1) {
+      $order->setOverrideQuantity($numRenewTerms);
+    }
     return [
       'lineItems' => [$this->_priceSetId => $order->getLineItems()],
       // This is one of those weird & wonderful legacy params we aim to get rid of.

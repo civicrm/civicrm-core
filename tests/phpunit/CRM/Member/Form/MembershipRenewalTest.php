@@ -19,6 +19,8 @@ use Civi\Api4\Contact;
  */
 class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
+  use CRM_Core_Payment_PaypalProTrait;
+
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -406,14 +408,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm();
     $this->mut = new CiviMailUtils($this, TRUE);
-    /** @var \CRM_Core_Payment_Dummy $processor */
-    $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
-    $processor->setDoDirectPaymentResult([
-      'payment_status_id' => 1,
-      'trxn_id' => 'kettles boil water',
-      'fee_amount' => .29,
-    ]);
-
+    $this->createPaypalProProcessor();
+    $this->processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['paypal_pro']);
+    $this->setupMockHandler();
     $this->callAPISuccess('MembershipType', 'create', [
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
@@ -559,9 +556,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
     $params = [
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y'),
-      'start_date' => '',
-      'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
       'membership_type_id' => [$this->ids['contact']['organization'], $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
@@ -572,7 +566,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => 0,
       'record_contribution' => TRUE,
       'trxn_id' => 777,
       'contribution_status_id' => 1,
@@ -589,12 +583,13 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ]);
 
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertEquals(777, $contribution['trxn_id']);
     $this->assertEquals(.5, $contribution['fee_amount']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
+      'qty' => 2,
     ], 1);
   }
 
