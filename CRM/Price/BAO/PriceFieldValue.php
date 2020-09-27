@@ -78,6 +78,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
     elseif (!$id) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+      if (!empty($params['membership_type_id']) && !isset($params['membership_num_terms'])) {
+        $params['membership_num_terms'] = 1;
+      }
     }
 
     $financialType = $params['financial_type_id'] ?? NULL;

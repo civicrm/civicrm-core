@@ -437,11 +437,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       [1 => [$contributionID, 'Integer'], 2 => [$membershipTypeID, 'Integer']]
     );
     $result->fetch();
-    if (!$result->membership_num_terms) {
-      Civi::log()->debug('membership num terms not set in corresponding line items, assuming 1 but could indicate an issue, contribution id ' . $contributionID . '  membership type id ' . $membershipTypeID);
-      $result->membership_num_terms = 1;
-    }
-    return $result->membership_num_terms * $result->qty;
+    return ($result->membership_num_terms ?? 1) * ($result->qty ?? 1);
   }
 
   /**
