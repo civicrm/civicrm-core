@@ -100,7 +100,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->_membershipID = $this->callAPISuccess('Membership', 'create', [
       'contact_id' => $this->_individualId,
       'membership_type_id' => $this->membershipTypeAnnualFixedID,
-      'join_date' => '2020-04-13',
+      'join_date' => date('Y-04-13'),
       'source' => 'original_source',
     ])['id'];
 
@@ -442,23 +442,19 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   public function testSubmitPayLater() {
     $form = $this->getForm(NULL);
     $this->createLoggedInUser();
-    $originalMembership = $this->callAPISuccessGetSingle('membership', []);
+    $originalMembership = $this->callAPISuccessGetSingle('Membership');
     $params = [
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y'),
-      'start_date' => '',
-      'end_date' => '',
-      // This format reflects the 23 being the organisation & the 25 being the type.
+      // This format reflects the first being the organisation & the second being the type.
       'membership_type_id' => [$this->ids['contact']['organization'], $this->membershipTypeAnnualFixedID],
       'auto_renew' => '0',
       'num_terms' => '2',
       'total_amount' => '50.00',
-      //Member dues, see data.xml
       'financial_type_id' => '2',
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => 0,
       'record_contribution' => TRUE,
       'trxn_id' => 777,
       'contribution_status_id' => 2,
@@ -468,19 +464,33 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->assertEquals(strtotime($membership['end_date']), strtotime($originalMembership['end_date']));
+    $this->assertEquals(strtotime($membership['start_date']), strtotime($originalMembership['start_date']));
+    $this->assertEquals(strtotime($membership['join_date']), strtotime($originalMembership['join_date']));
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 2,
       'return' => ['tax_amount', 'trxn_id'],
     ]);
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertEquals(777, $contribution['trxn_id']);
     $this->assertEquals(NULL, $contribution['tax_amount']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
+      'qty' => 2,
     ], 1);
+
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+      'payment_instrument_id' => 'Check',
+    ]);
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(strtotime($membership['start_date']), strtotime($originalMembership['start_date']));
+    $this->assertEquals(strtotime($membership['join_date']), strtotime($originalMembership['join_date']));
+    $this->assertEquals($membership['end_date'], date('Y') + 2 . '-12-31');
   }
 
   /**

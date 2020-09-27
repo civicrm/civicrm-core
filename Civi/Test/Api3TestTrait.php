@@ -218,7 +218,7 @@ trait Api3TestTrait {
    *
    * @return array|int
    */
-  public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
+  public function callAPISuccessGetSingle($entity, $params = [], $checkAgainst = NULL) {
     $params += [
       'version' => $this->_apiversion,
     ];

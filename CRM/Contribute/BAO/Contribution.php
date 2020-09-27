@@ -430,14 +430,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return int
    */
   public static function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
-    $numTerms = CRM_Core_DAO::singleValueQuery("
-      SELECT membership_num_terms FROM civicrm_line_item li
+    $result = CRM_Core_DAO::executeQuery("
+      SELECT membership_num_terms, qty FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
       WHERE contribution_id = %1 AND membership_type_id = %2",
       [1 => [$contributionID, 'Integer'], 2 => [$membershipTypeID, 'Integer']]
     );
-    // default of 1 is precautionary
-    return empty($numTerms) ? 1 : $numTerms;
+    $result->fetch();
+    if (!$result->membership_num_terms) {
+      Civi::log()->debug('membership num terms not set in corresponding line items, assuming 1 but could indicate an issue, contribution id ' . $contributionID . '  membership type id ' . $membershipTypeID);
+      $result->membership_num_terms = 1;
+    }
+    return $result->membership_num_terms * $result->qty;
   }
 
   /**

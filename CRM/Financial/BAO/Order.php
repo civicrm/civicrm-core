@@ -72,9 +72,9 @@ class CRM_Financial_BAO_Order {
   protected $overrideQuantity;
 
   /**
-   * @return int
+   * @return int|null
    */
-  public function getOverrideQuantity(): int {
+  public function getOverrideQuantity() {
     return $this->overrideQuantity;
   }
 
