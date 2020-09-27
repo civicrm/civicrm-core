@@ -610,22 +610,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
-      list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
+      [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
       $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
 
       //create line items
       $this->_params = $this->setPriceSetParameters($this->_params);
 
-      $order = new CRM_Financial_BAO_Order();
-      $order->setPriceSelectionFromUnfilteredInput($this->_params);
-      $order->setPriceSetID(self::getPriceSetID($this->_params));
-      $order->setOverrideTotalAmount($this->_params['total_amount']);
-      $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
-
-      $this->_params['lineItems'][$this->_priceSetId] = $order->getLineItems();
-      // This is one of those weird & wonderful legacy params we aim to get rid of.
-      $this->_params['processPriceSet'] = TRUE;
-      $this->_params['tax_amount'] = $order->getTotalTaxAmount();
+      $this->_params = array_merge($this->_params, $this->getOrderParams());
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
@@ -803,6 +794,29 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $membership->find(TRUE);
 
     return $membership;
+  }
+
+  /**
+   * Get order related params.
+   *
+   * In practice these are contribution params but later they cann be used with the Order api.
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getOrderParams(): array {
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSelectionFromUnfilteredInput($this->_params);
+    $order->setPriceSetID(self::getPriceSetID($this->_params));
+    $order->setOverrideTotalAmount($this->_params['total_amount']);
+    $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
+    return [
+      'lineItems' => [$this->_priceSetId => $order->getLineItems()],
+      // This is one of those weird & wonderful legacy params we aim to get rid of.
+      'processPriceSet' => TRUE,
+      'tax_amount' => $order->getTotalTaxAmount(),
+    ];
   }
 
 }
