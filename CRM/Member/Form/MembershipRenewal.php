@@ -553,7 +553,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'is_email_receipt' => !empty($this->_params['send_receipt']),
           'payment_instrument_id' => $this->_params['payment_instrument_id'],
           'invoice_id' => $this->_params['invoice_id'],
-        ], $membershipID = $paymentParams['membership_type_id'][1]);
+        ], $paymentParams['membership_type_id'][1]);
 
         $contributionRecurID = $contributionRecurParams['contributionRecurID'];
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
