@@ -614,18 +614,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
 
       //create line items
-      $this->_params = $this->setPriceSetParameters($this->_params);
-
-      $order = new CRM_Financial_BAO_Order();
-      $order->setPriceSelectionFromUnfilteredInput($this->_params);
-      $order->setPriceSetID(self::getPriceSetID($this->_params));
-      $order->setOverrideTotalAmount($this->_params['total_amount']);
-      $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
-
-      $this->_params['lineItems'][$this->_priceSetId] = $order->getLineItems();
-      // This is one of those weird & wonderful legacy params we aim to get rid of.
-      $this->_params['processPriceSet'] = TRUE;
-      $this->_params['tax_amount'] = $order->getTotalTaxAmount();
+      $orderParams = $this->getOrderParams($this->_params);
 
       //assign contribution contact id to the field expected by recordMembershipContribution
       if ($this->_contributorContactID != $this->_contactID) {
@@ -642,15 +631,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // not a great pattern & ideally it would not receive as a reference. We assign our params as a
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
-      $temporaryParams = array_merge($this->_params, [
+      $temporaryParams = array_merge($orderParams, [
         'membership_id' => $membership->id,
         'contribution_recur_id' => $contributionRecurID,
       ]);
-      //Remove `tax_amount` if it is not calculated.
-      // ?? WHY - I haven't been able to figure out...
-      if (CRM_Utils_Array::value('tax_amount', $temporaryParams) === 0.0) {
-        unset($temporaryParams['tax_amount']);
-      }
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
@@ -803,6 +787,33 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $membership->find(TRUE);
 
     return $membership;
+  }
+
+  /**
+   * Get the params to create the order - this is notably line items etc for the contribution.
+   *
+   * @param array $formParams
+   *   Submitted values.
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getOrderParams($formParams): array {
+    $formParams = $this->setPriceSetParameters($formParams);
+
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSelectionFromUnfilteredInput($formParams);
+    $order->setPriceSetID(self::getPriceSetID($formParams));
+    $order->setOverrideTotalAmount($formParams['total_amount']);
+    $order->setOverrideFinancialTypeID((int) $formParams['financial_type_id']);
+
+    $orderParams['lineItems'][$this->_priceSetId] = $order->getLineItems();
+    // This is one of those weird & wonderful legacy params we aim to get rid of.
+    $orderParams['processPriceSet'] = TRUE;
+    if ($order->getTotalTaxAmount()) {
+      $orderParams['tax_amount'] = $order->getTotalTaxAmount();
+    }
+    return $orderParams;
   }
 
 }
