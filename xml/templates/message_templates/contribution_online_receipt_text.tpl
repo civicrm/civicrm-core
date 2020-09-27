@@ -53,6 +53,7 @@
 {else}
 {ts}Amount{/ts}: {$amount|crmMoney:$currency} {if $amount_level } - {$amount_level} {/if}
 {/if}
+{/if}
 {if $receive_date}
 
 {ts}Date{/ts}: {$receive_date|crmDate}
@@ -83,7 +84,6 @@
 
 {$updateSubscriptionUrl}
 
-{/if}
 {/if}
 
 {if $honor_block_is_active}
