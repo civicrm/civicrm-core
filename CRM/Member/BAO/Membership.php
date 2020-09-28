@@ -1125,13 +1125,13 @@ AND civicrm_membership.is_test = %2";
    *   Reference to the array.
    *   containing all values of
    *   the current membership
-   * @param string $changeToday
+   * @param string|null $changeToday
    *   In case today needs
    *   to be customised, null otherwise
    *
    * @throws \CRM_Core_Exception
    */
-  public static function fixMembershipStatusBeforeRenew(&$currentMembership, $changeToday) {
+  public static function fixMembershipStatusBeforeRenew(&$currentMembership, $changeToday = NULL) {
     $today = 'now';
     if ($changeToday) {
       $today = CRM_Utils_Date::processDate($changeToday, NULL, FALSE, 'Y-m-d');
@@ -1150,8 +1150,6 @@ AND civicrm_membership.is_test = %2";
     if (empty($status) || empty($status['id'])) {
       throw new CRM_Core_Exception(ts('Oops, it looks like there is no valid membership status corresponding to the membership start and end dates for this membership. Contact the site administrator for assistance.'));
     }
-
-    $currentMembership['today_date'] = $today;
 
     if ($status['id'] !== $currentMembership['status_id']) {
       $oldStatus = $currentMembership['status_id'];
@@ -1181,10 +1179,7 @@ AND civicrm_membership.is_test = %2";
           $currentMembership['end_date'],
           $format
         ),
-        'modified_date' => CRM_Utils_Date::customFormat(
-          $currentMembership['today_date'],
-          $format
-        ),
+        'modified_date' => date('Y-m-d H:i:s', strtotime($today)),
         'membership_type_id' => $currentMembership['membership_type_id'],
         'max_related' => $currentMembership['max_related'] ?? 0,
       ];
