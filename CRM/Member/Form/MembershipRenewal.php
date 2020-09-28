@@ -79,13 +79,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public $_context;
 
   /**
-   * End date of renewed membership.
-   *
-   * @var string
-   */
-  protected $endDate = NULL;
-
-  /**
    * Has an email been sent.
    *
    * @var string
@@ -572,9 +565,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $renewalDate = !empty($this->_params['renewal_date']) ? $renewalDate = $this->_params['renewal_date'] : NULL;
 
-    // check for test membership.
-    $isTestMembership = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_membershipId, 'is_test');
-
     // chk for renewal for multiple terms CRM-8750
     $numRenewTerms = 1;
     if (is_numeric(CRM_Utils_Array::value('num_terms', $this->_params))) {
@@ -603,14 +593,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
     $membership = $this->processMembership($membershipParams, $renewalDate, $numRenewTerms, $pending);
 
-    $this->endDate = CRM_Utils_Date::processDate($membership->end_date);
-
-    $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membership->membership_type_id,
-      'name');
-
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
       [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
+      $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membership->membership_type_id,
+        'name');
       $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
 
       //create line items
