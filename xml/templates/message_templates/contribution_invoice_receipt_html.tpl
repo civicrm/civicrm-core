@@ -126,29 +126,28 @@
                 <td style="text-align:right;white-space: nowrap"><b><font size="1">{ts 1=$defaultCurrency}TOTAL %1{/ts}</font></b></td>
                 <td style="text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
               </tr>
-             {if $amountDue != 0}
-                <tr>
-                  <td colspan="3"></td>
-                  <td style="text-align:right;white-space: nowrap"><font size="1">
-                    {if $contribution_status_id == $refundedStatusId}
-                      {ts}Amount Credited{/ts}
-                    {else}
-                      {ts}Amount Paid{/ts}
-                    {/if}
-                   </font>
-                  </td>
-                  <td style="text-align:right;"><font size="1">{$amountPaid|crmMoney:$currency}</font></td>
-                </tr>
-                <tr>
-                  <td colspan="3"></td>
-                  <td colspan="2"><hr></hr></td>
-                </tr>
-                <tr>
-                  <td colspan="3"></td>
-                  <td style="text-align:right;white-space: nowrap" ><b><font size="1">{ts}AMOUNT DUE:{/ts}</font></b></td>
-                  <td style="text-align:right;"><b><font size="1">{$amountDue|crmMoney:$currency}</font></b></td>
-                </tr>
-              {/if}
+              <tr>
+                <td colspan="3"></td>
+                <td style="text-align:right;white-space: nowrap"><font size="1">
+                  {if $contribution_status_id == $refundedStatusId}
+                    {ts}Amount Credited{/ts}
+                  {else}
+                    {ts}Amount Paid{/ts}
+                  {/if}
+                 </font>
+                </td>
+                <td style="text-align:right;"><font size="1">{$amountPaid|crmMoney:$currency}</font></td>
+              </tr>
+              <tr>
+                <td colspan="3"></td>
+                <td colspan="2"><hr></hr></td>
+              </tr>
+              <tr>
+                <td colspan="3"></td>
+                <td style="text-align:right;white-space: nowrap" ><b><font size="1">{ts}AMOUNT DUE:{/ts}</font></b></td>
+                <td style="text-align:right;"><b><font size="1">{$amountDue|crmMoney:$currency}</font></b></td>
+              </tr>
+
               <br/><br/><br/>
               <tr>
                 <td colspan="5"></td>

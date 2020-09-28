@@ -75,8 +75,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertContains('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
     $this->assertContains('AMOUNT DUE:</font></b></td>
-                  <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
-
+                <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
   }
 
   /**
