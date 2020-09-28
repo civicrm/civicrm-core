@@ -225,7 +225,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'text'],
         ],
       ],
-
+      [
+        'version' => '5.30.beta1',
+        'upgrade_descriptor' => ts('Ensure that amount paid is shown even when fully paid'),
+        'templates' => [
+          ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 
