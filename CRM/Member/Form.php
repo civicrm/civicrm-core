@@ -358,19 +358,19 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @param array $contributionRecurParams
    *
-   * @param int $membershipID
+   * @param int $membershipTypeID
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  protected function processRecurringContribution($contributionRecurParams, $membershipID) {
+  protected function processRecurringContribution($contributionRecurParams, $membershipTypeID) {
 
     $mapping = [
       'frequency_interval' => 'duration_interval',
       'frequency_unit' => 'duration_unit',
     ];
     $membershipType = civicrm_api3('MembershipType', 'getsingle', [
-      'id' => $membershipID,
+      'id' => $membershipTypeID,
       'return' => $mapping,
     ]);
 
