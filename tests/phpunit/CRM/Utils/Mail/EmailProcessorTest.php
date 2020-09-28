@@ -163,7 +163,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       'api.GroupContact.create' => [
         'contact_id' => $this->contactID,
       ],
-    ]);
+    ])['id'];
     $this->createMailing(['scheduled_date' => 'now', 'groups' => ['include' => [$groupID]]]);
     $this->callAPISuccess('job', 'process_mailing', []);
     $this->eventQueue = $this->callAPISuccess('MailingEventQueue', 'get', ['api.MailingEventQueue.create' => ['hash' => 'aaaaaaaaaaaaaaaa']]);
