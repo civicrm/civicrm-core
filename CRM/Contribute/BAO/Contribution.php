@@ -4377,6 +4377,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   public static function completeOrder($input, $ids, $objects, $isPostPaymentCreate = FALSE) {
     $transaction = new CRM_Core_Transaction();
     $contribution = $objects['contribution'];
+    // Unset objects just to make it clear it's not used again.
+    unset($objects);
     // @todo see if we even need this - it's used further down to create an activity
     // but the BAO layer should create that - we just need to add a test to cover it & can
     // maybe remove $ids altogether.
@@ -4418,7 +4420,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionParams['payment_processor'] = $paymentProcessorId;
 
-    if (empty($contributionParams['payment_instrument_id']) && isset($contribution->_relatedObjects['paymentProcessor']['payment_instrument_id'])) {
+    if (empty($contributionParams['payment_instrument_id']) && $paymentProcessorId) {
       $contributionParams['payment_instrument_id'] = PaymentProcessor::get(FALSE)->addWhere('id', '=', $paymentProcessorId)->addSelect('payment_instrument_id')->execute()->first()['payment_instrument_id'];
     }
 
