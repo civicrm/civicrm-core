@@ -341,28 +341,57 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $activityId = $activity->id;
-    $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
-    $assigneeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees');
-    $targetID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');
-
     $activityRecordTypes = [
-      'source_contact_id' => 'Activity Source',
-      'assignee_contact_id' => 'Activity Assignees',
-      'target_contact_id' => 'Activity Targets',
+      'source_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source'),
+      'assignee_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'),
+      'target_contact_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
     ];
-    $activityContacts = array_intersect_key($params, $activityRecordTypes);
 
-    // Unset any which are a single id - this is just because they have traditionally been updated as
-    // opposed to delete + possible create for the others.
-    // Potentially we should nuance it for the others too....
-    foreach ($activityContacts as $index => $value) {
-      if ($value && !is_array($value)) {
-        unset($activityContacts[$index]);
+    $activityContacts = [];
+    // Cast to an array if we just have an integer. Index by record type id.
+    foreach ($activityRecordTypes as $key => $recordTypeID) {
+      if (isset($params[$key])) {
+        if (empty($params[$key])) {
+          $activityContacts[$recordTypeID] = [];
+        }
+        else {
+          foreach ((array) $params[$key] as $contactID) {
+            $activityContacts[$recordTypeID][$contactID] = (int) $contactID;
+          }
+        }
       }
     }
 
     if ($action === 'edit' && !empty($activityContacts)) {
-      $wheres = [['activity_id', '=', $params['id']], ['record_type_id:name', 'IN', array_intersect_key($activityRecordTypes, $activityContacts)]];
+      $wheres = [];
+      foreach ($activityContacts as $recordTypeID => $contactIDs) {
+        if (!empty($contactIDs)) {
+          $wheres[$key] = "(record_type_id = $recordTypeID AND contact_id IN (" . implode(',', $contactIDs) . '))';
+        }
+      }
+      $existingArray = empty($wheres) ? [] : CRM_Core_DAO::executeQuery("
+        SELECT id, contact_id, record_type_id
+        FROM civicrm_activity_contact
+        WHERE activity_id = %1
+          AND (" . implode(' OR ', $wheres) . ')',
+      [1 => [$params['id'], 'Integer']])->fetchAll();
+
+      $recordsToKeep = [];
+      $wheres = [['activity_id', '=', $params['id']], ['record_type_id', 'IN', array_keys($activityContacts)]];
+
+      foreach ($existingArray as $existingRecords) {
+        $recordsToKeep[$existingRecords['id']] = ['contact_id' => $existingRecords['contact_id'], 'record_type_id' => $existingRecords['record_type_id']];
+        unset($activityContacts[$recordTypeID][$existingRecords['contact_id']]);
+        if (empty($activityContacts[$recordTypeID])) {
+          // If we just removed the last one to update then also unset the key.
+          unset($activityContacts[$recordTypeID]);
+        }
+      }
+
+      if (!empty($recordsToKeep)) {
+        $wheres[] = ['id', 'NOT IN', array_keys($recordsToKeep)];
+      }
+
       // Delete all existing records for the types to be updated. Do a quick check to make sure there
       // is at least one to avoid a delete query if not necessary (delete queries are more likely to cause contention).
       if (ActivityContact::get($params['check_permissions'] ?? FALSE)->setLimit(1)->setWhere($wheres)->selectRowCount()->execute()) {
@@ -370,97 +399,20 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
     }
 
-    if (isset($params['source_contact_id'])) {
-      $acParams = [
-        'activity_id' => $activityId,
-        'contact_id' => $params['source_contact_id'],
-        'record_type_id' => $sourceID,
-      ];
-      CRM_Activity_BAO_ActivityContact::create($acParams);
+    $activityContactApiValues = [];
+    foreach ($activityContacts as $recordTypeID => $contactIDs) {
+      foreach ($contactIDs as $contactID) {
+        $activityContactApiValues[] = ['record_type_id' => $recordTypeID, 'contact_id' => $contactID];
+      }
+    }
+
+    if (!empty($activityContactApiValues)) {
+      ActivityContact::save($params['check_permissions'] ?? FALSE)->addDefault('activity_id', $activityId)
+        ->setRecords($activityContactApiValues)->execute();
     }
 
     // check and attach and files as needed
     CRM_Core_BAO_File::processAttachment($params, 'civicrm_activity', $activityId);
-
-    // attempt to save activity assignment
-    $resultAssignment = NULL;
-    if (!empty($params['assignee_contact_id'])) {
-
-      $assignmentParams = ['activity_id' => $activityId];
-
-      if (is_array($params['assignee_contact_id'])) {
-        foreach ($params['assignee_contact_id'] as $acID) {
-          if ($acID) {
-            $assigneeParams = [
-              'activity_id' => $activityId,
-              'contact_id' => $acID,
-              'record_type_id' => $assigneeID,
-            ];
-            CRM_Activity_BAO_ActivityContact::create($assigneeParams);
-          }
-        }
-      }
-      else {
-        $assignmentParams['contact_id'] = $params['assignee_contact_id'];
-        $assignmentParams['record_type_id'] = $assigneeID;
-        if (!empty($params['id'])) {
-          $assignment = new CRM_Activity_BAO_ActivityContact();
-          $assignment->activity_id = $activityId;
-          $assignment->record_type_id = $assigneeID;
-          $assignment->find(TRUE);
-
-          if ($assignment->contact_id != $params['assignee_contact_id']) {
-            $assignmentParams['id'] = $assignment->id;
-            $resultAssignment = CRM_Activity_BAO_ActivityContact::create($assignmentParams);
-          }
-        }
-        else {
-          $resultAssignment = CRM_Activity_BAO_ActivityContact::create($assignmentParams);
-        }
-      }
-    }
-
-    if (is_a($resultAssignment, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $resultAssignment;
-    }
-
-    // attempt to save activity targets
-    if (!empty($params['target_contact_id'])) {
-
-      $targetParams = ['activity_id' => $activityId];
-      if (is_array($params['target_contact_id'])) {
-
-        foreach ($params['target_contact_id'] as $tid) {
-          if ($tid) {
-            $targetContactParams = [
-              'activity_id' => $activityId,
-              'contact_id' => $tid,
-              'record_type_id' => $targetID,
-            ];
-            CRM_Activity_BAO_ActivityContact::create($targetContactParams);
-          }
-        }
-      }
-      else {
-        $targetParams['contact_id'] = $params['target_contact_id'];
-        $targetParams['record_type_id'] = $targetID;
-        if (!empty($params['id'])) {
-          $target = new CRM_Activity_BAO_ActivityContact();
-          $target->activity_id = $activityId;
-          $target->record_type_id = $targetID;
-          $target->find(TRUE);
-
-          if ($target->contact_id != $params['target_contact_id']) {
-            $targetParams['id'] = $target->id;
-            CRM_Activity_BAO_ActivityContact::create($targetParams);
-          }
-        }
-        else {
-          CRM_Activity_BAO_ActivityContact::create($targetParams);
-        }
-      }
-    }
 
     // write to changelog before transaction is committed/rolled
     // back (and prepare status to display)
