@@ -60,8 +60,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'] ?? NULL;
-    $contributeTasks = CRM_Contribute_Task::tasks();
-    $form->assign('taskName', CRM_Utils_Array::value($form->_task, $contributeTasks));
 
     $ids = [];
     if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {

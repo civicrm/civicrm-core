@@ -46,8 +46,6 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
     $values = $form->controller->exportValues('Search');
 
     $form->_task = $values['task'];
-    $pledgeTasks = CRM_Pledge_Task::tasks();
-    $form->assign('taskName', $pledgeTasks[$form->_task]);
 
     $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {

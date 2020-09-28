@@ -129,8 +129,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $cacheKey = "civicrm search {$qfKey}";
 
     $form->_task = self::$_searchFormValues['task'] ?? NULL;
-    $crmContactTaskTasks = CRM_Contact_Task::taskTitles();
-    $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
 
     // all contacts or action = save a search
     if ((CRM_Utils_Array::value('radio_ts', self::$_searchFormValues) == 'ts_all') ||

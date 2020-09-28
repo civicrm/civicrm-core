@@ -34,9 +34,6 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
     $values = $this->controller->exportValues('Search');
 
     $this->_task = $values['task'];
-    $campaignTasks = CRM_Campaign_Task::tasks();
-    $taskName = $campaignTasks[$this->_task] ?? NULL;
-    $this->assign('taskName', $taskName);
 
     $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
