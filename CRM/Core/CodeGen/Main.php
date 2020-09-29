@@ -5,6 +5,10 @@
  */
 class CRM_Core_CodeGen_Main {
   public $buildVersion;
+
+  /**
+   * @var string
+   */
   public $db_version;
   /**
    * drupal, joomla, wordpress
@@ -76,11 +80,11 @@ class CRM_Core_CodeGen_Main {
 
     $versionFile = $this->phpCodePath . "/xml/version.xml";
     $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
-    $this->db_version = $versionXML->version_no;
+    $this->db_version = (string) $versionXML->version_no;
     $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
     if (isset($argVersion)) {
       // change the version to that explicitly passed, if any
-      $this->db_version = $argVersion;
+      $this->db_version = (string) $argVersion;
     }
 
     $this->schemaPath = $schemaPath;
