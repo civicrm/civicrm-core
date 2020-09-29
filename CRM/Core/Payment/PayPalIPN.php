@@ -206,7 +206,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    $this->single($input, $ids, $objects, TRUE);
+    $this->single($input, [
+      'related_contact' => $ids['related_contact'] ?? NULL,
+      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+    ], $objects, TRUE);
   }
 
   /**
@@ -248,11 +252,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
-      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], $objects);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
   }
 
   /**
@@ -359,7 +359,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         Civi::log()->debug('Returning since contribution status is not handled');
         return;
       }
-      $this->single($input, $ids, $objects);
+      $this->single($input, [
+        'related_contact' => $ids['related_contact'] ?? NULL,
+        'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+        'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+      ], $objects);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage());
