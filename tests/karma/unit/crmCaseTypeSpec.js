@@ -726,34 +726,6 @@ describe('crmCaseType', function() {
     });
   });
 
-  describe('crmAddName', function () {
-    var element;
-
-    beforeEach(function() {
-      scope = $rootScope.$new();
-      scope.activityTypeOptions = [1, 2, 3];
-      element = '<span crm-add-name crm-options="activityTypeOptions"></span>';
-
-      spyOn(CRM.$.fn, 'crmSelect2').and.callThrough();
-
-      element = $compile(element)(scope);
-      scope.$digest();
-    });
-
-    describe('when initialized', function () {
-      var returnValue;
-
-      beforeEach (function () {
-        var dataFunction = CRM.$.fn.crmSelect2.calls.argsFor(0)[0].data;
-        returnValue = dataFunction();
-      });
-
-      it('updates the UI with updated value of scope variable', function () {
-        expect(returnValue).toEqual({ results: scope.activityTypeOptions });
-      });
-    });
-  });
-
   describe('crmEditableTabTitle', function () {
     var element, titleLabel, penIcon, saveButton, cancelButton;
 
@@ -1013,28 +985,6 @@ describe('crmCaseType', function() {
 
         it('removes the case type from the list', function() {
           expect(scope.caseTypes[caseType.id]).toBeUndefined();
-        });
-      });
-
-      describe('when the case type cannot be delted', function() {
-        var error = { error_message: 'Error Message' };
-
-        beforeEach(function() {
-          var errorHandler;
-
-          crmApiSpy.and.returnValue($q.reject(error));
-          scope.caseTypes[caseType.id] = caseType;
-
-          spyOn(CRM, 'alert');
-          scope.deleteCaseType(caseType);
-          scope.$digest();
-
-          errorHandler = crmApiSpy.calls.mostRecent().args[3].error;
-          errorHandler(error);
-        });
-
-        it('displays the error message', function() {
-          expect(CRM.alert).toHaveBeenCalledWith(error.error_message, 'Error', 'error');
         });
       });
 
