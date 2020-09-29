@@ -311,7 +311,13 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
     if ($isDeleted) {
       $title = "<del>{$title}</del>";
-      $mergedTo = civicrm_api3('Contact', 'getmergedto', ['contact_id' => $contactId, 'api.Contact.get' => ['return' => 'display_name']]);
+      try {
+        $mergedTo = civicrm_api3('Contact', 'getmergedto', ['contact_id' => $contactId, 'api.Contact.get' => ['return' => 'display_name']]);
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        CRM_Core_Session::singleton()->setStatus(ts('This contact was deleted during a merge operation. The contact it was merged into cannot be found and may have been deleted.'));
+        $mergedTo = ['count' => 0];
+      }
       if ($mergedTo['count']) {
         $mergedToContactID = $mergedTo['id'];
         $mergedToDisplayName = $mergedTo['values'][$mergedToContactID]['api.Contact.get']['values'][0]['display_name'];
