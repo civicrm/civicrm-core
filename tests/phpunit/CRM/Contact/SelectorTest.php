@@ -453,7 +453,7 @@ AND (contact_a.is_deleted = 0)',
    */
   public function testSelectorQueryOnNonASCIIlocationType() {
     $contactID = $this->individualCreate();
-    $locationType = $this->locationTypeCreate([
+    $locationTypeID = $this->locationTypeCreate([
       'name' => 'Non ASCII Location Type',
       'display_name' => 'Дом Location type',
       'vcard_name' => 'Non ASCII Location Type',
@@ -461,7 +461,7 @@ AND (contact_a.is_deleted = 0)',
     ]);
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $contactID,
-      'location_type_id' => $locationType->id,
+      'location_type_id' => $locationTypeID,
       'email' => 'test@test.com',
     ]);
 
@@ -470,7 +470,7 @@ AND (contact_a.is_deleted = 0)',
       ['email' => ['IS NOT NULL' => 1]],
       [
         [
-          0 => 'email-' . $locationType->id,
+          0 => 'email-' . $locationTypeID,
           1 => 'IS NOT NULL',
           2 => NULL,
           3 => 1,
@@ -483,7 +483,7 @@ AND (contact_a.is_deleted = 0)',
         'sort_name' => 1,
         'location' => [
           'Non ASCII Location Type' => [
-            'location_type' => $locationType->id,
+            'location_type' => $locationTypeID,
             'email' => 1,
           ],
         ],
