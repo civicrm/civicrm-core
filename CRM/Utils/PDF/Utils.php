@@ -194,6 +194,7 @@ class CRM_Utils_PDF_Utils {
       // CRM-19183 remove .pdf extension from filename
       $fileName = basename($fileName, ".pdf");
       $dompdf->stream($fileName);
+      CRM_Utils_System::civiExit();
     }
   }
 
