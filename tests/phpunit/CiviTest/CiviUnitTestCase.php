@@ -1230,7 +1230,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // clear getfields cache
     CRM_Core_PseudoConstant::flush();
     $this->callAPISuccess('phone', 'getfields', ['version' => 3, 'cache_clear' => 1]);
-    return $locationType;
+    return $locationType->id;
   }
 
   /**

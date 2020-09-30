@@ -35,8 +35,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->useTransaction();
 
     $this->_contactID = $this->organizationCreate();
-    $loc = $this->locationTypeCreate();
-    $this->_locationType = $loc->id;
+    $this->_locationType = $this->locationTypeCreate();
     CRM_Core_PseudoConstant::flush();
     $this->_params = [
       'contact_id' => $this->_contactID,
