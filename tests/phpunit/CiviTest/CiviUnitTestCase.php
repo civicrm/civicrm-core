@@ -494,6 +494,24 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->unsetExtensionSystem();
     $this->assertEquals([], CRM_Core_DAO::$_nullArray);
     $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
+    static::stripProperties($this);
+  }
+
+  /**
+   * Unset any properties, freeing memory.
+   *
+   * https://tomnewby.net/posts/speed-up-phpunit-1-weird-trick/
+   *
+   * @param \object $target
+   */
+  public static function stripProperties($target): void {
+    $refl = new \ReflectionObject($target);
+    foreach ($refl->getProperties() as $prop) {
+      if (!$prop->isStatic() && 0 !== \strncmp($prop->getDeclaringClass()->getName(), 'PHPUnit_', 8)) {
+        $prop->setAccessible(TRUE);
+        $prop->setValue($target, NULL);
+      }
+    }
   }
 
   /**
