@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dab2def1e60e4c40f0e9141463f1697b",
+    "content-hash": "197ce47c1897c60cbc5ce809f3d5cf14",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -310,17 +310,76 @@
             "time": "2020-02-05T03:24:26+00:00"
         },
         {
-            "name": "civicrm/composer-compile-plugin",
-            "version": "v0.8",
+            "name": "civicrm/composer-compile-lib",
+            "version": "v0.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/civicrm/composer-compile-plugin.git",
-                "reference": "bcc7731731702434340715402d7fd3d6af250d00"
+                "url": "https://github.com/civicrm/composer-compile-lib.git",
+                "reference": "ceed2f3abe500a8333470a1e916812391cd68261"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/bcc7731731702434340715402d7fd3d6af250d00",
-                "reference": "bcc7731731702434340715402d7fd3d6af250d00",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-lib/zipball/ceed2f3abe500a8333470a1e916812391cd68261",
+                "reference": "ceed2f3abe500a8333470a1e916812391cd68261",
+                "shasum": ""
+            },
+            "require": {
+                "civicrm/composer-compile-plugin": "~0.9 || ~1.0",
+                "padaliyajay/php-autoprefixer": "~1.2",
+                "scssphp/scssphp": "~1.2",
+                "symfony/filesystem": "~2.8 || ~3.4 || ~4.0 || ~5.0",
+                "tubalmartin/cssmin": "^4.1"
+            },
+            "type": "library",
+            "extra": {
+                "compile": [
+                    {
+                        "title": "Generate <comment>CCL</comment> wrapper functions",
+                        "run": [
+                            "@php-script src/StubsTpl.php"
+                        ],
+                        "watch-files": [
+                            "src/StubsTpl.php",
+                            "src/Functions.php"
+                        ]
+                    }
+                ]
+            },
+            "autoload": {
+                "psr-0": {
+                    "CCL": ""
+                },
+                "psr-4": {
+                    "CCL\\": [
+                        "src/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CiviCRM",
+                    "email": "info@civicrm.org"
+                }
+            ],
+            "description": "Small library of compilation helpers",
+            "time": "2020-09-30T22:30:37+00:00"
+        },
+        {
+            "name": "civicrm/composer-compile-plugin",
+            "version": "v0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/civicrm/composer-compile-plugin.git",
+                "reference": "2624473090698cf813d14545a70b422b48f263e8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-plugin/zipball/2624473090698cf813d14545a70b422b48f263e8",
+                "reference": "2624473090698cf813d14545a70b422b48f263e8",
                 "shasum": ""
             },
             "require": {
@@ -352,7 +411,7 @@
                 }
             ],
             "description": "Define a 'compile' event for all packages in the dependency-graph",
-            "time": "2020-09-24T11:50:28+00:00"
+            "time": "2020-09-30T21:14:46+00:00"
         },
         {
             "name": "civicrm/composer-downloads-plugin",
@@ -920,16 +979,16 @@
         },
         {
             "name": "padaliyajay/php-autoprefixer",
-            "version": "1.2",
+            "version": "1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/padaliyajay/php-autoprefixer.git",
-                "reference": "0f36b7cfbd71d25836bcb9f4b58c09252ca4e9ec"
+                "reference": "f05f374f0c1e463db62209613f52b38bf4b52430"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/padaliyajay/php-autoprefixer/zipball/0f36b7cfbd71d25836bcb9f4b58c09252ca4e9ec",
-                "reference": "0f36b7cfbd71d25836bcb9f4b58c09252ca4e9ec",
+                "url": "https://api.github.com/repos/padaliyajay/php-autoprefixer/zipball/f05f374f0c1e463db62209613f52b38bf4b52430",
+                "reference": "f05f374f0c1e463db62209613f52b38bf4b52430",
                 "shasum": ""
             },
             "require": {
@@ -951,7 +1010,7 @@
                 }
             ],
             "description": "CSS Autoprefixer written in pure PHP.",
-            "time": "2019-03-06T12:49:40+00:00"
+            "time": "2019-11-26T09:55:37+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -3320,6 +3379,59 @@
                 "recurrence",
                 "time"
             ]
+        },
+        {
+            "name": "tubalmartin/cssmin",
+            "version": "v4.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port.git",
+                "reference": "3cbf557f4079d83a06f9c3ff9b957c022d7805cf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tubalmartin/YUI-CSS-compressor-PHP-port/zipball/3cbf557f4079d83a06f9c3ff9b957c022d7805cf",
+                "reference": "3cbf557f4079d83a06f9c3ff9b957c022d7805cf",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcre": "*",
+                "php": ">=5.3.2"
+            },
+            "require-dev": {
+                "cogpowered/finediff": "0.3.*",
+                "phpunit/phpunit": "4.8.*"
+            },
+            "bin": [
+                "cssmin"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "tubalmartin\\CssMin\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Túbal Martín",
+                    "homepage": "http://tubalmartin.me/"
+                }
+            ],
+            "description": "A PHP port of the YUI CSS compressor",
+            "homepage": "https://github.com/tubalmartin/YUI-CSS-compressor-PHP-port",
+            "keywords": [
+                "compress",
+                "compressor",
+                "css",
+                "cssmin",
+                "minify",
+                "yui"
+            ],
+            "time": "2018-01-15T15:26:51+00:00"
         },
         {
             "name": "typo3/phar-stream-wrapper",
