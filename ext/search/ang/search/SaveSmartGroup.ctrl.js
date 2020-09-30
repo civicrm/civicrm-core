@@ -45,8 +45,7 @@
     }
 
     // Pick the first applicable column for contact id
-    model.api_params.select[0] = _.intersection(model.api_params.select, _.pluck($scope.columns, 'id'))[0] || $scope.columns[0].name;
-    model.api_params.select.length = 1;
+    model.api_params.select.unshift(_.intersection(model.api_params.select, _.pluck($scope.columns, 'id'))[0] || $scope.columns[0].id);
 
     if (!CRM.checkPerm('administer reserved groups')) {
       $scope.groupEntityRefParams.api.params.is_reserved = 0;
@@ -76,6 +75,7 @@
       group.visibility = model.visibility;
       group.group_type = model.group_type;
       group.saved_search_id = '$id';
+      model.api_params.select = _.unique(model.api_params.select);
       var savedSearch = {
         api_entity: model.api_entity,
         api_params: model.api_params

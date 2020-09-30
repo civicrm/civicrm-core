@@ -568,8 +568,8 @@
           api_params: _.cloneDeep(angular.extend({}, ctrl.params, {version: 4}))
         };
         delete model.api_params.orderBy;
-        if (ctrl.load && ctrl.load.api_params) {
-          model.api_params.select = ctrl.load.api_params.select;
+        if (ctrl.load && ctrl.load.api_params && ctrl.load.api_params.select && ctrl.load.api_params.select[0]) {
+          model.api_params.select.unshift(ctrl.load.api_params.select[0]);
         }
         var options = CRM.utils.adjustDialogDefaults({
           autoOpen: false,

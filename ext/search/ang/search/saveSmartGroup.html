@@ -1,6 +1,5 @@
 <form id="bootstrap-theme">
   <div ng-controller="SaveSmartGroup">
-    <div crm-ui-debug="model"></div>
     <input class="form-control" id="api-save-search-select-group" ng-model="model.id" crm-entityref="groupEntityRefParams" >
     <label ng-show="!model.id">{{:: ts('Or') }}</label>
     <input class="form-control" placeholder="{{:: ts('Create new group') }}" ng-model="model.title" ng-show="!model.id">
