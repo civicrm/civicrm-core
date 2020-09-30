@@ -480,7 +480,7 @@ SELECT g.*
       $cacheKey = CRM_Utils_Cache::cleanKey("$tableName-$aclKeys");
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
-      if (!$ids) {
+      if (!is_array($ids)) {
         $ids = [];
         $query = "
 SELECT   a.operation, a.object_id
