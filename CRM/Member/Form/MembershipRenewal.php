@@ -130,10 +130,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('formClass', 'membershiprenew');
     parent::preProcess();
 
-    $this->assign('endDate', CRM_Utils_Date::customFormat(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-      $this->_id, 'end_date'
-    )
-    ));
+    // @todo - we should store this as a property & re-use in setDefaults - for now that's a bigger change.
+    $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $this->_id]);
+    CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership);
+
+    $this->assign('endDate', $currentMembership['end_date']);
     $this->assign('membershipStatus',
       CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
         CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
@@ -747,9 +748,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       ]);
       return CRM_Member_BAO_Membership::create($memParams);
     }
-
-    // Check and fix the membership if it is STALE
-    CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
 
     $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
 

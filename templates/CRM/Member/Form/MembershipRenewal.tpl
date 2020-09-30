@@ -68,7 +68,7 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-end_date">
         <td class="label">{ts}Membership End Date{/ts}</td>
-        <td class="html-adjust">&nbsp;{$endDate}</td>
+        <td class="html-adjust">&nbsp;{$endDate|crmDate}</td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
