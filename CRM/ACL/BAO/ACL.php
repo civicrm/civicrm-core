@@ -204,8 +204,6 @@ SELECT      acl.*
   protected static function getGroupACLRoles($contact_id) {
     $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
 
-    $rule = new CRM_ACL_BAO_ACL();
-
     $query = "   SELECT          acl.*
                         FROM            civicrm_acl acl
                         INNER JOIN      civicrm_option_group og
@@ -228,7 +226,7 @@ SELECT      acl.*
 
     $results = [];
 
-    $rule->query($query);
+    $rule = CRM_Core_DAO::executeQuery($query);
 
     while ($rule->fetch()) {
       $results[$rule->id] = $rule->toArray();
@@ -249,7 +247,7 @@ SELECT acl.*
    AND acl.entity_table   = 'civicrm_acl_role'
 ";
 
-    $rule->query($query);
+    $rule = CRM_Core_DAO::executeQuery($query);
     while ($rule->fetch()) {
       $results[$rule->id] = $rule->toArray();
     }
