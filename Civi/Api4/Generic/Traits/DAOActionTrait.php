@@ -110,7 +110,6 @@ trait DAOActionTrait {
     $oddballs = [
       'EntityTag' => 'add',
       'GroupContact' => 'add',
-      'Website' => 'add',
     ];
     $method = $oddballs[$this->getEntityName()] ?? 'create';
     if (!method_exists($baoName, $method)) {

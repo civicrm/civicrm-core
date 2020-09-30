@@ -24,9 +24,11 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Create or update Website record.
    *
    * @param array $params
+   *
    * @return CRM_Core_DAO_Website
+   * @throws \CRM_Core_Exception
    */
-  public static function add($params) {
+  public static function create($params) {
     return self::writeRecord($params);
   }
 
@@ -36,23 +38,13 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
    *
    * @param array $params
-   * @param int $contactID
-   * @param bool $skipDelete
    *
    * @return bool|CRM_Core_BAO_Website
+   * @throws \CRM_Core_Exception
    */
-  public static function create($params, $contactID = NULL, $skipDelete = NULL) {
-    if ($skipDelete !== NULL || ($contactID && !is_array($contactID))) {
-      \Civi::log()->warning(ts('Calling website:create with vars other than $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
-      return self::process($params, $contactID, $skipDelete);
-    }
-    foreach ($params as $key => $value) {
-      if (is_numeric($key)) {
-        \Civi::log()->warning(ts('Calling website:create for multiple websites $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
-        return self::process($params, $contactID, $skipDelete);
-      }
-    }
-    return self::add($params);
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
+    return self::create($params);
   }
 
   /**
@@ -65,6 +57,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param bool $skipDelete
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public static function process($params, $contactID, $skipDelete) {
     if (empty($params)) {
@@ -87,7 +80,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
       }
       if (!empty($values['url'])) {
         $values['contact_id'] = $contactID;
-        self::add($values);
+        self::create($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
         self::del($values['id']);
