@@ -1337,7 +1337,7 @@ WHERE {$whereClause}";
       $this->{$fieldName} = "NULL";
     }
     else {
-      parent::assignTestValues($fieldName, $fieldDef, $counter);
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
     }
   }
 
