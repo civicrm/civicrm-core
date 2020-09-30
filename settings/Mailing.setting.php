@@ -386,6 +386,6 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('The frequency that CiviMail updates its sent mail database.'),
-    'help_text' => 'CiviMail records email sent at the frequency you specify.  If you set it to 1, it will update the database every time it sends an email.  This ensures that emails are not resent if the batch job fails, but this may cause a performance hit, particularly for large jobs.',
+    'help_text' => NULL,
   ],
 ];
