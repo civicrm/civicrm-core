@@ -111,13 +111,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Payment',
       'Order',
     ];
-    $this->onlyIDNonZeroCount['get'] = [
-      'ActivityType',
-      'Entity',
-      'Domain',
-      'Setting',
-      'User',
-    ];
     $this->deprecatedAPI = ['Location', 'ActivityType', 'SurveyRespondant'];
     $this->deletableTestObjects = [];
   }
@@ -128,6 +121,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         CRM_Core_DAO::deleteTestObjects($entityName, ['id' => $entityID]);
       }
     }
+    $this->deletableTestObjects = NULL;
   }
 
   /**
@@ -928,7 +922,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // just to get a clearer message in the log
       $this->assertEquals("only id should be enough", $result['error_message']);
     }
-    if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
+    if (!in_array($Entity, $this->getOnlyIDNonZeroCount(), TRUE)) {
       $this->assertEquals(0, $result['count']);
     }
   }
@@ -987,7 +981,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
 
     $baos = $this->getMockableBAOObjects($entityName);
-    list($baoObj1, $baoObj2) = $baos;
+    [$baoObj1, $baoObj2] = $baos;
 
     // fetch first by ID
     $result = $this->callAPISuccess($entityName, 'get', [
@@ -1209,7 +1203,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     $this->assertArrayHasKey('version', $result);
     $this->assertEquals(3, $result['version']);
-    if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
+    if (!in_array($Entity, $this->getOnlyIDNonZeroCount(), TRUE)) {
       $this->assertEquals(0, $result['count']);
     }
   }
@@ -1598,7 +1592,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $startCount = $this->callAPISuccess($entityName, 'getcount', []);
     $createcount = 2;
     $baos = $this->getMockableBAOObjects($entityName, $createcount);
-    list($baoObj1, $baoObj2) = $baos;
+    [$baoObj1, $baoObj2] = $baos;
 
     // make sure exactly 2 exist
     $result = $this->callAPISuccess($entityName, 'getcount', [],
@@ -1835,6 +1829,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertDBQuery('setValueDescription: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', [
       1 => [$eventId, 'Integer'],
     ]);
+  }
+
+  /**
+   * Get entities that have non-zero counts already.
+   *
+   * @return string[]
+   */
+  protected function getOnlyIDNonZeroCount(): array {
+    return [
+      'ActivityType',
+      'Entity',
+      'Domain',
+      'Setting',
+      'User',
+    ];
   }
 
 }
