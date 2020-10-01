@@ -29,69 +29,15 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    *   True if you need to fix (format) address values.
    *                               before inserting in db
    *
-   * @return array|NULL
+   * @return array|NULL|self
    *   array of created address
    */
   public static function create(&$params, $fixAddress = TRUE) {
     if (!isset($params['address']) || !is_array($params['address'])) {
-      return NULL;
+      return self::add($params, $fixAddress);
     }
-    CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
-    $contactId = NULL;
-
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-    $contactId = $params['contact_id'];
-    //get all the addresses for this contact
-    $addresses = self::allAddress($contactId);
-
-    $isPrimary = $isBilling = TRUE;
-    $blocks = [];
-    foreach ($params['address'] as $key => $value) {
-      if (!is_array($value)) {
-        continue;
-      }
-
-      $addressExists = self::dataExists($value);
-      if (empty($value['id'])) {
-        if (!empty($addresses) && !empty($value['location_type_id']) && array_key_exists($value['location_type_id'], $addresses)) {
-          $value['id'] = $addresses[$value['location_type_id']];
-        }
-      }
-
-      // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
-      // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
-      // $updateBlankLocInfo will help take appropriate decision. CRM-5969
-      if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
-        //delete the existing record
-        CRM_Core_BAO_Block::blockDelete('Address', ['id' => $value['id']]);
-        continue;
-      }
-      elseif (!$addressExists) {
-        continue;
-      }
-
-      if ($isPrimary && !empty($value['is_primary'])) {
-        $isPrimary = FALSE;
-      }
-      else {
-        $value['is_primary'] = 0;
-      }
-
-      if ($isBilling && !empty($value['is_billing'])) {
-        $isBilling = FALSE;
-      }
-      else {
-        $value['is_billing'] = 0;
-      }
-
-      if (empty($value['manual_geo_code'])) {
-        $value['manual_geo_code'] = 0;
-      }
-      $value['contact_id'] = $contactId;
-      $blocks[] = self::add($value, $fixAddress);
-    }
-
-    return $blocks;
+    CRM_Core_Error::deprecatedFunctionWarning('Use legacyCreate if not doing a single crud action');
+    return self::legacyCreate($params, $fixAddress);
   }
 
   /**
@@ -1364,6 +1310,75 @@ SELECT is_primary,
     }
     $provider::format($params);
     return TRUE;
+  }
+
+  /**
+   * Create multiple addresses using legacy methodology.
+   *
+   * @param array $params
+   * @param bool $fixAddress
+   *
+   * @return array|null
+   */
+  public static function legacyCreate(array $params, bool $fixAddress) {
+    if (!isset($params['address']) || !is_array($params['address'])) {
+      return NULL;
+    }
+    CRM_Core_BAO_Block::sortPrimaryFirst($params['address']);
+    $contactId = NULL;
+
+    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
+    $contactId = $params['contact_id'];
+    //get all the addresses for this contact
+    $addresses = self::allAddress($contactId);
+
+    $isPrimary = $isBilling = TRUE;
+    $blocks = [];
+    foreach ($params['address'] as $key => $value) {
+      if (!is_array($value)) {
+        continue;
+      }
+
+      $addressExists = self::dataExists($value);
+      if (empty($value['id'])) {
+        if (!empty($addresses) && !empty($value['location_type_id']) && array_key_exists($value['location_type_id'], $addresses)) {
+          $value['id'] = $addresses[$value['location_type_id']];
+        }
+      }
+
+      // Note there could be cases when address info already exist ($value[id] is set) for a contact/entity
+      // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
+      // $updateBlankLocInfo will help take appropriate decision. CRM-5969
+      if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
+        //delete the existing record
+        CRM_Core_BAO_Block::blockDelete('Address', ['id' => $value['id']]);
+        continue;
+      }
+      elseif (!$addressExists) {
+        continue;
+      }
+
+      if ($isPrimary && !empty($value['is_primary'])) {
+        $isPrimary = FALSE;
+      }
+      else {
+        $value['is_primary'] = 0;
+      }
+
+      if ($isBilling && !empty($value['is_billing'])) {
+        $isBilling = FALSE;
+      }
+      else {
+        $value['is_billing'] = 0;
+      }
+
+      if (empty($value['manual_geo_code'])) {
+        $value['manual_geo_code'] = 0;
+      }
+      $value['contact_id'] = $contactId;
+      $blocks[] = self::add($value, $fixAddress);
+    }
+    return $blocks;
   }
 
 }
