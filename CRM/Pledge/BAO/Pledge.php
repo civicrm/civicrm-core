@@ -587,13 +587,13 @@ GROUP BY  currency
     foreach ($fields as $key => $val) {
       $returnProperties[$val] = TRUE;
     }
-    $details = CRM_Utils_Token::getTokenDetails($ids,
+    [$details] = CRM_Utils_Token::getTokenDetails($ids,
       $returnProperties,
       TRUE, TRUE, NULL,
       $tokens,
       get_class($form)
     );
-    $form->assign('contact', $details[0][$params['contact_id']]);
+    $form->assign('contact', $details[$params['contact_id']]);
 
     // handle custom data.
     if (!empty($params['hidden_custom'])) {
