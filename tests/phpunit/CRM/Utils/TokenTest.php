@@ -11,8 +11,8 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
    */
   public function testGetTokenDetails() {
     $contactID = $this->individualCreate(['preferred_communication_method' => ['Phone', 'Fax']]);
-    $resolvedTokens = CRM_Utils_Token::getTokenDetails([$contactID]);
-    $this->assertEquals('Phone, Fax', $resolvedTokens[0][$contactID]['preferred_communication_method']);
+    [$resolvedTokens] = CRM_Utils_Token::getTokenDetails([$contactID]);
+    $this->assertEquals('Phone, Fax', $resolvedTokens[$contactID]['preferred_communication_method']);
   }
 
   /**
@@ -49,8 +49,8 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
     $contactIDs = [$contactID];
 
     // when we are fetching contact details ON basis of primary address fields
-    $contactDetails = CRM_Utils_Token::getTokenDetails($contactIDs);
-    $this->assertEquals($primaryEmail, $contactDetails[0][$contactID]['email']);
+    [$contactDetails] = CRM_Utils_Token::getTokenDetails($contactIDs);
+    $this->assertEquals($primaryEmail, $contactDetails[$contactID]['email']);
 
     // restore setting
     Civi::settings()->set('searchPrimaryDetailsOnly', '1');

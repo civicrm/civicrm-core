@@ -567,8 +567,8 @@ function civicrm_api3_mailing_preview($params) {
     $details = $details[0][0] ?? NULL;
   }
   else {
-    $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = $details[0][$contactID];
+    [$details] = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = $details[$contactID];
   }
 
   $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
