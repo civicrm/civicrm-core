@@ -193,13 +193,11 @@ class CRM_Core_BAO_Block {
    *   Block name.
    * @param array $params
    *   Array of name/value pairs.
-   * @param string $entity
-   * @param int $contactId
    *
    * @return array|null
    *   Array of created location entities or NULL if none to create.
    */
-  public static function create($blockName, $params, $entity = NULL, $contactId = NULL) {
+  public static function create($blockName, $params) {
     if (!self::blockExists($blockName, $params)) {
       return NULL;
     }
@@ -210,15 +208,7 @@ class CRM_Core_BAO_Block {
     $resetPrimaryId = NULL;
     $primaryId = FALSE;
 
-    if ($entity) {
-      $entityElements = [
-        'entity_table' => $params['entity_table'],
-        'entity_id' => $params['entity_id'],
-      ];
-    }
-    else {
-      $contactId = $params['contact_id'];
-    }
+    $contactId = $params['contact_id'];
 
     $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
     $isIdSet = CRM_Utils_Array::value('isIdSet', $params[$blockName], FALSE);
