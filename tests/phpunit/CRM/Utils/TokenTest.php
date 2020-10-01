@@ -129,9 +129,9 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
     }
     unset($params['email']);
 
-    $resolvedTokens = CRM_Utils_Token::getTokenDetails($contactIDs);
+    [$resolvedTokens] = CRM_Utils_Token::getTokenDetails($contactIDs);
     foreach ($contactIDs as $contactID) {
-      $resolvedContactTokens = $resolvedTokens[0][$contactID];
+      $resolvedContactTokens = $resolvedTokens[$contactID];
       $this->assertEquals('Individual', $resolvedContactTokens['contact_type']);
       $this->assertEquals('Anderson, Anthony', $resolvedContactTokens['sort_name']);
       $this->assertEquals('en_US', $resolvedContactTokens['preferred_language']);

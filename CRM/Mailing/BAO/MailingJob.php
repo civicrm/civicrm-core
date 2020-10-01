@@ -597,7 +597,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $params[] = $field['contact_id'];
     }
 
-    $details = CRM_Utils_Token::getTokenDetails(
+    [$details] = CRM_Utils_Token::getTokenDetails(
       $params,
       $returnProperties,
       $skipOnHold, TRUE, NULL,
@@ -606,11 +606,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $this->id
     );
 
-    $config = CRM_Core_Config::singleton();
     foreach ($fields as $key => $field) {
       $contactID = $field['contact_id'];
-      if (!array_key_exists($contactID, $details[0])) {
-        $details[0][$contactID] = [];
+      if (!array_key_exists($contactID, $details)) {
+        $details[$contactID] = [];
       }
 
       // Compose the mailing.
@@ -623,7 +622,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $message = $mailing->compose(
         $this->id, $field['id'], $field['hash'],
         $field['contact_id'], $field['email'],
-        $recipient, FALSE, $details[0][$contactID], $attachments,
+        $recipient, FALSE, $details[$contactID], $attachments,
         FALSE, NULL, $replyToEmail
       );
       if (empty($message)) {
@@ -640,8 +639,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       if ($mailing->sms_provider_id) {
         $provider = CRM_SMS_Provider::singleton(['mailing_id' => $mailing->id]);
-        $body = $provider->getMessage($message, $field['contact_id'], $details[0][$contactID]);
-        $headers = $provider->getRecipientDetails($field, $details[0][$contactID]);
+        $body = $provider->getMessage($message, $field['contact_id'], $details[$contactID]);
+        $headers = $provider->getRecipientDetails($field, $details[$contactID]);
       }
 
       // make $recipient actually be the *encoded* header, so as not to baffle Mail_RFC822, CRM-5743
