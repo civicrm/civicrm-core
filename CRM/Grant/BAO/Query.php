@@ -15,12 +15,12 @@
 class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
+   * Get grant fields.
+   *
    * @return array
    */
   public static function &getFields() {
-    $fields = [];
-    $fields = CRM_Grant_BAO_Grant::exportableFields();
-    return $fields;
+    return CRM_Grant_BAO_Grant::exportableFields();
   }
 
   /**
