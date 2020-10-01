@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\IM;
+
 /**
  * Class CRM_Core_BAO_IMTest
  * @group headless
@@ -11,12 +13,11 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   }
 
   /**
-   * Add() method (create and update modes)
+   * Create() method (create and update modes)
    */
-  public function testAdd() {
+  public function testCreate() {
     $contactId = $this->individualCreate();
 
-    $params = [];
     $params = [
       'name' => 'jane.doe',
       'provider_id' => 1,
@@ -25,7 +26,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
     ];
 
-    CRM_Core_BAO_IM::add($params);
+    IM::create(FALSE)->setValues($params)->execute();
 
     $imId = $this->assertDBNotNull('CRM_Core_DAO_IM', 'jane.doe', 'id', 'name',
       'Database check for created IM name.'
@@ -33,7 +34,6 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
 
     // Now call add() to modify an existing IM
 
-    $params = [];
     $params = [
       'id' => $imId,
       'contact_id' => $contactId,
@@ -41,7 +41,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
       'name' => 'doe.jane',
     ];
 
-    CRM_Core_BAO_IM::add($params);
+    IM::update(FALSE)->addWhere('id', '=', $imId)->setValues($params)->execute();
 
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'provider_id', 'id', 'Database check on updated IM provider_name record.');
     $this->assertEquals($isEditIM, 3, 'Verify IM provider_id value is 3.');
