@@ -575,9 +575,9 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         $searchParams = [[$key, '=', strtolower($value), 0, 1]];
       }
 
-      $result = CRM_Contact_BAO_Query::apiQuery($searchParams);
-      $this->assertCount(1, $result[0], 'search for ' . $key);
-      $contact = reset($result[0]);
+      [$result] = CRM_Contact_BAO_Query::apiQuery($searchParams);
+      $this->assertCount(1, $result, 'search for ' . $key);
+      $contact = reset($result);
       $this->assertEquals('Minnie Mouse', $contact['display_name']);
       $this->assertEquals('BOb', $contact['current_employer']);
     }

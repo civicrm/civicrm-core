@@ -555,7 +555,7 @@ SELECT    *
       ['group', 'IN', [$groupID], 0, 0],
       ['contact_id', '=', $contactID, 0, 0],
     ];
-    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
+    [$contacts] = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
 
     if (!empty($contacts)) {
       return TRUE;

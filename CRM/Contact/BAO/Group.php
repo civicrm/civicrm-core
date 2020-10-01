@@ -118,7 +118,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   public static function getGroupContacts($id) {
     $params = [['group', 'IN', [1 => $id], 0, 0]];
-    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
+    [$contacts] = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
     return $contacts;
   }
 
