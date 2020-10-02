@@ -38,4 +38,27 @@ class CRM_Core_Resources_Bundle implements CRM_Core_Resources_CollectionInterfac
     $this->types = $types ?: ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl'];
   }
 
+  /**
+   * Fill in default values for the 'region' property.
+   *
+   * @return static
+   */
+  public function fillDefaults() {
+    $this->filter(function ($s) {
+      if (!isset($s['region'])) {
+        if ($s['type'] === 'settings') {
+          $s['region'] = NULL;
+        }
+        elseif (preg_match(';^(markup|template|callback);', $s['type'])) {
+          $s['region'] = 'page-header';
+        }
+        else {
+          $s['region'] = CRM_Core_Resources_Common::REGION;
+        }
+      }
+      return $s;
+    });
+    return $this;
+  }
+
 }

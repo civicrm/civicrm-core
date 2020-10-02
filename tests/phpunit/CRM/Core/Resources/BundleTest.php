@@ -56,4 +56,20 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
     $this->assertEquals('http://example.com/region.css', $region->get('http://example.com/region.css')['styleUrl']);
   }
 
+  /**
+   * Add some resources - sometimes forgetting to set a 'region'. Fill in missing regions.
+   */
+  public function testFillDefaults() {
+    $bundle = new CRM_Core_Resources_Bundle(__FUNCTION__, ['scriptUrl', 'styleUrl', 'markup']);
+    $bundle->addScriptUrl('http://example.com/myscript.js');
+    $bundle->addStyleUrl('http://example.com/yonder-style.css', ['region' => 'yonder']);
+    $bundle->addMarkup('<b>Cheese</b>', ['name' => 'cheese']);
+
+    $bundle->fillDefaults();
+
+    $this->assertEquals('html-header', $bundle->get('http://example.com/myscript.js')['region']);
+    $this->assertEquals('yonder', $bundle->get('http://example.com/yonder-style.css')['region']);
+    $this->assertEquals('page-header', $bundle->get('cheese')['region']);
+  }
+
 }

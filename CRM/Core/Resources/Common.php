@@ -47,7 +47,7 @@ class CRM_Core_Resources_Common {
     );
 
     CRM_Utils_Hook::alterBundle($bundle);
-    self::useRegion($bundle, self::REGION);
+    $bundle->fillDefaults();
     return $bundle;
   }
 
@@ -76,7 +76,7 @@ class CRM_Core_Resources_Common {
     $bundle->addStyleFile('civicrm', 'css/crm-i.css', -101);
 
     CRM_Utils_Hook::alterBundle($bundle);
-    self::useRegion($bundle, self::REGION);
+    $bundle->fillDefaults();
     return $bundle;
   }
 
@@ -133,7 +133,7 @@ class CRM_Core_Resources_Common {
     ]);
 
     CRM_Utils_Hook::alterBundle($bundle);
-    self::useRegion($bundle, self::REGION);
+    $bundle->fillDefaults();
     return $bundle;
   }
 
@@ -271,23 +271,6 @@ class CRM_Core_Resources_Common {
     }, $items);
 
     return $items;
-  }
-
-  /**
-   * Ensure that all elements of the bundle are in the same region.
-   *
-   * @param CRM_Core_Resources_Bundle $bundle
-   * @param string $region
-   * @return CRM_Core_Resources_Bundle
-   */
-  protected static function useRegion($bundle, $region) {
-    $bundle->filter(function ($s) use ($region) {
-      if ($s['type'] !== 'settings' && !isset($s['region'])) {
-        $s['region'] = $region;
-      }
-      return $s;
-    });
-    return $bundle;
   }
 
 }
