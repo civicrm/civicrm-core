@@ -240,6 +240,10 @@ WHERE e.id = %1";
   /**
    * Delete all the block associated with the location.
    *
+   * Note a universe search on 1 Oct 2020 found no calls to this function.
+   *
+   * @deprecated
+   *
    * @param int $contactId
    *   Contact id.
    * @param int $locationTypeId
@@ -247,6 +251,7 @@ WHERE e.id = %1";
    * @throws CRM_Core_Exception
    */
   public static function deleteLocationBlocks($contactId, $locationTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use v4 api');
     // ensure that contactId has a value
     if (empty($contactId) ||
       !CRM_Utils_Rule::positiveInteger($contactId)
