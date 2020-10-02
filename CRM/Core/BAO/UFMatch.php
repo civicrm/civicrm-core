@@ -340,6 +340,14 @@ AND    domain_id    = %4
       return;
     }
 
+    // 1.do check for contact Id.
+    $ufmatch = new CRM_Core_DAO_UFMatch();
+    $ufmatch->contact_id = $contactId;
+    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    if (!$ufmatch->find(TRUE)) {
+      return;
+    }
+
     $config = CRM_Core_Config::singleton();
     $ufName = CRM_Contact_BAO_Contact::getPrimaryEmail($contactId);
 
@@ -349,13 +357,6 @@ AND    domain_id    = %4
 
     $update = FALSE;
 
-    // 1.do check for contact Id.
-    $ufmatch = new CRM_Core_DAO_UFMatch();
-    $ufmatch->contact_id = $contactId;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
-    if (!$ufmatch->find(TRUE)) {
-      return;
-    }
     if ($ufmatch->uf_name != $ufName) {
       $update = TRUE;
     }
