@@ -17,16 +17,22 @@ class CRM_Core_Resources_Common {
   const REGION = 'html-header';
 
   /**
-   * A "basic" bundle has an
+   * Create a "basic" (generic) bundle.
+   *
+   * The bundle goes through some lifecycle events (like `hook_alterBundle`).
+   *
+   * To define default content for a basic bundle, you may either give an
+   * `$init` function or subscribe to `hook_alterBundle`.
    *
    * @param string $name
    *   Symbolic name of the bundle.
    * @param callable|NULL $init
    *   Optional initialization function. Populate default resources.
-   *   ie `function($bundle): void`
+   *   Signature: `function($bundle): void`
+   *   Example: `function myinit($b) { $b->addScriptFile(...)->addStyleFile(...); }`
    * @param string|string[] $types
    *   List of resource-types to permit in this bundle. NULL for a default list.
-   *   Ex: ['styleFile', 'styleUrl']
+   *   Example: ['styleFile', 'styleUrl']
    *   The following aliases are allowed: '*all*', '*default*', '*script*', '*style*'
    * @return CRM_Core_Resources_Bundle
    */
