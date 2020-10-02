@@ -17,6 +17,36 @@ class CRM_Core_Resources_Common {
   const REGION = 'html-header';
 
   /**
+   * Create a "basic" (generic) bundle.
+   *
+   * The bundle goes through some lifecycle events (like `hook_alterBundle`).
+   *
+   * To define default content for a basic bundle, you may either give an
+   * `$init` function or subscribe to `hook_alterBundle`.
+   *
+   * @param string $name
+   *   Symbolic name of the bundle.
+   * @param callable|NULL $init
+   *   Optional initialization function. Populate default resources.
+   *   Signature: `function($bundle): void`
+   *   Example: `function myinit($b) { $b->addScriptFile(...)->addStyleFile(...); }`
+   * @param string|string[] $types
+   *   List of resource-types to permit in this bundle. NULL for a default list.
+   *   Example: ['styleFile', 'styleUrl']
+   *   The following aliases are allowed: '*all*', '*default*', '*script*', '*style*'
+   * @return CRM_Core_Resources_Bundle
+   */
+  public static function createBasicBundle($name, $init = NULL, $types = NULL) {
+    $bundle = new CRM_Core_Resources_Bundle($name, $types);
+    if ($init !== NULL) {
+      $init($bundle);
+    }
+    CRM_Utils_Hook::alterBundle($bundle);
+    $bundle->fillDefaults();
+    return $bundle;
+  }
+
+  /**
    * The 'bundle.bootstrap3' service is a collection of resources which are
    * loaded when a page needs to support Boostrap CSS v3.
    *
@@ -47,7 +77,7 @@ class CRM_Core_Resources_Common {
     );
 
     CRM_Utils_Hook::alterBundle($bundle);
-    self::useRegion($bundle, self::REGION);
+    $bundle->fillDefaults();
     return $bundle;
   }
 
@@ -76,7 +106,7 @@ class CRM_Core_Resources_Common {
     $bundle->addStyleFile('civicrm', 'css/crm-i.css', -101);
 
     CRM_Utils_Hook::alterBundle($bundle);
-    self::useRegion($bundle, self::REGION);
+    $bundle->fillDefaults();
     return $bundle;
   }
 
@@ -133,7 +163,7 @@ class CRM_Core_Resources_Common {
     ]);
 
     CRM_Utils_Hook::alterBundle($bundle);
-    self::useRegion($bundle, self::REGION);
+    $bundle->fillDefaults();
     return $bundle;
   }
 
@@ -271,23 +301,6 @@ class CRM_Core_Resources_Common {
     }, $items);
 
     return $items;
-  }
-
-  /**
-   * Ensure that all elements of the bundle are in the same region.
-   *
-   * @param CRM_Core_Resources_Bundle $bundle
-   * @param string $region
-   * @return CRM_Core_Resources_Bundle
-   */
-  protected static function useRegion($bundle, $region) {
-    $bundle->filter(function ($s) use ($region) {
-      if ($s['type'] !== 'settings' && !isset($s['region'])) {
-        $s['region'] = $region;
-      }
-      return $s;
-    });
-    return $bundle;
   }
 
 }
