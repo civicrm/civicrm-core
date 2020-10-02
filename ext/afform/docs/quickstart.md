@@ -31,7 +31,7 @@ from a local Drupal 7 site:
 ```
 $ cv url "civicrm/hello-world"
 "http://dmaster.localhost/civicrm/hello-world"
-$ cv url "civicrm/hello-world/#/?name=world"
+$ cv url "civicrm/hello-world/#!/?name=world"
 "http://dmaster.localhost/civicrm/hello-world/#/?name=world"
 ```
 

@@ -8,7 +8,7 @@
     <div crm-ui-debug="resultForm"></div>
 
     <div>
-      <a ng-href="#/">{{ts('Back')}}</a>
+      <a ng-href="#!/">{{ts('Back')}}</a>
       |
       <a af-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">{{ts('Save')}}</a>
       <span ng-if="resultForm.server_route">

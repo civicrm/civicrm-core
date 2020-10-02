@@ -125,7 +125,7 @@
         "path": "bower_components/{$id}"
       },
       "angular": {
-        "url": "https://github.com/angular/bower-angular/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular/archive/v1.8.0.zip"
       },
       "angular-bootstrap": {
         "url": "https://github.com/angular-ui/bootstrap-bower/archive/2.5.0.zip"
@@ -138,13 +138,13 @@
         "url": "https://github.com/totten/angular-jquery-dialog-service/archive/v0.8.0-civicrm-1.0.zip"
       },
       "angular-mocks": {
-        "url": "https://github.com/angular/bower-angular-mocks/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular-mocks/archive/v1.8.0.zip"
       },
       "angular-route": {
-        "url": "https://github.com/angular/bower-angular-route/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular-route/archive/v1.8.0.zip"
       },
       "angular-sanitize": {
-        "url": "https://github.com/angular/bower-angular-sanitize/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular-sanitize/archive/v1.8.0.zip"
       },
       "angular-ui-sortable": {
         "url": "https://github.com/angular-ui/ui-sortable/archive/v0.19.0.zip"
