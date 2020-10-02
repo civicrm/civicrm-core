@@ -1695,6 +1695,83 @@ $text
   }
 
   /**
+   * Same as testTargetAssigneeVariations but passes the target/assignee
+   * in as a scalar when there's only one of them.
+   *
+   * @dataProvider targetAndAssigneeProvider
+   * @param array $do_first
+   * @param array $do_second
+   */
+  public function testTargetAssigneeVariationsWithScalars(array $do_first, array $do_second) {
+    // Originally wanted to put this in setUp() but it broke other tests.
+    $this->loggedInUserId = $this->createLoggedInUser();
+    for ($i = 1; $i <= 4; $i++) {
+      $this->someContacts[$i] = $this->individualCreate([], $i - 1, TRUE);
+    }
+
+    $params = [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Meeting'),
+      'subject' => 'Test Meeting',
+      'source_contact_id' => $this->loggedInUserId,
+    ];
+
+    // Create an activity first if specified.
+    $activity = NULL;
+    if (!empty($do_first)) {
+      if (!empty($do_first['targets'])) {
+        // e.g. if it is [1], then pick $someContacts[1]. If it's [1,2], then
+        // pick $someContacts[1] and $someContacts[2].
+        $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['targets'])));
+        if (count($params['target_contact_id']) == 1) {
+          $params['target_contact_id'] = $params['target_contact_id'][0];
+        }
+      }
+      if (!empty($do_first['assignees'])) {
+        $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['assignees'])));
+        if (count($params['assignee_contact_id']) == 1) {
+          $params['assignee_contact_id'] = $params['assignee_contact_id'][0];
+        }
+      }
+
+      $activity = CRM_Activity_BAO_Activity::create($params);
+      $this->assertNotEmpty($activity->id);
+
+      $params['id'] = $activity->id;
+    }
+
+    // Now do the second one, which will either create or update depending what
+    // we did first.
+    $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['targets'])));
+    if (count($params['target_contact_id']) == 1) {
+      $params['target_contact_id'] = $params['target_contact_id'][0];
+    }
+    $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['assignees'])));
+    if (count($params['assignee_contact_id']) == 1) {
+      $params['assignee_contact_id'] = $params['assignee_contact_id'][0];
+    }
+    $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // Check targets
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
+    ];
+    $this->assertEquals((array) $params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Check assignees
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
+    ];
+    $this->assertEquals((array) $params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Clean up
+    foreach ($this->someContacts as $cid) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $cid]);
+    }
+  }
+
+  /**
    * Dataprovider for testTargetAssigneeVariations
    * @return array
    */
