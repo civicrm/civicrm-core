@@ -136,12 +136,9 @@ class CRM_Contact_Form_Task_LabelCommon {
     $numberofContacts = count($contactIDs);
     //this does the same as calling civicrm_api3('contact, get, array('id' => array('IN' => $this->_contactIds)
     // except it also handles multiple locations
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
+    [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
-    $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
-    // $details[0] is an array of [ contactID => contactDetails ]
-    $details = $details[0];
+    // $details is an array of [ contactID => contactDetails ]
     $tokenFields = CRM_Contact_Form_Task_LabelCommon::getTokenData($details);
 
     foreach ($contactIDs as $value) {
