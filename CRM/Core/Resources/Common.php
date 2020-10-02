@@ -17,6 +17,30 @@ class CRM_Core_Resources_Common {
   const REGION = 'html-header';
 
   /**
+   * A "basic" bundle has an
+   *
+   * @param string $name
+   *   Symbolic name of the bundle.
+   * @param callable|NULL $init
+   *   Optional initialization function. Populate default resources.
+   *   ie `function($bundle): void`
+   * @param string|string[] $types
+   *   List of resource-types to permit in this bundle. NULL for a default list.
+   *   Ex: ['styleFile', 'styleUrl']
+   *   The following aliases are allowed: '*all*', '*default*', '*script*', '*style*'
+   * @return CRM_Core_Resources_Bundle
+   */
+  public static function createBasicBundle($name, $init = NULL, $types = NULL) {
+    $bundle = new CRM_Core_Resources_Bundle($name, $types);
+    if ($init !== NULL) {
+      $init($bundle);
+    }
+    CRM_Utils_Hook::alterBundle($bundle);
+    $bundle->fillDefaults();
+    return $bundle;
+  }
+
+  /**
    * The 'bundle.bootstrap3' service is a collection of resources which are
    * loaded when a page needs to support Boostrap CSS v3.
    *

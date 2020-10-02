@@ -60,6 +60,25 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $_GET = $this->originalGet;
   }
 
+  public function testCreateBasicBundle() {
+    $hits = [];
+
+    $init = function(CRM_Core_Resources_Bundle $b) use (&$hits) {
+      $hits[] = 'init_' . $b->name;
+      $b->addScript('doStuff();');
+    };
+    $alter = function ($e) use (&$hits) {
+      $hits[] = 'alter_' . $e->bundle->name;
+      $e->bundle->addScript('alert();');
+    };
+
+    Civi::dispatcher()->addListener('hook_civicrm_alterBundle', $alter);
+    $b = CRM_Core_Resources_Common::createBasicBundle('cheese', $init);
+    $this->assertEquals('cheese', $b->name);
+    $this->assertEquals(['init_cheese', 'alter_cheese'], $hits);
+    $this->assertEquals(['doStuff();', 'alert();'], array_values(CRM_Utils_Array::collect('script', $b->getAll())));
+  }
+
   /**
    * Make two bundles (multi-regional). Add them to CRM_Core_Resources.
    * Ensure that the resources land in the right regions.
