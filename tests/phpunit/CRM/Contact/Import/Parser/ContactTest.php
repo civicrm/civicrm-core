@@ -256,6 +256,94 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the not-really-encouraged way of creating locations via contact.create doesn't mess up primaries.
+   */
+  public function testContactLocationBlockHandling() {
+    $id = $this->individualCreate([
+      'phone' => [
+        1 => [
+          'location_type_id' => 1,
+          'phone' => '987654321',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'phone' => '456-7890',
+        ],
+      ],
+      'im' => [
+        1 => [
+          'location_type_id' => 1,
+          'name' => 'bob',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'name' => 'fred',
+        ],
+      ],
+      'openid' => [
+        1 => [
+          'location_type_id' => 1,
+          'openid' => 'bob',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'openid' => 'fred',
+        ],
+      ],
+      'email' => [
+        1 => [
+          'location_type_id' => 1,
+          'email' => 'bob@example.com',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'email' => 'fred@example.com',
+        ],
+      ],
+    ]);
+    $phones = $this->callAPISuccess('Phone', 'get', ['contact_id' => $id])['values'];
+    $emails = $this->callAPISuccess('Email', 'get', ['contact_id' => $id])['values'];
+    $openIDs = $this->callAPISuccess('OpenID', 'get', ['contact_id' => $id])['values'];
+    $ims = $this->callAPISuccess('IM', 'get', ['contact_id' => $id])['values'];
+    $this->assertCount(2, $phones);
+    $this->assertCount(2, $emails);
+    $this->assertCount(2, $ims);
+    $this->assertCount(2, $openIDs);
+
+    $this->assertLocationValidity();
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $id,
+      // This is secret code for 'delete this phone'.
+      'updateBlankLocInfo' => TRUE,
+      'phone' => [
+        1 => [
+          'id' => key($phones),
+        ],
+      ],
+      'email' => [
+        1 => [
+          'id' => key($emails),
+        ],
+      ],
+      'im' => [
+        1 => [
+          'id' => key($ims),
+        ],
+      ],
+      'openid' => [
+        1 => [
+          'id' => key($openIDs),
+        ],
+      ],
+    ]);
+    $this->assertLocationValidity();
+    $this->callAPISuccessGetCount('Phone', ['contact_id' => $id], 1);
+    $this->callAPISuccessGetCount('Email', ['contact_id' => $id], 1);
+    $this->callAPISuccessGetCount('OpenID', ['contact_id' => $id], 1);
+    $this->callAPISuccessGetCount('IM', ['contact_id' => $id], 1);
+  }
+
+  /**
    * Test that the import parser adds the address to the primary location.
    *
    * @throws \Exception
