@@ -63,14 +63,6 @@ class CRM_Core_BAO_CustomQuery {
   public $_qill;
 
   /**
-   * No longer needed due to CRM-17646 refactoring, but still used in some places
-   *
-   * @var array
-   * @deprecated
-   */
-  public $_options;
-
-  /**
    * The custom fields information.
    *
    * @var array
@@ -141,52 +133,9 @@ class CRM_Core_BAO_CustomQuery {
     $this->_whereTables = [];
     $this->_where = [];
     $this->_qill = [];
-    $this->_options = [];
 
     $this->_contactSearch = $contactSearch;
     $this->_fields = CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
-
-    if (empty($this->_ids)) {
-      return;
-    }
-
-    // initialize the field array
-    $tmpArray = array_keys($this->_ids);
-    $idString = implode(',', $tmpArray);
-    $query = "
-SELECT f.id, f.label, f.data_type,
-       f.html_type, f.is_search_range,
-       f.option_group_id, f.custom_group_id,
-       f.column_name, g.table_name,
-       f.date_format,f.time_format
-  FROM civicrm_custom_field f,
-       civicrm_custom_group g
- WHERE f.custom_group_id = g.id
-   AND g.is_active = 1
-   AND f.is_active = 1
-   AND f.id IN ( $idString )";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      // Deprecated (and poorly named) cache of field attributes
-      $this->_options[$dao->id] = [
-        'attributes' => [
-          'label' => $dao->label,
-          'data_type' => $dao->data_type,
-          'html_type' => $dao->html_type,
-        ],
-      ];
-
-      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, [], 'search');
-      if ($options) {
-        $this->_options[$dao->id] += $options;
-      }
-
-      if ($dao->html_type == 'Select Date') {
-        $this->_options[$dao->id]['attributes']['date_format'] = $dao->date_format;
-        $this->_options[$dao->id]['attributes']['time_format'] = $dao->time_format;
-      }
-    }
   }
 
   /**
