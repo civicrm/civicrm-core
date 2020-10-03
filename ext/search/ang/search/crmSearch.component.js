@@ -343,12 +343,12 @@
 
       // Is a column eligible to use an aggregate function?
       this.canAggregate = function(col) {
+        var info = searchMeta.parseExpr(col);
         // If the column is used for a groupBy, no
-        if (ctrl.params.groupBy.indexOf(col) > -1) {
+        if (ctrl.params.groupBy.indexOf(info.path) > -1) {
           return false;
         }
         // If the entity this column belongs to is being grouped by id, then also no
-        var info = searchMeta.parseExpr(col);
         return ctrl.params.groupBy.indexOf(info.prefix + 'id') < 0;
       };
 
