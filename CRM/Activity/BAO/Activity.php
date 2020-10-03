@@ -2566,7 +2566,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
             }
           }
         }
-        elseif (!$values['target_contact_name']) {
+        elseif (empty($values['target_contact_name'])) {
           $activity['target_contact_name'] = '<em>n/a</em>';
         }
 

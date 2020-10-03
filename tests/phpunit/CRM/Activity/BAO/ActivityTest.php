@@ -214,6 +214,35 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check for errors when viewing a contact's activity tab when there
+   * is an activity that doesn't have a target (With Contact).
+   */
+  public function testActivitySelectorNoTargets() {
+    $contact_id = $this->individualCreate([], 0, TRUE);
+    $activity = $this->callAPISuccess('activity', 'create', [
+      'source_contact_id' => $contact_id,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Lonely Meeting',
+      'details' => 'Here at this meeting all by myself and no other contacts.',
+    ]);
+    $input = [
+      '_raw_values' => [],
+      'offset' => 0,
+      'rp' => 25,
+      'page' => 1,
+      'context' => 'activity',
+      'contact_id' => $contact_id,
+    ];
+    $output = CRM_Activity_BAO_Activity::getContactActivitySelector($input);
+    $this->assertEquals($activity['id'], $output['data'][0]['DT_RowId']);
+    $this->assertEquals('<em>n/a</em>', $output['data'][0]['target_contact_name']);
+    $this->assertEquals('Lonely Meeting', $output['data'][0]['subject']);
+
+    $this->callAPISuccess('activity', 'delete', ['id' => $activity['id']]);
+    $this->callAPISuccess('contact', 'delete', ['id' => $contact_id]);
+  }
+
+  /**
    * Test case for deleteActivity() method.
    *
    * deleteActivity($params) method deletes activity for given params.
