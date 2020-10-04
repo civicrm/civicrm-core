@@ -478,7 +478,7 @@ class CRM_Activity_BAO_Query {
           'multiple' =>
           'multiple',
           'class' => 'crm-select2',
-          'placeholder' => ts('- select -'),
+          'placeholder' => ts('- select tags -'),
         ]
       );
     }

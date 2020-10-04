@@ -628,10 +628,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     $element = $this->add('select', 'activity_type_id', ts('Activity Type'),
-      ['' => '- ' . ts('select') . ' -'] + $this->_fields['followup_activity_type_id']['attributes'],
+      $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, [
         'onchange' => "CRM.buildCustomData( 'Activity', this.value, false, false, false, false, false, false, {$this->_currentlyViewedContactId});",
         'class' => 'crm-select2 required',
+        'placeholder' => TRUE,
       ]
     );
 
@@ -695,7 +696,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $responseOptions = CRM_Campaign_BAO_Survey::getResponsesOptions($surveyId);
         if ($responseOptions) {
           $this->add('select', 'result', ts('Result'),
-            ['' => ts('- select -')] + array_combine($responseOptions, $responseOptions)
+            array_combine($responseOptions, $responseOptions),
+            FALSE, ['placeholder' => TRUE]
           );
         }
         $surveyTitle = NULL;

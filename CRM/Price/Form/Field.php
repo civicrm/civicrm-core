@@ -181,7 +181,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $this->add('text', 'label', ts('Field Label'), CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'label'), TRUE);
 
     // html_type
-    $javascript = 'onchange="option_html_type(this.form)";';
+    $javascript = ['onchange' => 'option_html_type(this.form);'];
 
     $htmlTypes = CRM_Price_BAO_PriceField::htmlTypes();
 

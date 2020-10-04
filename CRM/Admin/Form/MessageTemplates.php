@@ -179,7 +179,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       )
     ) {
       $this->add('textarea', 'msg_html', ts('HTML Message'),
-        "cols=50 rows=6"
+        ['cols' => 50, 'rows' => 6]
       );
     }
     else {
@@ -194,7 +194,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
     }
 
     $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
+      ['cols' => 50, 'rows' => 6]
     );
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),

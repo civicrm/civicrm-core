@@ -70,7 +70,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $providerNames = CRM_Core_OptionGroup::values('sms_provider_name', FALSE, FALSE, FALSE, NULL, 'label');
     $apiTypes = CRM_Core_OptionGroup::values('sms_api_type', FALSE, FALSE, FALSE, NULL, 'label');
 
-    $this->add('select', 'name', ts('Name'), ['' => '- select -'] + $providerNames, TRUE);
+    $this->add('select', 'name', ts('Name'), $providerNames, TRUE, ['placeholder' => TRUE]);
 
     $this->add('text', 'title', ts('Title'),
       $attributes['title'], TRUE
@@ -94,7 +94,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     $this->add('text', 'api_url', ts('API Url'), $attributes['api_url'], TRUE);
 
     $this->add('textarea', 'api_params', ts('API Parameters'),
-      "cols=50 rows=6", TRUE
+      ['cols' => 50, 'rows' => 6], TRUE
     );
 
     $this->add('checkbox', 'is_active', ts('Is this provider active?'));

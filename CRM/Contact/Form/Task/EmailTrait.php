@@ -247,7 +247,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->assign('totalSelectedContacts', count($this->_contactIds));
 
-    $this->add('text', 'subject', ts('Subject'), 'size=50 maxlength=254', TRUE);
+    $this->add('text', 'subject', ts('Subject'), ['size' => 50, 'maxlength' => 254], TRUE);
 
     $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
 
