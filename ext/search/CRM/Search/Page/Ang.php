@@ -84,13 +84,13 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
    */
   private function getSchema() {
     $schema = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'titlePlural', 'description', 'icon')
+      ->addSelect('name', 'title', 'titlePlural', 'description', 'icon')
       ->addWhere('name', '!=', 'Entity')
       ->addOrderBy('titlePlural')
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();
-    $getFields = ['name', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize'];
+    $getFields = ['name', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'fk_entity'];
     foreach ($schema as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {
@@ -99,6 +99,8 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
         if ($loadOptions) {
           $entity['optionsLoaded'] = TRUE;
         }
+        // Because multivalue custom pseudo-entities don't have titlePlural
+        $entity['titlePlural'] = $entity['titlePlural'] ?? $entity['title'];
         $entity['fields'] = civicrm_api4($entity['name'], 'getFields', [
           'select' => $getFields,
           'where' => [['permission', 'IS NULL']],

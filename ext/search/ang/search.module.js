@@ -20,6 +20,7 @@
           // For paths like /create/Contact, return the stashed savedSearch if present
           savedSearch: function($route, $location, $timeout, crmApi4) {
             var retrievedSearch = savedSearch,
+              getParams,
               params = $route.current.params;
             savedSearch = undefined;
             switch (params.mode) {
@@ -27,23 +28,33 @@
                 return retrievedSearch;
 
               case 'load':
+                // Load savedSearch by `id` (the SavedSearch entity doesn't have `name`)
+                if (params.entity === 'SavedSearch' && /^\d+$/.test(params.name)) {
+                  getParams = {
+                    where: [['id', '=', params.name]]
+                  };
+                }
+                // Load attached entity (e.g. Smart Groups) with a join via saved_search_id
+                else if (params.entity === 'Group' && params.name) {
+                  getParams = {
+                    select: ['id', 'title', 'saved_search_id', 'saved_search.*'],
+                    where: [['name', '=', params.name]]
+                  };
+                }
                 // In theory savedSearches could be attached to something other than groups, but for now that's not supported
-                if (params.entity !== 'Group' || !params.name) {
+                else {
                   throw 'Failed to load ' + params.entity;
                 }
-                return crmApi4(params.entity, 'get', {
-                  select: ['id', 'title', 'saved_search_id', 'saved_search.api_entity', 'saved_search.api_params'],
-                  where: [['name', '=', params.name]]
-                }, 0).then(function(retrieved) {
-                  savedSearch = {
-                    type: params.entity,
-                    id: retrieved.id,
-                    title: retrieved.title,
-                    saved_search_id: retrieved.saved_search_id,
-                    api_params: retrieved['saved_search.api_params']
-                  };
+                return crmApi4(params.entity, 'get', getParams, 0).then(function(retrieved) {
+                  savedSearch = retrieved;
+                  savedSearch.type = params.entity;
+                  if (params.entity !== 'SavedSearch') {
+                    savedSearch.api_entity = retrieved['saved_search.api_entity'];
+                    savedSearch.api_params = retrieved['saved_search.api_params'];
+                    savedSearch.form_values = retrieved['saved_search.form_values'];
+                  }
                   $timeout(function() {
-                    $location.url('/create/' + retrieved['saved_search.api_entity']);
+                    $location.url('/create/' + savedSearch.api_entity);
                   });
                 });
             }

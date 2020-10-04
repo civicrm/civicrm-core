@@ -83,4 +83,36 @@ class SavedSearchTest extends UnitTestCase {
     $this->assertArrayNotHasKey($out['id'], $ins['values']);
   }
 
+  public function testSmartGroupWithHaving() {
+    $in = Contact::create(FALSE)->addValue('first_name', 'yes')->addValue('last_name', 'siree')->execute()->first();
+    $in2 = Contact::create(FALSE)->addValue('first_name', 'yessir')->addValue('last_name', 'ee')->execute()->first();
+    $out = Contact::create(FALSE)->addValue('first_name', 'yess')->execute()->first();
+
+    $savedSearch = civicrm_api4('SavedSearch', 'create', [
+      'values' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'CONCAT(first_name, last_name) AS whole_name'],
+          'where' => [
+            ['id', '>=', $in['id']],
+          ],
+          'having' => [
+            ['whole_name', '=', 'yessiree'],
+          ],
+        ],
+      ],
+      'chain' => [
+        'group' => ['Group', 'create', ['values' => ['title' => 'Having Test', 'saved_search_id' => '$id']], 0],
+      ],
+    ])->first();
+
+    // Oops we don't have an api4 syntax yet for selecting contacts in a group.
+    $ins = civicrm_api3('Contact', 'get', ['group' => $savedSearch['group']['name'], 'options' => ['limit' => 0]]);
+    $this->assertCount(2, $ins['values']);
+    $this->assertArrayHasKey($in['id'], $ins['values']);
+    $this->assertArrayHasKey($in2['id'], $ins['values']);
+    $this->assertArrayNotHasKey($out['id'], $ins['values']);
+  }
+
 }

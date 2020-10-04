@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Query\SqlExpression;
+
 /**
  *
  * @package CRM
@@ -701,16 +703,18 @@ ORDER BY   gc.contact_id, g.children
    */
   protected static function getApiSQL(array $savedSearch, string $addSelect, string $excludeClause) {
     $apiParams = $savedSearch['api_params'] + ['select' => ['id'], 'checkPermissions' => FALSE];
-    list($idField) = explode(' AS ', $apiParams['select'][0]);
-    $apiParams['select'] = [
-      $addSelect,
-      $idField,
-    ];
+    $idField = SqlExpression::convert($apiParams['select'][0], TRUE)->getAlias();
+    // Unless there's a HAVING clause, we don't care about other columns
+    if (empty($apiParams['having'])) {
+      $apiParams['select'] = array_slice($apiParams['select'], 0, 1);
+    }
     $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
     $query = new \Civi\Api4\Query\Api4SelectQuery($api);
     $query->forceSelectId = FALSE;
     $query->getQuery()->having("$idField $excludeClause");
-    return $query->getSql();
+    $sql = $query->getSql();
+    // Place sql in a nested sub-query, otherwise HAVING is impossible on any field other than contact_id
+    return "SELECT $addSelect, `$idField` AS contact_id FROM ($sql) api_query";
   }
 
   /**

@@ -12,10 +12,10 @@
     templateUrl: '~/search/crmSearchActions.html',
     controller: function($scope, crmApi4, dialogService, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
-        entityTitle = searchMeta.getEntity(this.entity).titlePlural,
         ctrl = this;
 
-      this.init = function() {
+      this.$onInit = function() {
+        var entityTitle = searchMeta.getEntity(ctrl.entity).titlePlural;
         if (!ctrl.actions) {
           var actions = _.transform(_.cloneDeep(CRM.vars.search.actions), function (actions, action) {
             if (_.includes(action.entities, ctrl.entity)) {

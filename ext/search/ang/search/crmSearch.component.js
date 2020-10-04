@@ -343,12 +343,12 @@
 
       // Is a column eligible to use an aggregate function?
       this.canAggregate = function(col) {
+        var info = searchMeta.parseExpr(col);
         // If the column is used for a groupBy, no
-        if (ctrl.params.groupBy.indexOf(col) > -1) {
+        if (ctrl.params.groupBy.indexOf(info.path) > -1) {
           return false;
         }
         // If the entity this column belongs to is being grouped by id, then also no
-        var info = searchMeta.parseExpr(col);
         return ctrl.params.groupBy.indexOf(info.prefix + 'id') < 0;
       };
 
@@ -558,21 +558,19 @@
       };
 
       $scope.saveGroup = function() {
-        var selectField = ctrl.entity === 'Contact' ? 'id' : 'contact_id';
-        if (ctrl.entity !== 'Contact' && !searchMeta.getField('contact_id')) {
-          CRM.alert(ts('Cannot create smart group from %1.', {1: searchMeta.getEntity(true).titlePlural}), ts('Missing contact_id'), 'error', {expires: 5000});
-          return;
-        }
         var model = {
           title: '',
           description: '',
           visibility: 'User and User Admin Only',
           group_type: [],
           id: ctrl.load ? ctrl.load.id : null,
-          entity: ctrl.entity,
-          params: angular.extend({}, ctrl.params, {version: 4})
+          api_entity: ctrl.entity,
+          api_params: _.cloneDeep(angular.extend({}, ctrl.params, {version: 4}))
         };
-        delete model.params.orderBy;
+        delete model.api_params.orderBy;
+        if (ctrl.load && ctrl.load.api_params && ctrl.load.api_params.select && ctrl.load.api_params.select[0]) {
+          model.api_params.select.unshift(ctrl.load.api_params.select[0]);
+        }
         var options = CRM.utils.adjustDialogDefaults({
           autoOpen: false,
           title: ts('Save smart group')
