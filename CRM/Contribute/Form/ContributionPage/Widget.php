@@ -191,7 +191,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     $this->addElement('xbutton',
       $this->_refreshButtonName,
       ts('Save and Preview'),
-      ['type' => 'submit']
+      ['type' => 'submit', 'class' => 'crm-button crm-form-submit crm-button-type-submit']
     );
     parent::buildQuickForm();
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Widget', 'formRule'], $this);
