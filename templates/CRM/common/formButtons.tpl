@@ -12,7 +12,7 @@
 {* Loops through $linkButtons and assigns html "a" (link) buttons to the template. Used for additional entity functions such as "Move to Case" or "Renew Membership" *}
 {if $linkButtons}
   {foreach from=$linkButtons item=linkButton}
-    {if $linkButton.accesskey}
+    {if $linkButton.accessKey}
       {capture assign=accessKey}accesskey="{$linkButton.accessKey}"{/capture}
     {else}{assign var="accessKey" value=""}
     {/if}
