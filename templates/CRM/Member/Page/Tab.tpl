@@ -15,31 +15,20 @@
 {elseif $action eq 32768}  {* renew *}
     {include file="CRM/Member/Form/MembershipRenewal.tpl"}
 {elseif $action eq 16} {* Browse memberships for a contact *}
-    {if $permission EQ 'edit'}
-      {capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}{/if}
-
     {if $action ne 1 and $action ne 2 and $permission EQ 'edit'}
         <div class="help">
-            {if $permission EQ 'edit'}
-              {capture assign="link"}class="action-item" href="{$newURL}"{/capture}
-              {ts 1=$link}Click <a %1>Add Membership</a> to record a new membership.{/ts}
-              {if $newCredit}
-                {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership&mode=live"}{/capture}
-                {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
-                {ts 1=$link}Click <a %1>Submit Credit Card Membership</a> to process a Membership on behalf of the member using their credit card.{/ts}
-                {/if}
+            {if $linkButtons.add_membership}
+              {ts}Click <em>Add Membership</em> to record a new membership.{/ts}
             {else}
-                {ts 1=$displayName}Current and inactive memberships for %1 are listed below.{/ts}
+              {ts 1=$displayName}Current and inactive memberships for %1 are listed below.{/ts}
+            {/if}
+            {if $linkButtons.creditcard_membership}
+              {ts}Click <em>Submit Credit Card Membership</em> to process a Membership on behalf of the member using their credit card.{/ts}
             {/if}
         </div>
 
         <div class="action-link">
-            <a accesskey="N" href="{$newURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Membership{/ts}</span></a>
-            {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
-            {else}
-                <br/ ><br/ >
-            {/if}
+          {include file="CRM/common/formButtons.tpl" location="top"}
         </div>
     {/if}
     {if NOT ($activeMembers or $inActiveMembers) and $action ne 2 and $action ne 1 and $action ne 8 and $action ne 4 and $action ne 32768}
