@@ -1322,7 +1322,7 @@ if (!CRM.vars) CRM.vars = {};
       setTimeout(function () {
         ele.one('change', function () {
           if (msg && msg.close) msg.close();
-          ele.removeClass('error');
+          ele.removeClass('crm-error');
           label.removeClass('crm-error');
         });
       }, 1000);
