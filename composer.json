@@ -52,6 +52,7 @@
     "symfony/event-dispatcher": "~3.0 || ~4.4",
     "symfony/filesystem": "~3.0 || ~4.4",
     "symfony/process": "~3.0 || ~4.4",
+    "symfony/var-dumper": "~3.0 || ~4.4",
     "psr/log": "~1.0",
     "symfony/finder": "~3.0 || ~4.4",
     "tecnickcom/tcpdf" : "6.3.*",
