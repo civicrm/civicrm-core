@@ -903,11 +903,11 @@ class CRM_Core_Permission {
       ],
       'administer CiviCRM system' => [
         'label' => $prefix . ts('administer CiviCRM System'),
-        'description' => ts('Perform all system administration tasks in CiviCRM:'),
+        'description' => ts('Perform all system administration tasks in CiviCRM'),
       ],
       'administer CiviCRM data' => [
         'label' => $prefix . ts('administer CiviCRM Data'),
-        'description' => ts('Perform all system administration tasks in CiviCRM:'),
+        'description' => ts('Permit altering all restricted data options'),
       ],
     ];
     foreach (self::getImpliedPermissions() as $name => $includes) {
