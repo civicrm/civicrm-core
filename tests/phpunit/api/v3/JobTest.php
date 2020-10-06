@@ -45,6 +45,15 @@ class api_v3_JobTest extends CiviUnitTestCase {
   private $report_instance;
 
   /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * We cannot enable this until https://github.com/civicrm/civicrm-core/pull/18555 is merged
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = FALSE;
+
+  /**
    * Set up for tests.
    */
   public function setUp() {
