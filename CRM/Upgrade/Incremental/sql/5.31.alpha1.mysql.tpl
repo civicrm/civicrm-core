@@ -41,3 +41,5 @@ INSERT IGNORE INTO civicrm_state_province (country_id, abbreviation, name) VALUE
 (@UKCountryId, "TOF", "Torfaen"),
 (@UKCountryId, "VGL", "Vale of Glamorgan, The"),
 (@UKCountryId, "WRX", "Wrexham");
+
+ALTER TABLE civicrm_price_set MODIFY COLUMN `min_amount` decimal(20,2) DEFAULT '0.00' COMMENT 'Minimum Amount required for this set.';
