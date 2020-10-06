@@ -15,7 +15,7 @@
   */
 class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
 
-  protected $_contactIds = NULL;
+  protected $_contactIds;
 
   protected function setUp() {
     parent::setUp();
@@ -23,6 +23,14 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
       $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
       $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
     ];
+  }
+
+  /**
+   * Clean up after test.
+   */
+  protected function tearDown() {
+    unset($this->_contactIds);
+    parent::tearDown();
   }
 
   /**
@@ -38,7 +46,7 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
       // create the non-primary address first
       foreach (['non-primary', 'primary'] as $flag) {
         // @TODO: bug - this doesn't affect as if its the first and only address created for a contact then it always consider it as primary
-        $isPrimary = ($flag == 'primary');
+        $isPrimary = ($flag === 'primary');
         $streetName = substr(sha1(rand()), 0, 7);
         $addresses[$contactID][$flag] = $this->callAPISuccess('Address', 'create', [
           'street_name' => $streetName,
@@ -53,7 +61,7 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
           'sequential' => 1,
         ])['values'][0];
 
-        if ($flag == 'non-primary') {
+        if ($flag === 'non-primary') {
           $addresses[$contactID][$flag] = $this->callAPISuccess('Address', 'create', [
             'is_primary' => $isPrimary,
             'id' => $addresses[$contactID][$flag]['id'],
