@@ -205,11 +205,31 @@ class GatewayRequest {
    *
    */
   public function CreateNode($NodeName, $NodeValue) {
-    require_once E::path('lib/XML/Util.php');
-
-    $xml = new XML_Util();
-    $node = "<" . $NodeName . ">" . $xml->replaceEntities($NodeValue) . "</" . $NodeName . ">";
+    $node = "<" . $NodeName . ">" . self::replaceEntities($NodeValue) . "</" . $NodeName . ">";
     return $node;
+  }
+
+  /**
+   * replace XML entities
+   *
+   * <code>
+   * // replace XML entites:
+   * $string = self::replaceEntities('This string contains < & >.');
+   * </code>
+   *
+   * @param string $string          string where XML special chars
+   *                                should be replaced
+   *
+   * @return string string with replaced chars
+   */
+  public static function replaceEntities($string) {
+    return strtr($string, [
+      '&'  => '&amp;',
+      '>'  => '&gt;',
+      '<'  => '&lt;',
+      '"'  => '&quot;',
+      '\'' => '&apos;',
+    ]);
   }
 
 }
