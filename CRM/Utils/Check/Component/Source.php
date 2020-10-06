@@ -76,10 +76,15 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
         ]);
       }
       if (file_exists($path)) {
-        $orphans[] = [
-          'name' => $file,
-          'path' => $path,
-        ];
+        if ((strpos($file, '[civicrm.vendor]') !== FALSE || strpos($file, '[ivicrm.packages]') !== FALSE) && strpos($path, 'civicrm/') === FALSE) {
+          continue;
+        }
+        else {
+          $orphans[] = [
+            'name' => $file,
+            'path' => $path,
+          ];
+        }
       }
     }
 
