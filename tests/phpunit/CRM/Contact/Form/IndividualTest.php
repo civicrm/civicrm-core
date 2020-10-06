@@ -35,4 +35,39 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<label for="first_name">', $contents);
   }
 
+  /**
+   * This is the same as testOpeningNewIndividualForm but with a custom field
+   * defined. It maybe doesn't need to be a separate test but might make it
+   * easier to track down problems if one fails but not the other.
+   */
+  public function testOpeningNewIndividualFormWithCustomField() {
+    $custom_group = $this->customGroupCreate([]);
+    $custom_field1 = $this->customFieldCreate(['custom_group_id' => $custom_group['id']]);
+    $custom_field2 = $this->customFieldCreate([
+      'custom_group_id' => $custom_group['id'],
+      'label' => 'f2',
+      'html_type' => 'Select',
+      // being lazy, just re-use activity type choices
+      'option_group_id' => 'activity_type',
+    ]);
+    $custom_field3 = $this->customFieldCreate([
+      'custom_group_id' => $custom_group['id'],
+      'label' => 'f3',
+      'html_type' => 'Radio',
+      'option_group_id' => 'gender',
+    ]);
+    $form = new CRM_Contact_Form_Contact();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_Contact', 'New Individual');
+
+    $form->set('reset', '1');
+    $form->set('ct', 'Individual');
+
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    $contents = ob_get_contents();
+    ob_end_clean();
+
+    $this->assertStringContainsString('<label for="first_name">', $contents);
+  }
+
 }
