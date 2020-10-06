@@ -337,15 +337,8 @@ class CRM_Core_BAO_Block {
       $name = 'OpenID';
     }
 
-    $baoString = 'CRM_Core_DAO_' . $name;
-    $block = new $baoString();
-
-    $block->copyValues($params);
-
-    // CRM-11006 add call to pre and post hook for delete action
-    CRM_Utils_Hook::pre('delete', $name, $block->id, CRM_Core_DAO::$_nullArray);
-    $block->delete();
-    CRM_Utils_Hook::post('delete', $name, $block->id, $block);
+    $baoString = 'CRM_Core_BAO_' . $name;
+    $baoString::del($params['id']);
   }
 
   /**
