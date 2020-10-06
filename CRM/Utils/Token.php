@@ -1160,11 +1160,11 @@ class CRM_Utils_Token {
    *   Extra params.
    * @param array $tokens
    *   The list of tokens we've extracted from the content.
-   * @param null $className
-   * @param int $jobID
+   * @param string|null $className
+   * @param int|null $jobID
    *   The mailing list jobID - this is a legacy param.
    *
-   * @return array
+   * @return array - e.g [[1 => ['first_name' => 'bob'...], 34 => ['first_name' => 'fred'...]]]
    */
   public static function getTokenDetails(
     $contactIDs,
@@ -1227,8 +1227,7 @@ class CRM_Utils_Token {
       }
     }
 
-    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
-    $contactDetails = &$details[0];
+    [$contactDetails] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
 
     foreach ($contactIDs as $contactID) {
       if (array_key_exists($contactID, $contactDetails)) {
@@ -1270,7 +1269,7 @@ class CRM_Utils_Token {
       $tokens,
       $className
     );
-    return $details;
+    return [$contactDetails];
   }
 
   /**
