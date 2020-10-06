@@ -45,11 +45,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
     // create location blocks.
     foreach (self::$blocks as $block) {
-      if ($block != 'address') {
+      if ($block !== 'address') {
         $location[$block] = CRM_Core_BAO_Block::create($block, $params);
       }
-      else {
-        $location[$block] = CRM_Core_BAO_Address::create($params, $fixAddress);
+      elseif (is_array($params['address'] ?? NULL)) {
+        $location[$block] = CRM_Core_BAO_Address::legacyCreate($params, $fixAddress);
       }
     }
 

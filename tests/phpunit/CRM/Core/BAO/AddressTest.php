@@ -50,7 +50,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $fixAddress = TRUE;
 
-    CRM_Core_BAO_Address::create($params, $fixAddress);
+    CRM_Core_BAO_Address::legacyCreate($params, $fixAddress);
     $addressId = $this->assertDBNotNull('CRM_Core_DAO_Address', 'Oberoi Garden', 'id', 'street_address',
       'Database check for created address.'
     );
@@ -76,7 +76,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     ];
     $params['contact_id'] = $contactId;
 
-    $block = CRM_Core_BAO_Address::create($params, $fixAddress);
+    $block = CRM_Core_BAO_Address::legacyCreate($params, $fixAddress);
 
     $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for updated address by contactId.'
@@ -253,7 +253,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $fixAddress = TRUE;
 
-    CRM_Core_BAO_Address::create($params, $fixAddress);
+    CRM_Core_BAO_Address::legacyCreate($params, $fixAddress);
 
     $addressId = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
       'Database check for created address.'
