@@ -700,7 +700,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       // Search field is always multi-select
       if ($search || (self::isSerialized($field) && $widget === 'Select')) {
-        $fieldAttributes['class'] .= ltrim($fieldAttributes['class'] ?? '' . ' huge');
+        $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' huge');
         $fieldAttributes['multiple'] = 'multiple';
         $fieldAttributes['placeholder'] = $placeholder;
       }
@@ -794,7 +794,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       // For all select elements
       case 'Select':
-        $fieldAttributes['class'] .= ltrim($fieldAttributes['class'] ?? '' . ' crm-select2');
+        $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-select2');
         if ($field->is_search_range && $search && in_array($field->data_type, $rangeDataTypes)) {
           $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $fieldAttributes);
           $qf->add('text', $elementName . '_to', ts('To'), $fieldAttributes);
@@ -870,7 +870,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           if (!CRM_Core_Permission::check('access contact reference fields')) {
             break;
           }
-          $fieldAttributes['class'] = ltrim($fieldAttributes['class'] ?? '' . ' crm-form-contact-reference huge');
+          $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-form-contact-reference huge');
           $fieldAttributes['data-api-entity'] = 'Contact';
           $element = $qf->add('text', $elementName, $label, $fieldAttributes, $useRequired && !$search);
 
