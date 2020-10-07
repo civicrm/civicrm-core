@@ -75,7 +75,6 @@
 }
 
 #bootstrap-theme.api4-explorer-page fieldset legend {
-  background-color: white;
   font-size: 13px;
   margin: 0;
   width: auto;
@@ -83,12 +82,12 @@
   padding: 2px 5px;
   text-transform: capitalize;
 }
-#bootstrap-theme.api4-explorer-page fieldset > .btn-group {
+#bootstrap-theme.api4-explorer-page crm-api4-clause > .btn-group {
   position: absolute;
   right: 0;
-  top: 11px;
+  top: 0;
 }
-#bootstrap-theme.api4-explorer-page fieldset > .btn-group .btn {
+#bootstrap-theme.api4-explorer-page crm-api4-clause > .btn-group .btn {
   border: 0 none;
 }
 

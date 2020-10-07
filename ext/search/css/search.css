@@ -50,12 +50,12 @@
   padding: 2px 5px;
   text-transform: capitalize;
 }
-#bootstrap-theme.crm-search fieldset > .btn-group {
+#bootstrap-theme.crm-search crm-search-clause > .btn-group {
   position: absolute;
   right: 0;
-  top: 11px;
+  top: 0;
 }
-#bootstrap-theme.crm-search fieldset > .btn-group .btn {
+#bootstrap-theme.crm-search crm-search-clause > .btn-group .btn {
   border: 0 none;
 }
 
