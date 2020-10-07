@@ -69,7 +69,6 @@
             mailing_id_a: null,
             mailing_id_b: null,
             mailing_id_c: null,
-            domain_id: null,
             testing_criteria: 'subject',
             winner_criteria: null,
             specific_url: '',
