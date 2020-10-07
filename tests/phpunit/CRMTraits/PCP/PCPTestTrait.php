@@ -73,4 +73,22 @@ trait CRMTraits_PCP_PCPTestTrait {
     return $params;
   }
 
+  /**
+   * Create a pcp block for testing.
+   *
+   * @param array $params
+   *
+   * @return int
+   */
+  protected function createPCPBlock(array $params):int {
+    $blockParams = $this->pcpBlockParams();
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+
+    $params = array_merge($this->pcpParams(), $params);
+    $params['pcp_block_id'] = $pcpBlock->id;
+
+    $pcp = CRM_PCP_BAO_PCP::create($params);
+    return (int) $pcp->id;
+  }
+
 }

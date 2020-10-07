@@ -17,6 +17,7 @@
  * @group headless
  */
 class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
+  use CRMTraits_PCP_PCPTestTrait;
 
   protected $_individualId;
   protected $_contribution;
@@ -80,7 +81,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_userId = $this->createLoggedInUser();
 
-    $this->_individualId = $this->individualCreate();
+    $this->_individualId = $this->ids['contact'][0] = $this->individualCreate();
     $this->_params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -807,6 +808,32 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'clumsy smurf',
     ]);
     $mut->stop();
+  }
+
+  /**
+   * Test submitting the back office contribution form with pcp data.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testSubmitWithPCP() {
+    $params = $this->pcpParams();
+    $pcpID = $this->createPCPBlock($params);
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit([
+      'financial_type_id' => 3,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 1,
+      'total_amount' => 5,
+      'pcp_made_through_id' => $pcpID,
+      'pcp_display_in_roll' => '1',
+      'pcp_roll_nickname' => 'Dobby',
+      'pcp_personal_note' => 'I wuz here',
+    ], CRM_Core_Action::ADD);
+    $softCredit = $this->callAPISuccessGetSingle('ContributionSoft', []);
+    $this->assertEquals('Dobby', $softCredit['pcp_roll_nickname']);
   }
 
   /**
