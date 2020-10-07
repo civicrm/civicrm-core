@@ -371,9 +371,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       }
     }
 
-    // update the UF user_unique_id if that has changed
-    CRM_Core_BAO_UFMatch::updateUFName($contact->id);
-
     if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
@@ -3531,6 +3528,9 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         if ($dao->fetch()) {
           $dao->is_primary = 1;
           $dao->save();
+          if ($type === 'Email') {
+            CRM_Core_BAO_UFMatch::updateUFName($dao->contact_id);
+          }
         }
       }
     }
