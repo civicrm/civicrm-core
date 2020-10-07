@@ -47,13 +47,12 @@ class CRM_Dedupe_Finder {
     }
 
     $rgBao->fillTable();
-    $dao = new CRM_Core_DAO();
-    $dao->query($rgBao->thresholdQuery($checkPermissions));
+    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermissions));
     $dupes = [];
     while ($dao->fetch()) {
       $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
     }
-    $dao->query($rgBao->tableDropQuery());
+    CRM_Core_DAO::executeQuery(($rgBao->tableDropQuery()));
 
     return $dupes;
   }

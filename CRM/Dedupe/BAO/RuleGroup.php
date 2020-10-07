@@ -212,7 +212,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
 
-    $dao = new CRM_Core_DAO();
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
@@ -257,7 +256,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
           // construct and execute the intermediate query
           $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
-          $dao->query($query);
+          $dao = CRM_Core_DAO::executeQuery($query);
 
           // FIXME: we need to be more acurate with affected rows, especially for insert vs duplicate insert.
           // And that will help optimize further.
@@ -279,7 +278,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         $fieldWeight = $fieldWeight[0];
         $query = array_shift($tableQueries);
         $query = "{$insertClause} {$query} {$groupByClause} ON DUPLICATE KEY UPDATE weight = weight + VALUES(weight)";
-        $dao->query($query);
+        $dao = CRM_Core_DAO::executeQuery($query);
         if ($dao->affectedRows() >= 1) {
           $exclWeightSum[] = substr($fieldWeight, strrpos($fieldWeight, '.') + 1);
         }
