@@ -2283,39 +2283,25 @@ SELECT contact_id
     }
     // test for create view and trigger permissions and if allowed, add the option to go multilingual
     // and logging
-    // I'm not sure why we use the getStaticProperty for an error, rather than checking for DB_Error
-    CRM_Core_TemporaryErrorScope::ignoreException();
-    $dao = new CRM_Core_DAO();
-    if ($view) {
-      $result = $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError') || is_a($result, 'DB_Error')) {
-        return FALSE;
+    try {
+      if ($view) {
+        CRM_Core_DAO::executeQuery('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
+      }
+
+      if ($trigger) {
+        CRM_Core_DAO::executeQuery('CREATE TRIGGER civicrm_domain_trigger BEFORE INSERT ON civicrm_domain FOR EACH ROW BEGIN END');
+        CRM_Core_DAO::executeQuery('DROP TRIGGER IF EXISTS civicrm_domain_trigger');
+      }
+
+      if ($view) {
+        CRM_Core_DAO::executeQuery('DROP VIEW IF EXISTS civicrm_domain_view');
       }
     }
-
-    if ($trigger) {
-      $result = $dao->query('CREATE TRIGGER civicrm_domain_trigger BEFORE INSERT ON civicrm_domain FOR EACH ROW BEGIN END');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError') || is_a($result, 'DB_Error')) {
-        if ($view) {
-          $dao->query('DROP VIEW IF EXISTS civicrm_domain_view');
-        }
-        return FALSE;
+    catch (Exception $e) {
+      if ($view) {
+        CRM_Core_DAO::executeQuery('DROP VIEW IF EXISTS civicrm_domain_view');
       }
-
-      $dao->query('DROP TRIGGER IF EXISTS civicrm_domain_trigger');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
-        if ($view) {
-          $dao->query('DROP VIEW IF EXISTS civicrm_domain_view');
-        }
-        return FALSE;
-      }
-    }
-
-    if ($view) {
-      $dao->query('DROP VIEW IF EXISTS civicrm_domain_view');
-      if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
-        return FALSE;
-      }
+      return FALSE;
     }
 
     return TRUE;
