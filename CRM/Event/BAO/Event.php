@@ -682,6 +682,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
   AND civicrm_event.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
     $dao = new CRM_Core_DAO();
+    throw new CRM_Core_Exception('yep it is tested');
     $dao->query($sql);
 
     $locations = [];

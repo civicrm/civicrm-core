@@ -273,7 +273,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     $orderby = " ORDER BY civicrm_group.name";
     $sql = $select . $from . $where . $groupBy . $orderby;
-
+    throw new CRM_Core_Exception('yep it is tested');
     $group->query($sql);
 
     $values = [];

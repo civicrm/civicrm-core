@@ -40,6 +40,7 @@ class CRM_Event_Cart_Form_Checkout_ConferenceEvents extends CRM_Event_Cart_Form_
     ORDER BY
     slot.weight, start_date
 EOS;
+    throw new CRM_Core_Exception('yep it is tested');
     $events->query($query);
     while ($events->fetch()) {
       if (!array_key_exists($events->slot_label, $this->events_by_slot)) {

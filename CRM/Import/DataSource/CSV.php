@@ -188,12 +188,14 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     if ($tableName) {
+      throw new CRM_Core_Exception('yep it is tested');
       // Drop previous table if passed in and create new one.
       $db->query("DROP TABLE IF EXISTS $tableName");
     }
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
     // Do we still need this?
+    throw new CRM_Core_Exception('yep it is tested');
     $db->query("DROP TABLE IF EXISTS $tableName");
     $table->createWithColumns(implode(' text, ', $columns) . ' text');
 
@@ -235,6 +237,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
 
       if ($count >= self::NUM_ROWS_TO_INSERT && !empty($sql)) {
         $sql = "INSERT IGNORE INTO $tableName VALUES $sql";
+        throw new CRM_Core_Exception('yep it is tested');
         $db->query($sql);
 
         $sql = NULL;
@@ -244,6 +247,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     if (!empty($sql)) {
+      throw new CRM_Core_Exception('yep it is tested');
       $sql = "INSERT IGNORE INTO $tableName VALUES $sql";
       $db->query($sql);
     }

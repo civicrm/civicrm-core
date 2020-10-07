@@ -40,6 +40,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $daoTestPrivilege = new CRM_Core_DAO();
     $tempTable1 = CRM_Utils_SQL_TempTable::build()->getName();
     $tempTable2 = CRM_Utils_SQL_TempTable::build()->getName();
+    throw new CRM_Core_Exception('yep it is tested');
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable1} (test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("CREATE TEMPORARY TABLE {$tempTable2} (test int) ENGINE=InnoDB");
     $daoTestPrivilege->query("DROP TEMPORARY TABLE IF EXISTS {$tempTable1}, {$tempTable2}");
@@ -370,6 +371,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
                        ADD COLUMN ${statusFieldName}Msg TEXT,
                        ADD COLUMN $primaryKeyName INT PRIMARY KEY NOT NULL
                                AUTO_INCREMENT";
+    throw new CRM_Core_Exception('yep it is tested');
     $db->query($alterQuery);
 
     return ['status' => $statusFieldName, 'pk' => $primaryKeyName];

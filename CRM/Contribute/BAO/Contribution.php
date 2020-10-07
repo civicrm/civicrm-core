@@ -2271,6 +2271,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               ORDER BY  id DESC
               LIMIT     1;";
             $dao = new CRM_Core_DAO();
+            throw new CRM_Core_Exception('yep it is tested');
             $dao->query($sql);
             if ($dao->fetch()) {
               if (!empty($dao->membership_type_id)) {

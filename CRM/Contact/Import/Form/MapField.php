@@ -154,6 +154,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $columnsQuery = "SHOW FIELDS FROM $this->_importTableName
                          WHERE Field NOT LIKE '\_%'";
+      throw new CRM_Core_Exception('yep it is tested');throw new CRM_Core_Exception('yep it is tested');
       $columnsResult = $db->query($columnsQuery);
       while ($row = $columnsResult->fetchRow(DB_FETCHMODE_ASSOC)) {
         $columnNames[] = $row['Field'];

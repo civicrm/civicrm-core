@@ -1249,6 +1249,7 @@ class CRM_Core_CodeGen_GenerateData {
     if (!$this->stateMap) {
       $query = 'SELECT id, name, abbreviation from civicrm_state_province where country_id = 1228';
       $dao = new CRM_Core_DAO();
+      throw new CRM_Core_Exception('yep it is tested');
       $dao->query($query);
       $this->stateMap = array();
       while ($dao->fetch()) {

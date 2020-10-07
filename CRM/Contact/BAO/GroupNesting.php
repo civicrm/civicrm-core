@@ -128,6 +128,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
   public static function hasParentGroups($groupId) {
     $dao = new CRM_Contact_DAO_GroupNesting();
     $query = "SELECT parent_group_id FROM civicrm_group_nesting WHERE child_group_id = $groupId LIMIT 1";
+    throw new CRM_Core_Exception('yep it is tested');
     $dao->query($query);
     if ($dao->fetch()) {
       return TRUE;

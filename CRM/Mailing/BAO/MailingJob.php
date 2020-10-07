@@ -74,7 +74,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
     $job = new CRM_Mailing_BAO_MailingJob();
-
+    throw new CRM_Core_Exception('yep it is tested');
     $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');

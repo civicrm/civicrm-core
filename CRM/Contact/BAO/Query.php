@@ -5127,6 +5127,7 @@ civicrm_relationship.start_date > {$today}
    * @throws \CRM_Core_Exception
    */
   public function summaryContribution($context = NULL) {
+    throw new CRM_Core_Exception('yep it is tested');
     list($innerselect, $from, $where, $having) = $this->query(TRUE);
     if (!empty($this->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
       $from .= " $this->_permissionFromClause";
