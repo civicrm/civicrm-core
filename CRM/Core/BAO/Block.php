@@ -249,7 +249,7 @@ class CRM_Core_BAO_Block {
         }
       }
     }
-
+    $baoString = 'CRM_Core_BAO_' . $name;
     foreach ($params[$blockName] as $count => $value) {
       if (!is_array($value)) {
         continue;
@@ -289,7 +289,7 @@ class CRM_Core_BAO_Block {
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
       if (!empty($value['id']) && !$dataExists && $updateBlankLocInfo) {
         //delete the existing record
-        self::blockDelete($blockName, ['id' => $value['id']]);
+        $baoString::del($value['id']);
         continue;
       }
       elseif (!$dataExists) {
@@ -313,7 +313,6 @@ class CRM_Core_BAO_Block {
       }
 
       $blockFields = array_merge($value, $contactFields);
-      $baoString = 'CRM_Core_BAO_' . $name;
       $blocks[] = $baoString::create($blockFields);
     }
 
@@ -322,6 +321,7 @@ class CRM_Core_BAO_Block {
 
   /**
    * Delete block.
+   * @deprecated - just call the BAO / api directly.
    *
    * @param string $blockName
    *   Block name.
