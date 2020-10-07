@@ -56,6 +56,9 @@ function greenwich_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
       $bundle->addScriptFile('greenwich', 'extern/bootstrap3/assets/javascripts/bootstrap.min.js', [
         'translate' => FALSE,
       ]);
+      $bundle->addScriptFile('greenwich', 'js/noConflict.js', [
+        'translate' => FALSE,
+      ]);
       break;
   }
 }
