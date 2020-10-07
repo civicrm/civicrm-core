@@ -149,7 +149,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @var bool
    */
-  protected $isLocationTypesOnPostAssert = FALSE;
+  protected $isLocationTypesOnPostAssert = TRUE;
 
   /**
    * Class used for hooks during tests.

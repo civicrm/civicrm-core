@@ -225,29 +225,6 @@ class CRM_Core_BAO_Block {
           unset($value['id']);
         }
       }
-      //lets allow to update primary w/ more cleanly.
-      if (!$resetPrimaryId && !empty($value['is_primary'])) {
-        $primaryId = TRUE;
-        if (is_array($blockIds)) {
-          foreach ($blockIds as $blockId => $blockValue) {
-            if (!empty($blockValue['is_primary'])) {
-              $resetPrimaryId = $blockId;
-              break;
-            }
-          }
-        }
-        if ($resetPrimaryId) {
-          $baoString = 'CRM_Core_BAO_' . $blockName;
-          $block = new $baoString();
-          $block->selectAdd();
-          $block->selectAdd("id, is_primary");
-          $block->id = $resetPrimaryId;
-          if ($block->find(TRUE)) {
-            $block->is_primary = FALSE;
-            $block->save();
-          }
-        }
-      }
     }
     $baoString = 'CRM_Core_BAO_' . $name;
     foreach ($params[$blockName] as $count => $value) {
@@ -299,12 +276,6 @@ class CRM_Core_BAO_Block {
         'contact_id' => $contactId,
         'location_type_id' => $value['location_type_id'] ?? NULL,
       ];
-
-      $contactFields['is_primary'] = 0;
-      if ($isPrimary && !empty($value['is_primary'])) {
-        $contactFields['is_primary'] = $value['is_primary'];
-        $isPrimary = FALSE;
-      }
 
       $contactFields['is_billing'] = 0;
       if ($isBilling && !empty($value['is_billing'])) {

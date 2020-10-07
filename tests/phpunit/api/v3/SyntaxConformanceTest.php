@@ -39,6 +39,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_entity;
 
   /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * Turn off for this class as we use DAO methods that bypass business logic. Also, this test class
+   * takes a long time so might be good not to add another check.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = FALSE;
+
+  /**
    * Map custom group entities to civicrm components.
    * @var array
    */
