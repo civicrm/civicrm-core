@@ -22,6 +22,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   use CRMTraits_Profile_ProfileTrait;
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Financial_OrderTrait;
 
   protected $_individualId;
   protected $_contribution;
@@ -2765,6 +2766,41 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
+  }
+
+  /**
+   * Test Contribution with Order api.
+   *
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
+   */
+  public function testContributionOrder() {
+    $this->_contactID = $this->individualCreate();
+    $this->createContributionAndMembershipOrder();
+    $contribution = $this->callAPISuccess('contribution', 'get')['values'][$this->ids['Contribution'][0]];
+    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
+
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->ids['Contribution'][0],
+      'payment_instrument_id' => 'Check',
+      'total_amount' => 300,
+    ]);
+    $contribution = $this->callAPISuccess('contribution', 'get')['values'][$this->ids['Contribution'][0]];
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+
+    $lineItem = $this->callAPISuccess('LineItem', 'get', [
+      'sequential' => 1,
+      'contribution_id' => $this->ids['Contribution'][0],
+    ])['values'];
+    $this->assertCount(2, $lineItem);
+    $this->assertEquals($this->ids['Contribution'][0], $lineItem[0]['entity_id']);
+    $this->assertEquals('civicrm_contribution', $lineItem[0]['entity_table']);
+    $this->assertEquals($this->ids['Contribution'][0], $lineItem[0]['contribution_id']);
+    $this->assertEquals($this->ids['Contribution'][0], $lineItem[1]['contribution_id']);
+    $this->assertEquals('100.00', $lineItem[0]['line_total']);
+    $this->assertEquals('200.00', $lineItem[1]['line_total']);
+    $this->assertEquals($membership['id'], $lineItem[1]['entity_id']);
+    $this->assertEquals('civicrm_membership', $lineItem[1]['entity_table']);
   }
 
   /**
