@@ -134,7 +134,7 @@ trait DAOActionTrait {
       }
 
       if ($this->getEntityName() === 'Address') {
-        $createResult = $baoName::add($item, $this->fixAddress);
+        $createResult = $baoName::$method($item, $this->fixAddress);
       }
       elseif (method_exists($baoName, $method)) {
         $createResult = $baoName::$method($item);
