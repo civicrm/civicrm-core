@@ -983,8 +983,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       $queryString .= " AND id !=" . CRM_Utils_Type::escape($relationshipId, 'Integer');
     }
 
-    $relationship = new CRM_Contact_BAO_Relationship();
-    $relationship->query($queryString);
+    $relationship = CRM_Core_DAO::executeQuery($queryString);
     while ($relationship->fetch()) {
       // Check whether the custom field values are identical.
       $result = self::checkDuplicateCustomFields($params, $relationship->id);
