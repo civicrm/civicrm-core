@@ -253,10 +253,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    *   this array has key-> group id and value group title
    */
   public static function getGroupList($contactId = 0, $visibility = FALSE) {
-    $group = new CRM_Contact_DAO_Group();
-
-    $select = $from = $where = '';
-
     $select = 'SELECT civicrm_group.id, civicrm_group.title ';
     $from = ' FROM civicrm_group ';
     $where = " WHERE civicrm_group.is_active = 1 ";
@@ -274,7 +270,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     $orderby = " ORDER BY civicrm_group.name";
     $sql = $select . $from . $where . $groupBy . $orderby;
 
-    $group->query($sql);
+    $group = CRM_Core_DAO::executeQuery($sql);
 
     $values = [];
     while ($group->fetch()) {
