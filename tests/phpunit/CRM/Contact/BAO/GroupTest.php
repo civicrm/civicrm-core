@@ -142,6 +142,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'parents' => [
         $group2->id => 1,
       ],
+      'group_type' => ['2' => 1],
     ];
     $group3 = CRM_Contact_BAO_Group::create($params);
 
@@ -155,7 +156,10 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
     // Check restrict to mailing groups
     $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing');
-    $this->assertSame([$group1->id => 'Parent Group A'], $nestedGroup);
+    $this->assertSame([
+      $group1->id => 'Parent Group A',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
   }
 
   /**
