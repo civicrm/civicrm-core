@@ -296,7 +296,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     // Hooks allow more nuanced smarty usage here.
     CRM_Core_Smarty::singleton()->assign('contributions', $contributions);
     foreach ($contacts as $contactID => $contact) {
-      $tokenResolvedContacts = CRM_Utils_Token::getTokenDetails(['contact_id' => $contactID],
+      [$tokenResolvedContacts] = CRM_Utils_Token::getTokenDetails(['contact_id' => $contactID],
         $returnProperties,
         $skipOnHold,
         $skipDeceased,
@@ -304,7 +304,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $messageToken,
         $task
       );
-      $contacts[$contactID] = array_merge($tokenResolvedContacts[0][$contactID], $contact);
+      $contacts[$contactID] = array_merge($tokenResolvedContacts[$contactID], $contact);
     }
     return [$contributions, $contacts];
   }
