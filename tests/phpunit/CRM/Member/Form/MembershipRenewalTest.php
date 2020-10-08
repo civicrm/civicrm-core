@@ -18,6 +18,7 @@ use Civi\Api4\Contact;
  * @group headless
  */
 class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
 
   protected $_individualId;
   protected $_contribution;
@@ -119,7 +120,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         'civicrm_relationship',
         'civicrm_uf_match',
         'civicrm_address',
-      ]
+      ], TRUE
     );
     foreach ($this->ids['contact'] as $contactID) {
       $this->callAPISuccess('contact', 'delete', ['id' => $contactID, 'skip_undelete' => TRUE]);
@@ -404,6 +405,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    */
   public function testSubmitRecurCompleteInstantWithMail($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
+    // Visibility is 'Public Pages and Listings' in order to try to get to a specific line
+    // of code to ensure it's tested - it might not be a 'real' use case.
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'multi_country', NULL, ['visibility' => 'Public Pages and Listings']);
     $form = $this->getForm();
     $this->mut = new CiviMailUtils($this, TRUE);
     /** @var \CRM_Core_Payment_Dummy $processor */
@@ -424,13 +428,19 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->preProcess();
 
     $form->_contactID = $this->_individualId;
-    $form->_mode = 'test';
+    $form->_mode = 'live';
 
-    $form->testSubmit(array_merge($this->getBaseSubmitParams(), ['is_recur' => 1, 'send_receipt' => 1, 'auto_renew' => 1]));
+    $form->testSubmit(array_merge($this->getBaseSubmitParams(), [
+      'is_recur' => 1,
+      'send_receipt' => 1,
+      'auto_renew' => 1,
+      $this->getCustomFieldName('multi_country') => [1006, 1007],
+    ]));
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['contact_id' => $this->_individualId]);
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
     $this->mut->checkMailLog([
       '$ ' . $this->formatMoneyInput(7800.90),
+      'Country-multi : Angola, Anguilla',
     ]);
     $this->mut->stop();
     $this->setCurrencySeparators(',');

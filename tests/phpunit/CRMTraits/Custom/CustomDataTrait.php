@@ -86,14 +86,16 @@ trait CRMTraits_Custom_CustomDataTrait {
    *   Params for the group to be created.
    * @param string $customFieldType
    *
-   * @param string $identifier
+   * @param string|null $identifier
+   *
+   * @param array $fieldParams
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL) {
-    $supported = ['text', 'select', 'date', 'int', 'contact_reference', 'radio'];
+  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL, $fieldParams = []) {
+    $supported = ['text', 'select', 'date', 'int', 'contact_reference', 'radio', 'multi_country'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -101,7 +103,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     $groupParams['name'] = $identifier ?? 'Custom Group';
     $this->createCustomGroup($groupParams);
     $reference = &$this->ids['CustomField'][$identifier . $customFieldType];
-    $fieldParams = ['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]];
+    $fieldParams = array_merge($fieldParams, ['custom_group_id' => $this->ids['CustomGroup'][$groupParams['name']]]);
     switch ($customFieldType) {
       case 'text':
         $reference = $this->createTextCustomField($fieldParams)['id'];
@@ -125,6 +127,10 @@ trait CRMTraits_Custom_CustomDataTrait {
 
       case 'radio':
         $reference = $this->createIntegerRadioCustomField($fieldParams)['id'];
+        return;
+
+      case 'multi_country':
+        $reference = $this->createMultiCountryCustomField($fieldParams)['id'];
         return;
 
     }
