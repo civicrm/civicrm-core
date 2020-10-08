@@ -243,6 +243,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
       $params[$block][1]['is_primary'] = 1;
       foreach ($locationEntities as $index => $locationEntity) {
+        if (!$this->isLocationHasData($block, $locationEntity)) {
+          unset($params[$block][$index]);
+          continue;
+        }
         $params[$block][$index]['location_type_id'] = $defaultLocationTypeID;
         $fieldKey = (int) $index === 1 ? '_id' : '_2_id';
         if ($isUpdateToExistingLocationBlock && !empty($this->locationBlock['loc_block.' . $block . $fieldKey])) {
@@ -250,9 +254,9 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
         }
       }
     }
-    $addresses = Address::save(FALSE)->setRecords($params['address'])->execute();
-    $emails = Email::save(FALSE)->setRecords($params['email'])->execute();
-    $phones = Phone::save(FALSE)->setRecords($params['phone'])->execute();
+    $addresses = empty($params['address']) ? [] : Address::save(FALSE)->setRecords($params['address'])->execute();
+    $emails = empty($params['email']) ? [] : Email::save(FALSE)->setRecords($params['email'])->execute();
+    $phones = empty($params['phone']) ? [] : Phone::save(FALSE)->setRecords($params['phone'])->execute();
 
     $params['loc_block_id'] = LocBlock::save(FALSE)->setRecords([
       [
@@ -281,6 +285,29 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function getTitle() {
     return ts('Event Location');
+  }
+
+  /**
+   * Is there some data to save for the given entity
+   *
+   * @param string $block
+   * @param array $locationEntity
+   *
+   * @return bool
+   */
+  protected function isLocationHasData(string $block, array $locationEntity): bool {
+    if ($block === 'email') {
+      return !empty($locationEntity['email']);
+    }
+    if ($block === 'phone') {
+      return !empty($locationEntity['phone']);
+    }
+    foreach ($locationEntity as $value) {
+      if (!empty($value)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
