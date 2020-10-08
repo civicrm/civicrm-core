@@ -518,6 +518,8 @@ ORDER BY a.object_id
     if (empty($ids) && !empty($includedGroups) &&
       is_array($includedGroups)
     ) {
+      // This is pretty alarming - we 'sometimes' include all included groups
+      // seems problematic per https://lab.civicrm.org/dev/core/-/issues/1879
       $ids = $includedGroups;
     }
     if ($contactID) {
