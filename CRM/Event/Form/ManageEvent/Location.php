@@ -231,7 +231,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       CRM_Event_BAO_Event::deleteEventLocBlock($this->_oldLocBlockId, $this->_id);
     }
 
-    $isUpdateToExistingLocationBlock = !empty($params['loc_event_id']) && (int) $params['loc_event_id'] === $this->locationBlock['loc_block_id'];
+    $isUpdateToExistingLocationBlock = !$deleteOldBlock && !empty($params['loc_event_id']) && (int) $params['loc_event_id'] === $this->locationBlock['loc_block_id'];
     // It should be impossible for there to be no default location type. Consider removing this handling
     $defaultLocationTypeID = CRM_Core_BAO_LocationType::getDefault()->id ?? 1;
 
