@@ -129,10 +129,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       throw new CRM_Core_Exception("$file is empty. Please upload a valid file.");
     }
 
-    $config = CRM_Core_Config::singleton();
     // support tab separated
-    if (strtolower($fieldSeparator) == 'tab' ||
-      strtolower($fieldSeparator) == '\t'
+    if (strtolower($fieldSeparator) === 'tab' ||
+      strtolower($fieldSeparator) === '\t'
     ) {
       $fieldSeparator = "\t";
     }
@@ -188,13 +187,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     if ($tableName) {
-      // Drop previous table if passed in and create new one.
-      $db->query("DROP TABLE IF EXISTS $tableName");
+      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
     }
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
-    // Do we still need this?
-    $db->query("DROP TABLE IF EXISTS $tableName");
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
     $table->createWithColumns(implode(' text, ', $columns) . ' text');
 
     $numColumns = count($columns);
@@ -234,8 +231,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $count++;
 
       if ($count >= self::NUM_ROWS_TO_INSERT && !empty($sql)) {
-        $sql = "INSERT IGNORE INTO $tableName VALUES $sql";
-        $db->query($sql);
+        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tableName VALUES $sql");
 
         $sql = NULL;
         $first = TRUE;
@@ -244,8 +240,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     }
 
     if (!empty($sql)) {
-      $sql = "INSERT IGNORE INTO $tableName VALUES $sql";
-      $db->query($sql);
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tableName VALUES $sql");
     }
 
     fclose($fd);
