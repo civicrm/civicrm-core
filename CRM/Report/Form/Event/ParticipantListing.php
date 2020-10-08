@@ -723,7 +723,7 @@ ORDER BY  cv.label
 
         $rows[$rowNum]['civicrm_contact_sort_name_linked'] = "<a title='$contactTitle' href=$url>$displayName</a>";
         // Add a "View" link to the participant record if this isn't a CSV/PDF/printed document.
-        if ($this->_outputMode !== 'csv' && $this->_outputMode !== 'pdf' && $this->_outputMode !== 'print') {
+        if (empty($this->getOutputMode())) {
           $rows[$rowNum]['civicrm_contact_sort_name_linked'] .=
             "<span style='float: right;'><a title='$participantTitle' href=$viewUrl>" .
             ts('View') . "</a></span>";
