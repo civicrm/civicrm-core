@@ -35,7 +35,7 @@
 
     this.availableFields = function() {
       var results = _.transform(ctrl.entity.fields, function(result, item) {
-        var formatted = {id: item.name, text: item.title, description: item.description};
+        var formatted = {id: item.name, text: item.label, description: item.description};
         if (fieldInUse(item.name)) {
           formatted.disabled = true;
         }
