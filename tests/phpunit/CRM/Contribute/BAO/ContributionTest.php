@@ -1422,6 +1422,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'source' => 'SSF',
       'contribution_status_id' => 2,
       "custom_{$customField['id']}" => 'value1',
+      'currency' => 'EUR',
     ];
     $contribution1 = $this->contributionCreate($params);
     $contactId2 = $this->individualCreate();
@@ -1460,7 +1461,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       TRUE
     );
 
-    $this->assertEquals("Contribution Amount: $ 100.00", $contributionDetails[$contactId1]['text'], "The text does not match");
+    $this->assertEquals("Contribution Amount: € 100.00", $contributionDetails[$contactId1]['text'], "The text does not match");
     $this->assertEquals("<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
       <p>Contribution Receive Date: May 11th, 2015 12:00 AM</p></br>
