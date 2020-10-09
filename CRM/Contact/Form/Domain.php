@@ -73,7 +73,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));
     $breadCrumbPath = CRM_Utils_System::url('civicrm/admin', 'reset=1');
-    CRM_Utils_System::appendBreadCrumb(ts('Administer CiviCRM'), $breadCrumbPath);
+    CRM_Utils_System::appendBreadCrumb([['title' => ts('Administer CiviCRM'), 'url' => $breadCrumbPath]]);
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
 
