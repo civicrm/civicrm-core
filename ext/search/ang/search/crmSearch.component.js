@@ -18,7 +18,7 @@
       this.page = 1;
       this.params = {};
       // After a search this.results is an object of result arrays keyed by page,
-      // Prior to searching it's an empty string because 1: falsey and 2: doesn't throw an error if you try to access undefined properties
+      // Initially this.results is an empty string because 1: it's falsey (unlike an empty object) and 2: it doesn't throw an error if you try to access undefined properties (unlike null)
       this.results = '';
       this.rowCount = false;
       // Have the filters (WHERE, HAVING, GROUP BY, JOIN) changed?
@@ -381,13 +381,6 @@
         return value;
       }
 
-      function getOption(field, value) {
-        return _.find(field.options, function(option) {
-          // Type coersion is intentional
-          return option.id == value;
-        });
-      }
-
       $scope.fieldsForGroupBy = function() {
         return {results: getAllFields('', function(key) {
             return _.contains(ctrl.params.groupBy, key);
@@ -413,7 +406,9 @@
       };
 
       function getDefaultSelect() {
-        return _.filter(['id', 'display_name', 'label', 'title', 'location_type_id:label'], searchMeta.getField);
+        return _.filter(['id', 'display_name', 'label', 'title', 'location_type_id:label'], function(field) {
+          return !!searchMeta.getField(field, ctrl.entity);
+        });
       }
 
       function getAllFields(suffix, disabledIf) {
