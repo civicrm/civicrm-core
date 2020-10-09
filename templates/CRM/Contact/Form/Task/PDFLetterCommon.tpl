@@ -34,7 +34,7 @@
 
 <div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
     <div class="crm-accordion-header">
-        {$form.pdf_format_header.html}
+      {ts}Page Format:{/ts} <span class="pdf-format-header-label"></span>
     </div>
     <div class="crm-accordion-body">
       <div class="crm-block crm-form-block">
@@ -52,7 +52,7 @@
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
-        <td>{$form.paper_dimensions.html}</td><td id="paper_dimensions">&nbsp;</td>
+        <td>{ts}Width x Height{/ts}</td><td id="paper_dimensions">&nbsp;</td>
         <td colspan="2">&nbsp;</td>
       </tr>
       <tr>
