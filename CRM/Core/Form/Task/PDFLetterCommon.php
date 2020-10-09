@@ -52,7 +52,6 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       FALSE
     );
 
-    $form->add('static', 'pdf_format_header', NULL, ts('Page Format: %1', [1 => '<span class="pdf-format-header-label"></span>']));
     $form->addSelect('format_id', [
       'label' => ts('Select Format'),
       'placeholder' => ts('Default'),
@@ -68,7 +67,6 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       FALSE,
       ['onChange' => "selectPaper( this.value ); showUpdateFormatChkBox();"]
     );
-    $form->add('static', 'paper_dimensions', NULL, ts('Width x Height'));
     $form->add(
       'select',
       'orientation',
