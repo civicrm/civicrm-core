@@ -1451,7 +1451,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         foreach ($values as $fieldValue) {
           $isPublic = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $fieldValue['custom_group_id'], 'is_public');
           if ($isPublic) {
-            if(!empty($fieldValue['value'])) {
+            if (!empty($fieldValue['value'])) {
               $customFields[$fieldID]['id'] = $fieldID;
               $formattedValue = CRM_Core_BAO_CustomField::displayValue($fieldValue['value'], $fieldID, $participants[0]->id);
               $customGroup[$customFields[$fieldID]['groupTitle']][$customFields[$fieldID]['label']] = str_replace('&nbsp;', '', $formattedValue);
