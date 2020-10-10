@@ -349,6 +349,10 @@ class CRM_Utils_System {
         $e->url = $mkRouteUri('civicrm/mailing/url', $e->query);
         break;
 
+      case 'router:extern/widget':
+        $e->url = $mkRouteUri('civicrm/contribute/widget', $e->query);
+        break;
+
       // Otherwise, keep the default.
     }
   }

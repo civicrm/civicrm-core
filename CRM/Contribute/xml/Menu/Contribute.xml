@@ -329,4 +329,12 @@
     <page_callback>CRM_Member_Page_RecurringContributions</page_callback>
     <access_arguments>access CiviContribute</access_arguments>
   </item>
+  <item>
+    <path>civicrm/contribute/widget</path>
+    <title>CiviContribute</title>
+    <page_callback>CRM_Contribute_Page_Widget</page_callback>
+    <access_callback>1</access_callback>
+    <weight>0</weight>
+    <is_public>true</is_public>
+  </item>
 </menu>
