@@ -862,7 +862,7 @@ LIMIT {$offset}, {$rowCount}
   /**
    * Retrieve a PDF Page Format for the PDF Letter form.
    */
-  public function pdfFormat() {
+  public static function pdfFormat() {
     $formatId = CRM_Utils_Type::escape($_REQUEST['formatId'], 'Integer');
 
     $pdfFormat = CRM_Core_BAO_PdfFormat::getById($formatId);
