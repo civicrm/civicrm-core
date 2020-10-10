@@ -111,6 +111,76 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test updating a location block.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testUpdateLocationBlock() {
+    $eventID = (int) $this->eventCreate()['id'];
+    $this->submitForm([
+      'address' => [
+        '1' => [
+          'street_address' => 'Old address',
+          'supplemental_address_1' => 'Hallmark Ct',
+          'supplemental_address_2' => 'Jersey Village',
+          'supplemental_address_3' => 'My Town',
+          'city' => 'Newark',
+          'postal_code' => '01903',
+          'country_id' => 1228,
+          'state_province_id' => 1029,
+          'geo_code_1' => '18.219023',
+          'geo_code_2' => '-105.00973',
+          'is_primary' => 1,
+          'location_type_id' => 1,
+        ],
+      ],
+    ], $eventID);
+
+    $this->submitForm([
+      'location_option' => 1,
+      'loc_event_id' => Event::get()->addWhere('id', '=', $eventID)->addSelect('loc_block_id')->execute()->first()['loc_block_id'],
+      'address' => [
+        '1' => [
+          'street_address' => 'New address',
+          'supplemental_address_1' => 'Hallmark Ct',
+          'supplemental_address_2' => 'Jersey Village',
+          'supplemental_address_3' => 'My Town',
+          'city' => 'Newark',
+          'postal_code' => '01903',
+          'country_id' => 1228,
+          'state_province_id' => 1029,
+          'geo_code_1' => '18.219023',
+          'geo_code_2' => '-105.00973',
+        ],
+      ],
+      'email' => [
+        '1' => [
+          'email' => '',
+        ],
+        '2' => [
+          'email' => '',
+        ],
+      ],
+      'phone' => [
+        '1' => [
+          'phone_type_id' => 1,
+          'phone' => '',
+          'phone_ext' => '',
+        ],
+        '2' => [
+          'phone_type_id' => 1,
+          'phone' => '',
+          'phone_ext' => '',
+        ],
+      ],
+    ], $eventID);
+    // Cleanup.
+    $this->eventDelete($eventID);
+  }
+
+  /**
    * Get the values to submit for the form.
    *
    * @return array
