@@ -115,8 +115,13 @@ class AngularLoader {
     }
 
     $res->addSettingsFactory(function () use (&$moduleNames, $angular, $res, $assetParams) {
+      // Merge static settings with the results of settingsFactory functions
+      $settingsByModule = $angular->getResources($moduleNames, 'settings', 'settings');
+      foreach ($angular->getResources($moduleNames, 'settingsFactory', 'settingsFactory') as $moduleName => $factory) {
+        $settingsByModule[$moduleName] = array_merge($settingsByModule[$moduleName] ?? [], $factory());
+      }
       // TODO optimization; client-side caching
-      $result = array_merge($angular->getResources($moduleNames, 'settings', 'settings'), [
+      return array_merge($settingsByModule, [
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => [
           'modules' => $moduleNames,
@@ -125,7 +130,6 @@ class AngularLoader {
           'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json', $assetParams),
         ],
       ]);
-      return $result;
     });
 
     $res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->getRegion(), FALSE);
