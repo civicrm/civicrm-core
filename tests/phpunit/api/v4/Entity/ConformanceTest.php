@@ -20,7 +20,6 @@
 namespace api\v4\Entity;
 
 use Civi\Api4\Entity;
-use api\v4\Traits\TableDropperTrait;
 use api\v4\UnitTestCase;
 
 /**
@@ -28,7 +27,7 @@ use api\v4\UnitTestCase;
  */
 class ConformanceTest extends UnitTestCase {
 
-  use TableDropperTrait;
+  use \api\v4\Traits\TableDropperTrait;
   use \api\v4\Traits\OptionCleanupTrait {
     setUp as setUpOptionCleanup;
   }
@@ -116,12 +115,12 @@ class ConformanceTest extends UnitTestCase {
   public function testConformance($entity) {
     $entityClass = 'Civi\Api4\\' . $entity;
 
+    $this->checkEntityInfo($entityClass);
     $actions = $this->checkActions($entityClass);
 
     // Go no further if it's not a CRUD entity
     if (array_diff(['get', 'create', 'update', 'delete'], array_keys($actions))) {
-      $this->markTestSkipped("The entity \"$entity\" does not ");
-      return;
+      $this->markTestSkipped("The API \"$entity\" does not implement CRUD actions");
     }
 
     $this->checkFields($entityClass, $entity);
@@ -136,7 +135,19 @@ class ConformanceTest extends UnitTestCase {
   }
 
   /**
-   * @param string $entityClass
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   */
+  protected function checkEntityInfo($entityClass) {
+    $info = $entityClass::getInfo();
+    $this->assertNotEmpty($info['name']);
+    $this->assertNotEmpty($info['title']);
+    $this->assertNotEmpty($info['titlePlural']);
+    $this->assertNotEmpty($info['type']);
+    $this->assertNotEmpty($info['description']);
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param string $entity
    */
   protected function checkFields($entityClass, $entity) {
@@ -152,7 +163,7 @@ class ConformanceTest extends UnitTestCase {
   }
 
   /**
-   * @param string $entityClass
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    *
    * @return array
    */
