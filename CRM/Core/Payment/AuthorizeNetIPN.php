@@ -141,7 +141,14 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
             $objects['contribution'] = &$contribution;
           }
           $input['payment_processor_id'] = $paymentProcessorID;
-          return $this->recur($input, $ids, $objects, $first);
+          return $this->recur($input, [
+            'related_contact' => $ids['related_contact'] ?? NULL,
+            'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+            'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+            'membership' => $ids['membership'] ?? NULL,
+            'contact' => $ids['contact'] ?? NULL,
+            'contributionPage' => $ids['contributionPage'] ?? NULL,
+          ], $objects, $first);
         }
       }
       return TRUE;
@@ -222,11 +229,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return TRUE;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
-      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], ['contribution' => $objects['contribution']]);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, ['contribution' => $objects['contribution']]);
 
     // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
     // to do this we should make it available via the api, e.g as a parameter, changing the nuance
