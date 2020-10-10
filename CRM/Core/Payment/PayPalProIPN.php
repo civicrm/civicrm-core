@@ -300,7 +300,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
     $objects['contribution']->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
-    $this->single($input, $ids, $objects, TRUE, $first);
+    $this->single($input, [
+      'related_contact' => $ids['related_contact'] ?? NULL,
+      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+    ], $objects, TRUE, $first);
   }
 
   /**
@@ -364,11 +368,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
-      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], $objects);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects);
   }
 
   /**
@@ -480,7 +480,11 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
           return;
         }
       }
-      $this->single($input, $ids, $objects, FALSE, FALSE);
+      $this->single($input, [
+        'related_contact' => $ids['related_contact'] ?? NULL,
+        'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+        'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+      ], $objects, FALSE, FALSE);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage());
