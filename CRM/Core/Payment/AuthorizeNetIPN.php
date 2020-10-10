@@ -80,6 +80,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         if (!$contribution->find(TRUE)) {
           throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
         }
+        $ids['contributionPage'] = $contribution->contribution_page_id;
 
         // make sure contact exists and is valid
         // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
@@ -105,13 +106,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
         $objects['contact'] = &$contact;
         $objects['contribution'] = &$contribution;
-
-        // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
-        if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
-          // We don't need to worry if about removing contribution page id as it will be set later in
-          //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
-          unset($ids['contributionPage']);
-        }
 
         $this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID);
 
@@ -320,12 +314,6 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       $log->error('payment_notification', ['message' => $message, 'ids' => $ids, 'input' => $input]);
       throw new CRM_Core_Exception($message);
     }
-
-    // get page id based on contribution id
-    $ids['contributionPage'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-      $ids['contribution'],
-      'contribution_page_id'
-    );
 
     if ($input['component'] == 'event') {
       // FIXME: figure out fields for event

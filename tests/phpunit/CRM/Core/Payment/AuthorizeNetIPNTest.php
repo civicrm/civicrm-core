@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Api4\Contribution;
 
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
@@ -135,6 +136,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d'), substr($updatedContributionRecurAgain['end_date'], 0, 10));
     // There should not be any email.
     $mut->assertMailLogEmpty();
+
+    $contributions = Contribution::get()->addWhere('contribution_recur_id', '=', $this->_contributionRecurID)->addSelect('contribution_page_id')->execute();
+    foreach ($contributions as $contribution) {
+      $this->assertEquals($this->_contributionPageID, $contribution['contribution_page_id']);
+    }
   }
 
   /**
