@@ -99,8 +99,6 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
         if ($loadOptions) {
           $entity['optionsLoaded'] = TRUE;
         }
-        // Because multivalue custom pseudo-entities don't have titlePlural
-        $entity['titlePlural'] = $entity['titlePlural'] ?? $entity['title'];
         $entity['fields'] = civicrm_api4($entity['name'], 'getFields', [
           'select' => $getFields,
           'where' => [['permission', 'IS NULL']],

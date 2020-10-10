@@ -88,7 +88,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       }
 
       if ($groupID || !empty($group)) {
-        $groups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids);
+        $groups = CRM_Contact_BAO_Group::getGroupsHierarchy($ids, NULL, '- ');
 
         $attributes['skiplabel'] = TRUE;
         $elements = [];

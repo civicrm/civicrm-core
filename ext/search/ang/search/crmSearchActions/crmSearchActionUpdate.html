@@ -10,7 +10,7 @@
     <hr />
     <div class="buttons pull-right">
       <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger">{{:: ts('Cancel') }}</button>
-      <button ng-click="$ctrl.save()" class="btn btn-primary" ng-disabled="!$ctrl.values.length">{{:: ts('Update %1 %2', {1: model.ids.length, 2: $ctrl.entity.title}) }}</button>
+      <button ng-click="$ctrl.save()" class="btn btn-primary" ng-disabled="!$ctrl.values.length">{{:: ts('Update %1 %2', {1: model.ids.length, 2: (model.ids.length === 1 ? $ctrl.entity.title : $ctrl.entity.titlePlural)}) }}</button>
     </div>
   </div>
 </div>

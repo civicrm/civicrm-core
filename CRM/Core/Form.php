@@ -370,7 +370,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::addRadio');
     }
 
-    if ($attributes && !is_array($attributes)) {
+    if ($type !== 'static' && $attributes && !is_array($attributes)) {
       // The $attributes param used to allow for strings and would default to an
       // empty string.  However, now that the variable is heavily manipulated,
       // we should expect it to always be an array.

@@ -81,23 +81,21 @@
     .factory('searchMeta', function() {
       function getEntity(entityName) {
         if (entityName) {
-          entityName = entityName === true ? searchEntity : entityName;
           return _.find(CRM.vars.search.schema, {name: entityName});
         }
       }
-      function getField(name) {
-        var dotSplit = name.split('.'),
+      function getField(fieldName, entityName) {
+        var dotSplit = fieldName.split('.'),
           joinEntity = dotSplit.length > 1 ? dotSplit[0] : null,
-          fieldName = _.last(dotSplit).split(':')[0],
-          entityName = searchEntity;
+          name = _.last(dotSplit).split(':')[0];
         // Custom fields contain a dot in their fieldname
         // If 3 segments, the first is the joinEntity and the last 2 are the custom field
         if (dotSplit.length === 3) {
-          fieldName = dotSplit[1] + '.' + fieldName;
+          name = dotSplit[1] + '.' + name;
         }
         // If 2 segments, it's ambiguous whether this is a custom field or joined field. Search the main entity first.
         if (dotSplit.length === 2) {
-          var field = _.find(getEntity(true).fields, {name: dotSplit[0] + '.' + fieldName});
+          var field = _.find(getEntity(entityName).fields, {name: dotSplit[0] + '.' + name});
           if (field) {
             return field;
           }
@@ -105,7 +103,7 @@
         if (joinEntity) {
           entityName = _.find(CRM.vars.search.links[entityName], {alias: joinEntity}).entity;
         }
-        return _.find(getEntity(entityName).fields, {name: fieldName});
+        return _.find(getEntity(entityName).fields, {name: name});
       }
       return {
         getEntity: getEntity,
@@ -120,12 +118,14 @@
             result.fn = _.find(CRM.vars.search.functions, {name: expr.substring(0, bracketPos)});
             result.modifier = _.trim(parsed[1]);
           }
-          result.field = getField(fieldName);
-          var split = fieldName.split(':'),
-            prefixPos = split[0].lastIndexOf(result.field.name);
-          result.path = split[0];
-          result.prefix = prefixPos > 0 ? result.path.substring(0, prefixPos) : '';
-          result.suffix = !split[1] ? '' : ':' + split[1];
+          result.field = expr ? getField(fieldName, searchEntity) : undefined;
+          if (result.field) {
+            var split = fieldName.split(':'),
+              prefixPos = split[0].lastIndexOf(result.field.name);
+            result.path = split[0];
+            result.prefix = prefixPos > 0 ? result.path.substring(0, prefixPos) : '';
+            result.suffix = !split[1] ? '' : ':' + split[1];
+          }
           return result;
         }
       };
