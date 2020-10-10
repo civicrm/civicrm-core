@@ -235,13 +235,11 @@ class CRM_Core_Payment_BaseIPN {
    * Process cancelled payment outcome.
    *
    * @param array $objects
-   * @param CRM_Core_Transaction $transaction
-   * @param array $input
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
    */
-  public function cancelled(&$objects, $transaction = NULL, $input = []) {
+  public function cancelled($objects) {
     $contribution = &$objects['contribution'];
     $memberships = [];
     if (!empty($objects['membership'])) {
@@ -264,7 +262,6 @@ class CRM_Core_Payment_BaseIPN {
     ]);
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
     $contribution->cancel_date = self::$_now;
-    $contribution->cancel_reason = $input['reasonCode'] ?? NULL;
     $contribution->save();
 
     // Add line items for recurring payments.
@@ -291,9 +288,6 @@ class CRM_Core_Payment_BaseIPN {
       $this->cancelParticipant($participant->id);
     }
 
-    if ($transaction) {
-      $transaction->commit();
-    }
     Civi::log()->debug("Setting contribution status to Cancelled");
     return TRUE;
   }

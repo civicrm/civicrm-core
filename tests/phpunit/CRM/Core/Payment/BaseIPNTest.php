@@ -413,7 +413,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     ]);
 
     $transaction = new CRM_Core_Transaction();
-    $this->IPN->cancelled($this->objects, $transaction);
+    $this->IPN->cancelled($this->objects);
 
     $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
       'sequential' => 1,
