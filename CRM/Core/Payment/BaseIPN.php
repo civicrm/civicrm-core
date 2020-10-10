@@ -162,13 +162,11 @@ class CRM_Core_Payment_BaseIPN {
    * Set contribution to failed.
    *
    * @param array $objects
-   * @param object $transaction
-   * @param array $input
    *
    * @return bool
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
    */
-  public function failed(&$objects, $transaction = NULL, $input = []) {
+  public function failed($objects) {
     $contribution = &$objects['contribution'];
     $memberships = [];
     if (!empty($objects['membership'])) {
@@ -206,9 +204,6 @@ class CRM_Core_Payment_BaseIPN {
       $this->cancelParticipant($participant->id);
     }
 
-    if ($transaction) {
-      $transaction->commit();
-    }
     Civi::log()->debug("Setting contribution status to Failed");
     return TRUE;
   }
