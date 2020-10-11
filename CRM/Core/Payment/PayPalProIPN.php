@@ -275,28 +275,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    if (!$first) {
-      //check if this contribution transaction is already processed
-      //if not create a contribution and then get it processed
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->trxn_id = $input['trxn_id'];
-      if ($contribution->trxn_id && $contribution->find()) {
-        Civi::log()->debug('PayPalProIPN: Returning since contribution has already been handled.');
-        echo "Success: Contribution has already been handled<p>";
-        return;
-      }
-
-      $contribution->contact_id = $recur->contact_id;
-      $contribution->financial_type_id = $objects['contributionType']->id;
-      $contribution->contribution_page_id = $ids['contributionPage'];
-      $contribution->contribution_recur_id = $ids['contributionRecur'];
-      $contribution->currency = $objects['contribution']->currency;
-      $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
-      $contribution->amount_level = $objects['contribution']->amount_level;
-      $contribution->campaign_id = $objects['contribution']->campaign_id;
-      $objects['contribution'] = &$contribution;
-      $contribution->invoice_id = md5(uniqid(rand(), TRUE));
-    }
     // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
     $objects['contribution']->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
