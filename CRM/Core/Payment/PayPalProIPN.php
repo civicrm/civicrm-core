@@ -16,8 +16,6 @@
  */
 class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
-  public static $_paymentProcessor = NULL;
-
   /**
    * Input parameters from payment processor. Store these so that
    * the code does not need to keep retrieving from the http request
@@ -107,7 +105,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       // p has been overloaded & could mean contribution page or participant id. Clearly we need an
       // alphabet with more letters.
       // the mode will always be resolved before the mystery p is reached
-      if ($rpValueArray[1] == 'contribute') {
+      if ($rpValueArray[1] === 'contribute') {
         $mapping['p'] = 'contribution_page_id';
       }
     }
@@ -442,7 +440,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
-      self::$_paymentProcessor = &$objects['paymentProcessor'];
       //?? how on earth would we not have component be one of these?
       // they are the only valid settings & this IPN file can't even be called without one of them
       // grepping for this class doesn't find other paths to call this class
