@@ -290,7 +290,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function getIDs(&$ids, &$input) {
     $ids['contact'] = $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
-    $ids['contribution'] = $this->retrieve('x_invoice_num', 'Integer');
+    $ids['contribution'] = (int) $this->retrieve('x_invoice_num', 'Integer');
 
     // joining with contribution table for extra checks
     $sql = "
@@ -302,7 +302,7 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
      LIMIT 1";
     $contRecur = CRM_Core_DAO::executeQuery($sql);
     $contRecur->fetch();
-    $ids['contributionRecur'] = $contRecur->id;
+    $ids['contributionRecur'] = (int) $contRecur->id;
     if ($ids['contact'] != $contRecur->contact_id) {
       $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", [1 => $ids['contact'], 2 => $contRecur->contact_id]);
       CRM_Core_Error::debug_log_message($message);
@@ -314,24 +314,7 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       $log->error('payment_notification', ['message' => $message, 'ids' => $ids, 'input' => $input]);
       throw new CRM_Core_Exception($message);
     }
-
-    if ($input['component'] == 'event') {
-      // FIXME: figure out fields for event
-    }
-    else {
-      // Get membershipId. Join with membership payment table for additional checks
-      $sql = "
-    SELECT m.id
-      FROM civicrm_membership m
-INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contribution_id = {$ids['contribution']}
-     WHERE m.contribution_recur_id = {$ids['contributionRecur']}
-     LIMIT 1";
-      if ($membershipId = CRM_Core_DAO::singleValueQuery($sql)) {
-        $ids['membership'] = $membershipId;
-      }
-
-      // FIXME: todo related_contact and onBehalfDupeAlert. Check paypalIPN.
-    }
+    $ids['membership'] = $this->getMembershipID($ids['contribution'], $ids['contributionRecur']);
   }
 
   /**
@@ -357,6 +340,25 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       throw new CRM_Core_Exception("Could not find an entry for $name");
     }
     return $value;
+  }
+
+  /**
+   * Get membership id, if any.
+   *
+   * @param int $contributionID
+   * @param int $contributionRecurID
+   *
+   * @return int|null
+   */
+  protected function getMembershipID(int $contributionID, int $contributionRecurID): ?int {
+    // Get membershipId. Join with membership payment table for additional checks
+    $sql = "
+    SELECT m.id
+      FROM civicrm_membership m
+INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contribution_id = {$contributionID}
+     WHERE m.contribution_recur_id = {$contributionRecurID}
+     LIMIT 1";
+    return CRM_Core_DAO::singleValueQuery($sql);
   }
 
 }
