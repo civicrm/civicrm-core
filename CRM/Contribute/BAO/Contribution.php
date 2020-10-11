@@ -4363,7 +4363,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @param array $input
    * @param array $ids
-   * @param array $objects
+   * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $isPostPaymentCreate
    *   Is this being called from the payment.create api. If so the api has taken care of financial entities.
    *   Note that our goal is that this would only ever be called from payment.create and never handle financials (only
@@ -4373,11 +4373,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function completeOrder($input, $ids, $objects, $isPostPaymentCreate = FALSE) {
+  public static function completeOrder($input, $ids, $contribution, $isPostPaymentCreate = FALSE) {
     $transaction = new CRM_Core_Transaction();
-    $contribution = $objects['contribution'];
-    // Unset objects just to make it clear it's not used again.
-    unset($objects);
     // @todo see if we even need this - it's used further down to create an activity
     // but the BAO layer should create that - we just need to add a test to cover it & can
     // maybe remove $ids altogether.
