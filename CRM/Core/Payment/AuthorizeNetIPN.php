@@ -139,7 +139,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
             'related_contact' => $ids['related_contact'] ?? NULL,
             'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
             'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-            'membership' => $ids['membership'] ?? NULL,
             'contact' => $ids['contact'] ?? NULL,
             'contributionPage' => $ids['contributionPage'] ?? NULL,
           ], $objects, $first);
@@ -165,6 +164,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function recur($input, $ids, $objects, $first) {
     $recur = &$objects['contributionRecur'];
+    $contribution = &$objects['contribution'];
 
     // do a subscription check
     if ($recur->processor_id != $input['subscription_id']) {
@@ -225,15 +225,15 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects['contribution']);
 
-    // Only Authorize.net does this so it is on the a.net class. If there is a need for other processors
-    // to do this we should make it available via the api, e.g as a parameter, changing the nuance
-    // from isSentReceipt to an array of which receipts to send.
-    // Note that there is site-by-site opinions on which notifications are good to send.
     if ($isFirstOrLastRecurringPayment) {
-      CRM_Contribute_BAO_ContributionRecur::sendRecurringStartOrEndNotification($ids, $recur,
-        $isFirstOrLastRecurringPayment);
+      //send recurring Notification email for user
+      CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
+        $ids['contact'],
+        $ids['contributionPage'],
+        $recur,
+        (bool) $this->getMembershipID($contribution->id, $recur->id)
+      );
     }
-
   }
 
   /**
@@ -314,7 +314,6 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       $log->error('payment_notification', ['message' => $message, 'ids' => $ids, 'input' => $input]);
       throw new CRM_Core_Exception($message);
     }
-    $ids['membership'] = $this->getMembershipID($ids['contribution'], $ids['contributionRecur']);
   }
 
   /**

@@ -528,6 +528,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param bool $isFirstOrLastRecurringPayment
    */
   public static function sendRecurringStartOrEndNotification($ids, $recur, $isFirstOrLastRecurringPayment) {
+    CRM_Core_Error::deprecatedFunctionWarning('use CRM_Contribute_BAO_ContributionPage::recurringNotify');
     if ($isFirstOrLastRecurringPayment) {
       $autoRenewMembership = FALSE;
       if ($recur->id &&
