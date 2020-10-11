@@ -441,8 +441,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'status_id' => 'Pending from incomplete transaction',
     ]);
 
-    $transaction = new CRM_Core_Transaction();
-    $this->IPN->failed($this->objects, $transaction);
+    $this->IPN->failed($this->objects);
 
     $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
       'sequential' => 1,
