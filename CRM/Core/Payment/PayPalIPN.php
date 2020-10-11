@@ -16,8 +16,6 @@
  */
 class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
-  public static $_paymentProcessor = NULL;
-
   /**
    * Input parameters from payment processor. Store these so that
    * the code does not need to keep retrieving from the http request
@@ -329,7 +327,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
-      self::$_paymentProcessor = &$objects['paymentProcessor'];
       if ($component == 'contribute') {
         if ($ids['contributionRecur']) {
           // check if first contribution is completed, else complete first contribution
