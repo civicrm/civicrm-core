@@ -673,7 +673,7 @@ WHERE  id = %1";
         continue;
       }
 
-      list($params, $lineItem) = self::getLine($params, $lineItem, $priceSetID, $field, $id);
+      [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
     }
 
     $amount_level = [];
@@ -884,55 +884,7 @@ WHERE  id = %1";
     // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
-    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-    $adminFieldVisible = FALSE;
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $adminFieldVisible = TRUE;
-    }
-
-    $hideAdminValues = TRUE;
-    if (CRM_Core_Permission::check('edit contributions')) {
-      $hideAdminValues = FALSE;
-    }
-
-    foreach ($feeBlock as $id => $field) {
-      if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-        (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
-        !$validFieldsOnly
-      ) {
-        $options = $field['options'] ?? NULL;
-        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
-          $userid = $form->getVar('_membershipContactID');
-          $checklifetime = self::checkCurrentMembership($options, $userid);
-          if ($checklifetime) {
-            $form->assign('ispricelifetime', TRUE);
-          }
-        }
-
-        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
-
-        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
-          continue;
-        }
-        elseif ($hideAdminValues && !in_array($className, $formClasses)) {
-          foreach ($options as $key => $currentOption) {
-            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
-              unset($options[$key]);
-            }
-          }
-        }
-        if (!empty($options)) {
-          CRM_Price_BAO_PriceField::addQuickFormElement($form,
-            'price_' . $field['id'],
-            $field['id'],
-            FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
-            NULL,
-            $options
-          );
-        }
-      }
-    }
+    self::addPriceFieldsToForm($form, $feeBlock, $validFieldsOnly, $className, $validPriceFieldIds);
   }
 
   /**
@@ -1769,6 +1721,59 @@ WHERE     ct.id = cp.financial_type_id AND
         break;
     }
     return [$params, $lineItem];
+  }
+
+  /**
+   * Add the relevant price fields to the form.
+   *
+   * @param \CRM_Core_Form $form
+   * @param array $feeBlock
+   * @param bool $validFieldsOnly
+   * @param string $className
+   * @param array $validPriceFieldIds
+   */
+  protected static function addPriceFieldsToForm(CRM_Core_Form $form, $feeBlock, bool $validFieldsOnly, string $className, array $validPriceFieldIds) {
+    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
+    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
+    foreach ($feeBlock as $id => $field) {
+      if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
+        (CRM_Utils_Array::value('visibility', $field) == 'admin' && $adminFieldVisible == TRUE) ||
+        !$validFieldsOnly
+      ) {
+        $options = $field['options'] ?? NULL;
+        if ($className == 'CRM_Contribute_Form_Contribution_Main' && $component = 'membership') {
+          $userid = $form->getVar('_membershipContactID');
+          $checklifetime = self::checkCurrentMembership($options, $userid);
+          if ($checklifetime) {
+            $form->assign('ispricelifetime', TRUE);
+          }
+        }
+
+        $formClasses = ['CRM_Contribute_Form_Contribution', 'CRM_Member_Form_Membership'];
+
+        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+          continue;
+        }
+        elseif ($hideAdminValues && !in_array($className, $formClasses)) {
+          foreach ($options as $key => $currentOption) {
+            if ($currentOption['visibility_id'] == CRM_Price_BAO_PriceField::getVisibilityOptionID('admin')) {
+              unset($options[$key]);
+            }
+          }
+        }
+        if (!empty($options)) {
+          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+            'price_' . $field['id'],
+            $field['id'],
+            FALSE,
+            CRM_Utils_Array::value('is_required', $field, FALSE),
+            NULL,
+            $options
+          );
+        }
+      }
+    }
   }
 
 }
