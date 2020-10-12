@@ -42,7 +42,7 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       $this->set('cids', implode(',', array_keys($perm['values'])));
     }
 
-    $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action);
+    $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action, $entity);
 
     // create and instantiate the pages
     $this->addPages($this->_stateMachine, $action);

@@ -25,4 +25,20 @@ class CRM_Export_Form_Select_Case extends CRM_Export_Form_Select {
    */
   protected $queryMode = CRM_Contact_BAO_Query::MODE_CASE;
 
+  /**
+   * Call the pre-processing function.
+   */
+  protected function callPreProcessing(): void {
+    CRM_Case_Form_Task::preProcessCommon($this);
+  }
+
+  /**
+   * Does this export offer contact merging.
+   *
+   * @return bool
+   */
+  protected function isShowContactMergeOptions() {
+    return FALSE;
+  }
+
 }

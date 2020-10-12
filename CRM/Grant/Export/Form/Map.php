@@ -18,22 +18,6 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Member_Export_Form_Select extends CRM_Export_Form_Select {
-
-  /**
-   * Call the pre-processing function.
-   */
-  protected function callPreProcessing(): void {
-    CRM_Member_Form_Task::preProcessCommon($this);
-  }
-
-  /**
-   * Does this export offer contact merging.
-   *
-   * @return bool
-   */
-  protected function isShowContactMergeOptions() {
-    return FALSE;
-  }
+class CRM_Pledge_Export_Form_Map extends CRM_Export_Form_Map {
 
 }

@@ -60,8 +60,8 @@ class CRM_Event_Task extends CRM_Core_Task {
         self::TASK_EXPORT => [
           'title' => ts('Export participants'),
           'class' => [
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Event_Export_Form_Select',
+            'CRM_Event_Export_Form_Map',
           ],
           'result' => FALSE,
         ],
