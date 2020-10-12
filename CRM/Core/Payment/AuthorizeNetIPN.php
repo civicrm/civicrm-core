@@ -141,7 +141,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
             'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
             'contact' => $ids['contact'] ?? NULL,
             'contributionPage' => $ids['contributionPage'] ?? NULL,
-          ], $objects, $first);
+          ], $objects['contributionRecur'], $objects['contribution'], $first);
         }
       }
       return TRUE;
@@ -155,16 +155,15 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * @param array $input
    * @param array $ids
-   * @param array $objects
-   * @param $first
+   * @param \CRM_Contribute_BAO_ContributionRecur $recur
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   * @param bool $first
    *
    * @return bool
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function recur($input, $ids, $objects, $first) {
-    $recur = &$objects['contributionRecur'];
-    $contribution = &$objects['contribution'];
+  public function recur($input, $ids, $recur, $contribution, $first) {
 
     // do a subscription check
     if ($recur->processor_id != $input['subscription_id']) {
@@ -175,9 +174,9 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
     $now = date('YmdHis');
 
-    $objects['contribution']->invoice_id = md5(uniqid(rand(), TRUE));
-    $objects['contribution']->total_amount = $input['amount'];
-    $objects['contribution']->trxn_id = $input['trxn_id'];
+    $contribution->invoice_id = md5(uniqid(rand(), TRUE));
+    $contribution->total_amount = $input['amount'];
+    $contribution->trxn_id = $input['trxn_id'];
 
     $isFirstOrLastRecurringPayment = FALSE;
     if ($input['response_code'] == 1) {
@@ -217,13 +216,13 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     // check if contribution is already completed, if so we ignore this ipn
-    if ($objects['contribution']->contribution_status_id == 1) {
+    if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
       echo 'Success: Contribution has already been handled<p>';
       return TRUE;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects['contribution']);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution);
 
     if ($isFirstOrLastRecurringPayment) {
       //send recurring Notification email for user
