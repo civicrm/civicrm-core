@@ -227,8 +227,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $displayRelationshipType,
       $operator
     );
-
-    $this->_options = &$this->_query->_options;
   }
 
   /**

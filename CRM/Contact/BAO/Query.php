@@ -214,13 +214,6 @@ class CRM_Contact_BAO_Query {
   ];
 
   /**
-   * The cache to translate the option values into labels.
-   *
-   * @var array
-   */
-  public $_options;
-
-  /**
    * Are we in search mode.
    *
    * @var bool
@@ -546,7 +539,6 @@ class CRM_Contact_BAO_Query {
     $this->_whereTables = [];
     $this->_where = [];
     $this->_qill = [];
-    $this->_options = [];
     $this->_cfIDs = [];
     $this->_paramLookup = [];
     $this->_having = [];
@@ -577,7 +569,6 @@ class CRM_Contact_BAO_Query {
       $this->_select = array_merge($this->_select, $this->_customQuery->_select);
       $this->_element = array_merge($this->_element, $this->_customQuery->_element);
       $this->_tables = array_merge($this->_tables, $this->_customQuery->_tables);
-      $this->_options = $this->_customQuery->_options;
     }
     $isForcePrimaryOnly = !empty($apiEntity);
     $this->_whereClause = $this->whereClause($isForcePrimaryOnly);
@@ -4608,7 +4599,6 @@ civicrm_relationship.start_date > {$today}
 
     list($select, $from, $where, $having) = $query->query($count);
 
-    $options = $query->_options;
     if (!empty($query->_permissionWhereClause)) {
       if (!empty($query->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
         $from .= " $query->_permissionFromClause";
@@ -4657,7 +4647,7 @@ civicrm_relationship.start_date > {$today}
       }
       $values[$dao->$entityIDField] = $val;
     }
-    return [$values, $options];
+    return [$values];
   }
 
   /**
