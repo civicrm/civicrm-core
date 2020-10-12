@@ -1251,7 +1251,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $relTables[$name]['other_url'] = str_replace('$cid', $otherId, $relTables[$name]['url']);
       if ($name === 'rel_table_users') {
         // @todo - this user url stuff is only needed for the form layer - move to CRM_Contact_Form_Merge
-        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherId), $relTables[$name]['url']);
+        $relTables[$name]['main_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($mainId), $relTables[$name]['url']);
         $relTables[$name]['other_url'] = str_replace('%ufid', CRM_Core_BAO_UFMatch::getUFId($otherId), $relTables[$name]['url']);
       }
       if ($name === 'rel_table_memberships') {
