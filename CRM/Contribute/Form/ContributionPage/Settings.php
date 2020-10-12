@@ -168,7 +168,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $this->addElement('checkbox', 'is_confirm_enabled', ts('Use a confirmation page?'));
 
     // is this page shareable through social media ?
-    $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
+    $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
 
     // is this page active ?
     $this->addElement('checkbox', 'is_active', ts('Is this Online Contribution Page Active?'));
