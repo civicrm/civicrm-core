@@ -257,7 +257,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response mails don't leak.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testIPNPaymentMembershipRecurSuccessNoLeakage() {
     $mut = new CiviMailUtils($this, TRUE);
