@@ -214,6 +214,79 @@ class CRM_Dedupe_MergeHandler {
   }
 
   /**
+   * Get blocks, if any, to update for the deleted contact.
+   *
+   * If the deleted contact no longer has a primary address but still has
+   * one or more blocks we want to ensure the remaining block is updated
+   * to have is_primary = 1 in case the contact is ever undeleted.
+   *
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getBlocksToUpdateForDeletedContact($entity) {
+    $movedBlocks = $this->getLocationBlocksToMerge()[$entity];
+    $deletedContactsBlocks = $this->getLocationBlocksForContactToRemove()[$entity];
+    $unMovedBlocks = array_values(array_diff_key($deletedContactsBlocks, $movedBlocks));
+    if (empty($unMovedBlocks) || empty($movedBlocks)) {
+      return [];
+    }
+    foreach (array_keys($movedBlocks) as $index) {
+      if ($deletedContactsBlocks[$index]['is_primary']) {
+        // We have moved the primary - change any other block to be primary.
+        $newPrimaryBlock = $this->getDAOForLocationEntity($entity);
+        $newPrimaryBlock->id = $unMovedBlocks[0]['id'];
+        $newPrimaryBlock->is_primary = 1;
+        return [$newPrimaryBlock->id => $newPrimaryBlock];
+      }
+    }
+    return [];
+  }
+
+  /**
+   * Get the details of the blocks to be transferred over for the given entity.
+   *
+   * @param string $entity
+   *
+   * @return array
+   */
+  protected function getLocationBlocksToMoveForEntity($entity) {
+    $movedBlocks = $this->getLocationBlocksToMerge()[$entity];
+    $blockDetails = $this->getLocationBlocksForContactToRemove()[$entity];
+    return array_intersect_key($blockDetails, $movedBlocks);
+  }
+
+  /**
+   * Does the contact to keep have location blocks for the given entity.
+   *
+   * @param string $entity
+   *
+   * @return bool
+   */
+  public function contactToKeepHasLocationBlocksForEntity($entity) {
+    return !empty($this->getLocationBlocksForContactToKeep()[$entity]);
+  }
+
+  /**
+   * Get the location blocks for the contact to be kept.
+   *
+   * @return array
+   */
+  public function getLocationBlocksForContactToKeep() {
+    return $this->getMigrationInfo()['main_details']['location_blocks'];
+  }
+
+  /**
+   * Get the location blocks for the contact to be deleted.
+   *
+   * @return array
+   */
+  public function getLocationBlocksForContactToRemove() {
+    return $this->getMigrationInfo()['other_details']['location_blocks'];
+  }
+
+  /**
    * Get the DAO object appropriate to the location entity.
    *
    * @param string $entity
