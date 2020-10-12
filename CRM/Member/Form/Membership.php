@@ -1504,6 +1504,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $params['contribution_id'] = $this->_onlinePendingContributionId;
         $params['componentId'] = $params['id'];
         $params['componentName'] = 'contribute';
+        // It it is cancel don't call this - just call Contribution::create with contribution_status_id = Cancel, rely on pre hooks.
         $result = CRM_Contribute_BAO_Contribution::transitionComponents($params, TRUE);
         if (!empty($result) && !empty($params['contribution_id'])) {
           $lineItem = [];

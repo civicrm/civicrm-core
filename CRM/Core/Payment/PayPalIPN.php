@@ -344,7 +344,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       }
       $status = $input['paymentStatus'];
       if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
-        $this->failed($objects);
+        civicrm_api('Contribution', 'create', ['id' => x, 'contribution_status_id' => 'Failed']);
         return;
       }
       if ($status === 'Pending') {
@@ -352,7 +352,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
       if ($status === 'Refunded' || $status === 'Reversed') {
-        $this->cancelled($objects);
+        civicrm_api('Contribution', 'create', ['id' => x, 'contribution_status_id' => 'Cancelled']);
         return;
       }
       if ($status !== 'Completed') {
