@@ -208,21 +208,20 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
       'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], $objects, TRUE);
+    ], $objects['contribution'], TRUE);
   }
 
   /**
    * @param array $input
    * @param array $ids
-   * @param array $objects
+   * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $recur
    *
    * @return void
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function single($input, $ids, $objects, $recur = FALSE) {
-    $contribution = &$objects['contribution'];
+  public function single($input, $ids, $contribution, $recur = FALSE) {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if ($contribution->invoice_id != $input['invoice']) {
@@ -250,7 +249,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects['contribution']);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution);
   }
 
   /**
@@ -360,7 +359,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
         'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-      ], $objects);
+      ], $objects['contribution']);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage());
