@@ -456,7 +456,7 @@
         function enqueue(entity) {
           entity.optionsLoaded = false;
           entities[entity.name] = [entity.name, 'getFields', {
-            loadOptions: CRM.vars.search.loadOptions,
+            loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
             where: [['options', '!=', false]],
             select: ['options']
           }, {name: 'options'}];

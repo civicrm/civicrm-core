@@ -16,7 +16,7 @@
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
-      this.operators = CRM.vars.search.operators;
+      this.operators = CRM.searchAdmin.operators;
       this.sortOptions = {
         axis: 'y',
         connectWith: '.api4-clause-group-sortable',

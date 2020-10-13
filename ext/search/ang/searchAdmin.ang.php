@@ -14,4 +14,5 @@ return [
   ],
   'basePages' => [],
   'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'crmRouteBinder', 'ui.sortable', 'ui.bootstrap', 'dialogService', 'api4', 'searchActions'],
+  'settingsFactory' => ['\Civi\Search\Admin', 'getAdminSettings'],
 ];
