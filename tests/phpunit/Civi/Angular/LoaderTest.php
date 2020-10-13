@@ -29,9 +29,9 @@ class LoaderTest extends \CiviUnitTestCase {
 
   public function factoryScenarios() {
     return [
-      ['dummy1', 2, 1],
-      ['dummy2', 2, 0],
-      ['dummy3', 2, 2],
+      ['dummy1', 2, 1, ['access CiviCRM', 'administer CiviCRM']],
+      ['dummy2', 2, 0, []],
+      ['dummy3', 2, 2, ['access CiviCRM', 'administer CiviCRM', 'view debug output']],
     ];
   }
 
@@ -43,25 +43,29 @@ class LoaderTest extends \CiviUnitTestCase {
    * @param $module
    * @param $expectedSettingCount
    * @param $expectedCallbackCount
+   * @param $expectedPermissions
    */
-  public function testSettingFactory($module, $expectedSettingCount, $expectedCallbackCount) {
+  public function testSettingFactory($module, $expectedSettingCount, $expectedCallbackCount, $expectedPermissions) {
     (new \Civi\Angular\AngularLoader())
       ->setModules([$module])
       ->useApp()
       ->load();
 
     // Run factory callbacks
-    $factorySettings = \Civi::resources()->getSettings();
+    $actual = \Civi::resources()->getSettings();
 
     // Dummy1 module's factory setting should be set if it is loaded directly or required by dummy3
-    $this->assertTrue(($expectedCallbackCount > 0) === isset($factorySettings['dummy1']['dummy_setting_factory']));
+    $this->assertTrue(($expectedCallbackCount > 0) === isset($actual['dummy1']['dummy_setting_factory']));
     // Dummy3 module's factory setting should be set if it is loaded directly
-    $this->assertTrue(($expectedCallbackCount > 1) === isset($factorySettings['dummy3']['dummy_setting_factory']));
+    $this->assertTrue(($expectedCallbackCount > 1) === isset($actual['dummy3']['dummy_setting_factory']));
 
     // Dummy1 module's regular setting should be set if it is loaded directly or required by dummy3
-    $this->assertTrue(($module !== 'dummy2') === isset($factorySettings['dummy1']['dummy_setting']));
+    $this->assertTrue(($module !== 'dummy2') === isset($actual['dummy1']['dummy_setting']));
     // Dummy2 module's regular setting should be set if loaded
-    $this->assertTrue(($module === 'dummy2') === isset($factorySettings['dummy2']['dummy_setting']));
+    $this->assertTrue(($module === 'dummy2') === isset($actual['dummy2']['dummy_setting']));
+
+    // Assert appropriate permissions have been added
+    $this->assertEquals($expectedPermissions, array_keys($actual['permissions']));
 
     // Assert the callback functions ran the expected number of times
     $this->assertEquals($expectedSettingCount, self::$dummy_setting_count);
@@ -72,6 +76,7 @@ class LoaderTest extends \CiviUnitTestCase {
     $modules['dummy1'] = [
       'ext' => 'civicrm',
       'settings' => $this->getDummySetting(),
+      'permissions' => ['access CiviCRM', 'administer CiviCRM'],
       'settingsFactory' => [self::class, 'getDummySettingFactory'],
     ];
     $modules['dummy2'] = [
@@ -82,6 +87,8 @@ class LoaderTest extends \CiviUnitTestCase {
       'ext' => 'civicrm',
       // The string self::class is preferred but passing object $this should also work
       'settingsFactory' => [$this, 'getDummySettingFactory'],
+      // This should get merged with dummy1's permissions
+      'permissions' => ['view debug output', 'administer CiviCRM'],
       'requires' => ['dummy1'],
     ];
   }

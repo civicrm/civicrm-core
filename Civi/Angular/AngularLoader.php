@@ -120,8 +120,18 @@ class AngularLoader {
       foreach ($angular->getResources($moduleNames, 'settingsFactory', 'settingsFactory') as $moduleName => $factory) {
         $settingsByModule[$moduleName] = array_merge($settingsByModule[$moduleName] ?? [], $factory());
       }
+      // Add clientside permissions
+      $permissions = [];
+      $toCheck  = $angular->getResources($moduleNames, 'permissions', 'permissions');
+      foreach ($toCheck as $perms) {
+        foreach ((array) $perms as $perm) {
+          if (!isset($permissions[$perm])) {
+            $permissions[$perm] = \CRM_Core_Permission::check($perm);
+          }
+        }
+      }
       // TODO optimization; client-side caching
-      return array_merge($settingsByModule, [
+      return array_merge($settingsByModule, ['permissions' => $permissions], [
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => [
           'modules' => $moduleNames,

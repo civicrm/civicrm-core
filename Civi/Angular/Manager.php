@@ -31,6 +31,8 @@ class Manager {
    *     List of settings to preload.
    *   - settingsFactory: callable
    *     Callback function to fetch settings.
+   *   - permissions: array
+   *     List of permissions to make available client-side
    *   - requires: array
    *     List of other modules required
    */
@@ -413,6 +415,7 @@ class Manager {
             case 'settings':
             case 'settingsFactory':
             case 'requires':
+            case 'permissions':
               if (!empty($module[$resType])) {
                 $result[$moduleName] = $module[$resType];
               }
