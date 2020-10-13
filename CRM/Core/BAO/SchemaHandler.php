@@ -889,6 +889,9 @@ MODIFY      {$columnName} varchar( $length )
       // Disable i18n rewrite.
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     }
+    // Rebuild triggers and other schema reconciliation if needed.
+    $logging = new CRM_Logging_Schema();
+    $logging->fixSchemaDifferences();
     return TRUE;
   }
 
