@@ -1,12 +1,12 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').component('crmSearchFunction', {
+  angular.module('searchAdmin').component('crmSearchFunction', {
     bindings: {
       expr: '=',
       cat: '<'
     },
-    templateUrl: '~/search/crmSearchFunction.html',
+    templateUrl: '~/searchAdmin/crmSearchFunction.html',
     controller: function($scope, formatForSelect2, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;

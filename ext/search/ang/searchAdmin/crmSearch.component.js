@@ -1,12 +1,12 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').component('crmSearch', {
+  angular.module('searchAdmin').component('crmSearch', {
     bindings: {
       entity: '=',
       load: '<'
     },
-    templateUrl: '~/search/crmSearch.html',
+    templateUrl: '~/searchAdmin/crmSearch.html',
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
@@ -552,31 +552,6 @@
         loadFieldOptions();
       };
 
-      $scope.saveGroup = function() {
-        var model = {
-          title: '',
-          description: '',
-          visibility: 'User and User Admin Only',
-          group_type: [],
-          id: ctrl.load ? ctrl.load.id : null,
-          api_entity: ctrl.entity,
-          api_params: _.cloneDeep(angular.extend({}, ctrl.params, {version: 4}))
-        };
-        delete model.api_params.orderBy;
-        if (ctrl.load && ctrl.load.api_params && ctrl.load.api_params.select && ctrl.load.api_params.select[0]) {
-          model.api_params.select.unshift(ctrl.load.api_params.select[0]);
-        }
-        var options = CRM.utils.adjustDialogDefaults({
-          autoOpen: false,
-          title: ts('Save smart group')
-        });
-        dialogService.open('saveSearchDialog', '~/search/saveSmartGroup.html', model, options)
-          .then(function() {
-            if (ctrl.load) {
-              ctrl.load.saved = true;
-            }
-          });
-      };
     }
   });
 

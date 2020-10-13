@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').component('crmSearchClause', {
+  angular.module('searchAdmin').component('crmSearchClause', {
     bindings: {
       fields: '<',
       clauses: '<',
@@ -11,7 +11,7 @@
       label: '@',
       deleteGroup: '&'
     },
-    templateUrl: '~/search/crmSearchClause.html',
+    templateUrl: '~/searchAdmin/crmSearchClause.html',
     controller: function ($scope, $element, $timeout) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;

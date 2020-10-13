@@ -44,7 +44,9 @@
     <div class="navbar-form clearfix" ng-if="$ctrl.load">
       <div class="form-group pull-right">
         <label>{{ $ctrl.load.title }}</label>
-        <button class="btn btn-default" ng-disabled="$ctrl.load.saved" ng-click="saveGroup()">{{ $ctrl.load.saved ? ts('Saved') : ts('Save') }}</button>
+        <button ng-if=":: $ctrl.perm.editGroups" save-smart-group load="$ctrl.load" entity="$ctrl.entity" params="$ctrl.params" class="btn btn-default" ng-disabled="$ctrl.load.saved" ng-click="saveGroup()">
+          {{ $ctrl.load.saved ? ts('Saved') : ts('Save') }}
+        </button>
       </div>
     </div>
     <fieldset class="api4-clause-fieldset">

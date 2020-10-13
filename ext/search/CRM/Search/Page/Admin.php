@@ -1,6 +1,18 @@
 <?php
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
 
-class CRM_Search_Page_Ang extends CRM_Core_Page {
+/**
+ * Angular base page for search admin
+ */
+class CRM_Search_Page_Admin extends CRM_Core_Page {
   /**
    * @var string[]
    */
@@ -36,18 +48,16 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
       'schema' => $this->schema,
       'links' => $this->getLinks(),
       'loadOptions' => $this->loadOptions,
-      'actions' => $this->getActions(),
       'functions' => CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
     ];
 
     Civi::resources()
-      ->addPermissions(['edit groups', 'administer reserved groups'])
       ->addBundle('bootstrap3')
       ->addVars('search', $vars);
 
     // Load angular module
     $loader = new Civi\Angular\AngularLoader();
-    $loader->setModules(['search']);
+    $loader->setModules(['searchAdmin']);
     $loader->setPageName('civicrm/search');
     $loader->useApp([
       'defaultRoute' => '/create/Contact',
@@ -132,67 +142,6 @@ class CRM_Search_Page_Ang extends CRM_Core_Page {
       $results[$entity] = array_values($entityLinks);
     }
     return array_filter($results);
-  }
-
-  /**
-   * @return array[]
-   */
-  private function getActions() {
-    // Note: the placeholder %1 will be replaced with entity name on the clientside
-    $actions = [
-      'export' => [
-        'title' => ts('Export %1'),
-        'icon' => 'fa-file-excel-o',
-        'entities' => array_keys(CRM_Export_BAO_Export::getComponents()),
-        'crmPopup' => [
-          'path' => "'civicrm/export/standalone'",
-          'query' => "{entity: entity, id: ids.join(',')}",
-        ],
-      ],
-      'update' => [
-        'title' => ts('Update %1'),
-        'icon' => 'fa-save',
-        'entities' => [],
-        'uiDialog' => ['templateUrl' => '~/search/crmSearchActions/crmSearchActionUpdate.html'],
-      ],
-      'delete' => [
-        'title' => ts('Delete %1'),
-        'icon' => 'fa-trash',
-        'entities' => [],
-        'uiDialog' => ['templateUrl' => '~/search/crmSearchActions/crmSearchActionDelete.html'],
-      ],
-    ];
-
-    // Check permissions for update & delete actions
-    foreach ($this->allowedEntities as $entity) {
-      $result = civicrm_api4($entity, 'getActions', [
-        'where' => [['name', 'IN', ['update', 'delete']]],
-      ], ['name']);
-      foreach ($result as $action) {
-        // Contacts have their own delete action
-        if (!($entity === 'Contact' && $action === 'delete')) {
-          $actions[$action]['entities'][] = $entity;
-        }
-      }
-    }
-
-    // Add contact tasks which support standalone mode (with a 'url' property)
-    $contactTasks = CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
-    foreach (CRM_Contact_Task::tasks() as $id => $task) {
-      if (isset($contactTasks[$id]) && !empty($task['url'])) {
-        $actions['contact.' . $id] = [
-          'title' => $task['title'],
-          'entities' => ['Contact'],
-          'icon' => $task['icon'] ?? 'fa-gear',
-          'crmPopup' => [
-            'path' => "'{$task['url']}'",
-            'query' => "{cids: ids.join(',')}",
-          ],
-        ];
-      }
-    }
-
-    return $actions;
   }
 
 }

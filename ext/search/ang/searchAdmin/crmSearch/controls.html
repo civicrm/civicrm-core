@@ -18,7 +18,7 @@
     </button>
     <ul class="dropdown-menu">
       <li ng-if=":: $ctrl.perm.editGroups">
-        <a href ng-click="saveGroup()">{{:: ts('Smart Group') }}</a>
+        <a href save-smart-group load="$ctrl.load" entity="$ctrl.entity" params="$ctrl.params" ng-click="saveGroup()">{{:: ts('Smart Group') }}</a>
       </li>
     </ul>
   </div>

@@ -8,7 +8,7 @@
     undefined;
 
   // Declare module and route/controller/services
-  angular.module('search', CRM.angRequires('search'))
+  angular.module('searchAdmin', CRM.angRequires('searchAdmin'))
 
     .config(function($routeProvider) {
       $routeProvider.when('/:mode/:entity/:name?', {

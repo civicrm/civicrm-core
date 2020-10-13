@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').controller('SaveSmartGroup', function ($scope, $element, $timeout, crmApi4, dialogService, searchMeta) {
+  angular.module('searchActions').controller('SaveSmartGroup', function ($scope, $element, $timeout, crmApi4, dialogService, searchMeta) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model,
       joins = _.pluck((model.api_params.join || []), 0),
@@ -53,7 +53,7 @@
     $scope.perm = {
       administerReservedGroups: CRM.checkPerm('administer reserved groups')
     };
-    $scope.groupFields = _.indexBy(_.find(CRM.vars.search.schema, {name: 'Group'}).fields, 'name');
+    $scope.groupOptions = CRM.searchActions.groupOptions;
     $element.on('change', '#api-save-search-select-group', function() {
       if ($(this).val()) {
         $scope.$apply(function() {
