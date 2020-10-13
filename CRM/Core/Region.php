@@ -143,7 +143,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
     };
 
     foreach ($this->snippets as $snippet) {
-      if (empty($snippet['disabled'])) {
+      if (empty($snippet['disabled']) && !empty($snippet)) {
         $renderSnippet($snippet);
       }
     }
