@@ -119,7 +119,7 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
       'enabledLanguages' => $enabledLanguages,
       'isMultiLingual' => $isMultiLingual,
     ];
-    return ['crmMailing' => $crmMailingSettings];
+    return $crmMailingSettings;
   }
 
   /**
@@ -160,7 +160,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
 
     CRM_Core_Resources::singleton()
-      ->addSetting(self::createAngularSettings())
       ->addPermissions([
         'view all contacts',
         'edit all contacts',
