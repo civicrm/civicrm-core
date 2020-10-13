@@ -159,18 +159,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
     $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
 
-    CRM_Core_Resources::singleton()
-      ->addPermissions([
-        'view all contacts',
-        'edit all contacts',
-        'access CiviMail',
-        'create mailings',
-        'schedule mailings',
-        'approve mailings',
-        'delete in CiviMail',
-        'edit message templates',
-      ]);
-
     return $result;
   }
 
