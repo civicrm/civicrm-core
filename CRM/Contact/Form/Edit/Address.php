@@ -121,7 +121,7 @@ class CRM_Contact_Form_Edit_Address {
         $name = 'name';
       }
 
-      $params = ['entity' => 'address'];
+      $params = ['entity' => 'Address'];
 
       if ($name === 'postal_code_suffix') {
         $params['label'] = ts('Suffix');
