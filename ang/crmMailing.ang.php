@@ -14,5 +14,6 @@ return [
   ],
   'css' => ['ang/crmMailing.css'],
   'partials' => ['ang/crmMailing'],
+  'settingsFactory' => ['CRM_Mailing_Info', 'createAngularSettings'],
   'requires' => ['crmUtil', 'crmAttachment', 'crmAutosave', 'ngRoute', 'ui.utils', 'crmUi', 'dialogService', 'crmResource'],
 ];
