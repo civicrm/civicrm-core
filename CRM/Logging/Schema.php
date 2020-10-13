@@ -715,7 +715,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         $logTableSpecs[$col] = [];
       }
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
-      if (!empty($specDiff) && $col != 'id' && !in_array($col, $diff['ADD'])) {
+      if (!empty($specDiff) && $col !== 'id' && !in_array($col, $diff['ADD'])) {
         if (empty($colSpecs['EXTRA']) || (!empty($colSpecs['EXTRA']) && $colSpecs['EXTRA'] !== 'auto_increment')) {
           // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
           if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])
@@ -725,14 +725,14 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
             // if data-type is different, surely consider the column
             $diff['MODIFY'][] = $col;
           }
-          elseif ($civiTableSpecs[$col]['DATA_TYPE'] == 'enum' &&
+          elseif ($civiTableSpecs[$col]['DATA_TYPE'] === 'enum' &&
             CRM_Utils_Array::value('ENUM_VALUES', $civiTableSpecs[$col]) != CRM_Utils_Array::value('ENUM_VALUES', $logTableSpecs[$col])
           ) {
             // column is enum and the permitted values have changed
             $diff['MODIFY'][] = $col;
           }
           elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
-            $logTableSpecs[$col]['IS_NULLABLE'] == 'NO'
+            $logTableSpecs[$col]['IS_NULLABLE'] === 'NO'
           ) {
             // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
             $diff['MODIFY'][] = $col;
@@ -751,7 +751,9 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     $oldCols = array_diff(array_keys($logTableSpecs), array_keys($civiTableSpecs));
     foreach ($oldCols as $col) {
       if (!in_array($col, ['log_date', 'log_conn_id', 'log_user_id', 'log_action']) &&
-        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO'
+        $logTableSpecs[$col]['IS_NULLABLE'] === 'NO'
+        // This could be to support replication - https://lab.civicrm.org/dev/core/-/issues/2120
+        && $logTableSpecs[$col]['EXTRA'] !== 'auto_increment'
       ) {
         // if its a column present only in log table, not among those used by log tables for special purpose, and not-null
         $diff['OBSOLETE'][] = $col;
@@ -806,7 +808,7 @@ COLS;
     $mysqlEngines = [];
     $engines = CRM_Core_DAO::executeQuery("SHOW ENGINES");
     while ($engines->fetch()) {
-      if ($engines->Support == 'YES' || $engines->Support == 'DEFAULT') {
+      if ($engines->Support === 'YES' || $engines->Support === 'DEFAULT') {
         $mysqlEngines[] = $engines->Engine;
       }
     }

@@ -159,6 +159,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test that autoincrement keys are handled sensibly in logging table reconciliation.
+   */
   public function testAutoIncrementNonIdColumn() {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_table` (
       test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -167,10 +170,20 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
     $diffs = $schema->columnsWithDiffSpecs("civicrm_test_table", "log_civicrm_test_table");
-    // Test that just havving a non id nanmed column with Auto Increment doesn't create diffs
+    // Test that just having a non id named column with Auto Increment doesn't create diffs
     $this->assertTrue(empty($diffs['MODIFY']));
     $this->assertTrue(empty($diffs['ADD']));
     $this->assertTrue(empty($diffs['OBSOLETE']));
+
+    // Check we can add a primary key to the log table and it will not be treated as obsolete.
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE log_civicrm_test_table ADD COLUMN `log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      ADD PRIMARY KEY (`log_id`)
+   ");
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $diffs = $schema->columnsWithDiffSpecs('civicrm_test_table', "log_civicrm_test_table");
+    $this->assertTrue(empty($diffs['OBSOLETE']));
+
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_table ADD COLUMN test_varchar varchar(255) DEFAULT NULL");
     \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     // Check that it still picks up new columns added.
