@@ -1541,25 +1541,29 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   The field properties, including the entity and context.
    * @param bool $required
    *   If the field is required.
+   * @param string $title
+   *   A field title, if applicable.
    * @return string
    *   The placeholder text.
    */
-  private static function selectOrAnyPlaceholder($props, $required) {
+  private static function selectOrAnyPlaceholder($props, $required, $title = NULL) {
     if (empty($props['entity'])) {
       return NULL;
     }
-    $daoToClass = CRM_Core_DAO_AllCoreTables::daoToClass();
-    if (array_key_exists($props['entity'], $daoToClass)) {
-      $daoClass = $daoToClass[$props['entity']];
-      $tsPlaceholder = $daoClass::getEntityTitle();
-    }
-    else {
-      $tsPlaceholder = ts('option');
+    if (!$title) {
+      $daoToClass = CRM_Core_DAO_AllCoreTables::daoToClass();
+      if (array_key_exists($props['entity'], $daoToClass)) {
+        $daoClass = $daoToClass[$props['entity']];
+        $title = $daoClass::getEntityTitle();
+      }
+      else {
+        $title = ts('option');
+      }
     }
     if (($props['context'] ?? '') == 'search' && !$required) {
-      return ts('- any %1 -', [1 => $tsPlaceholder]);
+      return ts('- any %1 -', [1 => $title]);
     }
-    return ts('- select %1 -', [1 => $tsPlaceholder]);
+    return ts('- select %1 -', [1 => $title]);
   }
 
   /**
@@ -1660,6 +1664,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, []);
+    if (in_array($widget, ['Select', 'Select2'])
+      && !array_key_exists('placeholder', $props)
+      && $placeholder = self::selectOrAnyPlaceholder($props, $required, $label)) {
+      $props['placeholder'] = $placeholder;
+    }
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url', 'options');
 
     // TODO: refactor switch statement, to separate methods.
@@ -1718,9 +1727,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Select':
       case 'Select2':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
-        if (!array_key_exists('placeholder', $props) && $placeholder = self::selectOrAnyPlaceholder($props, $required)) {
-          $props['placeholder'] = $placeholder;
-        }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
 
