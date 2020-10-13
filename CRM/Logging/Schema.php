@@ -288,7 +288,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $config->logging = TRUE;
     }
     if ($config->logging) {
-      $this->fixSchemaDifferencesForALL();
+      $this->fixSchemaDifferencesForAll();
     }
     // invoke the meta trigger creation call
     CRM_Core_DAO::triggerRebuild(NULL, TRUE);
