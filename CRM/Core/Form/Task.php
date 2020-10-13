@@ -74,6 +74,33 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   public static $entityShortname = NULL;
 
   /**
+   * Set where the browser should be directed to next.
+   *
+   * @param string $pathPart
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setNextUrl(string $pathPart) {
+    //set the context for redirection for any task actions
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $urlParams = 'force=1';
+    if (CRM_Utils_Rule::qfKey($qfKey)) {
+      $urlParams .= "&qfKey=$qfKey";
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $searchFormName = strtolower($this->get('searchFormName'));
+    if ($searchFormName === 'search') {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $pathPart . '/search', $urlParams));
+    }
+    else {
+      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
+        $urlParams
+      ));
+    }
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @throws \CRM_Core_Exception
@@ -133,24 +160,8 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     // FIXME: This is really to handle legacy code that should probably be updated to use $form->_entityIds
     $entitySpecificIdsName = '_' . $form::$entityShortname . 'Ids';
     $form->$entitySpecificIdsName = $form->_entityIds;
+    $form->setNextUrl($form::$entityShortname);
 
-    //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $form::$entityShortname . '/search', $urlParams));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-        $urlParams
-      ));
-    }
   }
 
   /**
