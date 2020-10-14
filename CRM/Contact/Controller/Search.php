@@ -27,6 +27,8 @@
  */
 class CRM_Contact_Controller_Search extends CRM_Core_Controller {
 
+  protected $entity = 'Contact';
+
   /**
    * Class constructor.
    *
@@ -44,6 +46,7 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
 
     // add all the actions
     $this->addActions();
+    $this->set('entity', $this->entity);
   }
 
   /**

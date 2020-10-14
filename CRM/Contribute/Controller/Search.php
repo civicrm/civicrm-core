@@ -27,12 +27,16 @@
  */
 class CRM_Contribute_Controller_Search extends CRM_Core_Controller {
 
+  protected $entity = 'Contribution';
+
   /**
    * Class constructor.
    *
    * @param string $title
    * @param bool|int $action
    * @param bool $modal
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 
@@ -40,6 +44,7 @@ class CRM_Contribute_Controller_Search extends CRM_Core_Controller {
     $this->_stateMachine = new CRM_Contribute_StateMachine_Search($this, $action);
     $this->addPages($this->_stateMachine, $action);
     $this->addActions();
+    $this->set('entity', $this->entity);
   }
 
 }
