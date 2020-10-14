@@ -80,7 +80,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function setNextUrl(string $pathPart) {
+  public function setNextUrl(string $pathPart) {
     //set the context for redirection for any task actions
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
     $urlParams = 'force=1';

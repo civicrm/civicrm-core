@@ -83,24 +83,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
     }
 
     $form->_activityHolderIds = $form->_componentIds = $ids;
-
-    // Set the context for redirection for any task actions.
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/activity/search', $urlParams));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-        $urlParams
-      ));
-    }
+    $form->setNextUrl('activity');
   }
 
   /**
