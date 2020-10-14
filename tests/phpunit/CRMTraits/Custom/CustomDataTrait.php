@@ -350,6 +350,19 @@ trait CRMTraits_Custom_CustomDataTrait {
   }
 
   /**
+   * Create custom select field.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createAutoCompleteCustomField(array $params): array {
+    $params = array_merge($this->getFieldsValuesByType('String', 'Autocomplete-Select'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
    * Create a custom field of  type date.
    *
    * @param array $params

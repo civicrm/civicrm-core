@@ -983,4 +983,47 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test for single select Autocomplete custom field.
+   *
+   */
+  public function testSingleSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $colors = ['Y' => 'Yellow', 'G' => 'Green'];
+    $fieldId = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+      'option_values' => $colors,
+    ])['id'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => 'Y']);
+    $value = $this->callAPISuccessGetValue('Contact', [
+      'id' => $contactId,
+      'return' => 'custom_' . $fieldId,
+    ]);
+    $this->assertEquals('Y', $value);
+  }
+
+  /**
+   * Test for multi select Autocomplete custom field.
+   *
+   */
+  public function testMultiSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $colors = ['Y' => 'Yellow', 'G' => 'Green'];
+    $fieldId = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+      'serialize' => '1',
+      'option_values' => $colors,
+    ])['id'];
+    $contactId = $this->individualCreate(['custom_' . $fieldId => ['Y', 'G']]);
+    $value = $this->callAPISuccessGetValue('Contact', [
+      'id' => $contactId,
+      'return' => 'custom_' . $fieldId,
+    ]);
+    $this->assertEquals(array_keys($colors), $value);
+  }
+
 }
