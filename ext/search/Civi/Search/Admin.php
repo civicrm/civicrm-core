@@ -68,7 +68,7 @@ class Admin {
       if ($entity['get']) {
         $entity['fields'] = civicrm_api4($entity['name'], 'getFields', [
           'select' => $getFields,
-          'where' => [['permission', 'IS NULL']],
+          'where' => [['name', 'NOT IN', ['api_key', 'hash']]],
           'orderBy' => ['label'],
         ]);
         $params = $entity['get'][0];
