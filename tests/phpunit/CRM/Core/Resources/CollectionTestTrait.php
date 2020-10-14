@@ -223,6 +223,45 @@ trait CRM_Core_Resources_CollectionTestTrait {
   }
 
   /**
+   * Create a few resources with aliases. Use a mix of reads+writes on both the
+   * canonical names and aliased names.
+   */
+  public function testAliases() {
+    $b = $this->createEmptyCollection();
+    $b->add([
+      'styleUrl' => 'https://example.com/foo.css',
+      'name' => 'foo',
+      'aliases' => ['bar', 'borg'],
+    ]);
+    $b->add([
+      'scriptUrl' => 'https://example.com/whiz.js',
+      'name' => 'whiz',
+      'aliases' => 'bang',
+    ]);
+
+    $this->assertEquals('foo', $b->get('foo')['name']);
+    $this->assertEquals('foo', $b->get('bar')['name']);
+    $this->assertEquals('foo', $b->get('borg')['name']);
+    $this->assertEquals('whiz', $b->get('whiz')['name']);
+    $this->assertEquals('whiz', $b->get('bang')['name']);
+    $this->assertEquals(NULL, $b->get('snafu'));
+
+    // Go back+forth, updating with one name then reading with the other.
+
+    $b->get('borg')['borgify'] = TRUE;
+    $this->assertEquals(TRUE, $b->get('foo')['borgify']);
+
+    $b->get('foo')['d'] = 'ie';
+    $this->assertEquals('ie', $b->get('borg')['d']);
+
+    $b->update('bang', ['b52' => 'love shack']);
+    $this->assertEquals('love shack', $b->get('whiz')['b52']);
+
+    $b->update('whiz', ['golly' => 'gee']);
+    $this->assertEquals('gee', $b->get('bang')['golly']);
+  }
+
+  /**
    * Add some items to a bundle - then clear() all of them.
    */
   public function testClear() {
