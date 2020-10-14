@@ -50,6 +50,7 @@
  *
  *   - type: string (markup, template, callback, script, scriptFile, scriptUrl, jquery, style, styleFile, styleUrl)
  *   - name: string, symbolic identifier for this resource
+ *   - aliases: string[], list of alternative names for this resource
  *   - weight: int, default=1. Lower weights come before higher weights.
  *     (If two resources have the same weight, then a secondary ordering will be
  *     used to ensure reproducibility. However, the secondary ordering is

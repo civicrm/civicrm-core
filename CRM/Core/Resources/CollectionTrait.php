@@ -114,12 +114,22 @@ trait CRM_Core_Resources_CollectionTrait {
       }
       $snippet['scriptFileUrls'] = [$res->getUrl($ext, $res->filterMinify($ext, $file), TRUE)];
     }
+    if ($snippet['type'] === 'scriptFile' && !isset($snippet['aliases'])) {
+      $snippet['aliases'] = $snippet['scriptFileUrls'];
+    }
 
     if ($snippet['type'] === 'styleFile' && !isset($snippet['styleFileUrls'])) {
       /** @var Civi\Core\Themes $theme */
       $theme = Civi::service('themes');
       list ($ext, $file) = $snippet['styleFile'];
       $snippet['styleFileUrls'] = $theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file);
+    }
+    if ($snippet['type'] === 'styleFile' && !isset($snippet['aliases'])) {
+      $snippet['aliases'] = $snippet['styleFileUrls'];
+    }
+
+    if (isset($snippet['aliases']) && !is_array($snippet['aliases'])) {
+      $snippet['aliases'] = [$snippet['aliases']];
     }
 
     $this->snippets[$snippet['name']] = $snippet;
@@ -149,8 +159,15 @@ trait CRM_Core_Resources_CollectionTrait {
    * @see CRM_Core_Resources_CollectionInterface::update()
    */
   public function update($name, $snippet) {
-    $this->snippets[$name] = array_merge($this->snippets[$name], $snippet);
-    $this->isSorted = FALSE;
+    foreach ($this->resolveName($name) as $realName) {
+      $this->snippets[$realName] = array_merge($this->snippets[$realName], $snippet);
+      $this->isSorted = FALSE;
+      return $this;
+    }
+
+    Civi::log()->warning('Failed to update resource by name ({name})', [
+      'name' => $name,
+    ]);
     return $this;
   }
 
@@ -174,7 +191,12 @@ trait CRM_Core_Resources_CollectionTrait {
    * @see CRM_Core_Resources_CollectionInterface::get()
    */
   public function &get($name) {
-    return $this->snippets[$name];
+    foreach ($this->resolveName($name) as $realName) {
+      return $this->snippets[$realName];
+    }
+
+    $null = NULL;
+    return $null;
   }
 
   /**
@@ -288,6 +310,24 @@ trait CRM_Core_Resources_CollectionTrait {
       $this->isSorted = TRUE;
     }
     return $this;
+  }
+
+  /**
+   * @param string $name
+   *   Name or alias.
+   * return array
+   *   List of real names.
+   */
+  protected function resolveName($name) {
+    if (isset($this->snippets[$name])) {
+      return [$name];
+    }
+    foreach ($this->snippets as $snippetName => $snippet) {
+      if (isset($snippet['aliases']) && in_array($name, $snippet['aliases'])) {
+        return [$snippetName];
+      }
+    }
+    return [];
   }
 
   /**
