@@ -66,7 +66,7 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
     }
 
     // Assert contribIds are returned in a sorted order.
-    $form = $this->getFormObject('CRM_Contribute_Form_Task', [], 'Search');
+    $form = $this->getFormObject('CRM_Contribute_Form_Task', ['radio_ts' => 'ts_all'], 'Search');
     foreach ($fields as $val) {
       $form->set(CRM_Utils_Sort::SORT_ORDER, "`{$val}` asc");
       CRM_Contribute_Form_Task::preProcessCommon($form);

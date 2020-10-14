@@ -61,11 +61,8 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
 
     $form->_task = $values['task'] ?? NULL;
 
-    $ids = [];
-    if (isset($values['radio_ts']) && $values['radio_ts'] === 'ts_sel') {
-      $ids = $form->getSelectedIDs($values);
-    }
-    else {
+    $ids = $form->getSelectedIDs($values);
+    if (!$ids) {
       $queryParams = $form->get('queryParams');
       $isTest = FALSE;
       if (is_array($queryParams)) {

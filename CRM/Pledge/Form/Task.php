@@ -47,15 +47,9 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
 
     $form->_task = $values['task'];
 
-    $ids = [];
-    if ($values['radio_ts'] == 'ts_sel') {
-      foreach ($values as $name => $value) {
-        if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
-        }
-      }
-    }
-    else {
+    $ids = $form->getSelectedIDs($values);
+
+    if (!$ids) {
       $queryParams = $form->get('queryParams');
       $sortOrder = NULL;
       if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {

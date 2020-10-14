@@ -49,11 +49,9 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
 
     $form->_task = $values['task'];
 
-    $ids = [];
-    if ($values['radio_ts'] === 'ts_sel') {
-      $ids = $form->getSelectedIDs($values);
-    }
-    else {
+    $ids = $form->getSelectedIDs($values);
+
+    if (!$ids) {
       $queryParams = $form->get('queryParams');
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_ACTIVITY
