@@ -62,19 +62,15 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     $form->_task = $values['task'] ?? NULL;
 
     $ids = [];
-    if (isset($values['radio_ts']) && $values['radio_ts'] == 'ts_sel') {
-      foreach ($values as $name => $value) {
-        if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
-          $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
-        }
-      }
+    if (isset($values['radio_ts']) && $values['radio_ts'] === 'ts_sel') {
+      $ids = $form->getSelectedIDs($values);
     }
     else {
       $queryParams = $form->get('queryParams');
       $isTest = FALSE;
       if (is_array($queryParams)) {
         foreach ($queryParams as $fields) {
-          if ($fields[0] == 'contribution_test') {
+          if ($fields[0] === 'contribution_test') {
             $isTest = TRUE;
             break;
           }

@@ -101,6 +101,23 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   }
 
   /**
+   * Get the ids the user has selected.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
+  public function getSelectedIDs(array $values): array {
+    $ids = [];
+    foreach ($values as $name => $value) {
+      if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
+        $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
+      }
+    }
+    return $ids;
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @throws \CRM_Core_Exception
