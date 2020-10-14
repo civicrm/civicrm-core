@@ -16,7 +16,6 @@
  * @subpackage API_Job
  *
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * @version $Id: Job.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
 
@@ -104,9 +103,22 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a contact deleted after the mailing is queued is not emailed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeletedRecipient() {
+    $this->createContactsInGroup(2, $this->_groupID);
+    $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $this->callAPISuccessGetValue('GroupContact', ['return' => 'contact_id', 'options' => ['limit' => 1, 'sort' => 'id DESC']])]);
+    $this->callAPISuccess('job', 'process_mailing');
+    $this->_mut->assertRecipients($this->getRecipients(1, 1));
+  }
+
+  /**
    * Test what happens when a contact is set to decesaed
    */
-  public function testDecesasedRecepient() {
+  public function testDeceasedRecipient() {
     $contactID = $this->individualCreate(['first_name' => 'test dead recipeint', 'email' => 'mailtestdead@civicrm.org']);
     $this->callAPISuccess('group_contact', 'create', [
       'contact_id' => $contactID,
@@ -522,6 +534,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'civicrm_group_contact',
       'civicrm_contact',
     ]);
+    Civi::settings()->set('mailerBatchLimit', 0);
   }
 
   /**
