@@ -951,6 +951,9 @@ COLS;
       }
       $columns = $this->columnsOf($table, $force);
 
+      // Use utf8mb4_bin or utf8_bin, depending on what's in use.
+      $collation = preg_replace('/^(utf8(?:mb4)?)_.*$/', '$1_bin', CRM_Core_BAO_SchemaHandler::getInUseCollation());
+
       // only do the change if any data has changed
       $cond = [];
       foreach ($columns as $column) {
@@ -961,7 +964,7 @@ COLS;
         $excludeColumn = in_array($column, $tableExceptions) ||
           in_array(str_replace('`', '', $column), $tableExceptions);
         if (!$excludeColumn) {
-          $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
+          $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'') COLLATE {$collation}";
         }
       }
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
