@@ -93,7 +93,8 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $attributes['skiplabel'] = TRUE;
         $elements = [];
         $groupsOptions = [];
-        foreach ($groups as $id => $group) {
+        foreach ($groups as $group) {
+          $id = $group['id'];
           // make sure that this group has public visibility
           if ($visibility &&
             $group['visibility'] == 'User and User Admin Only'
