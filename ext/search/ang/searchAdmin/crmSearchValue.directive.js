@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('search').directive('crmSearchValue', function($interval, searchMeta, formatForSelect2) {
+  angular.module('searchAdmin').directive('crmSearchValue', function($interval, searchMeta, formatForSelect2) {
     return {
       scope: {
         data: '=crmSearchValue'

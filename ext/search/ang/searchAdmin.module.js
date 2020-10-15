@@ -8,7 +8,7 @@
     undefined;
 
   // Declare module and route/controller/services
-  angular.module('search', CRM.angRequires('search'))
+  angular.module('searchAdmin', CRM.angRequires('searchAdmin'))
 
     .config(function($routeProvider) {
       $routeProvider.when('/:mode/:entity/:name?', {
@@ -115,7 +115,7 @@
           if (bracketPos >= 0) {
             var parsed = expr.substr(bracketPos).match(/[ ]?([A-Z]+[ ]+)?([\w.:]+)/);
             fieldName = parsed[2];
-            result.fn = _.find(CRM.vars.search.functions, {name: expr.substring(0, bracketPos)});
+            result.fn = _.find(CRM.searchAdmin.functions, {name: expr.substring(0, bracketPos)});
             result.modifier = _.trim(parsed[1]);
           }
           result.field = expr ? getField(fieldName, searchEntity) : undefined;
