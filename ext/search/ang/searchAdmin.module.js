@@ -11,9 +11,25 @@
   angular.module('searchAdmin', CRM.angRequires('searchAdmin'))
 
     .config(function($routeProvider) {
+      $routeProvider.when('/list', {
+        controller: 'searchList',
+        templateUrl: '~/searchAdmin/searchList.html',
+        reloadOnSearch: false,
+        resolve: {
+          // Load data for lists
+          savedSearches: function(crmApi4) {
+            return crmApi4('SavedSearch', 'get', {
+              select: ['id', 'api_entity', 'form_values', 'COUNT(search_display.id) AS displays', 'GROUP_CONCAT(group.title) AS groups'],
+              join: [['SearchDisplay AS search_display'], ['Group AS group']],
+              where: [['api_entity', 'IS NOT NULL']],
+              groupBy: ['id']
+            });
+          }
+        }
+      });
       $routeProvider.when('/:mode/:entity/:name?', {
         controller: 'searchRoute',
-        template: '<div id="bootstrap-theme" class="crm-search"><crm-search ng-if="$ctrl.mode === \'create\'" entity="$ctrl.entity" load=":: $ctrl.savedSearch"></crm-search></div>',
+        template: '<crm-search ng-if="$ctrl.mode === \'create\'" entity="$ctrl.entity" load=":: $ctrl.savedSearch"></crm-search>',
         reloadOnSearch: false,
         resolve: {
           // For paths like /load/Group/MySmartGroup, load the group, stash it in the savedSearch variable, and then redirect

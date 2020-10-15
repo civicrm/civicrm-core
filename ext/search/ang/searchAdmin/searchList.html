@@ -1,0 +1,39 @@
+<div id="bootstrap-theme" class="crm-search">
+  <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
+  <div class="form-inline">
+    <a class="btn btn-primary pull-right" href="#/create/Contact/">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Search') }}
+    </a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>{{:: ts('ID') }}</th>
+        <th>{{:: ts('For') }}</th>
+        <th>{{:: ts('Displays') }}</th>
+        <th>{{:: ts('Smart Group') }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="search in $ctrl.savedSearches">
+        <td>{{ search.id }}</td>
+        <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
+        <td>{{ search.displays }}</td>
+        <td>{{ search.groups.join(', ') }}</td>
+        <td>
+          <a href="#/load/SavedSearch/{{ search.id }}">{{:: ts('Edit') }}</a>
+        </td>
+      </tr>
+      <tr ng-if="$ctrl.savedSearches.length === 0">
+        <td colspan="9">
+          <p class="messages status no-popup text-center">
+            {{:: ts('No saved searches.')}}
+            <a href="#/create/Contact/">{{:: ts('New Search') }}</a>
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
