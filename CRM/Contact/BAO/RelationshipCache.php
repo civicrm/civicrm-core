@@ -71,6 +71,9 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
    */
   public static function onHookTriggerInfo($e) {
     $relUpdates = self::createInsertUpdateQueries();
+    // Use utf8mb4_bin or utf8_bin, depending on what's in use.
+    $collation = preg_replace('/^(utf8(?:mb4)?)_.*$/', '$1_bin', CRM_Core_BAO_SchemaHandler::getInUseCollation());
+
     foreach ($relUpdates as $relUpdate) {
       /**
        * This trigger runs whenever a "civicrm_relationship" record is inserted or updated.
@@ -97,8 +100,8 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
         'sql' => sprintf("\nIF (%s) THEN\n %s;\n END IF;\n",
 
           // Condition
-          implode(' OR ', array_map(function ($col) {
-            return "(OLD.$col != NEW.$col COLLATE utf8_bin)";
+          implode(' OR ', array_map(function ($col) use ($collation) {
+            return "(OLD.$col != NEW.$col COLLATE $collation)";
           }, self::$relTypeWatchFields)),
 
           // Action
