@@ -5819,14 +5819,15 @@ AND   displayRelType.is_active = 1
       $this->_qill[0][] = $iqill;
     }
     if (strpos($from, $qcache['from']) === FALSE) {
-      if (strpos($from, "INNER JOIN") !== false) {
+      if (strpos($from, "INNER JOIN") !== FALSE) {
         // lets replace all the INNER JOIN's in the $from so we dont exclude other data
         // this happens when we have an event_type in the quert (CRM-7969)
         $from = str_replace("INNER JOIN", "LEFT JOIN", $from);
         // Make sure the relationship join right after the FROM and other joins afterwards.
         // This gives us the possibility to change the join on civicrm case.
         $from = preg_replace("/LEFT JOIN/", $qcache['from'] . " LEFT JOIN", $from, 1);
-      } else {
+      }
+      else {
         $from .= $qcache['from'];
       }
       $where = $qcache['where'];
