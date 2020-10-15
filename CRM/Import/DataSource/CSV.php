@@ -222,9 +222,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $first = FALSE;
 
       // CRM-17859 Trim non-breaking spaces from columns.
+      // dev/core#2127 avoid breaking strings ending in à
       $row = array_map(
         function($string) {
-          return trim($string, chr(0xC2) . chr(0xA0));
+          return preg_replace("/^(\u{a0})+|(\u{a0})+$/", '', $string);
         }, $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";

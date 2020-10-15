@@ -41,6 +41,10 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
     $dataSource->postProcess($params, $db, $form);
     $tableName = $form->get('importTableName');
     $this->assertEquals(4,
+      CRM_Core_DAO::singleValueQuery("SELECT LENGTH(first_name) FROM $tableName"),
+      $fileName . ' failed on first_name'
+    );
+    $this->assertEquals(4,
       CRM_Core_DAO::singleValueQuery("SELECT LENGTH(last_name) FROM $tableName"),
       $fileName . ' failed on last_name'
     );
@@ -57,7 +61,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCsvFiles() {
-    return [['import.csv'], ['yogi.csv']];
+    return [['import.csv'], ['yogi.csv'], ['specialchar.csv']];
   }
 
 }
