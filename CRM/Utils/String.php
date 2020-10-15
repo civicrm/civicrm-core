@@ -944,7 +944,7 @@ class CRM_Utils_String {
     if ($lastLetter == 's' || $lastLetter == 'x' || $lastTwo == 'ch') {
       return $str . 'es';
     }
-    if ($lastLetter == 'y' && $lastTwo != 'ey') {
+    if ($lastLetter == 'y' && !in_array($lastTwo, ['ay', 'ey', 'iy', 'oy', 'uy'])) {
       return substr($str, 0, -1) . 'ies';
     }
     return $str . 's';

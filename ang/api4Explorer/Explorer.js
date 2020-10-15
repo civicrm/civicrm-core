@@ -102,7 +102,7 @@
       if (lastLetter === 's' || lastLetter === 'x' || lastTwo === 'ch') {
         return str + 'es';
       }
-      if (lastLetter === 'y' && lastTwo !== 'ey') {
+      if (lastLetter === 'y' && !_.includes(['ay', 'ey', 'iy', 'oy', 'uy'], lastTwo)) {
         return str.slice(0, -1) + 'ies';
       }
       return str + 's';
