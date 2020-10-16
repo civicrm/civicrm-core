@@ -156,17 +156,17 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
       }
 
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE, $form->getQueryMode());
-      $query->_distinctComponentClause = " ( " . $form::$tableName . ".id )";
-      $query->_groupByComponentClause = " GROUP BY " . $form::$tableName . ".id ";
+      $query->_distinctComponentClause = $form->getDistinctComponentClause();
+      $query->_groupByComponentClause = $form->getGroupByComponentClause();
       $result = $query->searchQuery(0, 0, $sortOrder);
-      $selector = $form::$entityShortname . '_id';
+      $selector = $form->getEntityAliasField();
       while ($result->fetch()) {
         $entityIds[] = $result->$selector;
       }
     }
 
     if (!empty($entityIds)) {
-      $form->_componentClause = ' ' . $form::$tableName . '.id IN ( ' . implode(',', $entityIds) . ' ) ';
+      $form->_componentClause = ' ' . $form->getTableName() . '.id IN ( ' . implode(',', $entityIds) . ' ) ';
       $form->assign('totalSelected' . ucfirst($form::$entityShortname) . 's', count($entityIds));
     }
 
@@ -187,7 +187,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public function setContactIDs() {
     $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
-      $this::$tableName
+      $this->getTableName()
     );
   }
 
@@ -295,6 +295,44 @@ SELECT contact_id
       return $this->controller->exportValues('Search');
     }
     return $this->controller->exportValues('Basic');
+  }
+
+  /**
+   * Get the name of the table for the relevant entity.
+   *
+   * @return string
+   */
+  public function getTableName() {
+    CRM_Core_Error::deprecatedFunctionWarning('function should be overridden');
+    return $this::$tableName;
+  }
+
+  /**
+   * Get the clause for grouping by the component.
+   *
+   * @return string
+   */
+  public function getDistinctComponentClause() {
+    return " ( " . $this->getTableName() . ".id )";
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getGroupByComponentClause() {
+    return " GROUP BY " . $this->getTableName() . ".id ";
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getEntityAliasField() {
+    CRM_Core_Error::deprecatedFunctionWarning('function should be overridden');
+    return $this::$entityShortname . '_id';
   }
 
 }

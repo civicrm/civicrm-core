@@ -36,4 +36,22 @@ class CRM_Contact_Export_Form_Select extends CRM_Export_Form_Select {
     return TRUE;
   }
 
+  /**
+   * Get the name of the table for the relevant entity.
+   *
+   * @return string
+   */
+  public function getTableName() {
+    return 'civicrm_contact';
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getEntityAliasField() {
+    return 'contact_id';
+  }
+
 }
