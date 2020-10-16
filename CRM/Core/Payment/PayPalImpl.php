@@ -105,6 +105,22 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     return FALSE;
   }
+  
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * If the processor returns true it must be possible to take action from within CiviCRM
+   * that will result in no further payments being processed. In the case of token processors (e.g
+   * IATS, eWay) updating the contribution_recur table is probably sufficient.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
+      return FALSE;
+    }
+    return parent::supportsCancelRecurring();
+  }
 
   /**
    * Does this processor support pre-approval.
@@ -123,6 +139,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       return TRUE;
     }
     return FALSE;
+  }
+  
+  /**
+   * Does this processor support updating billing info for recurring contributions through code.
+   *
+   * If the processor returns true then it must be possible to update billing info from within CiviCRM
+   * that will be updated at the payment processor.
+   *
+   * @return bool
+   */
+  protected function supportsUpdateSubscriptionBillingInfo() {
+    if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
+      return FALSE;
+    }
+    return parent::supportsUpdateSubscriptionBillingInfo();
   }
 
   /**
