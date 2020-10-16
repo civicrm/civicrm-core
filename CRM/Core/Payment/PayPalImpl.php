@@ -155,6 +155,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     return parent::supportsUpdateSubscriptionBillingInfo();
   }
+  
+  /**
+   * Does this processor support changing the amount for recurring contributions through code.
+   *
+   * If the processor returns true then it must be possible to update the amount from within CiviCRM
+   * that will be updated at the payment processor.
+   *
+   * @return bool
+   */
+  protected function supportsChangeSubscriptionAmount() {
+    if (!$this->isPayPalType($this::PAYPAL_PRO)) {
+      return FALSE;
+    }
+    return parent::supportsChangeSubscriptionAmount();
+  }
 
   /**
    * Opportunity for the payment processor to override the entire form build.
