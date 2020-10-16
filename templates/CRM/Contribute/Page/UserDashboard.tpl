@@ -23,6 +23,7 @@
                       <th></th>
                     {/if}
                     {foreach from=$row.buttons item=button}
+                      {* @todo Fix this: doesn't work (doesn't add extra header cells) because $row does not exist in this context. See also comments below / in UserDashboard.php re changing to actions array *}
                       <th></th>
                     {/foreach}
                 </tr>
@@ -116,22 +117,19 @@
                 <div><label>{ts}Recurring Contribution(s){/ts}</label></div>
                 <table class="selector">
                     <tr class="columnheader">
-                        <th>{ts}Terms:{/ts}</th>
-                        <th>{ts}Status{/ts}</th>
+                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Interval{/ts}</th>
                         <th>{ts}Installments{/ts}</th>
+                        <th>{ts}Status{/ts}</th>
                         <th>{ts}Created{/ts}</th>
                         <th></th>
                     </tr>
                     {foreach from=$recurRows item=row key=id}
                         <tr class="{cycle values="odd-row,even-row"}">
-                            <td><label>{$recurRows.$id.amount|crmMoney}</label>
-                                every {$recurRows.$id.frequency_interval} {$recurRows.$id.frequency_unit}
-                                for {$recurRows.$id.installments} installments
-                            </td>
+                            <td>{$recurRows.$id.amount|crmMoney}</td>
+                            <td>{$recurRows.$id.frequency_interval} {$recurRows.$id.frequency_unit}</td>
+                            <td>{if $recurRows.$id.link}<a href="{$recurRows.$id.link}">{/if}{if $recurRows.$id.completed}{$recurRows.$id.completed}{else}0{/if} / {if $recurRows.$id.installments}{$recurRows.$id.installments}{else}{ts}(Open-ended){/ts}{/if}{if $recurRows.$id.link}</a>{/if}</td>
                             <td>{$recurRows.$id.recur_status}</td>
-                            <td>{if $recurRows.$id.completed}<a href="{$recurRows.$id.link}">{$recurRows.$id.completed}
-                                    /{$recurRows.$id.installments}</a>
-                                {else}0/{$recurRows.$id.installments} {/if}</td>
                             <td>{$recurRows.$id.create_date|crmDate}</td>
                             <td>{$recurRows.$id.action|replace:'xx':$recurRows.id}</td>
                         </tr>
