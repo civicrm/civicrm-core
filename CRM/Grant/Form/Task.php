@@ -81,15 +81,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
 
     $form->_grantIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/search', $urlParams));
+    $form->setNextUrl('grant');
   }
 
   /**
