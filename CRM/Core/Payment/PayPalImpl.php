@@ -150,7 +150,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @return bool
    */
   protected function supportsUpdateSubscriptionBillingInfo() {
-    if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
+    if (!$this->isPayPalType($this::PAYPAL_PRO)) {
       return FALSE;
     }
     return parent::supportsUpdateSubscriptionBillingInfo();
