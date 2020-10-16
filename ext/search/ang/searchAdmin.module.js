@@ -3,8 +3,6 @@
 
   // Shared between router and searchMeta service
   var searchEntity,
-    // For loading saved search
-    savedSearch,
     undefined;
 
   // Declare module and route/controller/services
@@ -14,7 +12,6 @@
       $routeProvider.when('/list', {
         controller: 'searchList',
         templateUrl: '~/searchAdmin/searchList.html',
-        reloadOnSearch: false,
         resolve: {
           // Load data for lists
           savedSearches: function(crmApi4) {
@@ -27,71 +24,49 @@
           }
         }
       });
-      $routeProvider.when('/:mode/:entity/:name?', {
-        controller: 'searchRoute',
-        template: '<crm-search ng-if="$ctrl.mode === \'create\'" entity="$ctrl.entity" load=":: $ctrl.savedSearch"></crm-search>',
-        reloadOnSearch: false,
+      $routeProvider.when('/create/:entity', {
+        controller: 'searchCreate',
+        template: '<crm-search saved-search="$ctrl.savedSearch"></crm-search>',
+      });
+      $routeProvider.when('/edit/:id', {
+        controller: 'searchEdit',
+        template: '<crm-search saved-search="$ctrl.savedSearch"></crm-search>',
         resolve: {
-          // For paths like /load/Group/MySmartGroup, load the group, stash it in the savedSearch variable, and then redirect
-          // For paths like /create/Contact, return the stashed savedSearch if present
-          savedSearch: function($route, $location, $timeout, crmApi4) {
-            var retrievedSearch = savedSearch,
-              getParams,
-              params = $route.current.params;
-            savedSearch = undefined;
-            switch (params.mode) {
-              case 'create':
-                return retrievedSearch;
-
-              case 'load':
-                // Load savedSearch by `id` (the SavedSearch entity doesn't have `name`)
-                if (params.entity === 'SavedSearch' && /^\d+$/.test(params.name)) {
-                  getParams = {
-                    where: [['id', '=', params.name]]
-                  };
-                }
-                // Load attached entity (e.g. Smart Groups) with a join via saved_search_id
-                else if (params.entity === 'Group' && params.name) {
-                  getParams = {
-                    select: ['id', 'title', 'saved_search_id', 'saved_search.*'],
-                    where: [['name', '=', params.name]]
-                  };
-                }
-                // In theory savedSearches could be attached to something other than groups, but for now that's not supported
-                else {
-                  throw 'Failed to load ' + params.entity;
-                }
-                return crmApi4(params.entity, 'get', getParams, 0).then(function(retrieved) {
-                  savedSearch = retrieved;
-                  savedSearch.type = params.entity;
-                  if (params.entity !== 'SavedSearch') {
-                    savedSearch.api_entity = retrieved['saved_search.api_entity'];
-                    savedSearch.api_params = retrieved['saved_search.api_params'];
-                    savedSearch.form_values = retrieved['saved_search.form_values'];
-                  }
-                  $timeout(function() {
-                    $location.url('/create/' + savedSearch.api_entity);
-                  });
-                });
-            }
+          // Load saved search
+          savedSearch: function($route, crmApi4) {
+            var params = $route.current.params;
+            return crmApi4('SavedSearch', 'get', {
+              where: [['id', '=', params.id]],
+              chain: {
+                group: ['Group', 'get', {where: [['saved_search_id', '=', '$id']]}, 0],
+                displays: ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']]}]
+              }
+            }, 0);
           }
         }
       });
     })
 
-    // Controller binds entity to route
-    .controller('searchRoute', function($scope, $routeParams, $location, savedSearch) {
-      searchEntity = this.entity = $routeParams.entity;
-      this.mode = $routeParams.mode;
-      this.savedSearch = savedSearch;
+    // Controller for creating a new search
+    .controller('searchCreate', function($scope, $routeParams, $location) {
+      searchEntity = $routeParams.entity;
       $scope.$ctrl = this;
-
+      this.savedSearch = {
+        api_entity: searchEntity,
+      };
       // Changing entity will refresh the angular page
-      $scope.$watch('$ctrl.entity', function(newEntity, oldEntity) {
+      $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
         if (newEntity && oldEntity && newEntity !== oldEntity) {
           $location.url('/create/' + newEntity);
         }
       });
+    })
+
+    // Controller for editing a SavedSearch
+    .controller('searchEdit', function($scope, savedSearch) {
+      searchEntity = savedSearch.api_entity;
+      this.savedSearch = savedSearch;
+      $scope.$ctrl = this;
     })
 
     .factory('searchMeta', function() {

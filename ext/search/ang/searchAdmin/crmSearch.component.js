@@ -3,8 +3,7 @@
 
   angular.module('searchAdmin').component('crmSearch', {
     bindings: {
-      entity: '=',
-      load: '<'
+      savedSearch: '<'
     },
     templateUrl: '~/searchAdmin/crmSearch.html',
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
@@ -16,14 +15,13 @@
       this.selectedRows = [];
       this.limit = CRM.cache.get('searchPageSize', 30);
       this.page = 1;
-      this.params = {};
       // After a search this.results is an object of result arrays keyed by page,
       // Initially this.results is an empty string because 1: it's falsey (unlike an empty object) and 2: it doesn't throw an error if you try to access undefined properties (unlike null)
       this.results = '';
       this.rowCount = false;
+      this.allRowsSelected = false;
       // Have the filters (WHERE, HAVING, GROUP BY, JOIN) changed?
       this.stale = true;
-      this.allRowsSelected = false;
 
       $scope.controls = {};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
@@ -32,14 +30,45 @@
         editGroups: CRM.checkPerm('edit groups')
       };
 
-      this.getEntity = searchMeta.getEntity;
+      this.$onInit = function() {
+        this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
+
+        if (!this.savedSearch.api_params) {
+          this.savedSearch.api_params = {
+            select: getDefaultSelect(),
+            orderBy: {},
+            where: [],
+          };
+        }
+
+        $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
+
+        $scope.$watch('$ctrl.savedSearch.api_params.where', onChangeFilters, true);
+
+        if (this.paramExists('groupBy')) {
+          this.savedSearch.api_params.groupBy = this.savedSearch.api_params.groupBy || [];
+          $scope.$watchCollection('$ctrl.savedSearch.api_params.groupBy', onChangeFilters);
+        }
+
+        if (this.paramExists('join')) {
+          this.savedSearch.api_params.join = this.savedSearch.api_params.join || [];
+          $scope.$watch('$ctrl.savedSearch.api_params.join', onChangeFilters, true);
+        }
+
+        if (this.paramExists('having')) {
+          this.savedSearch.api_params.having = this.savedSearch.api_params.having || [];
+          $scope.$watch('$ctrl.savedSearch.api_params.having', onChangeFilters, true);
+        }
+
+        loadFieldOptions();
+      };
 
       this.paramExists = function(param) {
-        return _.includes(searchMeta.getEntity(ctrl.entity).params, param);
+        return _.includes(searchMeta.getEntity(ctrl.savedSearch.api_entity).params, param);
       };
 
       $scope.getJoinEntities = function() {
-        var joinEntities = _.transform(CRM.vars.search.links[ctrl.entity], function(joinEntities, link) {
+        var joinEntities = _.transform(CRM.vars.search.links[ctrl.savedSearch.api_entity], function(joinEntities, link) {
           var entity = searchMeta.getEntity(link.entity);
           if (entity) {
             joinEntities.push({
@@ -57,8 +86,8 @@
         // Debounce the onchange event using timeout
         $timeout(function() {
           if ($scope.controls.join) {
-            ctrl.params.join = ctrl.params.join || [];
-            ctrl.params.join.push([$scope.controls.join, false]);
+            ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
+            ctrl.savedSearch.api_params.join.push([$scope.controls.join, false]);
             loadFieldOptions();
           }
           $scope.controls.join = '';
@@ -66,8 +95,8 @@
       };
 
       $scope.changeJoin = function(idx) {
-        if (ctrl.params.join[idx][0]) {
-          ctrl.params.join[idx].length = 2;
+        if (ctrl.savedSearch.api_params.join[idx][0]) {
+          ctrl.savedSearch.api_params.join[idx].length = 2;
           loadFieldOptions();
         } else {
           ctrl.clearParam('join', idx);
@@ -75,16 +104,16 @@
       };
 
       $scope.changeGroupBy = function(idx) {
-        if (!ctrl.params.groupBy[idx]) {
+        if (!ctrl.savedSearch.api_params.groupBy[idx]) {
           ctrl.clearParam('groupBy', idx);
         }
         // Remove aggregate functions when no grouping
-        if (!ctrl.params.groupBy.length) {
-          _.each(ctrl.params.select, function(col, pos) {
+        if (!ctrl.savedSearch.api_params.groupBy.length) {
+          _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
             if (_.contains(col, '(')) {
               var info = searchMeta.parseExpr(col);
               if (info.fn.category === 'aggregate') {
-                ctrl.params.select[pos] = info.path + info.suffix;
+                ctrl.savedSearch.api_params.select[pos] = info.path + info.suffix;
               }
             }
           });
@@ -99,9 +128,9 @@
       $scope.setOrderBy = function(col, $event) {
         var dir = $scope.getOrderBy(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
         if (!$event.shiftKey) {
-          ctrl.params.orderBy = {};
+          ctrl.savedSearch.api_params.orderBy = {};
         }
-        ctrl.params.orderBy[col] = dir;
+        ctrl.savedSearch.api_params.orderBy[col] = dir;
         if (ctrl.results) {
           ctrl.refreshPage();
         }
@@ -113,7 +142,7 @@
        * @returns {string}
        */
       $scope.getOrderBy = function(col) {
-        var dir = ctrl.params.orderBy && ctrl.params.orderBy[col];
+        var dir = ctrl.savedSearch.api_params.orderBy && ctrl.savedSearch.api_params.orderBy[col];
         if (dir) {
           return 'fa-sort-' + dir.toLowerCase();
         }
@@ -121,8 +150,8 @@
       };
 
       $scope.addParam = function(name) {
-        if ($scope.controls[name] && !_.contains(ctrl.params[name], $scope.controls[name])) {
-          ctrl.params[name].push($scope.controls[name]);
+        if ($scope.controls[name] && !_.contains(ctrl.savedSearch.api_params[name], $scope.controls[name])) {
+          ctrl.savedSearch.api_params[name].push($scope.controls[name]);
           if (name === 'groupBy') {
             // Expand the aggregate block
             $timeout(function() {
@@ -135,7 +164,7 @@
 
       // Deletes an item from an array param
       this.clearParam = function(name, idx) {
-        ctrl.params[name].splice(idx, 1);
+        ctrl.savedSearch.api_params[name].splice(idx, 1);
       };
 
       // Prevent visual jumps in results table height during loading
@@ -150,10 +179,10 @@
 
       // Ensure all non-grouped columns are aggregated if using GROUP BY
       function aggregateGroupByColumns() {
-        if (ctrl.params.groupBy.length) {
-          _.each(ctrl.params.select, function(col, pos) {
+        if (ctrl.savedSearch.api_params.groupBy.length) {
+          _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
             if (!_.contains(col, '(') && ctrl.canAggregate(col)) {
-              ctrl.params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(' + col + ')';
+              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(' + col + ')';
             }
           });
         }
@@ -162,7 +191,7 @@
       // Debounced callback for loadResults
       function _loadResultsCallback() {
         // Multiply limit to read 2 pages at once & save ajax requests
-        var params = angular.merge({debug: true, limit: ctrl.limit * 2}, ctrl.params);
+        var params = angular.merge({debug: true, limit: ctrl.limit * 2}, ctrl.savedSearch.api_params);
         lockTableHeight();
         $scope.error = false;
         if (ctrl.stale) {
@@ -173,7 +202,7 @@
           params.select.push('row_count');
         }
         params.offset = ctrl.limit * (ctrl.page - 1);
-        crmApi4(ctrl.entity, 'get', params).then(function(success) {
+        crmApi4(ctrl.savedSearch.api_entity, 'get', params).then(function(success) {
           if (ctrl.stale) {
             ctrl.results = {};
           }
@@ -198,7 +227,7 @@
         })
           .finally(function() {
             if (ctrl.debug) {
-              ctrl.debug.params = JSON.stringify(_.extend({version: 4}, ctrl.params), null, 2);
+              ctrl.debug.params = JSON.stringify(_.extend({version: 4}, ctrl.savedSearch.api_params), null, 2);
               if (ctrl.debug.timeIndex) {
                 ctrl.debug.timeIndex = Number.parseFloat(ctrl.debug.timeIndex).toPrecision(2);
               }
@@ -267,8 +296,8 @@
 
       function onChangeSelect(newSelect, oldSelect) {
         // When removing a column from SELECT, also remove from ORDER BY
-        _.each(_.difference(_.keys(ctrl.params.orderBy), newSelect), function(col) {
-          delete ctrl.params.orderBy[col];
+        _.each(_.difference(_.keys(ctrl.savedSearch.api_params.orderBy), newSelect), function(col) {
+          delete ctrl.savedSearch.api_params.orderBy[col];
         });
         // Re-arranging or removing columns doesn't merit a refresh, only adding columns does
         if (!oldSelect || _.difference(newSelect, oldSelect).length) {
@@ -309,9 +338,9 @@
         }
         // If more than one page of results, use ajax to fetch all ids
         $scope.loadingAllRows = true;
-        var params = _.cloneDeep(ctrl.params);
+        var params = _.cloneDeep(ctrl.savedSearch.api_params);
         params.select = ['id'];
-        crmApi4(ctrl.entity, 'get', params, ['id']).then(function(ids) {
+        crmApi4(ctrl.savedSearch.api_entity, 'get', params, ['id']).then(function(ids) {
           $scope.loadingAllRows = false;
           ctrl.selectedRows = _.toArray(ids);
         });
@@ -345,11 +374,11 @@
       this.canAggregate = function(col) {
         var info = searchMeta.parseExpr(col);
         // If the column is used for a groupBy, no
-        if (ctrl.params.groupBy.indexOf(info.path) > -1) {
+        if (ctrl.savedSearch.api_params.groupBy.indexOf(info.path) > -1) {
           return false;
         }
         // If the entity this column belongs to is being grouped by id, then also no
-        return ctrl.params.groupBy.indexOf(info.prefix + 'id') < 0;
+        return ctrl.savedSearch.api_params.groupBy.indexOf(info.prefix + 'id') < 0;
       };
 
       $scope.formatResult = function formatResult(row, col) {
@@ -383,14 +412,14 @@
 
       $scope.fieldsForGroupBy = function() {
         return {results: getAllFields('', function(key) {
-            return _.contains(ctrl.params.groupBy, key);
+            return _.contains(ctrl.savedSearch.api_params.groupBy, key);
           })
         };
       };
 
       $scope.fieldsForSelect = function() {
         return {results: getAllFields(':label', function(key) {
-            return _.contains(ctrl.params.select, key);
+            return _.contains(ctrl.savedSearch.api_params.select, key);
           })
         };
       };
@@ -400,14 +429,14 @@
       };
 
       $scope.fieldsForHaving = function() {
-        return {results: _.transform(ctrl.params.select, function(fields, name) {
+        return {results: _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
           fields.push({id: name, text: ctrl.getFieldLabel(name)});
         })};
       };
 
       function getDefaultSelect() {
         return _.filter(['id', 'display_name', 'label', 'title', 'location_type_id:label'], function(field) {
-          return !!searchMeta.getField(field, ctrl.entity);
+          return !!searchMeta.getField(field, ctrl.savedSearch.api_entity);
         });
       }
 
@@ -426,13 +455,13 @@
           }, []);
         }
 
-        var mainEntity = searchMeta.getEntity(ctrl.entity),
+        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
           result = [{
             text: mainEntity.title_plural,
             icon: mainEntity.icon,
-            children: formatFields(ctrl.entity, '')
+            children: formatFields(ctrl.savedSearch.api_entity, '')
           }];
-        _.each(ctrl.params.join, function(join) {
+        _.each(ctrl.savedSearch.api_params.join, function(join) {
           var joinName = join[0].split(' AS '),
             joinEntity = searchMeta.getEntity(joinName[0]);
           result.push({
@@ -450,7 +479,7 @@
        * Sets an optionsLoaded property on each entity to avoid duplicate requests
        */
       function loadFieldOptions() {
-        var mainEntity = searchMeta.getEntity(ctrl.entity),
+        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
           entities = {};
 
         function enqueue(entity) {
@@ -465,7 +494,7 @@
         if (typeof mainEntity.optionsLoaded === 'undefined') {
           enqueue(mainEntity);
         }
-        _.each(ctrl.params.join, function(join) {
+        _.each(ctrl.savedSearch.api_params.join, function(join) {
           var joinName = join[0].split(' AS '),
             joinEntity = searchMeta.getEntity(joinName[0]);
           if (typeof joinEntity.optionsLoaded === 'undefined') {
@@ -484,73 +513,6 @@
           });
         }
       }
-
-      this.$onInit = function() {
-        $scope.$bindToRoute({
-          expr: '$ctrl.params.select',
-          param: 'select',
-          format: 'json',
-          default: getDefaultSelect()
-        });
-        $scope.$watchCollection('$ctrl.params.select', onChangeSelect);
-
-        $scope.$bindToRoute({
-          expr: '$ctrl.params.orderBy',
-          param: 'orderBy',
-          format: 'json',
-          default: {}
-        });
-
-        $scope.$bindToRoute({
-          expr: '$ctrl.params.where',
-          param: 'where',
-          format: 'json',
-          default: [],
-          deep: true
-        });
-        $scope.$watch('$ctrl.params.where', onChangeFilters, true);
-
-        if (this.paramExists('groupBy')) {
-          $scope.$bindToRoute({
-            expr: '$ctrl.params.groupBy',
-            param: 'groupBy',
-            format: 'json',
-            default: []
-          });
-        }
-        $scope.$watchCollection('$ctrl.params.groupBy', onChangeFilters);
-
-        if (this.paramExists('join')) {
-          $scope.$bindToRoute({
-            expr: '$ctrl.params.join',
-            param: 'join',
-            format: 'json',
-            default: [],
-            deep: true
-          });
-        }
-        $scope.$watch('$ctrl.params.join', onChangeFilters, true);
-
-        if (this.paramExists('having')) {
-          $scope.$bindToRoute({
-            expr: '$ctrl.params.having',
-            param: 'having',
-            format: 'json',
-            default: [],
-            deep: true
-          });
-        }
-        $scope.$watch('$ctrl.params.having', onChangeFilters, true);
-
-        if (this.load) {
-          this.params = this.load.api_params;
-          $timeout(function() {
-            ctrl.load.saved = true;
-          });
-        }
-
-        loadFieldOptions();
-      };
 
     }
   });
