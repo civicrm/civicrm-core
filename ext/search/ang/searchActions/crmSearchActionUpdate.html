@@ -1,5 +1,6 @@
 <div id="bootstrap-theme">
   <div ng-controller="crmSearchActionUpdate">
+    <p><strong>{{:: ts('Update the %1 selected %2 with the following values:', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
     <div class="form-inline" ng-repeat="clause in $ctrl.values" >
       <input class="form-control" ng-change="$ctrl.updateField($index)" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: 'Field'}" />
       <input class="form-control" ng-model="clause[1]" crm-search-value="{field: clause[0]}" />
@@ -10,7 +11,7 @@
     <hr />
     <div class="buttons pull-right">
       <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger">{{:: ts('Cancel') }}</button>
-      <button ng-click="$ctrl.save()" class="btn btn-primary" ng-disabled="!$ctrl.values.length">{{:: ts('Update %1 %2', {1: model.ids.length, 2: (model.ids.length === 1 ? $ctrl.entity.title : $ctrl.entity.title_plural)}) }}</button>
+      <button ng-click="$ctrl.save()" class="btn btn-primary" ng-disabled="!$ctrl.values.length">{{:: ts('Update %1', {1: $ctrl.entityTitle}) }}</button>
     </div>
   </div>
 </div>

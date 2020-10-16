@@ -7,6 +7,7 @@
       ctrl = $scope.$ctrl = this;
 
     this.entity = searchMeta.getEntity(model.entity);
+    this.entityTitle = model.ids.length === 1 ? this.entity.title : this.entity.titlePlural;
 
     this.cancel = function() {
       dialogService.cancel('crmSearchAction');
