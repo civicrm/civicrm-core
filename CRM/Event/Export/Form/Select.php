@@ -36,4 +36,22 @@ class CRM_Event_Export_Form_Select extends CRM_Export_Form_Select {
     return FALSE;
   }
 
+  /**
+   * Get the name of the table for the relevant entity.
+   *
+   * @return string
+   */
+  public function getTableName() {
+    return 'civicrm_participant';
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getEntityAliasField() {
+    return 'participant_id';
+  }
+
 }

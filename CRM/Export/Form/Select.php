@@ -95,19 +95,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       throw new CRM_Core_Exception('Unreachable code');
     }
     $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
-    $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
 
-    if (isset($formTaskClassName::$entityShortname)) {
-      $this::$entityShortname = $formTaskClassName::$entityShortname;
-      if (isset($formTaskClassName::$tableName)) {
-        $this::$tableName = $formTaskClassName::$tableName;
-      }
-    }
-    else {
-      $this::$entityShortname = $entityShortname;
-      $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDAOName()));
-    }
-
+    $this::$entityShortname = strtolower($entityShortname);
     $values = $this->getSearchFormValues();
 
     $count = 0;
@@ -159,7 +148,14 @@ FROM   {$this->_componentTable}
     $this->set('selectAll', $this->_selectAll);
     $this->set('exportMode', $this->_exportMode);
     $this->set('componentClause', $this->_componentClause);
-    $this->set('componentTable', $this->_componentTable);
+    $this->set('componentTable', $this->getTableName());
+  }
+
+  /**
+   * Get the name of the table for the relevant entity.
+   */
+  public function getTableName() {
+    throw new CRM_Core_Exception('should be over-riden');
   }
 
   /**
