@@ -54,7 +54,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
           'label' => ts('Pay Now'),
           'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
             'reset' => 1,
-            'id' => Civi::settings()->get('default_invoice_page'),
+            'id' => Civi::settings()->get('default_invoice_page'), // Should this be the contribution page of the original transaction?
             'ccid' => $row['contribution_id'],
             'cs' => $this->getUserChecksum(),
             'cid' => $row['contact_id'],
@@ -124,11 +124,17 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     }
     if (is_array($recurIDs) && !empty($recurIDs)) {
       $getCount = CRM_Contribute_BAO_ContributionRecur::getCount($recurIDs);
+      $isLinked = CRM_Core_Permission::check('access CiviContribute');
       foreach ($getCount as $key => $val) {
         $recurRow[$key]['completed'] = $val;
-        $recurRow[$key]['link'] = CRM_Utils_System::url('civicrm/contribute/search',
-          "reset=1&force=1&recur=$key"
-        );
+        if ($isLinked) {
+          $recurRow[$key]['link'] = CRM_Utils_System::url('civicrm/contribute/search',
+            "reset=1&force=1&recur=$key"
+          );
+        }
+        else {
+          $recurRow[$key]['link'] = '';
+        }
       }
     }
 
