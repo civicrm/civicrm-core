@@ -104,8 +104,11 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00']);
+    $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
+    $mut->checkMailLog(['https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find'], ['civicrm/contribute/unsubscribe', 'civicrm/contribute/updatebilling']);
+    $mut->stop();
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
     $this->assertEquals(1, $contribution1['contribution_status_id']);
     $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);

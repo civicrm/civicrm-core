@@ -644,16 +644,23 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * @return null|string
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * Get url for users to manage this recurring contribution for this processor.
+   *
+   * @param int $entityID
+   * @param null $entity
+   * @param string $action
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
    */
-  public function cancelSubscriptionURL() {
+  public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
+      if ($action !== 'cancel') {
+        return NULL;
+      }
       return "{$this->_paymentProcessor['url_site']}cgi-bin/webscr?cmd=_subscr-find&alias=" . urlencode($this->_paymentProcessor['user_name']);
     }
-    else {
-      return NULL;
-    }
+    return parent::subscriptionURL($entityID, $entity, $action);
   }
 
   /**
