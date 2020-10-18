@@ -30,12 +30,7 @@
             autoOpen: false,
             title: ts('Save smart group')
           });
-          dialogService.open('saveSearchDialog', '~/searchActions/saveSmartGroup.html', model, options)
-            .then(function () {
-              if (ctrl.load) {
-                ctrl.load.saved = true;
-              }
-            });
+          dialogService.open('saveSearchDialog', '~/searchActions/saveSmartGroup.html', model, options);
         };
       }
     };

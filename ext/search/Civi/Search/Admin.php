@@ -24,6 +24,11 @@ class Admin {
     return [
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
+      'displayTypes' => \Civi\Api4\SearchDisplay::getFields(FALSE)
+        ->setLoadOptions(['name', 'label', 'description', 'icon'])
+        ->addWhere('name', '=', 'type')
+        ->execute()
+        ->first()['options'],
     ];
   }
 

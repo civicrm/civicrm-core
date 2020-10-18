@@ -15,6 +15,7 @@
       this.selectedRows = [];
       this.limit = CRM.cache.get('searchPageSize', 30);
       this.page = 1;
+      this.displayTypes = _.indexBy(CRM.searchAdmin.displayTypes, 'name');
       // After a search this.results is an object of result arrays keyed by page,
       // Initially this.results is an empty string because 1: it's falsey (unlike an empty object) and 2: it doesn't throw an error if you try to access undefined properties (unlike null)
       this.results = '';
@@ -23,7 +24,7 @@
       // Have the filters (WHERE, HAVING, GROUP BY, JOIN) changed?
       this.stale = true;
 
-      $scope.controls = {};
+      $scope.controls = {tab: 'compose'};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
       $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'title_plural', ['description', 'icon']);
       this.perm = {
@@ -32,6 +33,8 @@
 
       this.$onInit = function() {
         this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
+
+        this.savedSearch.displays = this.savedSearch.displays || [];
 
         if (!this.savedSearch.api_params) {
           this.savedSearch.api_params = {
@@ -65,6 +68,13 @@
 
       this.paramExists = function(param) {
         return _.includes(searchMeta.getEntity(ctrl.savedSearch.api_entity).params, param);
+      };
+
+      this.addDisplay = function(type) {
+        $scope.controls.tab = 'display_' + ctrl.savedSearch.displays.length;
+        ctrl.savedSearch.displays.push({
+          type: type
+        });
       };
 
       $scope.getJoinEntities = function() {
@@ -308,7 +318,7 @@
           }
         }
         if (ctrl.load) {
-          ctrl.load.saved = false;
+          ctrl.saved = false;
         }
       }
 
@@ -316,7 +326,7 @@
         ctrl.stale = true;
         ctrl.selectedRows.length = 0;
         if (ctrl.load) {
-          ctrl.load.saved = false;
+          ctrl.saved = false;
         }
         if (ctrl.autoSearch) {
           ctrl.refreshAll();

@@ -11,10 +11,28 @@
   </div>
 
   <form>
-    <div ng-include="'~/searchAdmin/crmSearch/criteria.html'"></div>
-    <div ng-include="'~/searchAdmin/crmSearch/controls.html'"></div>
-    <div ng-include="'~/searchAdmin/crmSearch/debug.html'" ng-if="$ctrl.debug"></div>
-    <div ng-include="'~/searchAdmin/crmSearch/results.html'" class="crm-search-results"></div>
-    <div ng-include="'~/searchAdmin/crmSearch/pager.html'"></div>
+    <div class="navbar-form clearfix">
+      <div class="form-group pull-right">
+        <button class="btn btn-default" ng-disabled="$ctrl.saved" ng-click="$ctrl.save()">
+          {{ $ctrl.saved ? ts('Saved') : ts('Save') }}
+        </button>
+      </div>
+    </div>
+    <div class="crm-flex-box">
+      <ul class="nav nav-pills nav-stacked" ng-include="'~/searchAdmin/tabs.html'"></ul>
+      <div class="crm-flex-4" ng-switch="controls.tab">
+        <div ng-switch-when="compose">
+          <div ng-include="'~/searchAdmin/compose/criteria.html'"></div>
+          <div ng-include="'~/searchAdmin/compose/controls.html'"></div>
+          <div ng-include="'~/searchAdmin/compose/debug.html'" ng-if="$ctrl.debug"></div>
+          <div ng-include="'~/searchAdmin/compose/results.html'" class="crm-search-results"></div>
+          <div ng-include="'~/searchAdmin/compose/pager.html'"></div>
+        </div>
+        <div ng-switch-when="group">
+        </div>
+        <div ng-switch-default>
+        </div>
+      </div>
+    </div>
   </form>
 </div>
