@@ -1,11 +1,11 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').component('crmSearch', {
+  angular.module('searchAdmin').component('crmSearchAdmin', {
     bindings: {
       savedSearch: '<'
     },
-    templateUrl: '~/searchAdmin/crmSearch.html',
+    templateUrl: '~/searchAdmin/crmSearchAdmin.html',
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;

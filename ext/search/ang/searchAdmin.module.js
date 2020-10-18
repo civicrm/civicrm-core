@@ -26,11 +26,11 @@
       });
       $routeProvider.when('/create/:entity', {
         controller: 'searchCreate',
-        template: '<crm-search saved-search="$ctrl.savedSearch"></crm-search>',
+        template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
       });
       $routeProvider.when('/edit/:id', {
         controller: 'searchEdit',
-        template: '<crm-search saved-search="$ctrl.savedSearch"></crm-search>',
+        template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
         resolve: {
           // Load saved search
           savedSearch: function($route, crmApi4) {
