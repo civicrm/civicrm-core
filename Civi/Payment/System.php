@@ -104,16 +104,19 @@ class System {
    *
    * @param int $id
    *
-   * @return \CRM_Core_Payment|NULL
+   * @return \CRM_Core_Payment
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
    */
   public function getById($id) {
-    if ($id == 0) {
+    if (isset($this->cache[$id])) {
+      return $this->cache[$id];
+    }
+    if ((int) $id === 0) {
       return new \CRM_Core_Payment_Manual();
     }
     $processor = civicrm_api3('payment_processor', 'getsingle', ['id' => $id, 'is_test' => NULL]);
-    return self::getByProcessor($processor);
+    return $this->getByProcessor($processor);
   }
 
   /**

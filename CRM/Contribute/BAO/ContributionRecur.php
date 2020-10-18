@@ -163,6 +163,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   (since it still makes sense to update / cancel
    */
   public static function getPaymentProcessorObject($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use Civi\Payment\System');
     $processor = self::getPaymentProcessor($id);
     return is_array($processor) ? $processor['object'] : NULL;
   }
