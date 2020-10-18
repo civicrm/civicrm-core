@@ -48,13 +48,14 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
       // and allow extensions to assign new ones through the pageRun hook
+	  // ALSO: Should 'id' be set to the contribution page of the original transaction?
       if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id'])) {
         $row['buttons']['pay'] = [
           'class' => 'button',
           'label' => ts('Pay Now'),
           'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
             'reset' => 1,
-            'id' => Civi::settings()->get('default_invoice_page'), // Should this be the contribution page of the original transaction?
+            'id' => Civi::settings()->get('default_invoice_page'),
             'ccid' => $row['contribution_id'],
             'cs' => $this->getUserChecksum(),
             'cid' => $row['contact_id'],

@@ -105,7 +105,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     return FALSE;
   }
-  
+
   /**
    * Does this processor support cancelling recurring contributions through code.
    *
@@ -140,7 +140,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     return FALSE;
   }
-  
+
   /**
    * Does this processor support updating billing info for recurring contributions through code.
    *
@@ -155,7 +155,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
     return parent::supportsUpdateSubscriptionBillingInfo();
   }
-  
+
   /**
    * Does this processor support changing the amount for recurring contributions through code.
    *

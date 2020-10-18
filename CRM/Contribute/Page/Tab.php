@@ -101,7 +101,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         unset($links[CRM_Core_Action::DISABLE]);
         unset($links[CRM_Core_Action::UPDATE]);
       }
-      
+
       if (!CRM_Core_Permission::check('view my contact') && $context === 'dashboard') {
         unset($links[CRM_Core_Action::VIEW]);
       }
