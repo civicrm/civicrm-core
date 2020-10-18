@@ -3,9 +3,7 @@
 
   angular.module('searchActions').controller('SaveSmartGroup', function ($scope, $element, $timeout, crmApi4, dialogService, searchMeta) {
     var ts = $scope.ts = CRM.ts(),
-      model = $scope.model,
-      joins = _.pluck((model.api_params.join || []), 0),
-      entityCount = {};
+      model = $scope.model;
     $scope.groupEntityRefParams = {
       entity: 'Group',
       api: {
@@ -18,23 +16,7 @@
         placeholder: ts('Select existing group')
       }
     };
-    // Find all possible search columns that could serve as contact_id for the smart group
-    $scope.columns = _.transform([model.api_entity].concat(joins), function(columns, joinExpr) {
-      var joinName = joinExpr.split(' AS '),
-        entityName = joinName[0],
-        entity = searchMeta.getEntity(entityName),
-        prefix = joinName[1] ? joinName[1] + '.' : '';
-      _.each(entity.fields, function(field) {
-        if ((entityName === 'Contact' && field.name === 'id') || field.fk_entity === 'Contact') {
-          columns.push({
-            id: prefix + field.name,
-            text: entity.title_plural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
-            icon: entity.icon
-          });
-        }
-      });
-      entityCount[entityName] = 1 + (entityCount[entityName] || 1);
-    });
+    $scope.columns = searchMeta.getSmartGroupColumns(model.api_entity, model.api_params);
 
     if (!$scope.columns.length) {
       CRM.alert(ts('Cannot create smart group; search does not include any contacts.'), ts('Error'));

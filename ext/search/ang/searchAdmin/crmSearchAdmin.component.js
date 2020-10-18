@@ -26,6 +26,7 @@
 
       $scope.controls = {tab: 'compose'};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
+      $scope.groupOptions = CRM.searchActions.groupOptions;
       $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'title_plural', ['description', 'icon']);
       this.perm = {
         editGroups: CRM.checkPerm('edit groups')
@@ -35,6 +36,12 @@
         this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
 
         this.savedSearch.displays = this.savedSearch.displays || [];
+        this.groupExists = !!this.savedSearch.group;
+
+        this.original = _.indexBy(_.cloneDeep(this.savedSearch.displays), 'id');
+        if (this.savedSearch.group) {
+          this.original.group = _.cloneDeep(this.savedSearch.group);
+        }
 
         if (!this.savedSearch.api_params) {
           this.savedSearch.api_params = {
@@ -71,10 +78,51 @@
       };
 
       this.addDisplay = function(type) {
-        $scope.controls.tab = 'display_' + ctrl.savedSearch.displays.length;
         ctrl.savedSearch.displays.push({
           type: type
         });
+        $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
+      };
+
+      this.removeDisplay = function(index) {
+        var display = ctrl.savedSearch.displays[index];
+        if (display.id) {
+          display.trashed = !display.trashed;
+        } else {
+          $scope.selectTab('compose');
+          ctrl.savedSearch.displays.splice(index, 1);
+        }
+      };
+
+      this.addGroup = function() {
+        ctrl.savedSearch.group = {
+          title: '',
+          description: '',
+          visibility: 'User and User Admin Only',
+          group_type: []
+        };
+        ctrl.groupExists = true;
+        $scope.selectTab('group');
+      };
+
+      $scope.selectTab = function(tab) {
+        if (tab === 'group') {
+          $scope.smartGroupColumns = searchMeta.getSmartGroupColumns(ctrl.savedSearch.api_entity, ctrl.savedSearch.api_params);
+          var smartGroupColumns = _.map($scope.smartGroupColumns, 'id');
+          if (smartGroupColumns.length && !_.includes(smartGroupColumns, ctrl.savedSearch.api_params.select[0])) {
+            ctrl.savedSearch.api_params.select.unshift(smartGroupColumns[0]);
+          }
+        }
+        ctrl.savedSearch.api_params.select = _.uniq(ctrl.savedSearch.api_params.select);
+        $scope.controls.tab = tab;
+      };
+
+      this.removeGroup = function() {
+        ctrl.groupExists = !ctrl.groupExists;
+        if (!ctrl.groupExists && (!ctrl.savedSearch.group || !ctrl.savedSearch.group.id)) {
+          ctrl.savedSearch.group = null;
+        }
+        $scope.selectTab('compose');
       };
 
       $scope.getJoinEntities = function() {
@@ -444,9 +492,24 @@
         })};
       };
 
+      $scope.sortableColumnOptions = {
+        axis: 'x',
+        handle: '.crm-sortable',
+        update: function(e, ui) {
+          // Don't allow items to be moved to position 0 if locked
+          if (!ui.item.sortable.dropindex && ctrl.groupExists) {
+            ui.item.sortable.cancel();
+          }
+        }
+      };
+
+      // Sets the default select clause based on commonly-named fields
       function getDefaultSelect() {
-        return _.filter(['id', 'display_name', 'label', 'title', 'location_type_id:label'], function(field) {
-          return !!searchMeta.getField(field, ctrl.savedSearch.api_entity);
+        var whitelist = ['id', 'name', 'subject', 'display_name', 'label', 'title'];
+        return _.transform(searchMeta.getEntity(ctrl.savedSearch.api_entity).fields, function(select, field) {
+          if (_.includes(whitelist, field.name) || _.includes(field.name, '_type_id')) {
+            select.push(field.name + (field.options ? ':label' : ''));
+          }
         });
       }
 

@@ -1,28 +1,43 @@
 <li role="presentation" ng-class="{active: controls.tab === 'compose'}">
-  <a href ng-click="controls.tab = 'compose'">
+  <a href ng-click="selectTab('compose')">
     <i class="crm-i fa-gears"></i>
     {{ ts('Compose Search') }}
   </a>
 </li>
-<li role="presentation" ng-class="{active: controls.tab === 'group'}">
-  <a href ng-click="controls.tab = 'group'">
+<li role="presentation" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.group">
+  <a href ng-click="selectTab('group')" ng-class="{strikethrough: !$ctrl.groupExists}">
     <i class="crm-i fa-users"></i>
-    {{ ts('Smart Group: %1') }}
+    {{:: ts('Smart Group:') }} {{ $ctrl.savedSearch.group.title }}
   </a>
+  <button class="btn-xs crm-search-delete-display" ng-click="$ctrl.removeGroup()">
+    <i class="crm-i fa-trash"></i>
+  </button>
 </li>
 <li role="presentation" ng-repeat="display in $ctrl.savedSearch.displays" ng-class="{active: controls.tab === ('display_' + $index)}">
-  <a href ng-click="controls.tab = ('display_' + $index)">
+  <a href ng-click="selectTab('display_' + $index)">
     <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}"></i>
     {{ $ctrl.displayTypes[display.type].label }}
   </a>
+  <button class="btn-xs crm-search-delete-display" ng-click="$ctrl.removeDisplay($index)">
+    <i class="crm-i fa-trash"></i>
+  </button>
 </li>
 <li role="presentation">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    <i class="crm-i fa-plus"></i> {{ ts('Add Display') }} <span class="caret"></span>
+    <i class="crm-i fa-plus"></i> {{:: ts('Add...') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li ng-repeat="type in $ctrl.displayTypes" >
-      <a href ng-click="$ctrl.addDisplay(type.name)">{{ type.label }}</a>
+    <li ng-if="!$ctrl.savedSearch.group">
+      <a href ng-click="$ctrl.addGroup()">
+        <i class="crm-i fa-users"></i>
+        {{:: ts('Smart Group') }}
+      </a>
+    </li>
+    <li ng-repeat="type in ::$ctrl.displayTypes">
+      <a href ng-click="$ctrl.addDisplay(type.name)">
+        <i class="crm-i {{:: type.icon }}"></i>
+        {{:: type.label }}
+      </a>
     </li>
   </ul>
 </li>

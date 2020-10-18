@@ -13,17 +13,20 @@
 .crm-flex-box > .crm-flex-4 {
   flex: 4;
 }
+.crm-sortable {
+  cursor: move;
+}
+
 #bootstrap-theme #crm-search-results-page-size {
   width: 5em;
 }
 #bootstrap-theme .crm-search-results {
   min-height: 200px;
 }
-.crm-search-results thead th[ng-repeat] {
-  cursor: pointer;
-}
-.crm-search-results thead th[ng-repeat] > span {
-  cursor: move;
+
+#bootstrap-theme.crm-search ul.nav.nav-stacked {
+  margin-left: 0;
+  margin-right: 20px;
 }
 
 #bootstrap-theme.crm-search fieldset {
@@ -150,4 +153,10 @@
 
 #bootstrap-theme.crm-search th.crm-search-result-select {
   padding-right: 10px;
+}
+
+#bootstrap-theme .crm-search-delete-display {
+  position: absolute;
+  right: 0;
+  top: 0;
 }

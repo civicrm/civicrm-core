@@ -1,13 +1,16 @@
 <table>
   <thead>
-    <tr ng-model="$ctrl.savedSearch.api_params.select" ui-sortable="{axis: 'x'}">
+    <tr ng-model="$ctrl.savedSearch.api_params.select" ui-sortable="sortableColumnOptions">
       <th class="crm-search-result-select">
         <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="selectAllRows()" ng-disabled="!(loading === false && !loadingAllRows && $ctrl.results[$ctrl.page] && $ctrl.results[$ctrl.page][0].id)">
       </th>
       <th ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-click="setOrderBy(col, $event)" title="{{:: ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).')}}">
         <i class="crm-i {{ getOrderBy(col) }}"></i>
-        <span>{{ $ctrl.getFieldLabel(col) }}</span>
-        <a href class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="$ctrl.clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+        <span ng-class="{'crm-sortable': $index || !$ctrl.groupExists}">{{ $ctrl.getFieldLabel(col) }}</span>
+        <span ng-switch="$index || !$ctrl.groupExists ? 'sortable' : 'locked'">
+          <i ng-switch-when="locked" class="crm-i fa-lock" aria-hidden="true"></i>
+          <a href ng-switch-default class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="$ctrl.clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+        </span>
       </th>
       <th class="form-inline">
         <input class="form-control crm-action-menu fa-plus" ng-model="controls.select" crm-ui-select="::{data: fieldsForSelect, placeholder: ts('Add')}" ng-change="addParam('select')">

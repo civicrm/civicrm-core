@@ -118,6 +118,27 @@
             result.suffix = !split[1] ? '' : ':' + split[1];
           }
           return result;
+        },
+        // Find all possible search columns that could serve as contact_id for a smart group
+        getSmartGroupColumns: function(api_entity, api_params) {
+          var joins = _.pluck((api_params.join || []), 0),
+            entityCount = {};
+          return _.transform([api_entity].concat(joins), function(columns, joinExpr) {
+            var joinName = joinExpr.split(' AS '),
+              entityName = joinName[0],
+              entity = getEntity(entityName),
+              prefix = joinName[1] ? joinName[1] + '.' : '';
+            _.each(entity.fields, function(field) {
+              if ((entityName === 'Contact' && field.name === 'id') || field.fk_entity === 'Contact') {
+                columns.push({
+                  id: prefix + field.name,
+                  text: entity.titlePlural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
+                  icon: entity.icon
+                });
+              }
+            });
+            entityCount[entityName] = 1 + (entityCount[entityName] || 1);
+          });
         }
       };
     })

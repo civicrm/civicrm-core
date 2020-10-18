@@ -13,6 +13,6 @@ return [
     'ang/searchAdmin',
   ],
   'basePages' => [],
-  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'ui.sortable', 'ui.bootstrap', 'dialogService', 'api4', 'searchActions'],
+  'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'ui.sortable', 'ui.bootstrap', 'api4', 'searchActions'],
   'settingsFactory' => ['\Civi\Search\Admin', 'getAdminSettings'],
 ];

@@ -1,5 +1,6 @@
 <div id="bootstrap-theme" class="crm-search">
   <h1 crm-page-title>{{:: ts('Search for %1', {1: $ctrl.entityTitle}) }}</h1>
+  <div crm-ui-debug="$ctrl.savedSearch"></div>
 
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
   <div class="messages warning no-popup collapse">
@@ -29,6 +30,7 @@
           <div ng-include="'~/searchAdmin/compose/pager.html'"></div>
         </div>
         <div ng-switch-when="group">
+          <fieldset ng-include="'~/searchAdmin/group.html'"></fieldset>
         </div>
         <div ng-switch-default>
         </div>
