@@ -246,7 +246,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * and format for use with buildProfile. This is the SQL analog of
    * formatUFFields().
    *
-   * @param mix $id
+   * @param int $id
    *   The id of the UF group or ids of ufgroup.
    * @param bool|int $register are we interested in registration fields
    * @param int $action

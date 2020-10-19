@@ -171,12 +171,12 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
 
     $form = new CRM_Batch_Form_Entry();
-    $profileID = $this->callAPISuccessGetValue('UFGroup', ['return' => 'id', 'name' => 'membership_batch_entry']);
+    $profileID = (int) $this->callAPISuccessGetValue('UFGroup', ['return' => 'id', 'name' => 'membership_batch_entry']);
     $form->_fields = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::VIEW);
 
     $params = $this->getMembershipData();
     $this->assertTrue($form->testProcessMembership($params));
-    $result = $this->callAPISuccess('membership', 'get', []);
+    $result = $this->callAPISuccess('membership', 'get');
     $this->assertEquals(3, $result['count']);
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('first day of January 2013')), $result['values'][1]['start_date']);
@@ -190,7 +190,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('07/22/2013')), $result['values'][1]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $result['values'][2]['join_date']);
-    $this->assertEquals(date('Y-m-d', strtotime('now')), $result['values'][3]['join_date']);
+    $this->assertEquals(date('Y-m-d'), $result['values'][3]['join_date']);
     $result = $this->callAPISuccess('contribution', 'get', ['return' => ['total_amount', 'trxn_id']]);
     $this->assertEquals(3, $result['count']);
     foreach ($result['values'] as $key => $contribution) {
