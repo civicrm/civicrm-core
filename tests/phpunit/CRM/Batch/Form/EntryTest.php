@@ -177,7 +177,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $form->_fields = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::VIEW);
 
     $params = $this->getMembershipData();
-    $this->assertTrue($form->testProcessMembership($params));
+    $this->assertEquals(4500.0, $form->testProcessMembership($params));
     $result = $this->callAPISuccess('membership', 'get');
     $this->assertEquals(3, $result['count']);
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
@@ -268,7 +268,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $params['field'][2]['membership_end_date'] = "2017-03-31";
     $params['field'][2]['receive_date'] = "2016-04-01";
 
-    $this->assertTrue($form->testProcessMembership($params));
+    $this->assertEquals(3.0, $form->testProcessMembership($params));
     $result = $this->callAPISuccess('membership', 'get')['values'];
 
     // renewal dates should be from current if start_date and end_date is passed as NULL
