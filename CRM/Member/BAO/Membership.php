@@ -1311,7 +1311,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @throws \CiviCRM_API3_Exception
    */
   public static function createRelatedMemberships($params, $dao) {
-
+    unset($params['membership_id']);
     $membership = new CRM_Member_DAO_Membership();
     $membership->id = $dao->id;
 
@@ -1448,11 +1448,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         // CRM-20966: Do not create membership_payment record for inherited membership.
         unset($params['relate_contribution_id']);
 
-        $ids = [];
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
           if (!self::hasExistingInheritedMembership($params)) {
-            CRM_Member_BAO_Membership::create($params);
+            civicrm_api3('Membership', 'create', $params);
           }
         }
         else {
