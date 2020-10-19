@@ -849,45 +849,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);
         }
         else {
-          $dateTypes = [
-            'membership_join_date' => 'joinDate',
-            'membership_start_date' => 'startDate',
-            'membership_end_date' => 'endDate',
-          ];
-
-          $dates = [
-            'join_date',
-            'start_date',
-            'end_date',
-            'reminder_date',
-          ];
-          foreach ($dateTypes as $dateField => $dateVariable) {
-            $$dateVariable = CRM_Utils_Date::processDate($value[$dateField]);
-            $fDate[$dateField] = $value[$dateField] ?? NULL;
-          }
-
-          $calcDates = [];
-          $calcDates[$membershipTypeId] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeId,
-            $joinDate, $startDate, $endDate
+          $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeId,
+            $value['membership_join_date'] ?? NULL, $value['membership_start_date'] ?? NULL, $value['membership_end_date'] ?? NULL
           );
-
-          foreach ($calcDates as $memType => $calcDate) {
-            foreach ($dates as $d) {
-              //first give priority to form values then calDates.
-              $date = $value[$d] ?? NULL;
-              if (!$date) {
-                $date = $calcDate[$d] ?? NULL;
-              }
-
-              $value[$d] = CRM_Utils_Date::processDate($date);
-            }
-          }
+          $value['join_date'] = $value['membership_join_date'] ?? $calcDates['join_date'];
+          $value['start_date'] = $value['membership_start_date'] ?? $calcDates['start_date'];
+          $value['end_date'] = $value['membership_end_date'] ?? $calcDates['end_date'];
 
           unset($value['membership_start_date']);
           unset($value['membership_end_date']);
-          $ids = [];
-          // @todo stop passing empty $ids
-          $membership = CRM_Member_BAO_Membership::create($value, $ids);
+          $membership = CRM_Member_BAO_Membership::create($value);
         }
 
         //process premiums
