@@ -821,13 +821,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $this->_params = $params;
           $value['is_renew'] = TRUE;
           $isPayLater = $params['is_pay_later'] ?? NULL;
-          $campaignId = NULL;
-          if (isset($this->_values) && is_array($this->_values) && !empty($this->_values)) {
-            $campaignId = $this->_params['campaign_id'] ?? NULL;
-            if (!array_key_exists('campaign_id', $this->_params)) {
-              $campaignId = $this->_values['campaign_id'] ?? NULL;
-            }
-          }
 
           $formDates = [
             'end_date' => $value['membership_end_date'] ?? NULL,
@@ -838,7 +831,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['contact_id'], $value['membership_type_id'], FALSE,
             //$numTerms should be default to 1.
             NULL, NULL, $value['custom'], 1, NULL, FALSE,
-            NULL, $membershipSource, $isPayLater, $campaignId, $formDates
+            NULL, $membershipSource, $isPayLater, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
           );
 
           // make contribution entry
