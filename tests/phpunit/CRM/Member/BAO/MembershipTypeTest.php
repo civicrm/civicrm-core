@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+
 /**
  * Class CRM_Member_BAO_MembershipTypeTest
  * @group headless
@@ -281,7 +283,6 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    *
    */
   public function testGetRenewalDatesForMembershipType() {
-    $ids = [];
     $params = [
       'name' => 'General',
       'domain_id' => 1,
@@ -296,11 +297,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    $membershipTypeID = MembershipType::create()->setValues($params)->execute()->first()['id'];
 
     $params = [
       'contact_id' => $this->_indiviContactID,
-      'membership_type_id' => $membershipType->id,
+      'membership_type_id' => $membershipTypeID,
       'join_date' => '20060121000000',
       'start_date' => '20060121000000',
       'end_date' => '20070120000000',
@@ -309,15 +310,15 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'status_id' => $this->_membershipStatusID,
     ];
 
-    $membership = CRM_Member_BAO_Membership::create($params);
+    $membership = $this->callAPISuccess('Membership', 'create', $params);
 
-    $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id);
+    $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership['id']);
 
-    $this->assertEquals($membershipRenewDates['start_date'], '20060121', 'Verify membership renewal start date.');
-    $this->assertEquals($membershipRenewDates['end_date'], '20080120', 'Verify membership renewal end date.');
+    $this->assertEquals('20060121', $membershipRenewDates['start_date'], 'Verify membership renewal start date.');
+    $this->assertEquals('20080120', $membershipRenewDates['end_date'], 'Verify membership renewal end date.');
 
-    $this->membershipDelete($membership->id);
-    $this->membershipTypeDelete(['id' => $membershipType->id]);
+    $this->membershipDelete($membership['id']);
+    $this->membershipTypeDelete(['id' => $membershipTypeID]);
   }
 
   /**
