@@ -1341,7 +1341,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * CRM-18503 - Test membership join date is correctly set for fixed memberships.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testMembershipJoinDateFixed() {
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();
@@ -1354,20 +1354,20 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $this->_membershipTypeID2,
       'source' => 'test membership',
       'is_pay_later' => 0,
-      'status_id' => array_search('Pending', $memStatus),
+      'status_id' => 'Pending',
       'skipStatusCal' => 1,
       'is_for_organization' => 1,
     ];
-    $membership = CRM_Member_BAO_Membership::create($params);
+    $membership = $this->callAPISuccess('Membership', 'create', $params);
 
     // Update membership to 'Completed' and check the dates.
     $memParams = [
-      'id' => $membership->id,
+      'id' => $membership['id'],
       'contact_id' => $contactId,
       'is_test' => 0,
       'membership_type_id' => $this->_membershipTypeID2,
       'num_terms' => 1,
-      'status_id' => array_search('New', $memStatus),
+      'status_id' => 'New',
     ];
     $result = $this->callAPISuccess('Membership', 'create', $memParams);
 
@@ -1380,11 +1380,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       $rollOver = FALSE;
       $startDate = date('Y-m-d', strtotime(date('Y-03-01') . '- 1 year'));
     }
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_membershipTypeID2);
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($this->_membershipTypeID2);
     $fixedPeriodRollover = CRM_Member_BAO_MembershipType::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $startDate);
     $y = 1;
     if ($fixedPeriodRollover && $rollOver) {
-      $y += 1;
+      ++$y;
     }
 
     $expectedDates = [
