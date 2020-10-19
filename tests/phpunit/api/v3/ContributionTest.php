@@ -3715,6 +3715,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ], [
       'Event',
     ]);
+    $this->checkReceiptDetails($mut, $contributionPage['id'], $contribution['id']);
     $mut->stop();
   }
 
@@ -3741,6 +3742,42 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ], [
       'Event',
     ]);
+  }
+
+  /**
+   * Check receipt details in sent mail via API
+   *
+   * @param CiviMailUtils $mut
+   * @param int $pageID Page ID
+   * @param int $contributionID Contribution ID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function checkReceiptDetails($mut, $pageID, $contributionID) {
+    $pageReceipt = [
+      'receipt_from_name' => "Page FromName",
+      'receipt_from_email' => "page_from@email.com",
+      'cc_receipt' => "page_cc@email.com",
+      'receipt_text' => "Page Receipt Text",
+    ];
+    $customReceipt = [
+      'receipt_from_name' => "Custom FromName",
+      'receipt_from_email' => "custom_from@email.com",
+      'cc_receipt' => "custom_cc@email.com",
+      'receipt_text' => "Test Custom Receipt Text",
+    ];
+    $this->callAPISuccess('ContributionPage', 'create', array_merge([
+      'id' => $pageID,
+      'is_email_receipt' => 1,
+    ], $pageReceipt));
+
+    $this->callAPISuccess('contribution', 'sendconfirmation', array_merge([
+      'id' => $contributionID,
+      'payment_processor_id' => $this->paymentProcessorID,
+    ], $customReceipt));
+
+    //Verify if custom receipt details are present in email.
+    $mut->checkMailLog(array_values($customReceipt), array_values($pageReceipt));
   }
 
   /**
