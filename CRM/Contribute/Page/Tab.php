@@ -70,32 +70,26 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
     if ($recurID) {
       $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
-      if ($paymentProcessorObj) {
-        if ($paymentProcessorObj->supports('cancelRecurring')) {
-          unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
-          $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
-          $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
-        }
-
-        if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
-          $links[CRM_Core_Action::RENEW] = [
-            'name' => ts('Change Billing Details'),
-            'title' => ts('Change Billing Details'),
-            'url' => 'civicrm/contribute/updatebilling',
-            'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
-          ];
-        }
-
-        if (
-        (!CRM_Core_Permission::check('edit contributions') && $context === 'contribution') ||
-        (!$paymentProcessorObj->supports('ChangeSubscriptionAmount')
-          && !$paymentProcessorObj->supports('EditRecurringContribution')
-        )) {
-          unset($links[CRM_Core_Action::UPDATE]);
-        }
+      if ($paymentProcessorObj->supports('cancelRecurring')) {
+        unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
+        $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
+        $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
       }
-      else {
-        unset($links[CRM_Core_Action::DISABLE]);
+
+      if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
+        $links[CRM_Core_Action::RENEW] = [
+          'name' => ts('Change Billing Details'),
+          'title' => ts('Change Billing Details'),
+          'url' => 'civicrm/contribute/updatebilling',
+          'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
+        ];
+      }
+
+      if (
+      (!CRM_Core_Permission::check('edit contributions') && $context === 'contribution') ||
+      (!$paymentProcessorObj->supports('ChangeSubscriptionAmount')
+        && !$paymentProcessorObj->supports('EditRecurringContribution')
+      )) {
         unset($links[CRM_Core_Action::UPDATE]);
       }
     }
