@@ -69,7 +69,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     ];
 
     if ($recurID) {
-      $paymentProcessorObj = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorObject($recurID);
+      $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
       if ($paymentProcessorObj) {
         if ($paymentProcessorObj->supports('cancelRecurring')) {
           unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
