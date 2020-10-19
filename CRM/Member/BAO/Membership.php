@@ -250,11 +250,26 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // eg pay later membership, membership update cron CRM-3984
 
     if (empty($params['is_override']) && empty($params['skipStatusCal'])) {
-      // @todo - we should be able to count on dates being correctly formatted by they time they hit the BAO.
-      // Maybe do some tests & throw some deprecation warnings if they aren't?
-      $params['start_date'] = trim($params['start_date']) ? date('Ymd', strtotime(trim($params['start_date']))) : 'null';
-      $params['end_date'] = trim($params['end_date']) ? date('Ymd', strtotime(trim($params['end_date']))) : 'null';
-      $params['join_date'] = trim($params['join_date']) ? date('Ymd', strtotime(trim($params['join_date']))) : 'null';
+      $fieldsToLoad = [];
+      foreach (['start_date', 'end_date', 'join_date'] as $dateField) {
+        if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && strpos($params[$dateField], date('Ymd', strtotime(trim($params[$dateField])))) !== 0) {
+          $params[$dateField] = date('Ymd', strtotime(trim($params[$dateField])));
+          // @todo enable this once core is using the api.
+          // Civi::log()->warning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api', ['civi.tag' => 'deprecated']);
+        }
+        if (!empty($params['id']) && empty($params[$dateField])) {
+          $fieldsToLoad[] = $dateField;
+        }
+      }
+      if (!empty($fieldsToLoad)) {
+        $membership = civicrm_api3('Membership', 'getsingle', ['id' => $params['id'], 'return' => $fieldsToLoad]);
+        foreach ($fieldsToLoad as $fieldToLoad) {
+          $params[$fieldToLoad] = $membership[$fieldToLoad];
+        }
+      }
+      $params['start_date'] = $params['start_date'] ?: 'null';
+      $params['end_date'] = $params['end_date'] ?: 'null';
+      $params['join_date'] = $params['join_date'] ?: 'null';
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
       $excludeIsAdmin = $params['exclude_is_admin'] ?? FALSE;
