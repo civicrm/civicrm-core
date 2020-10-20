@@ -2026,7 +2026,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($form, $contactId,
         CRM_Contact_Form_Edit_TagsAndGroups::GROUP,
         TRUE, $required,
-        $title, NULL, $name
+        $title, NULL, $name, 'checkbox', TRUE
       );
     }
     elseif ($fieldName === 'tag') {

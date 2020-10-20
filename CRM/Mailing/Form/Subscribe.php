@@ -34,7 +34,7 @@ class CRM_Mailing_Form_Subscribe extends CRM_Core_Form {
 
       // make sure requested qroup is accessible and exists
       $query = "
-SELECT   title, description
+SELECT   title, frontend_title, description, frontend_description
   FROM   civicrm_group
  WHERE   id={$this->_groupID}
    AND   visibility != 'User and User Admin Only'
@@ -42,8 +42,8 @@ SELECT   title, description
 
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->fetch()) {
-        $this->assign('groupName', $dao->title);
-        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', [1 => $dao->title]));
+        $this->assign('groupName', !empty($dao->frontend_title) ? $dao->frontend_title : $dao->title);
+        CRM_Utils_System::setTitle(ts('Subscribe to Mailing List - %1', [1 => !empty($dao->frontend_title) ? $dao->frontend_title : $dao->title]));
       }
       else {
         CRM_Core_Error::statusBounce("The specified group is not configured for this action OR The group doesn't exist.");
@@ -77,7 +77,7 @@ SELECT   title, description
       $groupTypeCondition = CRM_Contact_BAO_Group::groupTypeCondition('Mailing');
 
       $query = "
-SELECT   id, title, description
+SELECT   id, title, frontend_title, description, frontend_description
   FROM   civicrm_group
  WHERE   ( saved_search_id = 0
     OR     saved_search_id IS NULL )
@@ -89,8 +89,8 @@ ORDER BY title";
       while ($dao->fetch()) {
         $row = [];
         $row['id'] = $dao->id;
-        $row['title'] = $dao->title;
-        $row['description'] = $dao->description;
+        $row['title'] = $dao->frontend_title ?? $dao->title;
+        $row['description'] = $dao->frontend_description ?? $dao->description;
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $row['id'];
         $this->addElement('checkbox',
           $row['checkbox'],

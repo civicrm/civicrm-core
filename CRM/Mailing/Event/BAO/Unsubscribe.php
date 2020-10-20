@@ -234,6 +234,8 @@ WHERE  email = %2
     $do = CRM_Core_DAO::executeQuery("
             SELECT      grp.id as group_id,
                         grp.title as title,
+                        grp.frontend_title as frontend_title,
+                        grp.frontend_description as frontend_description,
                         grp.description as description
             FROM        civicrm_group grp
             LEFT JOIN   civicrm_group_contact gc
@@ -250,15 +252,15 @@ WHERE  email = %2
       $returnGroups = [];
       while ($do->fetch()) {
         $returnGroups[$do->group_id] = [
-          'title' => $do->title,
-          'description' => $do->description,
+          'title' => !empty($do->frontend_title) ? $do->frontend_title : $do->title,
+          'description' => !empty($do->frontend_description) ? $do->frontend_description : $do->description,
         ];
       }
       return $returnGroups;
     }
     else {
       while ($do->fetch()) {
-        $groups[$do->group_id] = $do->title;
+        $groups[$do->group_id] = !empty($do->frontend_title) ? $do->frontend_title : $do->title;
       }
     }
     $transaction = new CRM_Core_Transaction();
