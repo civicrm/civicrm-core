@@ -270,7 +270,18 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
         }
         return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
 
+      default:
+        return parent::getText($context, $params);
     }
+  }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return TRUE;
   }
 
 }
