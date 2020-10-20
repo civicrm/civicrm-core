@@ -51,7 +51,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
 
     $templateVariable = CRM_Core_Smarty::singleton()->get_template_vars();
     $this->assertEquals('Mr. Anthony Anderson II', $templateVariable['displayName']);
-    $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . "&amp;cid=" . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"#\" class=\"action-item crm-hover-button crm-enable-disable\" title='Cancel' >Cancel</a></span>",
+    $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . "&amp;cid=" . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=" . $recurID . "&amp;cid=" . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Cancel' >Cancel</a></span>",
       $templateVariable['activeRecurRows'][1]['action']
     );
   }
