@@ -13,7 +13,7 @@
 .crm-flex-box > .crm-flex-4 {
   flex: 4;
 }
-.crm-sortable {
+.crm-draggable {
   cursor: move;
 }
 

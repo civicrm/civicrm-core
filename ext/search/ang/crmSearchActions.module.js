@@ -2,6 +2,6 @@
   "use strict";
 
   // Declare module
-  angular.module('searchActions', CRM.angRequires('searchActions'));
+  angular.module('crmSearchActions', CRM.angRequires('crmSearchActions'));
 
 })(angular, CRM.$, CRM._);

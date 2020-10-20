@@ -1,13 +1,13 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchActions').component('crmSearchActions', {
+  angular.module('crmSearchActions').component('crmSearchActions', {
     bindings: {
       entity: '<',
       refresh: '&',
       ids: '<'
     },
-    templateUrl: '~/searchActions/crmSearchActions.html',
+    templateUrl: '~/crmSearchActions/crmSearchActions.html',
     controller: function($scope, crmApi4, dialogService, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this,
@@ -28,9 +28,9 @@
           where: [['name', 'IN', ['update', 'delete']]],
         }, ['name']).then(function(allowed) {
           _.each(allowed, function(action) {
-            CRM.searchActions.tasks[action].entities.push(ctrl.entity);
+            CRM.crmSearchActions.tasks[action].entities.push(ctrl.entity);
           });
-          var actions = _.transform(_.cloneDeep(CRM.searchActions.tasks), function(actions, action) {
+          var actions = _.transform(_.cloneDeep(CRM.crmSearchActions.tasks), function(actions, action) {
             if (_.includes(action.entities, ctrl.entity)) {
               action.title = action.title.replace('%1', entityTitle);
               actions.push(action);

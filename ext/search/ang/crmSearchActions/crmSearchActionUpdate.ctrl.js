@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchActions').controller('crmSearchActionUpdate', function ($scope, $timeout, crmApi4, dialogService, searchMeta) {
+  angular.module('crmSearchActions').controller('crmSearchActionUpdate', function ($scope, $timeout, crmApi4, dialogService, searchMeta) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model,
       ctrl = $scope.$ctrl = this;

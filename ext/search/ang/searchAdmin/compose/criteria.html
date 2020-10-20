@@ -1,9 +1,5 @@
 <div class="crm-flex-box">
   <div>
-    <div class="form-inline">
-      <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>
-      <input id="crm-search-main-entity" class="form-control" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: entities}" />
-    </div>
     <div ng-if=":: $ctrl.paramExists('join')">
       <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join">
         <div class="form-inline">

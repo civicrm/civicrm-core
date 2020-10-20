@@ -26,7 +26,7 @@
 
       $scope.controls = {tab: 'compose'};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
-      $scope.groupOptions = CRM.searchActions.groupOptions;
+      $scope.groupOptions = CRM.crmSearchActions.groupOptions;
       $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'title_plural', ['description', 'icon']);
       this.perm = {
         editGroups: CRM.checkPerm('edit groups')
@@ -36,15 +36,12 @@
         this.entityTitle = searchMeta.getEntity(this.savedSearch.api_entity).title_plural;
 
         this.savedSearch.displays = this.savedSearch.displays || [];
-        this.groupExists = !!this.savedSearch.group;
-
-        this.original = _.indexBy(_.cloneDeep(this.savedSearch.displays), 'id');
-        if (this.savedSearch.group) {
-          this.original.group = _.cloneDeep(this.savedSearch.group);
-        }
+        this.savedSearch.groups = this.savedSearch.groups || [];
+        this.groupExists = !!this.savedSearch.groups.length;
 
         if (!this.savedSearch.api_params) {
           this.savedSearch.api_params = {
+            version: 4,
             select: getDefaultSelect(),
             orderBy: {},
             where: [],
@@ -70,7 +67,44 @@
           $scope.$watch('$ctrl.savedSearch.api_params.having', onChangeFilters, true);
         }
 
+        $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
+
+        // Is this savedSearch record saved, unsaved or saving
+        $scope.status = this.savedSearch && this.savedSearch.id ? 'saved' : 'unsaved';
+
         loadFieldOptions();
+      };
+
+      function onChangeAnything() {
+        $scope.status = 'unsaved';
+      }
+
+      this.save = function() {
+        $scope.status = 'saving';
+        var params = _.cloneDeep(ctrl.savedSearch),
+          apiCalls = {},
+          chain = {};
+        if (ctrl.groupExists) {
+          chain.groups = ['Group', 'save', {defaults: {saved_search_id: '$id'}, records: params.groups}];
+          delete params.groups;
+        } else if (params.id) {
+          apiCalls.deleteGroup = ['Group', 'delete', {where: [['saved_search_id', '=', params.id]]}];
+        }
+        if (params.displays && params.displays.length) {
+          chain.displays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
+        } else if (params.id) {
+          apiCalls.deleteDisplays = ['SearchDisplay', 'delete', {where: [['saved_search_id', '=', params.id]]}];
+        }
+        delete params.displays;
+        apiCalls.saved = ['SavedSearch', 'save', {records: [params], chain: chain}, 0];
+        crmApi4(apiCalls).then(function(results) {
+          ctrl.savedSearch.id = results.saved.id;
+          ctrl.savedSearch.groups = results.saved.groups || [];
+          ctrl.savedSearch.displays = results.saved.displays || [];
+          if ($scope.status === 'saving') {
+            $scope.status = 'saved';
+          }
+        });
       };
 
       this.paramExists = function(param) {
@@ -79,7 +113,9 @@
 
       this.addDisplay = function(type) {
         ctrl.savedSearch.displays.push({
-          type: type
+          type: type,
+          label: '',
+          settings: {}
         });
         $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
       };
@@ -95,12 +131,12 @@
       };
 
       this.addGroup = function() {
-        ctrl.savedSearch.group = {
+        ctrl.savedSearch.groups.push({
           title: '',
           description: '',
           visibility: 'User and User Admin Only',
           group_type: []
-        };
+        });
         ctrl.groupExists = true;
         $scope.selectTab('group');
       };
@@ -119,8 +155,8 @@
 
       this.removeGroup = function() {
         ctrl.groupExists = !ctrl.groupExists;
-        if (!ctrl.groupExists && (!ctrl.savedSearch.group || !ctrl.savedSearch.group.id)) {
-          ctrl.savedSearch.group = null;
+        if (!ctrl.groupExists && (!ctrl.savedSearch.groups.length || !ctrl.savedSearch.groups[0].id)) {
+          ctrl.savedSearch.groups.length = 0;
         }
         $scope.selectTab('compose');
       };
@@ -494,7 +530,7 @@
 
       $scope.sortableColumnOptions = {
         axis: 'x',
-        handle: '.crm-sortable',
+        handle: '.crm-draggable',
         update: function(e, ui) {
           // Don't allow items to be moved to position 0 if locked
           if (!ui.item.sortable.dropindex && ctrl.groupExists) {

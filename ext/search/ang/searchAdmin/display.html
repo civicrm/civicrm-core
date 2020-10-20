@@ -1,0 +1,9 @@
+<fieldset>
+  <div class="form-inline">
+    <label for="search_display_label">{{:: ts('Name:') }} <span class="crm-marker">*</span></label>
+    <input id="search_display_label" type="text" class="form-control" ng-model="display.label" required />
+    <label class="pull-right">{{:: $ctrl.displayTypes[display.type].label }}</label>
+  </div>
+</fieldset>
+<!-- Load template with the name of this display type, e.g. 'table.html' -->
+<div ng-if="display.type" ng-include="'~/searchAdmin/displays/' + display.type + '.html'"></div>

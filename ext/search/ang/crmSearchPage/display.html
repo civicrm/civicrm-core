@@ -1,0 +1,7 @@
+<h1 crm-page-title>{{:: $ctrl.display.label }}</h1>
+
+<div ng-switch="$ctrl.display.type" id="bootstrap-theme">
+  <div ng-switch-when="table">
+    <crm-search-display-table api-entity="$ctrl.display['saved_search.api_entity']" api-params="$ctrl.display['saved_search.api_params']" settings="$ctrl.display.settings"></crm-search-display-table>
+  </div>
+</div>

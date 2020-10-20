@@ -1,13 +1,14 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchActions').directive('saveSmartGroup', function() {
+  angular.module('crmSearchActions').directive('saveSmartGroup', function() {
     return {
       bindToController: {
         load: '<',
         entity: '<',
         params: '<'
       },
+      restrict: 'A',
       controller: function ($scope, $element, dialogService) {
         var ts = $scope.ts = CRM.ts(),
           ctrl = this;
@@ -30,7 +31,7 @@
             autoOpen: false,
             title: ts('Save smart group')
           });
-          dialogService.open('saveSearchDialog', '~/searchActions/saveSmartGroup.html', model, options);
+          dialogService.open('saveSearchDialog', '~/crmSearchActions/saveSmartGroup.html', model, options);
         };
       }
     };

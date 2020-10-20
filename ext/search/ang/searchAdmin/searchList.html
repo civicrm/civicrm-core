@@ -10,6 +10,7 @@
     <thead>
       <tr>
         <th>{{:: ts('ID') }}</th>
+        <th>{{:: ts('Label') }}</th>
         <th>{{:: ts('For') }}</th>
         <th>{{:: ts('Displays') }}</th>
         <th>{{:: ts('Smart Group') }}</th>
@@ -19,18 +20,19 @@
     <tbody>
       <tr ng-repeat="search in $ctrl.savedSearches">
         <td>{{ search.id }}</td>
+        <td>{{ search.label }}</td>
         <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
         <td>{{ search.displays }}</td>
         <td>{{ search.groups.join(', ') }}</td>
         <td>
-          <a href="#/load/SavedSearch/{{ search.id }}">{{:: ts('Edit') }}</a>
+          <a href="#/edit/{{ search.id }}">{{:: ts('Edit') }}</a>
+          <a href crm-confirm="{type: 'delete', obj: search}" on-yes="$ctrl.deleteSearch(search)">{{:: ts('Delete') }}</a>
         </td>
       </tr>
       <tr ng-if="$ctrl.savedSearches.length === 0">
         <td colspan="9">
           <p class="messages status no-popup text-center">
             {{:: ts('No saved searches.')}}
-            <a href="#/create/Contact/">{{:: ts('New Search') }}</a>
           </p>
         </td>
       </tr>

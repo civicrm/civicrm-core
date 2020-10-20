@@ -58,13 +58,13 @@ class Actions {
         'title' => ts('Update %1'),
         'icon' => 'fa-save',
         'entities' => [],
-        'uiDialog' => ['templateUrl' => '~/searchActions/crmSearchActionUpdate.html'],
+        'uiDialog' => ['templateUrl' => '~/crmSearchActions/crmSearchActionUpdate.html'],
       ],
       'delete' => [
         'title' => ts('Delete %1'),
         'icon' => 'fa-trash',
         'entities' => [],
-        'uiDialog' => ['templateUrl' => '~/searchActions/crmSearchActionDelete.html'],
+        'uiDialog' => ['templateUrl' => '~/crmSearchActions/crmSearchActionDelete.html'],
       ],
     ];
 

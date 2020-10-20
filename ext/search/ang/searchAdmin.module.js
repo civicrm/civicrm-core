@@ -16,7 +16,7 @@
           // Load data for lists
           savedSearches: function(crmApi4) {
             return crmApi4('SavedSearch', 'get', {
-              select: ['id', 'api_entity', 'form_values', 'COUNT(search_display.id) AS displays', 'GROUP_CONCAT(group.title) AS groups'],
+              select: ['id', 'label', 'api_entity', 'form_values', 'COUNT(search_display.id) AS displays', 'GROUP_CONCAT(group.title) AS groups'],
               join: [['SearchDisplay AS search_display'], ['Group AS group']],
               where: [['api_entity', 'IS NOT NULL']],
               groupBy: ['id']
@@ -38,7 +38,7 @@
             return crmApi4('SavedSearch', 'get', {
               where: [['id', '=', params.id]],
               chain: {
-                group: ['Group', 'get', {where: [['saved_search_id', '=', '$id']]}, 0],
+                groups: ['Group', 'get', {where: [['saved_search_id', '=', '$id']]}],
                 displays: ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']]}]
               }
             }, 0);

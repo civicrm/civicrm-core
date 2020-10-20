@@ -14,7 +14,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
       ->addValue('parent_id:name', 'Search')
       ->addValue('label', E::ts('Search Kit'))
       ->addValue('name', 'search_kit')
-      ->addValue('url', 'civicrm/search')
+      ->addValue('url', 'civicrm/admin/search')
       ->addValue('icon', 'crm-i fa-search-plus')
       ->addValue('has_separator', 2)
       ->addValue('weight', 99)

@@ -2,12 +2,12 @@
 // Autoloader data for search actions.
 return [
   'js' => [
-    'ang/searchActions.module.js',
-    'ang/searchActions/*.js',
-    'ang/searchActions/*/*.js',
+    'ang/crmSearchActions.module.js',
+    'ang/crmSearchActions/*.js',
+    'ang/crmSearchActions/*/*.js',
   ],
   'partials' => [
-    'ang/searchActions',
+    'ang/crmSearchActions',
   ],
   'basePages' => [],
   'requires' => ['crmUi', 'crmUtil', 'dialogService', 'api4'],
