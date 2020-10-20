@@ -56,6 +56,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyTwo extends CRM_Upgrade_Incremental_
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add column civicrm_saved_search.name', 'addColumn', 'civicrm_saved_search', 'name', "varchar(255)   DEFAULT NULL COMMENT 'Unique name of saved search'");
     $this->addTask('Add column civicrm_saved_search.label', 'addColumn', 'civicrm_saved_search', 'label', "varchar(255)   DEFAULT NULL COMMENT 'Administrative label for search'");
+    $this->addTask('Add index civicrm_saved_search.UI_name', 'addIndex', 'civicrm_saved_search', 'name', 'UI');
   }
 
 }
