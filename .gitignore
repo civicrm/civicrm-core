@@ -11,6 +11,7 @@
 /ext/greenwich/extern
 !/ext/search
 !/ext/financialacls
+!/ext/contributioncancelactions
 backdrop/
 bower_components
 CRM/Case/xml/configuration
