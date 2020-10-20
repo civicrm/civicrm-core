@@ -335,18 +335,28 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Create a smart group from normalised values.
+   * Create or update SavedSearch record.
    *
    * @param array $params
    *
    * @return \CRM_Contact_DAO_SavedSearch
    */
   public static function create(&$params) {
-    $savedSearch = new CRM_Contact_DAO_SavedSearch();
-    $savedSearch->copyValues($params);
-    $savedSearch->save();
+    // Auto-create unique name from label if supplied
+    if (empty($params['id']) && empty($params['name']) && !empty($params['label'])) {
+      $name = CRM_Utils_String::munge($params['label']);
+      $existing = Civi\Api4\SavedSearch::get(FALSE)
+        ->addWhere('name', 'LIKE', $name . '%')
+        ->addSelect('name')
+        ->execute()->column('name');
+      $suffix = '';
+      while (in_array($name . $suffix, $existing)) {
+        $suffix = '_' . (1 + str_replace('_', '', $suffix));
+      }
+      $params['name'] = $name . $suffix;
+    }
 
-    return $savedSearch;
+    return self::writeRecord($params);
   }
 
   /**
