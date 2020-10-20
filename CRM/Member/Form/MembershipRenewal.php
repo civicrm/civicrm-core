@@ -682,8 +682,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $membership->membership_type_id
     ));
     $this->assign('customValues', $customValues);
-    $this->assign('mem_start_date', CRM_Utils_Date::customFormat($membership->start_date));
-    $this->assign('mem_end_date', CRM_Utils_Date::customFormat($membership->end_date));
+    $this->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
+    $this->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
     if ($this->_mode) {
       $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
         $this->_params,

@@ -423,6 +423,19 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Format the field according to the site's preferred date format.
+   *
+   * This is likely to look something like December 31st, 2020.
+   *
+   * @param string $date
+   *
+   * @return string
+   */
+  public static function formatDateOnlyLong(string $date):string {
+    return CRM_Utils_Date::customFormat($date, Civi::settings()->get('dateformatFull'));
+  }
+
+  /**
    * Wrapper for customFormat that takes a timestamp
    *
    * @param int $timestamp

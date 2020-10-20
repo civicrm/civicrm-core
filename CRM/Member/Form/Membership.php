@@ -994,9 +994,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $form->assign('formValues', $formValues);
 
     if (empty($lineItem)) {
-      $form->assign('mem_start_date', CRM_Utils_Date::customFormat($membership->start_date, '%B %E%f, %Y'));
+      $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
       if (!CRM_Utils_System::isNull($membership->end_date)) {
-        $form->assign('mem_end_date', CRM_Utils_Date::customFormat($membership->end_date, '%B %E%f, %Y'));
+        $form->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
       }
       $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
     }
@@ -1610,8 +1610,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $totalTaxAmount = 0;
       foreach ($lineItem[$this->_priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
-          $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'], '%B %E%f, %Y') : '-';
-          $priceFieldOp['end_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'] ? CRM_Utils_Date::customFormat($membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'], '%B %E%f, %Y') : '-';
+          $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::formatDateOnlyLong($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date']) : '-';
+          $priceFieldOp['end_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date'] ? CRM_Utils_Date::formatDateOnlyLong($membershipTypeValues[$priceFieldOp['membership_type_id']]['end_date']) : '-';
         }
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
@@ -1845,7 +1845,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
 
       if ($memEndDate && $memEndDate !== 'null') {
-        $memEndDate = CRM_Utils_Date::customFormat($memEndDate);
+        $memEndDate = CRM_Utils_Date::formatDateOnlyLong($memEndDate);
         $statusMsg[$memType] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
       }
     }
