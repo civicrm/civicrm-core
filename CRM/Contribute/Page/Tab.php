@@ -71,7 +71,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
     if ($paymentProcessorObj->supports('cancelRecurring')) {
       unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
-      $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
+      $links[CRM_Core_Action::DISABLE]['url'] = $paymentProcessorObj->subscriptionURL(NULL, NULL, 'cancel');
       $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
     }
 
@@ -79,7 +79,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $links[CRM_Core_Action::RENEW] = [
         'name' => ts('Change Billing Details'),
         'title' => ts('Change Billing Details'),
-        'url' => 'civicrm/contribute/updatebilling',
+        'url' => $paymentProcessorObj->subscriptionURL(NULL, NULL, 'billing'),
         'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
       ];
     }
