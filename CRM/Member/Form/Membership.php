@@ -1599,7 +1599,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $createdMemberships,
         $isRecur, $calcDates));
     }
 
@@ -1817,35 +1817,34 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * Get status message for create action.
    *
    * @param string $endDate
-   * @param array $membershipTypes
    * @param array $createdMemberships
    * @param bool $isRecur
    * @param array $calcDates
    *
    * @return array|string
    */
-  protected function getStatusMessageForCreate($endDate, $membershipTypes, $createdMemberships,
+  protected function getStatusMessageForCreate($endDate, $createdMemberships,
                                                $isRecur, $calcDates) {
     // FIX ME: fix status messages
 
     $statusMsg = [];
-    foreach ($membershipTypes as $memType => $membershipType) {
-      $statusMsg[$memType] = ts('%1 membership for %2 has been added.', [
-        1 => $membershipType,
+    foreach ($this->_memTypeSelected as $membershipTypeID) {
+      $statusMsg[$membershipTypeID] = ts('%1 membership for %2 has been added.', [
+        1 => $this->allMembershipTypeDetails[$membershipTypeID]['name'],
         2 => $this->_memberDisplayName,
       ]);
 
-      $membership = $createdMemberships[$memType];
+      $membership = $createdMemberships[$membershipTypeID];
       $memEndDate = $membership->end_date ?: $endDate;
 
       //get the end date from calculated dates.
       if (!$memEndDate && !$isRecur) {
-        $memEndDate = $calcDates[$memType]['end_date'] ?? NULL;
+        $memEndDate = $calcDates[$membershipTypeID]['end_date'] ?? NULL;
       }
 
       if ($memEndDate && $memEndDate !== 'null') {
         $memEndDate = CRM_Utils_Date::formatDateOnlyLong($memEndDate);
-        $statusMsg[$memType] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
+        $statusMsg[$membershipTypeID] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);
