@@ -93,7 +93,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         $attributes['skiplabel'] = TRUE;
         $elements = [];
         $groupsOptions = [];
-        foreach ($groups as $group) {
+        foreach ($groups as $key => $group) {
           $id = $group['id'];
           // make sure that this group has public visibility
           if ($visibility &&
@@ -103,7 +103,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           }
 
           if ($groupElementType == 'select') {
-            $groupsOptions[$id] = $group;
+            $groupsOptions[$key] = $group;
           }
           else {
             $form->_tagGroup[$fName][$id]['description'] = $group['description'];
