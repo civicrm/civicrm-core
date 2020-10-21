@@ -186,13 +186,6 @@ class CRM_Core_Payment_BaseIPN {
       CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
 
-    //add new soft credit against current contribution id and
-    //copy initial contribution custom fields for recurring contributions
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
-    }
-
     if (!empty($memberships)) {
       foreach ($memberships as $membership) {
         // @fixme Should we cancel only Pending memberships? per cancelled()
@@ -262,13 +255,6 @@ class CRM_Core_Payment_BaseIPN {
     // Add line items for recurring payments.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
       CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
-    }
-
-    //add new soft credit against current $contribution and
-    //copy initial contribution custom fields for recurring contributions
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
-      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
-      CRM_Contribute_BAO_ContributionRecur::copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
     if (!empty($memberships)) {
