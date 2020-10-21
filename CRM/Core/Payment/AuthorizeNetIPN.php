@@ -52,28 +52,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       // load post ids in $ids
       $this->getIDs($ids, $input);
-
-      // Attempt to get payment processor ID from URL
-      if (!empty($this->_inputParameters['processor_id'])) {
-        $paymentProcessorID = $this->_inputParameters['processor_id'];
-      }
-      else {
-        // This is an unreliable method as there could be more than one instance.
-        // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
-        // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
-        // entirely). The only thing the IPN class should really do is extract data from the request, validate it
-        // & call completetransaction or call fail? (which may not exist yet).
-        Civi::log()->warning('Unreliable method used to get payment_processor_id for AuthNet IPN - this will cause problems if you have more than one instance');
-        $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-          'AuthNet', 'id', 'name'
-        );
-        $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', [
-          'is_test' => 0,
-          'options' => ['limit' => 1],
-          'payment_processor_type_id' => $paymentProcessorTypeID,
-          'return' => 'id',
-        ]);
-      }
+      $paymentProcessorID = $this->getPaymentProcessorID();
 
       // Check if the contribution exists
       // make sure contribution exists and is valid
@@ -369,6 +348,36 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       CRM_Core_Error::debug_log_message($message);
     }
     return $contRecur;
+  }
+
+  /**
+   * Get the payment processor id.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getPaymentProcessorID(): int {
+    // Attempt to get payment processor ID from URL
+    if (!empty($this->_inputParameters['processor_id'])) {
+      return (int) $this->_inputParameters['processor_id'];
+    }
+    // This is an unreliable method as there could be more than one instance.
+    // Recommended approach is to use the civicrm/payment/ipn/xx url where xx is the payment
+    // processor id & the handleNotification function (which should call the completetransaction api & by-pass this
+    // entirely). The only thing the IPN class should really do is extract data from the request, validate it
+    // & call completetransaction or call fail? (which may not exist yet).
+    Civi::log()->warning('Unreliable method used to get payment_processor_id for AuthNet IPN - this will cause problems if you have more than one instance');
+    $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
+      'AuthNet', 'id', 'name'
+    );
+    return (int) civicrm_api3('PaymentProcessor', 'getvalue', [
+      'is_test' => 0,
+      'options' => ['limit' => 1],
+      'payment_processor_type_id' => $paymentProcessorTypeID,
+      'return' => 'id',
+    ]);
   }
 
 }
