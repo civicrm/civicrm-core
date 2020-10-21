@@ -880,7 +880,6 @@ WHERE  id = %1";
       $feeBlock = &$form->_priceSet['fields'];
     }
 
-    self::applyACLFinancialTypeStatusToFeeBlock($feeBlock);
     // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
@@ -893,9 +892,12 @@ WHERE  id = %1";
    * @param array $feeBlock
    *   Fee block: array of price fields.
    *
+   * @deprecated not used in civi universe as at Oct 2020.
+   *
    * @return void
    */
   public static function applyACLFinancialTypeStatusToFeeBlock(&$feeBlock) {
+    CRM_Core_Error::deprecatedFunctionWarning('enacted in financialtypeacl extension');
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
       foreach ($feeBlock as $key => $value) {
         foreach ($value['options'] as $k => $options) {

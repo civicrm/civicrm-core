@@ -190,6 +190,30 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
 
 }
 
+/**
+ * Remove un.
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildAmount
+ *
+ * @param string $component
+ * @param \CRM_Core_Form $form
+ * @param array $feeBlock
+ */
+function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
+  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+    foreach ($feeBlock as $key => $value) {
+      foreach ($value['options'] as $k => $options) {
+        if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+          unset($feeBlock[$key]['options'][$k]);
+        }
+      }
+      if (empty($feeBlock[$key]['options'])) {
+        unset($feeBlock[$key]);
+      }
+    }
+  }
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
