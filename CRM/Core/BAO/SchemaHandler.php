@@ -432,6 +432,8 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
           }
         }
 
+        $indexType = $createIndexPrefix === 'UI' ? 'UNIQUE' : '';
+
         // the index doesn't exist, so create it
         // if we're multilingual and the field is internationalised, do it for every locale
         // @todo remove is_array check & add multilingual support for combined indexes and add a test.
@@ -439,11 +441,11 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         // entity_id + entity_table which are not multilingual.
         if (!is_array($field) && !CRM_Utils_System::isNull($locales) and isset($columns[$table][$fieldName])) {
           foreach ($locales as $locale) {
-            $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
+            $queries[] = "CREATE $indexType INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
           }
         }
         else {
-          $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
+          $queries[] = "CREATE $indexType INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
         }
       }
     }
