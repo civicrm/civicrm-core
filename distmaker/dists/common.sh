@@ -126,6 +126,7 @@ function dm_core_exts() {
   echo ext/financialacls
   echo ext/afform
   echo ext/greenwich
+  echo ext/contributioncancelactions
 }
 
 ## Copy all packages
