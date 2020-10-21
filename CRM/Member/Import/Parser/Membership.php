@@ -327,7 +327,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
       $formatValues = [];
       foreach ($params as $key => $field) {
-        if ($field == NULL || $field === '') {
+        // ignore empty values or empty arrays etc
+        if (CRM_Utils_System::isNull($field)) {
           continue;
         }
 
@@ -621,10 +622,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
 
     foreach ($params as $key => $value) {
-      // ignore empty values or empty arrays etc
-      if (CRM_Utils_System::isNull($value)) {
-        continue;
-      }
 
       //Handling Custom Data
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
