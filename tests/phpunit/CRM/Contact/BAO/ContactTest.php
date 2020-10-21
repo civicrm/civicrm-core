@@ -11,6 +11,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
+    echo CRM_Core_BAO_SchemaHandler::getInUseCollation();
   }
 
   /**

@@ -141,6 +141,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * @dataProvider getRelationshipTypeDuplicates
    */
   public function testRemoveRelationshipTypeDuplicates($relationshipTypeList, $suffix = NULL, $expected, $description) {
+    echo CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $result = CRM_Contact_BAO_Relationship::removeRelationshipTypeDuplicates($relationshipTypeList, $suffix);
     $this->assertEquals($expected, $result, "Failure on set '$description'");
   }

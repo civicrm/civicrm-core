@@ -309,6 +309,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   public static function setUpBeforeClass() {
     static::_populateDB(TRUE);
+    CRM_Core_BAO_SchemaHandler::migrateUtf8mb4();
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
