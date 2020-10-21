@@ -2665,6 +2665,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $contribution->id = $createContribution['id'];
       $contribution->copyCustomFields($templateContribution['id'], $contribution->id);
       self::handleMembershipIDOverride($contribution->id, $input);
+      // Add new soft credit against current $contribution.
+      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($contributionParams['contribution_recur_id'], $createContribution['id']);
       return $createContribution;
     }
   }
@@ -4451,11 +4453,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if (!$contributionResult) {
       $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
-    }
-
-    // Add new soft credit against current $contribution.
-    if ($recurringContributionID) {
-      CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($recurringContributionID, $contributionID);
     }
 
     $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
