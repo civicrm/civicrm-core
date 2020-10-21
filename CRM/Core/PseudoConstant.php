@@ -182,10 +182,7 @@ class CRM_Core_PseudoConstant {
   public static function get($daoName, $fieldName, $params = [], $context = NULL) {
     CRM_Core_DAO::buildOptionsContext($context);
     $flip = !empty($params['flip']);
-    // Historically this was 'false' but according to the notes in
-    // CRM_Core_DAO::buildOptionsContext it should be context dependent.
-    // timidly changing for 'search' only to fix world_region in search options.
-    $localizeDefault = in_array($context, ['search']);
+    $localizeDefault = FALSE;
     // Merge params with defaults
     $params += [
       'grouping' => FALSE,
