@@ -188,10 +188,14 @@ class AssetBuilder {
       if (!file_exists($this->getCachePath())) {
         mkdir($this->getCachePath());
       }
-
-      $rendered = $this->render($name, $params);
-      file_put_contents($this->getCachePath($fileName), $rendered['content']);
-      return $fileName;
+      try {
+        $rendered = $this->render($name, $params);
+        file_put_contents($this->getCachePath($fileName), $rendered['content']);
+        return $fileName;
+      }
+      catch (UnknownAssetException $e) {
+        // ignore possibly missing asset
+      }
     }
     return $fileName;
   }
