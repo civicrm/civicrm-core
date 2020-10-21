@@ -1539,13 +1539,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     }
 
     CRM_Utils_Hook::membershipTypeValues($form, $membershipTypeValues);
-
-    if (is_numeric($membershipTypeID) &&
-      $membershipTypeID > 0
-    ) {
-      CRM_Core_Error::deprecatedFunctionWarning('Non arrays deprecated');
-      return $membershipTypeValues[$membershipTypeID];
-    }
     return $membershipTypeValues;
   }
 
