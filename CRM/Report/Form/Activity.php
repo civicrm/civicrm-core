@@ -94,6 +94,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'dbAlias' => "civicrm_contact_target.sort_name",
             'default' => TRUE,
           ],
+          'contact_target_birth' => [
+            'name' => 'birth_date',
+            'title' => ts('Target Birth Date'),
+            'alias' => 'civicrm_contact_target',
+            'dbAlias' => "civicrm_contact_target.birth_date",
+          ],
           'contact_source_id' => [
             'name' => 'id',
             'alias' => 'civicrm_contact_source',
