@@ -289,32 +289,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @throws \CRM_Core_Exception
    */
-  public function getIDs(&$ids, &$input) {
-    $ids['contact'] = $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
+  public function getIDs(&$ids, $input) {
+    $ids['contact'] = (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
     $ids['contribution'] = (int) $this->retrieve('x_invoice_num', 'Integer');
-
-    // joining with contribution table for extra checks
-    $sql = "
-    SELECT cr.id, cr.contact_id
-      FROM civicrm_contribution_recur cr
-INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
-     WHERE cr.processor_id = '{$input['subscription_id']}' AND
-           (cr.contact_id = {$ids['contact']} OR co.id = {$ids['contribution']})
-     LIMIT 1";
-    $contRecur = CRM_Core_DAO::executeQuery($sql);
-    $contRecur->fetch();
-    $ids['contributionRecur'] = (int) $contRecur->id;
-    if ($ids['contact'] != $contRecur->contact_id) {
-      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", [1 => $ids['contact'], 2 => $contRecur->contact_id]);
-      CRM_Core_Error::debug_log_message($message);
-      $ids['contact'] = $contRecur->contact_id;
-    }
-    if (!$ids['contributionRecur']) {
-      $message = ts("Could not find contributionRecur id");
-      $log = new CRM_Utils_SystemLogger();
-      $log->error('payment_notification', ['message' => $message, 'ids' => $ids, 'input' => $input]);
-      throw new CRM_Core_Exception($message);
-    }
+    $contributionRecur = $this->getContributionRecurObject($input['subscription_id'], $ids['contact'], $ids['contribution']);
+    $ids['contributionRecur'] = (int) $contributionRecur->id;
+    $ids['contact'] = $contributionRecur->contact_id;
   }
 
   /**
@@ -359,6 +339,36 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
      WHERE m.contribution_recur_id = {$contributionRecurID}
      LIMIT 1";
     return CRM_Core_DAO::singleValueQuery($sql);
+  }
+
+  /**
+   * Get the recurring contribution object.
+   *
+   * @param string $processorID
+   * @param int $contactID
+   * @param int $contributionID
+   *
+   * @return \CRM_Core_DAO|\DB_Error|object
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionRecurObject(string $processorID, int $contactID, int $contributionID) {
+    // joining with contribution table for extra checks
+    $sql = "
+    SELECT cr.id, cr.contact_id
+      FROM civicrm_contribution_recur cr
+INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
+     WHERE cr.processor_id = '{$processorID}' AND
+           (cr.contact_id = $contactID OR co.id = $contributionID)
+     LIMIT 1";
+    $contRecur = CRM_Core_DAO::executeQuery($sql);
+    if (!$contRecur->fetch()) {
+      throw new CRM_Core_Exception('Could not find contributionRecur id');
+    }
+    if ($contactID != $contRecur->contact_id) {
+      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", [1 => $ids['contact'], 2 => $contRecur->contact_id]);
+      CRM_Core_Error::debug_log_message($message);
+    }
+    return $contRecur;
   }
 
 }
