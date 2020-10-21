@@ -123,6 +123,13 @@ class CRM_Contact_BAO_Query {
   public $_whereTables;
 
   /**
+   * The table involved in the orderBy clause.
+   *
+   * @var array
+   */
+  public $orderByTables = [];
+
+  /**
    * Array of WHERE clause components.
    *
    * @var array
@@ -6408,12 +6415,8 @@ AND   displayRelType.is_active = 1
       $direction = $orderByClauseParts[1] ?? 'asc';
       $fieldSpec = $this->getMetadataForRealField($field);
 
-      // This is a hacky add-in for primary address joins. Feel free to iterate as it is unit tested.
-      // @todo much more cleanup on location handling in addHierarchical elements. Potentially
-      // add keys to $this->fields to represent the actual keys for locations.
-      if (empty($fieldSpec) && substr($field, 0, 2) === '1-') {
-        $fieldSpec = $this->getMetadataForField(substr($field, 2));
-        $this->addAddressTable('1-' . str_replace('civicrm_', '', $fieldSpec['table_name']), 'is_primary = 1');
+      if ($fieldSpec['table_name'] === 'civicrm_address') {
+        $this->addAddressTable('1-' . str_replace('civicrm_', '', $fieldSpec['table_name']), 'is_primary = 1', 'order_by');
       }
 
       if ($this->_returnProperties === []) {
@@ -6473,7 +6476,8 @@ AND   displayRelType.is_active = 1
     }
 
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-    $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+    $simpleFromTables = array_merge($this->orderByTables, $this->_whereTables);
+    $this->_simpleFromClause = self::fromClause($simpleFromTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
 
     // The above code relies on crazy brittle string manipulation of a peculiarly-encoded ORDER BY
     // clause. But this magic helper which forgivingly reescapes ORDER BY.
@@ -6839,7 +6843,7 @@ AND   displayRelType.is_active = 1
       $groupBy = " GROUP BY " . implode(', ', $groupByCols);
     }
 
-    $order = $orderBy = '';
+    $order = '';
     if (!$count) {
       if (!$sortByChar) {
         $order = $this->prepareOrderBy($sort, $sortOrder);
@@ -6903,6 +6907,12 @@ AND   displayRelType.is_active = 1
     }
     $pseudoField = $this->_pseudoConstantsSelect[$fieldName] ?? [];
     $field = $this->_fields[$fieldName] ?? $pseudoField;
+    if (empty($field) && strpos($fieldName, '1-') === 0
+      && !empty($this->_fields[substr($fieldName, 2)])
+    ) {
+      // This could be a primary address
+      $field = $this->_fields[substr($fieldName, 2)];
+    }
     $field = array_merge($field, $pseudoField);
     if (!empty($field) && empty($field['name'])) {
       // standardising field formatting here - over time we can phase out variants.
@@ -7141,18 +7151,23 @@ AND   displayRelType.is_active = 1
    *
    * @param string $tableKey
    * @param string $joinCondition
+   * @param string $context
+   *   Context of adding it - currently empty or 'order_by' supported.
    *
    * @return array
    *   - alias name
    *   - address join.
    */
-  protected function addAddressTable($tableKey, $joinCondition) {
+  protected function addAddressTable($tableKey, $joinCondition, $context = '') {
     $tName = "$tableKey-address";
     $aName = "`$tableKey-address`";
     $this->_select["{$tName}_id"] = "`$tName`.id as `{$tName}_id`";
     $this->_element["{$tName}_id"] = 1;
     $addressJoin = "\nLEFT JOIN civicrm_address $aName ON ($aName.contact_id = contact_a.id AND $aName.$joinCondition)";
     $this->_tables[$tName] = $addressJoin;
+    if ($context === 'order_by') {
+      $this->orderByTables[$tName] = $addressJoin;
+    }
 
     return [
       $aName,
