@@ -610,9 +610,7 @@ DESC limit 1");
 
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     if ($this->_contactID) {
-      list($this->_memberDisplayName,
-        $this->_memberEmail
-        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      [$this->_memberDisplayName, $this->_memberEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
 
       $this->assign('emailExists', $this->_memberEmail);
       $this->assign('displayName', $this->_memberDisplayName);
@@ -1030,8 +1028,8 @@ DESC limit 1");
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $endDate = NULL;
-    $membershipTypes = $membership = $calcDate = [];
-    $membershipType = NULL;
+    $membership = $calcDate = [];
+
     $paymentInstrumentID = $this->_paymentProcessor['object']->getPaymentInstrumentID();
     $params = $softParams = $ids = [];
 
@@ -1184,12 +1182,7 @@ DESC limit 1");
         $this->_id,
         'Membership'
       );
-      $membershipTypes[$memType] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $memType
-      );
     }
-
-    $membershipType = implode(', ', $membershipTypes);
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
@@ -1225,7 +1218,7 @@ DESC limit 1");
 
       if (empty($formValues['source'])) {
         $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', [
-          1 => $membershipType,
+          1 => $this->getSelectedMembershipLabels(),
           2 => $userName,
         ]);
       }
@@ -1402,7 +1395,7 @@ DESC limit 1");
       $params['receive_date'] = date('Y-m-d H:i:s');
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
-        [1 => $membershipType, 2 => $userName]
+        [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
       );
       $params['source'] = $formValues['source'] ?: $params['contribution_source'];
       $params['trxn_id'] = $result['trxn_id'] ?? NULL;
@@ -1842,6 +1835,19 @@ DESC limit 1");
 
     CRM_Core_BAO_UFGroup::getValues($formValues['contact_id'], $customFields, $customValues, FALSE, $members);
     return $customValues;
+  }
+
+  /**
+   * Get the selected memberships as a string of labels.
+   *
+   * @return string
+   */
+  protected function getSelectedMembershipLabels(): string {
+    $return = [];
+    foreach ($this->_memTypeSelected as $membershipTypeID) {
+      $return[] = $this->allMembershipTypeDetails[$membershipTypeID]['name'];
+    }
+    return implode(', ', $return);
   }
 
 }
