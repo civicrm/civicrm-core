@@ -20,7 +20,7 @@ class DrupalUtil {
       return basename(conf_path());
     }
     elseif (class_exists('Drupal')) {
-      return basename(\Drupal::service('site.path'));
+      return \Drupal::service('site.path');
     }
     else {
       throw new \Exception('Cannot detect path under Drupal "sites/".');

@@ -32,7 +32,7 @@ if (!defined('CIVI_SETUP')) {
 
     // Compute settingsPath.
     $siteDir = \Civi\Setup\DrupalUtil::getDrupalSiteDir($cmsPath);
-    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$cmsPath, 'sites', $siteDir, 'civicrm.settings.php']);
+    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$cmsPath, $siteDir, 'civicrm.settings.php']);
 
     if (($loadGenerated = \Drupal\Core\Site\Settings::get('civicrm_load_generated', NULL)) !== NULL) {
       $model->loadGenerated = $loadGenerated;
