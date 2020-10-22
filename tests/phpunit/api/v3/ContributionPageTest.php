@@ -1964,7 +1964,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $financialType = $this->createFinancialType();
     $financialTypeId = $financialType['id'];
     // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
-    $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $this->addTaxAccountToFinancialType($financialType['id']);
 
     $this->setUpContributionPage();
     $submitParams = [

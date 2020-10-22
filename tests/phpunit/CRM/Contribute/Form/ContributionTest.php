@@ -1070,7 +1070,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testSubmitSaleTax($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit([
@@ -1120,7 +1120,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    */
   public function testSubmitWithOutSaleTax() {
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit([
@@ -1161,8 +1161,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testReSubmitSaleTax($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
-    list($form, $contribution) = $this->doInitialSubmit();
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    [$form, $contribution] = $this->doInitialSubmit();
     $this->assertEquals(11000, $contribution['total_amount']);
     $this->assertEquals(1000, $contribution['tax_amount']);
     $this->assertEquals(11000, $contribution['net_amount']);
@@ -1222,8 +1222,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testReSubmitSaleTaxAlteredAmount($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
-    list($form, $contribution) = $this->doInitialSubmit();
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    [$form, $contribution] = $this->doInitialSubmit();
 
     $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:

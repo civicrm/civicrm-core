@@ -1402,7 +1402,7 @@ Expires: ',
    */
   public function testLineItemAmountOnSalesTax() {
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount(2);
+    $this->addTaxAccountToFinancialType(2);
     $form = $this->getForm();
     $form->preProcess();
     $this->mut = new CiviMailUtils($this, TRUE);

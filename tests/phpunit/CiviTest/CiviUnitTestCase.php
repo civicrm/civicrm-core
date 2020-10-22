@@ -3088,21 +3088,24 @@ VALUES
   }
 
   /**
-   * Add Sales Tax relation for financial type with financial account.
+   * Add Sales Tax Account for the financial type.
    *
    * @param int $financialTypeId
    *
-   * @return obj
+   * @param array $accountParams
+   *
+   * @return CRM_Financial_DAO_EntityFinancialAccount
+   * @throws \CRM_Core_Exception
    */
-  protected function relationForFinancialTypeWithFinancialAccount($financialTypeId) {
-    $params = [
+  protected function addTaxAccountToFinancialType(int $financialTypeId, $accountParams = []) {
+    $params = array_merge([
       'name' => 'Sales tax account ' . substr(sha1(rand()), 0, 4),
       'financial_account_type_id' => key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Liability' ")),
       'is_deductible' => 1,
       'is_tax' => 1,
       'tax_rate' => 10,
       'is_active' => 1,
-    ];
+    ], $accountParams);
     $account = CRM_Financial_BAO_FinancialAccount::add($params);
     $entityParams = [
       'entity_table' => 'civicrm_financial_type',
@@ -3111,7 +3114,7 @@ VALUES
     ];
 
     // set tax rate (as 10) for provided financial type ID to static variable, later used to fetch tax rates of all financial types
-    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeId] = 10;
+    \Civi::$statics['CRM_Core_PseudoConstant']['taxRates'][$financialTypeId] = $params['tax_rate'];
 
     //CRM-20313: As per unique index added in civicrm_entity_financial_account table,
     //  first check if there's any record on basis of unique key (entity_table, account_relationship, entity_id)

@@ -625,11 +625,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         'membership_id' => $membership->id,
         'contribution_recur_id' => $contributionRecurID,
       ]);
-      //Remove `tax_amount` if it is not calculated.
-      // ?? WHY - I haven't been able to figure out...
-      if (CRM_Utils_Array::value('tax_amount', $temporaryParams) === 0.0) {
-        unset($temporaryParams['tax_amount']);
-      }
       CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams);
     }
 
