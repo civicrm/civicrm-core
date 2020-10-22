@@ -50,7 +50,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->assign('uploadSize', $uploadSize);
 
-    $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
+    $this->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
     $this->setMaxFileSize($uploadFileSize);
     $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
       1 => $uploadSize,
