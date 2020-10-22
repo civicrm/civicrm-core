@@ -413,6 +413,7 @@ class CRM_Utils_Date {
         '%P' => $type,
         '%A' => $type,
         '%Y' => $year,
+        '%T' => CRM_Utils_Date::getDefaultTimezone(),
       ];
 
       return strtr($format, $date);
@@ -2207,6 +2208,24 @@ class CRM_Utils_Date {
     $systemTimeZone = new DateTimeZone(CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
     $dateObject->setTimezone($systemTimeZone);
     return $dateObject->format($format);
+  }
+
+  /**
+   * Print out a string representation of the default timezone
+   * This will allow CiviCRM to automatically handle things like
+   * daylight savings.
+   *
+   * @return string
+   */
+  public static function getDefaultTimezone() {
+    static $tz_string;
+    if (empty($tz_string)) {
+      $dateTzDefault = Civi::settings()->get('datetzdefault');
+      $dateTime = new DateTime();
+      $dateTime->setTimeZone(new DateTimeZone($dateTzDefault));
+      $tz_string = $dateTime->format('T');
+    }
+    return $tz_string;
   }
 
 }
