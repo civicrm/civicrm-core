@@ -308,9 +308,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               $params[$key] = $this->parsePseudoConstantField($val, $this->fieldMetadata[$key]);
               break;
 
-            case 'member_is_override':
-              $params[$key] = CRM_Utils_String::strtobool($val);
-              break;
           }
           if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
             if ($customFields[$customFieldID]['data_type'] == 'Date') {
@@ -371,20 +368,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               CRM_Price_BAO_LineItem::getLineItemArray($formatted, NULL, 'membership', $formatted['membership_type_id']);
             }
 
-            // @todo stop passing $ids array (and put details in $formatted if required)
-            $ids = [
-              'membership' => $formatValues['membership_id'],
-              'userId' => $session->get('userID'),
-            ];
-            $newMembership = CRM_Member_BAO_Membership::create($formatted, $ids, TRUE);
-            if (civicrm_error($newMembership)) {
-              array_unshift($values, $newMembership['is_error'] . ' for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
-              return CRM_Import_Parser::ERROR;
-            }
-            else {
-              $this->_newMemberships[] = $newMembership->id;
-              return CRM_Import_Parser::VALID;
-            }
+            $newMembership = civicrm_api3('Membership', 'create', $formatted);
+            $this->_newMemberships[] = $newMembership['id'];
+            return CRM_Import_Parser::VALID;
           }
           else {
             array_unshift($values, 'Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
