@@ -474,11 +474,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @dataProvider getThousandSeparators
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   *
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmit($thousandSeparator) {
+  public function testSubmit(string $thousandSeparator) {
     CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm();
@@ -508,8 +509,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => '9',
-        // TODO: Future proof
-        'Y' => '2024',
+        'Y' => date('Y', strtotime('+ 2 years')),
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -1488,8 +1488,6 @@ Expires: ',
    */
   public function testCreatePendingWithMultipleTerms() {
     CRM_Core_Session::singleton()->getStatus(TRUE);
-    $form = $this->getForm();
-    $form->preProcess();
     $this->mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     $membershipTypeAnnualRolling = $this->callAPISuccess('membership_type', 'create', [
@@ -1522,6 +1520,8 @@ Expires: ',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text' => '',
     ];
+    $form = $this->getForm();
+    $form->preProcess();
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
