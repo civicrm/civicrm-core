@@ -267,6 +267,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Get available Financial Types.
    *
+   * This logic is being moved into the financialacls extension.
+   *
+   * Rather than call this function consider using
+   *
+   * $types = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
+   *
    * @param array $financialTypes
    *   (reference ) an array of financial types
    * @param int|string $action
