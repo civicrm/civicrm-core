@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Class CRM_Core_Payment_BaseIPN.
  */
@@ -237,25 +239,28 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    $addLineItems = FALSE;
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
+      // CRM-15546
+      $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
+        'labelColumn' => 'name',
+        'flip' => 1,
+      ]);
+      $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
+      $contribution->cancel_date = self::$_now;
+      $contribution->save();
+      // Add line items for recurring payments.
+      if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
+        CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
+      }
+    }
+    else {
+      Contribution::update(FALSE)->setValues([
+        'cancel_date' => 'now',
+        'contribution_status_id:name' => 'Cancelled',
+      ])->addWhere('id', '=', $contribution->id)->execute();
     }
     $participant = &$objects['participant'];
-
-    // CRM-15546
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ]);
-    $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
-    $contribution->cancel_date = self::$_now;
-    $contribution->save();
-
-    // Add line items for recurring payments.
-    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
-      CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
-    }
 
     if (!empty($memberships)) {
       foreach ($memberships as $membership) {
