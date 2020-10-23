@@ -75,14 +75,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         $ids['contact'] = $contribution->contact_id;
       }
 
-      if (!empty($ids['contributionRecur'])) {
-        $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
-        $contributionRecur->id = $ids['contributionRecur'];
-        if (!$contributionRecur->find(TRUE)) {
-          CRM_Core_Error::debug_log_message("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
-          echo "Failure: Could not find contribution recur record: {$ids['ContributionRecur']}<p>";
-          return FALSE;
-        }
+      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
+      $contributionRecur->id = $ids['contributionRecur'];
+      if (!$contributionRecur->find(TRUE)) {
+        throw new CRM_Core_Exception("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
       }
 
       $objects['contact'] = &$contact;
@@ -90,11 +86,11 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       $this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID);
 
-      if (!empty($ids['paymentProcessor']) && $objects['contributionRecur']->payment_processor_id != $ids['paymentProcessor']) {
+      if (!empty($ids['paymentProcessor']) && $contributionRecur->payment_processor_id != $ids['paymentProcessor']) {
         Civi::log()->warning('Payment Processor does not match the recurring processor id.', ['civi.tag' => 'deprecated']);
       }
 
-      if ($component == 'contribute' && $ids['contributionRecur']) {
+      if ($component == 'contribute') {
         // check if first contribution is completed, else complete first contribution
         $first = TRUE;
         if ($objects['contribution']->contribution_status_id == 1) {
@@ -119,7 +115,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         return $this->recur($input, [
           'related_contact' => $ids['related_contact'] ?? NULL,
           'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-          'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+          'contributionRecur' => $contributionRecur->id,
           'contact' => $ids['contact'] ?? NULL,
           'contributionPage' => $ids['contributionPage'] ?? NULL,
         ], $objects['contributionRecur'], $objects['contribution'], $first);
