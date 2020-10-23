@@ -1512,7 +1512,10 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
   }
 
   /**
-   * Build an array of available membership types.
+   * Build an array of available membership types in the current context.
+   *
+   * While core does not do anything context specific extensions may filter
+   * or alter amounts based on user details.
    *
    * @param CRM_Core_Form $form
    * @param array $membershipTypeID
@@ -1527,7 +1530,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    */
   public static function buildMembershipTypeValues($form, $membershipTypeID = [], $activeOnly = FALSE) {
     $membershipTypeIDS = (array) $membershipTypeID;
-    $membershipTypeValues = CRM_Member_BAO_MembershipType::getPermissionedMembershipTypes();
+    $membershipTypeValues = CRM_Member_BAO_MembershipType::getAllMembershipTypes();
 
     // MembershipTypes are already filtered by domain, filter as appropriate by is_active & a passed in list of ids.
     foreach ($membershipTypeValues as $id => $type) {
