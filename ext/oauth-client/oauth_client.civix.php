@@ -473,5 +473,16 @@ function _oauth_client_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NU
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _oauth_client_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_OAuth_DAO_OAuthClient' => [
+      'name' => 'OAuthClient',
+      'class' => 'CRM_OAuth_DAO_OAuthClient',
+      'table' => 'civicrm_oauth_client',
+    ],
+    'CRM_OAuth_DAO_OAuthSysToken' => [
+      'name' => 'OAuthSysToken',
+      'class' => 'CRM_OAuth_DAO_OAuthSysToken',
+      'table' => 'civicrm_oauth_systoken',
+    ],
+  ]);
 }
