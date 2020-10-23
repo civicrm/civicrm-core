@@ -8,7 +8,7 @@ namespace E2E\Core;
  * Check that the active prev-next service behaves as expected.
  *
  * @package E2E\Core
- * @group e2e
+ * @group e2e ornery
  */
 class PrevNextTest extends \CiviEndToEndTestCase {
 
