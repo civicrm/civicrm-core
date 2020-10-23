@@ -92,7 +92,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
 
     $cond = NULL;
     if ($type) {
-      $phoneTypeId = array_search($type, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'));
+      $phoneTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', $type);
       if ($phoneTypeId) {
         $cond = " AND civicrm_phone.phone_type_id = $phoneTypeId";
       }
