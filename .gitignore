@@ -9,6 +9,7 @@
 !/ext/greenwich
 /ext/greenwich/dist
 /ext/greenwich/extern
+!/ext/oauth-client
 !/ext/search
 !/ext/financialacls
 !/ext/contributioncancelactions
