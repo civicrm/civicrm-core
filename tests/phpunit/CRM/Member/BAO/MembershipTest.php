@@ -444,7 +444,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       NULL,
       NULL,
       FALSE,
-      NULL,
       NULL
     );
     $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
@@ -514,8 +513,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       NULL,
       NULL,
       NULL,
-      FALSE,
-      NULL
+      FALSE
     );
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',

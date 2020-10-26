@@ -24,6 +24,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Campaign;
+
 /**
  *  Test CRM/Member/BAO Membership Log add , delete functions
  *
@@ -238,6 +240,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   public function testMembershipRenewalDates() {
     $form = new CRM_Batch_Form_Entry();
+    $campaignID = Campaign::create()->setValues(['name' => 'blah', 'title' => 'blah'])->execute()->first()['id'];
     foreach ([$this->_contactID, $this->_contactID2] as $contactID) {
       $membershipParams = [
         'membership_type_id' => $this->_membershipTypeID2,
@@ -257,6 +260,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     ];
     $params['field'][1]['membership_type'] = [0 => $this->_orgContactID2, 1 => $this->_membershipTypeID2];
     $params['field'][1]['receive_date'] = date('Y-m-d');
+    $params['field'][1]['member_campaign_id'] = $campaignID;
 
     // explicitly specify start and end dates
     $params['field'][2]['membership_type'] = [0 => $this->_orgContactID2, 1 => $this->_membershipTypeID2];
@@ -265,16 +269,18 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $params['field'][2]['receive_date'] = "2016-04-01";
 
     $this->assertTrue($form->testProcessMembership($params));
-    $result = $this->callAPISuccess('membership', 'get', []);
+    $result = $this->callAPISuccess('membership', 'get')['values'];
 
     // renewal dates should be from current if start_date and end_date is passed as NULL
-    $this->assertEquals(date('Y-m-d'), $result['values'][1]['start_date']);
+    $this->assertEquals(date('Y-m-d'), $result[1]['start_date']);
     $endDate = date("Y-m-d", strtotime(date("Y-m-d") . " +1 year -1 day"));
-    $this->assertEquals($endDate, $result['values'][1]['end_date']);
+    $this->assertEquals($endDate, $result[1]['end_date']);
+    $this->assertEquals(1, $result[1]['campaign_id']);
 
     // verify if the modified dates asserts with the dates passed above
-    $this->assertEquals('2016-04-01', $result['values'][2]['start_date']);
-    $this->assertEquals('2017-03-31', $result['values'][2]['end_date']);
+    $this->assertEquals('2016-04-01', $result[2]['start_date']);
+    $this->assertEquals('2017-03-31', $result[2]['end_date']);
+    $this->assertTrue(empty($result[2]['campaign_id']));
   }
 
   /**

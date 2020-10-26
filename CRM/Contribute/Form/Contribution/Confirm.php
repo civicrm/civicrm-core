@@ -1527,13 +1527,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (isset($form->_params)) {
           $isPayLater = $form->_params['is_pay_later'] ?? NULL;
         }
-        $campaignId = NULL;
-        if (isset($form->_values) && is_array($form->_values) && !empty($form->_values)) {
-          $campaignId = $form->_params['campaign_id'] ?? NULL;
-          if (!array_key_exists('campaign_id', $form->_params)) {
-            $campaignId = $form->_values['campaign_id'] ?? NULL;
-          }
-        }
+        $memParams = [
+          'campaign_id' => $form->_params['campaign_id'] ?? ($form->_values['campaign_id'] ?? NULL),
+        ];
 
         // @todo Move this into CRM_Member_BAO_Membership::processMembership
         if (!empty($membershipContribution)) {
@@ -1557,7 +1553,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
-          $contributionRecurID, $membershipSource, $isPayLater, $campaignId, [], $membershipContribution,
+          $contributionRecurID, $membershipSource, $isPayLater, $memParams, [], $membershipContribution,
           $membershipLineItems
         );
 
