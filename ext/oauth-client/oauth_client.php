@@ -90,6 +90,24 @@ function oauth_client_civicrm_managed(&$entities) {
 }
 
 /**
+ * Implements hook_civicrm_permission().
+ *
+ * @see CRM_Utils_Hook::permission()
+ * @see CRM_Core_Permission::getCorePermissions()
+ */
+function oauth_client_civicrm_permission(&$permissions) {
+  $prefix = ts('CiviCRM') . ': ';
+  $permissions['manage OAuth client'] = [
+    $prefix . ts('manage OAuth client'),
+    ts('Create and delete OAuth client connections'),
+  ];
+  $permissions['manage OAuth client secrets'] = [
+    $prefix . ts('manage OAuth client secrets'),
+    ts('Access OAuth secrets'),
+  ];
+}
+
+/**
  * Implements hook_civicrm_caseTypes().
  *
  * Generate a list of case-types.
