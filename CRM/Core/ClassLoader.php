@@ -198,7 +198,7 @@ class CRM_Core_ClassLoader {
    * @param $class
    */
   public function loadClass($class) {
-    if ($class === 'CiviCRM_API3_Exception') {
+    if ($class === 'CiviCRM_API3_Exception' || $class === 'API_Exception') {
       //call internal error class api/Exception first
       // allow api/Exception class call external error class
       // CiviCRM_API3_Exception
