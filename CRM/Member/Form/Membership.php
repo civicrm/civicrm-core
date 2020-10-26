@@ -1465,33 +1465,34 @@ DESC limit 1");
     }
     else {
       $params['action'] = $this->_action;
-      $count = 0;
-      foreach ($this->_memTypeSelected as $memType) {
-        if ($count && !empty($formValues['record_contribution']) &&
-          ($relateContribution = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id))
-        ) {
-          $membershipTypeValues[$memType]['relate_contribution_id'] = $relateContribution;
+      foreach ($lineItem[$this->_priceSetId] as $id => $lineItemValues) {
+        if (empty($lineItemValues['membership_type_id'])) {
+          continue;
         }
 
         // @todo figure out why recieve_date isn't being set right here.
         if (empty($params['receive_date'])) {
           $params['receive_date'] = date('Y-m-d H:i:s');
         }
-        $membershipParams = array_merge($params, $membershipTypeValues[$memType]);
+        $membershipParams = array_merge($params, $membershipTypeValues[$lineItemValues['membership_type_id']]);
 
         if (!empty($softParams)) {
           $membershipParams['soft_credit'] = $softParams;
         }
+        unset($membershipParams['contribution_status_id']);
+        $membershipParams['skipLineItem'] = TRUE;
+        unset($membershipParams['lineItems']);
         // @todo stop passing $ids (membership and userId only are set above)
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
-        $params['contribution'] = $membershipParams['contribution'] ?? NULL;
-        unset($params['lineItems']);
-        // skip line item creation for next interation since line item(s) are already created.
-        $params['skipLineItem'] = TRUE;
+        $lineItem[$this->_priceSetId][$id]['entity_id'] = $membership->id;
+        $lineItem[$this->_priceSetId][$id]['entity_table'] = 'civicrm_membership';
 
         $this->_membershipIDs[] = $membership->id;
-        $createdMemberships[$memType] = $membership;
-        $count++;
+        $createdMemberships[$membership->membership_type_id] = $membership;
+      }
+      $params['lineItems'] = $lineItem;
+      if (!empty($formValues['record_contribution'])) {
+        CRM_Member_BAO_Membership::recordMembershipContribution($params);
       }
     }
     $isRecur = $params['is_recur'] ?? NULL;

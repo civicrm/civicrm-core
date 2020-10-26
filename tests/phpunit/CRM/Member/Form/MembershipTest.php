@@ -582,7 +582,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testContributionUpdateOnMembershipTypeChange() {
+  public function testContributionUpdateOnMembershipTypeChange(): void {
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
     $form = $this->getForm();
     $form->preProcess();
@@ -647,9 +647,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'end_date' => '',
       // This format reflects the first number being the organisation & the 25 being the type.
       'membership_type_id' => [$this->ids['contact']['organization'], $secondMembershipType['id']],
-      'record_contribution' => 1,
       'status_id' => 1,
-      'total_amount' => 25,
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       //Member dues, see data.xml
@@ -668,7 +666,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('Pending refund', $contribution['contribution_status']);
     // Earlier paid amount
     $this->assertEquals(50, $payment['paid']);
-    // balance remaning
+    // balance remaining
     $this->assertEquals(-25, $payment['balance']);
   }
 
@@ -1098,6 +1096,8 @@ Expires: ',
       $this->assertEquals($contributionResult['values'][0]['id'], $membershipPayment['contribution_id'], "membership payment's contribution ID should be the ID of the organization's membership contribution.");
       $this->assertContains($membershipPayment['membership_id'], $primaryMembershipIds, "membership payment's membership ID should be the ID of a primary membership.");
     }
+    // Check for orphan line items.
+    $this->callAPISuccessGetCount('LineItem', [], 2);
 
     // CRM-20966: check that deleting relationship used for inheritance does not delete contribution.
     $this->callAPISuccess('relationship', 'delete', [
