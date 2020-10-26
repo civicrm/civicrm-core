@@ -1020,6 +1020,9 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     $coreSearch = TRUE;
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
+      if (is_a($this->_search, 'CRM_Contact_Form_Search_Custom_EventAggregate')) {
+        return;
+      }
       $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
       $coreSearch = FALSE;
     }
