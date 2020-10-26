@@ -214,6 +214,24 @@ function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
   }
 }
 
+/**
+ * Remove unpermitted membership types from selection availability..
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_membershipTypeValues
+ *
+ * @param \CRM_Core_Form $form
+ * @param array $membershipTypeValues
+ */
+function financialacls_civicrm_membershipTypeValues($form, &$membershipTypeValues) {
+  $financialTypes = NULL;
+  $financialTypes = CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+  foreach ($membershipTypeValues as $id => $type) {
+    if (!isset($financialTypes[$type['financial_type_id']])) {
+      unset($membershipTypeValues[$id]);
+    }
+  }
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
