@@ -157,11 +157,18 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       CRM_Contact_BAO_Individual::format($params, $contact);
     }
 
-    if (strlen($contact->display_name) > 128) {
-      $contact->display_name = substr($contact->display_name, 0, 128);
+    // Note that copyValues() above might already call this, via
+    // CRM_Utils_String::ellipsify(), but e.g. for Individual it gets put
+    // back or altered by Individual::format() just above, so we need to
+    // check again.
+    // Note also orgs will get ellipsified, but if we do that here then
+    // some existing tests on individual fail.
+    // Also api v3 will enforce org naming length by failing, v4 will truncate.
+    if (mb_strlen($contact->display_name, 'UTF-8') > 128) {
+      $contact->display_name = mb_substr($contact->display_name, 0, 128, 'UTF-8');
     }
-    if (strlen($contact->sort_name) > 128) {
-      $contact->sort_name = substr($contact->sort_name, 0, 128);
+    if (mb_strlen($contact->sort_name, 'UTF-8') > 128) {
+      $contact->sort_name = mb_substr($contact->sort_name, 0, 128, 'UTF-8');
     }
 
     $privacy = $params['privacy'] ?? NULL;
