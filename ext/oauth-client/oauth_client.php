@@ -190,6 +190,17 @@ function oauth_client_civicrm_themes(&$themes) {
 //}
 
 /**
+ * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+ */
+function oauth_client_civicrm_container($container) {
+  $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
+  $container->setDefinition('oauth2.league', new \Symfony\Component\DependencyInjection\Definition(
+    \Civi\OAuth\OAuthLeagueFacade::class, []))->setPublic(TRUE);
+  $container->setDefinition('oauth2.token', new \Symfony\Component\DependencyInjection\Definition(
+    \Civi\OAuth\OAuthTokenFacade::class, []))->setPublic(TRUE);
+}
+
+/**
  * Implements hook_civicrm_oauthProviders().
  */
 function oauth_client_civicrm_oauthProviders(&$providers) {
