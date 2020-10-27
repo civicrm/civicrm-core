@@ -124,7 +124,7 @@ class FormattingUtil {
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
-    if (!$hic->isSkippedField($fieldSpec['name'])) {
+    if (!$hic->isSkippedField($fieldSpec['name']) && is_string($value)) {
       $value = $hic->encodeValue($value);
     }
   }
