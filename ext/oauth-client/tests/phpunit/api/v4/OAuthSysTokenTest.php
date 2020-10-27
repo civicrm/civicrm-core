@@ -159,4 +159,57 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
   }
 
+  public function testGetByScope() {
+    $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
+    $usePerms = function($ps) {
+      $base = ['access CiviCRM'];
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
+    };
+
+    $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
+    $createClient = Civi\Api4\OAuthClient::create()->setValues([
+      'provider' => 'test_example_1',
+      'guid' => "example-id-$random" ,
+      'secret' => "example-secret-$random",
+    ])->execute();
+    $client = $createClient->first();
+    $this->assertTrue(is_numeric($client['id']));
+
+    $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
+    $createToken = Civi\Api4\OAuthSysToken::create()->setValues([
+      'client_id' => $client['id'],
+      'access_token' => "example-access-token-$random",
+      'refresh_token' => "example-refresh-token-$random",
+      'scopes' => ['foo', 'bar'],
+    ])->execute();
+    $token = $createToken->first();
+    $this->assertTrue(is_numeric($token['id']));
+    $this->assertEquals($client['id'], $token['client_id']);
+    $this->assertEquals("example-access-token-$random", $token['access_token']);
+    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertEquals(['foo', 'bar'], $token['scopes']);
+
+    $usePerms(['manage OAuth client']);
+    $getTokens = Civi\Api4\OAuthSysToken::get()
+      ->addWhere('client.provider', '=', 'test_example_1')
+      ->addWhere('scopes', 'CONTAINS', 'foo')
+      ->execute();
+    $this->assertEquals(1, count($getTokens));
+    $this->assertEquals($createToken->first()['id'], $getTokens->first()['id']);
+
+    $usePerms(['manage OAuth client']);
+    $getTokens = Civi\Api4\OAuthSysToken::get()
+      ->addWhere('client.provider', '=', 'test_example_1')
+      ->addWhere('scopes', 'CONTAINS', 'nada')
+      ->execute();
+    $this->assertEquals(0, count($getTokens));
+
+    $usePerms(['manage OAuth client']);
+    $getTokens = Civi\Api4\OAuthSysToken::get()
+      ->addWhere('client.provider', '=', 'test_example_2')
+      ->addWhere('scopes', 'CONTAINS', 'foo')
+      ->execute();
+    $this->assertEquals(0, count($getTokens));
+  }
+
 }
