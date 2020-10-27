@@ -4,7 +4,7 @@
       <th class="crm-search-result-select" ng-if="$ctrl.settings.actions">
         <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="selectAllRows()" >
       </th>
-      <th ng-repeat="col in $ctrl.settings.columns" ng-click="setOrderBy(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
+      <th ng-repeat="col in $ctrl.columns" ng-click="setOrderBy(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
         <i class="crm-i {{ getOrderBy(col) }}"></i>
         <span>{{ col.label }}</span>
       </th>
@@ -15,7 +15,7 @@
       <td ng-if="$ctrl.settings.actions">
         <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(loading === false && !loadingAllRows && row.id)">
       </td>
-      <td ng-repeat="col in $ctrl.settings.columns">
+      <td ng-repeat="col in $ctrl.columns">
         {{ formatResult(row, col) }}
       </td>
       <td></td>

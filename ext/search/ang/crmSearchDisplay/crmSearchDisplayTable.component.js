@@ -5,7 +5,8 @@
     bindings: {
       apiEntity: '<',
       apiParams: '<',
-      settings: '<'
+      settings: '<',
+      filters: '<'
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayTable.html',
     controller: function($scope, crmApi4) {
@@ -15,9 +16,10 @@
       this.page = 1;
 
       this.$onInit = function() {
-        this.orderBy = this.apiParams.orderBy || {};
+        this.orderBy = _.cloneDeep(this.apiParams.orderBy || {});
         this.limit = parseInt(ctrl.settings.limit || 0, 10);
-        _.each(ctrl.settings.columns, function(col, num) {
+        this.columns = _.cloneDeep(ctrl.settings.columns);
+        _.each(ctrl.columns, function(col, num) {
           var index = ctrl.apiParams.select.indexOf(col.expr);
           if (_.includes(col.expr, '(') && !_.includes(col.expr, ' AS ')) {
             col.expr += ' AS column_' + num;
@@ -25,11 +27,18 @@
           }
           col.key = _.last(col.expr.split(' AS '));
         });
-        getResults();
       };
 
       function getResults() {
         var params = _.merge(_.cloneDeep(ctrl.apiParams), {limit: ctrl.limit, offset: (ctrl.page - 1) * ctrl.limit, orderBy: ctrl.orderBy});
+        if (_.isEmpty(params.where)) {
+          params.where = [];
+        }
+        _.each(ctrl.filters, function(value, key) {
+          if (value) {
+            params.where.push([key, 'CONTAINS', value]);
+          }
+        });
         if (ctrl.settings.pager) {
           params.select.push('row_count');
         }
@@ -42,6 +51,8 @@
       this.changePage = function() {
         getResults();
       };
+
+      $scope.$watch('$ctrl.filters', getResults, true);
 
       /**
        * Returns crm-i icon class for a sortable column

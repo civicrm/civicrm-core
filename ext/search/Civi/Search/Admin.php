@@ -24,11 +24,7 @@ class Admin {
     return [
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
-      'displayTypes' => \Civi\Api4\SearchDisplay::getFields(FALSE)
-        ->setLoadOptions(['name', 'label', 'description', 'icon'])
-        ->addWhere('name', '=', 'type')
-        ->execute()
-        ->first()['options'],
+      'displayTypes' => self::getDisplayTypes(['name', 'label', 'description', 'icon']),
     ];
   }
 
@@ -57,6 +53,7 @@ class Admin {
 
   /**
    * Fetch all entities the current user has permission to `get`
+   * @return array
    */
   public static function getSchema() {
     $schema = [];
@@ -89,9 +86,10 @@ class Admin {
   }
 
   /**
+   * @param array $allowedEntities
    * @return array
    */
-  public static function getLinks($allowedEntities) {
+  public static function getLinks(array $allowedEntities) {
     $results = [];
     $keys = array_flip(['alias', 'entity', 'joinType']);
     foreach (civicrm_api4('Entity', 'getLinks', ['where' => [['entity', 'IN', $allowedEntities]]], ['entity' => 'links']) as $entity => $links) {
@@ -105,6 +103,23 @@ class Admin {
       $results[$entity] = array_values($entityLinks);
     }
     return array_filter($results);
+  }
+
+  /**
+   * @param array $props
+   * @return array
+   */
+  public static function getDisplayTypes(array $props):array {
+    try {
+      return \Civi\Api4\SearchDisplay::getFields(FALSE)
+        ->setLoadOptions($props)
+        ->addWhere('name', '=', 'type')
+        ->execute()
+        ->first()['options'];
+    }
+    catch (\Exception $e) {
+      return [];
+    }
   }
 
 }
