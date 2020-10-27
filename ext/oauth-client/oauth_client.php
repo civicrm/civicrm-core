@@ -188,3 +188,24 @@ function oauth_client_civicrm_themes(&$themes) {
 //  ));
 //  _oauth_client_civix_navigationMenu($menu);
 //}
+
+/**
+ * Implements hook_civicrm_oauthProviders().
+ */
+function oauth_client_civicrm_oauthProviders(&$providers) {
+  $ingest = function($file) use (&$providers) {
+    $parsed = json_decode(file_get_contents($file), 1);
+    foreach ($parsed as $provider) {
+      $providers[$provider['name']] = $provider;
+    }
+  };
+
+  $ingest(__DIR__ . '/data/oauth-providers.dist.json');
+  if (defined('CIVICRM_TEST')) {
+    $ingest(__DIR__ . '/data/oauth-providers.test.json');
+  }
+  $localFile = Civi::paths()->getPath('[civicrm.private]/oauth-providers.local.json');
+  if (file_exists($localFile)) {
+    $ingest($localFile);
+  }
+}

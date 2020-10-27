@@ -1,0 +1,30 @@
+[
+  {
+    "name": "ms-exchange",
+    "title": "Microsoft: Exchange Online",
+    "options": {
+      "urlAuthorize": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+      "urlAccessToken": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+      "urlResourceOwnerDetails": "https://graph.microsoft.com/v1.0/me",
+      "scopeSeparator": " ",
+      "scopes": [
+        "User.Read",
+        "https://outlook.office.com/IMAP.AccessAsUser.All",
+        "https://outlook.office.com/POP.AccessAsUser.All",
+        "https://outlook.office.com/SMTP.Send",
+        "offline_access"
+      ]
+    },
+    "mailSettingsTemplate": {
+      "name": "{{provider.name}}: {{token.resource_owner.mail}}",
+      "domain": "{{token.resource_owner.mail|getMailDomain}}",
+      "localpart": null,
+      "return_path": null,
+      "protocol:name": "IMAP",
+      "server": "outlook.office365.com",
+      "username": "{{token.resource_owner.mail}}",
+      "password": null,
+      "is_ssl": true
+    }
+  }
+]
