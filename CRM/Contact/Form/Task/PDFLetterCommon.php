@@ -101,6 +101,26 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   }
 
   /**
+   * Contact Form rule.
+   *
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   * @param array $self
+   *   Additional values form 'this'.
+   *
+   * @return bool
+   *   TRUE if no errors, else array of errors.
+   */
+  public static function contactPdfFormRule($fields, $files, $self) {
+    $errors = [];
+    if (!CRM_Utils_Rule::longTitle($fields['filename'])) {
+      $errors['filename'] = ts('Filename should include alphanumeric, -, _ or . only');
+    }
+    return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Core_Form $form
@@ -178,8 +198,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $mimeType = self::getMimeType($type);
     // ^^ Useful side-effect: consistently throws error for unrecognized types.
 
+    $fileName = !empty($formValues['filename']) ? $formValues['filename'] : "CiviLetter";
+    $fileName = !self::isLiveMode($form) ? $fileName . "_preview" : $fileName;
+    $fileName = "$fileName.$type";
     if ($type == 'pdf') {
-      $fileName = "CiviLetter.$type";
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
@@ -187,7 +209,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
-      $fileName = "CiviLetter.$type";
       CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
     }
 

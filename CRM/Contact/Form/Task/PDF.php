@@ -89,6 +89,14 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     //enable form element
     $this->assign('suppressForm', FALSE);
     CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    $this->add(
+      'text',
+      'filename',
+      ts('Filename'),
+      ['size' => 45, 'maxlength' => 255],
+      TRUE
+    );
+    $this->addFormRule(['CRM_Contact_Form_Task_PDFLetterCommon', 'contactPdfFormRule'], $this);
   }
 
   /**

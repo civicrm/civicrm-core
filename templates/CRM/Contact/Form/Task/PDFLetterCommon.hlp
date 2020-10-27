@@ -60,3 +60,7 @@
   {capture assign="pdfFormatsURL"}{crmURL p="civicrm/admin/pdfFormats" q="reset=1"}{/capture}
   <p>{ts 1=$pdfFormatsURL}Go to <strong><a href="%1">Administer CiviCRM &raquo; Communications &raquo; Print Page (PDF) Formats</a></strong> to add or edit formats or set the default format.{/ts}</p>
 {/htxt}
+{htxt id="id-contact-pdf-filename"}
+  <p>{ts}Provide filename for downloading the file.{/ts}</p>
+  <p>{ts}Filename should include alphanumeric, -, _ or . only.{/ts}</p>
+{/htxt}

@@ -23,6 +23,15 @@
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
+    <tr>
+      <td class="label-left">
+        {$form.filename.label}
+        {help id="id-contact-pdf-filename" title=$form.filename.label  file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
+      </td>
+      <td>
+        {$form.filename.html}
+      </td>
+    </tr>
     {if $form.campaign_id}
     <tr>
       <td class="label-left">{$form.campaign_id.label}</td>
