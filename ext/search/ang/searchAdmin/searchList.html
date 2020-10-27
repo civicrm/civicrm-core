@@ -22,11 +22,25 @@
         <td>{{ search.id }}</td>
         <td>{{ search.label }}</td>
         <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
-        <td>{{ search.displays }}</td>
-        <td>{{ search.groups.join(', ') }}</td>
         <td>
-          <a href="#/edit/{{ search.id }}">{{:: ts('Edit') }}</a>
-          <a href crm-confirm="{type: 'delete', obj: search}" on-yes="$ctrl.deleteSearch(search)">{{:: ts('Delete') }}</a>
+          <div class="btn-group">
+            <button type="button" disabled ng-if="!search.display_name" class="btn btn-xs dropdown-toggle btn-default-outline">
+              {{:: ts('0 Displays') }}
+            </button>
+            <button type="button" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-default-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{:: search.display_name.length === 1 ? ts('1 Display') : ts('%1 Displays', {1: search.display_name.length}) }} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" ng-if=":: search.display_name.length">
+              <li ng-repeat="display_name in search.display_name">
+                <a href="{{:: $ctrl.searchPath + '#/display/' + search.name + '/' + display_name }}"><i class="fa {{:: search.display_icon[$index] }}"></i> {{:: search.display_label[$index] }}</a>
+              </li>
+            </ul>
+          </div>
+        </td>
+        <td>{{ search.groups.join(', ') }}</td>
+        <td class="text-right">
+          <a class="btn btn-xs btn-default" href="#/edit/{{ search.id }}">{{:: ts('Edit') }}</a>
+          <a href class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: search}" on-yes="$ctrl.deleteSearch(search)">{{:: ts('Delete') }}</a>
         </td>
       </tr>
       <tr ng-if="$ctrl.savedSearches.length === 0">

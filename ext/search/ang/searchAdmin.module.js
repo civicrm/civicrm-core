@@ -16,8 +16,18 @@
           // Load data for lists
           savedSearches: function(crmApi4) {
             return crmApi4('SavedSearch', 'get', {
-              select: ['id', 'label', 'api_entity', 'form_values', 'COUNT(search_display.id) AS displays', 'GROUP_CONCAT(group.title) AS groups'],
-              join: [['SearchDisplay AS search_display'], ['Group AS group']],
+              select: [
+                'id',
+                'name',
+                'label',
+                'api_entity',
+                'form_values',
+                'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
+                'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
+                'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
+                'GROUP_CONCAT(group.title) AS groups'
+              ],
+              join: [['SearchDisplay AS display'], ['Group AS group']],
               where: [['api_entity', 'IS NOT NULL']],
               groupBy: ['id']
             });
