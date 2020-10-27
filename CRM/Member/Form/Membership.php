@@ -1568,15 +1568,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             $params['receive_date'] = date('Y-m-d H:i:s');
           }
           $membershipParams = array_merge($params, $membershipTypeValues[$memType]);
-          if (!empty($formValues['int_amount'])) {
-            $init_amount = [];
-            foreach ($formValues as $key => $value) {
-              if (strstr($key, 'txt-price')) {
-                $init_amount[$key] = $value;
-              }
-            }
-            $membershipParams['init_amount'] = $init_amount;
-          }
 
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
