@@ -1,6 +1,9 @@
 <?php
 namespace Civi\Api4;
 
+use Civi\Api4\Action\OAuthClient\Create;
+use Civi\Api4\Action\OAuthClient\Update;
+
 /**
  * OAuthClient entity.
  *
@@ -9,6 +12,16 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class OAuthClient extends Generic\DAOEntity {
+
+  public static function create($checkPermissions = TRUE) {
+    $action = new Create(static::class, __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
+  public static function update($checkPermissions = TRUE) {
+    $action = new Update(static::class, __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
+  }
 
   public static function permissions() {
     return [

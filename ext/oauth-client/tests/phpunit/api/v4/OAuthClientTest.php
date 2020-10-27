@@ -39,6 +39,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
 
     $usePerms(['manage OAuth client']);
     $create = Civi\Api4\OAuthClient::create()->setValues([
+      'provider' => 'test_example_1',
       'guid' => "example-id-$random" ,
       'secret' => "example-secret-$random",
     ])->execute();
@@ -59,6 +60,58 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
     Civi\Api4\OAuthClient::delete(0)->addWhere('guid', '=', "example-id-$random")->execute();
     $get = Civi\Api4\OAuthClient::get(0)->addWhere('guid', '=', "example-id-$random")->execute();
     $this->assertEquals(0, $get->count());
+  }
+
+  public function testCreateBadProvider() {
+    $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
+    $usePerms = function($ps) {
+      $base = ['access CiviCRM'];
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
+    };
+
+    $usePerms(['manage OAuth client']);
+    try {
+      Civi\Api4\OAuthClient::create()->setValues([
+        'provider' => 'test_example_does_not_exist',
+        'guid' => "example-id-$random" ,
+        'secret' => "example-secret-$random",
+      ])->execute();
+      $this->fail("Expected exception: invalid provider");
+    }
+    catch (API_Exception $e) {
+      $this->assertRegExp(';Invalid provider;', $e->getMessage());
+    }
+  }
+
+  public function testUpdateBadProvider() {
+    $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
+    $usePerms = function($ps) {
+      $base = ['access CiviCRM'];
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);
+    };
+
+    $usePerms(['manage OAuth client']);
+    $created = Civi\Api4\OAuthClient::create()->setValues([
+      'provider' => 'test_example_1',
+      'guid' => "example-id-$random" ,
+      'secret' => "example-secret-$random",
+    ])->execute();
+
+    try {
+      Civi\Api4\OAuthClient::update()
+        ->addWhere('id', '=', $created->first()['id'])
+        ->setValues(['provider' => 'test_example_does_not_exist'])
+        ->execute();
+      $this->fail("Expected exception: invalid provider");
+    }
+    catch (API_Exception $e) {
+      $this->assertRegExp(';Invalid provider;', $e->getMessage());
+    }
+
+    Civi\Api4\OAuthClient::update()
+      ->addWhere('id', '=', $created->first()['id'])
+      ->setValues(['provider:name' => 'test_example_2'])
+      ->execute();
   }
 
 }

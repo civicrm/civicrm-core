@@ -40,6 +40,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $createClient = Civi\Api4\OAuthClient::create()->setValues([
+      'provider' => 'test_example_1',
       'guid' => "example-id-$random" ,
       'secret' => "example-secret-$random",
     ])->execute();
@@ -94,6 +95,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client']);
     $createClient = Civi\Api4\OAuthClient::create()->setValues([
+      'provider' => 'test_example_1',
       'guid' => "example-id-$random" ,
       'secret' => "example-secret-$random",
     ])->execute();
