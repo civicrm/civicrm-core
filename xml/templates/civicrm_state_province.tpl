@@ -3682,10 +3682,10 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- department of France (CRM-4769)
 (10009, 1076, "39", "Jura"),
 
--- new Italian provinces, as yet without codes (CRM-5048)
-(10010, 1107, "Bar", "Barletta-Andria-Trani"),
-(10011, 1107, "Fer", "Fermo"),
-(10012, 1107, "Mon", "Monza e Brianza"),
+-- new Italian provinces (CRM-5048)
+(10010, 1107, "BT", "Barletta-Andria-Trani"),
+(10011, 1107, "FM", "Fermo"),
+(10012, 1107, "MB", "Monza e Brianza"),
 
 -- new UK provinces (CRM-5224)
 (10013, 1226, "CWD", "Clwyd"),
