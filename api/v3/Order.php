@@ -88,10 +88,25 @@ function civicrm_api3_order_create($params) {
         $item = reset($lineItems['line_item']);
         $entity = str_replace('civicrm_', '', $item['entity_table']);
       }
+
       if ($entityParams) {
-        if (in_array($entity, ['participant', 'membership'])) {
+        $supportedEntity = TRUE;
+        switch ($entity) {
+          case 'participant':
+            $entityParams['status_id'] = 'Pending from incomplete transaction';
+            break;
+
+          case 'membership':
+            $entityParams['status_id'] = 'Pending';
+            break;
+
+          default:
+            // Don't create any related entities. We might want to support eg. Pledge one day?
+            $supportedEntity = FALSE;
+            break;
+        }
+        if ($supportedEntity) {
           $entityParams['skipLineItem'] = TRUE;
-          $entityParams['status_id'] = ($entity === 'participant' ? 'Pending from incomplete transaction' : 'Pending');
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
           $entityIds[] = $params[$entity . '_id'] = $entityResult['id'];
@@ -99,10 +114,8 @@ function civicrm_api3_order_create($params) {
             $items['entity_id'] = $entityResult['id'];
           }
         }
-        else {
-          // pledge payment
-        }
       }
+
       if (empty($priceSetID)) {
         $item = reset($lineItems['line_item']);
         $priceSetID = (int) civicrm_api3('PriceField', 'getvalue', [
