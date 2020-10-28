@@ -24,10 +24,10 @@
         <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
         <td>
           <div class="btn-group">
-            <button type="button" disabled ng-if="!search.display_name" class="btn btn-xs dropdown-toggle btn-default-outline">
+            <button type="button" disabled ng-if="!search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline">
               {{:: ts('0 Displays') }}
             </button>
-            <button type="button" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-default-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button type="button" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{:: search.display_name.length === 1 ? ts('1 Display') : ts('%1 Displays', {1: search.display_name.length}) }} <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" ng-if=":: search.display_name.length">

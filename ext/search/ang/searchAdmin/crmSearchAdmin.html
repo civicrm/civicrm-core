@@ -1,5 +1,5 @@
 <div id="bootstrap-theme" class="crm-search">
-  <h1 crm-page-title>{{:: ts('Search for %1', {1: $ctrl.entityTitle}) }}</h1>
+  <h1 crm-page-title>{{ $ctrl.entityTitle + ': ' + $ctrl.savedSearch.label }}</h1>
   <div crm-ui-debug="$ctrl.savedSearch"></div>
 
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
