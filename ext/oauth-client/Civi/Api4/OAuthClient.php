@@ -34,6 +34,17 @@ class OAuthClient extends Generic\DAOEntity {
     return $action->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * Request access with a username and password.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\OAuthClient\UserPassword
+   */
+  public static function userPassword($checkPermissions = TRUE) {
+    $action = new \Civi\Api4\Action\OAuthClient\UserPassword(static::class, __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
