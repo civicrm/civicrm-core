@@ -29,6 +29,9 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+
 /**
  *  Test APIv3 civicrm_contact* functions
  *
@@ -1571,6 +1574,38 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'create', $params);
 
     $this->callAPISuccess('contact', 'delete', $contact);
+  }
+
+  /**
+   * Verify that attempt to create individual contact just email succeeds.
+   *
+   *
+   * @dataProvider versionThreeAndFour
+   * @param int $version
+   *
+   * @throws API_Exception
+   * @throws CRM_Core_Exception
+   */
+  public function testCreateIndividualWithJustEmail($version) {
+    $this->_apiversion = $version;
+    $params = [
+      'contact_type' => 'Individual',
+      'email' => 'garlic@example.com',
+    ];
+
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $created = Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->addSelect('sort_name', 'display_name')->execute()->first();
+    $this->assertEquals('garlic@example.com', $created['sort_name']);
+    $this->assertEquals('garlic@example.com', $created['display_name']);
+    $this->assertCount(1, Email::get(FALSE)
+      ->addWhere('email', '=', 'garlic@example.com')
+      ->addWhere('location_type_id', '=', CRM_Core_BAO_LocationType::getDefault()->id)
+      ->addWhere('is_primary', '=', TRUE)
+      ->addWhere('contact_id', '=', (int) $contact['id'])
+      ->addSelect('row_count')
+      ->execute());
+
+    Contact::delete(FALSE)->addWhere('id', '=', $contact['id'])->execute();
   }
 
   /**
