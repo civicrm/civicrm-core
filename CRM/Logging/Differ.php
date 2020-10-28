@@ -420,7 +420,8 @@ ORDER BY log_date
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
       if (empty($this->log_date)) {
-        $this->log_date = CRM_Core_DAO::singleValueQuery("SELECT log_date FROM {$this->db}.log_{$table} WHERE log_conn_id = %1 LIMIT 1", $params);
+        // look for available table in above query instead of looking for last table. this will avoid multiple loops
+        $this->log_date = CRM_Core_DAO::singleValueQuery("SELECT log_date FROM {$this->db}.log_{$dao->table_name} WHERE log_conn_id = %1 LIMIT 1", $params);
       }
       $diffs = array_merge($diffs, $this->diffsInTableForId($dao->table_name, $dao->id));
     }
