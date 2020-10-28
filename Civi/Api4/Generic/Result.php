@@ -68,6 +68,32 @@ class Result extends \ArrayObject implements \JsonSerializable {
   }
 
   /**
+   * Return the one-and-only result record.
+   *
+   * If there are too many or too few results, then throw an exception.
+   *
+   * @return array
+   * @throws \API_Exception
+   */
+  public function single() {
+    $result = NULL;
+    foreach ($this as $values) {
+      if ($result === NULL) {
+        $result = $values;
+      }
+      else {
+        throw new \API_Exception("Expected to find one {$this->entity} record, but there were multiple.");
+      }
+    }
+
+    if ($result === NULL) {
+      throw new \API_Exception("Expected to find one {$this->entity} record, but there were zero.");
+    }
+
+    return $result;
+  }
+
+  /**
    * @param int $index
    * @return array|null
    */
