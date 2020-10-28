@@ -41,7 +41,7 @@
         </div>
         <div ng-switch-default>
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
-            <div ng-include="'~/searchAdmin/display.html'"></div>
+            <crm-search-admin-display display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
           </div>
         </div>
       </div>

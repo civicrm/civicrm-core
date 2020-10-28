@@ -40,7 +40,6 @@
       };
 
       this.$onInit = function () {
-        ctrl.display.settings.limit = parseInt(ctrl.display.settings.limit || 0, 10);
         ctrl.getFieldLabel = ctrl.crmSearchAdmin.getFieldLabel;
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.apiParams.select, function(columns, fieldExpr) {

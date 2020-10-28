@@ -151,7 +151,7 @@ function search_civicrm_pre($op, $entity, $id, &$params) {
 function search_civicrm_alterAngular($angular) {
   $changeSet = \Civi\Angular\ChangeSet::create('searchSettings')
     ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
-      $displayTypes = array_column(\Civi\Search\Admin::getDisplayTypes(['name']), 'name');
+      $displayTypes = array_column(\Civi\Search\Display::getDisplayTypes(['name']), 'name');
 
       if ($displayTypes) {
         $componentNames = 'crm-search-display-' . implode(', crm-search-display-', $displayTypes);

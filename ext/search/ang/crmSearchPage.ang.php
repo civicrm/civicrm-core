@@ -11,4 +11,5 @@ return [
   ],
   'basePages' => ['civicrm/search'],
   'requires' => ['ngRoute', 'api4', 'crmUi', 'crmSearchDisplay'],
+  'settingsFactory' => ['\Civi\Search\Display', 'getPageSettings'],
 ];

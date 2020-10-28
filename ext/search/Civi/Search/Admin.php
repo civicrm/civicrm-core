@@ -24,7 +24,7 @@ class Admin {
     return [
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
-      'displayTypes' => self::getDisplayTypes(['name', 'label', 'description', 'icon']),
+      'displayTypes' => Display::getDisplayTypes(['name', 'label', 'description', 'icon']),
     ];
   }
 
@@ -103,23 +103,6 @@ class Admin {
       $results[$entity] = array_values($entityLinks);
     }
     return array_filter($results);
-  }
-
-  /**
-   * @param array $props
-   * @return array
-   */
-  public static function getDisplayTypes(array $props):array {
-    try {
-      return \Civi\Api4\SearchDisplay::getFields(FALSE)
-        ->setLoadOptions($props)
-        ->addWhere('name', '=', 'type')
-        ->execute()
-        ->first()['options'];
-    }
-    catch (\Exception $e) {
-      return [];
-    }
   }
 
 }

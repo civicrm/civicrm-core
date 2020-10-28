@@ -33,6 +33,7 @@
         {{:: ts('Smart Group') }}
       </a>
     </li>
+    <li class="dropdown-header">{{ ts('Display:') }}</li>
     <li ng-repeat="type in ::$ctrl.displayTypes">
       <a href ng-click="$ctrl.addDisplay(type.name)">
         <i class="crm-i {{:: type.icon }}"></i>
