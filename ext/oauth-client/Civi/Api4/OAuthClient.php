@@ -35,6 +35,17 @@ class OAuthClient extends Generic\DAOEntity {
   }
 
   /**
+   * Request access with client credentials
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\OAuthClient\ClientCredential
+   */
+  public static function clientCredential($checkPermissions = TRUE) {
+    $action = new \Civi\Api4\Action\OAuthClient\ClientCredential(static::class, __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
+  /**
    * Request access with a username and password.
    *
    * @param bool $checkPermissions
