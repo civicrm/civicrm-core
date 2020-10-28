@@ -44,7 +44,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
   public function testDispatch() {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_ghet',
       [$this, 'hook_civicrm_ghet']);
-    \Civi::service('dispatcher')->addListener('hook_civicrm_ghet',
+    \Civi::dispatcher()->addListener('hook_civicrm_ghet',
       [$this, 'onGhet']);
 
     $roString = 'readonly';

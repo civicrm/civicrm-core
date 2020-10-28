@@ -70,6 +70,16 @@
 <p>{ts}You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.{/ts}</p>
 {/htxt}
 
+{htxt id='id-defaultExternUrl'}
+<p>{ts}CiviCRM generates callback URLs for external services.{/ts}</p>
+<p>{ts}Some callback URLs are being migrated to a different style. During the transition, you may indicate a preferred style, such as:{/ts}</p>
+<ul>
+    <li>{ts}"Standalone Scripts" - In the traditional style, each callback URL is a standalone PHP script. You may wish to use this style if you need to maximize performance or if you need continuity.{/ts}</li>
+    <li>{ts}"Router" - In the newer style, each callback URL is defined like a normal CiviCRM page. You may wish to use this style for greater consistency or portability.{/ts}</li>
+</ul>
+<p>{ts}This setting only affects the default URL produced by "civicrm-core". Extensions and add-ons may override specific URLs.{/ts}</p>
+{/htxt}
+
 {htxt id='id-url_vars'}
 {ts}URL Variables{/ts}
   <table>

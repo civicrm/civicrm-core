@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -107,7 +105,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   protected function _itemsToGet($field) {
     foreach ($this->where as $clause) {
       // Look for exact-match operators (=, IN, or LIKE with no wildcard)
-      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN']) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && strpos($clause[2], '%') !== FALSE)))) {
+      if ($clause[0] == $field && (in_array($clause[1], ['=', 'IN'], TRUE) || ($clause[1] == 'LIKE' && !(is_string($clause[2]) && strpos($clause[2], '%') !== FALSE)))) {
         return (array) $clause[2];
       }
     }
@@ -120,7 +118,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    * Checks the SELECT, WHERE and ORDER BY params to see what fields are needed.
    *
    * Note that if no SELECT clause has been set then all fields should be selected
-   * and this function will always return TRUE.
+   * and this function will return TRUE for field expressions that don't contain a :pseudoconstant suffix.
    *
    * @param string ...$fieldNames
    *   One or more field names to check (uses OR if multiple)
@@ -128,7 +126,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
    *   Returns true if any given fields are in use.
    */
   protected function _isFieldSelected(string ...$fieldNames) {
-    if (!$this->select || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
+    if ((!$this->select && strpos($fieldNames[0], ':') === FALSE) || array_intersect($fieldNames, array_merge($this->select, array_keys($this->orderBy)))) {
       return TRUE;
     }
     return $this->_whereContains($fieldNames);

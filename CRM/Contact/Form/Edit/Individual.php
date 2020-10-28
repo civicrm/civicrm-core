@@ -88,7 +88,6 @@ class CRM_Contact_Form_Edit_Individual {
         'objectExists',
         ['CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier']
       );
-      CRM_Core_ShowHideBlocks::links($form, 'demographics', '', '');
     }
   }
 

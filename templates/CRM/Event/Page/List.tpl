@@ -10,10 +10,8 @@
 {* Displays current and upcoming public Events Listing as an HTML page. *}
 {include file="CRM/common/jsortable.tpl"}
 <div class="crm-section crm-event-list">
-  {if $eventCartEnabled}
-    <a href="{crmURL p='civicrm/event/view_cart' }" class="button crm-shoppingcart-button"><i class="crm-i fa-shopping-cart"></i> {ts}View Cart{/ts}</a>
-    <a href="{crmURL p='civicrm/event/cart_checkout'}" class="button crm-check-out-button"><i class="crm-i fa-credit-card"></i> {ts}Checkout{/ts}</a>
-  {/if}
+  {crmRegion name="crm-event-list-pre"}
+  {/crmRegion}
 
   <table id="options" class="display">
     <thead>
@@ -30,7 +28,7 @@
     {foreach from=$events key=uid item=event}
       <tr class="{cycle values="odd-row,even-row"} {$row.class}">
         <td><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}read more{/ts}"><strong>{$event.title}</strong></a></td>
-        <td>{if $event.summary}{$event.summary} (<a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}details...{/ts}">{ts}read more{/ts}...</a>){else}&nbsp;{/if}</td>
+        <td>{if $event.summary}{$event.summary|purify} (<a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}details...{/ts}">{ts}read more{/ts}...</a>){else}&nbsp;{/if}</td>
         <td class="nowrap" data-order="{$event.start_date|crmDate:'%Y-%m-%d'}">
           {if $event.start_date}{$event.start_date|crmDate}{if $event.end_date}<br /><em>{ts}through{/ts}</em><br />{strip}
             {* Only show end time if end date = start date *}
@@ -48,4 +46,7 @@
       </tr>
     {/foreach}
   </table>
+
+  {crmRegion name="crm-event-list-post"}
+  {/crmRegion}
 </div>

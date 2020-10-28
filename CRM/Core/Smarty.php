@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -258,14 +256,14 @@ class CRM_Core_Smarty extends Smarty {
   /**
    * Temporarily assign a list of variables.
    *
-   * @code
+   * ```
    * $smarty->pushScope(array(
    *   'first_name' => 'Alice',
    *   'last_name' => 'roberts',
    * ));
    * $html = $smarty->fetch('view-contact.tpl');
    * $smarty->popScope();
-   * @endcode
+   * ```
    *
    * @param array $vars
    *   (string $name => mixed $value).

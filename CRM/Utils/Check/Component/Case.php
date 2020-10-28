@@ -46,7 +46,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   /**
    * Check that the case-type names don't rely on double-munging.
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkCaseTypeNameConsistency() {
@@ -105,7 +105,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   /**
    * Check that the timestamp columns are populated. (CRM-20958)
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkNullTimestamps() {
@@ -149,7 +149,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   /**
    * Check that the relationship types aren't going to cause problems.
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkRelationshipTypeProblems() {
@@ -342,7 +342,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       + array_column($relationshipTypes, 'id', 'label_b_a');
     $missing = [];
     foreach ($caseTypes as $caseType) {
-      foreach ($caseType['definition']['caseRoles'] as $role) {
+      foreach ($caseType['definition']['caseRoles'] ?? [] as $role) {
         if (!isset($allConfigured[$role['name']])) {
           $missing[$role['name']] = $role['name'];
         }
@@ -387,7 +387,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
    * We don't have to think about edge cases because there are already
    * status checks above for those.
    *
-   * @return array<CRM_Utils_Check_Message>
+   * @return CRM_Utils_Check_Message[]
    *   An empty array, or a list of warnings
    */
   public function checkExternalXmlFileRoleNames() {

@@ -66,7 +66,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
         break;
 
       default:
-        CRM_Core_Error::fatal(ts('Unrecognized upgrade action'));
+        throw new CRM_Core_Exception(ts('Unrecognized upgrade action'));
     }
   }
 
@@ -78,35 +78,48 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template = CRM_Core_Smarty::singleton();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
-    if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
-      CRM_Core_Error::fatal($error);
+    // Show success msg if db already upgraded
+    if (version_compare($currentVer, $latestVer) == 0) {
+      $template->assign('upgraded', TRUE);
+      $template->assign('newVersion', $latestVer);
+      CRM_Utils_System::setTitle(ts('Your database has already been upgraded to CiviCRM %1',
+        [1 => $latestVer]
+      ));
+      $template->assign('pageTitle', ts('Your database has already been upgraded to CiviCRM %1',
+        [1 => $latestVer]
+      ));
     }
 
-    $config = CRM_Core_Config::singleton();
+    // Throw error if db in unexpected condition
+    elseif ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
+      throw new CRM_Core_Exception($error);
+    }
 
-    // All cached content needs to be cleared because the civi codebase was just replaced
-    CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
-    CRM_Core_Menu::store();
+    else {
+      $config = CRM_Core_Config::singleton();
 
-    // cleanup only the templates_c directory
-    $config->cleanup(1, FALSE);
+      // All cached content needs to be cleared because the civi codebase was just replaced
+      CRM_Core_Resources::singleton()->flushStrings()->resetCacheCode();
 
-    $preUpgradeMessage = NULL;
-    $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+      // cleanup only the templates_c directory
+      $config->cleanup(1, FALSE);
 
-    $template->assign('currentVersion', $currentVer);
-    $template->assign('newVersion', $latestVer);
-    $template->assign('upgradeTitle', ts('Upgrade CiviCRM from v %1 To v %2',
-      [1 => $currentVer, 2 => $latestVer]
-    ));
-    $template->assign('upgraded', FALSE);
+      $preUpgradeMessage = NULL;
+      $upgrade->setPreUpgradeMessage($preUpgradeMessage, $currentVer, $latestVer);
+
+      $template->assign('preUpgradeMessage', $preUpgradeMessage);
+      $template->assign('currentVersion', $currentVer);
+      $template->assign('newVersion', $latestVer);
+      $template->assign('upgradeTitle', ts('Upgrade CiviCRM from v %1 To v %2',
+        [1 => $currentVer, 2 => $latestVer]
+      ));
+      $template->assign('upgraded', FALSE);
+    }
 
     // Render page header
     if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
       CRM_Utils_System::addHTMLHead($region->render(''));
     }
-
-    $template->assign('preUpgradeMessage', $preUpgradeMessage);
 
     $content = $template->fetch('CRM/common/success.tpl');
     echo CRM_Utils_System::theme($content, $this->_print, TRUE);
@@ -120,7 +133,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
 
     if ($error = $upgrade->checkUpgradeableVersion($currentVer, $latestVer)) {
-      CRM_Core_Error::fatal($error);
+      throw new CRM_Core_Exception($error);
     }
 
     $config = CRM_Core_Config::singleton();
@@ -146,7 +159,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       'buttons' => ['retry' => $config->debug, 'skip' => $config->debug],
     ]);
     $queueRunner->runAllViaWeb();
-    CRM_Core_Error::fatal(ts('Upgrade failed to redirect'));
+    throw new CRM_Core_Exception(ts('Upgrade failed to redirect'));
   }
 
   /**
@@ -173,7 +186,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     // do a version check - after doFinish() sets the final version
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
     if ($error = $upgrade->checkCurrentVersion($currentVer, $latestVer)) {
-      CRM_Core_Error::fatal($error);
+      throw new CRM_Core_Exception($error);
     }
 
     $template->assign('message', $postUpgradeMessage);

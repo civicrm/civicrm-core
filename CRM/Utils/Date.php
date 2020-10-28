@@ -26,7 +26,7 @@ class CRM_Utils_Date {
    * @param array $date
    *   ('Y', 'M', 'd').
    * @param string $separator
-   *   The seperator to use when formatting the date.
+   *   The separator to use when formatting the date.
    * @param int|string $invalidDate what to return if the date is invalid
    *
    * @return string
@@ -420,6 +420,19 @@ class CRM_Utils_Date {
     else {
       return '';
     }
+  }
+
+  /**
+   * Format the field according to the site's preferred date format.
+   *
+   * This is likely to look something like December 31st, 2020.
+   *
+   * @param string $date
+   *
+   * @return string
+   */
+  public static function formatDateOnlyLong(string $date):string {
+    return CRM_Utils_Date::customFormat($date, Civi::settings()->get('dateformatFull'));
   }
 
   /**
@@ -1822,6 +1835,7 @@ class CRM_Utils_Date {
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
+            $to = self::intervalAdd('day', -1, $to);
             unset($from);
             break;
 

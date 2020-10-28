@@ -75,7 +75,7 @@ class CRM_Utils_Number {
    */
   public static function formatUnitSize($size, $checkForPostMax = FALSE) {
     if ($size) {
-      $last = strtolower($size{strlen($size) - 1});
+      $last = strtolower($size[strlen($size) - 1]);
       $size = (int) $size;
       switch ($last) {
         // The 'G' modifier is available since PHP 5.1.0

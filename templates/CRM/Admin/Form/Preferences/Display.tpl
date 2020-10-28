@@ -161,10 +161,7 @@
       <td>
         {$form.editor_id.html}
         &nbsp;
-        <span class="crm-button crm-icon-button" style="display:inline-block;vertical-align:middle;float:none!important;">
-          <i class="crm-i fa-wrench" style="margin: 0 -18px 0 2px;"></i>
-          {$form.ckeditor_config.html}
-        </span>
+        {$form.ckeditor_config.html}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
@@ -206,22 +203,14 @@
         {$form.menubar_color.html}
       </td>
     </tr>
-
-    {if $config->userSystem->is_drupal EQ '1'}
-      <tr class="crm-preferences-display-form-block-theme">
-        <td class="label">{ts}Theme{/ts} {help id="theme"}</td>
-        <td>{$form.theme_backend.html}</td>
-      </tr>
-    {else}
-      <tr class="crm-preferences-display-form-block-theme_backend">
-        <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
-        <td>{$form.theme_backend.html}</td>
-      </tr>
-      <tr class="crm-preferences-display-form-block-theme_frontend">
-        <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
-        <td>{$form.theme_frontend.html}</td>
-      </tr>
-      {/if}
+    <tr class="crm-preferences-display-form-block-theme_backend">
+      <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
+      <td>{$form.theme_backend.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-theme_frontend">
+      <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
+      <td>{$form.theme_frontend.html}</td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

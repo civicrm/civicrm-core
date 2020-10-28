@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionAVG extends SqlFunction {
 
+  protected static $category = self::CATEGORY_AGGREGATE;
+
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
@@ -23,5 +25,12 @@ class SqlFunctionAVG extends SqlFunction {
       'must_be' => ['SqlField'],
     ],
   ];
+
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Average');
+  }
 
 }

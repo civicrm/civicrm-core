@@ -26,7 +26,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    * @param array $params
    *   (reference) an assoc array of name/value pairs.
    *
-   * @return \CRM_Price_DAO_LineItem
+   * @return CRM_Price_BAO_LineItem
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
@@ -35,11 +35,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     $id = $params['id'] ?? NULL;
     if ($id) {
       CRM_Utils_Hook::pre('edit', 'LineItem', $id, $params);
-      $op = CRM_Core_Action::UPDATE;
     }
     else {
-      CRM_Utils_Hook::pre('create', 'LineItem', $params['entity_id'], $params);
-      $op = CRM_Core_Action::ADD;
+      CRM_Utils_Hook::pre('create', 'LineItem', $id, $params);
     }
 
     // unset entity table and entity id in $params
@@ -54,21 +52,18 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         $params['unit_price'] = 0;
       }
     }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
-      if (empty($params['financial_type_id'])) {
-        throw new Exception('Mandatory key(s) missing from params array: financial_type_id');
-      }
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
-      if (!in_array($params['financial_type_id'], array_keys($types))) {
-        throw new Exception('You do not have permission to create this line item');
-      }
+
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    if (isset($params['financial_type_id'], $params['line_total'], $taxRates[$params['financial_type_id']])) {
+      $taxRate = $taxRates[$params['financial_type_id']];
+      $params['tax_amount'] = ($taxRate / 100) * $params['line_total'];
     }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();
     $lineItemBAO->copyValues($params);
 
     $return = $lineItemBAO->save();
-    if ($lineItemBAO->entity_table == 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+    if ($lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       $membershipPaymentParams = [
         'membership_id' => $lineItemBAO->entity_id,
         'contribution_id' => $lineItemBAO->contribution_id,
@@ -117,34 +112,6 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
   }
 
   /**
-   * Modifies $params array for filtering financial types.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   */
-  public static function getAPILineItemParams(&$params) {
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
-    if ($types && empty($params['financial_type_id'])) {
-      $params['financial_type_id'] = ['IN' => array_keys($types)];
-    }
-    elseif ($types) {
-      if (is_array($params['financial_type_id'])) {
-        $invalidFts = array_diff($params['financial_type_id'], array_keys($types));
-      }
-      elseif (!in_array($params['financial_type_id'], array_keys($types))) {
-        $invalidFts = $params['financial_type_id'];
-      }
-      if ($invalidFts) {
-        $params['financial_type_id'] = ['NOT IN' => $invalidFts];
-      }
-    }
-    else {
-      $params['financial_type_id'] = 0;
-    }
-  }
-
-  /**
    * @param int $contributionId
    *
    * @return null|string
@@ -186,8 +153,8 @@ WHERE li.contribution_id = %1";
    */
   public static function getLineItems($entityId, $entity = 'participant', $isQuick = FALSE, $isQtyZero = TRUE, $relatedEntity = FALSE) {
     $whereClause = $fromClause = NULL;
-    $selectClause = "
-      SELECT    li.id,
+    $selectClause = '
+      SELECT li.id,
       li.label,
       li.contribution_id,
       li.qty,
@@ -205,19 +172,19 @@ WHERE li.contribution_id = %1";
       li.price_field_value_id,
       li.financial_type_id,
       li.tax_amount,
-      pfv.description";
+      pfv.description';
 
-    $condition = "li.entity_id = %2.id AND li.entity_table = 'civicrm_%2'";
+    $condition = "li.entity_id = civicrm_%2.id AND li.entity_table = 'civicrm_%2'";
     if ($relatedEntity) {
-      $condition = "li.contribution_id = %2.id ";
+      $condition = 'li.contribution_id = civicrm_%2.id ';
     }
 
     $fromClause = "
-      FROM      civicrm_%2 as %2
+      FROM civicrm_%2
       LEFT JOIN civicrm_line_item li ON ({$condition})
-      LEFT JOIN civicrm_price_field_value pfv ON ( pfv.id = li.price_field_value_id )
+      LEFT JOIN civicrm_price_field_value pfv ON (pfv.id = li.price_field_value_id)
       LEFT JOIN civicrm_price_field pf ON (pf.id = li.price_field_id )";
-    $whereClause = " WHERE     %2.id = %1";
+    $whereClause = " WHERE civicrm_%2.id = %1";
     $orderByClause = " ORDER BY pf.weight, pfv.weight";
 
     if ($isQuick) {
@@ -286,7 +253,7 @@ WHERE li.contribution_id = %1";
     }
     if ($invoicing) {
       // @todo - this is an inappropriate place to be doing form level assignments.
-      $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+      $taxTerm = Civi::settings()->get('tax_term');
       $smarty = CRM_Core_Smarty::singleton();
       $smarty->assign('taxTerm', $taxTerm);
       $smarty->assign('getTaxDetails', $getTaxDetails);
@@ -426,17 +393,8 @@ WHERE li.contribution_id = %1";
         }
         if (!empty($contributionDetails->id)) {
           $line['contribution_id'] = $contributionDetails->id;
-          if ($line['entity_table'] == 'civicrm_contribution') {
+          if ($line['entity_table'] === 'civicrm_contribution') {
             $line['entity_id'] = $contributionDetails->id;
-          }
-          // CRM-19094: entity_table is set to civicrm_membership then ensure
-          // the entityId is set to membership ID not contribution by default
-          elseif ($line['entity_table'] == 'civicrm_membership' && !empty($line['entity_id']) && $line['entity_id'] == $contributionDetails->id) {
-            $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionDetails->id, 'membership_id', 'contribution_id');
-            if ($membershipId && (int) $membershipId !== (int) $line['entity_id']) {
-              $line['entity_id'] = $membershipId;
-              Civi::log()->warning('Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required. Please log a ticket at https://lab.civicrm.org/dev/core with steps to get this.', ['civi.tag' => 'deprecated']);
-            }
           }
         }
 
@@ -654,8 +612,9 @@ WHERE li.contribution_id = %1";
     $lineItems
   ) {
     $entityTable = "civicrm_" . $entity;
+    $newLineItems = [];
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
-      $params, $lineItems
+      $params, $newLineItems
     );
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();

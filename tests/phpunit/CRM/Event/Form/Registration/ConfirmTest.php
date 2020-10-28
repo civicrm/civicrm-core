@@ -76,6 +76,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         ],
       ],
     ]);
+
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $mut->checkMailLog([
       'Dear Logged In,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
@@ -92,9 +93,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @dataProvider getThousandSeparators
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    *
-   * @throws \Exception
+   * @dataProvider getThousandSeparators
    */
   public function testPaidSubmit($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -165,6 +167,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(8000.67, $contribution['total_amount']);
     $this->assertEquals(1.67, $contribution['fee_amount']);
     $this->assertEquals(7999, $contribution['net_amount']);
+    $this->assertNotEmpty($contribution['receipt_date']);
     $this->assertNotContains(' (multiple participants)', $contribution['amount_level']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
@@ -413,9 +416,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Submit event registration with a note field
    *
-   * @param  array $event
+   * @param array $event
    * @param int $contact_id
    *
+   * @return array
    * @throws \Exception
    */
   private function submitWithNote($event, $contact_id) {
@@ -530,8 +534,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param string $field_name
    * @param string $field_type
    * @param string $field_label
+   *
    * @return array
    *   API result array
+   * @throws \CRM_Core_Exception
    */
   private function uf_field_add($uf_group_id, $field_name, $field_type, $field_label) {
     $params = [
@@ -544,8 +550,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'is_active' => 1,
       'uf_group_id' => $uf_group_id,
     ];
-    $result = civicrm_api3('UFField', 'create', $params);
-    return $result;
+    return $this->callAPISuccess('UFField', 'create', $params);
   }
 
   /**
@@ -557,7 +562,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     //create an event with an attached profile containing a note
     $event = $this->creatEventWithProfile(NULL);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
-    $event['note'] = "This is note 1";
+    $event['note'] = 'This is note 1';
     list($contact_id, $participant_id) = $this->submitWithNote($event, NULL);
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
@@ -565,15 +570,15 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     //and confirm that the note shown in the email is the current one
     $event = $this->creatEventWithProfile($event);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
-    $event['note'] = "This is note 2";
+    $event['note'] = 'This is note 2';
     list($contact_id, $participant_id) = $this->submitWithNote($event, $contact_id);
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
     //finally, submit a blank note and confirm that the note shown in the email is blank
     $event = $this->creatEventWithProfile($event);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
-    $event['note'] = "";
-    list($contact_id, $participant_id) = $this->submitWithNote($event, $contact_id);
+    $event['note'] = '';
+    $this->submitWithNote($event, $contact_id);
   }
 
 }

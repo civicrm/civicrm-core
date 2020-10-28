@@ -1,0 +1,32 @@
+<table>
+  <thead>
+    <tr ng-model="$ctrl.params.select" ui-sortable="{axis: 'x'}">
+      <th class="crm-search-result-select">
+        <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="selectAllRows()" ng-disabled="!(loading === false && !loadingAllRows && $ctrl.results[$ctrl.page] && $ctrl.results[$ctrl.page][0].id)">
+      </th>
+      <th ng-repeat="col in $ctrl.params.select" ng-click="setOrderBy(col, $event)" title="{{:: ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).')}}">
+        <i class="crm-i {{ getOrderBy(col) }}"></i>
+        <span>{{ $ctrl.getFieldLabel(col) }}</span>
+        <a href class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="$ctrl.clearParam('select', $index)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+      </th>
+      <th class="form-inline">
+        <input class="form-control crm-action-menu fa-plus" ng-model="controls.select" crm-ui-select="::{data: fieldsForSelect, placeholder: ts('Add')}" ng-change="addParam('select')">
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="row in $ctrl.results[$ctrl.page]">
+      <td>
+        <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(loading === false && !loadingAllRows && row.id)">
+      </td>
+      <td ng-repeat="col in $ctrl.params.select">
+        {{ formatResult(row, col) }}
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+<div class="messages warning no-popup" ng-if="error">
+  <h4>{{:: ts('An error occurred') }}</h4>
+  <p>{{ error }}</p>
+</div>

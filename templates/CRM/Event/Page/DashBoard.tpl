@@ -10,21 +10,15 @@
 {* CiviEvent DashBoard (launch page) *}
 {capture assign=newEventURL}{crmURL p="civicrm/event/add" q="action=add&reset=1"}{/capture}
 {capture assign=configPagesURL}{crmURL p="civicrm/event/manage" q="reset=1"}{/capture}
-{capture assign=icalFile}{crmURL p='civicrm/event/ical' q="reset=1" fe=1 a=1}{/capture}
-{capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1" fe=1 a=1}{/capture}
-{capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1" fe=1 a=1}{/capture}
-{capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1 a=1}{/capture}
 
 {if $eventSummary.total_events}
-    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list"></i> {ts}Manage Events{/ts}</span></a>
-    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o"></i> {ts}New Event{/ts}</span></a>
+    <a href="{$configPagesURL}" class="button no-popup"><span><i class="crm-i fa-th-list" aria-hidden="true"></i> {ts}Manage Events{/ts}</span></a>
+    <a href="{$newEventURL}" class="button"><span><i class="crm-i fa-calendar-plus-o" aria-hidden="true"></i> {ts}New Event{/ts}</span></a>
     <div class="clear">&nbsp;</div>
     <h3 id="crm-event-dashboard-heading">{ts}Event Summary{/ts}
       {help id="id-event-intro"}
-      <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
-      <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
-      <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
-      <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a></h3>
+      {include file="CRM/Event/Page/iCalLinks.tpl"}
+    </h3>
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -93,7 +87,7 @@
       {if $actionColumn}
         <td class="crm-event-isMap">
           {if $values.isMap}
-            <a href="{$values.isMap}" title="{ts}Map event location{/ts}">&raquo;&nbsp;{ts}Map{/ts}</a>
+            <a href="{$values.isMap}" title="{ts}Map event location{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
             &nbsp;|&nbsp;
           {/if}
           {if $values.configure}
@@ -124,13 +118,13 @@
     </tbody>
     </table>
     {if $eventSummary.total_events GT 10}
-     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}">&raquo; {ts}Browse more events{/ts}...</a></div>
+     <div><a href="{crmURL p='civicrm/admin/event' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Browse more events{/ts}...</a></div>
     {/if}
 {else}
     <br />
     <div class="messages status no-popup">
         <table>
-            <tr><div class="icon inform-icon"></div></tr>
+            <tr>{icon icon="fa-info-circle"}{/icon}</tr>
             <tr>
                 {ts}There are no active Events to display.{/ts}
                 {ts 1=$newEventURL}You can <a href="%1">Create a New Event</a> now.{/ts}

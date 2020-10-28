@@ -61,6 +61,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     $this->_actionButtonName = $this->getButtonName('next', 'action');
@@ -308,9 +311,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     // @todo - stop changing formValues - respect submitted form values, change a working array.
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
-
-    // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
 
     $this->set('queryParams', $this->_queryParams);
@@ -389,12 +389,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
-    if ($cid) {
+    // skip cid (contact id of membership/participant record) to get associated payments for membership/participant record,
+    // contribution record may be on different contact id.
+    $skip_cid = CRM_Utils_Request::retrieve('skip_cid', 'Boolean', $this, FALSE, FALSE);
+
+    if ($cid && !$skip_cid) {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        // @todo - why do we retrieve these when they are not used?
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );

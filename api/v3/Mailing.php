@@ -134,8 +134,8 @@ function _civicrm_api3_mailing_create_spec(&$params) {
 
   $params['forward_replies']['api.default'] = FALSE;
   $params['auto_responder']['api.default'] = FALSE;
-  $params['open_tracking']['api.default'] = TRUE;
-  $params['url_tracking']['api.default'] = TRUE;
+  $params['open_tracking']['api.default'] = Civi::settings()->get('open_tracking_default');
+  $params['url_tracking']['api.default'] = Civi::settings()->get('url_tracking_default');
 
   $params['header_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
   $params['footer_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
@@ -567,8 +567,8 @@ function civicrm_api3_mailing_preview($params) {
     $details = $details[0][0] ?? NULL;
   }
   else {
-    $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = $details[0][$contactID];
+    [$details] = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = $details[$contactID];
   }
 
   $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
@@ -657,7 +657,7 @@ function civicrm_api3_mailing_send_test($params) {
         $emailId = $emailDetail[$email]['email_id'];
         $contactId = $emailDetail[$email]['contact_id'];
       }
-      if (!$contactId) {
+      if (!$contactId && CRM_Core_Permission::check('add contacts')) {
         //create new contact.
         $contact   = civicrm_api3('Contact', 'create',
           [
@@ -669,13 +669,15 @@ function civicrm_api3_mailing_send_test($params) {
         $contactId = $contact['id'];
         $emailId   = $contact['values'][$contactId]['api.Email.get']['id'];
       }
-      civicrm_api3('MailingEventQueue', 'create',
-        [
-          'job_id' => $job['id'],
-          'email_id' => $emailId,
-          'contact_id' => $contactId,
-        ]
-      );
+      if ($emailId && $contactId) {
+        civicrm_api3('MailingEventQueue', 'create',
+          [
+            'job_id' => $job['id'],
+            'email_id' => $emailId,
+            'contact_id' => $contactId,
+          ]
+        );
+      }
     }
   }
 

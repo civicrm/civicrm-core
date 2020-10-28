@@ -397,7 +397,14 @@ function civicrm_api3_system_updatelogtables($params) {
  * @throws \API_Exception
  */
 function civicrm_api3_system_utf8conversion($params) {
-  if (CRM_Core_BAO_SchemaHandler::migrateUtf8mb4($params['is_revert'])) {
+  $params['patterns'] = explode(',', $params['patterns']);
+  $params['databases'] = empty($params['databases']) ? NULL : explode(',', $params['databases']);
+  if (CRM_Core_BAO_SchemaHandler::migrateUtf8mb4(
+    $params['is_revert'],
+    $params['patterns'],
+    $params['databases']
+    )
+  ) {
     return civicrm_api3_create_success(1);
   }
   throw new API_Exception('Conversion failed');
@@ -413,6 +420,15 @@ function _civicrm_api3_system_utf8conversion_spec(&$params) {
     'title' => ts('Revert back from UTF8MB4 to UTF8?'),
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => FALSE,
+  ];
+  $params['patterns'] = [
+    'title' => ts('CSV list of table patterns (defaults to "civicrm\_%")'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.default' => 'civicrm\_%',
+  ];
+  $params['databases'] = [
+    'title' => ts('CSV list of database names (defaults to CiviCRM database)'),
+    'type' => CRM_Utils_Type::T_STRING,
   ];
 }
 
@@ -514,11 +530,8 @@ function civicrm_api3_system_createmissinglogtables() {
  *
  */
 function civicrm_api3_system_rebuildmultilingualschema() {
-  $domain = new CRM_Core_DAO_Domain();
-  $domain->find(TRUE);
-
-  if ($domain->locales) {
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+  $locales = CRM_Core_I18n::getMultilingual();
+  if ($locales) {
     CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales);
     return civicrm_api3_create_success(1);
   }

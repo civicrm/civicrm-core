@@ -43,9 +43,8 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   /**
    * This report has been optimised for group filtering.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
 
@@ -172,7 +171,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'financial_type_id' => [
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'contribution_page_id' => [
@@ -354,7 +353,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $fy = $config->fiscalYearStart;
                 $fiscal = self::fiscalYearOffset($field['dbAlias']);
 
-                $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy{'M'}})-1 MONTH) AS {$tableName}_{$fieldName}_start";
+                $select[] = "DATE_ADD(MAKEDATE({$fiscal}, 1), INTERVAL ({$fy['M']})-1 MONTH) AS {$tableName}_{$fieldName}_start";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "{$fiscal} AS {$tableName}_{$fieldName}_interval";
                 $field['title'] = ts('Fiscal Year Beginning');
@@ -764,9 +763,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
   /**
    * Build chart.
    *
-   * @param array $rows
+   * @param array $original_rows
    */
-  public function buildChart(&$rows) {
+  public function buildChart(&$original_rows) {
     $graphRows = [];
 
     if (!empty($this->_params['charts'])) {
@@ -774,6 +773,14 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
         $contrib = !empty($this->_params['fields']['total_amount']);
         $softContrib = !empty($this->_params['fields']['soft_amount']);
+
+        // Make a copy so that we don't affect what gets passed later to hooks etc.
+        $rows = $original_rows;
+        if ($this->_rollup) {
+          // Remove the total row otherwise it overwrites the real last month's data since it has the
+          // same date.
+          array_pop($rows);
+        }
 
         foreach ($rows as $key => $row) {
           if ($row['civicrm_contribution_receive_date_subtotal']) {

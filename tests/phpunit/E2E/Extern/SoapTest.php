@@ -63,7 +63,7 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
   public function testAuthenticationBadKey() {
     $client = $this->createClient();
     $key = $client->authenticate($this->adminUser, $this->adminPass);
-    $client->get_contact(mt_rand(), array());
+    $client->get_contact(mt_rand(), []);
   }
 
   /**

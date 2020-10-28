@@ -38,7 +38,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
   /**
    * Common pre-processing.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Pledge_Form_Task $form
    */
   public static function preProcessCommon(&$form) {
     $form->_pledgeIds = [];
@@ -46,8 +46,6 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
     $values = $form->controller->exportValues('Search');
 
     $form->_task = $values['task'];
-    $pledgeTasks = CRM_Pledge_Task::tasks();
-    $form->assign('taskName', $pledgeTasks[$form->_task]);
 
     $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
@@ -81,16 +79,7 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
     }
 
     $form->_pledgeIds = $form->_componentIds = $ids;
-
-    // set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $session->replaceUserContext(CRM_Utils_System::url('civicrm/pledge/search', $urlParams));
+    $form->setNextUrl('pledge');
   }
 
   /**

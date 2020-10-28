@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -32,8 +30,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicUpdateAction $thisAction) => array
+   *   Function(array $item, BasicUpdateAction $thisAction): array
    */
   private $setter;
 
@@ -45,7 +42,6 @@ class BasicUpdateAction extends AbstractUpdateAction {
    * @param string|array $select
    *   One or more fields to select from each matching item.
    * @param callable $setter
-   *   Function(array $item, BasicUpdateAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $select = 'id', $setter = NULL) {
     parent::__construct($entityName, $actionName, $select);
@@ -61,6 +57,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function _run(Result $result) {
+    $this->formatWriteValues($this->values);
     foreach ($this->getBatchRecords() as $item) {
       $result[] = $this->writeRecord($this->values + $item);
     }

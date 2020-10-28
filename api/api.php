@@ -195,7 +195,7 @@ function civicrm_error($result) {
  * @return string|null
  */
 function _civicrm_api_get_camel_name($entity) {
-  return is_string($entity) ? CRM_Utils_String::convertStringToCamel($entity) : NULL;
+  return is_string($entity) ? \Civi\API\Request::normalizeEntityName($entity) : NULL;
 }
 
 /**
@@ -281,33 +281,25 @@ function _civicrm_api_replace_variable($value, $parentResult, $separator) {
  *
  * @return string
  *   Entity name in underscore separated format.
+ *
+ * @deprecated
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
-  if (!$entity || $entity === strtolower($entity)) {
-    return $entity;
+  if (!$entity) {
+    // @todo - this should not be called when empty.
+    return '';
   }
-  elseif ($entity == 'PCP') {
-    return 'pcp';
-  }
-  else {
-    $entity = ltrim(strtolower(str_replace('U_F',
-          'uf',
-          // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
-          preg_replace('/(?=[A-Z])/', '_$0', $entity)
-        )), '_');
-  }
-  return $entity;
+  return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entity);
 }
 
 /**
  * Having a DAO object find the entity name.
  *
- * @param object $bao
+ * @param CRM_Core_DAO $bao
  *   DAO being passed in.
  *
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {
-  $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+  return CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
 }

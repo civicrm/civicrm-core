@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -30,10 +28,12 @@ namespace Civi\Api4;
 class Campaign extends Generic\DAOEntity {
 
   /**
-   * @return \Civi\Api4\Action\Campaign\Get
+   * @param bool $checkPermissions
+   * @return Action\Campaign\Get
    */
-  public static function get() {
-    return new \Civi\Api4\Action\Campaign\Get(__CLASS__, __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Campaign\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

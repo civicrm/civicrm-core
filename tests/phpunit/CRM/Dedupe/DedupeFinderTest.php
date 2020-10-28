@@ -448,20 +448,4 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->assertEquals(count($this->contactIDs), 7, 'Check for number of contacts.');
   }
 
-  /**
-   * @return array|int
-   * @throws \CRM_Core_Exception
-   */
-  protected function createRuleGroup() {
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
-      'contact_type' => 'Individual',
-      'threshold' => 8,
-      'used' => 'General',
-      'name' => 'TestRule',
-      'title' => 'TestRule',
-      'is_reserved' => 0,
-    ]);
-    return $ruleGroup;
-  }
-
 }

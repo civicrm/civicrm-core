@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -30,30 +28,9 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog {
    * @return array
    */
   public static function create($params) {
-    $actionLog = new CRM_Core_DAO_ActionLog();
+    $params['action_date_time'] = $params['action_date_time'] ?? date('YmdHis');
 
-    $params['action_date_time'] = CRM_Utils_Array::value('action_date_time', $params, date('YmdHis'));
-
-    $actionLog->copyValues($params);
-
-    $edit = (bool) $actionLog->id;
-    if ($edit) {
-      CRM_Utils_Hook::pre('edit', 'ActionLog', $actionLog->id, $actionLog);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'ActionLog', NULL, $actionLog);
-    }
-
-    $actionLog->save();
-
-    if ($edit) {
-      CRM_Utils_Hook::post('edit', 'ActionLog', $actionLog->id, $actionLog);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'ActionLog', NULL, $actionLog);
-    }
-
-    return $actionLog;
+    return self::writeRecord($params);
   }
 
 }

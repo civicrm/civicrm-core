@@ -6,6 +6,7 @@
   <comment>Other Activity details stored here include contact, location, details.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-tasks</icon>
   <field>
     <name>id</name>
     <uniqueName>activity_id</uniqueName>
@@ -21,30 +22,6 @@
     <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-    <name>source_contact_id</name>
-    <type>int unsigned</type>
-    <title>Source Contact</title>
-    <import>true</import>
-    <headerPattern>/(activity.)?source(.contact(.id)?)?/i</headerPattern>
-    <comment>Contact ID of the person scheduling or logging this Activity. Usually the authenticated user.</comment>
-    <add>1.1</add>
-    <drop>4.4</drop>
-  </field>
-  <foreignKey>
-    <name>source_contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>1.1</add>
-    <drop>4.4</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <index>
-    <name>UI_source_contact_id</name>
-    <fieldName>source_contact_id</fieldName>
-    <add>2.0</add>
-    <drop>3.2</drop>
-  </index>
-  <field>
     <name>source_record_id</name>
     <type>int unsigned</type>
     <title>Source Record</title>
@@ -58,7 +35,7 @@
   </index>
   <field>
     <name>activity_type_id</name>
-    <title>Activity Type</title>
+    <title>Activity Type ID</title>
     <import>true</import>
     <type>int unsigned</type>
     <required>true</required>
@@ -72,6 +49,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Activity Type</label>
     </html>
   </field>
   <index>
@@ -79,23 +57,6 @@
     <fieldName>activity_type_id</fieldName>
     <add>1.6</add>
   </index>
-  <field>
-    <name>target_entity_table</name>
-    <type>varchar</type>
-    <length>64</length>
-    <required>true</required>
-    <comment>Name of table where item being referenced is stored.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
-    <name>target_entity_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>Foreign key to the referenced item.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
   <field>
     <name>subject</name>
     <uniqueName>activity_subject</uniqueName>
@@ -112,15 +73,11 @@
     <change>2.0</change>
   </field>
   <field>
-    <name>scheduled_date</name>
-    <type>datetime</type>
-    <comment>Date and time meeting is scheduled to occur.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>activity_date_time</name>
     <import>true</import>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP</default>
     <title>Activity Date</title>
     <type>datetime</type>
     <headerPattern>/(activity.)?date(.time$)?/i</headerPattern>
@@ -136,27 +93,6 @@
     <fieldName>activity_date_time</fieldName>
     <add>4.7</add>
   </index>
-  <field>
-    <name>due_date_time</name>
-    <type>datetime</type>
-    <comment>Date and time this activity is due.</comment>
-    <add>2.0</add>
-    <drop>3.0</drop>
-  </field>
-  <field>
-    <name>duration_hours</name>
-    <type>int unsigned</type>
-    <comment>Planned or actual duration of meeting - hours.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
-    <name>duration_minutes</name>
-    <type>int unsigned</type>
-    <comment>Planned or actual duration of meeting - minutes.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
   <field>
     <name>duration</name>
     <uniqueName>activity_duration</uniqueName>
@@ -187,11 +123,12 @@
   <field>
     <name>phone_id</name>
     <type>int unsigned</type>
-    <title>Phone (called)</title>
+    <title>Phone (called) ID</title>
     <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
     <add>2.0</add>
     <html>
       <type>EntityRef</type>
+      <label>Phone (called)</label>
     </html>
   </field>
   <foreignKey>
@@ -226,15 +163,6 @@
       <cols>60</cols>
     </html>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>status</name>
-    <type>enum</type>
-    <title>Status</title>
-    <values>Scheduled, Completed</values>
-    <comment>What is the status of this meeting? Completed meeting status results in activity history entry.</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
   </field>
   <field>
     <name>status_id</name>
@@ -319,6 +247,7 @@
     <name>index_medium_id</name>
     <fieldName>medium_id</fieldName>
     <add>2.2</add>
+    <drop>5.28</drop>
   </index>
   <field>
     <name>is_auto</name>
@@ -369,12 +298,6 @@
     <add>2.2</add>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
-  <index>
-    <name>UI_original_id</name>
-    <fieldName>original_id</fieldName>
-    <add>2.2</add>
-    <drop>3.2</drop>
-  </index>
   <field>
     <name>result</name>
     <uniqueName>activity_result</uniqueName>
@@ -466,7 +389,7 @@
     <comment>When was the activity was created.</comment>
     <required>false</required>
     <export>true</export>
-    <default>NULL</default>
+    <default>CURRENT_TIMESTAMP</default>
     <add>4.7</add>
   </field>
   <field>

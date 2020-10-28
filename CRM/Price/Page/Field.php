@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -111,7 +109,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
     // display taxTerm for priceFields
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+    $taxTerm = Civi::settings()->get('tax_term');
     $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $getTaxDetails = FALSE;
     $taxRate = CRM_Core_PseudoConstant::getTaxRates();
@@ -133,7 +131,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
           $getTaxDetails = TRUE;
         }
         if (isset($priceField[$priceFieldBAO->id]['tax_rate'])) {
-          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceField[$priceFieldBAO->id]['price'], $priceField[$priceFieldBAO->id]['tax_rate'], TRUE);
+          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($priceField[$priceFieldBAO->id]['price'], $priceField[$priceFieldBAO->id]['tax_rate']);
           $priceField[$priceFieldBAO->id]['tax_amount'] = $taxAmount['tax_amount'];
         }
       }

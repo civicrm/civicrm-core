@@ -28,7 +28,7 @@ trait CRMTraits_Financial_OrderTrait {
     $this->ids['contact'][0] = $this->individualCreate();
     $this->ids['membership_type'][0] = $this->membershipTypeCreate();
 
-    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
+    $contributionRecur = $this->callAPISuccess('ContributionRecur', 'create', array_merge([
       'contact_id' => $this->_contactID,
       'amount' => 1000,
       'sequential' => 1,
@@ -45,7 +45,6 @@ trait CRMTraits_Financial_OrderTrait {
     $orderID = $this->callAPISuccess('Order', 'create', [
       'total_amount' => '200',
       'financial_type_id' => 'Donation',
-      'contribution_status_id' => 'Pending',
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $this->_contributionPageID,
       'payment_processor_id' => $this->_paymentProcessorID,
@@ -61,6 +60,101 @@ trait CRMTraits_Financial_OrderTrait {
             'contribution_recur_id' => $contributionRecur['id'],
             'source' => 'Payment',
           ],
+          'line_item' => $this->getMembershipLineItem(),
+        ],
+      ],
+    ])['id'];
+
+    $this->ids['ContributionRecur'][0] = $contributionRecur['id'];
+    $this->ids['Contribution'][0] = $orderID;
+  }
+
+  /**
+   * Create an order with a contribution AND a membership line item.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createContributionAndMembershipOrder() {
+    $this->ids['membership_type'][0] = $this->membershipTypeCreate();
+    $orderID = $this->callAPISuccess('Order', 'create', [
+      'financial_type_id' => 'Donation',
+      'contact_id' => $this->_contactID,
+      'is_test' => 0,
+      'payment_instrument_id' => 'Check',
+      'receive_date' => date('Y-m-d'),
+      'line_items' => [
+        [
+          'params' => [
+            'contact_id' => $this->_contactID,
+            'source' => 'Payment',
+          ],
+          'line_item' => [
+            [
+              'label' => 'Contribution Amount',
+              'qty' => 1,
+              'unit_price' => 100,
+              'line_total' => 100,
+              'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+              'entity_table' => 'civicrm_contribution',
+              'price_field_id' => $this->callAPISuccessGetValue('price_field', [
+                'return' => 'id',
+                'label' => 'Contribution Amount',
+                'options' => ['limit' => 1, 'sort' => 'id DESC'],
+              ]),
+              'price_field_value_id' => NULL,
+            ],
+          ],
+        ],
+        [
+          'params' => [
+            'contact_id' => $this->_contactID,
+            'membership_type_id' => 'General',
+            'source' => 'Payment',
+          ],
+          'line_item' => $this->getMembershipLineItem(),
+        ],
+      ],
+    ])['id'];
+
+    $this->ids['Contribution'][0] = $orderID;
+  }
+
+  /**
+   * Create an order with more than one membership.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createMultipleMembershipOrder() {
+    $this->createExtraneousContribution();
+    $this->ids['contact'][0] = $this->individualCreate();
+    $this->ids['contact'][1] = $this->individualCreate();
+    $this->ids['membership_type'][0] = $this->membershipTypeCreate();
+    $this->ids['membership_type'][1] = $this->membershipTypeCreate(['name' => 'Type 2']);
+    $priceFieldID = $this->callAPISuccessGetValue('price_field', [
+      'return' => 'id',
+      'label' => 'Membership Amount',
+      'options' => ['limit' => 1, 'sort' => 'id DESC'],
+    ]);
+    $generalPriceFieldValueID = $this->callAPISuccessGetValue('price_field_value', [
+      'return' => 'id',
+      'label' => 'General',
+      'options' => ['limit' => 1, 'sort' => 'id DESC'],
+    ]);
+
+    $orderID = $this->callAPISuccess('Order', 'create', [
+      'total_amount' => 400,
+      'financial_type_id' => 'Member Dues',
+      'contact_id' => $this->_contactID,
+      'is_test' => 0,
+      'payment_instrument_id' => 'Check',
+      'receive_date' => '2019-07-25 07:34:23',
+      'line_items' => [
+        [
+          'params' => [
+            'contact_id' => $this->ids['contact'][0],
+            'membership_type_id' => $this->ids['membership_type'][0],
+            'source' => 'Payment',
+          ],
           'line_item' => [
             [
               'label' => 'General',
@@ -69,24 +163,46 @@ trait CRMTraits_Financial_OrderTrait {
               'line_total' => 200,
               'financial_type_id' => 1,
               'entity_table' => 'civicrm_membership',
-              'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
-                'return' => 'id',
-                'label' => 'Membership Amount',
-                'options' => ['limit' => 1, 'sort' => 'id DESC'],
-              ]),
-              'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
-                'return' => 'id',
-                'label' => 'General',
-                'options' => ['limit' => 1, 'sort' => 'id DESC'],
-              ]),
+              'price_field_id' => $priceFieldID,
+              'price_field_value_id' => $generalPriceFieldValueID,
+            ],
+          ],
+        ],
+        [
+          'params' => [
+            'contact_id' => $this->ids['contact'][1],
+            'membership_type_id' => $this->ids['membership_type'][0],
+            'source' => 'Payment',
+          ],
+          'line_item' => [
+            [
+              'label' => 'General',
+              'qty' => 1,
+              'unit_price' => 200,
+              'line_total' => 200,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_membership',
+              'price_field_id' => $priceFieldID,
+              'price_field_value_id' => $generalPriceFieldValueID,
             ],
           ],
         ],
       ],
     ])['id'];
 
-    $this->ids['ContributionRecur'][0] = $contributionRecur['id'];
     $this->ids['Contribution'][0] = $orderID;
+  }
+
+  /**
+   * Create an order for an event.
+   *
+   * @param array $orderParams
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createEventOrder($orderParams = []) {
+    $this->ids['Contribution'][0] = $this->callAPISuccess('Order', 'create', array_merge($this->getParticipantOrderParams(), $orderParams))['id'];
+    $this->ids['Participant'][0] = $this->callAPISuccessGetValue('ParticipantPayment', ['return' => 'participant_id', 'contribution_id' => $this->ids['Contribution'][0]]);
   }
 
   /**
@@ -97,13 +213,40 @@ trait CRMTraits_Financial_OrderTrait {
    */
   protected function createExtraneousContribution() {
     $this->contributionCreate([
-      'contact_id' => $this->_contactID,
+      'contact_id' => $this->individualCreate(),
       'is_test' => 1,
       'financial_type_id' => 1,
       'invoice_id' => 'abcd',
       'trxn_id' => 345,
       'receive_date' => '2019-07-25 07:34:23',
     ]);
+  }
+
+  /**
+   * @return array[]
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMembershipLineItem(): array {
+    return [
+      [
+        'label' => 'General',
+        'qty' => 1,
+        'unit_price' => 200,
+        'line_total' => 200,
+        'financial_type_id' => 1,
+        'entity_table' => 'civicrm_membership',
+        'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
+          'return' => 'id',
+          'label' => 'Membership Amount',
+          'options' => ['limit' => 1, 'sort' => 'id DESC'],
+        ]),
+        'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
+          'return' => 'id',
+          'label' => 'General',
+          'options' => ['limit' => 1, 'sort' => 'id DESC'],
+        ]),
+      ],
+    ];
   }
 
 }

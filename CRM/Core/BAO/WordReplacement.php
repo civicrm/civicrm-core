@@ -51,6 +51,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @param null $reset
    *
    * @return null|CRM_Core_BAO_WordReplacement
+   * @throws CRM_Core_Exception
    */
   public static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
@@ -58,7 +59,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
       $wordReplacement = new CRM_Core_BAO_WordReplacement();
       $wordReplacement->id = CRM_Core_Config::wordReplacementID();
       if (!$wordReplacement->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Unable to find word replacement');
       }
     }
     return $wordReplacement;
@@ -151,8 +152,6 @@ WHERE  domain_id = %1
       }
     }
     $config = CRM_Core_Config::singleton();
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
 
     // So. Weird. Some bizarre/probably-broken multi-lingual thing where
     // data isn't really stored in civicrm_word_replacements. Probably

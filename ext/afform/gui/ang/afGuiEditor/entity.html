@@ -1,0 +1,60 @@
+<div class="af-gui-columns">
+  <fieldset class="af-gui-entity-values">
+    <legend>{{ ts('Values:') }}</legend>
+    <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in entity.data">
+      <label>{{ getMeta().fields[fieldName].title }}:</label><br />
+      <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
+      <a href ng-click="removeValue(entity, fieldName)">
+        <i class="crm-i fa-times"></i>
+      </a>
+    </div>
+    <hr />
+    <div class="form-inline">
+      <input class="form-control" ng-model="controls.addValue" crm-ui-select="{data: valuesFields}" placeholder="Add value" />
+    </div>
+  </fieldset>
+
+  <fieldset class="af-gui-entity-palette">
+    <legend class="form-inline">
+      {{ ts('Add:') }}
+      <input ng-model="controls.fieldSearch" class="form-control" type="search" placeholder="&#xf002" title="{{ ts('Search fields') }}" />
+    </legend>
+    <div class="af-gui-entity-palette-select-list">
+      <div ng-if="blockList.length">
+        <label>{{ ts('Blocks') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="blockList">
+          <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
+            {{ blockTitles[$index] }}
+          </div>
+        </div>
+      </div>
+      <div ng-if="elementList.length">
+        <label>{{ ts('Elements') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="elementList">
+          <div ng-repeat="element in elementList" >
+            {{ elementTitles[$index] }}
+          </div>
+        </div>
+      </div>
+      <div ng-repeat="fieldGroup in fieldList">
+        <div ng-if="fieldGroup.fields.length">
+          <label>{{ fieldGroup.label }}</label>
+          <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + fieldGroup.entityName + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="fieldGroup.fields">
+            <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
+              {{ editor.getField(fieldGroup.entityType, field.name).title }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+<a href ng-click="editor.removeEntity(entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: getMeta().label}) }}">
+  <i class="crm-i fa-trash"></i>
+</a>
+
+<fieldset>
+  <legend>{{ ts('Options') }}</legend>
+  <div ng-include="'~/afGuiEditor/entityConfig/' + entity.type + '.html'"></div>
+</fieldset>

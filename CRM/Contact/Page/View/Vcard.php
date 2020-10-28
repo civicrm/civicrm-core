@@ -73,7 +73,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     }
 
     if (!empty($defaults['birth_date'])) {
-      $vcard->setBirthday(CRM_Utils_Array::value('birth_date', $defaults));
+      $vcard->setBirthday($defaults['birth_date']);
     }
 
     if (!empty($defaults['home_URL'])) {
@@ -98,11 +98,11 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         $locality = $location['city'] ?? NULL;
         $region = NULL;
         if (!empty($location['state_province_id'])) {
-          $region = $stateProvices[CRM_Utils_Array::value('state_province_id', $location)];
+          $region = $stateProvices[$location['state_province_id']];
         }
         $country = NULL;
         if (!empty($location['country_id'])) {
-          $country = $countries[CRM_Utils_Array::value('country_id', $location)];
+          $country = $countries[$location['country_id']];
         }
 
         $postcode = $location['postal_code'] ?? NULL;

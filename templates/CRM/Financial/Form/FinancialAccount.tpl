@@ -11,7 +11,7 @@
 <div class="crm-block crm-form-block crm-contribution_type-form-block crm-financial_type-form-block">
 {if $action eq 8}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {ts}WARNING: You cannot delete a {$delName} Financial Account if it is currently used by any Financial Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}

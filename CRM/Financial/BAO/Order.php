@@ -9,11 +9,12 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Order class.
  *
  * This class is intended to become the object to manage orders, including via Order.api.
@@ -232,23 +233,28 @@ class CRM_Financial_BAO_Order {
     }
 
     foreach ($this->getPriceOptions() as $fieldID => $valueID) {
+      if (!isset($this->priceSetID)) {
+        $this->setPriceSetID(PriceField::get()->addSelect('price_set_id')->addWhere('id', '=', $fieldID)->execute()->first()['price_set_id']);
+      }
       $throwAwayArray = [];
       // @todo - still using getLine for now but better to bring it to this class & do a better job.
-      $lineItems[$valueID] = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID, 0)[1][$valueID];
+      $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
+      foreach ($newLines as $newLine) {
+        $lineItems[$newLine['price_field_value_id']] = $newLine;
+      }
     }
 
-    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     foreach ($lineItems as &$lineItem) {
       // Set any pre-calculation to zero as we will calculate.
       $lineItem['tax_amount'] = 0;
       if ($this->getOverrideFinancialTypeID() !== FALSE) {
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
-      $taxRate = $taxRates[$lineItem['financial_type_id']] ?? 0;
+      $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
       if ($this->getOverrideTotalAmount() !== FALSE) {
         if ($taxRate) {
           // Total is tax inclusive.
-          $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount();
+          $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
           $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
         }
         else {
@@ -263,7 +269,7 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * Get the total tax amount for the order.
+   * Get the total amount for the order.
    *
    * @return float
    *
@@ -275,6 +281,36 @@ class CRM_Financial_BAO_Order {
       $amount += $lineItem['tax_amount'] ?? 0.0;
     }
     return $amount;
+  }
+
+  /**
+   * Get the total tax amount for the order.
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getTotalAmount() :float {
+    $amount = 0.0;
+    foreach ($this->getLineItems() as $lineItem) {
+      $amount += $lineItem['line_total'] ?? 0.0;
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the tax rate for the given financial type.
+   *
+   * @param int $financialTypeID
+   *
+   * @return float
+   */
+  public function getTaxRate(int $financialTypeID) {
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    if (!isset($taxRates[$financialTypeID])) {
+      return 0;
+    }
+    return $taxRates[$financialTypeID];
   }
 
 }

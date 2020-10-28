@@ -12,8 +12,6 @@
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  * This script processes "Instant Payment Notifications" (IPNs).  Modern
  * Payment Processors use the /civicrm/payment/ipn/123 endpoint instead (where
  * 123 is the payment processor ID), however a quirk in the way PayPal works

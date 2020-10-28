@@ -2,7 +2,7 @@
   "use strict";
 
   /**
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#date-picker
    */
   $.fn.crmDatepicker = function(options) {
     return $(this).each(function() {
@@ -29,7 +29,7 @@
         type = hasDatepicker ? 'text' : 'number';
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times"></i></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times" aria-hidden="true"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
@@ -75,6 +75,7 @@
         } else {
           $dateField.attr('min', settings.minDate ? CRM.utils.formatDate(settings.minDate, 'yy') : '1000');
           $dateField.attr('max', settings.maxDate ? CRM.utils.formatDate(settings.maxDate, 'yy') : '4000');
+          placeholder = null;
         }
         // Set placeholder as calendar icon (`fa-calendar` is Unicode f073)
         $dateField.attr({placeholder: placeholder === undefined ? '\uF073' : placeholder}).change(updateDataField);

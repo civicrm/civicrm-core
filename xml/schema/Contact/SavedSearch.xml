@@ -18,15 +18,39 @@
     <name>id</name>
     <autoincrement>false</autoincrement>
   </primaryKey>
+
   <field>
-    <name>query</name>
-    <title>SQL Query</title>
-    <type>text</type>
-    <import>true</import>
-    <comment>SQL query for this search</comment>
-    <add>1.1</add>
-    <drop>1.5</drop>
+    <name>name</name>
+    <title>Saved Search Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>Unique name of saved search</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.0</add>
   </field>
+  <index>
+    <name>UI_name</name>
+    <fieldName>name</fieldName>
+    <unique>true</unique>
+    <add>5.32</add>
+  </index>
+
+  <field>
+    <name>label</name>
+    <title>Saved Search Label</title>
+    <type>varchar</type>
+    <length>255</length>
+    <default>NULL</default>
+    <comment>Administrative label for search</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.32</add>
+  </field>
+
   <field>
     <name>form_values</name>
     <title>Submitted Form Values</title>
@@ -36,14 +60,7 @@
     <serialize>PHP</serialize>
     <add>1.1</add>
   </field>
-  <field>
-    <name>is_active</name>
-    <type>boolean</type>
-    <title>Saved Search Enabled</title>
-    <comment>Is this entry active?</comment>
-    <add>1.1</add>
-    <drop>1.5</drop>
-  </field>
+
   <field>
     <name>mapping_id</name>
     <type>int unsigned</type>
@@ -58,6 +75,7 @@
     <onDelete>SET NULL</onDelete>
     <add>1.5</add>
   </foreignKey>
+
   <field>
     <name>search_custom_id</name>
     <type>int unsigned</type>
@@ -65,6 +83,7 @@
     <comment>Foreign key to civicrm_option value table used for saved custom searches.</comment>
     <add>2.0</add>
   </field>
+
   <field>
     <name>where_clause</name>
     <type>text</type>
@@ -73,6 +92,7 @@
     <add>1.6</add>
     <drop>5.24</drop>
   </field>
+
   <field>
     <name>select_tables</name>
     <type>text</type>
@@ -82,6 +102,7 @@
     <add>1.6</add>
     <drop>5.24</drop>
   </field>
+
   <field>
     <name>where_tables</name>
     <type>text</type>
@@ -91,6 +112,7 @@
     <add>1.6</add>
     <drop>5.24</drop>
   </field>
+
   <field>
     <name>api_entity</name>
     <type>varchar</type>
@@ -99,6 +121,7 @@
     <comment>Entity name for API based search</comment>
     <add>5.24</add>
   </field>
+
   <field>
     <name>api_params</name>
     <type>text</type>

@@ -106,15 +106,14 @@ class Modules extends \CRM_Core_Page {
   public function digestJs($files) {
     $scripts = [];
     foreach ($files as $file) {
-      $scripts[] = file_get_contents($file);
+      $scripts[] = \CRM_Utils_JS::stripComments(file_get_contents($file));
     }
     $scripts = \CRM_Utils_JS::dedupeClosures(
       $scripts,
       ['angular', '$', '_'],
       ['angular', 'CRM.$', 'CRM._']
     );
-    // This impl of stripComments currently adds 10-20ms and cuts ~7%
-    return \CRM_Utils_JS::stripComments(implode("\n", $scripts));
+    return implode("\n", $scripts);
   }
 
   /**

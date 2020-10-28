@@ -229,8 +229,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-20821
-   * CRM-14283
+   * @see https://issues.civicrm.org/jira/browse/CRM-20821
+   * @see https://issues.civicrm.org/jira/browse/CRM-14283
    *
    * @param string $imageURL
    * @param book $forceHttps

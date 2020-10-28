@@ -14,15 +14,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace Civi\Api4\Action\Entity;
 
 use Civi\Api4\CustomGroup;
-use Civi\Api4\Utils\ReflectionUtils;
+use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 
 /**
  * Get the names & docblocks of all APIv4 entities.
@@ -49,7 +47,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   protected function getRecords() {
     $entities = [];
     $toGet = $this->_itemsToGet('name');
-    $getDocs = $this->_isFieldSelected('description', 'comment', 'see');
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
@@ -59,15 +56,13 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];
           preg_match('/(\w*)\.php$/', $file, $matches);
+          $entity = '\Civi\Api4\\' . $matches[1];
           if (
             (!$toGet || in_array($matches[1], $toGet))
-            && is_a('\Civi\Api4\\' . $matches[1], '\Civi\Api4\Generic\AbstractEntity', TRUE)
+            && is_a($entity, '\Civi\Api4\Generic\AbstractEntity', TRUE)
           ) {
-            $entity = ['name' => $matches[1]];
-            if ($getDocs) {
-              $this->addDocs($entity);
-            }
-            $entities[$matches[1]] = $entity;
+            $info = $entity::getInfo();
+            $entities[$info['name']] = $info;
           }
         }
       }
@@ -92,18 +87,22 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $customEntities = CustomGroup::get()
       ->addWhere('is_multiple', '=', 1)
       ->addWhere('is_active', '=', 1)
-      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends'])
+      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'icon'])
       ->setCheckPermissions(FALSE)
       ->execute();
     foreach ($customEntities as $customEntity) {
       $fieldName = 'Custom_' . $customEntity['name'];
+      $baseEntity = '\Civi\Api4\\' . CustomGroupJoinable::getEntityFromExtends($customEntity['extends']);
       $entities[$fieldName] = [
         'name' => $fieldName,
-        'description' => $customEntity['title'] . ' custom group - extends ' . $customEntity['extends'],
+        'title' => $customEntity['title'],
+        'titlePlural' => $customEntity['title'],
+        'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['titlePlural']]),
         'see' => [
           'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
           '\\Civi\\Api4\\CustomGroup',
         ],
+        'icon' => $customEntity['icon'],
       ];
       if (!empty($customEntity['help_pre'])) {
         $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);
@@ -123,17 +122,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   private function plainTextify($input) {
     return html_entity_decode(strip_tags($input), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-  }
-
-  /**
-   * Add info from code docblock.
-   *
-   * @param $entity
-   */
-  private function addDocs(&$entity) {
-    $reflection = new \ReflectionClass("\\Civi\\Api4\\" . $entity['name']);
-    $entity += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $entity['name']]);
-    unset($entity['package'], $entity['method']);
   }
 
 }

@@ -93,10 +93,18 @@
   {literal}
 
   var params = {
-    errorClass: 'crm-inline-error',
+    errorClass: 'crm-inline-error alert-danger',
     messages: {},
-    // TODO: remove after resolution of https://github.com/jzaefferer/jquery-validation/pull/1261
-    ignore: ":hidden, [readonly]"
+    ignore: '.select2-offscreen, [readonly], :hidden:not(.crm-select2), .crm-no-validate',
+    ignoreTitle: true,
+    errorPlacement: function(error, element) {
+      if (element.prop('type') === 'radio') {
+        error.appendTo(element.parent('div.content'));
+      }
+      else {
+        error.insertAfter(element);
+      }
+    }
   };
 
   // use civicrm notifications when there are errors
@@ -105,6 +113,7 @@
     // but there will be no overall message. Currently the container is only available on backoffice pages.
     if ($('#crm-notification-container').length) {
       $.each(validator.errorList, function(k, error) {
+        $(error.element).parents('.crm-custom-accordion.collapsed').crmAccordionToggle();
         $(error.element).crmError(error.message);
       });
     }

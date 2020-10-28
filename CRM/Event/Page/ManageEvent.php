@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -125,12 +123,15 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   /**
    * Get tab  Links for events.
    *
-   * @param $enableCart
-   *
    * @return array
    *   (reference) of tab links
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function &tabs($enableCart) {
+  public static function &tabs() {
+    // @todo Move to eventcart extension
+    // check if we're in shopping cart mode for events
+    $enableCart = (bool) Civi::settings()->get('enable_cart');
+
     $cacheKey = $enableCart ? 1 : 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = [];
@@ -164,7 +165,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
       // @fixme I don't understand the event permissions check here - can we just get rid of it?
       $permissions = CRM_Event_BAO_Event::getAllPermissions();
-      if (CRM_Core_Permission::check('administer CiviCRM') || !empty($permissions[CRM_Core_Permission::EDIT])) {
+      if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
         self::$_tabLinks[$cacheKey]['reminder']
           = [
             'title' => ts('Schedule Reminders'),
@@ -224,6 +225,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
+    $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0, 'REQUEST'
     );
@@ -340,9 +342,6 @@ ORDER BY start_date desc
     while ($pcpDao->fetch()) {
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
-    // check if we're in shopping cart mode for events
-    $enableCart = Civi::settings()->get('enable_cart');
-    $this->assign('eventCartEnabled', $enableCart);
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
     ]));
@@ -426,7 +425,7 @@ ORDER BY start_date desc
       }
     }
 
-    $manageEvent['tab'] = self::tabs($enableCart);
+    $manageEvent['tab'] = self::tabs();
     $this->assign('rows', $manageEvent);
 
     $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');

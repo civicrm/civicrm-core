@@ -203,7 +203,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->add('checkbox', 'bypass_confirm', ts('Bypass email confirmation'));
 
     //is share through social media
-    $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
+    $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
 
     // is active ?
     $this->add('checkbox', 'is_active', ts('Is Active?'));

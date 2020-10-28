@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -42,19 +40,18 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Core_Form_Task $form
    */
   public static function preProcessCommon(&$form) {
     $form->_participantIds = [];
 
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'];
     $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
     if (!array_key_exists($form->_task, $tasks)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
-    $form->assign('taskName', $tasks[$form->_task]);
 
     $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
@@ -89,24 +86,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
 
     $form->_participantIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
-    $session = CRM_Core_Session::singleton();
-
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/event/search', $urlParams));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-        $urlParams
-      ));
-    }
+    $form->setNextUrl('event');
   }
 
   /**

@@ -51,7 +51,6 @@
      <desc>Component wise listing of all available templates</desc>
      <access_arguments>access CiviCRM,access CiviReport</access_arguments>
      <adminGroup>CiviReport</adminGroup>
-     <icon>admin/small/report_template.gif</icon>
   </item>
   <item>
      <path>civicrm/admin/report/options/report_template</path>
@@ -60,7 +59,6 @@
      <desc>Browse, Edit and Delete the Report templates.</desc>
      <access_arguments>access CiviCRM,access CiviReport</access_arguments>
      <adminGroup>CiviReport</adminGroup>
-     <icon>admin/small/template.png</icon>
   </item>
   <item>
      <path>civicrm/admin/report/list</path>
@@ -68,6 +66,5 @@
      <page_callback>CRM_Report_Page_InstanceList</page_callback>
      <desc>Browse existing report, change report criteria and settings.</desc>
      <adminGroup>CiviReport</adminGroup>
-     <icon>admin/small/report_list.gif</icon>
   </item>
 </menu>

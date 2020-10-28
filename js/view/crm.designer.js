@@ -2,7 +2,7 @@
   if (!CRM.Designer) CRM.Designer = {};
 
   /**
-   * When rendering a template with Marionette.ItemView, the list of variables is determined by
+   * When rendering a template with Backbone.Marionette.ItemView, the list of variables is determined by
    * serializeData(). The normal behavior is to map each property of this.model to a template
    * variable.
    *
@@ -14,7 +14,7 @@
    * @return {*}
    */
   var extendedSerializeData = function() {
-    var result = Marionette.ItemView.prototype.serializeData.apply(this);
+    var result = Backbone.Marionette.ItemView.prototype.serializeData.apply(this);
     result._view = this;
     result._model = this.model;
     result._collection = this.collection;
@@ -675,7 +675,7 @@
       });
       var form1 = CRM.loadForm(url)
         .on('crmFormLoad', function() {
-          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
+          $(this).prepend('<div class="messages status"><i class="crm-i fa-info-circle" aria-hidden="true"></i> ' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
         });
     },
     onChangeIsDuplicate: function(model, value, options) {

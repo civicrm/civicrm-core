@@ -195,7 +195,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * Revert settings to defaults.
  *
  * @param array $params
- *
+ * @deprecated
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -241,6 +241,15 @@ function _civicrm_api3_setting_fill_spec(&$params) {
 }
 
 /**
+ * Declare deprecated api functions.
+ *
+ * @return array
+ */
+function _civicrm_api3_setting_deprecation() {
+  return ['fill' => 'Setting "fill" is no longer necessary.'];
+}
+
+/**
  * Create or update a setting.
  *
  * @param array $params
@@ -248,6 +257,9 @@ function _civicrm_api3_setting_fill_spec(&$params) {
  *
  * @return array
  *   api result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -379,24 +391,24 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws \Exception
+ * @throws API_Exception
  */
 function _civicrm_api3_setting_getDomainArray(&$params) {
   if (empty($params['domain_id']) && isset($params['id'])) {
     $params['domain_id'] = $params['id'];
   }
 
-  if ($params['domain_id'] == 'current_domain') {
+  if ($params['domain_id'] === 'current_domain') {
     $params['domain_id'] = CRM_Core_Config::domainID();
   }
 
-  if ($params['domain_id'] == 'all') {
+  if ($params['domain_id'] === 'all') {
     $domainAPIResult = civicrm_api('domain', 'get', ['version' => 3, 'return' => 'id']);
     if (isset($domainAPIResult['values'])) {
       $params['domain_id'] = array_keys($domainAPIResult['values']);
     }
     else {
-      throw new Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
+      throw new API_Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
     }
   }
   if (is_array($params['domain_id'])) {

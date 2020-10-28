@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -50,11 +48,13 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
+    Civi::resources()->addScriptFile('civicrm', 'js/jquery/jquery.crmIconPicker.js');
+
     // current set id
     $this->_id = $this->get('id');
 
     if ($this->_id && $isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot edit the settings of a reserved custom field-set.");
+      CRM_Core_Error::statusBounce("You cannot edit the settings of a reserved custom field-set.");
     }
     // setting title for html page
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -297,6 +297,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // display style
     $this->add('select', 'style', ts('Display Style'), CRM_Core_SelectValues::customGroupStyle());
 
+    $this->add('text', 'icon', ts('Tab icon'), ['class' => 'crm-icon-picker', 'allowClear' => TRUE]);
+
     // is this set collapsed or expanded ?
     $this->addElement('advcheckbox', 'collapse_display', ts('Collapse this set on initial display'));
 
@@ -349,7 +351,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // TODO: Is this condition ever true? Can this code be removed?
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"]);
+      $this->addElement('xbutton', 'done', ts('Done'), [
+        'type' => 'button',
+        'onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'",
+      ]);
     }
   }
 

@@ -39,6 +39,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public $membershipTypeID;
 
   /**
+   * Report instance used in mail_report tests.
+   * @var array
+   */
+  private $report_instance;
+
+  /**
    * Set up for tests.
    */
   public function setUp() {
@@ -55,6 +61,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
     ];
+    $this->report_instance = $this->createReportInstance();
   }
 
   /**
@@ -67,6 +74,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // The membershipType create breaks transactions so this extra cleanup is needed.
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->cleanUpSetUpIDs();
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
     parent::tearDown();
   }
@@ -330,6 +338,41 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
+   * Deleted events should not send reminders to additional contacts.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeletedEventRemindAddlContacts() {
+    $contactId = $this->individualCreate();
+    $groupId = $this->groupCreate(['name' => 'Additional Contacts', 'title' => 'Additional Contacts']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contactId,
+      'group_id' => $groupId,
+    ]);
+    $event = $this->eventCreate(['title' => 'delete this event']);
+    $eventId = $event['id'];
+
+    $this->callAPISuccess('action_schedule', 'create', [
+      'title' => 'Do not send me',
+      'subject' => 'I am a reminder attached to a (soon to be) deleted event.',
+      'entity_value' => $eventId,
+      'mapping_id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
+      'start_action_date' => 'start_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'day',
+      'group_id' => $groupId,
+      'limit_to' => FALSE,
+      'mode' => 'Email',
+    ]);
+    $this->callAPISuccess('event', 'delete', ['id' => $eventId]);
+
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
+    $this->assertEquals(0, $successfulCronCount);
+  }
+
+  /**
    * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
    *
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
@@ -435,8 +478,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Short']);
     $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Tall']);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
-    $this->assertEquals(0, count($result['values']['skipped']));
-    $this->assertEquals(1, count($result['values']['merged']));
+    $this->assertCount(0, $result['values']['skipped']);
+    $this->assertCount(1, $result['values']['merged']);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contact2ID], 0);
     $this->callAPISuccessGetCount('FinancialItem', ['contact_id' => $contactID], 2);
@@ -451,6 +494,27 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('ActivityContact', ['contact_id' => $contactID], 14);
     // 2 for the connection to the deleted by merge activity (source & target)
     $this->callAPISuccessGetCount('ActivityContact', ['contact_id' => $contact2ID], 2);
+  }
+
+  /**
+   * Test that non-contact entity tags are untouched in merge.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionEntityTag() {
+    $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'tag_used_for', 'value' => 'civicrm_contribution', 'label' => 'Contribution']);
+    $tagID = $this->tagCreate(['name' => 'Big', 'used_for' => 'civicrm_contribution'])['id'];
+    $contact1 = (int) $this->individualCreate();
+    $contact2 = (int) $this->individualCreate();
+    $contributionID = NULL;
+    while ($contributionID !== $contact2) {
+      $contributionID = (int) $this->callAPISuccess('Contribution', 'create', ['contact_id' => $contact1, 'total_amount' => 5, 'financial_type_id' => 'Donation'])['id'];
+    }
+    $entityTagParams = ['entity_id' => $contributionID, 'entity_table' => 'civicrm_contribution', 'tag_id' => $tagID];
+    $this->callAPISuccess('EntityTag', 'create', $entityTagParams);
+    $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+    $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);
   }
 
   /**
@@ -551,9 +615,35 @@ class api_v3_JobTest extends CiviUnitTestCase {
     foreach ($groupResult['values'] as $groupValues) {
       $this->assertEquals($contactID, $groupValues['contact_id']);
       $this->assertEquals('Added', $groupValues['status']);
-      $this->assertTrue(in_array($groupValues['group_id'], $expectedGroups));
+      $this->assertContains($groupValues['group_id'], $expectedGroups);
 
     }
+  }
+
+  /**
+   * Test that we handle cache entries without clashes.
+   */
+  public function testMergeCaches() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $groupID = $this->groupCreate();
+    $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $contactID]);
+    $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $contact2ID]);
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_group_contact_cache(group_id, contact_id) VALUES
+      ($groupID, $contactID),
+      ($groupID, $contact2ID)
+    ");
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
+  }
+
+  /**
+   * Test that we handle cache entries without clashes.
+   */
+  public function testMergeSharedActivity() {
+    $contactID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
+    $activityID = $this->activityCreate(['target_contact_id' => [$contactID, $contact2ID]]);
+    $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
   }
 
   /**
@@ -1935,7 +2025,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * and left alone when it shouldn't.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testProcessMembershipUpdateStatus() {
     $this->ids['MembershipType'] = $this->membershipTypeCreate();
@@ -2052,10 +2141,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals($organizationMembershipID, $expiredInheritedRelationship['owner_membership_id']);
     $this->assertMembershipStatus('Grace', (int) $expiredInheritedRelationship['status_id']);
 
-    // Reset static $relatedContactIds array in createRelatedMemberships(),
-    // to avoid bug where inherited membership gets deleted.
-    $var = TRUE;
-    CRM_Member_BAO_Membership::createRelatedMemberships($var, $var, TRUE);
     // Check that after running process_membership job, statuses are correct.
     $this->callAPISuccess('Job', 'process_membership', []);
 
@@ -2203,6 +2288,188 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'domain_id' => '1',
     ]);
     return [$membershipTypeID, $groupID, $theChosenOneID, $provider];
+  }
+
+  /**
+   * Test that the mail_report job sends an email for 'print' format.
+   *
+   * We're not testing that the report itself is correct since in 'print'
+   * format it's a little difficult to parse out, so we're just testing that
+   * the email was sent and it more or less looks like an email we'd expect.
+   */
+  public function testMailReportForPrint() {
+    $mut = new CiviMailUtils($this, TRUE);
+
+    // avoid warnings
+    if (empty($_SERVER['QUERY_STRING'])) {
+      $_SERVER['QUERY_STRING'] = 'reset=1';
+    }
+
+    $this->callAPISuccess('job', 'mail_report', [
+      'instanceId' => $this->report_instance['id'],
+      'format' => 'print',
+    ]);
+
+    $message = $mut->getMostRecentEmail('ezc');
+
+    $this->assertEquals('This is the email subject', $message->subject);
+    $this->assertEquals('reportperson@example.com', $message->to[0]->email);
+
+    $parts = $message->fetchParts(NULL, TRUE);
+    $this->assertCount(1, $parts);
+    $this->assertStringContainsString('test report', $parts[0]->text);
+
+    $mut->clearMessages();
+    $mut->stop();
+  }
+
+  /**
+   * Test that the mail_report job sends an email for 'pdf' format.
+   *
+   * We're not testing that the report itself is correct since in 'pdf'
+   * format it's a little difficult to parse out, so we're just testing that
+   * the email was sent and it more or less looks like an email we'd expect.
+   */
+  public function testMailReportForPdf() {
+    $mut = new CiviMailUtils($this, TRUE);
+
+    // avoid warnings
+    if (empty($_SERVER['QUERY_STRING'])) {
+      $_SERVER['QUERY_STRING'] = 'reset=1';
+    }
+
+    $this->callAPISuccess('job', 'mail_report', [
+      'instanceId' => $this->report_instance['id'],
+      'format' => 'pdf',
+    ]);
+
+    $message = $mut->getMostRecentEmail('ezc');
+
+    $this->assertEquals('This is the email subject', $message->subject);
+    $this->assertEquals('reportperson@example.com', $message->to[0]->email);
+
+    $parts = $message->fetchParts(NULL, TRUE);
+    $this->assertCount(2, $parts);
+    $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[0]->text);
+    $this->assertEquals(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[1]->contentType);
+    $this->assertEquals('pdf', $parts[1]->mimeType);
+    $this->assertEquals(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[1]->dispositionType);
+    $this->assertGreaterThan(0, filesize($parts[1]->fileName));
+
+    $mut->clearMessages();
+    $mut->stop();
+  }
+
+  /**
+   * Test that the mail_report job sends an email for 'csv' format.
+   *
+   * As with the print and pdf we're not super-concerned about report
+   * functionality itself - we're more concerned with the mailing part,
+   * but since it's csv we can easily check the output.
+   */
+  public function testMailReportForCsv() {
+    // Create many contacts, in particular so that the report would be more
+    // than a one-pager.
+    for ($i = 0; $i < 110; $i++) {
+      $this->individualCreate([], $i, TRUE);
+    }
+
+    $mut = new CiviMailUtils($this, TRUE);
+
+    // avoid warnings
+    if (empty($_SERVER['QUERY_STRING'])) {
+      $_SERVER['QUERY_STRING'] = 'reset=1';
+    }
+
+    $this->callAPISuccess('job', 'mail_report', [
+      'instanceId' => $this->report_instance['id'],
+      'format' => 'csv',
+    ]);
+
+    $message = $mut->getMostRecentEmail('ezc');
+
+    $this->assertEquals('This is the email subject', $message->subject);
+    $this->assertEquals('reportperson@example.com', $message->to[0]->email);
+
+    $parts = $message->fetchParts(NULL, TRUE);
+    $this->assertCount(2, $parts);
+    $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[0]->text);
+    $this->assertEquals('csv', $parts[1]->subType);
+
+    // Pull all the contacts to get our expected output.
+    $contacts = $this->callAPISuccess('Contact', 'get', [
+      'return' => 'sort_name',
+      'options' => [
+        'limit' => 0,
+        'sort' => 'sort_name',
+      ],
+    ]);
+    $rows = [];
+    foreach ($contacts['values'] as $contact) {
+      $rows[] = ['civicrm_contact_sort_name' => $contact['sort_name']];
+    }
+    // need this for makeCsv()
+    $fakeForm = new CRM_Report_Form();
+    $fakeForm->_columnHeaders = [
+      'civicrm_contact_sort_name' => [
+        'title' => 'Contact Name',
+        'type' => 2,
+      ],
+    ];
+
+    $this->assertEquals(
+      CRM_Report_Utils_Report::makeCsv($fakeForm, $rows),
+      $parts[1]->text
+    );
+
+    $mut->clearMessages();
+    $mut->stop();
+  }
+
+  /**
+   * Helper to create a report instance of the contact summary report.
+   */
+  private function createReportInstance() {
+    return $this->callAPISuccess('ReportInstance', 'create', [
+      'report_id' => 'contact/summary',
+      'title' => 'test report',
+      'form_values' => [
+        serialize([
+          'fields' => [
+            'sort_name' => '1',
+            'street_address' => '1',
+            'city' => '1',
+            'country_id' => '1',
+          ],
+          'sort_name_op' => 'has',
+          'sort_name_value' => '',
+          'source_op' => 'has',
+          'source_value' => '',
+          'id_min' => '',
+          'id_max' => '',
+          'id_op' => 'lte',
+          'id_value' => '',
+          'country_id_op' => 'in',
+          'country_id_value' => [],
+          'state_province_id_op' => 'in',
+          'state_province_id_value' => [],
+          'gid_op' => 'in',
+          'gid_value' => [],
+          'tagid_op' => 'in',
+          'tagid_value' => [],
+          'description' => 'Provides a list of address and telephone information for constituent records in your system.',
+          'email_subject' => 'This is the email subject',
+          'email_to' => 'reportperson@example.com',
+          'email_cc' => '',
+          'permission' => 'view all contacts',
+          'groups' => '',
+          'domain_id' => 1,
+        ]),
+      ],
+      // Email params need to be repeated outside form_values for some reason
+      'email_subject' => 'This is the email subject',
+      'email_to' => 'reportperson@example.com',
+    ]);
   }
 
 }

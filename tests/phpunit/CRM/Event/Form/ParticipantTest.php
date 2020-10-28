@@ -833,7 +833,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     /* @var CRM_Event_Form_SelfSvcTransfer $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
     $toContactId = $this->individualCreate();
-    $form->transferParticipantRegistration($toContactId, $participantId, CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'event_id'));
+    $form->transferParticipantRegistration($toContactId, $participantId);
 
     //Assert participant is transferred to $toContactId.
     $participant = $this->callAPISuccess('Participant', 'getsingle', [
@@ -859,7 +859,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @return int
    */
   protected function getEventID(): int {
-    return $this->ids['event']['event'];
+    return $this->ids['Event']['event'];
   }
 
   /**

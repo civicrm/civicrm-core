@@ -138,23 +138,6 @@
     </html>
   </field>
   <field>
-    <name>contribution_type_id</name>
-    <title>Price Set Contribution Type</title>
-    <type>int unsigned</type>
-    <default>NULL</default>
-    <comment>FK to Contribution Type(for membership price sets only).</comment>
-    <add>3.4</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <add>3.4</add>
-    <drop>4.3</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
     <title>Financial Type</title>
     <type>int unsigned</type>
@@ -202,8 +185,8 @@
   <field>
     <name>min_amount</name>
     <title>Minimum Amount</title>
-    <type>int unsigned</type>
-    <default>0</default>
+    <type>decimal</type>
+    <default>0.0</default>
     <comment>Minimum Amount required for this set.</comment>
     <add>4.7</add>
     <html>

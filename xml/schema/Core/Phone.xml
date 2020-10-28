@@ -7,6 +7,7 @@
   <comment>Phone information for a specific location.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-phone</icon>
   <field>
     <name>id</name>
     <title>Phone ID</title>
@@ -35,7 +36,7 @@
   </foreignKey>
   <field>
     <name>location_type_id</name>
-    <title>Phone Location Type</title>
+    <title>Phone Location Type ID</title>
     <type>int unsigned</type>
     <comment>Which Location does this phone belong to.</comment>
     <pseudoconstant>
@@ -45,6 +46,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Phone Location Type</label>
     </html>
     <add>2.0</add>
   </field>
@@ -136,18 +138,8 @@
     <add>4.3</add>
   </index>
   <field>
-    <name>phone_type</name>
-    <type>enum</type>
-    <values>Phone, Mobile, Fax, Pager</values>
-    <headerPattern>/phone\s+type/i</headerPattern>
-    <dataPattern>/phone|mobile|fax|pager/i</dataPattern>
-    <comment>What type of telecom device is this.</comment>
-    <add>1.1</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
     <name>phone_type_id</name>
-    <title>Phone Type</title>
+    <title>Phone Type ID</title>
     <type>int unsigned</type>
     <export>true</export>
     <comment>Which type of phone does this number belongs.</comment>
@@ -156,6 +148,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Phone Type</label>
     </html>
     <add>2.2</add>
   </field>

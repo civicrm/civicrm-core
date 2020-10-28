@@ -12,7 +12,7 @@
 <div class="crm-block crm-form-block crm-grant-form-block">
   {if $action eq 8}
      <div class="messages status">
-         <p><div class="icon inform-icon"></div>&nbsp;
+         <p>{icon icon="fa-info-circle"}{/icon}
          {ts}Are you sure you want to delete this Grant?{/ts} {ts}This action cannot be undone.{/ts}</p>
          <p>{include file="CRM/Grant/Form/Task.tpl"}</p>
      </div>

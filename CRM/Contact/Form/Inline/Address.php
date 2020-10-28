@@ -58,7 +58,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
    * hence calling parent constructor
    */
   public function __construct() {
-    $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
+    $locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
     $name = "Address_{$locBlockNo}";
 
     parent::__construct(NULL, CRM_Core_Action::NONE, 'post', $name);
@@ -70,14 +70,14 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public function preProcess() {
     parent::preProcess();
 
-    $this->_locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', $this, TRUE, NULL, $_REQUEST);
+    $this->_locBlockNo = CRM_Utils_Request::retrieve('locno', 'Positive', $this, TRUE);
     $this->assign('blockId', $this->_locBlockNo);
 
     $addressSequence = CRM_Core_BAO_Address::addressSequence();
     $this->assign('addressSequence', $addressSequence);
 
     $this->_values = [];
-    $this->_addressId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, NULL, $_REQUEST);
+    $this->_addressId = CRM_Utils_Request::retrieve('aid', 'Positive', $this);
 
     $this->_action = CRM_Core_Action::ADD;
     if ($this->_addressId) {
@@ -169,7 +169,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     }
 
     // save address changes
-    $address = CRM_Core_BAO_Address::create($params, TRUE);
+    $address = CRM_Core_BAO_Address::legacyCreate($params, TRUE);
 
     $this->log();
     $this->ajaxResponse['addressId'] = $address[0]->id;

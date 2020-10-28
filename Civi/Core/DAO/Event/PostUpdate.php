@@ -23,10 +23,17 @@ class PostUpdate extends \Symfony\Component\EventDispatcher\Event {
   public $object;
 
   /**
-   * @param $object
+   * @var mixed
    */
-  public function __construct($object) {
+  public $result;
+
+  /**
+   * @param $object
+   * @param $result
+   */
+  public function __construct($object, $result) {
     $this->object = $object;
+    $this->result = $result;
   }
 
 }

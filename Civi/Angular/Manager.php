@@ -29,6 +29,12 @@ class Manager {
    *     This will be mapped to "~/moduleName" by crmResource.
    *   - settings: array(string $key => mixed $value)
    *     List of settings to preload.
+   *   - settingsFactory: callable
+   *     Callback function to fetch settings.
+   *   - permissions: array
+   *     List of permissions to make available client-side
+   *   - requires: array
+   *     List of other modules required
    */
   protected $modules = NULL;
 
@@ -51,6 +57,20 @@ class Manager {
   public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;
     $this->cache = $cache ? $cache : new \CRM_Utils_Cache_ArrayCache([]);
+  }
+
+  /**
+   * Clear out any runtime-cached metadata.
+   *
+   * This is useful if, eg, you have recently added or destroyed Angular modules.
+   *
+   * @return static
+   */
+  public function clear() {
+    $this->cache->clear();
+    $this->modules = NULL;
+    $this->changeSets = NULL;
+    return $this;
   }
 
   /**
@@ -106,9 +126,19 @@ class Manager {
         $angularModules = array_merge($angularModules, $component->getAngularModules());
       }
       \CRM_Utils_Hook::angularModules($angularModules);
-      foreach (array_keys($angularModules) as $module) {
-        if (!isset($angularModules[$module]['basePages'])) {
-          $angularModules[$module]['basePages'] = ['civicrm/a'];
+      foreach ($angularModules as $module => $info) {
+        // Merge in defaults
+        $angularModules[$module] += ['basePages' => ['civicrm/a']];
+        // Validate settingsFactory callables
+        if (isset($info['settingsFactory'])) {
+          // To keep the cache small, we want `settingsFactory` to contain the string names of class & function, not an object
+          if (!is_array($info['settingsFactory']) && !is_string($info['settingsFactory'])) {
+            throw new \CRM_Core_Exception($module . ' settingsFactory must be a callable array or string');
+          }
+          // To keep the cache small, convert full object to just the class name
+          if (is_array($info['settingsFactory']) && is_object($info['settingsFactory'][0])) {
+            $angularModules[$module]['settingsFactory'][0] = get_class($info['settingsFactory'][0]);
+          }
         }
       }
       $this->modules = $this->resolvePatterns($angularModules);
@@ -383,7 +413,9 @@ class Manager {
               break;
 
             case 'settings':
+            case 'settingsFactory':
             case 'requires':
+            case 'permissions':
               if (!empty($module[$resType])) {
                 $result[$moduleName] = $module[$resType];
               }

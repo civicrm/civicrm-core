@@ -58,6 +58,12 @@
     <title>Line Item Price Field</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_price_field</comment>
+    <pseudoconstant>
+      <table>civicrm_price_field</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
     <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
     <add>1.7</add>
   </field>
@@ -67,15 +73,6 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
-  <field>
-    <name>option_group_id</name>
-    <title>Line Item Option Group</title>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>FK to option group</comment>
-    <add>1.7</add>
-    <drop>3.3</drop>
-  </field>
   <field>
     <name>label</name>
     <title>Line Item Label</title>
@@ -154,6 +151,12 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to civicrm_price_field_value</comment>
+    <pseudoconstant>
+      <table>civicrm_price_field_value</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>label</labelColumn>
+    </pseudoconstant>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -164,7 +167,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -176,6 +179,7 @@
     <add>4.3</add>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>

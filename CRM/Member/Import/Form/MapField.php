@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -47,7 +45,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate', $onDuplicate ?? "");
 
-    $highlightedFields = array();
+    $highlightedFields = [];
     if ($skipColumnHeader) {
       $this->assign('skipColumnHeader', $skipColumnHeader);
       $this->assign('rowDisplayCount', 3);
@@ -120,7 +118,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       //mapping is to be loaded from database
 
       $params = array('id' => $savedMapping);
-      $temp = array();
+      $temp = [];
       $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
 
       $this->assign('loadedMapping', $mappingDetails->name);
@@ -150,7 +148,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //-------- end of saved mapping stuff ---------
 
-    $defaults = array();
+    $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
@@ -198,7 +196,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
             $jsSet = TRUE;
           }
           else {
-            $defaults["mapper[$i]"] = array();
+            $defaults["mapper[$i]"] = [];
           }
           if (!$jsSet) {
             for ($k = 1; $k < 4; $k++) {
@@ -293,10 +291,10 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
 
     if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = array();
+      $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
@@ -400,15 +398,15 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
-    $mapperKeys = array();
-    $mapper = array();
+    $mapperKeys = [];
+    $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain = array();
-    $mapperLocType = array();
-    $mapperPhoneType = array();
+    $mapperKeysMain = [];
+    $mapperLocType = [];
+    $mapperPhoneType = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
@@ -441,7 +439,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mappingFields->mapping_id = $params['mappingId'];
       $mappingFields->find();
 
-      $mappingFieldsId = array();
+      $mappingFieldsId = [];
       while ($mappingFields->fetch()) {
         if ($mappingFields->id) {
           $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
@@ -489,7 +487,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Member_Import_Parser_Membership($mapperKeysMain, $mapperLocType, $mapperPhoneType);
-    $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
+    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
       CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form

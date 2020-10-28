@@ -29,14 +29,14 @@ class CRM_Utils_AutoClean {
   /**
    * Call a cleanup function when the current context shuts down.
    *
-   * @code
+   * ```
    * function doStuff() {
    *   $ac = CRM_Utils_AutoClean::with(function(){
    *     MyCleanup::doIt();
    *   });
    *   ...
    * }
-   * @endcode
+   * ```
    *
    * @param mixed $callback
    * @return CRM_Utils_AutoClean
@@ -52,12 +52,12 @@ class CRM_Utils_AutoClean {
    * Temporarily swap values using callback functions, and cleanup
    * when the current context shuts down.
    *
-   * @code
+   * ```
    * function doStuff() {
    *   $ac = CRM_Utils_AutoClean::swap('My::get', 'My::set', 'tmpValue');
    *   ...
    * }
-   * @endcode
+   * ```
    *
    * @param mixed $getter
    *   Function to lookup current value.

@@ -113,6 +113,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
       $op = 'edit';
     }
     CRM_Utils_Hook::post($op, 'FinancialAccount', $financialAccount->id, $financialAccount);
+    CRM_Core_PseudoConstant::flush();
 
     return $financialAccount;
   }
@@ -215,6 +216,8 @@ WHERE cft.id = %1
    *
    * Note that we avoid the CRM_Core_PseudoConstant function as it stores one
    * account per financial type and is unreliable.
+   * @todo Not sure what the above comment means, and the function uses the
+   * PseudoConstant twice. Three times if you count the for loop.
    *
    * @param int $financialTypeID
    *
@@ -223,7 +226,12 @@ WHERE cft.id = %1
    * @return int
    */
   public static function getFinancialAccountForFinancialTypeByRelationship($financialTypeID, $relationshipType) {
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$relationshipType}' "));
+    // This is keyed on the `value` column from civicrm_option_value
+    $accountRelationshipsByValue = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, NULL, 'name');
+    // We look up by the name a couple times below, so flip it.
+    $accountRelationships = array_flip($accountRelationshipsByValue);
+
+    $relationTypeId = $accountRelationships[$relationshipType] ?? NULL;
 
     if (!isset(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$relationTypeId])) {
       $accounts = civicrm_api3('EntityFinancialAccount', 'get', [
@@ -235,14 +243,12 @@ WHERE cft.id = %1
         Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$account['account_relationship']] = $account['financial_account_id'];
       }
 
-      $accountRelationships = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL);
-
-      $incomeAccountRelationshipID = array_search('Income Account is', $accountRelationships);
+      $incomeAccountRelationshipID = $accountRelationships['Income Account is'] ?? FALSE;
       $incomeAccountFinancialAccountID = Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$incomeAccountRelationshipID];
 
       foreach (['Chargeback Account is', 'Credit/Contra Revenue Account is'] as $optionalAccountRelationship) {
 
-        $accountRelationshipID = array_search($optionalAccountRelationship, $accountRelationships);
+        $accountRelationshipID = $accountRelationships[$optionalAccountRelationship] ?? FALSE;
         if (empty(Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID])) {
           Civi::$statics[__CLASS__]['entity_financial_account'][$financialTypeID][$accountRelationshipID] = $incomeAccountFinancialAccountID;
         }

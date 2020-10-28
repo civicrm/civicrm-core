@@ -143,7 +143,7 @@ trait DbTestTrait {
     $expectedValue, $message
   ) {
     $value = \CRM_Core_DAO::getFieldValue($daoName, $searchValue, $returnColumn, $searchColumn, TRUE);
-    $this->assertEquals($expectedValue, $value, $message);
+    $this->assertEquals(trim($expectedValue), trim($value), $message);
   }
 
   /**
@@ -154,7 +154,7 @@ trait DbTestTrait {
    */
   public function assertDBCompareValues($daoName, $searchParams, $expectedValues) {
     //get the values from db
-    $dbValues = array();
+    $dbValues = [];
     \CRM_Core_DAO::commonRetrieve($daoName, $searchParams, $dbValues);
 
     // compare db values with expected values
@@ -184,7 +184,7 @@ trait DbTestTrait {
     $actual = \CRM_Core_DAO::singleValueQuery($query, $params);
     $this->assertEquals($expected, $actual,
       sprintf('%sexpected=[%s] actual=[%s] query=[%s]',
-        $message, $expected, $actual, \CRM_Core_DAO::composeQuery($query, $params, FALSE)
+        $message, $expected, $actual, \CRM_Core_DAO::composeQuery($query, $params)
       )
     );
   }

@@ -13,7 +13,7 @@
 {else}
 {if !$email and $action neq 8 and $context neq 'standalone'}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   <p>{ts}You will not be able to send an acknowledgment for this pledge because there is no email address recorded for this contact. If you want a acknowledgment to be sent when this pledge is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the pledge.{/ts}</p>
 </div>
 {/if}
@@ -29,7 +29,7 @@
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
    {if $action eq 8}
     <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>&nbsp;
+    {icon icon="fa-info-circle"}{/icon}
     <span class="font-red bold">{ts}WARNING: Deleting this pledge will also delete any related pledge payments.{/ts} {ts}This action cannot be undone.{/ts}</span>
     <p>{ts}Consider cancelling the pledge instead if you want to maintain an audit trail and avoid losing payment data. To set the pledge status to Cancelled and cancel any not-yet-paid pledge payments, first click Cancel on this form. Then click the more &gt; link from the pledge listing, and select the Cancel action.{/ts}</p>
     </div>
@@ -43,7 +43,7 @@
             <td class="label">{$form.amount.label}</td>
             <td>
               <span>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.amount.html|crmAddClass:eight}</span>
-              {if $originalPledgeAmount}<div class="messages status no-popup"><div class="icon inform-icon"></div>&nbsp;{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
+              {if $originalPledgeAmount}<div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon}{ts 1=$originalPledgeAmount|crmMoney:$currency} Pledge total has changed due to payment adjustments. Original pledge amount was %1.{/ts}</div>{/if}
             </td>
           </tr>
           <tr class="crm-pledge-form-block-installments">
@@ -217,14 +217,14 @@
 
      function calculatedPaymentAmount( ) {
        var thousandMarker = {/literal}{crmSetting name="monetaryThousandSeparator" group="CiviCRM Localization"}{literal};
-       var seperator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
+       var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
        var amount = document.getElementById("amount").value;
-       // replace all thousandMarker and change the seperator to a dot
-       amount = amount.replace(thousandMarker,'').replace(seperator,'.');
+       // replace all thousandMarker and change the separator to a dot
+       amount = amount.replace(thousandMarker,'').replace(separator,'.');
        var installments = document.getElementById("installments").value;
        if ( installments != '' && installments != NaN) {
             amount =  amount/installments;
-            var installmentAmount = formatMoney( amount, 2, seperator, thousandMarker );
+            var installmentAmount = formatMoney( amount, 2, separator, thousandMarker );
             document.getElementById("eachPaymentAmount").value = installmentAmount;
        }
      }

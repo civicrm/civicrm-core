@@ -17,6 +17,7 @@
  * @group headless
  */
 class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
+  use CRMTraits_PCP_PCPTestTrait;
 
   protected $_individualId;
   protected $_contribution;
@@ -80,7 +81,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_userId = $this->createLoggedInUser();
 
-    $this->_individualId = $this->individualCreate();
+    $this->_individualId = $this->ids['contact'][0] = $this->individualCreate();
     $this->_params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -413,7 +414,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50', $contribution['total_amount']);
+    $this->assertEquals('50.00', $contribution['total_amount']);
     $this->assertEquals(.08, $contribution['fee_amount']);
     $this->assertEquals(49.92, $contribution['net_amount']);
     $this->assertEquals('tx', $contribution['trxn_id']);
@@ -464,7 +465,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50', $contribution['total_amount']);
+    $this->assertEquals('50.00', $contribution['total_amount']);
     $this->assertEquals(0, $contribution['non_deductible_amount']);
   }
 
@@ -479,6 +480,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *  - 1 Contribution with status = Pending
    *  - 1 Line item
    *  - 1 civicrm_financial_item. This is linked to the line item and has a status of 3
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardInvalid() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -517,6 +521,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function creates a billing address if provided.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardWithBillingAddress() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -801,6 +808,32 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'clumsy smurf',
     ]);
     $mut->stop();
+  }
+
+  /**
+   * Test submitting the back office contribution form with pcp data.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testSubmitWithPCP() {
+    $params = $this->pcpParams();
+    $pcpID = $this->createPCPBlock($params);
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit([
+      'financial_type_id' => 3,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 1,
+      'total_amount' => 5,
+      'pcp_made_through_id' => $pcpID,
+      'pcp_display_in_roll' => '1',
+      'pcp_roll_nickname' => 'Dobby',
+      'pcp_personal_note' => 'I wuz here',
+    ], CRM_Core_Action::ADD);
+    $softCredit = $this->callAPISuccessGetSingle('ContributionSoft', []);
+    $this->assertEquals('Dobby', $softCredit['pcp_roll_nickname']);
   }
 
   /**
@@ -1168,13 +1201,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 3);
-    $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1]);
-    $this->assertEquals(2, $items['count']);
-    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
-    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+    $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1])['values'];
+    $this->assertEquals(2, count($items));
+    $this->assertEquals('Contribution Amount', $items[0]['description']);
+    $this->assertEquals('Sales Tax', $items[1]['description']);
 
-    $this->assertEquals(10000, $items['values'][0]['amount']);
-    $this->assertEquals(1000, $items['values'][1]['amount']);
+    $this->assertEquals(10000, $items[0]['amount']);
+    $this->assertEquals(1000, $items[1]['amount']);
   }
 
   /**
@@ -1688,6 +1721,59 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ]);
     $this->assertEquals($membershipPayment['membership_id'], $membership['id']);
     $this->membershipDelete($membership['id']);
+  }
+
+  /**
+   * Test no warnings or errors during preProcess when editing.
+   */
+  public function testPreProcessContributionEdit() {
+    // Simulate a contribution in pending status
+    $contribution = $this->callAPISuccess(
+      'Contribution',
+      'create',
+      array_merge($this->_params, ['contribution_status_id' => 'Pending'])
+    );
+
+    // set up the form to edit the contribution and call preProcess
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution');
+    $_REQUEST['cid'] = $this->_individualId;
+    $_REQUEST['id'] = $contribution['id'];
+    $form->_action = CRM_Core_Action::UPDATE;
+    $form->preProcess();
+
+    // Check something while we're here
+    $this->assertEquals($contribution['id'], $form->_values['contribution_id']);
+
+    unset($_REQUEST['cid']);
+    unset($_REQUEST['id']);
+  }
+
+  /**
+   * Mostly just check there's no errors opening the Widget tab on contribution
+   * pages.
+   */
+  public function testOpeningWidgetAdminPage() {
+    $page_id = $this->callAPISuccess('ContributionPage', 'create', [
+      'title' => 'my page',
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_processor' => $this->paymentProcessorID,
+    ])['id'];
+
+    $form = new CRM_Contribute_Form_ContributionPage_Widget();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Contribute_Form_ContributionPage_Widget', 'Widget');
+
+    $form->set('reset', '1');
+    $form->set('action', 'update');
+    $form->set('id', $page_id);
+
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    $contents = ob_get_contents();
+    ob_end_clean();
+
+    // The page contents load later by ajax, so there's just the surrounding
+    // html available now, but we can check at least one thing while we're here.
+    $this->assertStringContainsString("selectedTab = 'widget';", $contents);
   }
 
 }

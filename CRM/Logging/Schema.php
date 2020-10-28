@@ -72,10 +72,12 @@ class CRM_Logging_Schema {
    * @throws API_Exception
    */
   public static function checkLoggingSupport(&$value, $fieldSpec) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
       throw new API_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
+    }
+    // dev/core#1812 Disable logging in a multilingual environment.
+    if (CRM_Core_I18n::isMultilingual() && $value) {
+      throw new API_Exception(ts("Logging is not supported in a multilingual environment!"));
     }
     return TRUE;
   }
@@ -142,6 +144,9 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // do not log civicrm_mailing_event* tables, CRM-12300
     $this->tables = preg_grep('/^civicrm_mailing_event_/', $this->tables, PREG_GREP_INVERT);
 
+    // dev/core#1762 Don't log subscription_history
+    $this->tables = preg_grep('/^civicrm_subscription_history/', $this->tables, PREG_GREP_INVERT);
+
     // do not log civicrm_mailing_recipients table, CRM-16193
     $this->tables = array_diff($this->tables, ['civicrm_mailing_recipients']);
     $this->logTableSpec = array_fill_keys($this->tables, []);
@@ -153,11 +158,13 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     $nonStandardTableNameString = $this->getNonStandardTableNameFilterString();
 
     if (defined('CIVICRM_LOGGING_DSN')) {
-      $dsn = DB::parseDSN(CIVICRM_LOGGING_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN);
+      $dsn = DB::parseDSN($dsn);
       $this->useDBPrefix = (CIVICRM_LOGGING_DSN != CIVICRM_DSN);
     }
     else {
-      $dsn = DB::parseDSN(CIVICRM_DSN);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
       $this->useDBPrefix = FALSE;
     }
     $this->db = $dsn['database'];
@@ -281,7 +288,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $config->logging = TRUE;
     }
     if ($config->logging) {
-      $this->fixSchemaDifferencesForALL();
+      $this->fixSchemaDifferencesForAll();
     }
     // invoke the meta trigger creation call
     CRM_Core_DAO::triggerRebuild(NULL, TRUE);
@@ -434,10 +441,12 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     // should treat it as a modification.
     $this->resetSchemaCacheForTable("log_$table");
     $logTableSchema = $this->columnSpecsOf("log_$table");
-    foreach ($cols['ADD'] as $colKey => $col) {
-      if (array_key_exists($col, $logTableSchema)) {
-        $cols['MODIFY'][] = $col;
-        unset($cols['ADD'][$colKey]);
+    if (!empty($cols['ADD'])) {
+      foreach ($cols['ADD'] as $colKey => $col) {
+        if (array_key_exists($col, $logTableSchema)) {
+          $cols['MODIFY'][] = $col;
+          unset($cols['ADD'][$colKey]);
+        }
       }
     }
 
@@ -1041,6 +1050,10 @@ COLS;
    */
   public function getLogTablesForContact() {
     $tables = array_keys(CRM_Core_DAO::getReferencesToContactTable());
+    // This additional hardcoding has been moved from getReferencesToContactTable
+    // to here as it is not needed in the other place where the function is called.
+    // It may not be needed here either...
+    $tables[] = 'civicrm_entity_tag';
     return array_intersect($tables, $this->tables);
   }
 

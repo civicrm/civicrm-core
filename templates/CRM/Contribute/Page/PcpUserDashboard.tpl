@@ -40,7 +40,7 @@
 </div>
 {else}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   {ts}You do not have any active Personal Campaign pages.{/ts}
 </div>
 {/if}

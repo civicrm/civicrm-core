@@ -13,8 +13,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
  *
+ * Class CRM_Member_Import_Parser
  */
 abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
@@ -27,10 +27,10 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
   protected $_fileSize;
 
   /**
-   * Seperator being used
+   * Separator being used
    * @var string
    */
-  protected $_seperator;
+  protected $_separator;
 
   /**
    * Total number of lines in file
@@ -47,7 +47,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
   /**
    * @param string $fileName
-   * @param string $seperator
+   * @param string $separator
    * @param $mapper
    * @param bool $skipColumnHeader
    * @param int $mode
@@ -61,7 +61,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    */
   public function run(
     $fileName,
-    $seperator = ',',
+    $separator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
@@ -71,7 +71,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Unable to determine import file');
     }
     $fileName = $fileName['name'];
 
@@ -92,7 +92,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
     $this->_haveColumnHeader = $skipColumnHeader;
 
-    $this->_seperator = $seperator;
+    $this->_separator = $separator;
 
     $fd = fopen($fileName, "r");
     if (!$fd) {
@@ -123,7 +123,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     while (!feof($fd)) {
       $this->_lineCount++;
 
-      $values = fgetcsv($fd, 8192, $seperator);
+      $values = fgetcsv($fd, 8192, $separator);
       if (!$values) {
         continue;
       }
@@ -342,7 +342,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
-    $store->set('seperator', $this->_seperator);
+    $store->set('separator', $this->_separator);
     $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 

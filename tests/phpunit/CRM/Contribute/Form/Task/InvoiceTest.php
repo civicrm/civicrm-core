@@ -69,13 +69,13 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $this->assertNotContains('Due Date', $invoiceHTML[$result['id']]);
     $this->assertNotContains('PAYMENT ADVICE', $invoiceHTML[$result['id']]);
+    $this->assertContains('Mr. Anthony Anderson II', $invoiceHTML[$result['id']]);
 
     $this->assertContains('Due Date', $invoiceHTML[$contribution['id']]);
     $this->assertContains('PAYMENT ADVICE', $invoiceHTML[$contribution['id']]);
 
     $this->assertContains('AMOUNT DUE:</font></b></td>
-                  <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
-
+                <td style="text-align:right;"><b><font size="1">$ 92.00</font></b></td>', $invoiceHTML[$contribution3['id']]);
   }
 
   /**
@@ -136,7 +136,6 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
         return $total;
       }),
       'financial_type_id' => $priceFieldValues['values'][0]['financial_type_id'],
-      'contribution_status_id' => 'Pending',
       'currency' => 'USD',
       'line_items' => $lineItemParams,
     ];

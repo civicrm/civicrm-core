@@ -15,7 +15,17 @@ $argFilters = [];
 if (PHP_SAPI !== 'cli') {
   die("phpunit can only be run from command line.");
 }
-if (version_compare(PHP_VERSION, '7.0', '>=')) {
+if (version_compare(PHP_VERSION, '7.1', '>=')) {
+  $phpunit = findCommand('phpunit7');
+  $argFilters[] = function ($argv) {
+    $pos = array_search('--tap', $argv);
+    if ($pos !== FALSE) {
+      array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
+    }
+    return $argv;
+  };
+}
+elseif (version_compare(PHP_VERSION, '7.0', '>=')) {
   $phpunit = findCommand('phpunit6');
   $argFilters[] = function ($argv) {
     $pos = array_search('--tap', $argv);

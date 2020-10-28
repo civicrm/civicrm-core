@@ -124,6 +124,8 @@ abstract class CRM_Utils_System_Base {
    *   This link should be to the CMS front end (applies to WP & Joomla).
    * @param bool $forceBackend
    *   This link should be to the CMS back end (applies to WP & Joomla).
+   * @param bool $htmlize
+   *   Whether to encode special html characters such as &.
    *
    * @return string
    */
@@ -133,7 +135,8 @@ abstract class CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     return NULL;
   }
@@ -984,6 +987,21 @@ abstract class CRM_Utils_System_Base {
    */
   public function getRoleNames() {
     return NULL;
+  }
+
+  /**
+   * Determine if the Views module exists.
+   *
+   * @return bool
+   */
+  public function viewsExists() {
+    return FALSE;
+  }
+
+  /**
+   * Perform any necessary actions prior to redirecting via POST.
+   */
+  public function prePostRedirect() {
   }
 
 }

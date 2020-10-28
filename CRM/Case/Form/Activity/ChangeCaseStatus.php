@@ -27,7 +27,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    */
   public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
-      CRM_Core_Error::fatal(ts('Case Id not found.'));
+      CRM_Core_Error::statusBounce(ts('Case Id not found.'));
     }
 
     $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, ['class' => 'select-row']);

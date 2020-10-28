@@ -467,8 +467,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     // if view mode pls freeze it with the done button.
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'),
-        ['onclick' => "location.href='civicrm/admin/uf/group/field?reset=1&action=browse&gid=" . $this->_gid . "'"]
+      $this->addElement('xbutton', 'done', ts('Done'),
+        [
+          'type' => 'button',
+          'onclick' => "location.href='civicrm/admin/uf/group/field?reset=1&action=browse&gid=" . $this->_gid . "'",
+        ]
       );
     }
 
@@ -530,9 +533,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         $apiFormattedParams['location_type_id'] = $params['field_name'][2];
       }
     }
-    elseif ($params['field_name'][2] == 0) {
+    elseif (isset($params['field_name'][2]) && $params['field_name'][2] == 0) {
       // 0 is Primary location type
-      $apiFormattedParams['location_type_id'] = NULL;
+      $apiFormattedParams['location_type_id'] = '';
     }
     if (!empty($params['field_name'][3])) {
       $apiFormattedParams['phone_type_id'] = $params['field_name'][3];

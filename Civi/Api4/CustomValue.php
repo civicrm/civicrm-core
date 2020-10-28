@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -39,74 +37,90 @@ class CustomValue {
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Get
    * @throws \API_Exception
    */
-  public static function get($customGroup) {
-    return new Action\CustomValue\Get($customGroup, __FUNCTION__);
+  public static function get($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Get($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\GetFields
    * @throws \API_Exception
    */
-  public static function getFields($customGroup = NULL) {
-    return new Action\CustomValue\GetFields($customGroup, __FUNCTION__);
+  public static function getFields($customGroup = NULL, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\GetFields($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Save
    * @throws \API_Exception
    */
-  public static function save($customGroup) {
-    return new Action\CustomValue\Save($customGroup, __FUNCTION__);
+  public static function save($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Save($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Create
    * @throws \API_Exception
    */
-  public static function create($customGroup) {
-    return new Action\CustomValue\Create($customGroup, __FUNCTION__);
+  public static function create($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Create($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Update
    * @throws \API_Exception
    */
-  public static function update($customGroup) {
-    return new Action\CustomValue\Update($customGroup, __FUNCTION__);
+  public static function update($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Update($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Delete
    * @throws \API_Exception
    */
-  public static function delete($customGroup) {
-    return new Action\CustomValue\Delete($customGroup, __FUNCTION__);
+  public static function delete($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Delete($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\Replace
    * @throws \API_Exception
    */
-  public static function replace($customGroup) {
-    return new Action\CustomValue\Replace($customGroup, __FUNCTION__);
+  public static function replace($customGroup, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\Replace($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
    * @param string $customGroup
+   * @param bool $checkPermissions
    * @return Action\CustomValue\GetActions
    * @throws \API_Exception
    */
-  public static function getActions($customGroup = NULL) {
-    return new Action\CustomValue\GetActions($customGroup, __FUNCTION__);
+  public static function getActions($customGroup = NULL, $checkPermissions = TRUE) {
+    return (new Action\CustomValue\GetActions($customGroup, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -77,7 +75,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
 
       // fix the display of the monetary value, CRM-4038
       foreach ($this->_moneyFields as $field) {
-        $defaults[$field] = CRM_Utils_Money::format(CRM_Utils_Array::value($field, $defaults), NULL, '%a');
+        $defaults[$field] = isset($defaults[$field]) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults[$field], 9) : '';
       }
     }
 
@@ -109,7 +107,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_oid, 'financial_type_id');
       if (!CRM_Financial_BAO_FinancialType::checkPermissionToEditFinancialType($finTypeId)) {
-        CRM_Core_Error::fatal(ts("You do not have permission to access this page"));
+        CRM_Core_Error::statusBounce(ts("You do not have permission to access this page"));
       }
     }
     if ($this->_action == CRM_Core_Action::DELETE) {
@@ -286,7 +284,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     }
 
     $priceField = CRM_Price_BAO_PriceField::findById($fields['fieldId']);
-    $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, ['labelColumn' => 'name']);
+    $visibilityOptions = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceFieldValue', 'visibility_id', ['labelColumn' => 'name']);
 
     $publicCount = 0;
     $options = CRM_Price_BAO_PriceField::getOptions($priceField->id);
@@ -328,7 +326,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       return NULL;
     }
     else {
-      $params = $ids = [];
       $params = $this->controller->exportValues('Option');
       $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 

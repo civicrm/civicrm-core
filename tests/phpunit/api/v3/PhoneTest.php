@@ -22,32 +22,40 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   protected $_params;
   protected $_entity;
 
+  /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = TRUE;
+
   public function setUp() {
     $this->_entity = 'Phone';
     parent::setUp();
     $this->useTransaction();
 
     $this->_contactID = $this->organizationCreate();
-    $loc = $this->locationTypeCreate();
-    $this->_locationType = $loc->id;
+    $this->_locationType = $this->locationTypeCreate();
     CRM_Core_PseudoConstant::flush();
     $this->_params = [
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationType,
       'phone' => '(123) 456-7890',
-      'is_primary' => 1,
+      'is_primary' => TRUE,
       'phone_type_id' => 1,
     ];
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePhone($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('phone', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('Phone', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
@@ -59,7 +67,9 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    * the LocationType default
    *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePhoneDefaultLocation($version) {
     $this->_apiversion = $version;
@@ -164,17 +174,20 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreatePhonePrimaryHandlingChangeExisting($version) {
     $this->_apiversion = $version;
     $phone1 = $this->callAPISuccess('phone', 'create', $this->_params);
-    $phone2 = $this->callAPISuccess('phone', 'create', $this->_params);
+    $this->callAPISuccess('phone', 'create', $this->_params);
     $check = $this->callAPISuccess('phone', 'getcount', [
       'is_primary' => 1,
       'contact_id' => $this->_contactID,
     ]);
     $this->assertEquals(1, $check);
+    $this->callAPISuccess('Phone', 'create', ['id' => $phone1['id'], 'is_primary' => TRUE]);
   }
 
 }

@@ -24,6 +24,19 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   public function checkConfig() {}
 
   /**
+   * Constructor.
+   */
+  public function __construct() {
+    $this->_paymentProcessor = [
+      'payment_type' => 0,
+      'billing_mode' => 0,
+      'id' => 0,
+      'url_recur' => '',
+      'is_recur' => 0,
+    ];
+  }
+
+  /**
    * Get billing fields required for this processor.
    *
    * We apply the existing default of returning fields only for payment processor type 1. Processors can override to
@@ -197,6 +210,19 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Does the processor support the user having a choice as to whether to cancel the recurring with the processor?
+   *
+   * If this returns TRUE then there will be an option to send a cancellation request in the cancellation form.
+   *
+   * This would normally be false for processors where CiviCRM maintains the schedule.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurringNotifyOptional() {
+    return FALSE;
+  }
+
+  /**
    * Are back office payments supported.
    *
    * @return bool
@@ -210,25 +236,6 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    */
   protected function supportsNoEmailProvided() {
     return TRUE;
-  }
-
-  /**
-   * Submit a manual payment.
-   *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
-   */
-  public function doDirectPayment(&$params) {
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
-    if ($params['is_pay_later']) {
-      $result['payment_status_id'] = array_search('Pending', $statuses);
-    }
-    else {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-    }
-    return $result;
   }
 
   /**
@@ -263,7 +270,18 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
         }
         return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
 
+      default:
+        return parent::getText($context, $params);
     }
+  }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return TRUE;
   }
 
 }

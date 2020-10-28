@@ -33,7 +33,7 @@
 {else}
     <div class='spacer'></div>
     <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
         {ts}There are currently no participants registered for this event.{/ts}
     </div>
 {/if}

@@ -178,6 +178,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->activityTypeXml = new SimpleXMLElement($activityTypeXml);
     $this->activityParams = [
       'activity_date_time' => date('Ymd'),
+      // @todo This seems wrong, it just happens to work out because both caseId and caseTypeId equal 1 in the stock setup here.
       'caseID' => $this->caseTypeId,
       'clientID' => $this->contacts['ana'],
       'creatorID' => $this->_loggedInUser,
@@ -195,6 +196,97 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
     $this->process->createActivity($this->activityTypeXml, $this->activityParams);
     $this->assertActivityAssignedToContactExists($this->contacts['beto']);
+  }
+
+  /**
+   * Test the creation of activities where the default assignee should not
+   * end up being a contact from another case where it has the same client
+   * and relationship.
+   */
+  public function testCreateActivityWithDefaultContactByRelationshipTwoCases() {
+    /*
+    At this point the stock setup looks like this:
+    Case 1: no roles assigned
+    Non-case relationship with ana as pupil of beto
+    Non-case relationship with ana as spouse of carlos
+
+    So we want to:
+    Make another case for the same client ana.
+    Add a pupil role on that new case with some other person.
+    Make an activity on the first case.
+
+    Since there is a non-case relationship of that type for the
+    right person we do want it to take that one even though there is no role
+    on the first case, i.e. it SHOULD fall back to non-case relationships.
+    So this is test 1.
+
+    Then we want to get rid of the non-case relationship and try again. In
+    this situation it should not make any assignment, i.e. it should not
+    take the other person from the other case. The original bug was that it
+    would assign the activity to that other person from the other case. This
+    is test 2.
+     */
+
+    $relationship = $this->relationships['ana_is_pupil_of_beto'];
+
+    // Make another case and add a case role with the same relationship we
+    // want, but a different person.
+    $caseObj = $this->createCase($this->contacts['ana'], $this->_loggedInUser);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $this->contacts['ana'],
+      'contact_id_b' => $this->contacts['carlos'],
+      'relationship_type_id' => $relationship['type_id'],
+      'case_id' => $caseObj->id,
+    ]);
+
+    $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
+    $this->activityTypeXml->default_assignee_relationship = "{$relationship['type_id']}_b_a";
+
+    $this->process->createActivity($this->activityTypeXml, $this->activityParams);
+
+    // We can't use assertActivityAssignedToContactExists because it assumes
+    // there's only one activity in the database, but we have several from the
+    // second case. We want the one we just created on the first case.
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $this->activityParams['caseID'],
+      'return' => ['assignee_contact_id'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      // Note the first parameter is turned into an array to match the second.
+      $this->assertEquals([$this->contacts['beto']], $activity['assignee_contact_id']);
+    }
+
+    // Now remove the non-case relationship.
+    $result = $this->callAPISuccess('Relationship', 'get', [
+      'case_id' => ['IS NULL' => 1],
+      'relationship_type_id' => $relationship['type_id'],
+      'contact_id_a' => $this->contacts['ana'],
+      'contact_id_b' => $this->contacts['beto'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      $result = $this->callAPISuccess('Relationship', 'delete', ['id' => $activity['id']]);
+    }
+
+    // Create another activity on the first case. Make it a different activity
+    // type so we can find it better.
+    $activityXml = '<activity-type><name>Follow up</name></activity-type>';
+    $activityXmlElement = new SimpleXMLElement($activityXml);
+    $activityXmlElement->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
+    $activityXmlElement->default_assignee_relationship = "{$relationship['type_id']}_b_a";
+    $this->process->createActivity($activityXmlElement, $this->activityParams);
+
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $this->activityParams['caseID'],
+      'activity_type_id' => 'Follow up',
+      'return' => ['assignee_contact_id'],
+    ])['values'];
+    $this->assertCount(1, $result);
+    foreach ($result as $activity) {
+      // It should be empty, not the contact from the second case.
+      $this->assertEmpty($activity['assignee_contact_id']);
+    }
   }
 
   /**
@@ -425,6 +517,80 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
         ['b_a', 'Enemy of'],
       ],
     ];
+  }
+
+  /**
+   * Test XMLProcessor activityTypes()
+   */
+  public function testXmlProcessorActivityTypes() {
+    // First change an activity's label since we also test getting the labels.
+    // @todo Having a brain freeze or something - can't do this in one step?
+    $activity_type_id = $this->callApiSuccess('OptionValue', 'get', [
+      'option_group_id' => 'activity_type',
+      'name' => 'Medical evaluation',
+    ])['id'];
+    $this->callApiSuccess('OptionValue', 'create', [
+      'id' => $activity_type_id,
+      'label' => 'Medical evaluation changed',
+    ]);
+
+    $p = new CRM_Case_XMLProcessor_Process();
+    $xml = $p->retrieve('housing_support');
+
+    // Test getting the `name`s
+    $activityTypes = $p->activityTypes($xml->ActivityTypes, FALSE, FALSE, FALSE);
+    $this->assertEquals(
+      [
+        13 => 'Open Case',
+        55 => 'Medical evaluation',
+        56 => 'Mental health evaluation',
+        57 => 'Secure temporary housing',
+        60 => 'Income and benefits stabilization',
+        58 => 'Long-term housing plan',
+        14 => 'Follow up',
+        15 => 'Change Case Type',
+        16 => 'Change Case Status',
+        18 => 'Change Case Start Date',
+        25 => 'Link Cases',
+      ],
+      $activityTypes
+    );
+
+    // While we're here and have the `name`s check the editable types in
+    // Settings.xml which is something that gets called reasonably often
+    // thru CRM_Case_XMLProcessor_Process::activityTypes().
+    $activityTypeValues = array_flip($activityTypes);
+    $xml = $p->retrieve('Settings');
+    $settings = $p->activityTypes($xml->ActivityTypes, FALSE, FALSE, 'edit');
+    $this->assertEquals(
+      [
+        'edit' => [
+          0 => $activityTypeValues['Change Case Status'],
+          1 => $activityTypeValues['Change Case Start Date'],
+        ],
+      ],
+      $settings
+    );
+
+    // Now get `label`s
+    $xml = $p->retrieve('housing_support');
+    $activityTypes = $p->activityTypes($xml->ActivityTypes, FALSE, TRUE, FALSE);
+    $this->assertEquals(
+      [
+        13 => 'Open Case',
+        55 => 'Medical evaluation changed',
+        56 => 'Mental health evaluation',
+        57 => 'Secure temporary housing',
+        60 => 'Income and benefits stabilization',
+        58 => 'Long-term housing plan',
+        14 => 'Follow up',
+        15 => 'Change Case Type',
+        16 => 'Change Case Status',
+        18 => 'Change Case Start Date',
+        25 => 'Link Cases',
+      ],
+      $activityTypes
+    );
   }
 
 }

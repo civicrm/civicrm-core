@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 /*
  * Settings metadata file
@@ -340,5 +338,54 @@ return [
     'is_contact' => 0,
     'description' => ts('Allow sending email from the logged in contact\'s email address.'),
     'help_text' => 'CiviCRM allows you to send email from the domain from email addresses and the logged in contact id addresses by default. Disable this if you only want to allow the domain from addresses to be used.',
+  ],
+  'url_tracking_default' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'url_tracking_default',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'quick_form_type' => 'CheckBox',
+    'default' => '1',
+    'title' => ts('Enable click-through tracking by default'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('If checked, mailings will have click-through tracking enabled by default.'),
+    'help_text' => NULL,
+  ],
+  'open_tracking_default' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'open_tracking_default',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'quick_form_type' => 'CheckBox',
+    'default' => '1',
+    'title' => ts('Enable open tracking by default'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('If checked, mailings will have open tracking enabled by default.'),
+    'help_text' => NULL,
+  ],
+  // dev/cor#1768 Allow mailer sync interval to be configured by the
+  // adminstrator.
+  'civimail_sync_interval' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'civimail_sync_interval',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 4,
+      'maxlength' => 8,
+    ],
+    'default' => 10,
+    'title' => ts('Database Update Frequency'),
+    'add' => '5.28',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('The frequency that CiviMail updates its sent mail database.'),
+    'help_text' => NULL,
   ],
 ];

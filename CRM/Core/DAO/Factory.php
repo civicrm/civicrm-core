@@ -24,12 +24,12 @@ class CRM_Core_DAO_Factory {
    * @param string $className
    *
    * @return mixed
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function create($className) {
     $type = self::$_classes[$className] ?? NULL;
     if (!$type) {
-      CRM_Core_Error::fatal("class $className not found");
+      throw new CRM_Core_Exception("class $className not found");
     }
 
     $class = self::$_prefix[$type] . $className;

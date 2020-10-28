@@ -15,7 +15,7 @@
       <tr>
         <td colspan="2">
           <div class="status">
-            <div class="icon inform-icon"></div>
+            {icon icon="fa-info-circle"}{/icon}
             &nbsp;{ts}Are you sure you want to delete this Petition?{/ts}</div>
         </td>
       </tr>

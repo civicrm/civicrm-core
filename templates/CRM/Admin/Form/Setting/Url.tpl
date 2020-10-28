@@ -77,6 +77,15 @@
             <p class="description font-red">{ts}{$verifySSL_description}{/ts}</p>
         </td>
     </tr>
+    <tr class="crm-url-form-block-defaultExternUrl">
+        <td class="label">
+            {$form.defaultExternUrl.label} {help id='id-defaultExternUrl'}
+        </td>
+        <td>
+            {$form.defaultExternUrl.html}<br/>
+            <p class="description font-red">{ts}{$settings_fields.defaultExternUrl.description}{/ts}</p>
+        </td>
+    </tr>
 </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

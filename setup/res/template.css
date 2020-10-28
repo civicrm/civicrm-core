@@ -15,7 +15,7 @@ body {
   float: left;
   margin-left: 10%;
   margin-top: 50px;
-  margin-right: 20%; 
+  margin-right: 20%;
   display: inline-flex;
 }
 
@@ -39,7 +39,7 @@ body {
     100% { left: 0; color: #555;}
 }
 
-  
+
 .civicrm-setup-header hr{
   border-bottom: 2px solid #fff;
   border-top: 2px solid #ddd;
@@ -84,7 +84,7 @@ body {
   padding-bottom: 1.5em;
 }
 
-.civicrm-setup-body label span {
+.civicrm-setup-block-components label span {
   float: left;
   width: 120px;
 }
@@ -130,6 +130,13 @@ body {
   font-size: 80%;
 }
 
+.civicrm-setup-body .install-validate-ok {
+  display: none;
+}
+
+.civicrm-setup-body .install-validate-bad {
+}
+
 .civicrm-setup-body .reqTable {
   border-collapse: collapse;
   width: 100%;
@@ -156,7 +163,7 @@ body {
 
 .civicrm-setup-body .comp-box {
   height: 3.5em;
-  width: 31%;
+  width: 30%;
   display: inline-block;
   padding: 0.5em;
   padding-top: 15px;
@@ -210,7 +217,7 @@ body {
   text-align: center;
   margin: 2em 0.5em;
 }
-.civicrm-setup-body input[type=submit] {
+.civicrm-setup-body button[type=submit] {
   padding:15px 25px;
   background:#82C459;
   color: white;
@@ -220,8 +227,12 @@ body {
   border-radius: 5px;
   font-size: 20px;
 }
-.civicrm-setup-body input[type=submit]:hover {
+.civicrm-setup-body button[type=submit]:hover {
   background: #60A237;
+}
+.civicrm-setup-body button[type=submit]:disabled {
+  background: #888;
+  cursor: not-allowed;
 }
 
 .civicrm-setup-body .settingsTable input[type=text] { width: 80%; }
@@ -256,4 +267,3 @@ body {
     width: 95%;
   }
 }
-

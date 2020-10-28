@@ -7,6 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
+  {capture assign="buttonTitle"}{ts}Configure Event{/ts}{/capture}
+  {crmButton target="_blank" p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
+  <div class='clear'></div>
+{/if}
 {* Callback snippet: Load payment processor *}
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
@@ -28,6 +33,7 @@
       </div>
     {/if}
 
+    {crmRegion name='event-register-not-you-block'}
     {if $contact_id}
       <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}. (<a
@@ -35,6 +41,8 @@
           title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
       </div>
     {/if}
+    {/crmRegion}
+
     {if $event.intro_text}
       <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
         <p>{$event.intro_text}</p>
@@ -55,7 +63,7 @@
           {$form.additional_participants.html}{if $contact_id || $contact_id == NULL}{ts}(including yourself){/ts}{/if}
           <br/>
           <span
-            class="description">{ts}Fill in your registration information on this page. If you are registering additional people, you will be able to enter their registration information after you complete this page and click &quot;Continue&quot;.{/ts}</span>
+            class="description">{ts}Fill in your registration information on this page. If you are registering additional people, you will be able to enter their registration information after you complete this page and click &quot;Review your registration&quot;.{/ts}</span>
         </div>
         <div class="clear"></div>
       </div>

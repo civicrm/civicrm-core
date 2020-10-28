@@ -3,6 +3,7 @@ namespace Civi\Payment;
 
 use InvalidArgumentException;
 use Civi;
+use CRM_Core_Error;
 use CRM_Core_PseudoConstant;
 
 /**
@@ -21,11 +22,6 @@ use CRM_Core_PseudoConstant;
  *
  */
 class PropertyBag implements \ArrayAccess {
-  /**
-   * @var array
-   * - see legacyWarning
-   */
-  public static $legacyWarnings = [];
 
   protected $props = ['default' => []];
 
@@ -72,7 +68,16 @@ class PropertyBag implements \ArrayAccess {
     'transactionID'               => TRUE,
     'transaction_id'              => 'transactionID',
     'trxnResultCode'              => TRUE,
+    'isNotifyProcessorOnCancelRecur' => TRUE,
   ];
+
+
+  /**
+   * @var bool
+   * Temporary, internal variable to help ease transition to PropertyBag.
+   * Used by cast() to suppress legacy warnings.
+   */
+  protected $suppressLegacyWarnings = FALSE;
 
   /**
    * Get the property bag.
@@ -108,7 +113,9 @@ class PropertyBag implements \ArrayAccess {
    */
   public function offsetExists ($offset): bool {
     $prop = $this->handleLegacyPropNames($offset, TRUE);
-    return $prop && isset($this->props['default'][$prop]);
+    // If there's no prop, assume it's a custom property.
+    $prop = $prop ?? $offset;
+    return array_key_exists($prop, $this->props['default']);
   }
 
   /**
@@ -117,8 +124,35 @@ class PropertyBag implements \ArrayAccess {
    * @param mixed $offset
    * @return mixed
    */
-  public function offsetGet ($offset) {
-    $prop = $this->handleLegacyPropNames($offset);
+  public function offsetGet($offset) {
+    try {
+      $prop = $this->handleLegacyPropNames($offset);
+    }
+    catch (InvalidArgumentException $e) {
+
+      CRM_Core_Error::deprecatedFunctionWarning(
+        "proper getCustomProperty('$offset') for non-core properties. "
+        . $e->getMessage(),
+        "PropertyBag array access to get '$offset'"
+      );
+
+      try {
+        return $this->getCustomProperty($offset, 'default');
+      }
+      catch (BadMethodCallException $e) {
+        CRM_Core_Error::deprecatedFunctionWarning(
+          "proper setCustomProperty('$offset', \$value) to store the value (since it is not a core value), then access it with getCustomProperty('$offset'). NULL is returned but in future an exception will be thrown."
+          . $e->getMessage(),
+          "PropertyBag array access to get unset property '$offset'"
+        );
+        return NULL;
+      }
+    }
+
+    CRM_Core_Error::deprecatedFunctionWarning(
+      "get" . ucfirst($offset) . "()",
+      "PropertyBag array access for core property '$offset'"
+    );
     return $this->get($prop, 'default');
   }
 
@@ -138,7 +172,15 @@ class PropertyBag implements \ArrayAccess {
       // This is fine if it's something particular to a payment processor
       // (which should be using setCustomProperty) however it could also lead to
       // things like 'my_weirly_named_contact_id'.
-      $this->legacyWarning($e->getMessage() . " We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties");
+      //
+      // From 5.28 we suppress this when using PropertyBag::cast() to ease transition.
+      if (!$this->suppressLegacyWarnings) {
+        CRM_Core_Error::deprecatedFunctionWarning(
+          "proper setCustomProperty('$offset', \$value) for non-core properties. "
+          . $e->getMessage(),
+          "PropertyBag array access to set '$offset'"
+        );
+      }
       $this->setCustomProperty($offset, $value, 'default');
       return;
     }
@@ -154,6 +196,12 @@ class PropertyBag implements \ArrayAccess {
     // These lines are here (and not in try block) because the catch must only
     // catch the case when the prop is custom.
     $setter = 'set' . ucfirst($prop);
+    if (!$this->suppressLegacyWarnings) {
+      CRM_Core_Error::deprecatedFunctionWarning(
+        "$setter()",
+        "PropertyBag array access to set core property '$offset'"
+      );
+    }
     $this->$setter($value, 'default');
   }
 
@@ -165,24 +213,6 @@ class PropertyBag implements \ArrayAccess {
   public function offsetUnset ($offset) {
     $prop = $this->handleLegacyPropNames($offset);
     unset($this->props['default'][$prop]);
-  }
-
-  /**
-   * Log legacy warnings info.
-   *
-   * @param string $message
-   */
-  protected function legacyWarning($message) {
-    if (empty(static::$legacyWarnings)) {
-      // First time we have been called.
-      register_shutdown_function([PropertyBag::class, 'writeLegacyWarnings']);
-    }
-    // Store warnings instead of logging immediately, as calls to Civi::log()
-    // can take over half a second to work in some hosting environments.
-    static::$legacyWarnings[$message] = TRUE;
-
-    // For unit tests:
-    $this->lastWarning = $message;
   }
 
   /**
@@ -210,6 +240,13 @@ class PropertyBag implements \ArrayAccess {
       // Good, modern name.
       return $prop;
     }
+    // Handling for legacy addition of billing details.
+    if ($newName === NULL && substr($prop, -2) === '-' . \CRM_Core_BAO_LocationType::getBilling()
+      && isset(static::$propMap[substr($prop, 0, -2)])
+    ) {
+      $newName = substr($prop, 0, -2);
+    }
+
     if ($newName === NULL) {
       if ($silent) {
         // Only for use by offsetExists
@@ -218,7 +255,10 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
     // Remaining case is legacy name that's been translated.
-    $this->legacyWarning("We have translated '$prop' to '$newName' for you, but please update your code to use the propper setters and getters.");
+    if (!$this->suppressLegacyWarnings) {
+      CRM_Core_Error::deprecatedFunctionWarning("Canonical property name '$newName'", "Legacy property name '$prop'");
+    }
+
     return $newName;
   }
 
@@ -227,9 +267,11 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param mixed $prop Valid property name
    * @param string $label e.g. 'default'
+   *
+   * @return mixed
    */
   protected function get($prop, $label) {
-    if (isset($this->props['default'][$prop])) {
+    if (array_key_exists($prop, $this->props[$label] ?? [])) {
       return $this->props[$label][$prop];
     }
     throw new \BadMethodCallException("Property '$prop' has not been set.");
@@ -281,17 +323,21 @@ class PropertyBag implements \ArrayAccess {
 
   /**
    * This is used to merge values from an array.
-   * It's a transitional function and should not be used!
+   * It's a transitional, internal function and should not be used!
    *
    * @param array $data
    */
   public function mergeLegacyInputParams($data) {
-    $this->legacyWarning('We have merged input params into the property bag for now but please rewrite code to not use this.');
+    // Suppress legacy warnings for merging an array of data as this
+    // suits our migration plan at this moment. Future behaviour may differ.
+    // @see https://github.com/civicrm/civicrm-core/pull/17643
+    $this->suppressLegacyWarnings = TRUE;
     foreach ($data as $key => $value) {
       if ($value !== NULL && $value !== '') {
         $this->offsetSet($key, $value);
       }
     }
+    $this->suppressLegacyWarnings = FALSE;
   }
 
   /**
@@ -371,14 +417,26 @@ class PropertyBag implements \ArrayAccess {
   }
 
   /**
-   * Get the monetary amount.
+   * Set the monetary amount.
+   *
+   * - We expect to be called with a string amount with optional decimals using
+   *   a '.' as the decimal point (not a ',').
+   *
+   * - We're ok with floats/ints being passed in, too, but we'll cast them to a
+   *   string.
+   *
+   * - Negatives are fine.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/18219
+   *
+   * @param string|float|int $value
+   * @param string $label
    */
   public function setAmount($value, $label = 'default') {
     if (!is_numeric($value)) {
       throw new \InvalidArgumentException("setAmount requires a numeric amount value");
     }
-
-    return $this->set('amount', CRM_Utils_Money::format($value, NULL, NULL, TRUE), $label);
+    return $this->set('amount', $label, filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
   }
 
   /**
@@ -471,6 +529,8 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param string $input
    * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setBillingCity($input, $label = 'default') {
     return $this->set('billingCity', $label, (string) $input);
@@ -599,11 +659,13 @@ class PropertyBag implements \ArrayAccess {
   /**
    * @param int $contributionRecurID
    * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setContributionRecurID($contributionRecurID, $label = 'default') {
     // We don't use this because it counts zero as positive: CRM_Utils_Type::validate($contactID, 'Positive');
     if (!($contributionRecurID > 0)) {
-      throw new InvalidArgumentException("ContributionRecurID must be a positive integer");
+      throw new InvalidArgumentException('ContributionRecurID must be a positive integer');
     }
 
     return $this->set('contributionRecurID', $label, (int) $contributionRecurID);
@@ -766,9 +828,12 @@ class PropertyBag implements \ArrayAccess {
    *
    * @param string $label
    *
-   * @return bool|null
+   * @return bool
    */
   public function getIsRecur($label = 'default'):bool {
+    if (!$this->has('isRecur')) {
+      return FALSE;
+    }
     return $this->get('isRecur', $label);
   }
 
@@ -781,6 +846,35 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("isRecur must be a bool, received NULL.");
     }
     return $this->set('isRecur', $label, (bool) $isRecur);
+  }
+
+  /**
+   * Set whether the user has selected to notify the processor of a cancellation request.
+   *
+   * When cancelling the user may be presented with an option to notify the processor. The payment
+   * processor can take their response, if present, into account.
+   *
+   * @param bool $value
+   * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
+   */
+  public function setIsNotifyProcessorOnCancelRecur($value, $label = 'default') {
+    return $this->set('isNotifyProcessorOnCancelRecur', $label, (bool) $value);
+  }
+
+  /**
+   * Get whether the user has selected to notify the processor of a cancellation request.
+   *
+   * When cancelling the user may be presented with an option to notify the processor. The payment
+   * processor can take their response, if present, into account.
+   *
+   * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
+   */
+  public function getIsNotifyProcessorOnCancelRecur($label = 'default') {
+    return $this->get('isNotifyProcessorOnCancelRecur', $label);
   }
 
   /**
@@ -916,7 +1010,9 @@ class PropertyBag implements \ArrayAccess {
    * Nb. this is stored in civicrm_contribution_recur.processor_id and is NOT
    * in any way related to the payment processor ID.
    *
-   * @return string
+   * @param string $label
+   *
+   * @return string|null
    */
   public function getRecurProcessorID($label = 'default') {
     return $this->get('recurProcessorID', $label);
@@ -926,12 +1022,20 @@ class PropertyBag implements \ArrayAccess {
    * Set the unique payment processor service provided ID for a particular
    * subscription.
    *
-   * @param string $input
+   * See https://github.com/civicrm/civicrm-core/pull/17292 for discussion
+   * of how this function accepting NULL fits with standard / planned behaviour.
+   *
+   * @param string|null $input
    * @param string $label e.g. 'default'
+   *
+   * @return \Civi\Payment\PropertyBag
    */
   public function setRecurProcessorID($input, $label = 'default') {
-    if (empty($input) || strlen($input) > 255) {
-      throw new \InvalidArgumentException("processorID field has max length of 255");
+    if ($input === '') {
+      $input = NULL;
+    }
+    if (strlen($input) > 255 || in_array($input, [FALSE, 0], TRUE)) {
+      throw new \InvalidArgumentException('processorID field has max length of 255');
     }
     return $this->set('recurProcessorID', $label, $input);
   }
@@ -999,6 +1103,10 @@ class PropertyBag implements \ArrayAccess {
   public function getCustomProperty($prop, $label = 'default') {
     if (isset(static::$propMap[$prop])) {
       throw new \InvalidArgumentException("Attempted to get '$prop' via getCustomProperty - must use using its getter.");
+    }
+
+    if (!array_key_exists($prop, $this->props[$label] ?? [])) {
+      throw new \BadMethodCallException("Property '$prop' has not been set.");
     }
     return $this->props[$label][$prop] ?? NULL;
   }

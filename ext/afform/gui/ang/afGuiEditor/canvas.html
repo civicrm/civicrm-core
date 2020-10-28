@@ -1,0 +1,18 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <form class="form-inline">
+      <div class="btn-group btn-group-md pull-right">
+        <button type="submit" class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving || !afform.title" ng-click="save()">
+          <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
+          <span ng-if="changesSaved && !saving">{{ ts('Saved') }}</span>
+          <span ng-if="!changesSaved && !saving">{{ ts('Save') }}</span>
+          <span ng-if="saving">{{ ts('Saving...') }}</span>
+        </button>
+      </div>
+      <div>{{ ts('Form Layout') }}</div>
+    </form>
+  </div>
+  <div id="afGuiEditor-canvas-body" class="panel-body">
+    <div ng-if="layout" af-gui-container="layout" entity-name="" />
+  </div>
+</div>

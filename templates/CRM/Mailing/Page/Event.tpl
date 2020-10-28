@@ -39,14 +39,14 @@
   {/strip}
 {else}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     &nbsp;
     {ts 1=$title}There are currently no %1.{/ts}
   </div>
 {/if}
 
 <div class="action-link">
-  <a href="{$backUrl}">&raquo; {$backUrlTitle}</a>
+  <a href="{$backUrl}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {$backUrlTitle}</a>
 </div>
 
 {include file="CRM/common/pager.tpl" location="bottom"}
@@ -56,7 +56,7 @@
   <script type="text/javascript">
     var totalPages = {/literal}{$pager->_totalPages}{literal};
     CRM.$(function($) {
-      $("#crm-container .crm-pager input.crm-form-submit").click(function () {
+      $("#crm-container .crm-pager button.crm-form-submit").click(function () {
         submitPagerData(this);
       });
     });

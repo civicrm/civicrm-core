@@ -221,7 +221,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       ];
       // see if we need to include this paneName in the current form
       if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-        CRM_Utils_Array::value("hidden_{$type}", $defaults)
+        !empty($defaults["hidden_{$type}"])
       ) {
         $showAdditionalInfo = TRUE;
         $allPanes[$name]['open'] = 'true';

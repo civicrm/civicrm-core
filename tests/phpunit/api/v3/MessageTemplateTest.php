@@ -75,6 +75,52 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
+  /**
+   * If you give workflow_id, then workflow_name should also be set.
+   */
+  public function testWorkflowIdToName() {
+    $wfName = 'uf_notify';
+    $wfId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE name = %1', [
+      1 => [$wfName, 'String'],
+    ]);
+
+    $created = $this->callAPISuccess('MessageTemplate', 'create', [
+      'msg_title' => __FUNCTION__,
+      'msg_subject' => __FUNCTION__,
+      'msg_text' => __FUNCTION__,
+      'msg_html' => __FUNCTION__,
+      'workflow_id' => $wfId,
+    ]);
+    $this->assertEquals($wfName, $created['values'][$created['id']]['workflow_name']);
+    $this->assertEquals($wfId, $created['values'][$created['id']]['workflow_id']);
+    $get = $this->callAPISuccess('MessageTemplate', 'getsingle', ['id' => $created['id']]);
+    $this->assertEquals($wfName, $get['workflow_name']);
+    $this->assertEquals($wfId, $get['workflow_id']);
+  }
+
+  /**
+   * If you give workflow_name, then workflow_id should also be set.
+   */
+  public function testWorkflowNameToId() {
+    $wfName = 'petition_sign';
+    $wfId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_value WHERE name = %1', [
+      1 => [$wfName, 'String'],
+    ]);
+
+    $created = $this->callAPISuccess('MessageTemplate', 'create', [
+      'msg_title' => __FUNCTION__,
+      'msg_subject' => __FUNCTION__,
+      'msg_text' => __FUNCTION__,
+      'msg_html' => __FUNCTION__,
+      'workflow_name' => $wfName,
+    ]);
+    $this->assertEquals($wfName, $created['values'][$created['id']]['workflow_name']);
+    $this->assertEquals($wfId, $created['values'][$created['id']]['workflow_id']);
+    $get = $this->callAPISuccess('MessageTemplate', 'getsingle', ['id' => $created['id']]);
+    $this->assertEquals($wfName, $get['workflow_name']);
+    $this->assertEquals($wfId, $get['workflow_id']);
+  }
+
   public function testPermissionChecks() {
     $entity = $this->createTestEntity();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['edit user-driven message templates'];
@@ -88,6 +134,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     unset($testUserEntity['id']);
     $testUserEntity['msg_subject'] = 'Test user message template';
     unset($testUserEntity['workflow_id']);
+    unset($testUserEntity['workflow_name']);
     $testuserEntity['check_permissions'] = TRUE;
     // ensure that it can create user templates;
     $userEntity = $this->callAPISuccess('MessageTemplate', 'create', $testUserEntity);

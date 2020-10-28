@@ -227,7 +227,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], CRM_Utils_Array::value('html_attributes', $props), '&nbsp;&nbsp;');
         }
         elseif ($add === 'add') {
-          $this->add($props['html_type'], $setting, $props['title'], $options);
+          $this->add($props['html_type'], $setting, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
         }
         else {
           $this->$add($setting, $props['title'], $options);
@@ -290,7 +290,7 @@ trait CRM_Admin_Form_SettingTrait {
       'advmultiselect' => 'Element',
     ];
     $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
-    return $mapping[$htmlType];
+    return $mapping[$htmlType] ?? '';
   }
 
   /**

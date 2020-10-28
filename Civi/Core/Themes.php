@@ -78,7 +78,7 @@ class Themes {
 
       \CRM_Utils_Hook::activeTheme($themeKey, [
         'themes' => $this,
-        'page' => \CRM_Utils_Array::value(\CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET),
+        'page' => \CRM_Utils_System::currentPath(),
       ]);
 
       $themes = $this->getAll();
@@ -133,9 +133,9 @@ class Themes {
    * @see CRM_Utils_Hook::themes
    */
   public function getAvailable() {
-    $result = array();
+    $result = [];
     foreach ($this->getAll() as $key => $theme) {
-      if ($key{0} !== '_') {
+      if ($key[0] !== '_') {
         $result[$key] = $theme['title'];
       }
     }
@@ -164,14 +164,14 @@ class Themes {
   public function resolveUrls($active, $cssExt, $cssFile) {
     $all = $this->getAll();
     if (!isset($all[$active])) {
-      return array();
+      return [];
     }
 
     $cssId = $this->cssId($cssExt, $cssFile);
 
     foreach ($all[$active]['search_order'] as $themeKey) {
       if (isset($all[$themeKey]['excludes']) && in_array($cssId, $all[$themeKey]['excludes'])) {
-        $result = array();
+        $result = [];
       }
       else {
         $result = Civi\Core\Resolver::singleton()

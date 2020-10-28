@@ -57,18 +57,20 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
    *   Id of the database record.
    * @param bool $is_active
    *   Value we want to set the is_active field.
+   * @throws CRM_Core_Exception
    */
   public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::fatal();
+    throw new CRM_Core_Exception('Cannot call setIsActive function');
   }
 
   /**
    * Delete preference dates.
    *
    * @param int $id
+   * @throws CRM_Core_Exception
    */
   public static function del($id) {
-    CRM_Core_Error::fatal();
+    throw new CRM_Core_Exception('Cannot call del function');
   }
 
   /**

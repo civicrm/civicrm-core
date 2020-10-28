@@ -41,6 +41,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
       [2, 1, 'USD', 1],
       [0, 0, 'USD', 0],
       [1, 2, 'USD', -1],
+      [269.565217391, 1, 'USD', 268.57],
       [number_format(19.99, 2), number_format(20.00, 2), 'USD', number_format(-0.01, 2)],
       ['notanumber', 5.00, 'USD', NULL],
     ];
@@ -69,6 +70,38 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
     $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
     $this->assertEquals('8.950,37', $result);
     $this->setCurrencySeparators(',');
+  }
+
+  /**
+   * Test rounded by currency function with specified precision.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testFormatLocaleNumericRoundedByPrecision($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByPrecision(8950.3678, 3);
+    $expected = ($thousandSeparator === ',') ? '8,950.368' : '8.950,368';
+    $this->assertEquals($expected, $result);
+  }
+
+  /**
+   * Test rounded by currency function with specified precision but without padding to reach it.
+   *
+   * @param string $thousandSeparator
+   *
+   * @dataProvider getThousandSeparators
+   */
+  public function testFormatLocaleNumericRoundedByOptionalPrecision($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision(8950.3678, 8);
+    $expected = ($thousandSeparator === ',') ? '8,950.3678' : '8.950,3678';
+    $this->assertEquals($expected, $result);
+
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision(123456789.987654321, 9);
+    $expected = ($thousandSeparator === ',') ? '123,456,789.98765' : '123.456.789,98765';
+    $this->assertEquals($result, $expected);
   }
 
   /**

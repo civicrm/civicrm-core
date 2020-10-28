@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,24 +21,33 @@
 class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
 
   /**
-   * Takes an associative array and adds im.
+   * Create or update IM record.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return object
-   *   CRM_Core_BAO_IM object on success, null otherwise
+   * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'IM', CRM_Utils_Array::value('id', $params), $params);
+  public static function create($params) {
+    CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
+    return self::writeRecord($params);
+  }
 
-    $im = new CRM_Core_DAO_IM();
-    $im->copyValues($params);
-    $im->save();
-
-    CRM_Utils_Hook::post($hook, 'IM', $im->id, $im);
-    return $im;
+  /**
+   * Create or update IM record.
+   *
+   * @deprecated
+   *
+   * @param array $params
+   *
+   * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the v4 api');
+    return self::create($params);
   }
 
   /**

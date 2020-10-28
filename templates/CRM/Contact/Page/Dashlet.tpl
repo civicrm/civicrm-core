@@ -16,7 +16,7 @@
     <div id="available-dashlets" class="dash-column">
         {foreach from=$availableDashlets item=row key=dashID}
       <div class="portlet">
-        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet"></a>{/if}</div>
+        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet" aria-hidden="true"></a>{/if}</div>
       </div>
         {/foreach}
     </div>
@@ -27,7 +27,7 @@
     <div id="existing-dashlets-col-0" class="dash-column">
         {foreach from=$contactDashlets.0 item=row key=dashID}
       <div class="portlet">
-        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet"></a>{/if}</div>
+        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet" aria-hidden="true"></a>{/if}</div>
       </div>
         {/foreach}
     </div>
@@ -35,7 +35,7 @@
     <div id="existing-dashlets-col-1" class="dash-column">
         {foreach from=$contactDashlets.1 item=row key=dashID}
       <div class="portlet">
-        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet"></a>{/if}</div>
+        <div class="portlet-header" id="{$dashID}">{$row.label}{if $admin and !$row.is_reserved}&nbsp;<a class="crm-i fa-times delete-dashlet" aria-hidden="true"></a>{/if}</div>
       </div>
         {/foreach}
     </div>

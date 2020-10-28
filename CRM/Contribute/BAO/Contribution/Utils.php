@@ -83,6 +83,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values['amount'] = $form->_params['amount'];
     }
 
+    if (isset($paymentParams['contribution_source'])) {
+      $paymentParams['source'] = $paymentParams['contribution_source'];
+    }
     if ($isPaymentTransaction) {
       $contributionParams = [
         'id' => $paymentParams['contribution_id'] ?? NULL,
@@ -142,9 +145,6 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       $paymentParams['contributionID'] = $contribution->id;
       $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
-      if (isset($paymentParams['contribution_source'])) {
-        $paymentParams['source'] = $paymentParams['contribution_source'];
-      }
 
       if (!empty($form->_params['is_recur']) && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
@@ -346,78 +346,6 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param array $params
-   * @param string $type
-   *
-   * @return bool
-   */
-  public static function _fillCommonParams(&$params, $type = 'paypal') {
-    if (array_key_exists('transaction', $params)) {
-      $transaction = &$params['transaction'];
-    }
-    else {
-      $transaction = &$params;
-    }
-
-    $params['contact_type'] = 'Individual';
-
-    $billingLocTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', 'Billing', 'id', 'name');
-    if (!$billingLocTypeId) {
-      $billingLocTypeId = 1;
-    }
-    if (!CRM_Utils_System::isNull($params['address'])) {
-      $params['address'][1]['is_primary'] = 1;
-      $params['address'][1]['location_type_id'] = $billingLocTypeId;
-    }
-    if (!CRM_Utils_System::isNull($params['email'])) {
-      $params['email'] = [
-        1 => [
-          'email' => $params['email'],
-          'location_type_id' => $billingLocTypeId,
-        ],
-      ];
-    }
-
-    if (isset($transaction['trxn_id'])) {
-      // set error message if transaction has already been processed.
-      $contribution = new CRM_Contribute_DAO_Contribution();
-      $contribution->trxn_id = $transaction['trxn_id'];
-      if ($contribution->find(TRUE)) {
-        $params['error'][] = ts('transaction already processed.');
-      }
-    }
-    else {
-      // generate a new transaction id, if not already exist
-      $transaction['trxn_id'] = md5(uniqid(rand(), TRUE));
-    }
-
-    if (!isset($transaction['financial_type_id'])) {
-      $contributionTypes = array_keys(CRM_Contribute_PseudoConstant::financialType());
-      $transaction['financial_type_id'] = $contributionTypes[0];
-    }
-
-    if (($type == 'paypal') && (!isset($transaction['net_amount']))) {
-      $transaction['net_amount'] = $transaction['total_amount'] - CRM_Utils_Array::value('fee_amount', $transaction, 0);
-    }
-
-    if (!isset($transaction['invoice_id'])) {
-      $transaction['invoice_id'] = $transaction['trxn_id'];
-    }
-
-    $source = ts('ContributionProcessor: %1 API',
-      [1 => ucfirst($type)]
-    );
-    if (isset($transaction['source'])) {
-      $transaction['source'] = $source . ':: ' . $transaction['source'];
-    }
-    else {
-      $transaction['source'] = $source;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * @param int $contactID
    *
    * @return mixed
@@ -473,31 +401,19 @@ LIMIT 1
    *   Amount of field.
    * @param float $taxRate
    *   Tax rate of selected financial account for field.
-   * @param bool $ugWeDoNotKnowIfItNeedsCleaning_Help
-   *   This should ALWAYS BE FALSE and then be removed. A 'clean' money string uses a standardised format
-   *   such as '1000.99' for one thousand $/Euro/CUR and ninety nine cents/units.
-   *   However, we are in the habit of not necessarily doing that so need to grandfather in
-   *   the new expectation.
    *
    * @return array
    *   array of tax amount
    *
    */
-  public static function calculateTaxAmount($amount, $taxRate, $ugWeDoNotKnowIfItNeedsCleaning_Help = FALSE) {
-    $taxAmount = [];
-    if ($ugWeDoNotKnowIfItNeedsCleaning_Help) {
-      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', ['civi.tag' => 'deprecated']);
-      $amount = CRM_Utils_Rule::cleanMoney($amount);
-    }
-    // There can not be any rounding at this stage - as this is prior to quantity multiplication
-    $taxAmount['tax_amount'] = ($taxRate / 100) * $amount;
-
-    return $taxAmount;
+  public static function calculateTaxAmount($amount, $taxRate) {
+    // There can not be any rounding at this stage - as it should be done at point of display.
+    return ['tax_amount' => ($taxRate / 100) * $amount];
   }
 
   /**
    * Format monetary amount: round and return to desired decimal place
-   * CRM-20145
+   * @see https://issues.civicrm.org/jira/browse/CRM-20145
    *
    * @param float $amount
    *   Monetary amount
@@ -508,6 +424,7 @@ LIMIT 1
    *   Amount rounded and returned with the desired decimal places
    */
   public static function formatAmount($amount, $decimals = 2) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Utils_Rule::cleanMoney instead');
     return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 

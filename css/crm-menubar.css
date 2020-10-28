@@ -31,10 +31,8 @@
 #civicrm-menu li li a {
   padding: 6px 36px 6px 10px;
 }
-#civicrm-menu li.crm-menu-border-bottom:not(:last-child) {
-  border-bottom: 1px solid #bbb;
-}
-#civicrm-menu li:not(.crm-menu-border-bottom) + li.crm-menu-border-top {
+#civicrm-menu li.crm-menu-border-bottom + li,
+#civicrm-menu li + li.crm-menu-border-top {
   border-top: 1px solid #bbb;
 }
 #civicrm-menu li a:focus,

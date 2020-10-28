@@ -110,7 +110,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $participant = $values = [];
     $this->_participant_id = CRM_Utils_Request::retrieve('pid', 'Positive', $this, FALSE, NULL, 'REQUEST');
     $this->_userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE, NULL, 'REQUEST');
-    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, NULL, 'REQUEST');
+    $this->isBackoffice = CRM_Utils_Request::retrieve('is_backoffice', 'String', $this, FALSE, FALSE, 'REQUEST') ?? FALSE;
     $params = ['id' => $this->_participant_id];
     $this->_participant = CRM_Event_BAO_Participant::getValues($params, $values, $participant);
     $this->_part_values = $values[$this->_participant_id];
@@ -140,6 +140,9 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participant_id, 'contribution_id', 'participant_id');
     $this->assign('contributionId', $contributionId);
     $selfServiceDetails = CRM_Event_BAO_Participant::getSelfServiceEligibility($this->_participant_id, $url, $this->isBackoffice);
+    if (!$selfServiceDetails['eligible']) {
+      CRM_Core_Error::statusBounce($selfServiceDetails['ineligible_message'], $url, ts('Sorry'));
+    }
     $details = array_merge($details, $selfServiceDetails);
     $this->assign('details', $details);
     $this->selfsvcupdateUrl = CRM_Utils_System::url('civicrm/event/selfsvcupdate', "reset=1&id={$this->_participant_id}&id=0");

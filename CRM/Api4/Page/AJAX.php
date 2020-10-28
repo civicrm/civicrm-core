@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Api4_Page_AJAX extends CRM_Core_Page {
 
@@ -131,6 +129,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     foreach (get_class_vars(get_class($result)) as $key => $val) {
       $vals[$key] = $result->$key;
     }
+    unset($vals['rowCount']);
     $vals['count'] = $result->count();
     return $vals;
   }

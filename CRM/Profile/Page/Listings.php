@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -100,7 +99,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
       // check if we are rendering mixed profiles
       if (CRM_Core_BAO_UFGroup::checkForMixProfiles($this->_profileIds)) {
-        CRM_Core_Error::fatal(ts('You cannot combine profiles of multiple types.'));
+        CRM_Core_Error::statusBounce(ts('You cannot combine profiles of multiple types.'));
       }
 
       $this->_gid = $this->_profileIds[0];
@@ -282,7 +281,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();
       $ufgroupDAO->id = $this->_gid;
       if (!$ufgroupDAO->find(TRUE)) {
-        CRM_Core_Error::fatal();
+        CRM_Core_Error::statusBounce('Unable to find matching UF Group');
       }
     }
 

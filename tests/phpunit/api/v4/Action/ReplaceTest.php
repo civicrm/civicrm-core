@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -106,8 +104,7 @@ class ReplaceTest extends UnitTestCase {
   }
 
   public function testCustomValueReplace() {
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('name', 'replaceTest')
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', TRUE)
@@ -121,8 +118,7 @@ class ReplaceTest extends UnitTestCase {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Custom2')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'String')

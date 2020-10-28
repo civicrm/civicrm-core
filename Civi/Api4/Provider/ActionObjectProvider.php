@@ -31,7 +31,7 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
     // to override standard implementations -- which is
     // handy for testing/mocking.
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         ['onApiResolve', Events::W_EARLY],
       ],
     ];
@@ -116,7 +116,8 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
       }
     }
     elseif (is_string($val) && strlen($val) > 1 && substr($val, 0, 1) === '$') {
-      $val = \CRM_Utils_Array::pathGet($result, explode('.', substr($val, 1)));
+      $key = substr($val, 1);
+      $val = $result[$key] ?? \CRM_Utils_Array::pathGet($result, explode('.', $key));
     }
   }
 

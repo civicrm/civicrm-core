@@ -174,7 +174,7 @@
   {section name=rowLoop start=1 loop=6}
      {assign var=index value=$smarty.section.rowLoop.index}
      <tr id="discount_{$index}" class=" crm-event-manage-fee-form-block-discount_{$index} {if $index GT 1 AND empty( $form.discount_name[$index].value) } hiddenElement {/if} form-item {cycle values="odd-row,even-row"}">
-           <td>{if $index GT 1} <a onclick="showHideDiscountRow('discount_{$index}', false, {$index}); return false;" name="discount_{$index}" href="#" class="form-link"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}hide field or section{/ts}"/></a>{/if}
+           <td>{if $index GT 1} <a onclick="showHideDiscountRow('discount_{$index}', false, {$index}); return false;" name="discount_{$index}" href="#" class="form-link">{icon icon="fa-trash"}{ts}remove discount set{/ts}{/icon}</span></a>{/if}
            </td>
            <td class="crm-event-manage-fee-form-block-discount_name"> {$form.discount_name.$index.html}</td>
            <td class="crm-event-manage-fee-form-block-discount_start_date"> {$form.discount_start_date.$index.html} </td>
@@ -183,7 +183,7 @@
     {/section}
     </table>
         <div id="discountLink" class="add-remove-link">
-           <a onclick="showHideDiscountRow( 'discount', true);return false;" id="discountLink" href="#" class="form-link"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}show field or section{/ts}"/>{ts}another discount set{/ts}</a>
+           <a onclick="showHideDiscountRow( 'discount', true);return false;" id="discountLink" href="#" class="form-link"><i class="crm-i fa-plus action-icon" aria-hidden="true"></i> {ts}another discount set{/ts}</a>
         </div>
         {$form._qf_Fee_submit.html}
 

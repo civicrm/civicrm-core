@@ -12,6 +12,7 @@
 /**
  * Tests for linking to resource files
  * @group headless
+ * @group resources
  */
 class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
@@ -39,7 +40,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     list ($this->basedir, $this->container, $this->mapper) = $this->_createMapper();
     $cache = new CRM_Utils_Cache_Arraycache([]);
-    $this->res = new CRM_Core_Resources($this->mapper, $cache, NULL);
+    $this->res = new CRM_Core_Resources($this->mapper, new CRM_Core_Resources_Strings($cache), NULL);
     $this->res->setCacheCode('resTest');
     CRM_Core_Resources::singleton($this->res);
 
@@ -57,6 +58,70 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function tearDown() {
     $_REQUEST = $this->originalRequest;
     $_GET = $this->originalGet;
+  }
+
+  public function testCreateBasicBundle() {
+    $hits = [];
+
+    $init = function(CRM_Core_Resources_Bundle $b) use (&$hits) {
+      $hits[] = 'init_' . $b->name;
+      $b->addScript('doStuff();');
+    };
+    $alter = function ($e) use (&$hits) {
+      $hits[] = 'alter_' . $e->bundle->name;
+      $e->bundle->addScript('alert();');
+    };
+
+    Civi::dispatcher()->addListener('hook_civicrm_alterBundle', $alter);
+    $b = CRM_Core_Resources_Common::createBasicBundle('cheese', $init);
+    $this->assertEquals('cheese', $b->name);
+    $this->assertEquals(['init_cheese', 'alter_cheese'], $hits);
+    $this->assertEquals(['doStuff();', 'alert();'], array_values(CRM_Utils_Array::collect('script', $b->getAll())));
+  }
+
+  /**
+   * Make two bundles (multi-regional). Add them to CRM_Core_Resources.
+   * Ensure that the resources land in the right regions.
+   */
+  public function testAddBundle() {
+    $foo = new CRM_Core_Resources_Bundle('foo', ['scriptUrl', 'styleUrl', 'markup']);
+    $bar = new CRM_Core_Resources_Bundle('bar', ['scriptUrl', 'styleUrl', 'markup']);
+
+    $foo->addScriptUrl('http://example.com/foo.js', 100, 'testAddBundle_foo');
+    $foo->add(['markup' => 'Hello, foo', 'region' => 'page-header']);
+    $bar->addScriptUrl('http://example.com/bar.js', 100, 'testAddBundle_bar');
+    $bar->add(['markup' => 'Hello, bar', 'region' => 'page-header']);
+    $foo->addStyleUrl('http://example.com/shoes.css');
+
+    $this->res->addBundle($foo);
+    $this->res->addBundle([$bar]);
+
+    $getPropsByRegion = function($region, $key) {
+      $props = [];
+      foreach (CRM_Core_Region::instance($region)->getAll() as $snippet) {
+        if (isset($snippet[$key])) {
+          $props[] = $snippet[$key];
+        }
+      }
+      return $props;
+    };
+
+    $this->assertEquals(
+      ['http://example.com/foo.js'],
+      $getPropsByRegion('testAddBundle_foo', 'scriptUrl')
+    );
+    $this->assertEquals(
+      ['http://example.com/bar.js'],
+      $getPropsByRegion('testAddBundle_bar', 'scriptUrl')
+    );
+    $this->assertEquals(
+      ['', 'Hello, foo', 'Hello, bar'],
+      $getPropsByRegion('page-header', 'markup')
+    );
+    $this->assertEquals(
+      ['http://example.com/shoes.css'],
+      $getPropsByRegion('page-footer', 'styleUrl')
+    );
   }
 
   public function testAddScriptFile() {
@@ -137,7 +202,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
           ],
         ],
       ],
-      $this->res->getSettings()
+      $this->res->getSettings('html-header')
     );
   }
 
@@ -147,10 +212,23 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addSetting(['fruit' => ['yours' => 'orange']]);
     $this->assertTreeEquals(
       ['fruit' => ['yours' => 'orange', 'mine' => 'apple']],
-      $this->res->getSettings()
+      $this->res->getSettings('html-header')
     );
-    $actual = $this->res->renderSetting();
-    $expected = json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]);
+    $actual = CRM_Core_Region::instance('html-header')->render('');
+    $expected = '})(' . json_encode(['fruit' => ['yours' => 'orange', 'mine' => 'apple']]) . ')';
+    $this->assertTrue(strpos($actual, $expected) !== FALSE);
+  }
+
+  public function testAddSettingToBillingBlock() {
+    $this->res
+      ->addSetting(['cheese' => ['cheddar' => 'yellow']], 'billing-block')
+      ->addSetting(['cheese' => ['edam' => 'red']], 'billing-block');
+    $this->assertTreeEquals(
+      ['cheese' => ['edam' => 'red', 'cheddar' => 'yellow']],
+      $this->res->getSettings('billing-block')
+    );
+    $actual = CRM_Core_Region::instance('billing-block')->render('');
+    $expected = '})(' . json_encode(['cheese' => ['edam' => 'red', 'cheddar' => 'yellow']]) . ')';
     $this->assertTrue(strpos($actual, $expected) !== FALSE);
   }
 
@@ -161,7 +239,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       $event->data['fruit']['mine'] = 'banana';
     });
     $this->res->addSetting(['fruit' => ['mine' => 'apple']]);
-    $settings = $this->res->getSettings();
+    $settings = $this->res->getSettings('html-header');
     $this->assertTreeEquals(['fruit' => ['mine' => 'banana']], $settings);
   }
 
@@ -173,7 +251,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       return ['fruit' => ['mine' => 'apple']];
     });
 
-    $actual = $this->res->getSettings();
+    $actual = $this->res->getSettings('html-header');
     $expected = ['fruit' => ['yours' => 'orange', 'mine' => 'apple']];
     $this->assertTreeEquals($expected, $actual);
   }
@@ -185,14 +263,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->res->addSettingsFactory(function () use (&$muckableValue) {
       return $muckableValue;
     });
-    $actual = $this->res->getSettings();
+    $actual = $this->res->getSettings('html-header');
     $expected = ['fruit' => ['mine' => 'apple', 'yours' => 'orange', 'theirs' => 'apricot']];
     $this->assertTreeEquals($expected, $actual);
 
     // note: the setting is not fixed based on what the factory returns when registered; it's based
     // on what the factory returns when getSettings is called
     $muckableValue = ['fruit' => ['yours' => 'banana']];
-    $actual = $this->res->getSettings();
+    $actual = $this->res->getSettings('html-header');
     $expected = ['fruit' => ['mine' => 'apple', 'yours' => 'banana']];
     $this->assertTreeEquals($expected, $actual);
   }

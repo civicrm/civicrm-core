@@ -335,10 +335,8 @@ ALTER TABLE {$tableName}
       else {
         CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
       }
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if ($domain->locales) {
-        $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+      $locales = CRM_Core_I18n::getMultilingual();
+      if ($locales) {
         CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, $isUpgradeMode);
       }
     }
@@ -367,9 +365,9 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    *
    * @param $tables
    *   Tables to create index for in the format:
-   *     array('civicrm_entity_table' => 'entity_id')
+   *     ['civicrm_entity_table' => ['entity_id']]
    *     OR
-   *     array('civicrm_entity_table' => array('entity_id', 'entity_table'))
+   *     array['civicrm_entity_table' => array['entity_id', 'entity_table']]
    *   The latter will create a combined index on the 2 keys (in order).
    *
    *  Side note - when creating combined indexes the one with the most variation
@@ -385,9 +383,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    */
   public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLengths = []) {
     $queries = [];
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
 
     // if we're multilingual, cache the information on internationalised fields
     static $columns = NULL;
@@ -436,6 +432,8 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
           }
         }
 
+        $indexType = $createIndexPrefix === 'UI' ? 'UNIQUE' : '';
+
         // the index doesn't exist, so create it
         // if we're multilingual and the field is internationalised, do it for every locale
         // @todo remove is_array check & add multilingual support for combined indexes and add a test.
@@ -443,11 +441,11 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
         // entity_id + entity_table which are not multilingual.
         if (!is_array($field) && !CRM_Utils_System::isNull($locales) and isset($columns[$table][$fieldName])) {
           foreach ($locales as $locale) {
-            $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
+            $queries[] = "CREATE $indexType INDEX {$createIndexPrefix}_{$fieldName}{$lengthName}_{$locale} ON {$table} ({$fieldName}_{$locale}{$lengthSize})";
           }
         }
         else {
-          $queries[] = "CREATE INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
+          $queries[] = "CREATE $indexType INDEX {$createIndexPrefix}_{$fieldName}{$lengthName} ON {$table} (" . implode(',', (array) $field) . "{$lengthSize})";
         }
       }
     }
@@ -502,7 +500,7 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
    * @param string $columnName
    * @param $length
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function alterFieldLength($customFieldID, $tableName, $columnName, $length) {
     // first update the custom field tables
@@ -543,7 +541,7 @@ MODIFY      {$columnName} varchar( $length )
       CRM_Core_DAO::executeQuery($sql);
     }
     else {
-      CRM_Core_Error::fatal(ts('Could Not Find Custom Field Details for %1, %2, %3',
+      throw new CRM_Core_Exception(ts('Could Not Find Custom Field Details for %1, %2, %3',
         [
           1 => $tableName,
           2 => $columnName,
@@ -596,7 +594,8 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function checkFKExists($table_name, $constraint_name) {
     $config = CRM_Core_Config::singleton();
-    $dbUf = DB::parseDSN($config->dsn);
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
+    $dbUf = DB::parseDSN($dsn);
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = %1
@@ -800,30 +799,51 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @param bool $revert
    *   Being able to revert if primarily for unit testing.
+   * @param array $patterns
+   *   Defaults to ['civicrm\_%'] but can be overridden to specify any pattern. eg ['civicrm\_%', 'civi%\_%', 'veda%\_%'].
+   * @param array $databaseList
+   *   Allows you to specify an alternative database to the configured CiviCRM database.
    *
    * @return bool
    */
-  public static function migrateUtf8mb4($revert = FALSE) {
+  public static function migrateUtf8mb4($revert = FALSE, $patterns = ['civicrm\_%'], $databaseList = NULL) {
     $newCharSet = $revert ? 'utf8' : 'utf8mb4';
     $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
     $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
     $tables = [];
     $dao = new CRM_Core_DAO();
-    $database = $dao->_database;
-    CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
-    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS WHERE Engine = 'InnoDB' AND Name LIKE 'civicrm\_%'");
-    while ($dao->fetch()) {
-      $tables[$dao->Name] = [
-        'Engine' => $dao->Engine,
-      ];
+    $databases = $databaseList ?? [$dao->_database];
+
+    $tableNameLikePatterns = [];
+    $logTableNameLikePatterns = [];
+
+    foreach ($patterns as $pattern) {
+      $pattern = CRM_Utils_Type::escape($pattern, 'String');
+      $tableNameLikePatterns[] = "Name LIKE '{$pattern}'";
+      $logTableNameLikePatterns[] = "Name LIKE 'log\_{$pattern}'";
     }
-    $dsn = defined('CIVICRM_LOGGING_DSN') ? DB::parseDSN(CIVICRM_LOGGING_DSN) : DB::parseDSN(CIVICRM_DSN);
-    $logging_database = $dsn['database'];
-    $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `$logging_database` WHERE Engine <> 'MyISAM' AND Name LIKE 'log\_civicrm\_%'");
-    while ($dao->fetch()) {
-      $tables["$logging_database.{$dao->Name}"] = [
-        'Engine' => $dao->Engine,
-      ];
+
+    foreach ($databases as $database) {
+      CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
+      $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$database}` WHERE Engine = 'InnoDB' AND (" . implode(' OR ', $tableNameLikePatterns) . ")");
+      while ($dao->fetch()) {
+        $tables["{$database}.{$dao->Name}"] = [
+          'Engine' => $dao->Engine,
+        ];
+      }
+    }
+    // If we specified a list of databases assume the user knows what they are doing.
+    // If they specify the database they should also specify the pattern.
+    if (!$databaseList) {
+      $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
+      $logging_database = $dsn['database'];
+      $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$logging_database}` WHERE Engine <> 'MyISAM' AND (" . implode(' OR ', $logTableNameLikePatterns) . ")");
+      while ($dao->fetch()) {
+        $tables["{$logging_database}.{$dao->Name}"] = [
+          'Engine' => $dao->Engine,
+        ];
+      }
     }
     foreach ($tables as $table => $param) {
       $query = "ALTER TABLE $table";
@@ -866,11 +886,14 @@ MODIFY      {$columnName} varchar( $length )
       }
       $query .= " CHARACTER SET = $newCharSet COLLATE = $tableCollation";
       if ($param['Engine'] === 'InnoDB') {
-        $query .= ' ROW_FORMAT = Dynamic';
+        $query .= ' ROW_FORMAT = Dynamic KEY_BLOCK_SIZE = 0';
       }
       // Disable i18n rewrite.
       CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     }
+    // Rebuild triggers and other schema reconciliation if needed.
+    $logging = new CRM_Logging_Schema();
+    $logging->fixSchemaDifferences();
     return TRUE;
   }
 
@@ -881,6 +904,23 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function getDBCollation() {
     return CRM_Core_DAO::singleValueQuery('SELECT @@collation_database');
+  }
+
+  /**
+   * Get the collation actually being used by the tables in the database.
+   *
+   * The db collation may not match the collation used by the tables, get what is
+   * set on the tables (represented by civicrm_contact).
+   *
+   * @return string
+   */
+  public static function getInUseCollation() {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_contact\'');
+      $dao->fetch();
+      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__];
   }
 
   /**

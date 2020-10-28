@@ -32,8 +32,8 @@ class I18nSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::PREPARE => ['onApiPrepare', Events::W_MIDDLE],
-      Events::RESPOND => ['onApiRespond', Events::W_LATE],
+      'civi.api.prepare' => ['onApiPrepare', Events::W_MIDDLE],
+      'civi.api.respond' => ['onApiRespond', Events::W_LATE],
     ];
   }
 

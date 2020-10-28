@@ -74,6 +74,50 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   public static $entityShortname = NULL;
 
   /**
+   * Set where the browser should be directed to next.
+   *
+   * @param string $pathPart
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function setNextUrl(string $pathPart) {
+    //set the context for redirection for any task actions
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $urlParams = 'force=1';
+    if (CRM_Utils_Rule::qfKey($qfKey)) {
+      $urlParams .= "&qfKey=$qfKey";
+    }
+
+    $session = CRM_Core_Session::singleton();
+    $searchFormName = strtolower($this->get('searchFormName'));
+    if ($searchFormName === 'search') {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $pathPart . '/search', $urlParams));
+    }
+    else {
+      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
+        $urlParams
+      ));
+    }
+  }
+
+  /**
+   * Get the ids the user has selected.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
+  public function getSelectedIDs(array $values): array {
+    $ids = [];
+    foreach ($values as $name => $value) {
+      if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
+        $ids[] = substr($name, CRM_Core_Form::CB_PREFIX_LEN);
+      }
+    }
+    return $ids;
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @throws \CRM_Core_Exception
@@ -92,12 +136,9 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   public static function preProcessCommon(&$form) {
     $form->_entityIds = [];
 
-    $searchFormValues = $form->controller->exportValues($form->get('searchFormName'));
+    $searchFormValues = $form->getSearchFormValues();
 
     $form->_task = $searchFormValues['task'];
-    $className = 'CRM_' . ucfirst($form::$entityShortname) . '_Task';
-    $entityTasks = $className::tasks();
-    $form->assign('taskName', $entityTasks[$form->_task]);
 
     $entityIds = [];
     if ($searchFormValues['radio_ts'] == 'ts_sel') {
@@ -115,17 +156,17 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
       }
 
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE, $form->getQueryMode());
-      $query->_distinctComponentClause = " ( " . $form::$tableName . ".id )";
-      $query->_groupByComponentClause = " GROUP BY " . $form::$tableName . ".id ";
+      $query->_distinctComponentClause = $form->getDistinctComponentClause();
+      $query->_groupByComponentClause = $form->getGroupByComponentClause();
       $result = $query->searchQuery(0, 0, $sortOrder);
-      $selector = $form::$entityShortname . '_id';
+      $selector = $form->getEntityAliasField();
       while ($result->fetch()) {
         $entityIds[] = $result->$selector;
       }
     }
 
     if (!empty($entityIds)) {
-      $form->_componentClause = ' ' . $form::$tableName . '.id IN ( ' . implode(',', $entityIds) . ' ) ';
+      $form->_componentClause = ' ' . $form->getTableName() . '.id IN ( ' . implode(',', $entityIds) . ' ) ';
       $form->assign('totalSelected' . ucfirst($form::$entityShortname) . 's', count($entityIds));
     }
 
@@ -136,24 +177,8 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
     // FIXME: This is really to handle legacy code that should probably be updated to use $form->_entityIds
     $entitySpecificIdsName = '_' . $form::$entityShortname . 'Ids';
     $form->$entitySpecificIdsName = $form->_entityIds;
+    $form->setNextUrl($form::$entityShortname);
 
-    //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $searchFormName = strtolower($form->get('searchFormName'));
-    if ($searchFormName == 'search') {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/' . $form::$entityShortname . '/search', $urlParams));
-    }
-    else {
-      $session->replaceUserContext(CRM_Utils_System::url("civicrm/contact/search/$searchFormName",
-        $urlParams
-      ));
-    }
   }
 
   /**
@@ -162,7 +187,7 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public function setContactIDs() {
     $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_entityIds,
-      $this::$tableName
+      $this->getTableName()
     );
   }
 
@@ -249,6 +274,65 @@ SELECT contact_id
    */
   public function orderBy() {
     return '';
+  }
+
+  /**
+   * Get the submitted values for the form.
+   *
+   * @return array
+   */
+  public function getSearchFormValues() {
+    if ($this->_action === CRM_Core_Action::ADVANCED) {
+      return $this->controller->exportValues('Advanced');
+    }
+    if ($this->_action === CRM_Core_Action::PROFILE) {
+      return $this->controller->exportValues('Builder');
+    }
+    if ($this->_action == CRM_Core_Action::COPY) {
+      return $this->controller->exportValues('Custom');
+    }
+    if ($this->get('entity') !== 'Contact') {
+      return $this->controller->exportValues('Search');
+    }
+    return $this->controller->exportValues('Basic');
+  }
+
+  /**
+   * Get the name of the table for the relevant entity.
+   *
+   * @return string
+   */
+  public function getTableName() {
+    CRM_Core_Error::deprecatedFunctionWarning('function should be overridden');
+    return $this::$tableName;
+  }
+
+  /**
+   * Get the clause for grouping by the component.
+   *
+   * @return string
+   */
+  public function getDistinctComponentClause() {
+    return " ( " . $this->getTableName() . ".id )";
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getGroupByComponentClause() {
+    return " GROUP BY " . $this->getTableName() . ".id ";
+  }
+
+  /**
+   * Get the group by clause for the component.
+   *
+   * @return string
+   */
+  public function getEntityAliasField() {
+    CRM_Core_Error::deprecatedFunctionWarning('function should be overridden');
+    return $this::$entityShortname . '_id';
   }
 
 }

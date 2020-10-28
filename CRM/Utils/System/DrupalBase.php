@@ -153,7 +153,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $config = CRM_Core_Config::singleton();
     $script = 'index.php';
@@ -655,11 +656,12 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return bool
    */
   public function isFrontEndPage() {
-    $path = CRM_Utils_System::getUrlPath();
+    $path = CRM_Utils_System::currentPath();
 
     // Get the menu for above URL.
     $item = CRM_Core_Menu::get($path);
-    return !empty($item['is_public']);
+    // In case the URL is not a civicrm page (a drupal page) we set the FE theme to TRUE - covering the corner case
+    return (empty($item) || !empty($item['is_public']));
   }
 
   /**
@@ -685,6 +687,18 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getRoleNames() {
     return array_combine(user_roles(), user_roles());
+  }
+
+  /**
+   * Determine if the Views module exists.
+   *
+   * @return bool
+   */
+  public function viewsExists() {
+    if (function_exists('module_exists') && module_exists('views')) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

@@ -114,10 +114,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    */
   public static function &create(&$params) {
     if (isset($params['report_header'])) {
-      $params['header'] = $params['report_header'] ?? NULL;
+      $params['header'] = $params['report_header'];
     }
     if (isset($params['report_footer'])) {
-      $params['footer'] = $params['report_footer'] ?? NULL;
+      $params['footer'] = $params['report_footer'];
     }
 
     // build navigation parameters

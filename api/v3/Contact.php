@@ -765,6 +765,10 @@ function civicrm_api3_contact_getquick($params) {
   // If we are doing quicksearch by a field other than name, make sure that field is added to results
   if (!empty($params['field_name'])) {
     $field_name = CRM_Utils_String::munge($params['field_name']);
+    // there is no good reason to request api_key via getquick
+    if ($field_name == 'api_key') {
+      throw new API_Exception('Illegal value "api_key" for parameter "field_name"');
+    }
     // Unique name contact_id = id
     if ($field_name == 'contact_id') {
       $field_name = 'id';
@@ -814,7 +818,7 @@ function civicrm_api3_contact_getquick($params) {
   }
 
   $select = $actualSelectElements = ['sort_name'];
-  $where = '';
+
   foreach ($list as $value) {
     $suffix = substr($value, 0, 2) . substr($value, -1);
     switch ($value) {
@@ -871,14 +875,14 @@ function civicrm_api3_contact_getquick($params) {
 
   // add acl clause here
   list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
-
+  $whereClauses = ['cc.is_deleted = 0'];
   if ($aclWhere) {
-    $where .= " AND $aclWhere ";
+    $whereClauses[] = $aclWhere;
   }
   $isPrependWildcard = \Civi::settings()->get('includeWildCardInName');
 
   if (!empty($params['org'])) {
-    $where .= " AND contact_type = \"Organization\"";
+    $whereClauses[] = 'contact_type = "Organization"';
 
     // CRM-7157, hack: get current employer details when
     // employee_id is present.
@@ -910,27 +914,27 @@ function civicrm_api3_contact_getquick($params) {
 
   if (!empty($params['contact_sub_type'])) {
     $contactSubType = CRM_Utils_Type::escape($params['contact_sub_type'], 'String');
-    $where .= " AND cc.contact_sub_type = '{$contactSubType}'";
+    $whereClauses[] = "cc.contact_sub_type = '{$contactSubType}'";
   }
 
   if (!empty($params['contact_type'])) {
     $contactType = CRM_Utils_Type::escape($params['contact_type'], 'String');
-    $where .= " AND cc.contact_type LIKE '{$contactType}'";
+    $whereClauses[] = "cc.contact_type LIKE '{$contactType}'";
   }
 
   // Set default for current_employer or return contact with particular id
   if (!empty($params['id'])) {
-    $where .= " AND cc.id = " . (int) $params['id'];
+    $whereClauses[] = 'cc.id = ' . (int) $params['id'];
   }
 
   if (!empty($params['cid'])) {
-    $where .= " AND cc.id <> " . (int) $params['cid'];
+    $whereClauses[] = 'cc.id <> ' . (int) $params['cid'];
   }
 
   // Contact's based of relationhip type
   $relType = NULL;
   if (!empty($params['rel'])) {
-    $relation = explode('_', CRM_Utils_Array::value('rel', $params));
+    $relation = explode('_', $params['rel']);
     $relType = CRM_Utils_Type::escape($relation[0], 'Integer');
     $rel = CRM_Utils_Type::escape($relation[2], 'String');
   }
@@ -945,10 +949,10 @@ function civicrm_api3_contact_getquick($params) {
   if ($config->includeNickNameInName) {
     $includeNickName = " OR nick_name LIKE '$strSearch'";
   }
-
+  $where = ' AND ' . implode(' AND ', $whereClauses);
   if (isset($customOptionsWhere)) {
     $customOptionsWhere = $customOptionsWhere ?: [0];
-    $whereClause = " WHERE (" . implode(' OR ', $customOptionsWhere) . ") $where";
+    $whereClause = ' WHERE (' . implode(' OR ', $customOptionsWhere) . ") $where";
   }
   elseif (!empty($params['field_name']) && !empty($params['table_name']) && $params['field_name'] != 'sort_name') {
     $whereClause = " WHERE ( $table_name.$field_name LIKE '$strSearch') {$where}";

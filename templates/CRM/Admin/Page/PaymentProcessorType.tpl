@@ -36,7 +36,7 @@
           <td class="crm-paymentProcessorType-title crm-editable" data-field="title">{$row.title}</td>
             <td class="crm-paymentProcessorType-description">{$row.description}</td>
           <td id="row_{$row.id}_status" class="crm-paymentProcessorType-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td class="crm-paymentProcessorType-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
+            <td class="crm-paymentProcessorType-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
           <td>{$row.action}</td>
         </tr>
         {/foreach}
@@ -45,7 +45,7 @@
 
         {if $action ne 1 and $action ne 2}
         <div class="action-link">
-          <a href="{crmURL q="action=add&reset=1"}" id="newPaymentProcessor">&raquo; {ts}New Payment Processor{/ts}</a>
+          <a href="{crmURL q="action=add&reset=1"}" id="newPaymentProcessor"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}New Payment Processor{/ts}</a>
           {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
         </div>
         {/if}

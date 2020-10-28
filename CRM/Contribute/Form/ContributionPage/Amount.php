@@ -33,6 +33,14 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
   const NUM_OPTION = 11;
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('amount');
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -40,10 +48,10 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     // do u want to allow a free form text field for amount
     $this->addElement('checkbox', 'is_allow_other_amount', ts('Allow other amounts'), NULL, ['onclick' => "minMax(this);showHideAmountBlock( this, 'is_allow_other_amount' );"]);
     $this->add('text', 'min_amount', ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $this->addRule('min_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $this->addRule('min_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $this->add('text', 'max_amount', ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $this->addRule('max_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $this->addRule('max_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     //CRM-12055
     $this->add('text', 'amount_label', ts('Contribution Amounts Label'));
@@ -59,7 +67,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
       // value
       $this->add('text', "value[$i]", ts('Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'));
-      $this->addRule("value[$i]", ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+      $this->addRule("value[$i]", ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
       // default
       $default[] = $this->createElement('radio', NULL, NULL, NULL, $i);
@@ -254,7 +262,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
         // CRM-4038: fix value display
         foreach ($defaults['value'] as & $amount) {
-          $amount = trim(CRM_Utils_Money::format($amount, ' '));
+          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($amount));
         }
       }
     }
@@ -358,7 +366,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       }
     }
     else {
-      if ($fields['amount_block_is_active'] && empty($fields['payment_processor'])) {
+      if (!empty($fields['amount_block_is_active']) && empty($fields['payment_processor'])) {
         $errors['payment_processor'] = ts('You have listed fixed contribution options or selected a price set, but no payment option has been selected. Please select at least one payment processor and/or enable the pay later option.');
       }
     }
@@ -525,7 +533,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     if (array_key_exists('payment_processor', $params) &&
       !CRM_Utils_System::isNull($params['payment_processor'])
     ) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
+      $params['payment_processor'] = array_keys($params['payment_processor']);
     }
     else {
       $params['payment_processor'] = 'null';

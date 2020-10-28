@@ -187,7 +187,7 @@ class CRM_Report_Form_Instance {
    */
   public static function setDefaultValues(&$form, &$defaults) {
     // we should not build form elements in dashlet mode.
-    if ($form->_section) {
+    if (!empty($form->_section)) {
       return;
     }
 
@@ -365,7 +365,7 @@ class CRM_Report_Form_Instance {
     else {
       $statusMsg = ts('"%1" report has been successfully created. You are currently viewing the new report instance.', [1 => $instance->title]);
     }
-    CRM_Core_Session::setStatus($statusMsg);
+    CRM_Core_Session::setStatus($statusMsg, '', 'success');
 
     if ($redirect) {
       $urlParams = ['reset' => 1];

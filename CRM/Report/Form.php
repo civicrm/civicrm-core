@@ -153,9 +153,8 @@ class CRM_Report_Form extends CRM_Core_Form {
    * separately marked every class with a groupFilter in the hope that will trigger
    * people to fix them as they touch them.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -195,6 +194,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $groupConcatTested = FALSE;
 
   /**
+   * Are we in print mode. Can be set by another outputMode, ex: sendmail.
+   *
+   * @var bool
+   */
+  public $printOnly = FALSE;
+
+  /**
    * An attribute for checkbox/radio form field layout
    *
    * @var array
@@ -217,9 +223,6 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   protected $_instanceButtonName = NULL;
   protected $_createNewButtonName = NULL;
-  protected $_printButtonName = NULL;
-  protected $_pdfButtonName = NULL;
-  protected $_csvButtonName = NULL;
   protected $_groupButtonName = NULL;
   protected $_chartButtonName = NULL;
   protected $_csvSupported = TRUE;
@@ -280,7 +283,13 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
-  protected $_absoluteUrl = FALSE;
+
+  /**
+   * Whether to generate absolute URLs (ex: in report emails).
+   *
+   * @var bool
+   */
+  public $_absoluteUrl = FALSE;
 
   /**
    * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.
@@ -602,7 +611,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         $this->_instanceValues
       );
       if (empty($this->_instanceValues)) {
-        CRM_Core_Error::fatal("Report could not be loaded.");
+        CRM_Core_Error::statusBounce("Report could not be loaded.");
       }
       $this->_title = $this->_instanceValues['title'];
       if (!empty($this->_instanceValues['permission']) &&
@@ -671,7 +680,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     // Do not display Report Settings section if administer Reports permission is absent OR
     // if report instance is reserved and administer reserved reports absent
     if (!CRM_Core_Permission::check('administer Reports') ||
-      ($this->_instanceValues['is_reserved'] &&
+      (!empty($this->_instanceValues['is_reserved']) &&
         !CRM_Core_Permission::check('administer reserved reports'))
     ) {
       $this->_instanceForm = FALSE;
@@ -682,7 +691,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (CRM_Core_Permission::check('administer Reports') ||
       CRM_Core_Permission::check('access Report Criteria')
     ) {
-      if (!$this->_instanceValues['is_reserved'] ||
+      if (empty($this->_instanceValues['is_reserved']) ||
         CRM_Core_Permission::check('administer reserved reports')
       ) {
         $this->assign('criteriaForm', TRUE);
@@ -1095,6 +1104,46 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * Getter for $_id.
+   *
+   * @return int
+   */
+  public function getID() {
+    return $this->_id;
+  }
+
+  /**
+   * Getter for _outputMode
+   *
+   * Note you can implement hook_civicrm_alterReportVar('actions', ...)
+   * which indirectly allows setting _outputMode if the user chooses
+   * your action.
+   *
+   * @return string
+   */
+  public function getOutputMode():string {
+    return $this->_outputMode;
+  }
+
+  /**
+   * Getter for report header form field value
+   *
+   * @return string
+   */
+  public function getReportHeader():string {
+    return $this->_formValues['report_header'] ?? '';
+  }
+
+  /**
+   * Getter for report footer form field value
+   *
+   * @return string
+   */
+  public function getReportFooter():string {
+    return $this->_formValues['report_footer'] ?? '';
+  }
+
+  /**
    * Setter for $_force.
    *
    * @param bool $isForce
@@ -1486,7 +1535,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!empty($this->_charts)) {
       $this->addElement('select', "charts", ts('Chart'), $this->_charts);
       $this->assign('charts', $this->_charts);
-      $this->addElement('submit', $this->_chartButtonName, ts('View'));
+      $this->addElement('xbutton', $this->_chartButtonName, ts('View'), ['type' => 'submit']);
     }
   }
 
@@ -1611,7 +1660,10 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('group', TRUE);
     }
 
-    $this->addElement('submit', $this->_groupButtonName, '', ['style' => 'display: none;']);
+    $this->addElement('xbutton', $this->_groupButtonName, '', [
+      'type' => 'submit',
+      'style' => 'display: none;',
+    ]);
 
     $this->addChartOptions();
     $showResultsLabel = $this->getResultsLabel();
@@ -1661,6 +1713,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!$this->_csvSupported) {
       unset($actions['report_instance.csv']);
     }
+
+    CRM_Utils_Hook::alterReportVar('actions', $actions, $this);
 
     return $actions;
   }
@@ -2165,6 +2219,10 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
+    }
+    if (strlen($to) === 10) {
+      // If we just have the date we assume the end of that day.
+      $to .= ' 23:59:59';
     }
 
     if ($relative) {
@@ -2816,46 +2874,44 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         CRM_Core_DAO::$_nullObject
       );
 
-    $this->_absoluteUrl = FALSE;
-    $printOnly = FALSE;
-    $this->assign('printOnly', FALSE);
-
-    if ($this->_outputMode == 'print' ||
-      ($this->_sendmail && !$this->_outputMode)
-    ) {
-      $this->assign('printOnly', TRUE);
-      $printOnly = TRUE;
-      $this->addPaging = FALSE;
-      $this->assign('outputMode', 'print');
+    if ($this->_sendmail && !$this->_outputMode) {
+      // If we're here from the mail_report job, then the default there gets
+      // set to pdf before we get here, but if we're somehow here and sending
+      // by email and don't have a format set, then use print.
+      // @todo Is this on purpose - why would they be different defaults?
       $this->_outputMode = 'print';
+    }
+
+    // _outputMode means multiple things and can cover export to file formats,
+    // like csv, or actions with no output, like save. So this will only set
+    // a handler if it's one of the former. But it's also possible we have a
+    // really interesting handler out there. But the point is we don't need to
+    // know, just to know that a handler doesn't always get set by this call.
+    $this->setOutputHandler();
+
+    if (!empty($this->outputHandler)) {
       if ($this->_sendmail) {
+        // If we're sending by email these are the only options that make
+        // sense.
+        $this->printOnly = TRUE;
+        $this->addPaging = FALSE;
         $this->_absoluteUrl = TRUE;
       }
-    }
-    elseif ($this->_outputMode == 'pdf') {
-      $printOnly = TRUE;
-      $this->addPaging = FALSE;
-      $this->_absoluteUrl = TRUE;
-    }
-    elseif ($this->_outputMode == 'csv') {
-      $printOnly = TRUE;
-      $this->_absoluteUrl = TRUE;
-      $this->addPaging = FALSE;
-    }
-    elseif ($this->_outputMode == 'group') {
-      $this->assign('outputMode', 'group');
-    }
-    elseif ($this->_outputMode == 'create_report' && $this->_criteriaForm) {
-      $this->assign('outputMode', 'create_report');
+      else {
+        // otherwise ask the handler
+        $this->printOnly = $this->outputHandler->isPrintOnly();
+        $this->addPaging = $this->outputHandler->isAddPaging();
+        $this->_absoluteUrl = $this->outputHandler->isAbsoluteUrl();
+      }
     }
     elseif ($this->_outputMode == 'copy' && $this->_criteriaForm) {
       $this->_createNew = TRUE;
     }
 
     $this->assign('outputMode', $this->_outputMode);
-    $this->assign('printOnly', $printOnly);
+    $this->assign('printOnly', $this->printOnly);
     // Get today's date to include in printed reports
-    if ($printOnly) {
+    if ($this->printOnly) {
       $reportDate = CRM_Utils_Date::customFormat(date('Y-m-d H:i'));
       $this->assign('reportDate', $reportDate);
     }
@@ -3297,7 +3353,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             if (!empty($this->_params["{$fieldName}_relative"])) {
               list($from, $to) = CRM_Utils_Date::getFromTo($this->_params["{$fieldName}_relative"], NULL, NULL);
             }
-
+            if (strlen($to) === 10) {
+              // If we just have the date we assume the end of that day.
+              $to .= ' 23:59:59';
+            }
             if ($from || $to) {
               if ($from) {
                 $from = date('l j F Y, g:iA', strtotime($from));
@@ -3390,108 +3449,38 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   public function endPostProcess(&$rows = NULL) {
     $this->assign('report_class', get_class($this));
+
+    // This is used by unit tests, where _outputMode is intentionally blank.
+    // Is there a reason it couldn't just always do this? It effectively does
+    // the same thing anyway by assigning it to the template (in
+    // doTemplateAssignment()).
     if ($this->_storeResultSet) {
       $this->_resultSet = $rows;
     }
 
-    if ($this->_outputMode == 'print' ||
-      $this->_outputMode == 'pdf' ||
-      $this->_sendmail
-    ) {
-
-      $content = $this->compileContent();
-      $url = CRM_Utils_System::url("civicrm/report/instance/{$this->_id}",
-        "reset=1", TRUE
-      );
-
-      if ($this->_sendmail) {
-        $config = CRM_Core_Config::singleton();
-        $attachments = [];
-
-        if ($this->_outputMode == 'csv') {
-          $content
-            = $this->_formValues['report_header'] . '<p>' . ts('Report URL') .
-            ": {$url}</p>" . '<p>' .
-            ts('The report is attached as a CSV file.') . '</p>' .
-            $this->_formValues['report_footer'];
-
-          $csvFullFilename = $config->templateCompileDir .
-            CRM_Utils_File::makeFileName('CiviReport.csv');
-          $csvContent = CRM_Report_Utils_Report::makeCsv($this, $rows);
-          file_put_contents($csvFullFilename, $csvContent);
-          $attachments[] = [
-            'fullPath' => $csvFullFilename,
-            'mime_type' => 'text/csv',
-            'cleanName' => 'CiviReport.csv',
-          ];
-        }
-        if ($this->_outputMode == 'pdf') {
-          // generate PDF content
-          $pdfFullFilename = $config->templateCompileDir .
-            CRM_Utils_File::makeFileName('CiviReport.pdf');
-          file_put_contents($pdfFullFilename,
-            CRM_Utils_PDF_Utils::html2pdf($content, "CiviReport.pdf",
-              TRUE, ['orientation' => 'landscape']
-            )
-          );
-          // generate Email Content
-          $content
-            = $this->_formValues['report_header'] . '<p>' . ts('Report URL') .
-            ": {$url}</p>" . '<p>' .
-            ts('The report is attached as a PDF file.') . '</p>' .
-            $this->_formValues['report_footer'];
-
-          $attachments[] = [
-            'fullPath' => $pdfFullFilename,
-            'mime_type' => 'application/pdf',
-            'cleanName' => 'CiviReport.pdf',
-          ];
-        }
-
-        if (CRM_Report_Utils_Report::mailReport($content, $this->_id,
-          $this->_outputMode, $attachments
-        )
-        ) {
-          CRM_Core_Session::setStatus(ts("Report mail has been sent."), ts('Sent'), 'success');
-        }
-        else {
-          CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
-        }
-        return;
-      }
-      elseif ($this->_outputMode == 'print') {
-        echo $content;
-      }
-      else {
-        // Nb. Once upon a time we used a package called Open Flash Charts to
-        // draw charts, and we had a feature whereby a browser could send the
-        // server a PNG version of the chart, which could then be included in a
-        // PDF by including <img> tags in the HTML for the conversion below.
-        //
-        // This feature stopped working when browsers stopped supporting Flash,
-        // and although we have a different client-side charting library in
-        // place, we decided not to reimplement the (rather convoluted)
-        // browser-sending-rendered-chart-to-server process.
-        //
-        // If this feature is required in future we should find a better way to
-        // render charts on the server side, e.g. server-created SVG.
-        CRM_Utils_PDF_Utils::html2pdf($content, "CiviReport.pdf", FALSE, ['orientation' => 'landscape']);
-      }
-      CRM_Utils_System::civiExit();
-    }
-    elseif ($this->_outputMode == 'csv') {
-      CRM_Report_Utils_Report::export2csv($this, $rows);
-    }
-    elseif ($this->_outputMode == 'group') {
+    // Add contacts to group
+    if ($this->_outputMode == 'group') {
       $group = $this->_params['groups'];
       $this->add2group($group);
+    }
+    else {
+      if ($this->_sendmail) {
+        $this->sendEmail();
+      }
+      elseif (!empty($this->outputHandler)) {
+        $this->outputHandler->download();
+        CRM_Utils_System::civiExit();
+      }
+      // else we don't need to do anything here since it must have been
+      // outputMode=save or something like that
     }
   }
 
   /**
    * Set store result set indicator to TRUE.
    *
-   * @todo explain what this does
+   * This is used by unit tests, along with getResultSet(), to get just
+   * the output rows unformatted.
    */
   public function storeResultSet() {
     $this->_storeResultSet = TRUE;
@@ -4309,13 +4298,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         }
         if (array_key_exists('filters', $table)) {
           foreach ($table['filters'] as $filterName => $filter) {
+            $filterOp = $this->_params["{$filterName}_op"] ?? '';
             if ((isset($this->_params["{$filterName}_value"])
                 && !CRM_Utils_System::isNull($this->_params["{$filterName}_value"]))
               || !empty($this->_params["{$filterName}_relative"])
-              || CRM_Utils_Array::value("{$filterName}_op", $this->_params) ==
-              'nll'
-              || CRM_Utils_Array::value("{$filterName}_op", $this->_params) ==
-              'nnll'
+              || $filterOp === 'nll'
+              || $filterOp === 'nnll'
             ) {
               $this->_selectedTables[] = $tableName;
               $this->filteredTables[] = $tableName;
@@ -5826,7 +5814,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    */
   protected function storeGroupByArray() {
 
-    if (!CRM_Utils_Array::value('group_bys', $this->_params)
+    if (empty($this->_params['group_bys'])
       || !is_array($this->_params['group_bys'])) {
       $this->_params['group_bys'] = [];
     }
@@ -5952,7 +5940,9 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
         $from = $this->_params["{$fieldName}_from"] ?? NULL;
         $to = $this->_params["{$fieldName}_to"] ?? NULL;
-        return $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
+        $fromTime = $this->_params["{$fieldName}_from_time"] ?? NULL;
+        $toTime = $this->_params["{$fieldName}_to_time"] ?? NULL;
+        return $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type'], $fromTime, $toTime);
       }
     }
     else {
@@ -5967,6 +5957,60 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       }
     }
     return '';
+  }
+
+  /**
+   * Retrieve a suitable object from the factory depending on the report
+   * parameters, which typically might just be dependent on outputMode.
+   *
+   * If there is no suitable output handler, e.g. if outputMode is "copy",
+   * then this sets it to NULL.
+   */
+  public function setOutputHandler() {
+    $this->outputHandler = \Civi\Report\OutputHandlerFactory::singleton()->create($this);
+  }
+
+  /**
+   * Send report by email
+   */
+  public function sendEmail() {
+    if (empty($this->outputHandler)) {
+      // It's possible to end up here with outputMode unset, so we use
+      // the "print" handler which was the default before, i.e. include
+      // it as html in the body.
+      $oldOutputMode = $this->_outputMode ?? NULL;
+      $this->_outputMode = 'print';
+      $this->setOutputHandler();
+      $this->_outputMode = $oldOutputMode;
+    }
+
+    $mailBody = $this->outputHandler->getMailBody();
+
+    $attachments = [];
+    $attachmentFileName = $this->outputHandler->getFileName();
+    // It's not always in the form of an attachment, e.g. for 'print' the
+    // output ends up in $mailBody above.
+    if ($attachmentFileName) {
+      $fullFilename = CRM_Core_Config::singleton()->templateCompileDir . CRM_Utils_File::makeFileName($attachmentFileName);
+      file_put_contents($fullFilename, $this->outputHandler->getOutputString());
+      $attachments[] = [
+        'fullPath' => $fullFilename,
+        'mime_type' => $this->outputHandler->getMimeType(),
+        'cleanName' => $attachmentFileName,
+        'charset' => $this->outputHandler->getCharset(),
+      ];
+    }
+
+    // Send the email
+    // @todo outputMode doesn't seem to get used by mailReport, which is good
+    // since it shouldn't have any outputMode-related `if` statements in it.
+    // Someday could remove the param from the function call.
+    if (CRM_Report_Utils_Report::mailReport($mailBody, $this->_id, $this->_outputMode, $attachments)) {
+      CRM_Core_Session::setStatus(ts("Report mail has been sent."), ts('Sent'), 'success');
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("Report mail could not be sent."), ts('Mail Error'), 'error');
+    }
   }
 
 }

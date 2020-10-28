@@ -24,7 +24,7 @@
 
 {if $action eq 16 and $permission EQ 'edit'}
     <div class="action-link">
-       <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Pledge{/ts}</a></span>
+       <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Pledge{/ts}</a></span>
        <br/><br/>
     </div>
 {/if}
@@ -36,7 +36,7 @@
 
 {else}
    <div class="messages status no-popup">
-       <div class="icon inform-icon"></div>
+       {icon icon="fa-info-circle"}{/icon}
             {ts}No pledges have been recorded from this contact.{/ts}
        </div>
 {/if}

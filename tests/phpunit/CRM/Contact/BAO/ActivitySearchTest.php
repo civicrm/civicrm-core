@@ -91,6 +91,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'civicrm_activity',
       'civicrm_activity_contact',
       'civicrm_uf_match',
+      'civicrm_entity_tag',
     ];
     $this->quickCleanup($tablesToTruncate, TRUE);
     $type = $this->callAPISuccess('optionValue', 'get', ['id' => $this->test_activity_type_id]);
@@ -205,6 +206,110 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     }
     $this->assertEquals($case['expected_count'], count($groupContacts));
     $this->checkArrayEquals($case['expected_contact'], $groupContacts);
+  }
+
+  /**
+   * Test that activity.get api works when filtering on bare tags (i.e. tags
+   * not part of a tagset).
+   */
+  public function testSearchByBareTags() {
+    $tag = $this->callAPISuccess('Tag', 'create', [
+      'name' => 'a1',
+      'used_for' => 'Activities',
+    ]);
+    $subject = 'test activity ' . __FUNCTION__;
+    $params = $this->_params;
+    $params['subject'] = $subject;
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $this->callAPISuccess('EntityTag', 'create', [
+      'entity_id' => $activity['id'],
+      'entity_table' => 'civicrm_activity',
+      'tag_id' => 'a1',
+    ]);
+    $case = [
+      'form_value' => [
+        // It looks like it can be an array or comma-separated string.
+        // The qill will be slightly different ("IN" vs. "OR").
+        // The search form seems to use commas.
+        'activity_tags' => (string) $tag['id'],
+      ],
+      'expected_count' => 1,
+      'expected_contact' => [$this->_contactID],
+    ];
+    $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
+    list($select, $from, $where, $having) = $query->query();
+
+    $expectedQill = [
+      0 => [
+        0 => 'Activity Tag = a1',
+      ],
+    ];
+    $this->assertEquals($expectedQill, $query->_qill);
+
+    $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
+    foreach ($groupContacts as $key => $value) {
+      $groupContacts[$key] = $value['id'];
+    }
+    $this->assertEquals($case['expected_count'], count($groupContacts));
+    $this->checkArrayEquals($case['expected_contact'], $groupContacts);
+
+    // Clean up. Don't want to use teardown to wipe the table since then
+    // the stock tags get wiped.
+    $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
+  }
+
+  /**
+   * Test that activity.get api works when filtering on a tag in a tagset.
+   */
+  public function testSearchByTagset() {
+    $tagset = $this->callAPISuccess('Tag', 'create', [
+      'name' => 'activity tagset',
+      'is_tagset' => 1,
+      'used_for' => 'Activities',
+    ]);
+    $tag = $this->callAPISuccess('Tag', 'create', [
+      'name' => 'aa1',
+      'used_for' => 'Activities',
+      'parent_id' => 'activity tagset',
+    ]);
+    $subject = 'test activity ' . __FUNCTION__;
+    $params = $this->_params;
+    $params['subject'] = $subject;
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+    $this->callAPISuccess('EntityTag', 'create', [
+      'entity_id' => $activity['id'],
+      'entity_table' => 'civicrm_activity',
+      'tag_id' => 'aa1',
+    ]);
+    $case = [
+      'form_value' => [
+        // If multiple tags the array element value is a comma-separated string
+        // and then the qill looks like "IN a OR b".
+        "activity_taglist" => [$tagset['id'] => (string) $tag['id']],
+      ],
+      'expected_count' => 1,
+      'expected_contact' => [$this->_contactID],
+    ];
+    $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
+    list($select, $from, $where, $having) = $query->query();
+
+    $expectedQill = [
+      0 => [
+        0 => 'Activity Tag IN aa1',
+      ],
+    ];
+    $this->assertEquals($expectedQill, $query->_qill);
+
+    $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
+    foreach ($groupContacts as $key => $value) {
+      $groupContacts[$key] = $value['id'];
+    }
+    $this->assertEquals($case['expected_count'], count($groupContacts));
+    $this->checkArrayEquals($case['expected_contact'], $groupContacts);
+
+    // Clean up. Don't want to use teardown to wipe the table since then
+    // the stock tags get wiped.
+    $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
   }
 
 }

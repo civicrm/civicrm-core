@@ -35,7 +35,7 @@
   "Activity": [
     {
       "subject": "Test A Phone Activity",
-      "activity_type": "Phone Call",
+      "activity_type_id:name": "Phone Call",
       "source_contact_id": "@ref test_contact_1.id"
     }
   ]

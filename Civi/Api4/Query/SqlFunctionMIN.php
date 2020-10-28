@@ -16,6 +16,10 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionMIN extends SqlFunction {
 
+  public $supportsExpansion = TRUE;
+
+  protected static $category = self::CATEGORY_AGGREGATE;
+
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
@@ -23,5 +27,12 @@ class SqlFunctionMIN extends SqlFunction {
       'must_be' => ['SqlField'],
     ],
   ];
+
+  /**
+   * @return string
+   */
+  public static function getTitle(): string {
+    return ts('Min');
+  }
 
 }

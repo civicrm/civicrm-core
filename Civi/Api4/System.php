@@ -14,14 +14,9 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
-
 namespace Civi\Api4;
-
-use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * A collection of system maintenance/diagnostic utilities.
@@ -30,18 +25,32 @@ use Civi\Api4\Generic\BasicGetFieldsAction;
  */
 class System extends Generic\AbstractEntity {
 
-  public static function flush() {
-    return new Action\System\Flush(__CLASS__, __FUNCTION__);
+  /**
+   * @param bool $checkPermissions
+   * @return Action\System\Flush
+   */
+  public static function flush($checkPermissions = TRUE) {
+    return (new Action\System\Flush(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
-  public static function check() {
-    return new Action\System\Check(__CLASS__, __FUNCTION__);
+  /**
+   * @param bool $checkPermissions
+   * @return Action\System\Check
+   */
+  public static function check($checkPermissions = TRUE) {
+    return (new Action\System\Check(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
-  public static function getFields() {
-    return new BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
+  /**
+   * @param bool $checkPermissions
+   * @return Generic\BasicGetFieldsAction
+   */
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
       return [];
-    });
+    }))->setCheckPermissions($checkPermissions);
   }
 
 }

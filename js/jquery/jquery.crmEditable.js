@@ -37,7 +37,7 @@
   };
 
   /**
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Structure+convention+for+automagic+edit+in+place
+   * @see https://docs.civicrm.org/dev/en/latest/framework/ui/#in-place-field-editing
    */
   $.fn.crmEditable = function(options) {
     function checkable() {
@@ -108,10 +108,10 @@
 
       var settings = {
         tooltip: $i.data('tooltip') || ts('Click to edit'),
-        placeholder: $i.data('placeholder') || '<i class="crm-i fa-pencil crm-editable-placeholder"></i>',
+        placeholder: $i.data('placeholder') || '<i class="crm-i fa-pencil crm-editable-placeholder" aria-hidden="true"></i>',
         onblur: 'cancel',
-        cancel: '<button type="cancel"><i class="crm-i fa-times"></i></button>',
-        submit: '<button type="submit"><i class="crm-i fa-check"></i></button>',
+        cancel: '<button type="cancel"><i class="crm-i fa-times" aria-hidden="true"></i></button>',
+        submit: '<button type="submit"><i class="crm-i fa-check" aria-hidden="true"></i></button>',
         cssclass: 'crm-editable-form',
         data: getData,
         onreset: restoreContainer

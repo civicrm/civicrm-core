@@ -10,21 +10,17 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Grant_BAO_Query
  */
 class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
+   * Get grant fields.
+   *
    * @return array
    */
   public static function &getFields() {
-    $fields = [];
-    $fields = CRM_Grant_BAO_Grant::exportableFields();
-    return $fields;
+    return CRM_Grant_BAO_Grant::exportableFields();
   }
 
   /**
@@ -332,10 +328,10 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
     $form->addElement('checkbox', 'grant_decision_date_notset', ts('Date is not set'), NULL);
 
     $form->add('text', 'grant_amount_low', ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $form->add('text', 'grant_amount_high', ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     self::addCustomFormFields($form, ['Grant']);
 

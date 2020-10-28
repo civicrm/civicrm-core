@@ -142,12 +142,12 @@ AND    {$this->_componentClause}";
     $elements = self::getElements($this->_contributionIds, $params, $this->_contactIds);
 
     foreach ($elements['details'] as $contribID => $detail) {
-      $input = $ids = $objects = [];
+      $input = $ids = [];
 
       if (in_array($detail['contact'], $elements['excludeContactIds'])) {
         continue;
       }
-
+      // @todo - CRM_Contribute_BAO_Contribution::sendMail re-does pretty much everything between here & when we call it.
       $input['component'] = $detail['component'];
 
       $ids['contact'] = $detail['contact'];
@@ -158,11 +158,9 @@ AND    {$this->_componentClause}";
       $ids['participant'] = $detail['participant'] ?? NULL;
       $ids['event'] = $detail['event'] ?? NULL;
 
-      if (!$elements['baseIPN']->validateData($input, $ids, $objects, FALSE)) {
-        throw new CRM_Core_Exception('invalid data');
-      }
-
-      $contribution = &$objects['contribution'];
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->id = $contribID;
+      $contribution->fetch();
 
       // set some fake input values so we can reuse IPN code
       $input['amount'] = $contribution->total_amount;
@@ -181,10 +179,6 @@ AND    {$this->_componentClause}";
             1 => [$contribution->trxn_id, 'String'],
           ]);
 
-      // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
-      $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
-
-      $values = [];
       if (isset($params['from_email_address']) && !$elements['createPdf']) {
         // If a logged in user from email is used rather than a domain wide from email address
         // the from_email_address params key will be numerical and we need to convert it to be
@@ -196,8 +190,7 @@ AND    {$this->_componentClause}";
         $input['receipt_from_name'] = str_replace('"', '', $fromDetails[0]);
       }
 
-      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,
-        $elements['createPdf']);
+      $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $elements['createPdf']);
 
       if ($mail['html']) {
         $message[] = $mail['html'];
@@ -253,7 +246,7 @@ AND    {$this->_componentClause}";
 
     $pdfElements['contribIDs'] = implode(',', $contribIds);
 
-    $pdfElements['details'] = CRM_Contribute_Form_Task_Status::getDetails($pdfElements['contribIDs']);
+    $pdfElements['details'] = self::getDetails($pdfElements['contribIDs']);
 
     $pdfElements['baseIPN'] = new CRM_Core_Payment_BaseIPN();
 
@@ -281,7 +274,7 @@ AND    {$this->_componentClause}";
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
-          || CRM_Utils_Array::value('is_deceased', $values)
+          || !empty($values['is_deceased'])
           || !empty($values['on_hold'])
         ) {
           $suppressedEmails++;
@@ -293,6 +286,49 @@ AND    {$this->_componentClause}";
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;
+  }
+
+  /**
+   * @param string $contributionIDs
+   *
+   * @return array
+   */
+  private static function getDetails($contributionIDs) {
+    if (empty($contributionIDs)) {
+      return [];
+    }
+    $query = "
+SELECT    c.id              as contribution_id,
+          c.contact_id      as contact_id     ,
+          mp.membership_id  as membership_id  ,
+          pp.participant_id as participant_id ,
+          p.event_id        as event_id
+FROM      civicrm_contribution c
+LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
+LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
+LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
+WHERE     c.id IN ( $contributionIDs )";
+
+    $rows = [];
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    while ($dao->fetch()) {
+      $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
+      $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
+      if ($dao->membership_id) {
+        if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
+          $rows[$dao->contribution_id]['membership'] = [];
+        }
+        $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
+      }
+      if ($dao->participant_id) {
+        $rows[$dao->contribution_id]['participant'] = $dao->participant_id;
+      }
+      if ($dao->event_id) {
+        $rows[$dao->contribution_id]['event'] = $dao->event_id;
+      }
+    }
+    return $rows;
   }
 
 }

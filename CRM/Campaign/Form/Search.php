@@ -55,7 +55,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
    */
   public function preProcess() {
     $this->_done = FALSE;
-    $this->_defaults = array();
+    $this->_defaults = [];
 
     //set the button name.
     $this->_printButtonName = $this->getButtonName('next', 'print');

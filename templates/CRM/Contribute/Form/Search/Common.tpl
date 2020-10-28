@@ -120,7 +120,7 @@
     {$form.financial_type_id.html|crmAddClass:twenty}
   </td>
   <td>
-    <label>{ts}Contribution Page{/ts}</label> <br />
+    <label>{$form.contribution_page_id.label}</label> <br />
     {$form.contribution_page_id.html|crmAddClass:twenty}
   </td>
 </tr>
@@ -156,6 +156,9 @@
     {$form.cancel_reason.label}<br />
     {$form.cancel_reason.html}
   </td>
+</tr>
+<tr>
+  <td><label>{$form.contribution_id.label}</label> {$form.contribution_id.html}</td>
 </tr>
 
 {* campaign in contribution search *}

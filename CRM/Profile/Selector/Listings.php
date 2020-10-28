@@ -66,13 +66,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_query;
 
   /**
-   * Cache the expanded options list if any.
-   *
-   * @var object
-   */
-  protected $_options;
-
-  /**
    * The group id that we are editing.
    *
    * @var int
@@ -180,8 +173,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     //the below is done for query building for multirecord custom field listing
     //to show all the custom field multi valued records of a particular contact
     $this->setMultiRecordTableName($this->_fields);
-
-    $this->_options = &$this->_query->_options;
   }
 
   /**
@@ -491,7 +482,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     if ($editLink && ($mask & CRM_Core_Permission::EDIT)) {
       // do not allow edit for anon users in joomla frontend, CRM-4668
       $config = CRM_Core_Config::singleton();
-      if (!$config->userFrameworkFrontend || CRM_Core_Session::singleton()->getLoggedInContactID()) {
+      if (!$config->userFrameworkFrontend || CRM_Core_Session::getLoggedInContactID()) {
         $this->_editLink = TRUE;
       }
     }

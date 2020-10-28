@@ -82,6 +82,51 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertTrue($this->runPermissionCheck('contact', 'create', $params), 'permission check should be skippable');
   }
 
+  public function getCamelCaseFuncs() {
+    // There have been two slightly different functions for normalizing names;
+    // _civicrm_api_get_camel_name() and \Civi\API\Request::normalizeEntityName().
+    return [
+      // These are the typical cases - where the two have always agreed.
+      ['Foo', 'Foo'],
+      ['foo', 'Foo'],
+      ['FooBar', 'FooBar'],
+      ['foo_bar', 'FooBar'],
+      ['fooBar', 'FooBar'],
+      ['Im', 'Im'],
+      ['ACL', 'Acl'],
+      ['HTTP', 'HTTP'],
+
+      // These are some atypical cases - where the two have always agreed.
+      ['foo__bar', 'FooBar'],
+      ['Foo_Bar', 'FooBar'],
+      ['one_two_three', 'OneTwoThree'],
+      ['oneTwo_three', 'OneTwoThree'],
+      ['Got2B', 'Got2B'],
+      ['got2_BGood', 'Got2BGood'],
+
+      // These are some atypical cases - where they have traditionally disagreed.
+      // _civicrm_api_get_camel_name() has now changed to match normalizeEntityName()
+      // because the latter is more defensive.
+      ['Foo-Bar', 'FooBar'],
+      ['Foo+Bar', 'FooBar'],
+      ['Foo.Bar', 'FooBar'],
+      ['Foo/../Bar/', 'FooBar'],
+      ['./Foo', 'Foo'],
+    ];
+  }
+
+  /**
+   * @param string $inputValue
+   *   The user-supplied/untrusted entity name.
+   * @param string $expectValue
+   *   The normalized/UpperCamelCase entity name.
+   * @dataProvider getCamelCaseFuncs
+   */
+  public function testCamelName($inputValue, $expectValue) {
+    $actualValue = _civicrm_api_get_camel_name($inputValue);
+    $this->assertEquals($expectValue, $actualValue);
+  }
+
   /**
    * @param string $entity
    * @param string $action

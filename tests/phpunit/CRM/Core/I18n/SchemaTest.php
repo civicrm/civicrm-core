@@ -40,9 +40,18 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
    * @param string $expectedRewrite
    *
    * @dataProvider translateTables
+   * @throws \CRM_Core_Exception
    */
   public function testI18nSchemaRewrite($table, $expectedRewrite) {
     CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $domains = $this->callAPISuccess('Domain', 'get')['values'];
+    $this->assertGreaterThan(1, count($domains));
+    foreach ($domains as $domain) {
+      // If the DB is multilingual the locales value must be not-null for all domains
+      // to ensure the db can be accessed (I suspect it must be the same for all locales but
+      // if null then the database layer attempts to access non-existent fields 'label' not label_en_us'.
+      $this->assertEquals('en_US', $domain['locales']);
+    }
     $skip_tests = FALSE;
     if (in_array($table, ['civicrm_option_group', 'civicrm_event'])) {
       $skip_tests = TRUE;

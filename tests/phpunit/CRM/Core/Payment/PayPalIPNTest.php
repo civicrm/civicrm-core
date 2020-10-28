@@ -22,12 +22,6 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   protected $_contributionPageID;
   protected $_paymentProcessorID;
   protected $_customFieldID;
-  /**
-   * IDs of entities created to support the tests.
-   *
-   * @var array
-   */
-  protected $ids = [];
 
   /**
    * Set up function.
@@ -36,8 +30,8 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate(['is_test' => 0, 'payment_processor_type_id' => 'PayPal_Standard']);
     $this->_contactID = $this->individualCreate();
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', [
-      'title' => "Test Contribution Page",
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [
+      'title' => 'Test Contribution Page',
       'financial_type_id' => $this->_financialTypeID,
       'currency' => 'USD',
       'payment_processor' => $this->_paymentProcessorID,
@@ -50,6 +44,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -109,13 +104,16 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function testIPNPaymentRecurSuccess() {
     $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00']);
+    $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
     $paypalIPN->main();
-    $contribution1 = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
+    $mut->checkMailLog(['https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find'], ['civicrm/contribute/unsubscribe', 'civicrm/contribute/updatebilling']);
+    $mut->stop();
+    $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
     $this->assertEquals(1, $contribution1['contribution_status_id']);
     $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);
     // source gets set by processor
-    $this->assertTrue(substr($contribution1['contribution_source'], 0, 20) == "Online Contribution:");
+    $this->assertTrue(substr($contribution1['contribution_source'], 0, 20) === 'Online Contribution:');
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
@@ -301,22 +299,22 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     ];
     $this->_contributionID = $this->contributionCreate($params);
     $this->createCustomField();
-    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
+    $contribution = $this->callAPISuccessGetSingle('contribution', ['id' => $this->_contributionID]);
     // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
-    $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
-    $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
+    $this->assertEquals(NULL, $contribution['trxn_id']);
+    $this->assertEquals($pendingStatusID, $contribution['contribution_status_id']);
     $this->hookClass->setHook('civicrm_postIPNProcess', [$this, 'hookCiviCRMAlterIPNData']);
     global $_REQUEST;
     $_REQUEST = ['q' => CRM_Utils_System::url('civicrm/payment/ipn/' . $this->_paymentProcessorID)] + $this->getPaypalTransaction();
 
     $mut = new CiviMailUtils($this, TRUE);
-    $payment = CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $this->_paymentProcessorID]);
+    CRM_Core_Payment::handlePaymentMethod('PaymentNotification', ['processor_id' => $this->_paymentProcessorID]);
 
-    $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $this->_contributionID, 'sequential' => 1]);
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
-    $this->assertEquals($_REQUEST['txn_id'], $contribution['values'][0]['trxn_id']);
-    $this->assertEquals($completedStatusID, $contribution['values'][0]['contribution_status_id']);
-    $this->assertEquals('test12345', $contribution['values'][0]['custom_' . $this->_customFieldID]);
+    $this->assertEquals($_REQUEST['txn_id'], $contribution['trxn_id']);
+    $this->assertEquals($completedStatusID, $contribution['contribution_status_id']);
+    $this->assertEquals('test12345', $contribution['custom_' . $this->_customFieldID]);
   }
 
   /**

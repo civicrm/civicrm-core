@@ -35,7 +35,7 @@ class CRM_Core_Report_Excel {
   public static function makeCSVTable($header, $rows, $outputHeader = TRUE) {
 
     $config = CRM_Core_Config::singleton();
-    $seperator = $config->fieldSeparator;
+    $separator = $config->fieldSeparator;
     $add_character = "\015\012";
 
     if ($outputHeader) {
@@ -68,7 +68,7 @@ class CRM_Core_Report_Excel {
               }
             }
 
-            $str = implode($seperator, $strArray);
+            $str = implode($separator, $strArray);
             $value = &$str;
           }
 
@@ -76,7 +76,7 @@ class CRM_Core_Report_Excel {
         }
 
         if ($colNo < $fields_cnt - 1) {
-          $schema_insert .= $seperator;
+          $schema_insert .= $separator;
         }
         $colNo++;
       }
@@ -152,23 +152,20 @@ class CRM_Core_Report_Excel {
    *   An array of the headers.
    * @param array $rows
    *   An array of arrays of the table contents.
-   * @param bool $outputHeader
-   *   Should we output the header row.
    *
    * @return void
    */
-  public static function writeCSVFile($fileName, $header, $rows, $outputHeader = TRUE) {
-    if ($outputHeader) {
-      CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
-        'text/x-csv',
-        CRM_Core_DAO::$_nullObject,
-        'csv',
-        FALSE
-      );
-    }
+  public static function writeCSVFile($fileName, $header, $rows) {
+    $null = NULL;
+    CRM_Utils_System::download(CRM_Utils_String::munge($fileName),
+      'text/x-csv',
+      $null,
+      'csv',
+      FALSE
+    );
 
     if (!empty($rows)) {
-      return self::makeCSVTable($header, $rows, $outputHeader);
+      return self::makeCSVTable($header, $rows, TRUE);
     }
   }
 

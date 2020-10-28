@@ -1,0 +1,5 @@
+## When exporting patches for a given major-series (e.g. 5.27),
+## we use a fixed reference-point (e.g. `git log $REFPOINT..`).
+##
+## Major Series : Reference-Point (Tag/Commit)
+5.27:5.27.4

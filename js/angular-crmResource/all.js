@@ -34,9 +34,9 @@
 
     var moduleUrl = CRM.angular.bundleUrl;
     $http.get(moduleUrl)
-      .success(function httpSuccess(data) {
+      .then(function httpSuccess(response) {
         templates = [];
-        angular.forEach(data, function(module) {
+        angular.forEach(response.data, function(module) {
           if (module.partials) {
             angular.extend(templates, module.partials);
           }
@@ -45,8 +45,7 @@
           }
         });
         notify();
-      })
-      .error(function httpError() {
+      }, function httpError() {
         templates = [];
         notify();
       });

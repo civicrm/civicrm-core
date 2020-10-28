@@ -12,7 +12,7 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="crm-i fa-pencil"></span> {if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}
+        <span class="crm-i fa-pencil" aria-hidden="true"></span> {if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}
       </div>
     {/if}
     {if !$add}
@@ -24,14 +24,14 @@
       <div class="crm-summary-row {if $add.is_primary eq 1} primary{/if}">
         <div class="crm-label">
           {ts 1=$add.location_type}%1 Address{/ts}
-          {if $privacy.do_not_mail}<span class="icon privacy-flag do-not-mail" title="{ts}Privacy flag: Do Not Mail{/ts}"></span>{/if}
+          {privacyFlag field=do_not_mail condition=$privacy.do_not_mail}
           {if $config->mapProvider AND
               !empty($add.geo_code_1) AND
               is_numeric($add.geo_code_1) AND
               !empty($add.geo_code_2) AND
               is_numeric($add.geo_code_2)
           }
-          <br /><a href="{crmURL p='civicrm/contact/map' q="reset=1&cid=`$contactId`&lid=`$add.location_type_id`"}" title="{ts 1=`$add.location_type`}Map %1 Address{/ts}"><span class="geotag">{ts}Map{/ts}</span></a>
+          <br /><a href="{crmURL p='civicrm/contact/map' q="reset=1&cid=`$contactId`&lid=`$add.location_type_id`"}" title="{ts 1=`$add.location_type`}Map %1 Address{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
           {/if}
         </div>
         <div class="crm-content">

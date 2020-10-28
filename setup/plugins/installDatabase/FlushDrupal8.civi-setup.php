@@ -16,7 +16,7 @@ if (!defined('CIVI_SETUP')) {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Flush CMS metadata', basename(__FILE__)));
 
-    system_rebuild_module_data();
+    \Drupal::service('extension.list.module')->reset();
     \Drupal::service('module_installer')->install(['civicrm', 'civicrmtheme']);
     drupal_flush_all_caches();
     civicrm_install_set_drupal8_perms();
@@ -51,6 +51,6 @@ function civicrm_install_set_drupal8_perms() {
     ]);
   }
   $perms = array_intersect($perms, $allPerms);
-  user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, $perms);
-  user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, $perms);
+  user_role_grant_permissions(\Drupal\user\RoleInterface::AUTHENTICATED_ID, $perms);
+  user_role_grant_permissions(\Drupal\user\RoleInterface::ANONYMOUS_ID, $perms);
 }

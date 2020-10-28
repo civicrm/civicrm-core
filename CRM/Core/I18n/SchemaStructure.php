@@ -92,7 +92,9 @@ class CRM_Core_I18n_SchemaStructure {
           'description' => "text COMMENT 'Optional description.'",
         ],
         'civicrm_group' => [
-          'title' => "varchar(64) COMMENT 'Name of Group.'",
+          'title' => "varchar(255) NOT NULL COMMENT 'Name of Group.'",
+          'frontend_title' => "varchar(255) DEFAULT NULL COMMENT 'Alternative public title for this Group.'",
+          'frontend_description' => "text DEFAULT NULL COMMENT 'Alternative public description of the group.'",
         ],
         'civicrm_contribution_page' => [
           'title' => "varchar(255) COMMENT 'Contribution Page title. For top of page display'",
@@ -118,7 +120,7 @@ class CRM_Core_I18n_SchemaStructure {
           'title' => "varchar(127) COMMENT 'Payment Processor Descriptive Name.'",
         ],
         'civicrm_membership_type' => [
-          'name' => "varchar(128) COMMENT 'Name of Membership Type'",
+          'name' => "varchar(128) NOT NULL COMMENT 'Name of Membership Type'",
           'description' => "varchar(255) COMMENT 'Description of Membership Type'",
         ],
         'civicrm_membership_block' => [
@@ -154,7 +156,7 @@ class CRM_Core_I18n_SchemaStructure {
           'help_post' => "text COMMENT 'Description and/or help text to display after this field.'",
         ],
         'civicrm_price_field_value' => [
-          'label' => "varchar(255) COMMENT 'Price field option label'",
+          'label' => "varchar(255) DEFAULT NULL COMMENT 'Price field option label'",
           'description' => "text DEFAULT NULL COMMENT 'Price field option description.'",
           'help_pre' => "text DEFAULT NULL COMMENT 'Price field option pre help text.'",
           'help_post' => "text DEFAULT NULL COMMENT 'Price field option post field help.'",
@@ -412,6 +414,15 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_group' => [
           'title' => [
             'type' => "Text",
+            'required' => "true",
+          ],
+          'frontend_title' => [
+            'type' => "Text",
+          ],
+          'frontend_description' => [
+            'type' => "TextArea",
+            'rows' => "2",
+            'cols' => "60",
           ],
         ],
         'civicrm_contribution_page' => [
@@ -486,6 +497,7 @@ class CRM_Core_I18n_SchemaStructure {
           'name' => [
             'type' => "Text",
             'label' => "Name",
+            'required' => "true",
           ],
           'description' => [
             'type' => "TextArea",

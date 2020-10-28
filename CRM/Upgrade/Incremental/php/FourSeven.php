@@ -515,7 +515,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
   //  }
 
   /**
-   * CRM-16354
+   * @see https://issues.civicrm.org/jira/browse/CRM-16354
    *
    * @return int
    */
@@ -1249,7 +1249,7 @@ FROM `civicrm_dashboard_contact` JOIN `civicrm_contact` WHERE civicrm_dashboard_
   }
 
   /**
-   * CRM-19961
+   * @see https://issues.civicrm.org/jira/browse/CRM-19961
    * Poputate newly added domain id column and add foriegn key onto table.
    */
   public static function populateSMSProviderDomainId() {

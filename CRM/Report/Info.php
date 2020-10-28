@@ -15,8 +15,6 @@
  * abstract class.
  *
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Info extends CRM_Core_Component_Info {
 

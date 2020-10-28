@@ -108,7 +108,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     // show billing address location details, if exists
     if (!empty($values['address_id'])) {
-      $addressParams = ['id' => CRM_Utils_Array::value('address_id', $values)];
+      $addressParams = ['id' => $values['address_id']];
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
       $addressDetails = array_values($addressDetails);
       $values['billing_address'] = $addressDetails[0]['display'];

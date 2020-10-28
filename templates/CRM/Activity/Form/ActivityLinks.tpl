@@ -43,7 +43,7 @@
 {foreach from=$activityTypes key=k item=act}
 <li class="crm-activity-type_{$k}">
   <a href="{$act.url}" data-tab="activity">
-    <i class="crm-i {$act.icon}"></i> {$act.label}
+    <i class="crm-i {$act.icon}" aria-hidden="true"></i> {$act.label}
   </a>
 </li>
 {/foreach}

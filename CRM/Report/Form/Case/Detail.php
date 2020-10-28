@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
@@ -548,14 +546,14 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
 
     if (!empty($this->_params['last_completed_date_time_relative']) ||
       !empty($this->_params['last_completed_date_time_from']) ||
-      CRM_Utils_Array::value('last_completed_date_time_to', $this->_params)
+      !empty($this->_params['last_completed_date_time_to'])
     ) {
       $this->_activityLastCompleted = TRUE;
     }
 
     if (!empty($this->_params['last_activity_date_time_relative']) ||
       !empty($this->_params['last_activity_date_time_from']) ||
-      CRM_Utils_Array::value('last_activity_date_time_to', $this->_params)
+      !empty($this->_params['last_activity_date_time_to'])
     ) {
       $this->_activityLast = TRUE;
     }

@@ -99,11 +99,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Are we operating in "single mode", i.e. adding / editing only
-   * one participant record, or is this a batch add operation
+   * one participant record, or is this a batch add operation.
+   *
+   * Note the goal is to disentangle all the non-single stuff
+   * to CRM_Event_Form_Task_Register and discontinue this param.
    *
    * @var bool
    */
-  public $_single = FALSE;
+  public $_single = TRUE;
 
   /**
    * If event is paid or unpaid.
@@ -335,57 +338,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       return CRM_Event_Form_EventFees::preProcess($this);
     }
 
-    //check the mode when this form is called either single or as
-    //search task action
-    if ($this->_id || $this->_contactId || $this->_context == 'standalone') {
-      $this->_single = TRUE;
-      $this->assign('urlPath', 'civicrm/contact/view/participant');
-      if (!$this->_id && !$this->_contactId) {
-        $breadCrumbs = [
-          [
-            'title' => ts('CiviEvent Dashboard'),
-            'url' => CRM_Utils_System::url('civicrm/event', 'reset=1'),
-          ],
-        ];
-
-        CRM_Utils_System::appendBreadCrumb($breadCrumbs);
-      }
-    }
-    else {
-      //set the appropriate action
-      $context = $this->get('context');
-      $urlString = 'civicrm/contact/search';
-      $this->_action = CRM_Core_Action::BASIC;
-      switch ($context) {
-        case 'advanced':
-          $urlString = 'civicrm/contact/search/advanced';
-          $this->_action = CRM_Core_Action::ADVANCED;
-          break;
-
-        case 'builder':
-          $urlString = 'civicrm/contact/search/builder';
-          $this->_action = CRM_Core_Action::PROFILE;
-          break;
-
-        case 'basic':
-          $urlString = 'civicrm/contact/search/basic';
-          $this->_action = CRM_Core_Action::BASIC;
-          break;
-
-        case 'custom':
-          $urlString = 'civicrm/contact/search/custom';
-          $this->_action = CRM_Core_Action::COPY;
-          break;
-      }
-      CRM_Contact_Form_Task::preProcessCommon($this);
-
-      $this->_single = FALSE;
-      $this->_contactId = NULL;
-
-      //set ajax path, this used for custom data building
-      $this->assign('urlPath', $urlString);
-      $this->assign('urlPathVar', "_qf_Participant_display=true&qfKey={$this->controller->_key}");
-    }
+    $this->assignUrlPath();
 
     $this->assign('single', $this->_single);
 
@@ -1262,32 +1215,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_contactIds[] = $this->_contactId;
     }
     else {
-      $participants = [];
-      if ($this->_single) {
-        if ($params['role_id']) {
-          $params['role_id'] = $roleIdWithSeparator;
-        }
-        else {
-          $params['role_id'] = 'NULL';
-        }
-        $participants[] = CRM_Event_BAO_Participant::create($params);
-      }
-      else {
-        foreach ($this->_contactIds as $contactID) {
-          $commonParams = $params;
-          $commonParams['contact_id'] = $contactID;
-          if ($commonParams['role_id']) {
-            $commonParams['role_id'] = $commonParams['role_id'] = str_replace(',', CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
-          }
-          else {
-            $commonParams['role_id'] = 'NULL';
-          }
-          $participants[] = CRM_Event_BAO_Participant::create($commonParams);
-        }
-      }
-
       if ($this->_single) {
         $this->_contactIds[] = $this->_contactId;
+      }
+      $participants = [];
+      foreach ($this->_contactIds as $contactID) {
+        $commonParams = $params;
+        $commonParams['contact_id'] = $contactID;
+        $participants[] = CRM_Event_BAO_Participant::create($commonParams);
       }
 
       $contributions = [];
@@ -1495,13 +1430,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $this->_bltID
         ));
 
-        $date = CRM_Utils_Date::format($params['credit_card_exp_date']);
-        $date = CRM_Utils_Date::mysqlToIso($date);
-        $this->assign('credit_card_exp_date', $date);
-        $this->assign('credit_card_number',
-          CRM_Utils_System::mungeCreditCard($params['credit_card_number'])
-        );
-        $this->assign('credit_card_type', $params['credit_card_type']);
+        $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+        $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+
         // The concept of contributeMode is deprecated.
         $this->assign('contributeMode', 'direct');
         $this->assign('isAmountzero', 0);
@@ -1761,7 +1692,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         );
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-        && !CRM_Utils_Array::value('fee', $form->_values)
+        && empty($form->_values['fee'])
         && CRM_Utils_Array::value('snippet', $_REQUEST) == CRM_Core_Smarty::PRINT_NOFORM
       ) {
         CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
@@ -2348,6 +2279,23 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
     }
 
     return $feeDetails;
+  }
+
+  /**
+   * Assign the url path to the template.
+   */
+  protected function assignUrlPath() {
+    $this->assign('urlPath', 'civicrm/contact/view/participant');
+    if (!$this->_id && !$this->_contactId) {
+      $breadCrumbs = [
+        [
+          'title' => ts('CiviEvent Dashboard'),
+          'url' => CRM_Utils_System::url('civicrm/event', 'reset=1'),
+        ],
+      ];
+
+      CRM_Utils_System::appendBreadCrumb($breadCrumbs);
+    }
   }
 
 }

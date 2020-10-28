@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
 
@@ -26,23 +24,13 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
   }
 
   /**
-   * Add the membership Blocks.
+   * Create or update a MembershipBlock.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
-   *
-   *
-   * @return object
+   * @return CRM_Member_DAO_MembershipBlock
    */
-  public static function create(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MembershipBlock', CRM_Utils_Array::value('id', $params), $params);
-    $dao = new CRM_Member_DAO_MembershipBlock();
-    $dao->copyValues($params);
-    $dao->id = $params['id'] ?? NULL;
-    $dao->save();
-    CRM_Utils_Hook::post($hook, 'MembershipBlock', $dao->id, $dao);
-    return $dao;
+  public static function create($params) {
+    return self::writeRecord($params);
   }
 
   /**

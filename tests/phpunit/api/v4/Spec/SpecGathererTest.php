@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -80,8 +78,7 @@ class SpecGathererTest extends UnitTestCase {
   }
 
   public function testPseudoConstantOptionsWillBeAdded() {
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'FavoriteThings')
       ->addValue('extends', 'Contact')
       ->execute()
@@ -89,8 +86,7 @@ class SpecGathererTest extends UnitTestCase {
 
     $options = ['r' => 'Red', 'g' => 'Green', 'p' => 'Pink'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('option_values', $options)
@@ -103,12 +99,12 @@ class SpecGathererTest extends UnitTestCase {
 
     $regularField = $spec->getFieldByName('contact_type');
     $this->assertNotEmpty($regularField->getOptions());
-    $this->assertContains('Individual', $regularField->getOptions());
+    $this->assertContains('Individual', array_column($regularField->getOptions([], ['id', 'label']), 'label', 'id'));
 
     $customField = $spec->getFieldByName('FavoriteThings.FavColor');
-    $this->assertNotEmpty($customField->getOptions());
-    $this->assertContains('Green', $customField->getOptions());
-    $this->assertEquals('Pink', $customField->getOptions()['p']);
+    $options = array_column($customField->getOptions([], ['id', 'name', 'label']), NULL, 'id');
+    $this->assertEquals('Green', $options['g']['name']);
+    $this->assertEquals('Pink', $options['p']['label']);
   }
 
 }

@@ -404,7 +404,7 @@ WHERE ce.entity_table = 'civicrm_event'
 ORDER BY  cv.label
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
-    $elements = array();
+    $elements = [];
     while ($dao->fetch()) {
       $elements[$dao->id] = "$dao->label\n";
     }
@@ -417,8 +417,8 @@ ORDER BY  cv.label
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
 
     //add blank column at the Start
     if (array_key_exists('options', $this->_params) &&
@@ -475,7 +475,7 @@ ORDER BY  cv.label
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     return $errors;
   }
 
@@ -530,7 +530,7 @@ ORDER BY  cv.label
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -673,7 +673,7 @@ ORDER BY  cv.label
         $roleId = $row['civicrm_participant_role_id'];
         if ($roleId) {
           $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $roleId);
-          $roleId = array();
+          $roleId = [];
           foreach ($roles as $role) {
             $roleId[$role] = CRM_Event_PseudoConstant::participantRole($role, FALSE);
           }
@@ -693,7 +693,7 @@ ORDER BY  cv.label
         }
       }
 
-      // Handle value seperator in Fee Level
+      // Handle value separator in Fee Level
       if (array_key_exists('civicrm_participant_participant_fee_level', $row)) {
         $feeLevel = $row['civicrm_participant_participant_fee_level'];
         if ($feeLevel) {
@@ -723,7 +723,7 @@ ORDER BY  cv.label
 
         $rows[$rowNum]['civicrm_contact_sort_name_linked'] = "<a title='$contactTitle' href=$url>$displayName</a>";
         // Add a "View" link to the participant record if this isn't a CSV/PDF/printed document.
-        if ($this->_outputMode !== 'csv' && $this->_outputMode !== 'pdf' && $this->_outputMode !== 'print') {
+        if (empty($this->getOutputMode())) {
           $rows[$rowNum]['civicrm_contact_sort_name_linked'] .=
             "<span style='float: right;'><a title='$participantTitle' href=$viewUrl>" .
             ts('View') . "</a></span>";

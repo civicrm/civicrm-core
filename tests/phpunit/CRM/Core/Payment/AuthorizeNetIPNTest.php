@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Api4\Contribution;
 
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
@@ -93,7 +94,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
         'billing_country_id-5' => 1228,
         'frequency_interval' => 1,
         'frequency_unit' => 'month',
-        'installments' => '',
+        'installments' => 2,
         'hidden_AdditionalDetail' => 1,
         'hidden_Premium' => 1,
         'payment_processor_id' => $this->_paymentProcessorID,
@@ -109,26 +110,37 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->_contributionID = $contribution->id;
     $this->ids['Contribution'][0] = $contribution->id;
     $this->_contributionRecurID = $contribution->contribution_recur_id;
-    $recur_params = [
-      'id' => $this->_contributionRecurID,
-      'return' => 'processor_id',
-    ];
-    $processor_id = civicrm_api3('ContributionRecur', 'getvalue', $recur_params);
-    // Process the initial one.
+
+    $contributionRecur  = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $this->_contributionRecurID]);
+    $processor_id = $contributionRecur['processor_id'];
+    $this->assertEquals('Pending', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionRecur['contribution_status_id']));
+    // Process the initial one after a second's break to ensure modified date really is later.
+    sleep(1);
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN(
       $this->getRecurTransaction(['x_subscription_id' => $processor_id])
     );
     $IPN->main();
+    $updatedContributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $this->_contributionRecurID]);
+    $this->assertEquals('In Progress', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $updatedContributionRecur['contribution_status_id']));
+    $this->assertTrue(strtotime($updatedContributionRecur['modified_date']) > strtotime($contributionRecur['modified_date']));
 
     // Now send a second one (authorize seems to treat first and second contributions
     // differently.
-    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction(
-      ['x_subscription_id' => $processor_id]
-    ));
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction([
+      'x_subscription_id' => $processor_id,
+      'x_subscription_paynum' => 2,
+    ]));
     $IPN->main();
-
+    $updatedContributionRecurAgain = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $this->_contributionRecurID]);
+    $this->assertEquals('Completed', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $updatedContributionRecurAgain['contribution_status_id']));
+    $this->assertEquals(date('Y-m-d'), substr($updatedContributionRecurAgain['end_date'], 0, 10));
     // There should not be any email.
     $mut->assertMailLogEmpty();
+
+    $contributions = Contribution::get()->addWhere('contribution_recur_id', '=', $this->_contributionRecurID)->addSelect('contribution_page_id')->execute();
+    foreach ($contributions as $contribution) {
+      $this->assertEquals($this->_contributionPageID, $contribution['contribution_page_id']);
+    }
   }
 
   /**
@@ -180,6 +192,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurSuccessSuppliedReceiveDate() {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -192,7 +206,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
-    $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge(['receive_date' => '1 July 2010'], $this->getRecurSubsequentTransaction()));
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge(['receive_date' => '2010-07-01'], $this->getRecurSubsequentTransaction()));
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', [
       'contribution_recur_id' => $this->_contributionRecurID,
@@ -242,6 +256,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   /**
    * Test IPN response mails don't leak.
+   *
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testIPNPaymentMembershipRecurSuccessNoLeakage() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -377,9 +393,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    */
   public function getRecurTransaction($params = []) {
     return array_merge([
-      "x_amount" => "200.00",
+      'x_amount' => '200.00',
       "x_country" => 'US',
-      "x_phone" => "",
+      'x_phone' => "",
       "x_fax" => "",
       "x_email" => "me@gmail.com",
       "x_description" => "lots of money",

@@ -36,14 +36,6 @@
     <add>2.1</add>
   </field>
   <index>
-    <name>UI_group_path</name>
-    <fieldName>group_name</fieldName>
-    <fieldName>path</fieldName>
-    <unique>true</unique>
-    <add>2.1</add>
-    <drop>4.2</drop>
-  </index>
-  <index>
     <name>UI_group_path_date</name>
     <fieldName>group_name</fieldName>
     <fieldName>path</fieldName>

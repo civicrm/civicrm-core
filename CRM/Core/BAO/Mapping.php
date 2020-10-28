@@ -151,6 +151,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         civicrm_api3('OptionValue', 'create', [
           'option_group_id' => 'mapping_type',
           'label' => $mappingType,
+          'name' => $mappingType,
           'value' => max(array_keys($mappingValues['values'])) + 1,
           'is_reserved' => 1,
         ]);
@@ -317,8 +318,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     $hasRelationTypes = [];
 
     $columnCount = $columnNo;
-    $form->addElement('submit', 'addBlock', ts('Also include contacts where'),
-      ['class' => 'submit-link']
+    $form->addElement('xbutton', 'addBlock', ts('Also include contacts where'),
+      [
+        'type' => 'submit',
+        'class' => 'submit-link',
+        'value' => 1,
+      ]
     );
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypes();
@@ -552,7 +557,11 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         $form->add('text', "value[$x][$i]", '');
       }
 
-      $form->addElement('submit', "addMore[$x]", ts('Another search field'), ['class' => 'submit-link']);
+      $form->addElement('xbutton', "addMore[$x]", ts('Another search field'), [
+        'type' => 'submit',
+        'class' => 'submit-link',
+        'value' => 1,
+      ]);
     }
     //end of block for
 
@@ -870,6 +879,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @return array
    */
   protected static function loadSavedMapping($mappingLocation, int $x, int $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, array $specialFields, $mappingPhoneType, array $defaults, array $noneArray, $mappingImProvider, $mappingOperator, $mappingValue) {
+    $jsSet = FALSE;
     $locationId = $mappingLocation[$x][$i] ?? 0;
     if (isset($mappingName[$x][$i])) {
       if (is_array($mapperFields[$mappingContactType[$x][$i]])) {
@@ -1002,6 +1012,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return array
    *   formatted associated array of elements
+   * @throws CRM_Core_Exception
    */
   public static function formattedFields(&$params, $row = FALSE) {
     $fields = [];
@@ -1016,7 +1027,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       foreach ($value as $k => $v) {
         if (in_array($v[0], $types)) {
           if ($contactType && $contactType != $v[0]) {
-            CRM_Core_Error::fatal(ts("Cannot have two clauses with different types: %1, %2",
+            throw new CRM_Core_Exception(ts("Cannot have two clauses with different types: %1, %2",
               [1 => $contactType, 2 => $v[0]]
             ));
           }

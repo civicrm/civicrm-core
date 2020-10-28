@@ -9,6 +9,10 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+use Civi\Api4\Relationship;
+use Civi\Api4\RelationshipType;
+
 /**
  *  Test APIv3 civicrm_membership functions
  *
@@ -21,7 +25,9 @@
  * @group headless
  */
 class api_v3_MembershipTest extends CiviUnitTestCase {
-  protected $_apiversion;
+
+  use CRMTraits_Financial_OrderTrait;
+
   protected $_contactID;
   protected $_membershipID;
   protected $_membershipID2;
@@ -37,7 +43,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
     $this->_membershipTypeID2 = $this->membershipTypeCreate([
@@ -50,7 +55,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ]);
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
-    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
     CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
 
@@ -114,7 +118,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'contact_id' => $this->_params['contact_id'],
     ]);
-    $membershipPaymentCreate = $this->callAPISuccess('MembershipPayment', 'create', [
+    $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
       'contribution_id' => $ContributionCreate['values'][0]['id'],
       'membership_id' => $membershipID,
@@ -139,20 +143,17 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   public function testActivityForCancelledContribution() {
     $contactId = $this->createLoggedInUser();
     $membershipID = $this->contactMembershipCreate($this->_params);
-    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
 
     $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => "Member Dues",
+      'financial_type_id' => 'Member Dues',
       'total_amount' => 100,
       'contact_id' => $this->_params['contact_id'],
     ]);
-    $membershipPaymentCreate = $this->callAPISuccess('MembershipPayment', 'create', [
+    $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
       'contribution_id' => $ContributionCreate['id'],
       'membership_id' => $membershipID,
     ]);
-    $instruments = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->paymentInstruments = $instruments['values'];
 
     $form = new CRM_Contribute_Form_Contribution();
     $form->_id = $ContributionCreate['id'];
@@ -160,16 +161,118 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'financial_type_id' => 1,
       'contact_id' => $contactId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 3,
     ],
     CRM_Core_Action::UPDATE);
 
-    $activity = $this->callAPISuccess('Activity', 'get', [
-      'activity_type_id' => "Change Membership Status",
+    $this->callAPISuccessGetSingle('Activity', [
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $membershipID,
+      'subject' => 'General - Payment - Status: test status',
+    ]);
+    $this->callAPISuccessGetSingle('Activity', [
+      'activity_type_id' => 'Change Membership Status',
       'source_record_id' => $membershipID,
     ]);
-    $this->assertNotEmpty($activity['values']);
+  }
+
+  /**
+   * Test Multiple Membership Status for same contribution id.
+   */
+  public function testMultipleMembershipsContribution() {
+    // Main contact
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+    // Pending Membership Status
+    $pendingMembershipId = array_search('Pending', $memStatus);
+    // New Membership Status
+    $newMembershipId = array_search('test status', $memStatus);
+
+    $membershipParam = [
+      'membership_type_id' => $this->_membershipTypeID,
+      'source' => 'Webform Payment',
+      'status_id' => $pendingMembershipId,
+      'is_pay_later' => 1,
+      'skipStatusCal' => 1,
+    ];
+
+    // Contact 1
+    $contactId1 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId1;
+    $membershipID1 = $this->contactMembershipCreate($membershipParam);
+
+    // Pending Payment Status
+    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => '1',
+      'total_amount' => 100,
+      'contact_id' => $contactId1,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 2,
+      'is_pay_later' => 1,
+      'receive_date' => date('Ymd'),
+    ]);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID1,
+    ]);
+
+    // Contact 2
+    $contactId2 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId2;
+    $membershipID2 = $this->contactMembershipCreate($membershipParam);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID2,
+    ]);
+
+    // Contact 3
+    $contactId3 = $this->individualCreate();
+    $membershipParam['contact_id'] = $contactId3;
+    $membershipID3 = $this->contactMembershipCreate($membershipParam);
+    $this->callAPISuccess('MembershipPayment', 'create', [
+      'sequential' => 1,
+      'contribution_id' => $ContributionCreate['id'],
+      'membership_id' => $membershipID3,
+    ]);
+
+    // Change Payment Status to Completed
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->_id = $ContributionCreate['id'];
+    $params = ['id' => $ContributionCreate['id']];
+    $values = $ids = [];
+    CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
+    $form->_values = $values;
+    $form->testSubmit([
+      'total_amount' => 100,
+      'financial_type_id' => '1',
+      'contact_id' => $contactId1,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 1,
+    ],
+      CRM_Core_Action::UPDATE);
+
+    // check for Membership 1
+    $params = ['id' => $membershipID1];
+    $membership1 = $this->callAPISuccess('membership', 'get', $params);
+    $result1 = $membership1['values'][$membershipID1];
+    $this->assertEquals($result1['contact_id'], $contactId1);
+    $this->assertEquals($result1['status_id'], $newMembershipId);
+
+    // check for Membership 2
+    $params = ['id' => $membershipID2];
+    $membership2 = $this->callAPISuccess('membership', 'get', $params);
+    $result2 = $membership2['values'][$membershipID2];
+    $this->assertEquals($result2['contact_id'], $contactId2);
+    $this->assertEquals($result2['status_id'], $newMembershipId);
+
+    // check for Membership 3
+    $params = ['id' => $membershipID3];
+    $membership3 = $this->callAPISuccess('membership', 'get', $params);
+    $result3 = $membership3['values'][$membershipID3];
+    $this->assertEquals($result3['contact_id'], $contactId3);
+    $this->assertEquals($result3['status_id'], $newMembershipId);
   }
 
   /**
@@ -494,7 +597,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * and max_related property for Membership_Type and Membership entities
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCreateWithRelationship() {
     // Create membership type: inherited through employment, max_related = 2
@@ -664,6 +766,75 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($employerId[0]);
     $this->membershipTypeDelete(['id' => $membershipTypeId]);
     $this->contactDelete($membershipOrgId);
+  }
+
+  /**
+   * Test that loops are not created when adding spouse relationships.
+   *
+   * This add a test for https://issues.civicrm.org/jira/browse/CRM-4213 in the hope of removing
+   * the buggy fix for that without a resurgence.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testCreateWithSpouseRelationship() {
+    $relationshipTypeID = RelationshipType::get()->addSelect('id')->addWhere('name_a_b', '=', 'Spouse of')->execute()->first()['id'];
+    MembershipType::update()->setValues([
+      'relationship_direction' => ['b_a', 'a_b'],
+      'relationship_type_id' => [$relationshipTypeID, $relationshipTypeID],
+    ])
+      ->addWhere('name', '=', 'General')
+      ->execute()->first()['id'];
+
+    $spouse1ID = $this->individualCreate(['first_name' => 'him']);
+    $spouse2ID = $this->individualCreate(['first_name' => 'her']);
+    $spouse3ID = $this->individualCreate(['first_name' => 'they']);
+    $spouse4ID = $this->individualCreate(['first_name' => 'them']);
+    Relationship::create()->setValues([
+      'contact_id_a' => $spouse1ID,
+      'contact_id_b' => $spouse2ID,
+      'relationship_type_id' => $relationshipTypeID,
+    ])->execute();
+
+    $this->contactMembershipCreate([
+      'contact_id' => $spouse1ID,
+      'start_date' => date('Y-m-d'),
+      'end_date' => '+1 year',
+    ]);
+
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse2ID,
+      'membership_type_id' => 'General',
+    ]);
+
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse1ID,
+      'membership_type_id' => 'General',
+    ]);
+    // Add another Spouse
+    Relationship::create()->setValues([
+      'contact_id_a' => $spouse3ID,
+      'contact_id_b' => $spouse1ID,
+      'relationship_type_id' => $relationshipTypeID,
+    ])->execute();
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse3ID,
+      'membership_type_id' => 'General',
+    ]);
+    $this->callAPISuccessGetCount('Membership', [], 3);
+    Relationship::create()->setValues([
+      'contact_id_a' => $spouse1ID,
+      'contact_id_b' => $spouse4ID,
+      'relationship_type_id' => $relationshipTypeID,
+    ])->execute();
+
+    $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $spouse4ID,
+      'membership_type_id' => 'General',
+    ]);
+
+    $this->callAPISuccessGetCount('Membership', [], 4);
   }
 
   /**
@@ -1006,7 +1177,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function hook_civicrm_pre_update_create_membership($op, $objectName, $id, &$params) {
-    if ($objectName == 'Membership' && $op == 'edit') {
+    if ($objectName === 'Membership' && $op === 'edit') {
       $existingMembership = $this->callAPISuccessGetSingle('membership', ['id' => $params['id']]);
       unset($params['id'], $params['membership_id']);
       $params['join_date'] = $params['membership_start_date'] = $params['start_date'] = date('Ymd000000', strtotime($existingMembership['start_date']));
@@ -1169,6 +1340,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * CRM-18503 - Test membership join date is correctly set for fixed memberships.
+   *
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testMembershipJoinDateFixed() {
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();
@@ -1181,22 +1354,20 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $this->_membershipTypeID2,
       'source' => 'test membership',
       'is_pay_later' => 0,
-      'status_id' => array_search('Pending', $memStatus),
+      'status_id' => 'Pending',
       'skipStatusCal' => 1,
       'is_for_organization' => 1,
     ];
-    // @todo stop passing empty $ids
-    $ids = [];
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
+    $membership = $this->callAPISuccess('Membership', 'create', $params);
 
     // Update membership to 'Completed' and check the dates.
     $memParams = [
-      'id' => $membership->id,
+      'id' => $membership['id'],
       'contact_id' => $contactId,
       'is_test' => 0,
       'membership_type_id' => $this->_membershipTypeID2,
       'num_terms' => 1,
-      'status_id' => array_search('New', $memStatus),
+      'status_id' => 'New',
     ];
     $result = $this->callAPISuccess('Membership', 'create', $memParams);
 
@@ -1209,11 +1380,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       $rollOver = FALSE;
       $startDate = date('Y-m-d', strtotime(date('Y-03-01') . '- 1 year'));
     }
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($this->_membershipTypeID2);
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($this->_membershipTypeID2);
     $fixedPeriodRollover = CRM_Member_BAO_MembershipType::isDuringFixedAnnualRolloverPeriod($joinDate, $membershipTypeDetails, $year, $startDate);
     $y = 1;
     if ($fixedPeriodRollover && $rollOver) {
-      $y += 1;
+      ++$y;
     }
 
     $expectedDates = [
@@ -1526,6 +1697,22 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
 
+  }
+
+  /**
+   * Test that a contribution linked to multiple memberships results in all being updated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultipleMembershipContribution() {
+    $this->createMultipleMembershipOrder();
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->ids['Contribution'][0],
+      'payment_instrument_id' => 'Check',
+      'total_amount' => 400,
+    ]);
+    $memberships = $this->callAPISuccess('membership', 'get')['values'];
+    $this->assertCount(2, $memberships);
   }
 
   /**

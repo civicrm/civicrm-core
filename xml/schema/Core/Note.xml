@@ -7,6 +7,7 @@
   <comment>Notes can be linked to any object in the application.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-sticky-note</icon>
   <field>
     <name>id</name>
     <title>Note ID</title>

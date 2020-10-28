@@ -21,7 +21,7 @@
         </td>
         <td class="crm-contact-form-block-search">
           <label>&nbsp;</label><br />
-          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search"></i> Find Contacts</span></button>
+          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> Find Contacts</span></button>
         </td>
       </tr>
     </table>
@@ -60,7 +60,7 @@
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{ $exception.$contact2name }</a>
           </td>
           <td>
-            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a>
+            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>
           </td>
         </tr>
 

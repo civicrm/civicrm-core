@@ -11,7 +11,7 @@
 <h3>{ts}Configure Widget{/ts}</h3>
 {if $showStatus}
 <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {ts}It looks like you may have posted and / or distributed the flash version of the Contribution widget. We won't be supporting the flash version in next release. You should try and get all sites using the flash widget to update to the improved HTML widget code below as soon as possible.{/ts}
 </div>
 {/if}
@@ -60,7 +60,7 @@
                     </div>
                     <textarea rows="8" cols="50" name="widget_code" id="widget_code">{include file="CRM/Contribute/Page/Widget.tpl" widgetId=$widget_id cpageId=$cpageId}</textarea>
                     <br />
-                    <strong><a href="#" onclick="Widget.widget_code.select(); return false;">&raquo; {ts}Select Code{/ts}</a></strong>
+                    <strong><a href="#" onclick="Widget.widget_code.select(); return false;"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Select Code{/ts}</a></strong>
                 {else}
                     <div class="description">
                         {ts}The code for adding this widget to web pages will be displayed here after you click <strong>Save and Preview</strong>.{/ts}

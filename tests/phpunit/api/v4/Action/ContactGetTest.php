@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -56,6 +54,40 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     // Putting is_deleted anywhere in the where clause will disable the default
     $contacts = Contact::get()->addClause('OR', ['last_name', '=', $last_name], ['is_deleted', '=', 0])->addSelect('id')->execute();
     $this->assertContains($del['id'], $contacts->column('id'));
+  }
+
+  public function testGetWithLimit() {
+    $last_name = uniqid('getWithLimitTest');
+
+    $bob = Contact::create()
+      ->setValues(['first_name' => 'Bob', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jan = Contact::create()
+      ->setValues(['first_name' => 'Jan', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $dan = Contact::create()
+      ->setValues(['first_name' => 'Dan', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $num = Contact::get(FALSE)->selectRowCount()->execute()->count();
+
+    // The object's count() method will account for all results, ignoring limit & offset, while the array results are limited
+    $offset1 = Contact::get(FALSE)->setOffset(1)->execute();
+    $this->assertCount($num, $offset1);
+    $this->assertCount($num - 1, (array) $offset1);
+    $offset2 = Contact::get(FALSE)->setOffset(2)->execute();
+    $this->assertCount($num - 2, (array) $offset2);
+    $this->assertCount($num, $offset2);
+    // With limit, it doesn't fetch total count by default
+    $limit2 = Contact::get(FALSE)->setLimit(2)->execute();
+    $this->assertCount(2, (array) $limit2);
+    $this->assertCount(2, $limit2);
+    // With limit, you have to trigger the full row count manually
+    $limit2 = Contact::get(FALSE)->setLimit(2)->addSelect('sort_name', 'row_count')->execute();
+    $this->assertCount(2, (array) $limit2);
+    $this->assertCount($num, $limit2);
   }
 
 }

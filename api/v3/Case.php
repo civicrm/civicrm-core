@@ -21,7 +21,7 @@
  *
  * @param array $params
  *
- * @code
+ * ```
  * // REQUIRED for create:
  * 'case_type_id' => int OR
  * 'case_type' => str (provide one or the other)
@@ -38,7 +38,7 @@
  * 'start_date' => str datestamp // defaults to: date('YmdHis')
  * 'duration' => int // in minutes
  * 'details' => str // html format
- * @endcode
+ * ```
  *
  * @throws API_Exception
  * @return array
@@ -556,13 +556,13 @@ function civicrm_api3_case_update($params) {
  *
  * @param array $params
  *
- * @code
+ * ```
  *   //REQUIRED:
  *   'id' => int
  *
  *   //OPTIONAL
  *   'move_to_trash' => bool (defaults to false)
- * @endcode
+ * ```
  *
  * @throws API_Exception
  * @return mixed

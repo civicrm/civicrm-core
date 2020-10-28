@@ -12,14 +12,15 @@
   <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit phone{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
-        <span class="crm-i fa-pencil"></span> {if empty($phone)}{ts}Add phone{/ts}{else}{ts}Add or edit phone{/ts}{/if}
+        <span class="crm-i fa-pencil" aria-hidden="true"></span> {if empty($phone)}{ts}Add phone{/ts}{else}{ts}Add or edit phone{/ts}{/if}
       </div>
     {/if}
     {if empty($phone)}
       <div class="crm-summary-row">
         <div class="crm-label">
           {ts}Phone{/ts}
-          {if $privacy.do_not_phone}<span class="icon privacy-flag do-not-phone" title="{ts}Privacy flag: Do Not Phone{/ts}"></span>{/if}
+          {privacyFlag field=do_not_sms condition=$privacy.do_not_sms}
+          {privacyFlag field=do_not_phone condition=$privacy.do_not_phone}
         </div>
         <div class="crm-content"></div>
       </div>
@@ -28,7 +29,8 @@
       {if $item.phone || $item.phone_ext}
         <div class="crm-summary-row {if $item.is_primary eq 1}primary{/if}">
           <div class="crm-label">
-            {if $privacy.do_not_phone}<span class="icon privacy-flag do-not-phone" title="{ts}Privacy flag: Do Not Phone{/ts}"></span>{/if}
+            {privacyFlag field=do_not_sms condition=$privacy.do_not_sms}
+            {privacyFlag field=do_not_phone condition=$privacy.do_not_phone}
             {$item.location_type} {$item.phone_type}
           </div>
           <div class="crm-content crm-contact_phone">

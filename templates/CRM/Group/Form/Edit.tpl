@@ -26,25 +26,23 @@
       </td>
     </tr>
 
-    {if $group.created_by}
-      <tr class="crm-group-form-block-created">
-        <td class="label">{ts}Created By{/ts}</td>
-        <td>{$group.created_by}</td>
-      </tr>
-    {/if}
-
-    {if $group.modified_by}
-      <tr class="crm-group-form-block-modified">
-        <td class="label">{ts}Modified By{/ts}</td>
-        <td>{$group.modified_by}</td>
-      </tr>
-    {/if}
-
     <tr class="crm-group-form-block-description">
       <td class="label">{$form.description.label}</td>
-      <td>{$form.description.html}<br />
-        <span class="description">{ts}Group description is displayed when groups are listed in Profiles and Mailing List Subscribe forms.{/ts}</span>
+      <td>{$form.description.html}</td>
+    </tr>
+
+    <tr><td colspan="2">If either of the following fields are filled out they will be used instead of the title or description field in profiles and Mailing List Subscription/unsubscribe forms</td></tr>
+
+    <tr class="crm-group-form-block-frontend-title">
+      <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_title' id=$group.id}{/if}</td>
+      <td>{$form.frontend_title.html|crmAddClass:huge}
+        {if $group.saved_search_id}&nbsp;({ts}Smart Group{/ts}){/if}
       </td>
+    </tr>
+
+    <tr class="crm-group-form-block-frontend-description">
+      <td class="label">{$form.frontend_description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_description' id=$group.id}{/if}</td>
+      <td>{$form.frontend_description.html}</td>
     </tr>
 
     {if $form.group_type}
@@ -71,6 +69,21 @@
       <td>{$form.is_active.html}</td>
     </tr>
 
+   {if $group.created_by}
+      <tr class="crm-group-form-block-created">
+        <td class="label">{ts}Created By{/ts}</td>
+        <td>{$group.created_by}</td>
+      </tr>
+    {/if}
+
+    {if $group.modified_by}
+      <tr class="crm-group-form-block-modified">
+        <td class="label">{ts}Modified By{/ts}</td>
+        <td>{$group.modified_by}</td>
+      </tr>
+    {/if}
+
+
     <tr>
       <td colspan=2>{include file="CRM/Custom/Form/CustomData.tpl"}</td>
     </tr>
@@ -82,17 +95,10 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL}>&raquo; {ts}Contacts in this Group{/ts}</a>
-      {if $group.saved_search_id}
+      <a {$crmURL}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
+      {if $editSmartGroupURL}
         <br />
-        {if $group.mapping_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
-        {elseif $group.search_custom_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
-        {else}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
-        {/if}
-
+        <a class="no-popup" href="{$editSmartGroupURL}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
       {/if}
     </div>
   {/if}

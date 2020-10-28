@@ -169,7 +169,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
   /**
    * Get tracked url count for each mailing for a given set of mailing IDs.
    *
-   * CRM-12814
+   * @see https://issues.civicrm.org/jira/browse/CRM-12814
    *
    * @param array $mailingIDs
    *

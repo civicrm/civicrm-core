@@ -53,39 +53,17 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    * Process the soft contribution and/or link to personal campaign page.
    *
    * @param array $params
-   * @param object $contribution CRM_Contribute_DAO_Contribution
+   * @param CRM_Contribute_BAO_Contribution $contribution
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function processSoftContribution($params, $contribution) {
-    //retrieve existing soft-credit and pcp id(s) if any against $contribution
-    $softIDs = self::getSoftCreditIds($contribution->id);
-    $pcpId = self::getSoftCreditIds($contribution->id, TRUE);
-
-    if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
-      $softParams = [];
-      $softParams['id'] = $pcpId ? $pcpId : NULL;
-      $softParams['contribution_id'] = $contribution->id;
-      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
-      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
-        $pcp['pcp_made_through_id'], 'contact_id'
-      );
-      $softParams['currency'] = $contribution->currency;
-      $softParams['amount'] = $contribution->total_amount;
-      $softParams['pcp_display_in_roll'] = $pcp['pcp_display_in_roll'] ?? NULL;
-      $softParams['pcp_roll_nickname'] = $pcp['pcp_roll_nickname'] ?? NULL;
-      $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
-      $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
-      $contributionSoft = self::add($softParams);
-      //Send notification to owner for PCP
-      if ($contributionSoft->pcp_id && empty($pcpId)) {
-        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
-      }
-    }
-    //Delete PCP against this contribution and create new on submitted PCP information
-    elseif (array_key_exists('pcp', $params) && $pcpId) {
-      civicrm_api3('ContributionSoft', 'delete', ['id' => $pcpId]);
+    if (array_key_exists('pcp', $params)) {
+      self::processPCP($params['pcp'], $contribution);
     }
     if (isset($params['soft_credit'])) {
+      $softIDs = self::getSoftCreditIds($contribution->id);
       $softParams = $params['soft_credit'];
       foreach ($softParams as $softParam) {
         if (!empty($softIDs)) {
@@ -562,7 +540,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     switch ($profileContactType) {
       case 'Individual':
         if (array_key_exists('prefix_id', $params)) {
-          $honorName = CRM_Utils_Array::value(CRM_Utils_Array::value('prefix_id', $params),
+          $honorName = CRM_Utils_Array::value($params['prefix_id'],
             CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
           );
           unset($profileFields['prefix_id']);
@@ -571,7 +549,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         unset($profileFields['first_name']);
         unset($profileFields['last_name']);
         if (array_key_exists('suffix_id', $params)) {
-          $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
+          $honorName .= ' ' . CRM_Utils_Array::value($params['suffix_id'],
               CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
             );
           unset($profileFields['suffix_id']);
@@ -599,6 +577,44 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     }
     else {
       $form->assign('honorName', $honorName);
+    }
+  }
+
+  /**
+   * Process the pcp associated with a contribution.
+   *
+   * @param array $pcp
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function processPCP($pcp, $contribution) {
+    $pcpId = self::getSoftCreditIds($contribution->id, TRUE);
+
+    if ($pcp) {
+      $softParams = [];
+      $softParams['id'] = $pcpId ?: NULL;
+      $softParams['contribution_id'] = $contribution->id;
+      $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
+      $softParams['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP',
+        $pcp['pcp_made_through_id'], 'contact_id'
+      );
+      $softParams['currency'] = $contribution->currency;
+      $softParams['amount'] = $contribution->total_amount;
+      $softParams['pcp_display_in_roll'] = $pcp['pcp_display_in_roll'] ?? NULL;
+      $softParams['pcp_roll_nickname'] = $pcp['pcp_roll_nickname'] ?? NULL;
+      $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
+      $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
+      $contributionSoft = self::add($softParams);
+      //Send notification to owner for PCP
+      if ($contributionSoft->pcp_id && empty($pcpId)) {
+        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+      }
+    }
+    //Delete PCP against this contribution and create new on submitted PCP information
+    elseif ($pcpId) {
+      civicrm_api3('ContributionSoft', 'delete', ['id' => $pcpId]);
     }
   }
 

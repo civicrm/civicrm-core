@@ -22,7 +22,7 @@
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_generic_getList($apiRequest) {
-  $entity = _civicrm_api_get_entity_name_from_camel($apiRequest['entity']);
+  $entity = CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($apiRequest['entity']);
   $request = $apiRequest['params'];
   $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE);
 

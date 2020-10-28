@@ -126,7 +126,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *   $note CRM_Core_BAO_Note object
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return NULL;
@@ -169,7 +169,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
 
       $noteActions = FALSE;
 
-      $loggedInContactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
       if ($loggedInContactID) {
         if ($loggedInContactID == $note->entity_id) {
           $noteActions = TRUE;
@@ -350,7 +350,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *
    */
   public static function &getNote($id, $entityTable = 'civicrm_relationship') {
-    $viewNote = array();
+    $viewNote = [];
 
     $query = "
   SELECT  id,
@@ -453,7 +453,7 @@ ORDER BY  modified_date desc";
    * @return array
    *   Nested associative array beginning with direct children of given note.
    */
-  private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = array(), $depth = 0) {
+  private static function buildNoteTree($parentId, $maxDepth = 0, $snippet = FALSE, &$tree = [], $depth = 0) {
     if ($maxDepth && $depth > $maxDepth) {
       return FALSE;
     }
@@ -517,7 +517,7 @@ ORDER BY  modified_date desc";
    * @return array
    *   One-dimensional array containing ids of all desendent notes
    */
-  public static function getDescendentIds($parentId, &$ids = array()) {
+  public static function getDescendentIds($parentId, &$ids = []) {
     // get direct children of given parentId note
     $note = new CRM_Core_DAO_Note();
     $note->entity_table = 'civicrm_note';

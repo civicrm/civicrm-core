@@ -64,7 +64,7 @@ class CRM_Utils_Check {
    * Display daily system status alerts (admin only).
    */
   public function showPeriodicAlerts() {
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Permission::check('administer CiviCRM system')) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
 
@@ -170,31 +170,20 @@ class CRM_Utils_Check {
   }
 
   /**
-   * Run all system checks.
+   * Run all enabled system checks.
    *
    * This functon is wrapped by the System.check api.
    *
    * Calls hook_civicrm_check() for extensions to add or modify messages.
-   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_check
+   * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_check/
    *
    * @param bool $max
    *   Whether to return just the maximum non-hushed severity
    *
-   * @return array
-   *   Array of CRM_Utils_Check_Message objects
+   * @return CRM_Utils_Check_Message[]
    */
   public static function checkAll($max = FALSE) {
-    $messages = [];
-    foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
-      $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
-      /* @var CRM_Utils_Check_Component $check */
-      $check = new $className();
-      if ($check->isEnabled()) {
-        $messages = array_merge($messages, $check->checkAll());
-      }
-    }
-
-    CRM_Utils_Hook::check($messages);
+    $messages = self::checkStatus();
 
     uasort($messages, [__CLASS__, 'severitySort']);
 
@@ -210,6 +199,38 @@ class CRM_Utils_Check {
     Civi::cache('checks')->set('systemStatusCheckResult', $maxSeverity);
 
     return ($max) ? $maxSeverity : $messages;
+  }
+
+  /**
+   * @param array $statusNames
+   *   Optionally specify the names of specific checks to run, or leave empty to run all
+   * @param bool $includeDisabled
+   *   Run checks that have been explicitly disabled (default false)
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public static function checkStatus($statusNames = [], $includeDisabled = FALSE) {
+    $messages = [];
+    $checksNeeded = $statusNames;
+    foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
+      $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
+      /* @var CRM_Utils_Check_Component $component */
+      $component = new $className();
+      if ($includeDisabled || $component->isEnabled()) {
+        $messages = array_merge($messages, $component->checkAll($statusNames, $includeDisabled));
+      }
+      if ($statusNames) {
+        // Early return if we have already run (or skipped) all the requested checks.
+        $checksNeeded = array_diff($checksNeeded, $component->getAllChecks());
+        if (!$checksNeeded) {
+          return $messages;
+        }
+      }
+    }
+
+    CRM_Utils_Hook::check($messages, $statusNames, $includeDisabled);
+
+    return $messages;
   }
 
   /**

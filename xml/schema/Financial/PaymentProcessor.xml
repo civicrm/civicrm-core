@@ -71,14 +71,6 @@
     <add>1.8</add>
   </field>
   <field>
-    <name>payment_processor_type</name>
-    <type>varchar</type>
-    <length>255</length>
-    <comment>Payment Processor Type.</comment>
-    <add>1.8</add>
-    <drop>4.3</drop>
-  </field>
-  <field>
     <name>payment_processor_type_id</name>
     <title>Payment Processor Type ID</title>
     <type>int unsigned</type>

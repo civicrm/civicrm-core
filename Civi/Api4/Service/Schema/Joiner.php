@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -60,10 +58,14 @@ class Joiner {
     foreach ($fullPath as $link) {
       $target = $link->getTargetTable();
       $alias = $link->getAlias();
+      $bao = \CRM_Core_DAO_AllCoreTables::getBAOClassName(\CRM_Core_DAO_AllCoreTables::getClassForTable($target));
       $conditions = $link->getConditionsForJoin($baseTable);
+      // Custom fields do not have a bao, and currently do not have field-specific ACLs
+      if ($bao) {
+        $conditions = array_merge($conditions, $query->getAclClause($alias, $bao, explode('.', $joinPath)));
+      }
 
       $query->join($side, $target, $alias, $conditions);
-      $query->addJoinedTable($link);
 
       $baseTable = $link->getAlias();
     }
@@ -72,20 +74,33 @@ class Joiner {
   }
 
   /**
-   * @param \Civi\Api4\Query\Api4SelectQuery $query
+   * Determines if path string points to a simple n-1 join that can be automatically added
+   *
+   * @param string $baseTable
    * @param $joinPath
    *
    * @return bool
    */
-  public function canJoin(Api4SelectQuery $query, $joinPath) {
-    return !empty($this->getPath($query->getFrom(), $joinPath));
+  public function canAutoJoin($baseTable, $joinPath) {
+    try {
+      $path = $this->getPath($baseTable, $joinPath);
+      foreach ($path as $joinable) {
+        if ($joinable->getJoinType() === $joinable::JOIN_TYPE_ONE_TO_MANY) {
+          return FALSE;
+        }
+      }
+      return TRUE;
+    }
+    catch (\Exception $e) {
+      return FALSE;
+    }
   }
 
   /**
    * @param string $baseTable
    * @param string $joinPath
    *
-   * @return array
+   * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
    * @throws \Exception
    */
   protected function getPath($baseTable, $joinPath) {

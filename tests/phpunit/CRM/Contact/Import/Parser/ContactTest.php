@@ -158,7 +158,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
    *
-   * CRM-17275
+   * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @throws \Exception
    */
@@ -183,7 +183,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
    *
-   * CRM-17275
+   * @see https://issues.civicrm.org/jira/browse/CRM-17275
    *
    * @throws \Exception
    */
@@ -256,6 +256,94 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the not-really-encouraged way of creating locations via contact.create doesn't mess up primaries.
+   */
+  public function testContactLocationBlockHandling() {
+    $id = $this->individualCreate([
+      'phone' => [
+        1 => [
+          'location_type_id' => 1,
+          'phone' => '987654321',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'phone' => '456-7890',
+        ],
+      ],
+      'im' => [
+        1 => [
+          'location_type_id' => 1,
+          'name' => 'bob',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'name' => 'fred',
+        ],
+      ],
+      'openid' => [
+        1 => [
+          'location_type_id' => 1,
+          'openid' => 'bob',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'openid' => 'fred',
+        ],
+      ],
+      'email' => [
+        1 => [
+          'location_type_id' => 1,
+          'email' => 'bob@example.com',
+        ],
+        2 => [
+          'location_type_id' => 2,
+          'email' => 'fred@example.com',
+        ],
+      ],
+    ]);
+    $phones = $this->callAPISuccess('Phone', 'get', ['contact_id' => $id])['values'];
+    $emails = $this->callAPISuccess('Email', 'get', ['contact_id' => $id])['values'];
+    $openIDs = $this->callAPISuccess('OpenID', 'get', ['contact_id' => $id])['values'];
+    $ims = $this->callAPISuccess('IM', 'get', ['contact_id' => $id])['values'];
+    $this->assertCount(2, $phones);
+    $this->assertCount(2, $emails);
+    $this->assertCount(2, $ims);
+    $this->assertCount(2, $openIDs);
+
+    $this->assertLocationValidity();
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $id,
+      // This is secret code for 'delete this phone'.
+      'updateBlankLocInfo' => TRUE,
+      'phone' => [
+        1 => [
+          'id' => key($phones),
+        ],
+      ],
+      'email' => [
+        1 => [
+          'id' => key($emails),
+        ],
+      ],
+      'im' => [
+        1 => [
+          'id' => key($ims),
+        ],
+      ],
+      'openid' => [
+        1 => [
+          'id' => key($openIDs),
+        ],
+      ],
+    ]);
+    $this->assertLocationValidity();
+    $this->callAPISuccessGetCount('Phone', ['contact_id' => $id], 1);
+    $this->callAPISuccessGetCount('Email', ['contact_id' => $id], 1);
+    $this->callAPISuccessGetCount('OpenID', ['contact_id' => $id], 1);
+    $this->callAPISuccessGetCount('IM', ['contact_id' => $id], 1);
+  }
+
+  /**
    * Test that the import parser adds the address to the primary location.
    *
    * @throws \Exception
@@ -277,6 +365,54 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Email', ['email' => 'bill.gates@microsoft.com']);
 
     $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
+  }
+
+  /**
+   * Test that address location type id is ignored for dedupe purposes on import.
+   *
+   * @throws \Exception
+   */
+  public function testIgnoreLocationTypeId() {
+    // Create a rule that matches on last name and street address.
+    $rgid = $this->createRuleGroup()['id'];
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $rgid,
+      'rule_field' => 'last_name',
+      'rule_table' => 'civicrm_contact',
+      'rule_weight' => 4,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $rgid,
+      'rule_field' => 'street_address',
+      'rule_table' => 'civicrm_address',
+      'rule_weight' => 4,
+    ]);
+    // Create a contact with an address of location_type_id 1.
+    $contact1Params = [
+      'contact_type' => 'Individual',
+      'first_name' => 'Original',
+      'last_name' => 'Smith',
+    ];
+    $contact1 = $this->callAPISuccess('Contact', 'create', $contact1Params);
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contact1['id'],
+      'location_type_id' => 1,
+      'street_address' => 'Big Mansion',
+    ]);
+
+    $contactValues = [
+      'first_name' => 'New',
+      'last_name' => 'Smith',
+      'street_address' => 'Big Mansion',
+    ];
+
+    // We want to import with a location_type_id of 4.
+    $importLocationTypeId = '4';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_SKIP, CRM_Import_Parser::DUPLICATE, [0 => NULL, 1 => NULL, 2 => $importLocationTypeId], NULL, $rgid);
+    $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
+    $this->assertEquals(1, $address['location_type_id']);
+    $contact = $this->callAPISuccessGetSingle('Contact', $contact1Params);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
   }
 
@@ -548,7 +684,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'extends' => 'Contact',
       'title' => 'ABC',
     ]);
-    $customField = $this->customFieldOptionValueCreate($customGroup, 'fieldABC', ['html_type' => 'Multi-Select']);
+    $customField = $this->customFieldOptionValueCreate($customGroup, 'fieldABC', ['html_type' => 'Select', 'serialize' => 1]);
     $params = [
       'custom_' . $customField['id'] => 'Label1|Label2',
     ];
@@ -713,14 +849,17 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in, but
    *   that method does not cope with duplicates.
+   * @param int|null $ruleGroupId
+   *   To test against a specific dedupe rule group, pass its ID as this argument.
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperLocType = [], $fields = NULL) {
+  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperLocType = [], $fields = NULL, int $ruleGroupId = NULL) {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
     $values = array_values($originalValues);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
     $parser->_contactType = 'Individual';
+    $parser->_dedupeRuleGroupID = $ruleGroupId;
     $parser->_onDuplicate = $onDuplicateAction;
     $parser->init();
     $this->assertEquals($expectedResult, $parser->import($onDuplicateAction, $values), 'Return code from parser import was not as expected');

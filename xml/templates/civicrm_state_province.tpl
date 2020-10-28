@@ -9,7 +9,7 @@
 -- Generated from {$smarty.template}
 -- {$generated}
 --
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1000, 1228, "AL", "Alabama"),
@@ -119,6 +119,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (1231, 1101, "DL", "Delhi"),
 (1232, 1101, "LD", "Lakshadweep"),
 (1233, 1101, "PY", "Pondicherry"),
+-- Note we believe all lower-case is correct for Poland. See https://github.com/civicrm/civicrm-core/pull/17107
 (1300, 1172, "MZ", "mazowieckie"),
 (1301, 1172, "PM", "pomorskie"),
 (1302, 1172, "DS", "dolnośląskie"),
@@ -1215,7 +1216,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2597, 1226, "AGB", "Argyll and Bute"),
 (2598, 1226, "ARM", "Co Armagh"),
 (2606, 1226, "BDF", "Bedfordshire"),
-(2612, 1226, "BGW", "Gwent"),
+(2612, 1226, "BGW", "Blaenau Gwent"),
 (2620, 1226, "BST", "Bristol, City of"),
 (2622, 1226, "BKM", "Buckinghamshire"),
 (2626, 1226, "CAM", "Cambridgeshire"),
@@ -1284,7 +1285,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (2786, 1226, "STG", "Stirling"),
 (2791, 1226, "SFK", "Suffolk"),
 (2793, 1226, "SRY", "Surrey"),
-(2804, 1226, "VGL", "Mid Glamorgan"),
+(2804, 1226, "VGL", "Vale of Glamorgan, The"),
 (2811, 1226, "WAR", "Warwickshire"),
 (2813, 1226, "WDU", "West Dunbartonshire"),
 (2814, 1226, "WLN", "West Lothian"),
@@ -2566,23 +2567,23 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (4126, 1173, "01", "Aveiro"),
 (4127, 1173, "02", "Beja"),
 (4128, 1173, "03", "Braga"),
-(4129, 1173, "04", "Braganca"),
+(4129, 1173, "04", "Bragança"),
 (4130, 1173, "05", "Castelo Branco"),
-(4131, 1173, "06", "Colmbra"),
-(4132, 1173, "07", "Ovora"),
+(4131, 1173, "06", "Coimbra"),
+(4132, 1173, "07", "Évora"),
 (4133, 1173, "08", "Faro"),
 (4134, 1173, "09", "Guarda"),
 (4135, 1173, "10", "Leiria"),
 (4136, 1173, "11", "Lisboa"),
 (4137, 1173, "12", "Portalegre"),
 (4138, 1173, "13", "Porto"),
-(4139, 1173, "14", "Santarem"),
-(4140, 1173, "15", "Setubal"),
+(4139, 1173, "14", "Santarém"),
+(4140, 1173, "15", "Setúbal"),
 (4141, 1173, "16", "Viana do Castelo"),
 (4142, 1173, "17", "Vila Real"),
 (4143, 1173, "18", "Viseu"),
-(4144, 1173, "20", "Regiao Autonoma dos Acores"),
-(4145, 1173, "30", "Regiao Autonoma da Madeira"),
+(4144, 1173, "20", "Região Autónoma dos Açores"),
+(4145, 1173, "30", "Região Autónoma da Madeira"),
 (4146, 1168, "ASU", "Asuncion"),
 (4147, 1168, "16", "Alto Paraguay"),
 (4148, 1168, "10", "Alto Parana"),
@@ -3681,14 +3682,13 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- department of France (CRM-4769)
 (10009, 1076, "39", "Jura"),
 
--- new Italian provinces, as yet without codes (CRM-5048)
-(10010, 1107, "Bar", "Barletta-Andria-Trani"),
-(10011, 1107, "Fer", "Fermo"),
-(10012, 1107, "Mon", "Monza e Brianza"),
+-- new Italian provinces (CRM-5048)
+(10010, 1107, "BT", "Barletta-Andria-Trani"),
+(10011, 1107, "FM", "Fermo"),
+(10012, 1107, "MB", "Monza e Brianza"),
 
 -- new UK provinces (CRM-5224)
 (10013, 1226, "CWD", "Clwyd"),
-(10014, 1226, "DFD", "Dyfed"),
 (10015, 1226, "SGM", "South Glamorgan"),
 
 -- Haiti (CRM-5628)
@@ -4107,4 +4107,35 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1080, "09", "Woleu-Ntem"),
 
 -- dev/Core#131 Missing UK State
-(NULL, 1226, "MON", "Monmouthshire");
+(NULL, 1226, "MON", "Monmouthshire"),
+
+-- dev/core#2027 Missing subdivisions for Northern Ireland and Wales
+(NULL, 1226, "ANN", "Antrim and Newtownabbey"),
+(NULL, 1226, "AND", "Ards and North Down"),
+(NULL, 1226, "ABC", "Armagh City, Banbridge and Craigavon"),
+(NULL, 1226, "BFS", "Belfast"),
+(NULL, 1226, "CCG", "Causeway Coast and Glens"),
+(NULL, 1226, "DRS", "Derry City and Strabane"),
+(NULL, 1226, "FMO", "Fermanagh and Omagh"),
+(NULL, 1226, "LBC", "Lisburn and Castlereagh"),
+(NULL, 1226, "MEA", "Mid and East Antrim"),
+(NULL, 1226, "MUL", "Mid Ulster"),
+(NULL, 1226, "NMD", "Newry, Mourne and Down"),
+
+(NULL, 1226, "BGE", "Bridgend"),
+(NULL, 1226, "CAY", "Caerphilly"),
+(NULL, 1226, "CRF", "Cardiff"),
+(NULL, 1226, "CRF", "Carmarthenshire"),
+(NULL, 1226, "CGN", "Ceredigion"),
+(NULL, 1226, "CWY", "Conwy"),
+(NULL, 1226, "DEN", "Denbighshire"),
+(NULL, 1226, "FLN", "Flintshire"),
+(NULL, 1226, "AGY", "Isle of Anglesey"),
+(NULL, 1226, "MTY", "Merthyr Tydfil"),
+(NULL, 1226, "NTL", "Neath Port Talbot"),
+(NULL, 1226, "NWP", "Newport"),
+(NULL, 1226, "PEM", "Pembrokeshire"),
+(NULL, 1226, "RCT", "Rhondda, Cynon, Taff"),
+(NULL, 1226, "SWA", "Swansea"),
+(NULL, 1226, "TOF", "Torfaen"),
+(NULL, 1226, "WRX", "Wrexham");

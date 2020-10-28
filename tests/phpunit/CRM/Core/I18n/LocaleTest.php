@@ -45,6 +45,11 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
       'fr_CA' => 'French (Canada)',
       'de_DE' => 'German',
     ];
+    $examples = [
+      'en_US' => 'Yes',
+      'fr_CA' => 'Oui',
+      'de_DE' => 'Ja',
+    ];
     $codes = array_keys($languages);
     Civi::settings()->set('uiLanguages', $codes);
 
@@ -76,6 +81,14 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
       'en_US' => 'English (United States)',
       'fr_CA' => 'French (Canada)',
     ], $result);
+
+    // If you switch back and forth among these languages, `ts()` should follow suit.
+    for ($trial = 0; $trial < 3; $trial++) {
+      foreach ($examples as $exLocale => $exString) {
+        CRM_Core_I18n::singleton()->setLocale($exLocale);
+        $this->assertEquals($exString, ts('Yes'), "Translate");
+      }
+    }
 
     CRM_Core_I18n::singleton()->setLocale('en_US');
     CRM_Core_I18n_Schema::makeSinglelingual('en_US');

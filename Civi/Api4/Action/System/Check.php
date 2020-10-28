@@ -10,24 +10,43 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
 namespace Civi\Api4\Action\System;
 
 /**
  * Retrieve system notices, warnings, errors, etc.
+ * @method bool getIncludeDisabled()
  */
 class Check extends \Civi\Api4\Generic\BasicGetAction {
 
+  /**
+   * Run checks that have been explicitly disabled (default false)
+   * @var bool
+   */
+  protected $includeDisabled = FALSE;
+
+  /**
+   * @param bool $includeDisabled
+   * @return Check
+   */
+  public function setIncludeDisabled(bool $includeDisabled): Check {
+    $this->includeDisabled = $includeDisabled;
+    return $this;
+  }
+
   protected function getRecords() {
-    $messages = [];
-    foreach (\CRM_Utils_Check::checkAll() as $message) {
+    $messages = $names = [];
+
+    // Filtering by name relies on the component check rather than the api arrayQuery
+    // @see \CRM_Utils_Check_Component::isCheckable
+    foreach ($this->where as $i => $clause) {
+      if ($clause[0] == 'name' && !empty($clause[2]) && in_array($clause[1], ['=', 'IN'], TRUE)) {
+        $names = (array) $clause[2];
+        unset($this->where[$i]);
+        break;
+      }
+    }
+
+    foreach (\CRM_Utils_Check::checkStatus($names, $this->includeDisabled) as $message) {
       $messages[] = $message->toArray();
     }
     return $messages;

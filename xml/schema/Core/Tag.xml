@@ -7,6 +7,7 @@
   <comment>Provides support for flat or hierarchical classification of various types of entities (contacts, groups, actions...).</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-tag</icon>
   <field>
     <name>id</name>
     <title>Tag ID</title>

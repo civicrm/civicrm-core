@@ -8,6 +8,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $allowedContactsACL = [];
 
+  private $loggedInUserId = NULL;
+
+  private $someContacts = [];
+
   /**
    * Set up for test.
    *
@@ -210,6 +214,35 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check for errors when viewing a contact's activity tab when there
+   * is an activity that doesn't have a target (With Contact).
+   */
+  public function testActivitySelectorNoTargets() {
+    $contact_id = $this->individualCreate([], 0, TRUE);
+    $activity = $this->callAPISuccess('activity', 'create', [
+      'source_contact_id' => $contact_id,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Lonely Meeting',
+      'details' => 'Here at this meeting all by myself and no other contacts.',
+    ]);
+    $input = [
+      '_raw_values' => [],
+      'offset' => 0,
+      'rp' => 25,
+      'page' => 1,
+      'context' => 'activity',
+      'contact_id' => $contact_id,
+    ];
+    $output = CRM_Activity_BAO_Activity::getContactActivitySelector($input);
+    $this->assertEquals($activity['id'], $output['data'][0]['DT_RowId']);
+    $this->assertEquals('<em>n/a</em>', $output['data'][0]['target_contact_name']);
+    $this->assertEquals('Lonely Meeting', $output['data'][0]['subject']);
+
+    $this->callAPISuccess('activity', 'delete', ['id' => $activity['id']]);
+    $this->callAPISuccess('contact', 'delete', ['id' => $contact_id]);
+  }
+
+  /**
    * Test case for deleteActivity() method.
    *
    * deleteActivity($params) method deletes activity for given params.
@@ -241,6 +274,24 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'id', 'contact_id',
       'Database check for created activity target.'
     );
+
+    $paramOptions = ['0))+and+0+--+-f', ['0))+and+0+--+-f']];
+    $paramField = ['source_record_id', 'activity_type_id'];
+    foreach ($paramField as $field) {
+      foreach ($paramOptions as $paramOption) {
+        $params = [
+          $field => $paramOption,
+        ];
+        try {
+          CRM_Activity_BAO_Activity::deleteActivity($params);
+        }
+        catch (Exception $e) {
+          if ($e->getMessage() === 'DB Error: syntax error') {
+            $this->fail('Delete Activity function did not validate field: ' . $field);
+          }
+        }
+      }
+    }
     $params = [
       'source_contact_id' => $contactId,
       'source_record_id' => $contactId,
@@ -258,9 +309,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for deleteActivityTarget() method.
-   *
-   * deleteActivityTarget($activityId) method deletes activity target for given activity id.
+   * Test case for deleteActivityContact() method.
    */
   public function testDeleteActivityTarget() {
     $contactId = $this->individualCreate();
@@ -445,13 +494,18 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'cid' => 9,
       'context' => 'activity',
       'activity_type_id' => 1,
-      'is_unit_test' => 1,
     ];
     $expectedFilters = [
       'activity_type_filter_id' => 1,
     ];
 
-    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $activityFilter = Civi::contactSettings()->get('activity_tab_filter');
+      $activities = $e->errorData;
+    }
     //Assert whether filters are correctly set.
     $this->checkArrayEquals($expectedFilters, $activityFilter);
     // This should include activities of type Meeting only.
@@ -461,7 +515,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     unset($_GET['activity_type_id']);
 
     $_GET['activity_type_exclude_id'] = $expectedFilters['activity_type_exclude_filter_id'] = 1;
-    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $activityFilter = Civi::contactSettings()->get('activity_tab_filter');
+      $activities = $e->errorData;
+    }
     $this->assertEquals(['activity_type_exclude_filter_id' => 1], $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
@@ -507,7 +567,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // with no contact ID and there should be 8 schedule activities shown on dashboard
     $count = 8;
     foreach ([$activitiesNew] as $activities) {
-      $this->assertEquals($count, count($activities));
+      $this->assertCount($count, $activities);
 
       foreach ($activities as $key => $value) {
         $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -519,10 +579,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
     $this->setShowCaseActivitiesInCore(TRUE);
     $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
-    $this->assertEquals(9, count($activitiesNew));
+    $this->assertCount(9, $activitiesNew);
     // Scan through to find the meeting.
-    $this->assertTrue(in_array('test meeting activity', array_column($activitiesNew, 'subject')),
-      "failed to find scheduled case Meeting activity");
+    $this->assertContains('test meeting activity', array_column($activitiesNew, 'subject'), "failed to find scheduled case Meeting activity");
     // Reset to default
     $this->setShowCaseActivitiesInCore(FALSE);
   }
@@ -535,7 +594,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->setUpForActivityDashboardTests();
     foreach ([CRM_Activity_BAO_Activity::getActivities($this->_params)] as $activities) {
       // Skipped until we get back to the upgraded version properly.
-      $this->assertEquals(0, count($activities));
+      $this->assertCount(0, $activities);
     }
   }
 
@@ -1140,9 +1199,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
 
     // create a logged in USER since the code references it for sendEmail user.
-    $this->createLoggedInUser();
-    $session = CRM_Core_Session::singleton();
-    $loggedInUser = $session->get('userID');
+    $loggedInUser = $this->createLoggedInUser();
 
     $contact = $this->civicrm_api('contact', 'getsingle', ['id' => $contactId, 'version' => $this->_apiversion]);
     $contactDetailsIntersectKeys = [
@@ -1597,7 +1654,670 @@ $text
   protected function setShowCaseActivitiesInCore(bool $val) {
     Civi::settings()->set('civicaseShowCaseActivities', $val ? 1 : 0);
     CRM_Core_Component::getEnabledComponents();
+    Civi::$statics['CRM_Core_Component']['info']['CiviCase'] = new CRM_Case_Info('CiviCase', 'CRM_Case', 7);
     Civi::$statics['CRM_Core_Component']['info']['CiviCase']->info['showActivitiesInCore'] = $val;
+  }
+
+  /**
+   * Test multiple variations of target and assignee contacts in create
+   * and edit mode.
+   *
+   * @dataProvider targetAndAssigneeProvider
+   * @param array $do_first
+   * @param array $do_second
+   */
+  public function testTargetAssigneeVariations(array $do_first, array $do_second) {
+    // Originally wanted to put this in setUp() but it broke other tests.
+    $this->loggedInUserId = $this->createLoggedInUser();
+    for ($i = 1; $i <= 4; $i++) {
+      $this->someContacts[$i] = $this->individualCreate([], $i - 1, TRUE);
+    }
+
+    $params = [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Meeting'),
+      'subject' => 'Test Meeting',
+      'source_contact_id' => $this->loggedInUserId,
+    ];
+
+    // Create an activity first if specified.
+    $activity = NULL;
+    if (!empty($do_first)) {
+      if (!empty($do_first['targets'])) {
+        // e.g. if it is [1], then pick $someContacts[1]. If it's [1,2], then
+        // pick $someContacts[1] and $someContacts[2].
+        $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['targets'])));
+      }
+      if (!empty($do_first['assignees'])) {
+        $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['assignees'])));
+      }
+
+      $activity = CRM_Activity_BAO_Activity::create($params);
+      $this->assertNotEmpty($activity->id);
+
+      $params['id'] = $activity->id;
+    }
+
+    // Now do the second one, which will either create or update depending what
+    // we did first.
+    $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['targets'])));
+    $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['assignees'])));
+    $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // Check targets
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
+    ];
+    $this->assertEquals($params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Check assignees
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
+    ];
+    $this->assertEquals($params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Clean up
+    foreach ($this->someContacts as $cid) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $cid]);
+    }
+  }
+
+  /**
+   * Same as testTargetAssigneeVariations but passes the target/assignee
+   * in as a scalar when there's only one of them.
+   *
+   * @dataProvider targetAndAssigneeProvider
+   * @param array $do_first
+   * @param array $do_second
+   */
+  public function testTargetAssigneeVariationsWithScalars(array $do_first, array $do_second) {
+    // Originally wanted to put this in setUp() but it broke other tests.
+    $this->loggedInUserId = $this->createLoggedInUser();
+    for ($i = 1; $i <= 4; $i++) {
+      $this->someContacts[$i] = $this->individualCreate([], $i - 1, TRUE);
+    }
+
+    $params = [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Meeting'),
+      'subject' => 'Test Meeting',
+      'source_contact_id' => $this->loggedInUserId,
+    ];
+
+    // Create an activity first if specified.
+    $activity = NULL;
+    if (!empty($do_first)) {
+      if (!empty($do_first['targets'])) {
+        // e.g. if it is [1], then pick $someContacts[1]. If it's [1,2], then
+        // pick $someContacts[1] and $someContacts[2].
+        $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['targets'])));
+        if (count($params['target_contact_id']) == 1) {
+          $params['target_contact_id'] = $params['target_contact_id'][0];
+        }
+      }
+      if (!empty($do_first['assignees'])) {
+        $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['assignees'])));
+        if (count($params['assignee_contact_id']) == 1) {
+          $params['assignee_contact_id'] = $params['assignee_contact_id'][0];
+        }
+      }
+
+      $activity = CRM_Activity_BAO_Activity::create($params);
+      $this->assertNotEmpty($activity->id);
+
+      $params['id'] = $activity->id;
+    }
+
+    // Now do the second one, which will either create or update depending what
+    // we did first.
+    $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['targets'])));
+    if (count($params['target_contact_id']) == 1) {
+      $params['target_contact_id'] = $params['target_contact_id'][0];
+    }
+    $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['assignees'])));
+    if (count($params['assignee_contact_id']) == 1) {
+      $params['assignee_contact_id'] = $params['assignee_contact_id'][0];
+    }
+    $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // Check targets
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
+    ];
+    $this->assertEquals((array) $params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Check assignees
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
+    ];
+    $this->assertEquals((array) $params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Clean up
+    foreach ($this->someContacts as $cid) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $cid]);
+    }
+  }
+
+  /**
+   * Dataprovider for testTargetAssigneeVariations
+   * @return array
+   */
+  public function targetAndAssigneeProvider():array {
+    return [
+      // Explicit index so that it's easy to see which one has failed without
+      // having to finger count.
+      0 => [
+        'do first' => [
+          // Completely empty array means don't create any activity first,
+          // as opposed to the ones we do later where "do first" has member
+          // elements but those are empty, which means create an activity first
+          // but with no contacts.
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      1 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      2 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      3 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      4 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      5 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      6 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      7 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      // The next sets test the same thing again but updating an activity
+      // that has no contacts
+      8 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      9 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      10 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      11 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      12 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      13 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      14 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      15 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      // And again but updating an activity with 1 contact
+      16 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      17 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      18 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      19 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      20 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      21 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      22 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      23 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      24 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          // a little different variation where we're changing the target as
+          // opposed to adding one or deleting
+          'targets' => [2],
+          'assignees' => [],
+        ],
+      ],
+      // And again but updating an activity with 2 contacts
+      25 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      26 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      27 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      28 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      29 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      30 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      31 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      32 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      33 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [2],
+          'assignees' => [],
+        ],
+      ],
+      // And again but now start with assignees
+      34 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      35 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      36 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      37 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      38 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      39 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      40 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      41 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      42 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [4],
+        ],
+      ],
+      // And again but now start with 2 assignees
+      43 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      44 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      45 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      46 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      47 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      48 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      49 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      50 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      51 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [4],
+        ],
+      ],
+    ];
   }
 
 }

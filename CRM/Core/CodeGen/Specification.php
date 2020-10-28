@@ -192,6 +192,7 @@ class CRM_Core_CodeGen_Specification {
     $sourceFile = "xml/schema/{$base}/{$klass}.xml";
     $daoPath = "{$base}/DAO/";
     $baoPath = __DIR__ . '/../../../' . str_replace(' ', '', "{$base}/BAO/");
+    $useBao = $this->value('useBao', $tableXML, file_exists($baoPath . $klass . '.php'));
     $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
 
@@ -203,15 +204,20 @@ class CRM_Core_CodeGen_Specification {
       }
     }
 
+    $titleFromClass = preg_replace('/([a-z])([A-Z])/', '$1 $2', $klass);
     $table = [
       'name' => $name,
       'base' => $daoPath,
       'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
+      'title' => $tableXML->title ?? $titleFromClass,
+      'titlePlural' => $tableXML->titlePlural ?? CRM_Utils_String::pluralize($tableXML->title ?? $titleFromClass),
+      'icon' => $tableXML->icon ?? NULL,
+      'add' => $tableXML->add ?? NULL,
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
-      'bao' => (file_exists($baoPath . $klass . '.php') ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
+      'bao' => ($useBao ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
       'entity' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
@@ -339,7 +345,7 @@ class CRM_Core_CodeGen_Specification {
       default:
         $field['phpType'] = $this->value('phpType', $fieldXML, $type);
         $field['sqlType'] = $type;
-        if ($type == 'int unsigned') {
+        if ($type == 'int unsigned' || $type == 'tinyint') {
           $field['phpType'] = 'int';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
@@ -418,6 +424,7 @@ class CRM_Core_CodeGen_Specification {
     if (isset($fieldXML->localize_context)) {
       $field['localize_context'] = $fieldXML->localize_context;
     }
+    $field['add'] = $this->value('add', $fieldXML);
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach

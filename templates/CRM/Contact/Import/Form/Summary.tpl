@@ -75,7 +75,7 @@
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields (for example, invalid email address formatting). These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
-                <div class="action-link"><a href="{$downloadErrorRecordsUrl}">&raquo; {ts}Download Errors{/ts}</a></div>
+                <div class="action-link"><a href="{$downloadErrorRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Errors{/ts}</a></div>
             {/if}
         </td>
     </tr>
@@ -86,7 +86,7 @@
         <td class="data">{$unMatchCount}</td>
         <td class="explanation">{ts}Rows with mismatched contact IDs... (NOT updated).{/ts}
             {if $unMatchCount}
-                <<div class="action-link"><a href="{$downloadMismatchRecordsUrl}">&raquo; {ts}Download Mismatched Contacts{/ts}</a></div>
+                <<div class="action-link"><a href="{$downloadMismatchRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Mismatched Contacts{/ts}</a></div>
             {/if}
         </td>
     </tr>
@@ -97,7 +97,7 @@
         <td class="data">{$conflictRowCount}</td>
         <td class="explanation">{ts}Rows with conflicting email addresses (NOT imported).{/ts}
             {if $conflictRowCount}
-                <div class="action-link"><a href="{$downloadConflictRecordsUrl}">&raquo; {ts}Download Conflicts{/ts}</a></div>
+                <div class="action-link"><a href="{$downloadConflictRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Conflicts{/ts}</a></div>
             {/if}
         </td>
     </tr>
@@ -108,7 +108,7 @@
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM contact records.{/ts} {$dupeActionString}
             {if $duplicateRowCount}
-                <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}">&raquo; {ts}Download Duplicates{/ts}</a></div>
+                <div class="action-link"><a href="{$downloadDuplicateRecordsUrl}"><i class="crm-i fa-download" aria-hidden="true"></i> {ts}Download Duplicates{/ts}</a></div>
             {/if}
         </td>
     </tr>
@@ -151,4 +151,3 @@
 
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-

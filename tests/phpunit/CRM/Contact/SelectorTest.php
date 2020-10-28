@@ -32,7 +32,14 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSelectorQuery($dataSet) {
+    if (!empty($dataSet['limitedPermissions'])) {
+      CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+        'access CiviCRM',
+        'access deleted contacts',
+      ];
+    }
     $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
+    $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params);
     foreach ($dataSet['settings'] as $setting) {
       $this->callAPISuccess('Setting', 'create', [$setting['name'] => $setting['value']]);
     }
@@ -49,30 +56,30 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     $queryObject = $selector->getQueryObject();
     // Make sure there is no fail on alphabet query.
     $selector->alphabetQuery()->fetchAll();
-    $sql = $queryObject->query();
+    $sql = $queryObject->query(FALSE, FALSE, FALSE, $isDeleted);
     $this->wrangleDefaultClauses($dataSet['expected_query']);
     foreach ($dataSet['expected_query'] as $index => $queryString) {
       $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
     // Ensure that search builder return individual contact as per criteria
-    if ($dataSet['context'] == 'builder') {
+    if ($dataSet['context'] === 'builder') {
       $contactID = $this->individualCreate(['first_name' => 'James', 'last_name' => 'Bond']);
-      if ('Search builder behaviour for Activity' == $dataSet['description']) {
+      if ('Search builder behaviour for Activity' === $dataSet['description']) {
         $this->callAPISuccess('Activity', 'create', [
           'activity_type_id' => 'Meeting',
-          'subject' => "Test",
+          'subject' => 'Test',
           'source_contact_id' => $contactID,
         ]);
         $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
-        $this->assertEquals(1, count($rows));
+        $this->assertCount(1, $rows);
         $this->assertEquals($contactID, $rows[0]['source_contact_id']);
       }
       else {
         $this->callAPISuccess('Address', 'create', [
           'contact_id' => $contactID,
-          'location_type_id' => "Home",
+          'location_type_id' => 'Home',
           'is_primary' => 1,
-          'country_id' => "IN",
+          'country_id' => 'IN',
         ]);
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
         $this->assertEquals(1, count($rows));
@@ -88,6 +95,9 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
         CRM_Core_DAO::reenableFullGroupByMode();
         $selector->getQueryObject()->getCachedContacts([$contactID], FALSE);
       }
+    }
+    if (!empty($dataSet['limitedPermissions'])) {
+      $this->cleanUpAfterACLs();
     }
   }
 
@@ -297,6 +307,45 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       ],
       [
         [
+          'description' => 'Site set to not pre-pend wildcard and check that trash value is respected',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => [['name' => 'includeWildCardInName', 'value' => FALSE]],
+          'form_values' => ['email' => 'mickey@mouseville.com', 'sort_name' => 'Mouse', 'deleted_contacts' => 1],
+          'params' => [],
+          'return_properties' => NULL,
+          'context' => 'advanced',
+          'action' => CRM_Core_Action::ADVANCED,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+          'expected_query' => [
+            0 => 'default',
+            1 => 'default',
+            2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND (contact_a.is_deleted)",
+          ],
+        ],
+      ],
+      [
+        [
+          'description' => 'Ensure that the Join to the acl contact cache is correct and that if we are searching in deleted contacts appropriate where clause is added',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => [['name' => 'includeWildCardInName', 'value' => FALSE]],
+          'form_values' => ['email' => 'mickey@mouseville.com', 'sort_name' => 'Mouse', 'deleted_contacts' => 1],
+          'params' => [],
+          'return_properties' => NULL,
+          'context' => 'advanced',
+          'action' => CRM_Core_Action::ADVANCED,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+          'limitedPermissions' => TRUE,
+          'expected_query' => [
+            0 => 'default',
+            1 => 'FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1) LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1) LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id INNER JOIN civicrm_acl_contact_cache aclContactCache ON contact_a.id = aclContactCache.contact_id',
+            2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND  aclContactCache.user_id = 0 AND (contact_a.is_deleted)",
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Use of quotes for exact string',
           'use_case_comments' => 'This is something that was in the code but seemingly not working. No UI info on it though!',
           'class' => 'CRM_Contact_Selector',
@@ -404,7 +453,7 @@ AND (contact_a.is_deleted = 0)',
    */
   public function testSelectorQueryOnNonASCIIlocationType() {
     $contactID = $this->individualCreate();
-    $locationType = $this->locationTypeCreate([
+    $locationTypeID = $this->locationTypeCreate([
       'name' => 'Non ASCII Location Type',
       'display_name' => 'Дом Location type',
       'vcard_name' => 'Non ASCII Location Type',
@@ -412,7 +461,7 @@ AND (contact_a.is_deleted = 0)',
     ]);
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $contactID,
-      'location_type_id' => $locationType->id,
+      'location_type_id' => $locationTypeID,
       'email' => 'test@test.com',
     ]);
 
@@ -421,7 +470,7 @@ AND (contact_a.is_deleted = 0)',
       ['email' => ['IS NOT NULL' => 1]],
       [
         [
-          0 => 'email-' . $locationType->id,
+          0 => 'email-' . $locationTypeID,
           1 => 'IS NOT NULL',
           2 => NULL,
           3 => 1,
@@ -434,7 +483,7 @@ AND (contact_a.is_deleted = 0)',
         'sort_name' => 1,
         'location' => [
           'Non ASCII Location Type' => [
-            'location_type' => $locationType->id,
+            'location_type' => $locationTypeID,
             'email' => 1,
           ],
         ],

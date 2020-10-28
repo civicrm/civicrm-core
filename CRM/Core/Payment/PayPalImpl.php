@@ -43,19 +43,25 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   public function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
+  }
 
-    if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
-      $this->_processorName = ts('PayPal Standard');
-    }
-    elseif ($this->isPayPalType($this::PAYPAL_EXPRESS)) {
-      $this->_processorName = ts('PayPal Express');
-    }
-    elseif ($this->isPayPalType($this::PAYPAL_PRO)) {
-      $this->_processorName = ts('PayPal Pro');
-    }
-    else {
-      throw new PaymentProcessorException('CRM_Core_Payment_PayPalImpl: Payment processor type is not defined!');
-    }
+  /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
   }
 
   /**
@@ -173,12 +179,22 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $form->_expressButtonName = $form->getButtonName('upload', 'express');
       }
       $form->assign('expressButtonName', $form->_expressButtonName);
-      $form->add(
-        'image',
-        $form->_expressButtonName,
-        $this->_paymentProcessor['url_button'],
-        ['class' => 'crm-form-submit']
-      );
+      $form->add('xbutton', $form->_expressButtonName, ts('Pay using PayPal'), [
+        'type' => 'submit',
+        'formnovalidate' => 'formnovalidate',
+        'class' => 'crm-form-submit',
+      ]);
+      CRM_Core_Resources::singleton()->addStyle('
+        button#' . $form->_expressButtonName . '{
+         background-image: url(' . $this->_paymentProcessor['url_button'] . ');
+         color: transparent;
+         background-repeat: no-repeat;
+         background-color: transparent;
+         background-position: center;
+         min-width: 150px;
+         min-height: 50px;
+         border: none;
+       ');
     }
   }
 
@@ -352,7 +368,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     /* Success */
     $params['trxn_id'] = $result['transactionid'];
-    $params['gross_amount'] = $result['amt'];
     $params['fee_amount'] = $result['feeamt'];
     $params['net_amount'] = $result['settleamt'] ?? NULL;
     if ($params['net_amount'] == 0 && $params['fee_amount'] != 0) {
@@ -629,16 +644,23 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
-   * @return null|string
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * Get url for users to manage this recurring contribution for this processor.
+   *
+   * @param int $entityID
+   * @param null $entity
+   * @param string $action
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
    */
-  public function cancelSubscriptionURL() {
+  public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
+      if ($action !== 'cancel') {
+        return NULL;
+      }
       return "{$this->_paymentProcessor['url_site']}cgi-bin/webscr?cmd=_subscr-find&alias=" . urlencode($this->_paymentProcessor['user_name']);
     }
-    else {
-      return NULL;
-    }
+    return parent::subscriptionURL($entityID, $entity, $action);
   }
 
   /**
@@ -703,7 +725,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function handlePaymentNotification() {
+  public function handlePaymentNotification() {
     $params = array_merge($_GET, $_REQUEST);
     $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
     $lastParam = array_pop($q);
@@ -929,7 +951,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // if recurring donations, add a few more items
     if (!empty($params['is_recur'])) {
       if (!$params['contributionRecurID']) {
-        CRM_Core_Error::fatal(ts('Recurring contribution, but no database id'));
+        throw new CRM_Core_Exception(ts('Recurring contribution, but no database id'));
       }
 
       $paypalParams += [
@@ -975,6 +997,9 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $sub = empty($params['is_recur']) ? 'cgi-bin/webscr' : 'subscriptions';
     $paypalURL = "{$url}{$sub}?$uri";
 
+    // Allow each CMS to do a pre-flight check before redirecting to PayPal.
+    CRM_Core_Config::singleton()->userSystem->prePostRedirect();
+
     CRM_Utils_System::redirect($paypalURL);
   }
 
@@ -1010,35 +1035,19 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       throw new PaymentProcessorException('curl functions NOT available.');
     }
 
-    //setting the curl parameters.
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_VERBOSE, 0);
+    $response = (string) $this->getGuzzleClient()->post($url, [
+      'body' => $nvpreq,
+      'curl' => [
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+      ],
+    ])->getBody();
 
-    //turning off the server and peer verification(TrustManager Concept).
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
-
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-
-    //setting the nvpreq as POST FIELD to curl
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
-
-    //getting response from server
-    $response = curl_exec($ch);
-
-    //converting NVPResponse to an Associative Array
     $result = self::deformat($response);
 
-    if (curl_errno($ch)) {
-      throw new PaymentProcessorException(ts('Network error') . ' ' . curl_error($ch) . curl_errno($ch), curl_errno($ch));
-    }
-    curl_close($ch);
+    $outcome = strtolower($result['ack'] ?? '');
 
-    $outcome = strtolower(CRM_Utils_Array::value('ack', $result));
-
-    if ($outcome != 'success' && $outcome != 'successwithwarning') {
+    if ($outcome !== 'success' && $outcome !== 'successwithwarning') {
       throw new PaymentProcessorException("{$result['l_shortmessage0']} {$result['l_longmessage0']}");
     }
 
@@ -1122,7 +1131,6 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if ($this->isPayPalType($this::PAYPAL_EXPRESS)) {
       return TRUE;
     }
-
     // This would occur postProcess.
     if (!empty($params['token'])) {
       return TRUE;
@@ -1134,8 +1142,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // The contribution form passes a 'button' but the event form might still set one of these fields.
     // @todo more standardisation & get paypal fully out of the form layer.
     $possibleExpressFields = [
+      // @todo - we think these top 2 are likely not required & it's still here
+      // on a precautionary basis.
+      // see https://github.com/civicrm/civicrm-core/pull/18680
       '_qf_Register_upload_express_x',
       '_qf_Payment_upload_express_x',
+      '_qf_Register_upload_express',
+      '_qf_Payment_upload_express',
+      '_qf_Main_upload_express',
     ];
     if (array_intersect_key($params, array_fill_keys($possibleExpressFields, 1))) {
       return TRUE;

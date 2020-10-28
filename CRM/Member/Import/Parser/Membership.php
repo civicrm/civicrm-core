@@ -125,7 +125,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    */
   public function summary(&$values) {
     $erroneousField = NULL;
-    $response = $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values, $erroneousField);
 
     $errorRequired = FALSE;
 
@@ -268,7 +268,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       }
 
       $session = CRM_Core_Session::singleton();
-      $dateType = $session->get('dateTypes');
+      $dateType = CRM_Core_Session::singleton()->get('dateTypes');
       $formatted = [];
       $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
       $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
@@ -308,9 +308,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               $params[$key] = $this->parsePseudoConstantField($val, $this->fieldMetadata[$key]);
               break;
 
-            case 'member_is_override':
-              $params[$key] = CRM_Utils_String::strtobool($val);
-              break;
           }
           if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
             if ($customFields[$customFieldID]['data_type'] == 'Date') {
@@ -371,20 +368,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               CRM_Price_BAO_LineItem::getLineItemArray($formatted, NULL, 'membership', $formatted['membership_type_id']);
             }
 
-            // @todo stop passing $ids array (and put details in $formatted if required)
-            $ids = [
-              'membership' => $formatValues['membership_id'],
-              'userId' => $session->get('userID'),
-            ];
-            $newMembership = CRM_Member_BAO_Membership::create($formatted, $ids, TRUE);
-            if (civicrm_error($newMembership)) {
-              array_unshift($values, $newMembership['is_error'] . ' for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
-              return CRM_Import_Parser::ERROR;
-            }
-            else {
-              $this->_newMemberships[] = $newMembership->id;
-              return CRM_Import_Parser::VALID;
-            }
+            $newMembership = civicrm_api3('Membership', 'create', $formatted);
+            $this->_newMemberships[] = $newMembership['id'];
+            return CRM_Import_Parser::VALID;
           }
           else {
             array_unshift($values, 'Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.');
@@ -428,7 +414,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
               $endDate,
               $joinDate,
-              'today',
+              'now',
               $excludeIsAdmin,
               $formatted['membership_type_id'],
               $formatted
@@ -518,7 +504,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
           $endDate,
           $joinDate,
-          'today',
+          'now',
           $excludeIsAdmin,
           $formatted['membership_type_id'],
           $formatted
@@ -631,24 +617,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $values[$key] = $value;
         $type = $customFields[$customFieldID]['html_type'];
         if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-          $mulValues = explode(',', $value);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $customValueID => $customLabel) {
-              $customValue = $customLabel['value'];
-              if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))
-              ) {
-                if ($type == 'CheckBox') {
-                  $values[$key][$customValue] = 1;
-                }
-                else {
-                  $values[$key][] = $customValue;
-                }
-              }
-            }
-          }
+          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
         }
       }
 

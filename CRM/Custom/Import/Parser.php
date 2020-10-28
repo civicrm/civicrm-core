@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
 
@@ -68,7 +66,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
     $onDuplicate = self::DUPLICATE_SKIP
   ) {
     if (!is_array($fileName)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Unable to determine import file');
     }
     $fileName = $fileName['name'];
 
@@ -314,7 +312,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   public function set($store, $mode = self::MODE_SUMMARY) {
     $store->set('fileSize', $this->_fileSize);
     $store->set('lineCount', $this->_lineCount);
-    $store->set('seperator', $this->_separator);
+    $store->set('separator', $this->_separator);
     $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 

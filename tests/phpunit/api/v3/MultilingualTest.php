@@ -101,6 +101,8 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     ];
     // deprecated or API.Get is not supported/implemented
     $skippableEntities = [
+      'Cxn',
+      'CxnApp',
       'Logging',
       'MailingEventConfirm',
       'MailingEventResubscribe',

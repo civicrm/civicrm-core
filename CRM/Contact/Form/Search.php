@@ -429,11 +429,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
         $this->assign('ssID', $ssID);
 
-        //get the saved search mapping id
+        //get the saved search edit link
         if ($ssID) {
           $this->_ssID = $ssID;
-          $ssMappingId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $ssID, 'mapping_id');
-          $this->assign('ssMappingID', $ssMappingId);
+          $this->assign('editSmartGroupURL', CRM_Contact_BAO_SavedSearch::getEditSearchUrl($ssID));
         }
 
         // Set dynamic page title for 'Show Members of Group'
@@ -450,6 +449,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         'group_contact_status', ts('Group Status')
       );
 
+      $this->assign('permissionEditSmartGroup', CRM_Core_Permission::check('edit groups'));
       $this->assign('permissionedForGroup', $permissionForGroup);
     }
 
@@ -468,8 +468,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       // also set the group title and freeze the action task with Add Members to Group
       $groupValues = ['id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]];
       $this->assign_by_ref('group', $groupValues);
-      $this->add('submit', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
+      $this->add('xbutton', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
         [
+          'type' => 'submit',
           'class' => 'crm-form-submit',
         ]
       );
@@ -528,6 +529,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS, $_REQUEST);
     $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND, 'REQUEST');
+
+    if (!empty($this->_ssID) && !CRM_Core_Permission::check('edit groups')) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to modify smart groups'));
+    }
 
     /**
      * set the button names

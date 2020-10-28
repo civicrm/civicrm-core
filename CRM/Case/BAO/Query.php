@@ -100,9 +100,9 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['case_relation_type'] = $query->_whereTables['case_relation_type'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_recent_activity_date'])) {
-      $query->_select['case_recent_activity_date'] = "case_activity.activity_date_time as case_recent_activity_date";
-      $query->_element['case_recent_activity_date'] = 1;
+    if (!empty($query->_returnProperties['case_activity_date_time'])) {
+      $query->_select['case_activity_date_time'] = "case_activity.activity_date_time as case_activity_date_time";
+      $query->_element['case_activity_date_time'] = 1;
       $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
     }
 
@@ -121,6 +121,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
+    // @todo switch to a more standard case_source_contact as the key where we want the name not the id.
     if (!empty($query->_returnProperties['case_source_contact_id'])) {
       $query->_select['case_source_contact_id'] = "civicrm_case_reporter.sort_name as case_source_contact_id";
       $query->_element['case_source_contact_id'] = 1;
@@ -134,7 +135,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       $query->_select['case_activity_status_id'] = "rec_activity_status.id as case_activity_status_id";
       $query->_element['case_activity_status_id'] = 1;
       $query->_tables['case_activity'] = 1;
-      $query->_tables['recent_activity_status'] = 1;
+      $query->_tables['case_activity_status'] = 1;
       $query->_tables['civicrm_case_contact'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
@@ -143,7 +144,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       $query->_select['case_activity_status'] = "rec_activity_status.label as case_activity_status";
       $query->_element['case_activity_status'] = 1;
       $query->_tables['case_activity'] = 1;
-      $query->_tables['recent_activity_status'] = 1;
+      $query->_tables['case_activity_status'] = 1;
       $query->_tables['civicrm_case_contact'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
@@ -157,7 +158,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
     }
 
     if (!empty($query->_returnProperties['case_activity_medium_id'])) {
-      $query->_select['case_activity_medium_id'] = "recent_activity_medium.label as case_activity_medium_id";
+      $query->_select['case_activity_medium_id'] = "case_activity_medium.label as case_activity_medium_id";
       $query->_element['case_activity_medium_id'] = 1;
       $query->_tables['case_activity'] = 1;
       $query->_tables['case_activity_medium'] = 1;
@@ -181,16 +182,16 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_scheduled_activity_date'])) {
-      $query->_select['case_scheduled_activity_date'] = "case_activity.activity_date_time as case_scheduled_activity_date";
-      $query->_element['case_scheduled_activity_date'] = 1;
+    if (!empty($query->_returnProperties['case_activity_date_time'])) {
+      $query->_select['case_activity_date_time'] = "case_activity.activity_date_time as case_activity_date_time";
+      $query->_element['case_activity_date_time'] = 1;
       $query->_tables['case_activity'] = 1;
       $query->_tables['civicrm_case_contact'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
-    if (!empty($query->_returnProperties['case_recent_activity_type'])) {
-      $query->_select['case_recent_activity_type'] = "rec_activity_type.label as case_recent_activity_type";
-      $query->_element['case_recent_activity_type'] = 1;
+    if (!empty($query->_returnProperties['case_activity_type'])) {
+      $query->_select['case_activity_type'] = "rec_activity_type.label as case_activity_type";
+      $query->_element['case_activity_type'] = 1;
       $query->_tables['case_activity'] = 1;
       $query->_tables['case_activity_type'] = 1;
       $query->_tables['civicrm_case_contact'] = 1;
@@ -320,6 +321,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         $query->handleWhereFromMetadata($fieldSpec, $name, $value, $op);
         return;
 
+      // @todo switch to a more standard case_source_contact as the key where we want the name not the id.
       case 'case_source_contact_id':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case_reporter.sort_name", $op, $value, 'String');
         $query->_qill[$grouping][] = ts("Activity Reporter %1 '%2'", [1 => $op, 2 => $value]);
@@ -329,31 +331,19 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
         return;
 
-      case 'case_recent_activity_date':
+      case 'case_activity_date_time':
         $date = CRM_Utils_Date::format($value);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_activity.activity_date_time", $op, $date, 'Date');
         if ($date) {
           $date = CRM_Utils_Date::customFormat($date);
-          $query->_qill[$grouping][] = ts("Activity Actual Date %1 %2", [1 => $op, 2 => $date]);
+          $query->_qill[$grouping][] = ts("Activity Date %1 %2", [1 => $op, 2 => $date]);
         }
         $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
         return;
 
-      case 'case_scheduled_activity_date':
-        $date = CRM_Utils_Date::format($value);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_activity.activity_date_time", $op, $date, 'Date');
-        if ($date) {
-          $date = CRM_Utils_Date::customFormat($date);
-          $query->_qill[$grouping][] = ts("Activity Schedule Date %1 %2", [1 => $op, 2 => $date]);
-        }
-        $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
-        $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
-        $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
-        return;
-
-      case 'case_recent_activity_type':
+      case 'case_activity_type':
         $names = $value;
         if (($activityType = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $value)) != FALSE) {
           $names = $activityType;
@@ -374,7 +364,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         }
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("case_activity.status_id", $op, $value, 'Int');
-        $query->_qill[$grouping][] = ts("Activity Type %1 %2", [1 => $op, 2 => $names]);
+        $query->_qill[$grouping][] = ts("Activity Status %1 %2", [1 => $op, 2 => $names]);
         $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         $query->_tables['case_activity_status'] = 1;
@@ -537,7 +527,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         $from .= " $side JOIN civicrm_option_value rec_activity_type ON (case_activity.activity_type_id = rec_activity_type.value AND option_group_activity_type.id = rec_activity_type.option_group_id ) ";
         break;
 
-      case 'recent_activity_status':
+      case 'case_activity_status':
         $from .= " $side JOIN civicrm_option_group option_group_activity_status ON (option_group_activity_status.name = 'activity_status')";
         $from .= " $side JOIN civicrm_option_value rec_activity_status ON (case_activity.status_id = rec_activity_status.value AND option_group_activity_status.id = rec_activity_status.option_group_id ) ";
         break;
@@ -555,7 +545,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
 
       case 'case_activity_medium':
         $from .= " $side JOIN civicrm_option_group option_group_activity_medium ON (option_group_activity_medium.name = 'encounter_medium')";
-        $from .= " $side JOIN civicrm_option_value recent_activity_medium ON (case_activity.medium_id = recent_activity_medium.value AND option_group_activity_medium.id = recent_activity_medium.option_group_id ) ";
+        $from .= " $side JOIN civicrm_option_value case_activity_medium ON (case_activity.medium_id = case_activity_medium.value AND option_group_activity_medium.id = case_activity_medium.option_group_id ) ";
         break;
 
       case 'case_activity':
@@ -607,11 +597,9 @@ case_relation_type.id = case_relationship.relationship_type_id )";
         'case_type' => 1,
         'case_role' => 1,
         'case_deleted' => 1,
-        'case_recent_activity_date' => 1,
-        'case_recent_activity_type' => 1,
-        'case_scheduled_activity_date' => 1,
+        'case_activity_date_time' => 1,
+        'case_activity_type' => 1,
         'phone' => 1,
-        // 'case_scheduled_activity_type'=>      1
       ];
 
       if ($includeCustomFields) {
@@ -643,6 +631,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
         'case_start_date' => 1,
         'case_end_date' => 1,
         'case_subject' => 1,
+        // @todo switch to a more standard case_source_contact as the key where we want the name not the id.
         'case_source_contact_id' => 1,
         'case_activity_status' => 1,
         'case_activity_duration' => 1,

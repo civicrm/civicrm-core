@@ -28,9 +28,9 @@
     </div>
     {if $action eq 16 and $permission EQ 'edit'}
        <div class="action-link">
-           <a accesskey="N" href="{$newEventURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Event Registration{/ts}</span></a>
+           <a accesskey="N" href="{$newEventURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Event Registration{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Event Registration{/ts}</a></span>
+                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Event Registration{/ts}</a></span>
             {/if}
             <br/ ><br/ >
        </div>
@@ -43,7 +43,7 @@
     {else}
        <div class="messages status no-popup">
            <table class="form-layout">
-             <tr><div class="icon inform-icon"></div>
+             <tr>{icon icon="fa-info-circle"}{/icon}
                    {ts}No event registrations have been recorded for this contact.{/ts}
              </tr>
            </table>

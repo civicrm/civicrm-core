@@ -12,8 +12,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2020
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  * Settings metadata file
  */
 
@@ -41,17 +40,8 @@ return [
     'group' => 'contribute',
     'name' => 'contribution_invoice_settings',
     'type' => 'Array',
-    'default' => [
-      'invoice_prefix' => 'INV_',
-      'credit_notes_prefix' => 'CN_',
-      'due_date' => '10',
-      'due_date_period' => 'days',
-      'notes' => '',
-      'tax_term' => 'Sales Tax',
-      'tax_display_settings' => 'Inclusive',
-    ],
     'add' => '4.7',
-    'title' => ts('Deprecated setting'),
+    'title' => ts('Deprecated, virtualized setting'),
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
@@ -74,6 +64,7 @@ return [
     'settings_pages' => ['contribute' => ['weight' => 90]],
   ],
   'invoice_prefix' => [
+    'default' => 'INV_',
     'html_type' => 'text',
     'name' => 'invoice_prefix',
     'add' => '5.23',
@@ -84,6 +75,7 @@ return [
     'is_contact' => 0,
   ],
   'invoice_due_date' => [
+    'default' => '10',
     'name' => 'invoice_due_date',
     'html_type' => 'text',
     'title' => ts('Due Date'),
@@ -93,6 +85,7 @@ return [
     'is_contact' => 0,
   ],
   'invoice_due_date_period' => [
+    'default' => 'days',
     'html_type' => 'select',
     'name' => 'invoice_due_date_period',
     'title' => ts('For transmission'),
@@ -110,6 +103,7 @@ return [
     ],
   ],
   'invoice_notes' => [
+    'default' => '',
     'name' => 'invoice_notes',
     'html_type' => 'wysiwyg',
     'title' => ts('Notes or Standard Terms'),
@@ -131,6 +125,7 @@ return [
     'description' => ts('Should a pdf invoice be emailed automatically?'),
   ],
   'tax_term' => [
+    'default' => 'Sales Tax',
     'name' => 'tax_term',
     'html_type' => 'text',
     'add' => '5.23',
@@ -140,6 +135,7 @@ return [
     'is_contact' => 0,
   ],
   'tax_display_settings' => [
+    'default' => 'Inclusive',
     'html_type' => 'select',
     'name' => 'tax_display_settings',
     'type' => CRM_Utils_Type::T_STRING,

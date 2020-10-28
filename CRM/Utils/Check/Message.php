@@ -251,22 +251,20 @@ class CRM_Utils_Check_Message {
     if ($this->level < 2) {
       return FALSE;
     }
-    $statusPreferenceParams = [
-      'name' => $this->getName(),
-      'domain_id' => CRM_Core_Config::domainID(),
-      'sequential' => 1,
+    $where = [
+      ['name', '=', $this->getName()],
+      ['domain_id', '=', CRM_Core_Config::domainID()],
     ];
     // Check if there's a StatusPreference matching this name/domain.
-    $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    $prefs = CRM_Utils_Array::value('values', $statusPreference, []);
-    if ($prefs) {
+    $pref = civicrm_api4('StatusPreference', 'get', ['checkPermissions' => FALSE, 'where' => $where])->first();
+    if ($pref) {
       // If so, compare severity to StatusPreference->severity.
-      if ($this->level <= $prefs[0]['ignore_severity']) {
-        if (isset($prefs[0]['hush_until'])) {
+      if ($this->level <= $pref['ignore_severity']) {
+        if (isset($pref['hush_until'])) {
           // Time-based hush.
-          $this->hiddenUntil = $prefs[0]['hush_until'];
+          $this->hiddenUntil = $pref['hush_until'];
           $today = new DateTime();
-          $snoozeDate = new DateTime($prefs[0]['hush_until']);
+          $snoozeDate = new DateTime($pref['hush_until']);
           return !($today > $snoozeDate);
         }
         else {

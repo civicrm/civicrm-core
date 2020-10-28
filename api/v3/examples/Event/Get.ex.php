@@ -50,7 +50,6 @@ function event_get_expectedresult() {
         'event_title' => 'Annual CiviCRM meet',
         'event_description' => '',
         'event_type_id' => '1',
-        'participant_listing_id' => 0,
         'is_public' => '1',
         'start_date' => '2013-07-29 00:00:00',
         'event_start_date' => '2013-07-29 00:00:00',

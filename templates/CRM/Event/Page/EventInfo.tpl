@@ -12,7 +12,7 @@
 {if $registerClosed }
 <div class="spacer"></div>
 <div class="messages status no-popup">
-  <i class="crm-i fa-info-circle"></i>
+  <i class="crm-i fa-info-circle" aria-hidden="true"></i>
      &nbsp;{ts}Registration is closed for this event{/ts}
   </div>
 {/if}
@@ -23,7 +23,7 @@
   <li>
     <div id="crm-event-links-wrapper">
       <span id="crm-event-configure-link" class="crm-hover-button">
-        <span title="{ts}Configure this event.{/ts}" class="crm-i fa-wrench"></span>
+        <span title="{ts}Configure this event.{/ts}" class="crm-i fa-wrench" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-event-links-list" style="margin-left: -25px;">
         <div class="crm-event-links-list-inner">
@@ -47,7 +47,7 @@
   <li>
     <div id="crm-participant-wrapper">
       <span id="crm-participant-links" class="crm-hover-button">
-        <span title="{ts}Participant listing links.{/ts}" class="crm-i fa-search"></span>
+        <span title="{ts}Participant listing links.{/ts}" class="crm-i fa-search" aria-hidden="true"></span>
       </span>
       <div class="ac_results" id="crm-participant-list" style="margin-left: -25px;">
         <div class="crm-participant-list-inner">
@@ -89,34 +89,31 @@
 
   {if $event.summary}
       <div class="crm-section event_summary-section">
-        {$event.summary}
+        {$event.summary|purify}
       </div>
   {/if}
   {if $event.description}
       <div class="crm-section event_description-section summary">
-          {$event.description}
+          {$event.description|purify}
       </div>
   {/if}
   <div class="clear"></div>
   <div class="crm-section event_date_time-section">
       <div class="label">{ts}When{/ts}</div>
       <div class="content">
-            <abbr class="dtstart" title="{$event.event_start_date|crmDate}">
-            {$event.event_start_date|crmDate}</abbr>
+        {strip}
+            {$event.event_start_date|crmDate}
             {if $event.event_end_date}
-                &nbsp; {ts}through{/ts} &nbsp;
+                &nbsp;{ts}through{/ts}&nbsp;
                 {* Only show end time if end date = start date *}
                 {if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}
-                    <abbr class="dtend" title="{$event.event_end_date|crmDate:0:1}">
                     {$event.event_end_date|crmDate:0:1}
-                    </abbr>
                 {else}
-                    <abbr class="dtend" title="{$event.event_end_date|crmDate}">
                     {$event.event_end_date|crmDate}
-                    </abbr>
                 {/if}
             {/if}
-        </div>
+        {/strip}
+      </div>
     <div class="clear"></div>
   </div>
 
@@ -137,7 +134,7 @@
               <div class="content">
                     {assign var=showDirectly value="1"}
                     {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly}
-                    <br /><a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
+                    <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>
           </div>
@@ -150,17 +147,20 @@
       <div class="crm-section event_contact-section">
           <div class="label">{ts}Contact{/ts}</div>
           <div class="content">
-              {* loop on any phones and emails for this event *}
               {foreach from=$location.phone item=phone}
                   {if $phone.phone}
-                      {if $phone.phone_type_id}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}:
-                          <span class="tel">{$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if} </span> <br />
-                      {/if}
+                    <div class="crm-eventinfo-contact-phone">
+                      {* @todo This should use "{ts 1=$phone.phone_type_display 2=$phone}%1: %2{/ts}" because some language have nbsp before column *}
+                      {if $phone.phone_type_id}{$phone.phone_type_display}:{else}{ts}Phone:{/ts}{/if}
+                      <span class="tel">{$phone.phone}{if $phone.phone_ext}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
+                    </div>
+                  {/if}
               {/foreach}
-
               {foreach from=$location.email item=email}
                   {if $email.email}
+                    <div class="crm-eventinfo-contact-email">
                       {ts}Email:{/ts} <span class="email"><a href="mailto:{$email.email}">{$email.email}</a></span>
+                    </div>
                   {/if}
               {/foreach}
           </div>
@@ -217,7 +217,9 @@
       {/crmRegion}
     </div>
     {if $event.is_public }
-        <br />{include file="CRM/Event/Page/iCalLinks.tpl"}
+        <div class="action-link section iCal_links-section">
+          {include file="CRM/Event/Page/iCalLinks.tpl"}
+        </div>
     {/if}
 
     {if $event.is_share }

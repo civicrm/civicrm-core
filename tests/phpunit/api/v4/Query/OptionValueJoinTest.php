@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -48,21 +46,23 @@ class OptionValueJoinTest extends UnitTestCase {
   }
 
   public function testCommunicationMethodJoin() {
-    $api = \Civi\API\Request::create('Contact', 'get', ['version' => 4, 'checkPermissions' => FALSE]);
+    $api = \Civi\API\Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['first_name', 'preferred_communication_method:label'],
+      'where' => [['preferred_communication_method', 'IS NOT NULL']],
+    ]);
     $query = new Api4SelectQuery($api);
-    $query->select[] = 'first_name';
-    $query->select[] = 'preferred_communication_method.label';
-    $query->where[] = ['preferred_communication_method', 'IS NOT NULL'];
     $results = $query->run();
     $first = array_shift($results);
     $keys = array_keys($first);
     sort($keys);
-    $this->assertEquals(['first_name', 'id', 'preferred_communication_method'], $keys);
-    $firstPreferredMethod = array_shift($first['preferred_communication_method']);
+    $this->assertEquals(['first_name', 'id', 'preferred_communication_method:label'], $keys);
+    $firstPreferredMethod = array_shift($first['preferred_communication_method:label']);
 
     $this->assertEquals(
       'Phone',
-      $firstPreferredMethod['label']
+      $firstPreferredMethod
     );
   }
 

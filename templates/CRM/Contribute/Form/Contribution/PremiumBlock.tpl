@@ -62,7 +62,9 @@
               <div class="premium-full-title">{$row.name}</div>
               <div class="premium-full-disabled">
                 {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
-                <input type="button" value="{ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}" amount="{$row.min_contribution}" />
+                <button type="button" amount="{$row.min_contribution}">
+                  {ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}
+                </button>
               </div>
               <div class="premium-full-description">
                 {$row.description}
@@ -235,7 +237,7 @@
         amounts.sort(function(a,b){return a - b});
 
         // make contribution instead buttons work
-        $('.premium-full-disabled input').click(function(){
+        $('.premium-full-disabled button').click(function(){
           var amount = Number($(this).attr('amount'));
           if (price_sets[amount]) {
             if (!$(price_sets[amount]).length) {
@@ -332,8 +334,6 @@
           $('#selectProduct').rules('add', 'premiums');
         });
 
-        // need to use jquery validate's ignore option, so that it will not ignore hidden fields
-        CRM.validate.params['ignore'] = '.ignore';
       });
     </script>
     {/literal}
@@ -349,4 +349,3 @@
     {/literal}
   {/if}
 {/if}
-

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -114,11 +112,24 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
           $dao->id
         );
       }
-      if ($startEvent = CRM_Utils_Array::value('start_event', $membershipStatus[$dao->id])) {
+      $startEvent = $membershipStatus[$dao->id]['start_event'] ?? NULL;
+      $endEvent = $membershipStatus[$dao->id]['end_event'] ?? NULL;
+      $startEventUnit = $membershipStatus[$dao->id]['start_event_adjust_unit'] ?? NULL;
+      $endEventUnit = $membershipStatus[$dao->id]['end_event_adjust_unit'] ?? NULL;
+      $startEventInterval = $membershipStatus[$dao->id]['start_event_adjust_interval'] ?? NULL;
+      $endEventInterval = $membershipStatus[$dao->id]['end_event_adjust_interval'] ?? NULL;
+
+      if ($startEvent) {
         $membershipStatus[$dao->id]['start_event'] = ($startEvent == 'join_date') ? 'member since' : str_replace("_", " ", $startEvent);
       }
-      if ($endEvent = CRM_Utils_Array::value('end_event', $membershipStatus[$dao->id])) {
+      if ($endEvent) {
         $membershipStatus[$dao->id]['end_event'] = ($endEvent == 'join_date') ? 'member since' : str_replace("_", " ", $endEvent);
+      }
+      if ($startEventUnit && $startEventInterval) {
+        $membershipStatus[$dao->id]['start_event_adjust_unit_interval'] = "{$startEventInterval} {$startEventUnit}";
+      }
+      if ($endEventUnit && $endEventInterval) {
+        $membershipStatus[$dao->id]['end_event_adjust_interval'] = "{$endEventInterval} {$endEventUnit}";
       }
     }
     // Add order changing widget to selector

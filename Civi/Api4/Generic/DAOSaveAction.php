@@ -14,19 +14,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace Civi\Api4\Generic;
 
 /**
- * Create or update one or more $ENTITIES.
- *
- * If creating more than one $ENTITY with similar values, use the `defaults` param.
- *
- * Set `reload` if you need the api to return complete records for each saved $ENTITY.
+ * @inheritDoc
  */
 class DAOSaveAction extends AbstractSaveAction {
   use Traits\DAOActionTrait;
@@ -37,6 +31,7 @@ class DAOSaveAction extends AbstractSaveAction {
   public function _run(Result $result) {
     foreach ($this->records as &$record) {
       $record += $this->defaults;
+      $this->formatWriteValues($record);
       if (empty($record['id'])) {
         $this->fillDefaults($record);
       }

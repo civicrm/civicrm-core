@@ -106,7 +106,12 @@ class CRM_Core_OptionGroup {
     $orderBy = 'weight'
   ) {
     $cache = CRM_Utils_Cache::singleton();
-    $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
+    if (in_array($name, self::$_domainIDGroups)) {
+      $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy, CRM_Core_Config::domainID());
+    }
+    else {
+      $cacheKey = self::createCacheKey($name, $flip, $grouping, $localize, $condition, $labelColumnName, $onlyActive, $keyColumnName, $orderBy);
+    }
 
     if (!$fresh) {
       // Fetch from static var
@@ -186,8 +191,7 @@ WHERE  v.option_group_id = g.id
    * @return string
    */
   protected static function createCacheKey($id) {
-    $cacheKey = "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
-    return $cacheKey;
+    return "CRM_OG_" . preg_replace('/[^a-zA-Z0-9]/', '', $id) . '_' . md5(serialize(func_get_args()));
   }
 
   /**
@@ -439,8 +443,6 @@ WHERE  v.option_group_id = g.id
 
   /**
    * Creates a new option group with the passed in values.
-   * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
-   * not messed up. Currently deletes the old group
    *
    * @param string $groupName
    *   The name of the option group - make sure there is no conflict.
@@ -464,10 +466,10 @@ WHERE  v.option_group_id = g.id
    *   the option group ID
    */
   public static function createAssoc($groupName, &$values, &$defaultID, $groupTitle = NULL) {
-    self::deleteAssoc($groupName);
     if (!empty($values)) {
       $group = new CRM_Core_DAO_OptionGroup();
       $group->name = $groupName;
+      $group->find(TRUE);
       $group->title = empty($groupTitle) ? $groupName : $groupTitle;
       $group->is_reserved = 1;
       $group->is_active = 1;
@@ -476,8 +478,9 @@ WHERE  v.option_group_id = g.id
       foreach ($values as $v) {
         $value = new CRM_Core_DAO_OptionValue();
         $value->option_group_id = $group->id;
-        $value->label = $v['label'];
         $value->value = $v['value'];
+        $value->find(TRUE);
+        $value->label = $v['label'];
         $value->name = $v['name'] ?? NULL;
         $value->description = $v['description'] ?? NULL;
         $value->weight = $v['weight'] ?? NULL;
@@ -502,8 +505,11 @@ WHERE  v.option_group_id = g.id
    * @param $values
    * @param bool $flip
    * @param string $field
+   *
+   * @deprecated
    */
   public static function getAssoc($groupName, &$values, $flip = FALSE, $field = 'name') {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function');
     $query = "
 SELECT v.id as amount_id, v.value, v.label, v.name, v.description, v.weight
   FROM civicrm_option_group g,
@@ -546,8 +552,11 @@ ORDER BY v.weight
   /**
    * @param string $groupName
    * @param string $operator
+   *
+   * @deprecated
    */
   public static function deleteAssoc($groupName, $operator = "=") {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function');
     $query = "
 DELETE g, v
   FROM civicrm_option_group g,

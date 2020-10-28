@@ -11,40 +11,39 @@
 {assign var="showBlock" value="'searchForm'"}
 {assign var="hideBlock" value="'searchForm_show','searchForm_hide'"}
 <div class="crm-block crm-form-block crm-search-form-block">
-<div id="searchForm_show" class="form-item">
-    <a href="#" onclick="cj('#searchForm_show').hide(); cj('#searchForm').show(); return false;"><img src="{$config->resourceBase}i/TreePlus.gif" class="action-icon" alt="{ts}open section{/ts}" /></a>
-    <label>{ts}Edit Search Criteria{/ts}</label>
-</div>
-
-<div id="searchForm" class="crm-block crm-form-block crm-contact-custom-search-eventDetails-form-block">
-    <fieldset>
-        <legend><span id="searchForm_hide"><a href="#" onclick="cj('#searchForm').hide(); cj('#searchForm_show').show(); return false;"><img src="{$config->resourceBase}i/TreeMinus.gif" class="action-icon" alt="{ts}close section{/ts}" /></a></span>{ts}Search Criteria{/ts}</legend>
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-        <table class="form-layout-compressed">
-            {* Loop through all defined search criteria fields (defined in the buildForm() function). *}
-            {foreach from=$elements item=element}
-                <tr class="crm-contact-custom-search-eventDetails-form-block-{$element}">
-                    <td class="label">{$form.$element.label}</td>
-                    <td>{$form.$element.html}</td>
+  <div class="crm-accordion-wrapper crm-eventDetails_search-accordion {if $rows}collapsed{/if}">
+    <div class="crm-accordion-header crm-master-accordion-header">
+      {ts}Edit Search Criteria{/ts}
+    </div><!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
+      <div id="searchForm" class="crm-block crm-form-block crm-contact-custom-search-eventDetails-form-block">
+          <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+            <table class="form-layout-compressed">
+                {* Loop through all defined search criteria fields (defined in the buildForm() function). *}
+                {foreach from=$elements item=element}
+                    <tr class="crm-contact-custom-search-eventDetails-form-block-{$element}">
+                        <td class="label">{$form.$element.label}</td>
+                        <td>{$form.$element.html}</td>
+                    </tr>
+                {/foreach}
+                <tr class="crm-contact-custom-search-eventDetails-form-block-event_type">
+                    <td class="label">{ts}Event Type{/ts}</td>
+                    <td>
+                        <div class="listing-box">
+                            {foreach from=$form.event_type_id item="event_val"}
+                                <div class="{cycle values="odd-row,even-row"}">
+                                    {$event_val.html}
+                                </div>
+                            {/foreach}
+                        </div>
+                        <div class="spacer"></div>
+                    </td>
                 </tr>
-            {/foreach}
-            <tr class="crm-contact-custom-search-eventDetails-form-block-event_type">
-                <td class="label">{ts}Event Type{/ts}</td>
-                <td>
-                    <div class="listing-box">
-                        {foreach from=$form.event_type_id item="event_val"}
-                            <div class="{cycle values="odd-row,even-row"}">
-                                {$event_val.html}
-                            </div>
-                        {/foreach}
-                    </div>
-                    <div class="spacer"></div>
-                </td>
-            </tr>
-        </table>
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-    </fieldset>
-</div>
+            </table>
+          <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+      </div>
+    </div>
+  </div>
 
 {if $rowsEmpty}
     {include file="CRM/Contact/Form/Search/Custom/EmptyResults.tpl"}
@@ -118,12 +117,4 @@
     </fieldset>
     {* END Actions/Results section *}
 {/if}
-
-<script type="text/javascript">
-    var showBlock = new Array({$showBlock});
-    var hideBlock = new Array({$hideBlock});
-
-    {* hide and display the appropriate blocks *}
-    on_load_init_blocks( showBlock, hideBlock );
-</script>
 </div>

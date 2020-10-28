@@ -194,7 +194,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-13964
+   * @see https://issues.civicrm.org/jira/browse/CRM-13964
    *
    * @throws \CRM_Core_Exception
    */

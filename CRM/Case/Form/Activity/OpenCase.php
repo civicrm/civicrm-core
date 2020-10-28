@@ -10,12 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-/**
  * This class generates form components for OpenCase Activity.
  */
 class CRM_Case_Form_Activity_OpenCase {
@@ -28,9 +22,15 @@ class CRM_Case_Form_Activity_OpenCase {
   public $_contactID;
 
   /**
+   * @var int
+   */
+  public $_caseStatusId;
+
+  /**
    * @param CRM_Case_Form_Case $form
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function preProcess(&$form) {
     //get multi client case configuration
@@ -75,6 +75,7 @@ class CRM_Case_Form_Activity_OpenCase {
    * @param CRM_Case_Form_Case $form
    *
    * @return array $defaults
+   * @throws \CiviCRM_API3_Exception
    */
   public static function setDefaultValues(&$form) {
     $defaults = [];
@@ -131,6 +132,9 @@ class CRM_Case_Form_Activity_OpenCase {
 
   /**
    * @param CRM_Case_Form_Case $form
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
   public static function buildQuickForm(&$form) {
     if ($form->_context == 'caseActivity') {
@@ -215,23 +219,19 @@ class CRM_Case_Form_Activity_OpenCase {
     $params['location'] = $params['activity_location'] ?? NULL;
 
     // Add attachments
-    CRM_Core_BAO_File::formatAttachment(
-      $params,
-      $params,
-      'civicrm_activity',
-      $form->_activityId
-    );
-
+    CRM_Core_BAO_File::formatAttachment($params, $params, 'civicrm_activity', $form->_activityId);
   }
 
   /**
    * Global validation rules for the form.
    *
-   * @param $fields
-   * @param $files
+   * @param array $fields
+   *   The input form values.
+   * @param array $files
+   *   The uploaded files if any.
    * @param CRM_Case_Form_Case $form
    *
-   * @return array
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $form) {
@@ -260,21 +260,18 @@ class CRM_Case_Form_Activity_OpenCase {
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
 
     if (!$isMultiClient && !$form->_currentlyViewedContactId) {
-      CRM_Core_Error::fatal('Required parameter missing for OpenCase - end post processing');
+      CRM_Core_Error::statusBounce('Required parameter missing for OpenCase - end post processing');
     }
 
-    if (!$form->_currentUserId ||
-      !$params['case_id'] ||
-      !$params['case_type']
-    ) {
-      CRM_Core_Error::fatal('Required parameter missing for OpenCase - end post processing');
+    if (!$form->_currentUserId || !$params['case_id'] || !$params['case_type']) {
+      CRM_Core_Error::statusBounce('Required parameter missing for OpenCase - end post processing');
     }
 
     // 1. create case-contact
     if ($isMultiClient && $form->_context == 'standalone') {
       foreach ($params['client_id'] as $cliId) {
         if (empty($cliId)) {
-          CRM_Core_Error::fatal('client_id cannot be empty');
+          CRM_Core_Error::statusBounce('client_id cannot be empty for OpenCase - end post processing');
         }
         $contactParams = [
           'case_id' => $params['case_id'],

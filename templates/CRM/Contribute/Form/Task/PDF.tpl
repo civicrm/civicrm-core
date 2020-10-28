@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
       {include file="CRM/Contribute/Form/Task.tpl"}
 </div>
 <div class="help">

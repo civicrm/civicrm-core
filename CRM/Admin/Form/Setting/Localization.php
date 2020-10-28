@@ -39,13 +39,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     'uiLanguages' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   ];
 
-  public function preProcess() {
-    if (!CRM_Core_I18n::isMultiLingual()) {
-      CRM_Core_Resources::singleton()
-        ->addScriptFile('civicrm', 'templates/CRM/Admin/Form/Setting/Localization.js', 1, 'html-header');
-    }
-  }
-
   /**
    * Build the form object.
    */
@@ -168,29 +161,12 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     //cache contact fields retaining localized titles
     //though we changed localization, so reseting cache.
-    Civi::cache('fields')->flush();
+    Civi::cache('fields')->clear();
 
     //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
-    Civi::cache('navigation')->flush();
+    Civi::cache('navigation')->clear();
     // reset ACL and System caches
     CRM_Core_BAO_Cache::resetCaches();
-
-    // we do this only to initialize monetary decimal point and thousand separator
-    $config = CRM_Core_Config::singleton();
-
-    // save enabled currencies and default currency in option group 'currencies_enabled'
-    // CRM-1496
-    if (empty($values['currencyLimit'])) {
-      $values['currencyLimit'] = [$values['defaultCurrency']];
-    }
-    elseif (!in_array($values['defaultCurrency'], $values['currencyLimit'])) {
-      $values['currencyLimit'][] = $values['defaultCurrency'];
-    }
-
-    self::updateEnabledCurrencies($values['currencyLimit'], $values['defaultCurrency']);
-
-    // unset currencyLimit so we dont store there
-    unset($values['currencyLimit']);
 
     // make the site multi-lang if requested
     if (!empty($values['makeMultilingual'])) {
@@ -205,9 +181,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // add a new db locale if the requested language is not yet supported by the db
     if (empty($values['makeSinglelingual']) && !empty($values['addLanguage'])) {
-      $domain = new CRM_Core_DAO_Domain();
-      $domain->find(TRUE);
-      if (!substr_count($domain->locales, $values['addLanguage'])) {
+      $locales = CRM_Core_I18n::getMultilingual();
+      if (!in_array($values['addLanguage'], $locales)) {
         CRM_Core_I18n_Schema::addLocale($values['addLanguage'], $values['lcMessages']);
       }
       $values['languageLimit'][$values['addLanguage']] = 1;
@@ -220,6 +195,21 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // if we manipulated the language list, return to the localization admin screen
     $return = (bool) (CRM_Utils_Array::value('makeMultilingual', $values) or CRM_Utils_Array::value('addLanguage', $values));
+
+    // Update enabled currencies
+    // we do this only to initialize monetary decimal point and thousand separator
+    $config = CRM_Core_Config::singleton();
+    // save enabled currencies and default currency in option group 'currencies_enabled'
+    // CRM-1496
+    if (empty($values['currencyLimit'])) {
+      $values['currencyLimit'] = [$values['defaultCurrency']];
+    }
+    elseif (!in_array($values['defaultCurrency'], $values['currencyLimit'])) {
+      $values['currencyLimit'][] = $values['defaultCurrency'];
+    }
+    self::updateEnabledCurrencies($values['currencyLimit'], $values['defaultCurrency']);
+    // unset currencyLimit so we dont store there
+    unset($values['currencyLimit']);
 
     $filteredValues = $values;
     unset($filteredValues['makeMultilingual']);
@@ -285,22 +275,15 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getDefaultLocaleOptions() {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = CRM_Core_I18n::languages();
-    if ($domain->locales) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    $languages = CRM_Core_I18n::languages();
+    if ($locales) {
       // for multi-lingual sites, populate default language drop-down with available languages
-      $defaultLocaleOptions = [];
-      foreach ($locales as $loc => $lang) {
-        if (substr_count($domain->locales, $loc)) {
-          $defaultLocaleOptions[$loc] = $lang;
-        }
-      }
+      return array_intersect_key($languages, array_flip($locales));
     }
     else {
-      $defaultLocaleOptions = $locales;
+      return $languages;
     }
-    return $defaultLocaleOptions;
   }
 
   /**
@@ -342,8 +325,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $ufm = new CRM_Core_DAO_UFMatch();
       $ufm->contact_id = $session->get('userID');
       if ($newLocale && $ufm->find(TRUE)) {
-        $ufm->language = $newLocale;
-        $ufm->save();
         $session->set('lcMessages', $newLocale);
       }
     }

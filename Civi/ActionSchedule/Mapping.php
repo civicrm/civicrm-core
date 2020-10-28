@@ -337,4 +337,10 @@ abstract class Mapping implements MappingInterface {
     return FALSE;
   }
 
+  /**
+   * Determine whether a schedule based on this mapping should
+   * send to additional contacts.
+   */
+  abstract public function sendToAdditional($entityId): bool;
+
 }

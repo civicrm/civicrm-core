@@ -21,13 +21,16 @@ class CRM_Export_StateMachine_Standalone extends CRM_Core_StateMachine {
    *
    * @param object $controller
    * @param \const|int $action
+   * @param string $entity
    */
-  public function __construct($controller, $action = CRM_Core_Action::NONE) {
+  public function __construct($controller, $action = CRM_Core_Action::NONE, $entity = 'Contact') {
     parent::__construct($controller, $action);
 
+    $entityMap = ['Contribution' => 'Contribute', 'Membership' => 'Member', 'Participant' => 'Event'];
+    $entity = $entityMap[$entity] ?? $entity;
     $this->_pages = [
-      'CRM_Export_Form_Select' => NULL,
-      'CRM_Export_Form_Map' => NULL,
+      'CRM_' . $entity . '_Export_Form_Select' => NULL,
+      'CRM_' . $entity . '_Export_Form_Map' => NULL,
     ];
 
     $this->addSequentialPages($this->_pages, $action);

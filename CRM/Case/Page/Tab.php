@@ -63,7 +63,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
     else {
       if ($this->_action & CRM_Core_Action::VIEW) {
-        CRM_Core_Error::fatal('Contact Id is required for view action.');
+        CRM_Core_Error::statusBounce('Contact Id is required for view action.');
       }
     }
 

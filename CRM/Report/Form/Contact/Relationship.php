@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
@@ -35,9 +33,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -250,6 +247,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           ],
           'is_active' => [
             'title' => ts('Is active?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
           ],
           'relationship_id' => [
             'title' => ts('Rel ID'),
@@ -771,8 +769,6 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           = ts(self::permissionedRelationship($row['civicrm_relationship_is_permission_b_a']));
         $entryFound = TRUE;
       }
-
-      $rows[$rowNum]['civicrm_relationship_is_active'] = $row['civicrm_relationship_is_active'] ? ts('Yes') : '';
 
       // skip looking further in rows, if first row itself doesn't
       // have the column we need

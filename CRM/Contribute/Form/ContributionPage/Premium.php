@@ -21,6 +21,14 @@
 class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_ContributionPage {
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('premium');
+  }
+
+  /**
    * Set default values for the form.
    */
   public function setDefaultValues() {
@@ -44,7 +52,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
 
     $this->addElement('text', 'premiums_intro_title', ts('Title'), $attributes['premiums_intro_title']);
 
-    $this->add('textarea', 'premiums_intro_text', ts('Introductory Message'), 'rows=5, cols=50');
+    $this->add('textarea', 'premiums_intro_text', ts('Introductory Message'), ['cols' => 50, 'rows' => 5]);
 
     $this->add('text', 'premiums_contact_email', ts('Contact Email') . ' ', $attributes['premiums_contact_email']);
 

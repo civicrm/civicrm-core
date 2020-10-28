@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -170,9 +168,10 @@ class CRM_Core_Permission_Base {
    * @param string $permissionName
    *   Name of the permission we are interested in.
    *
+   * @throws CRM_Core_Exception.
    */
   public function permissionEmails($permissionName) {
-    CRM_Core_Error::fatal("this function only works in Drupal 6 at the moment");
+    throw new CRM_Core_Exception("this function only works in Drupal 6 at the moment");
   }
 
   /**
@@ -181,9 +180,10 @@ class CRM_Core_Permission_Base {
    * @param string $roleName
    *   Name of the role we are interested in.
    *
+   * @throws CRM_Core_Exception.
    */
   public function roleEmails($roleName) {
-    CRM_Core_Error::fatal("this function only works in Drupal 6 at the moment");
+    throw new CRM_Core_Exception("this function only works in Drupal 6 at the moment");
   }
 
   /**

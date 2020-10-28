@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -79,11 +77,6 @@ class Joinable {
    * @var string
    */
   protected $entity;
-
-  /**
-   * @var array
-   */
-  protected $entityFields;
 
   /**
    * @param $targetTable
@@ -270,15 +263,14 @@ class Joinable {
    * @return \Civi\Api4\Service\Spec\FieldSpec[]
    */
   public function getEntityFields() {
-    if (!$this->entityFields) {
-      $bao = AllCoreTables::getClassForTable($this->getTargetTable());
-      if ($bao) {
-        foreach ($bao::fields() as $field) {
-          $this->entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntity());
-        }
+    $entityFields = [];
+    $bao = AllCoreTables::getClassForTable($this->getTargetTable());
+    if ($bao) {
+      foreach ($bao::getSupportedFields() as $field) {
+        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntity());
       }
     }
-    return $this->entityFields;
+    return $entityFields;
   }
 
   /**

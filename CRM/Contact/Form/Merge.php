@@ -229,9 +229,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       }
 
       // add related table elements
-      foreach ($rowsElementsAndInfo['rel_table_elements'] as $relTableElement) {
-        $element = $this->addElement($relTableElement[0], $relTableElement[1]);
-        $element->setChecked(TRUE);
+      foreach (array_keys($rowsElementsAndInfo['rel_tables']) as $relTableElement) {
+        $this->addElement('checkbox', $relTableElement);
+        $this->_defaults[$relTableElement] = 1;
       }
 
       $this->assign('rel_tables', $rowsElementsAndInfo['rel_tables']);
@@ -376,7 +376,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
     // ensure that oid is not the current user, if so refuse to do the merge
-    if (CRM_Core_Session::singleton()->getLoggedInContactID() == $oid) {
+    if (CRM_Core_Session::getLoggedInContactID() == $oid) {
       $message = ts('The contact record which is linked to the currently logged in user account - \'%1\' - cannot be deleted.',
         [1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName()]
       );
@@ -412,6 +412,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         'other_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_oid]['modified_date']) . ($mostRecent == $this->_oid ? ' (' . ts('Most Recent') . ')' : ''),
       ],
     ]);
+  }
+
+  /**
+   * Set the defaults for the form.
+   *
+   * @return array
+   *   Array of default values
+   */
+  public function setDefaultValues() {
+    return $this->_defaults;
   }
 
 }

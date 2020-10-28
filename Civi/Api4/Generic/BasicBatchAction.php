@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -34,8 +32,7 @@ class BasicBatchAction extends AbstractBatchAction {
 
   /**
    * @var callable
-   *
-   * Function(array $item, BasicBatchAction $thisAction) => array
+   *   Function(array $item, BasicBatchAction $thisAction): array
    */
   private $doer;
 
@@ -54,7 +51,6 @@ class BasicBatchAction extends AbstractBatchAction {
    * @param string|array $select
    *   One or more fields to select from each matching item.
    * @param callable $doer
-   *   Function(array $item, BasicBatchAction $thisAction) => array
    */
   public function __construct($entityName, $actionName, $select = 'id', $doer = NULL) {
     parent::__construct($entityName, $actionName, $select);

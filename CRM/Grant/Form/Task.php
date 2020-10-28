@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * Class for grant form task actions.
  * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
  */
@@ -42,19 +34,20 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
     $form->_grantIds = [];
 
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'];
     $tasks = CRM_Grant_Task::tasks();
     if (!array_key_exists($form->_task, $tasks)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
-    $form->assign('taskName', $tasks[$form->_task]);
 
     $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
@@ -88,15 +81,7 @@ class CRM_Grant_Form_Task extends CRM_Core_Form_Task {
 
     $form->_grantIds = $form->_componentIds = $ids;
 
-    //set the context for redirection for any task actions
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= "&qfKey=$qfKey";
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/search', $urlParams));
+    $form->setNextUrl('grant');
   }
 
   /**

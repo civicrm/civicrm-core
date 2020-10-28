@@ -666,6 +666,48 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertTrue($foundManager);
   }
 
+  /**
+   * Test that case role is not assigned to logged in user if you've unchecked
+   * the assign to creator in the case type definition.
+   */
+  public function testCaseGetWithRolesNoCreator() {
+    // Copy and adjust stock case type so that assign role to creator is not checked
+    $caseType = $this->callAPISuccess('CaseType', 'get', ['id' => $this->caseTypeId]);
+    $newCaseType = $caseType['values'][$this->caseTypeId];
+    // Sanity check that we're changing what we think we're changing.
+    $this->assertEquals('Homeless Services Coordinator', $newCaseType['definition']['caseRoles'][0]['name']);
+    // string '0' to match what actually happens when you do it in UI
+    $newCaseType['definition']['caseRoles'][0]['creator'] = '0';
+    unset($newCaseType['id']);
+    $newCaseType['name'] = 'tree_climbing';
+    $newCaseType['title'] = 'Tree Climbing';
+    $newCaseType = $this->callAPISuccess('CaseType', 'create', $newCaseType);
+
+    $case1 = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => 17,
+      'subject' => "Test case with roles no creator",
+      'case_type_id' => $newCaseType['id'],
+      'status_id' => "Open",
+    ]);
+    $result = $this->callAPISuccessGetSingle('Case', [
+      'id' => $case1['id'],
+      'status_id' => "Open",
+      'return' => ['contacts'],
+    ]);
+
+    // There should only be the client role.
+    $this->assertCount(1, $result['contacts']);
+    $contact = $result['contacts'][0];
+    $this->assertEquals('Client', $contact['role']);
+    // For good measure
+    $this->assertNotEquals(1, $contact['creator'] ?? NULL);
+    $this->assertNotEquals(1, $contact['manager'] ?? NULL);
+
+    // clean up
+    $this->callAPISuccess('Case', 'create', ['id' => $case1['id'], 'case_type_id' => $this->caseTypeId]);
+    $this->callAPISuccess('CaseType', 'delete', ['id' => $newCaseType['id']]);
+  }
+
   public function testCaseGetWithDefinition() {
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => 17,
@@ -961,19 +1003,17 @@ class api_v3_CaseTest extends CiviCaseTestCase {
    * Test the case merge function.
    *
    * 2 cases should be mergeable into 1
-   *
-   * @throws \Exception
    */
   public function testCaseMerge() {
     $contact1 = $this->individualCreate([], 1);
     $case1 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $contact1,
-      'subject' => "Test case 1",
+      'subject' => 'Test case 1',
       'case_type_id' => $this->caseTypeId,
     ]);
     $case2 = $this->callAPISuccess('Case', 'create', [
       'contact_id' => $contact1,
-      'subject' => "Test case 2",
+      'subject' => 'Test case 2',
       'case_type_id' => $this->caseTypeId,
     ]);
     $result = $this->callAPISuccess('Case', 'getcount', ['contact_id' => $contact1]);

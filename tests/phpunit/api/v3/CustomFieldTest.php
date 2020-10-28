@@ -107,13 +107,14 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $dtype = CRM_Core_BAO_CustomField::dataType();
     $htype = CRM_Custom_Form_Field::$_dataToHTML;
 
-    $n = 0;
+    // Legacy html types returned by v3
+    $htype['StateProvince'] = ['Select State/Province'];
+    $htype['Country'] = ['Select Country'];
+
     foreach ($dtype as $dkey => $dvalue) {
-      foreach ($htype[$n] as $hkey => $hvalue) {
-        //echo $dkey."][".$hvalue."\n";
+      foreach ($htype[$dkey] as $hvalue) {
         $this->_loopingCustomFieldCreateTest($this->_buildParams($gid['id'], $hvalue, $dkey));
       }
-      $n++;
     }
   }
 
@@ -616,6 +617,139 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_active' => 0,
     ];
     $this->callAPISuccess('CustomField', 'create', $params);
+  }
+
+  public function testLegacyHtmlType() {
+    $customGroup = $this->customGroupCreate([
+      'name' => 'testCustomGroup',
+      'title' => 'testCustomGroup',
+      'extends' => 'Individual',
+    ]);
+    $f1 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'SingleSelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'String',
+      'html_type' => 'Select',
+      'option_values' => [1 => 'One', 2 => 'Two'],
+    ]);
+    $f2 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'CheckBoxes',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'String',
+      'html_type' => 'CheckBox',
+      'option_values' => [1 => 'One', 2 => 'Two'],
+    ]);
+    $f3 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'MultiSelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'String',
+      'html_type' => 'Multi-Select',
+      'option_values' => [1 => 'One', 2 => 'Two'],
+    ]);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Multi-Select',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('MultiSelect', $result['values'][0]['label']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => ['IN' => ['Multi-Select', 'CheckBox']],
+      'sequential' => 1,
+    ]);
+    $this->assertCount(2, $result['values']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Select',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('SingleSelect', $result['values'][0]['label']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => ['IN' => ['Select']],
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('SingleSelect', $result['values'][0]['label']);
+  }
+
+  public function testLegacyStateCountryTypes() {
+    $customGroup = $this->customGroupCreate([
+      'name' => 'testCustomGroup',
+      'title' => 'testCustomGroup',
+      'extends' => 'Individual',
+    ]);
+    $f1 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'CountrySelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'Country',
+      'html_type' => 'Select Country',
+    ]);
+    $f2 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'StateSelect',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'StateProvince',
+      'html_type' => 'Select State/Province',
+    ]);
+    $f3 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'MultiSelectSP',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'StateProvince',
+      'html_type' => 'Multi-Select State/Province',
+    ]);
+    $f4 = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'MultiSelectCountry',
+      'custom_group_id' => 'testCustomGroup',
+      'data_type' => 'Country',
+      'html_type' => 'Select Country',
+      'serialize' => 1,
+    ]);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Multi-Select State/Province',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('MultiSelectSP', $result['values'][0]['label']);
+    $this->assertEquals('Multi-Select State/Province', $result['values'][0]['html_type']);
+    $this->assertEquals('1', $result['values'][0]['serialize']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Multi-Select Country',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('MultiSelectCountry', $result['values'][0]['label']);
+    $this->assertEquals('Multi-Select Country', $result['values'][0]['html_type']);
+    $this->assertEquals('1', $result['values'][0]['serialize']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Select Country',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('CountrySelect', $result['values'][0]['label']);
+    $this->assertEquals('Select Country', $result['values'][0]['html_type']);
+    $this->assertEquals('0', $result['values'][0]['serialize']);
+
+    $result = $this->callAPISuccess('CustomField', 'get', [
+      'custom_group_id' => 'testCustomGroup',
+      'html_type' => 'Select State/Province',
+      'sequential' => 1,
+    ]);
+    $this->assertCount(1, $result['values']);
+    $this->assertEquals('StateSelect', $result['values'][0]['label']);
+    $this->assertEquals('Select State/Province', $result['values'][0]['html_type']);
+    $this->assertEquals('0', $result['values'][0]['serialize']);
   }
 
 }

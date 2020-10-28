@@ -13,14 +13,19 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
  * WordPress specific stuff goes here
  */
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
+
+  /**
+   * Get a normalized version of the wpBasePage.
+   */
+  public static function getBasePage() {
+    return rtrim(Civi::settings()->get('wpBasePage'), '/');
+  }
 
   /**
    */
@@ -33,6 +38,118 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
      */
     $this->is_drupal = FALSE;
     $this->is_wordpress = TRUE;
+  }
+
+  public function initialize() {
+    parent::initialize();
+    $this->registerPathVars();
+  }
+
+  /**
+   * Specify the default computation for various paths/URLs.
+   */
+  protected function registerPathVars():void {
+    $isNormalBoot = function_exists('get_option');
+    if ($isNormalBoot) {
+      // Normal mode - CMS boots first, then calls Civi. "Normal" web pages and newer extern routes.
+      // To simplify the code-paths, some items are re-registered with WP-specific functions.
+      $cmsRoot = function() {
+        return [
+          'path' => untrailingslashit(ABSPATH),
+          'url' => home_url(),
+        ];
+      };
+      Civi::paths()->register('cms', $cmsRoot);
+      Civi::paths()->register('cms.root', $cmsRoot);
+      Civi::paths()->register('civicrm.root', function () {
+        return [
+          'path' => CIVICRM_PLUGIN_DIR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => CIVICRM_PLUGIN_URL . 'civicrm/',
+        ];
+      });
+      Civi::paths()->register('wp.frontend.base', function () {
+        return [
+          'url' => home_url('/'),
+        ];
+      });
+      Civi::paths()->register('wp.frontend', function () {
+        $config = CRM_Core_Config::singleton();
+        $basepage = get_page_by_path($config->wpBasePage);
+        return [
+          'url' => get_permalink($basepage->ID),
+        ];
+      });
+      Civi::paths()->register('wp.backend.base', function () {
+        return [
+          'url' => admin_url(),
+        ];
+      });
+      Civi::paths()->register('wp.backend', function() {
+        return [
+          'url' => admin_url('admin.php'),
+        ];
+      });
+      Civi::paths()->register('civicrm.files', function () {
+        $upload_dir = wp_get_upload_dir();
+
+        $old = CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
+        $new = [
+          'path' => $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR,
+          'url' => $upload_dir['baseurl'] . '/civicrm/',
+        ];
+
+        if ($old['path'] === $new['path']) {
+           return $new;
+        }
+
+        $oldExists = file_exists($old['path']);
+        $newExists = file_exists($new['path']);
+
+        if ($oldExists && !$newExists) {
+          return $old;
+        }
+        elseif (!$oldExists && $newExists) {
+          return $new;
+        }
+        elseif (!$oldExists && !$newExists) {
+          // neither exists. but that's ok. we're in one of these two cases:
+          // - we're just starting installation... which will get sorted in a moment
+          //   when someone calls mkdir().
+          // - we're running a bespoke setup... which will get sorted in a moment
+          //   by applying $civicrm_paths.
+          return $new;
+        }
+        elseif ($oldExists && $newExists) {
+          // situation ambiguous. encourage admin to set value explicitly.
+          if (!isset($GLOBALS['civicrm_paths']['civicrm.files'])) {
+            \Civi::log()->warning("The system has data from both old+new conventions. Please use civicrm.settings.php to set civicrm.files explicitly.");
+          }
+          return $new;
+        }
+      });
+    }
+    else {
+      // Legacy support - only relevant for older extern routes.
+      Civi::paths()
+        ->register('wp.frontend.base', function () {
+          return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
+        })
+        ->register('wp.frontend', function () {
+          $config = \CRM_Core_Config::singleton();
+          $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
+          return [
+            'url' => Civi::paths()->getVariable('wp.frontend.base', 'url') . $suffix,
+          ];
+        })
+        ->register('wp.backend.base', function () {
+          return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
+        })
+        ->register('wp.backend', function () {
+          return [
+            'url' => Civi::paths()->getVariable('wp.backend.base', 'url') . 'admin.php',
+          ];
+        });
+    }
   }
 
   /**
@@ -61,6 +178,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Moved from CRM_Utils_System_Base
    */
   public function getDefaultFileStorage() {
+    // NOTE: On WordPress, this will be circumvented in the future. However,
+    // should retain it to allow transitional/upgrade code determine the old value.
+
     $config = CRM_Core_Config::singleton();
     $cmsUrl = CRM_Utils_System::languageNegotiationURL($config->userFrameworkBaseURL, FALSE, TRUE);
     $cmsPath = $this->cmsRootPath();
@@ -184,7 +304,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $config = CRM_Core_Config::singleton();
     $script = '';
@@ -205,9 +326,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if ($config->userFrameworkFrontend) {
       global $post;
       if (get_option('permalink_structure') != '') {
-        $script = get_permalink($post->ID);
+        $script = $post ? get_permalink($post->ID) : "";
       }
-      if ($config->wpBasePage == $post->post_name) {
+      if ($post && $config->wpBasePage == $post->post_name) {
         $basepage = TRUE;
       }
       // when shortcode is included in page
@@ -253,7 +374,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
       // pre-existing logic
       if (isset($path)) {
-        $queryParts[] = 'page=CiviCRM';
+        // Admin URLs still need "page=CiviCRM", front-end URLs do not.
+        if ((is_admin() && !$frontend) || $forceBackend) {
+          $queryParts[] = 'page=CiviCRM';
+        }
+        else {
+          $queryParts[] = 'civiwp=CiviCRM';
+        }
         $queryParts[] = 'q=' . rawurlencode($path);
       }
       if ($wpPageParam) {
@@ -926,6 +1053,195 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     echo $response->getBody();
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Start a new session if there's no existing session ID.
+   *
+   * Checks are needed to prevent sessions being started when not necessary.
+   */
+  public function sessionStart() {
+    $session_id = session_id();
+
+    // Check WordPress pseudo-cron.
+    $wp_cron = FALSE;
+    if (function_exists('wp_doing_cron') && wp_doing_cron()) {
+      $wp_cron = TRUE;
+    }
+
+    // Check WP-CLI.
+    $wp_cli = FALSE;
+    if (defined('WP_CLI') && WP_CLI) {
+      $wp_cli = TRUE;
+    }
+
+    // Check PHP on the command line - e.g. `cv`.
+    $php_cli = TRUE;
+    if (PHP_SAPI !== 'cli') {
+      $php_cli = FALSE;
+    }
+
+    // Maybe start session.
+    if (empty($session_id) && !$wp_cron && !$wp_cli && !$php_cli) {
+      session_start();
+    }
+  }
+
+  /**
+   * Perform any necessary actions prior to redirecting via POST.
+   *
+   * Redirecting via POST means that cookies need to be sent with SameSite=None.
+   */
+  public function prePostRedirect() {
+    // Get User Agent string.
+    $rawUserAgent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    $userAgent = mb_convert_encoding($rawUserAgent, 'UTF-8');
+
+    // Bail early if User Agent does not support `SameSite=None`.
+    $shouldUseSameSite = CRM_Utils_SameSite::shouldSendSameSiteNone($userAgent);
+    if (!$shouldUseSameSite) {
+      return;
+    }
+
+    // Make sure session cookie is present in header.
+    $cookie_params = session_name() . '=' . session_id() . '; SameSite=None; Secure';
+    CRM_Utils_System::setHttpHeader('Set-Cookie', $cookie_params);
+
+    // Add WordPress auth cookies when user is logged in.
+    $user = wp_get_current_user();
+    if ($user->exists()) {
+      self::setAuthCookies($user->ID, TRUE, TRUE);
+    }
+  }
+
+  /**
+   * Explicitly set WordPress authentication cookies.
+   *
+   * Chrome 84 introduced a cookie policy change which prevents cookies for the
+   * session and for WordPress user authentication from being indentified when
+   * a purchaser returns to the site from PayPal using the "Back to Merchant"
+   * button.
+   *
+   * In order to comply with this policy, cookies need to be sent with their
+   * "SameSite" attribute set to "None" and with the "Secure" flag set, but this
+   * isn't possible to do via `wp_set_auth_cookie()` as it stands.
+   *
+   * This method is a modified clone of `wp_set_auth_cookie()` which satisfies
+   * the Chrome policy.
+   *
+   * @see wp_set_auth_cookie()
+   *
+   * The $remember parameter increases the time that the cookie will be kept. The
+   * default the cookie is kept without remembering is two days. When $remember is
+   * set, the cookies will be kept for 14 days or two weeks.
+   *
+   * @param int $user_id The WordPress User ID.
+   * @param bool $remember Whether to remember the user.
+   * @param bool|string $secure Whether the auth cookie should only be sent over
+   *                            HTTPS. Default is an empty string which means the
+   *                            value of `is_ssl()` will be used.
+   * @param string $token Optional. User's session token to use for this cookie.
+   */
+  private function setAuthCookies($user_id, $remember = FALSE, $secure = '', $token = '') {
+    if ($remember) {
+      /** This filter is documented in wp-includes/pluggable.php */
+      $expiration = time() + apply_filters('auth_cookie_expiration', 14 * DAY_IN_SECONDS, $user_id, $remember);
+
+      /*
+       * Ensure the browser will continue to send the cookie after the expiration time is reached.
+       * Needed for the login grace period in wp_validate_auth_cookie().
+       */
+      $expire = $expiration + (12 * HOUR_IN_SECONDS);
+    }
+    else {
+      /** This filter is documented in wp-includes/pluggable.php */
+      $expiration = time() + apply_filters('auth_cookie_expiration', 2 * DAY_IN_SECONDS, $user_id, $remember);
+      $expire = 0;
+    }
+
+    if ('' === $secure) {
+      $secure = is_ssl();
+    }
+
+    // Front-end cookie is secure when the auth cookie is secure and the site's home URL is forced HTTPS.
+    $secure_logged_in_cookie = $secure && 'https' === parse_url(get_option('home'), PHP_URL_SCHEME);
+
+    /** This filter is documented in wp-includes/pluggable.php */
+    $secure = apply_filters('secure_auth_cookie', $secure, $user_id);
+
+    /** This filter is documented in wp-includes/pluggable.php */
+    $secure_logged_in_cookie = apply_filters('secure_logged_in_cookie', $secure_logged_in_cookie, $user_id, $secure);
+
+    if ($secure) {
+      $auth_cookie_name = SECURE_AUTH_COOKIE;
+      $scheme = 'secure_auth';
+    }
+    else {
+      $auth_cookie_name = AUTH_COOKIE;
+      $scheme = 'auth';
+    }
+
+    if ('' === $token) {
+      $manager = WP_Session_Tokens::get_instance($user_id);
+      $token = $manager->create($expiration);
+    }
+
+    $auth_cookie = wp_generate_auth_cookie($user_id, $expiration, $scheme, $token);
+    $logged_in_cookie = wp_generate_auth_cookie($user_id, $expiration, 'logged_in', $token);
+
+    /** This filter is documented in wp-includes/pluggable.php */
+    do_action('set_auth_cookie', $auth_cookie, $expire, $expiration, $user_id, $scheme, $token);
+
+    /** This filter is documented in wp-includes/pluggable.php */
+    do_action('set_logged_in_cookie', $logged_in_cookie, $expire, $expiration, $user_id, 'logged_in', $token);
+
+    /** This filter is documented in wp-includes/pluggable.php */
+    if (!apply_filters('send_auth_cookies', TRUE)) {
+      return;
+    }
+
+    $base_options = [
+      'expires' => $expire,
+      'domain' => COOKIE_DOMAIN,
+      'httponly' => TRUE,
+      'samesite' => 'None',
+    ];
+
+    self::setAuthCookie($auth_cookie_name, $auth_cookie, $base_options + ['secure' => $secure, 'path' => PLUGINS_COOKIE_PATH]);
+    self::setAuthCookie($auth_cookie_name, $auth_cookie, $base_options + ['secure' => $secure, 'path' => ADMIN_COOKIE_PATH]);
+    self::setAuthCookie(LOGGED_IN_COOKIE, $logged_in_cookie, $base_options + ['secure' => $secure_logged_in_cookie, 'path' => COOKIEPATH]);
+    if (COOKIEPATH != SITECOOKIEPATH) {
+      self::setAuthCookie(LOGGED_IN_COOKIE, $logged_in_cookie, $base_options + ['secure' => $secure_logged_in_cookie, 'path' => SITECOOKIEPATH]);
+    }
+  }
+
+  /**
+   * Set cookie with "SameSite" flag.
+   *
+   * The method here is compatible with all versions of PHP. Needed because it
+   * is only as of PHP 7.3.0 that the setcookie() method supports the "SameSite"
+   * attribute in its options and will accept "None" as a valid value.
+   *
+   * @param $name The name of the cookie.
+   * @param $value The value of the cookie.
+   * @param array $options The header options for the cookie.
+   */
+  private function setAuthCookie($name, $value, $options) {
+    $header = 'Set-Cookie: ';
+    $header .= rawurlencode($name) . '=' . rawurlencode($value) . '; ';
+    $header .= 'expires=' . gmdate('D, d-M-Y H:i:s T', $options['expires']) . '; ';
+    $header .= 'Max-Age=' . max(0, (int) ($options['expires'] - time())) . '; ';
+    $header .= 'path=' . rawurlencode($options['path']) . '; ';
+    $header .= 'domain=' . rawurlencode($options['domain']) . '; ';
+
+    if (!empty($options['secure'])) {
+      $header .= 'secure; ';
+    }
+    $header .= 'httponly; ';
+    $header .= 'SameSite=' . rawurlencode($options['samesite']);
+
+    header($header, FALSE);
+    $_COOKIE[$name] = $value;
   }
 
 }

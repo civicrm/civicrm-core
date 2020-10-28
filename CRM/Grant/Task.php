@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -57,8 +55,8 @@ class CRM_Grant_Task extends CRM_Core_Task {
         self::TASK_EXPORT => [
           'title' => ts('Export grants'),
           'class' => [
-            'CRM_Export_Form_Select',
-            'CRM_Export_Form_Map',
+            'CRM_Grant_Export_Form_Select',
+            'CRM_Grant_Export_Form_Map',
           ],
           'result' => FALSE,
         ],

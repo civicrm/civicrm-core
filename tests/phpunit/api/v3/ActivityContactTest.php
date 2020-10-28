@@ -40,21 +40,28 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateActivityContact($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('activity_contact', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('ActivityContact', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
+
+    $result = $this->callAPIAndDocument('ActivityContact', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
 
     $this->callAPISuccess('activity_contact', 'delete', ['id' => $result['id']]);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteActivityContact($version) {
     $this->_apiversion = $version;
@@ -71,7 +78,9 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetActivitiesByContact($version) {
     $this->_apiversion = $version;
@@ -80,7 +89,9 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetActivitiesByActivity($version) {
     $this->_apiversion = $version;
@@ -89,8 +100,11 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activity_contact_get with empty params.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetEmptyParams($version) {
     $this->_apiversion = $version;

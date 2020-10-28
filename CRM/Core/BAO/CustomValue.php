@@ -175,6 +175,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       ) {
         $formValues[$key] = ['LIKE' => $formValues[$key]];
       }
+      elseif ($htmlType == 'Autocomplete-Select' && !empty($formValues[$key]) && is_string($formValues[$key]) && (strpos($formValues[$key], ',') != FALSE)) {
+        $formValues[$key] = ['IN' => explode(',', $formValues[$key])];
+      }
     }
   }
 
@@ -204,6 +207,18 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       $entityID,
       $customValueID
     );
+  }
+
+  /**
+   * ACL clause for an APIv4 custom pseudo-entity (aka multi-record custom group extending Contact).
+   * @return array
+   */
+  public function addSelectWhereClause() {
+    $clauses = [
+      'entity_id' => CRM_Utils_SQL::mergeSubquery('Contact'),
+    ];
+    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    return $clauses;
   }
 
 }

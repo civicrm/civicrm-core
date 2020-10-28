@@ -26,7 +26,7 @@
     <div class="breadcrumb">
       {foreach from=$breadcrumb item=crumb key=key}
         {if $key != 0}
-           &raquo;
+           <i class="crm-i fa-angle-double-right" aria-hidden="true"></i>
         {/if}
         <a href="{$crumb.url}">{$crumb.title}</a>
       {/foreach}

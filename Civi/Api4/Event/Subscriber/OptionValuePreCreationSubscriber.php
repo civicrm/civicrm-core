@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -52,9 +50,8 @@ class OptionValuePreCreationSubscriber extends Generic\PreCreationSubscriber {
     if (!$optionGroupName || $request->getValue('option_group_id')) {
       return;
     }
-
-    $optionGroup = OptionGroup::get()
-      ->setCheckPermissions(FALSE)
+    \CRM_Core_Error::deprecatedFunctionWarning('Use option_group_id:name instead of option_group in APIv4');
+    $optionGroup = OptionGroup::get(FALSE)
       ->addSelect('id')
       ->addWhere('name', '=', $optionGroupName)
       ->execute();

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -75,9 +73,9 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
-    $htmlize = TRUE,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $config = CRM_Core_Config::singleton();
     static $script = 'index.php';
@@ -92,7 +90,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     }
     $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
 
-    $separator = $htmlize ? '&amp;' : '&';
+    $separator = ($htmlize && $frontend) ? '&amp;' : '&';
 
     if (!$config->cleanURL) {
       if (isset($path)) {

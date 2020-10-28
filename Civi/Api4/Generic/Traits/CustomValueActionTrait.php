@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -54,10 +52,9 @@ trait CustomValueActionTrait {
    * @inheritDoc
    */
   protected function writeObjects($items) {
-    $result = [];
     $fields = $this->entityFields();
-    foreach ($items as $item) {
-      FormattingUtil::formatWriteParams($item, $this->getEntityName(), $fields);
+    foreach ($items as $idx => $item) {
+      FormattingUtil::formatWriteParams($item, $fields);
 
       // Convert field names to custom_xx format
       foreach ($fields as $name => $field) {
@@ -67,16 +64,23 @@ trait CustomValueActionTrait {
         }
       }
 
-      $result[] = \CRM_Core_BAO_CustomValueTable::setValues($item);
+      \CRM_Core_BAO_CustomValueTable::setValues($item);
+
+      // Darn setValues function doesn't return an id.
+      if (empty($item['id'])) {
+        $tableName = CoreUtil::getTableName($this->getEntityName());
+        $items[$idx]['id'] = (int) \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM ' . $tableName);
+      }
     }
-    return $result;
+    FormattingUtil::formatOutputValues($items, $this->entityFields(), $this->getEntityName(), 'create');
+    return $items;
   }
 
   /**
    * @inheritDoc
    */
   protected function deleteObjects($items) {
-    $customTable = CoreUtil::getCustomTableByName($this->getCustomGroup());
+    $customTable = CoreUtil::getTableName($this->getEntityName());
     $ids = [];
     foreach ($items as $item) {
       \CRM_Utils_Hook::pre('delete', $this->getEntityName(), $item['id'], \CRM_Core_DAO::$_nullArray);
@@ -106,6 +110,13 @@ trait CustomValueActionTrait {
    */
   public function getCustomGroup() {
     return $this->customGroup;
+  }
+
+  /**
+   * @return \CRM_Core_DAO|string
+   */
+  protected function getBaoName() {
+    return \CRM_Core_BAO_CustomValue::class;
   }
 
 }

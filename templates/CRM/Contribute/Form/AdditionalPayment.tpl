@@ -20,7 +20,7 @@
 
   {if !$email}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+      {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
     </div>
   {/if}
   {if $newCredit AND $contributionMode EQ null}
@@ -29,7 +29,7 @@
     {/if}
     {if $paymentType eq 'owed'}
       <div class="action-link css_right crm-link-credit-card-mode">
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}submit credit card payment{/ts}</a>
       </div>
     {/if}
   {/if}
@@ -92,7 +92,7 @@
             <td class="label">{$form.trxn_id.label}</td>
             <td>{$form.trxn_id.html} {help id="id-trans_id"}</td>
           </tr>
-          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
+          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
         </table>
       </div>

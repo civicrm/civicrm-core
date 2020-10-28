@@ -68,7 +68,7 @@ function civicrm_api3_address_create($params) {
    * Create array for BAO (expects address params in as an
    * element in array 'address'
    */
-  $addressBAO = CRM_Core_BAO_Address::add($params, $params['fix_address']);
+  $addressBAO = CRM_Core_BAO_Address::create($params, $params['fix_address']);
   if (empty($addressBAO)) {
     return civicrm_api3_create_error("Address is not created or updated ");
   }

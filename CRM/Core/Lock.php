@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
 
@@ -113,7 +111,8 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    */
   public function __construct($name, $timeout = NULL, $serverWideLock = FALSE) {
     $config = CRM_Core_Config::singleton();
-    $dsnArray = DB::parseDSN($config->dsn);
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
+    $dsnArray = DB::parseDSN($dsn);
     $database = $dsnArray['database'];
     $domainID = CRM_Core_Config::domainID();
     if ($serverWideLock) {

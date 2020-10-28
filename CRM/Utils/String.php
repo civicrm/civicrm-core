@@ -86,37 +86,17 @@ class CRM_Utils_String {
   }
 
   /**
-   * Convert possibly underscore separated words to camel case with special handling for 'UF'
-   * e.g membership_payment returns MembershipPayment
+   * Convert possibly underscore separated words to camel case.
    *
-   * @param string $string
-   *
+   * @param string $str
+   * @param bool $ucFirst
+   *   Should the first letter be capitalized like `CamelCase` or lower like `camelCase`
    * @return string
    */
-  public static function convertStringToCamel($string) {
-    $map = [
-      'acl' => 'Acl',
-      'ACL' => 'Acl',
-      'im' => 'Im',
-      'IM' => 'Im',
-    ];
-    if (isset($map[$string])) {
-      return $map[$string];
-    }
-
-    $fragments = explode('_', $string);
-    foreach ($fragments as & $fragment) {
-      $fragment = ucfirst($fragment);
-      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
-      if (strpos($fragment, 'Uf') === 0 && strlen($string) > 2) {
-        $fragment = 'UF' . ucfirst(substr($fragment, 2));
-      }
-    }
-    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
-    if ($fragments[0] === 'Uf') {
-      $fragments[0] = 'UF';
-    }
-    return implode('', $fragments);
+  public static function convertStringToCamel($str, $ucFirst = TRUE) {
+    $fragments = explode('_', $str);
+    $camel = implode('', array_map('ucfirst', $fragments));
+    return $ucFirst ? $camel : lcfirst($camel);
   }
 
   /**
@@ -959,16 +939,15 @@ class CRM_Utils_String {
    * @return string
    */
   public static function pluralize($str) {
-    switch (substr($str, -1)) {
-      case 's':
-        return $str . 'es';
-
-      case 'y':
-        return substr($str, 0, -1) . 'ies';
-
-      default:
-        return $str . 's';
+    $lastLetter = substr($str, -1);
+    $lastTwo = substr($str, -2);
+    if ($lastLetter == 's' || $lastLetter == 'x' || $lastTwo == 'ch') {
+      return $str . 'es';
     }
+    if ($lastLetter == 'y' && !in_array($lastTwo, ['ay', 'ey', 'iy', 'oy', 'uy'])) {
+      return substr($str, 0, -1) . 'ies';
+    }
+    return $str . 's';
   }
 
   /**
@@ -983,6 +962,51 @@ class CRM_Utils_String {
    */
   public static function stringContainsTokens(string $string) {
     return strpos($string, '{') !== FALSE;
+  }
+
+  /**
+   * Parse a string through smarty without creating a smarty template file per string.
+   *
+   * This function is for swapping out any smarty tokens that appear in a string
+   * and are not re-used much if at all. For example parsing a contact's greeting
+   * does not need to be cached are there are some minor security / data privacy benefits
+   * to not caching them per file. We also save disk space, reduce I/O and disk clearing time.
+   *
+   * Doing this is cleaning in Smarty3 which we are alas not using
+   * https://www.smarty.net/docs/en/resources.string.tpl
+   *
+   * However, it highlights that smarty-eval is not evil-eval and still have the security applied.
+   *
+   * In order to replicate that in Smarty2 I'm using {eval} per
+   * https://www.smarty.net/docsv2/en/language.function.eval.tpl#id2820446
+   * From the above:
+   * - Evaluated variables are treated the same as templates. They follow the same escapement and security features just as if they were templates.
+   * - Evaluated variables are compiled on every invocation, the compiled versions are not saved! However if you have caching enabled, the output
+   *   will be cached with the rest of the template.
+   *
+   * Our set up does not have caching enabled and my testing suggests this still works fine with it
+   * enabled so turning it off before running this is out of caution based on the above.
+   *
+   * When this function is run only one template file is created (for the eval) tag no matter how
+   * many times it is run. This compares to it otherwise creating one file for every parsed string.
+   *
+   * @param string $templateString
+   *
+   * @return string
+   */
+  public static function parseOneOffStringThroughSmarty($templateString) {
+    if (!CRM_Utils_String::stringContainsTokens($templateString)) {
+      // Skip expensive smarty processing.
+      return $templateString;
+    }
+    $smarty = CRM_Core_Smarty::singleton();
+    $cachingValue = $smarty->caching;
+    $smarty->caching = 0;
+    $smarty->assign('smartySingleUseString', $templateString);
+    $templateString = $smarty->fetch('string:{eval var=$smartySingleUseString}');
+    $smarty->caching = $cachingValue;
+    $smarty->assign('smartySingleUseString', NULL);
+    return $templateString;
   }
 
 }

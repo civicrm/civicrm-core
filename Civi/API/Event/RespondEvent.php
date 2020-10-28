@@ -14,6 +14,10 @@ namespace Civi\API\Event;
 /**
  * Class RespondEvent
  * @package Civi\API\Event
+ *
+ * Apply post-execution filtering to the API request/response.
+ *
+ * Event name: 'civi.api.respond'
  */
 class RespondEvent extends Event {
   /**

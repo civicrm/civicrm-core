@@ -137,7 +137,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();
 
-    $paymentParams = array();
+    $paymentParams = [];
     if (!empty($params['installment_amount'])) {
       $params['amount'] = $params['installment_amount'] * $params['installments'];
     }
@@ -206,7 +206,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       "action=view&reset=1&id={$pledge->id}&cid={$pledge->contact_id}&context=home"
     );
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviPledge', CRM_Core_Action::UPDATE)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/pledge',
         "action=update&reset=1&id={$pledge->id}&cid={$pledge->contact_id}&context=home"
@@ -330,7 +330,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @return array|null
    */
   public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
-    $where = array();
+    $where = [];
     $select = $from = $queryDate = NULL;
     $statusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $status);
 
@@ -365,7 +365,7 @@ GROUP BY  currency
     $start = substr($startDate, 0, 8);
     $end = substr($endDate, 0, 8);
     $pCount = 0;
-    $pamount = array();
+    $pamount = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $pCount += $dao->pledge_count;
@@ -380,7 +380,7 @@ GROUP BY  currency
       ),
     );
 
-    $where = array();
+    $where = [];
     switch ($status) {
       case 'Completed':
         $select = 'sum( total_amount ) as received_pledge , count( cd.id ) as received_count';
@@ -428,7 +428,7 @@ GROUP BY  currency
 ";
     if ($select) {
       $dao = CRM_Core_DAO::executeQuery($query);
-      $amount = array();
+      $amount = [];
       $count = 0;
 
       while ($dao->fetch()) {
@@ -462,7 +462,7 @@ GROUP BY  currency
    *   return the list of pledge fields
    */
   public static function getHonorContacts($honorId) {
-    $params = array();
+    $params = [];
     $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
     $honorDAO->contact_id = $honorId;
     $honorDAO->find();
@@ -506,7 +506,7 @@ GROUP BY  currency
    */
   public static function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.
-    $allPayments = $payments = array();
+    $allPayments = $payments = [];
 
     // get All Payments status types.
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -516,7 +516,7 @@ GROUP BY  currency
 
     if (!empty($allPayments)) {
       foreach ($allPayments as $payID => $values) {
-        $contributionValue = $contributionStatus = array();
+        $contributionValue = $contributionStatus = [];
         if (isset($values['contribution_id'])) {
           $contributionParams = array('id' => $values['contribution_id']);
           $returnProperties = array('contribution_status_id', 'receive_date');
@@ -573,7 +573,7 @@ GROUP BY  currency
       'domain' => array('name', 'phone', 'address', 'email'),
       'contact' => CRM_Core_SelectValues::contactTokens(),
     );
-    $domainValues = array();
+    $domainValues = [];
     foreach ($tokens['domain'] as $token) {
       $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
     }
@@ -587,22 +587,22 @@ GROUP BY  currency
     foreach ($fields as $key => $val) {
       $returnProperties[$val] = TRUE;
     }
-    $details = CRM_Utils_Token::getTokenDetails($ids,
+    [$details] = CRM_Utils_Token::getTokenDetails($ids,
       $returnProperties,
       TRUE, TRUE, NULL,
       $tokens,
       get_class($form)
     );
-    $form->assign('contact', $details[0][$params['contact_id']]);
+    $form->assign('contact', $details[$params['contact_id']]);
 
     // handle custom data.
     if (!empty($params['hidden_custom'])) {
       $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
       $pledgeParams = array(array('pledge_id', '=', $params['id'], 0, 0));
-      $customGroup = array();
+      $customGroup = [];
       // retrieve custom data
       foreach ($groupTree as $groupID => $group) {
-        $customFields = $customValues = array();
+        $customFields = $customValues = [];
         if ($groupID == 'info') {
           continue;
         }
@@ -692,7 +692,7 @@ GROUP BY  currency
       }
 
       if (is_a(CRM_Activity_BAO_Activity::create($activityParams), 'CRM_Core_Error')) {
-        CRM_Core_Error::fatal("Failed creating Activity for acknowledgment");
+        throw new CRM_Core_Exception('Failed creating Activity for acknowledgment');
       }
     }
   }
@@ -708,7 +708,7 @@ GROUP BY  currency
   public static function exportableFields($checkPermission = TRUE) {
     if (!self::$_exportableFields) {
       if (!self::$_exportableFields) {
-        self::$_exportableFields = array();
+        self::$_exportableFields = [];
       }
 
       $fields = CRM_Pledge_DAO_Pledge::export();
@@ -773,12 +773,12 @@ GROUP BY  currency
    *   associated array of pledge id(s)
    */
   public static function getContactPledges($contactID) {
-    $pledgeDetails = array();
+    $pledgeDetails = [];
     $pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
       FALSE, FALSE, FALSE, NULL, 'name'
     );
 
-    $status = array();
+    $status = [];
 
     // get pending and in progress status
     foreach (array(
@@ -833,7 +833,7 @@ GROUP BY  currency
    */
   public static function updatePledgeStatus($params) {
 
-    $returnMessages = array();
+    $returnMessages = [];
 
     $sendReminders = CRM_Utils_Array::value('send_reminders', $params, FALSE);
 
@@ -881,7 +881,7 @@ SELECT  pledge.contact_id              as contact_id,
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $now = date('Ymd');
-    $pledgeDetails = $contactIds = $pledgePayments = $pledgeStatus = array();
+    $pledgeDetails = $contactIds = $pledgePayments = $pledgeStatus = [];
     while ($dao->fetch()) {
       $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($dao->contact_id);
 
@@ -941,7 +941,7 @@ SELECT  pledge.contact_id              as contact_id,
         'contact' => CRM_Core_SelectValues::contactTokens(),
       );
 
-      $domainValues = array();
+      $domainValues = [];
       foreach ($tokens['domain'] as $token) {
         $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
       }
@@ -1100,7 +1100,7 @@ SELECT  pledge.contact_id              as contact_id,
     ));
     $paymentDAO->find();
 
-    $paymentIDs = array();
+    $paymentIDs = [];
     while ($paymentDAO->fetch()) {
       $paymentIDs[] = $paymentDAO->id;
     }
@@ -1261,7 +1261,7 @@ SELECT  pledge.contact_id              as contact_id,
    *
    * @return array|bool
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+  public static function buildOptions($fieldName, $context = NULL, $props = []) {
     $result = parent::buildOptions($fieldName, $context, $props);
     if ($fieldName == 'status_id') {
       $result = array_diff($result, array('Failed'));

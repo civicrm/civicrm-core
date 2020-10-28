@@ -29,10 +29,10 @@
     "psr-0": {
       "PHPUnit_": ["packages/"],
       "Civi": "",
-      "Civi\\": [".", "tests/phpunit/"]
+      "Civi\\": ["tests/phpunit/"]
     },
     "psr-4": {
-      "Civi\\": ["setup/src/"]
+      "Civi\\": [".", "Civi/", "setup/src/"]
     }
   },
   "include-path": ["vendor/tecnickcom"],
@@ -44,17 +44,18 @@
   "require": {
     "php": "~7.1",
     "cache/integration-tests": "~0.16.0",
-    "dompdf/dompdf" : "0.8.*",
+    "dompdf/dompdf" : "~0.8",
     "electrolinux/phpquery": "^0.9.6",
-    "symfony/config": "^2.8.50 || ~3.0",
+    "symfony/config": "~3.0 || ~4.4",
     "symfony/polyfill-iconv": "~1.0",
-    "symfony/dependency-injection": "^2.8.50 || ~3.0",
-    "symfony/event-dispatcher": "^2.8.50 || ~3.0",
-    "symfony/filesystem": "^2.8.50 || ~3.0",
-    "symfony/process": "^2.8.50 || ~3.0",
+    "symfony/dependency-injection": "~3.0 || ~4.4",
+    "symfony/event-dispatcher": "~3.0 || ~4.4",
+    "symfony/filesystem": "~3.0 || ~4.4",
+    "symfony/process": "~3.0 || ~4.4",
+    "symfony/var-dumper": "~3.0 || ~4.4 || ~5.1",
     "psr/log": "~1.0",
-    "symfony/finder": "^2.8.50 || ~3.0",
-    "tecnickcom/tcpdf" : "6.2.*",
+    "symfony/finder": "~3.0 || ~4.4",
+    "tecnickcom/tcpdf" : "6.3.*",
     "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "1.9.*",
@@ -69,12 +70,18 @@
     "guzzlehttp/guzzle": "^6.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
-    "pear/log": "1.13.1",
+    "pear/log": "1.13.2",
     "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^2.0",
     "league/csv": "^9.2",
     "tplaner/when": "~3.0.0",
-    "xkerman/restricted-unserialize": "~1.1"
+    "xkerman/restricted-unserialize": "~1.1",
+    "typo3/phar-stream-wrapper": "^2 || ^3.0",
+    "brick/money": "~0.4",
+    "ext-intl": "*",
+    "pear/mail_mime": "~1.10",
+    "pear/db": "1.10",
+    "civicrm/composer-compile-lib": "~0.3 || ~1.0"
   },
   "scripts": {
     "post-install-cmd": [
@@ -119,7 +126,7 @@
         "path": "bower_components/{$id}"
       },
       "angular": {
-        "url": "https://github.com/angular/bower-angular/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular/archive/v1.8.0.zip"
       },
       "angular-bootstrap": {
         "url": "https://github.com/angular-ui/bootstrap-bower/archive/2.5.0.zip"
@@ -132,13 +139,13 @@
         "url": "https://github.com/totten/angular-jquery-dialog-service/archive/v0.8.0-civicrm-1.0.zip"
       },
       "angular-mocks": {
-        "url": "https://github.com/angular/bower-angular-mocks/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular-mocks/archive/v1.8.0.zip"
       },
       "angular-route": {
-        "url": "https://github.com/angular/bower-angular-route/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular-route/archive/v1.8.0.zip"
       },
       "angular-sanitize": {
-        "url": "https://github.com/angular/bower-angular-sanitize/archive/v1.5.11.zip"
+        "url": "https://github.com/angular/bower-angular-sanitize/archive/v1.8.0.zip"
       },
       "angular-ui-sortable": {
         "url": "https://github.com/angular-ui/ui-sortable/archive/v0.19.0.zip"
@@ -190,6 +197,12 @@
       "es6-promise": {
         "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
       },
+      "ext-greenwich-bootstrap3": {
+        "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
+        "path": "ext/greenwich/extern/bootstrap3",
+        "version": "3.4.1",
+        "ignore": ["test", "tasks", "lib"]
+      },
       "font-awesome": {
         "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
         "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
@@ -200,7 +213,7 @@
       },
       "google-code-prettify": {
         "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
-        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile"]
+        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile", "examples", "*.html", "run_prettify*js"]
       },
       "jquery": {
         "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
@@ -223,9 +236,6 @@
       "phantomjs-polyfill": {
         "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
       },
-      "qunit": {
-        "url": "https://github.com/jquery/qunit/archive/v1.10.0.zip"
-      },
       "select2": {
         "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
       },
@@ -239,13 +249,25 @@
       }
     },
     "patches": {
+      "adrienrn/php-mimetyper": {
+        "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch"
+      },
       "cache/integration-tests": {
         "Allow adding tests": "https://github.com/php-cache/integration-tests/commit/05f97174c09364dc10c084a38ba0cfd5124f4cec.patch",
         "Support PHPUnit 6+": "https://github.com/php-cache/integration-tests/commit/1ec7362962185df91d3d749bc3fa7e7b99cb9fc7.patch",
         "Add tests for binary data round trip": "https://github.com/php-cache/integration-tests/commit/89cd7068e83aa776774bfc44f6bcba858c085616.patch"
       },
+      "electrolinux/phpquery": {
+        "PHP7.4 Fix for array access using {} instead of []": "https://raw.githubusercontent.com/civicrm/civicrm-core/fe45bdfc4f3e3d3deb27e3d853cdbc7f616620a9/tools/scripts/composer/patches/php74_array_access_fix_phpquery.patch"
+      },
+      "pear/db": {
+        "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/a48a43c2b5f6d694fff1cfb99d522c5d9e2459a0/tools/scripts/composer/pear_db_civicrm_changes.patch"
+      },
       "pear/mail": {
         "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+      },
+      "pear/mail_mime": {
+        "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://raw.githubusercontent.com/civicrm/civicrm-core/74e25f27bb3be32519657539afe8a285c6c99a08/tools/scripts/composer/patches/mail_mime_crm_3133.patch"
       },
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
@@ -259,6 +281,8 @@
       "zetacomponents/mail": {
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
       }
-    }
+    },
+    "compile-includes": ["ext/greenwich/composer.compile.json"],
+    "compile-whitelist": ["civicrm/composer-compile-lib"]
   }
 }

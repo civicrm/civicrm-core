@@ -1,0 +1,4 @@
+<label ng-repeat="opt in getOptions() track by opt.key" >
+  <input class="crm-form-radio" type="radio" ng-model="dataProvider.getFieldData()[fieldName]" ng-value="opt.key" />
+  {{ opt.label }}
+</label>

@@ -21,6 +21,7 @@
 class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   protected $_settings = [
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'defaultExternUrl' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'userFrameworkResourceURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'imageUploadURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'customCSSURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,

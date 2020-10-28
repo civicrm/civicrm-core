@@ -13,13 +13,13 @@
  * Implement the "reload" option. This option can be used with "create" to force
  * the API to reload a clean copy of the entity before returning the result.
  *
- * @code
+ * ```
  * $clean = civicrm_api('myentity', 'create', array(
  *   'options' => array(
  *     'reload' => 1
  *   ),
  * ));
- * @endcode
+ * ```
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing

@@ -10,7 +10,7 @@
 <div class="crm-block crm-form-block crm-unhold-form-block">
 <div class="spacer"></div>
 <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
           <p>{ts}Are you sure you want to unhold email of selected contact(s)?.{/ts} {ts}This action cannot be undone.{/ts}</p>
       <p>{include file="CRM/Contact/Form/Task.tpl"}</p>
     </div>

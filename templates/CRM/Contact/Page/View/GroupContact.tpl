@@ -10,7 +10,7 @@
 <div class="view-content view-contact-groups">
   {if $groupCount eq 0}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       &nbsp;{ts}This contact does not currently belong to any groups.{/ts}
     </div>
   {else}

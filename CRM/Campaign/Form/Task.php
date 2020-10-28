@@ -34,9 +34,6 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
     $values = $this->controller->exportValues('Search');
 
     $this->_task = $values['task'];
-    $campaignTasks = CRM_Campaign_Task::tasks();
-    $taskName = $campaignTasks[$this->_task] ?? NULL;
-    $this->assign('taskName', $taskName);
 
     $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
@@ -61,15 +58,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
     $this->_voterIds = $this->_contactIds = $this->_componentIds = $ids;
 
     $this->assign('totalSelectedContacts', count($this->_contactIds));
-
-    //set the context for redirection for any task actions
-    $session = CRM_Core_Session::singleton();
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
-    $urlParams = 'force=1';
-    if (CRM_Utils_Rule::qfKey($qfKey)) {
-      $urlParams .= '&qfKey=' . $qfKey;
-    }
-    $session->replaceUserContext(CRM_Utils_System::url('civicrm/survey/search', $urlParams));
+    $this->setNextUrl('survey');
   }
 
   /**

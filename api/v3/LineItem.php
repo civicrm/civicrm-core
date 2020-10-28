@@ -26,12 +26,11 @@
  *
  * @return array
  *   api result array
+ *
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_line_item_create($params) {
-  // @todo the following line is not really appropriate for the api. The BAO should
-  // do the work, and it should be in a tighter function. The below function is  not really
-  // readable because it is handling contribution and line item together.
-  $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'LineItem');
 }
 
@@ -62,9 +61,6 @@ function _civicrm_api3_line_item_create_spec(&$params) {
  *   Array of matching line_items
  */
 function civicrm_api3_line_item_get($params) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
-    CRM_Price_BAO_LineItem::getAPILineItemParams($params);
-  }
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -75,18 +71,11 @@ function civicrm_api3_line_item_get($params) {
  *
  * @param array $params
  *   Array containing id of the group to be deleted.
+ *
  * @return array API result array
  * @throws API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_line_item_delete($params) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($params['check_permissions'])) {
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::DELETE);
-    if (empty($params['financial_type_id'])) {
-      $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
-    }
-    if (!in_array($params['financial_type_id'], array_keys($types))) {
-      throw new API_Exception('You do not have permission to delete this line item');
-    }
-  }
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

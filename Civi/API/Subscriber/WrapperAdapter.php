@@ -26,8 +26,8 @@ class WrapperAdapter implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::PREPARE => ['onApiPrepare', Events::W_MIDDLE],
-      Events::RESPOND => ['onApiRespond', Events::W_EARLY * 2],
+      'civi.api.prepare' => ['onApiPrepare', Events::W_MIDDLE],
+      'civi.api.respond' => ['onApiRespond', Events::W_EARLY * 2],
     ];
   }
 

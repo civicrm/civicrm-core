@@ -9,11 +9,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
   protected $_priceSetID;
 
-  protected $_cheapFee = 80;
+  protected $_cheapFee = '80.00';
 
-  protected $_expensiveFee = 100;
+  protected $_expensiveFee = '100.00';
 
-  protected $_veryExpensive = 120;
+  protected $_veryExpensive = '120.00';
 
   protected $_noFee = 0;
 
@@ -490,7 +490,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
-    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount', 'id', $this->_cheapFee, "Total Amount equals " . $this->_expensiveFee);
+    $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount', 'id', $this->_cheapFee, 'Total Amount equals ' . $this->_expensiveFee);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $pendingRefundStatusId, 'Contribution must be refunding');
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');

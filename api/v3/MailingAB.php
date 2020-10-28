@@ -23,6 +23,7 @@ function _civicrm_api3_mailing_a_b_create_spec(&$spec) {
   $spec['created_date']['api.default'] = 'now';
   $spec['created_id']['api.required'] = 1;
   $spec['created_id']['api.default'] = 'user_contact_id';
+  $spec['domain_id']['api.default'] = CRM_Core_Config::domainID();
 }
 
 /**

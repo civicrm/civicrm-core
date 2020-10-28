@@ -14,7 +14,6 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @copyright David Strauss <david@fourkitchens.com> (c) 2007
- * $Id$
  *
  * (Note: This has been considerably rewritten; the interface is preserved
  * for backward compatibility.)
@@ -28,7 +27,7 @@
  *
  * Examples:
  *
- * @code
+ * ```
  * // Some business logic using the helper functions
  * function my_business_logic() {
  *   CRM_Core_Transaction::create()->run(function($tx) {
@@ -60,7 +59,7 @@
  *   }
  * }
  *
- * @endcode
+ * ```
  *
  * Note: As of 4.6, the transaction manager supports both reference-counting and nested
  * transactions (SAVEPOINTs). In the past, it only supported reference-counting. The two cases

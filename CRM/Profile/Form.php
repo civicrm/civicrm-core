@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -306,7 +305,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       if ($this->_multiRecord &&
         !in_array($this->_multiRecord, [CRM_Core_Action::UPDATE, CRM_Core_Action::ADD, CRM_Core_Action::DELETE])
       ) {
-        CRM_Core_Error::fatal(ts('Proper action not specified for this custom value record profile'));
+        CRM_Core_Error::statusBounce(ts('Proper action not specified for this custom value record profile'));
       }
     }
     $this->_duplicateButtonName = $this->getButtonName('upload', 'duplicate');
@@ -322,7 +321,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
       // check if we are rendering mixed profiles
       if (CRM_Core_BAO_UFGroup::checkForMixProfiles($this->_profileIds)) {
-        CRM_Core_Error::fatal(ts('You cannot combine profiles of multiple types.'));
+        CRM_Core_Error::statusBounce(ts('You cannot combine profiles of multiple types.'));
       }
 
       // for now consider 1'st profile as primary profile and validate it
@@ -358,7 +357,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
 
       if (empty($this->_ufGroup['is_active'])) {
-        CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', [
+        CRM_Core_Error::statusBounce(ts('The requested profile (gid=%1) is inactive or does not exist.', [
           1 => $this->_gid,
         ]));
       }
@@ -407,12 +406,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if (!$this->_recordId
             && ($this->_multiRecord == CRM_Core_Action::UPDATE || $this->_multiRecord == CRM_Core_Action::DELETE)
           ) {
-            CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) requires record id while performing this action',
+            CRM_Core_Error::statusBounce(ts('The requested Profile (gid=%1) requires record id while performing this action',
               [1 => $this->_gid]
             ));
           }
           elseif (empty($this->_multiRecordFields)) {
-            CRM_Core_Error::fatal(ts('No Multi-Record Fields configured for this profile (gid=%1)',
+            CRM_Core_Error::statusBounce(ts('No Multi-Record Fields configured for this profile (gid=%1)',
               [1 => $this->_gid]
             ));
           }
@@ -905,9 +904,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     if ($this->_context == 'dialog') {
       $this->addElement(
-        'submit',
+        'xbutton',
         $this->_duplicateButtonName,
-        ts('Save Matching Contact')
+        ts('Save Matching Contact'),
+        [
+          'type' => 'submit',
+          'class' => 'crm-button',
+        ]
       );
     }
   }
@@ -1107,7 +1110,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $details = $contactDetails[$this->_id];
     }
     if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
-      CRM_Utils_Array::value('postal_greeting_id', $details)
+      !empty($details['postal_greeting_id'])
     )
     ) {
 

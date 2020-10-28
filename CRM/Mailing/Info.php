@@ -26,6 +26,103 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
   protected $keyword = 'mailing';
 
   /**
+   * @return array
+   */
+  public static function createAngularSettings():array {
+    $reportIds = [];
+    $reportTypes = ['detail', 'opened', 'bounce', 'clicks'];
+    foreach ($reportTypes as $report) {
+      $rptResult = civicrm_api3('ReportInstance', 'get', [
+        'sequential' => 1,
+        'report_id' => 'mailing/' . $report,
+      ]);
+      if (!empty($rptResult['values'])) {
+        $reportIds[$report] = $rptResult['values'][0]['id'];
+      }
+    }
+
+    $config = CRM_Core_Config::singleton();
+    $session = CRM_Core_Session::singleton();
+    $contactID = $session->get('userID');
+
+    // Generic params.
+    $params = [
+      'options' => ['limit' => 0],
+      'sequential' => 1,
+    ];
+    $groupNames = civicrm_api3('Group', 'get', $params + [
+      'is_active' => 1,
+      'check_permissions' => TRUE,
+      'return' => ['title', 'visibility', 'group_type', 'is_hidden'],
+    ]);
+    $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + [
+      'is_active' => 1,
+      'return' => [
+        'name',
+        'component_type',
+        'is_default',
+        'body_html',
+        'body_text',
+      ],
+    ]);
+
+    $emailAdd = civicrm_api3('Email', 'get', [
+      'sequential' => 1,
+      'return' => "email",
+      'contact_id' => $contactID,
+    ]);
+
+    $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + [
+      'sequential' => 1,
+      'is_active' => 1,
+      'return' => ["id", "msg_title"],
+      'workflow_id' => ['IS NULL' => ""],
+    ]);
+    $mailTokens = civicrm_api3('Mailing', 'gettokens', [
+      'entity' => ['contact', 'mailing'],
+      'sequential' => 1,
+    ]);
+    $fromAddress = civicrm_api3('OptionValue', 'get', $params + [
+      'option_group_id' => "from_email_address",
+      'domain_id' => CRM_Core_Config::domainID(),
+    ]);
+    $enabledLanguages = CRM_Core_I18n::languages(TRUE);
+    $isMultiLingual = (count($enabledLanguages) > 1);
+    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
+    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()
+      ->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS,
+        []) : CRM_Utils_Token::getRequiredTokens();
+    $crmMailingSettings = [
+      'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
+      'civiMails' => [],
+      'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
+      'groupNames' => [],
+      // @todo this is not used in core. Remove once Mosaico no longer depends on it.
+      'testGroupNames' => $groupNames['values'],
+      'headerfooterList' => $headerfooterList['values'],
+      'mesTemplate' => $mesTemplate['values'],
+      'emailAdd' => $emailAdd['values'],
+      'mailTokens' => $mailTokens['values'],
+      'contactid' => $contactID,
+      'requiredTokens' => $requiredTokens,
+      'enableReplyTo' => (int) Civi::settings()->get('replyTo'),
+      'disableMandatoryTokensCheck' => (int) Civi::settings()
+        ->get('disable_mandatory_tokens_check'),
+      'fromAddress' => $fromAddress['values'],
+      'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', [
+        'id' => 'user_contact_id',
+        'return' => 'email',
+      ]),
+      'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
+      'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
+      'reportIds' => $reportIds,
+      'enabledLanguages' => $enabledLanguages,
+      'isMultiLingual' => $isMultiLingual,
+    ];
+    return $crmMailingSettings;
+  }
+
+  /**
    * @inheritDoc
    * @return array
    */
@@ -57,104 +154,10 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     }
     global $civicrm_root;
 
-    $reportIds = [];
-    $reportTypes = ['detail', 'opened', 'bounce', 'clicks'];
-    foreach ($reportTypes as $report) {
-      $result = civicrm_api3('ReportInstance', 'get', [
-        'sequential' => 1,
-        'report_id' => 'mailing/' . $report,
-      ]);
-      if (!empty($result['values'])) {
-        $reportIds[$report] = $result['values'][0]['id'];
-      }
-    }
     $result = [];
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
     $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
     $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
-
-    $config = CRM_Core_Config::singleton();
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-
-    // Generic params.
-    $params = [
-      'options' => ['limit' => 0],
-      'sequential' => 1,
-    ];
-    $groupNames = civicrm_api3('Group', 'get', $params + [
-      'is_active' => 1,
-      'check_permissions' => TRUE,
-      'return' => ['title', 'visibility', 'group_type', 'is_hidden'],
-    ]);
-    $headerfooterList = civicrm_api3('MailingComponent', 'get', $params + [
-      'is_active' => 1,
-      'return' => ['name', 'component_type', 'is_default', 'body_html', 'body_text'],
-    ]);
-
-    $emailAdd = civicrm_api3('Email', 'get', [
-      'sequential' => 1,
-      'return' => "email",
-      'contact_id' => $contactID,
-    ]);
-
-    $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + [
-      'sequential' => 1,
-      'is_active' => 1,
-      'return' => ["id", "msg_title"],
-      'workflow_id' => ['IS NULL' => ""],
-    ]);
-    $mailTokens = civicrm_api3('Mailing', 'gettokens', [
-      'entity' => ['contact', 'mailing'],
-      'sequential' => 1,
-    ]);
-    $fromAddress = civicrm_api3('OptionValue', 'get', $params + [
-      'option_group_id' => "from_email_address",
-      'domain_id' => CRM_Core_Config::domainID(),
-    ]);
-    $enabledLanguages = CRM_Core_I18n::languages(TRUE);
-    $isMultiLingual = (count($enabledLanguages) > 1);
-    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, []) : CRM_Utils_Token::getRequiredTokens();
-    CRM_Core_Resources::singleton()
-      ->addSetting([
-        'crmMailing' => [
-          'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
-          'civiMails' => [],
-          'campaignEnabled' => in_array('CiviCampaign', $config->enableComponents),
-          'groupNames' => [],
-          // @todo this is not used in core. Remove once Mosaico no longer depends on it.
-          'testGroupNames' => $groupNames['values'],
-          'headerfooterList' => $headerfooterList['values'],
-          'mesTemplate' => $mesTemplate['values'],
-          'emailAdd' => $emailAdd['values'],
-          'mailTokens' => $mailTokens['values'],
-          'contactid' => $contactID,
-          'requiredTokens' => $requiredTokens,
-          'enableReplyTo' => (int) Civi::settings()->get('replyTo'),
-          'disableMandatoryTokensCheck' => (int) Civi::settings()->get('disable_mandatory_tokens_check'),
-          'fromAddress' => $fromAddress['values'],
-          'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', [
-            'id' => 'user_contact_id',
-            'return' => 'email',
-          ]),
-          'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
-          'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
-          'reportIds' => $reportIds,
-          'enabledLanguages' => $enabledLanguages,
-          'isMultiLingual' => $isMultiLingual,
-        ],
-      ])
-      ->addPermissions([
-        'view all contacts',
-        'edit all contacts',
-        'access CiviMail',
-        'create mailings',
-        'schedule mailings',
-        'approve mailings',
-        'delete in CiviMail',
-        'edit message templates',
-      ]);
 
     return $result;
   }

@@ -15,8 +15,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_Component {
 
@@ -72,7 +70,7 @@ class CRM_Core_Component {
    * @param bool $force
    *
    * @return CRM_Core_Component_Info[]
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function &getComponents($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['all']) || $force) {
@@ -89,7 +87,7 @@ class CRM_Core_Component {
         require_once $infoClassFile;
         $infoObject = new $infoClass($cr->name, $cr->namespace, $cr->id);
         if ($infoObject->info['name'] !== $cr->name) {
-          CRM_Core_Error::fatal("There is a discrepancy between name in component registry and in info file ({$cr->name}).");
+          throw new CRM_Core_Exception("There is a discrepancy between name in component registry and in info file ({$cr->name}).");
         }
         Civi::$statics[__CLASS__]['all'][$cr->name] = $infoObject;
         unset($infoObject);

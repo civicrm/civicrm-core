@@ -135,7 +135,7 @@ function civicrm_api3_membership_create($params) {
   // @todo stop passing $ids (membership and userId may be set above)
   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids);
 
-  if (array_key_exists('is_error', $membershipBAO)) {
+  if (property_exists($membershipBAO, 'is_error')) {
     // In case of no valid status for given dates, $membershipBAO
     // is going to contain 'is_error' => "Error Message"
     return civicrm_api3_create_error(ts('The membership can not be saved, no valid membership status for given dates'));

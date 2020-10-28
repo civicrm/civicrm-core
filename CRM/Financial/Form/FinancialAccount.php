@@ -160,7 +160,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
-      $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
+      $defaults['contact_id'] = CRM_Core_BAO_Domain::getDomain()->contact_id;
     }
     return $defaults;
   }

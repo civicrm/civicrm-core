@@ -120,7 +120,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $recipientsGroup = $excludeSmartGroupIDs = $includeSmartGroupIDs = $priorMailingIDs = [];
     $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-      ->select('GROUP_CONCAT(entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
+      ->select('GROUP_CONCAT(DISTINCT entity_id SEPARATOR ",") as group_ids, group_type, entity_table')
       ->where('mailing_id = #mailing_id AND entity_table RLIKE "^civicrm_(group.*|mailing)$" ')
       ->groupBy(['group_type', 'entity_table'])
       ->param('!groupTableName', CRM_Contact_BAO_Group::getTableName())
@@ -690,6 +690,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       }
 
       $this->templates['mailingID'] = $this->id;
+      $this->templates['campaign_id'] = $this->campaign_id;
       $this->templates['template_type'] = $this->template_type;
       CRM_Utils_Hook::alterMailContent($this->templates);
     }
@@ -1527,6 +1528,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       \Civi::log('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params', ['civi.tag' => 'deprecated']);
     }
 
+    // CRM-#1843
+    // If it is a mass sms, set url_tracking to false
+    if (!empty($params['sms_provider_id'])) {
+      $params['url_tracking'] = 0;
+    }
+
     // CRM-12430
     // Do the below only for an insert
     // for an update, we should not set the defaults
@@ -1558,8 +1565,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         // correct template IDs here
         'override_verp' => TRUE,
         'forward_replies' => FALSE,
-        'open_tracking' => TRUE,
-        'url_tracking' => TRUE,
+        'open_tracking' => Civi::settings()->get('open_tracking_default'),
+        'url_tracking' => Civi::settings()->get('url_tracking_default'),
         'visibility' => 'Public Pages',
         'replyto_email' => $domain_email,
         'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),

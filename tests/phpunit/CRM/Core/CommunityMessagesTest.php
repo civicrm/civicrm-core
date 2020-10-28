@@ -19,7 +19,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * The max difference between two times such that they should be
    * treated as equals (expressed in seconds).
    */
-  const APPROX_TIME_EQUALITY = 2;
+  const APPROX_TIME_EQUALITY = 4;
 
   /**
    * @var CRM_Utils_Cache_Interface
@@ -293,14 +293,14 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals($doc2['expires'], $doc3['expires']);
 
     // fourth try, $doc2 has expired yet; new request; replace data
-    CRM_Utils_Time::setTime('2013-03-01 12:10:02');
+    CRM_Utils_Time::setTime('2013-03-01 12:10:05');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest(self::$webResponses['second-valid-response'])
     );
     $doc4 = $communityMessages->getDocument();
     $this->assertEquals('<h1>Second valid response</h1>', $doc4['messages'][0]['markup']);
-    $this->assertApproxEquals(strtotime('2013-03-01 12:20:02'), $doc4['expires'], self::APPROX_TIME_EQUALITY);
+    $this->assertApproxEquals(strtotime('2013-03-01 12:20:05'), $doc4['expires'], self::APPROX_TIME_EQUALITY);
   }
 
   /**
@@ -369,8 +369,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * @return CRM_Utils_HttpClient|PHPUnit\Framework\MockObject\MockObject
    */
   protected function expectNoHttpRequest() {
-    $mockFunction = $this->mockMethod;
-    $client = $this->$mockFunction('CRM_Utils_HttpClient');
+    $client = $this->getMockBuilder('CRM_Utils_HttpClient')->getMock();
     $client->expects($this->never())
       ->method('get');
     return $client;
@@ -384,8 +383,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    * @return CRM_Utils_HttpClient|PHPUnit\Framework\MockObject\MockObject
    */
   protected function expectOneHttpRequest($response) {
-    $mockFunction = $this->mockMethod;
-    $client = $this->$mockFunction('CRM_Utils_HttpClient');
+    $client = $this->getMockBuilder('CRM_Utils_HttpClient')->getMock();
     $client->expects($this->once())
       ->method('get')
       ->will($this->returnValue($response));

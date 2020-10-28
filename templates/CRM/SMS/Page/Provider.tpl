@@ -10,9 +10,8 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/SMS/Form/Provider.tpl"}
 {else}
-  {capture assign=wikiLink}{docURL page="Setting up a SMS Provider for CiviSMS" text="(How to add a SMS Provider)" resource="wiki"}{/capture}
   <div class="help">
-    {ts}You can configure one or more SMS Providers for your CiviCRM installation. To learn more about the procedure to install SMS extension and Provider, refer{/ts} {$wikiLink}
+    {ts}You can configure one or more SMS Providers for your CiviCRM installation.{/ts} {docURL page="user/sms-text-messaging/set-up"}
   </div>
 
 <div class="crm-content-block crm-block">
@@ -47,7 +46,7 @@
   </div>
   {else}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
         {ts}None found.{/ts}
      </div>
 

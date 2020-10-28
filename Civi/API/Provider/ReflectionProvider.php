@@ -24,11 +24,11 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         // TODO decide if we really want to override others
         ['onApiResolve', Events::W_EARLY],
       ],
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         // TODO decide if we really want to override others
         ['onApiAuthorize', Events::W_EARLY],
       ],

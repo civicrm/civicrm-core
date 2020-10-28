@@ -41,7 +41,7 @@
 {/if}
 
   {foreach from=$paymentLinks item=paymentLink}
-    <a class="open-inline action-item crm-hover-button" href="{$paymentLink.url}">&raquo; {ts}{$paymentLink.title}{/ts}</a>
+    <a class="open-inline action-item crm-hover-button" href="{$paymentLink.url}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}{$paymentLink.title}{/ts}</a>
   {/foreach}
 
 {/crmRegion}

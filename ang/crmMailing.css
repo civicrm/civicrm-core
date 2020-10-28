@@ -86,10 +86,6 @@ input[name=preview_test_email]:-ms-input-placeholder {
   font-size: 1.2em;
   float: none;
 }
-.crm-container a.crmMailing-submit-button div {
-  background: url(../i/check.gif) no-repeat left center;
-  padding-left: 20px;
-}
 .crm-container a.crmMailing-submit-button.disabled,
 .crm-container a.crmMailing-submit-button.blocking {
   opacity: .6;

@@ -380,17 +380,16 @@ WHERE ceft.entity_id = %1";
    * @param array $params
    *   To create trxn entries.
    *
-   * @return bool|void
+   * @throws \CRM_Core_Exception
    */
   public static function recordFees($params) {
-    $domainId = CRM_Core_Config::domainID();
     $amount = 0;
     if (!empty($params['prevContribution'])) {
       $amount = $params['prevContribution']->fee_amount;
     }
     $amount = $params['fee_amount'] - $amount;
     if (!$amount) {
-      return FALSE;
+      return;
     }
     $contributionId = $params['contribution']->id ?? $params['contribution_id'];
     if (empty($params['financial_type_id'])) {
@@ -416,9 +415,9 @@ WHERE ceft.entity_id = %1";
     $fItemParams
       = [
         'financial_account_id' => $financialAccount,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
+        'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'created_date' => date('YmdHis'),
-        'transaction_date' => date('YmdHis'),
+        'transaction_date' => $params['trxnParams']['trxn_date'],
         'amount' => $amount,
         'description' => 'Fee',
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),

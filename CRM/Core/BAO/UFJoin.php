@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -90,7 +88,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
     // CRM-4377 (ab)uses the module column
     if (isset($params['module'])) {
-      $dao->module = $params['module'] ?? NULL;
+      $dao->module = $params['module'];
     }
     $dao->entity_table = $params['entity_table'] ?? NULL;
     $dao->entity_id = $params['entity_id'] ?? NULL;
@@ -143,7 +141,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
 
     // CRM-4377 (ab)uses the module column
     if (isset($params['module'])) {
-      $dao->module = $params['module'] ?? NULL;
+      $dao->module = $params['module'];
     }
     $dao->entity_table = $params['entity_table'] ?? NULL;
     $dao->entity_id = $params['entity_id'] ?? NULL;

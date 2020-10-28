@@ -67,7 +67,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     $this->add('select', 'permission_operator', NULL, $operators);
 
     //make separator location configurable
-    $separator = [ts('None'), ts('After menu element'), ts('Before menu element')];
+    $separator = CRM_Core_SelectValues::navigationMenuSeparator();
     $this->add('select', 'has_separator', ts('Separator'), $separator);
 
     $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));

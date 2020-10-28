@@ -104,7 +104,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     );
 
     $session = CRM_Core_Session::singleton();
-    $recentOther = array();
+    $recentOther = [];
 
     if (($session->get('userID') == $this->getContactId()) ||
       CRM_Contact_BAO_Contact_Permission::allow($this->getContactId(), CRM_Core_Permission::EDIT)

@@ -58,7 +58,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    *   Each item is an array with keys:
    *     - name: string, an abstract name
    *     - path: string, a full file path
@@ -99,7 +99,7 @@ class CRM_Utils_Check_Component_Source extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkOrphans() {
     $orphans = $this->findOrphanedFiles();

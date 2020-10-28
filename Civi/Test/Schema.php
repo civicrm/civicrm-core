@@ -26,8 +26,10 @@ class Schema {
     );
     $tables = $pdo->query($query);
     $result = [];
-    foreach ($tables as $table) {
-      $result[] = $table['TABLE_NAME'] ?? $table['table_name'];
+    if (!empty($tables)) {
+      foreach ($tables as $table) {
+        $result[] = $table['TABLE_NAME'] ?? $table['table_name'];
+      }
     }
     return $result;
   }

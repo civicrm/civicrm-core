@@ -14,12 +14,12 @@
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
 {if $deleteRecord}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>&nbsp;
+  {icon icon="fa-info-circle"}{/icon}
         {ts}Are you sure you want to delete this record?{/ts}
   </div>
 
   <div class="crm-submit-buttons">
-    <span class="crm-button">{$form._qf_Edit_upload_delete.html}</span>
+    {$form._qf_Edit_upload_delete.html}
     {if $includeCancelButton}
       <a class="button cancel" href="{$cancelURL}">{$cancelButtonText}</a>
     {/if}
@@ -37,7 +37,7 @@
 
   {if $isDuplicate and ( ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192) ) }
     <div class="crm-submit-buttons">
-      <span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>
+      {$form._qf_Edit_upload_duplicate.html}
     </div>
   {/if}
   {if $mode eq 1 || $activeComponent neq "CiviCRM"}
@@ -53,7 +53,7 @@
     {if $action eq 2 and $multiRecordFieldListing}
       <h1>{ts}Edit Details{/ts}</h1>
       <div class="crm-submit-buttons" style='float:right'>
-      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+      {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
       </div>
     {/if}
 
@@ -157,7 +157,9 @@
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
-                {$form.$n.html}
+                {if $field.html_type neq 'File' || ($field.html_type eq 'File' && !$field.is_view)}
+                   {$form.$n.html}
+                {/if}
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
                     {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
@@ -170,7 +172,9 @@
 
           {if $form.$n.type eq 'file'}
             <div class="crm-section file_displayURL-section file_displayURL{$n}-section"><div class="content">{$customFiles.$n.displayURL}</div></div>
-            <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
+            {if !$fields.$n.is_view}
+               <div class="crm-section file_deleteURL-section file_deleteURL{$n}-section"><div class="content">{$customFiles.$n.deleteURL}</div></div>
+            {/if}
           {/if}
         {/if}
 
@@ -199,15 +203,17 @@
 
     {if ($action eq 1 and $mode eq 4 ) or ($action eq 2) or ($action eq 8192)}
       {if $action eq 2 and $multiRecordFieldListing}
-      {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
-        {assign var=floatStyle value='float:right'}
+        <div class="crm-multi-record-custom-field-listing">
+          {include file="CRM/Profile/Page/MultipleRecordFieldsListing.tpl" showListing=true}
+          {assign var=floatStyle value='float:right'}
+        </div>
       {/if}
       <div class="crm-submit-buttons" style='{$floatStyle}'>
-        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}<span class="crm-button">{$form._qf_Edit_upload_duplicate.html}</span>{/if}
+        {include file="CRM/common/formButtons.tpl"}{if $isDuplicate}{$form._qf_Edit_upload_duplicate.html}{/if}
         {if $includeCancelButton}
           <a class="button cancel" href="{$cancelURL}">
             <span>
-              <i class="crm-i fa-times"></i>
+              <i class="crm-i fa-times" aria-hidden="true"></i>
               {$cancelButtonText}
             </span>
           </a>
@@ -246,7 +252,7 @@ invert              = 0
 }
 {elseif $statusMessage}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   {$statusMessage}
 </div>
 {/if}

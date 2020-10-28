@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -59,7 +57,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
     if (!isset(Civi::$statics[__CLASS__]['countryLimit'])) {
       $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
       $country = [];
-      $countryLimit = Civi::settings()->get('countryLimit');
+      $countryLimit = Civi::settings()->get('countryLimit') ?? [];
       if (is_array($countryLimit)) {
         foreach ($countryLimit as $val) {
           // CRM-12007

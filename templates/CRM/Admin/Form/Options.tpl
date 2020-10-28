@@ -12,7 +12,7 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>
+        {icon icon="fa-info-circle"}{/icon}
              {ts 1=$gLabel}WARNING: Deleting this option will result in the loss of all %1 related records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
       </div>
     {else}
@@ -58,7 +58,7 @@
           <td class="label">{$form.value.label}</td>
           <td>{$form.value.html}<br />
             {if $action == 2}
-              <span class="description"><i class="crm-i fa-exclamation-triangle"></i> {ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
+              <span class="description"><i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i> {ts}Changing the Value field will unlink records which have been marked with this option. This change can not be undone except by restoring the previous value.{/ts}</span>
             {/if}
           </td>
         </tr>

@@ -149,14 +149,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     else {
       // get the field names from the temp. DB table
-      $dao = new CRM_Core_DAO();
-      $db = $dao->getDatabaseConnection();
-
       $columnsQuery = "SHOW FIELDS FROM $this->_importTableName
                          WHERE Field NOT LIKE '\_%'";
-      $columnsResult = $db->query($columnsQuery);
-      while ($row = $columnsResult->fetchRow(DB_FETCHMODE_ASSOC)) {
-        $columnNames[] = $row['Field'];
+      $columnsResult = CRM_Core_DAO::executeQuery($columnsQuery);
+      while ($columnsResult->fetch()) {
+        $columnNames[] = $columnsResult->Field;
       }
     }
 

@@ -19,7 +19,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   /**
    * Check defined indices exist.
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    * @throws \CiviCRM_API3_Exception
    */
   public function checkIndices() {
@@ -62,7 +62,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMissingLogTables() {
     $messages = [];
@@ -91,9 +91,13 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
   /**
    * Check that no smart groups exist that contain deleted custom fields.
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkSmartGroupCustomFieldCriteria() {
+    if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
+      // Do not run this check when the db has not been updated as it might fail on non-updated schema issues.
+      return [];
+    }
     $messages = $problematicSG = [];
     $customFieldIds = array_keys(CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE));
     try {
@@ -153,8 +157,8 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
             $fieldName = ' <span style="color:red"> - Deleted - </span> ';
           }
         }
-        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "?reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria') . '"> <i class="crm-i fa-pencil"></i> </a>';
-        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "?reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings') . '"> <i class="crm-i fa-gear"></i> </a>';
+        $groupEdit = '<a href="' . CRM_Utils_System::url('civicrm/contact/search/advanced', "?reset=1&ssID={$field['ssid']}", TRUE) . '" title="' . ts('Edit search criteria') . '"> <i class="crm-i fa-pencil" aria-hidden="true"></i> </a>';
+        $groupConfig = '<a href="' . CRM_Utils_System::url('civicrm/group', "?reset=1&action=update&id={$id}", TRUE) . '" title="' . ts('Group settings') . '"> <i class="crm-i fa-gear" aria-hidden="true"></i> </a>';
         $html .= "<tr><td>{$id} - {$field['title']} </td><td>{$groupEdit} {$groupConfig}</td><td class='disabled'>{$fieldName}</td>";
       }
 
@@ -170,6 +174,27 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         __FUNCTION__,
         ts($message),
         ts('Disabled/Deleted fields on Smart Groups'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $messages[] = $msg;
+    }
+    return $messages;
+  }
+
+  /**
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkMoneyValueFormatConfig() {
+    $messages = [];
+    if (CRM_Core_Config::singleton()->moneyvalueformat !== '%!i') {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts(
+          '<p>The Monetary Value Display format is a deprecated setting, and this site has a non-standard format. Please report your configuration on <a href="%1">this Gitlab issue</a>.',
+          [1 => 'https://lab.civicrm.org/dev/core/-/issues/1494']
+        ),
+        ts('Deprecated monetary value display format configuration'),
         \Psr\Log\LogLevel::WARNING,
         'fa-server'
       );

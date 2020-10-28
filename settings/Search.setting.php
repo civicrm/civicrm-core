@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 /*
  * Settings metadata file
@@ -65,7 +63,7 @@ return [
     'html_type' => 'text',
     'default' => 'simple',
     'add' => '4.5',
-    'title' => ts('How to handle full-tet queries'),
+    'title' => ts('How to handle full-text queries'),
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,

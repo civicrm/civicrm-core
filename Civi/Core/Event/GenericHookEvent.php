@@ -26,7 +26,7 @@ namespace Civi\Core\Event;
  * and methods. This requires some kind of mapping. `GenericHookEvent`
  * maps each parameter to a field (using magic methods):
  *
- * @code
+ * ```
  * // Creating an event object.
  * $event = GenericHookEvent::create(array(
  *   'bar' => 'abc',
@@ -40,8 +40,8 @@ namespace Civi\Core\Event;
  * $event->bang->objProperty = 'abcd';
  *
  * // Dispatching an event.
- * Civi::service('dispatcher')->dispatch('hook_civicrm_foo', $event);
- * @endCode
+ * Civi::dispatcher()->dispatch('hook_civicrm_foo', $event);
+ * ```
  *
  * Design Discussion:
  *
@@ -56,10 +56,10 @@ namespace Civi\Core\Event;
  * as an array, and all the returned values are merged into one big array.
  * You can add and retrieve return-values using these methods:
  *
- * @code
+ * ```
  * $event->addReturnValues(array(...));
  * foreach ($event->getReturnValues() as $retVal) { ... }
- * @endCode
+ * ```
  */
 class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
 

@@ -673,4 +673,12 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->assertEquals('1991-11-01 00:00:00', $formValues['receive_date_from']);
   }
 
+  public function testUpdateContactTypeNameField() {
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact_type (name,label,parent_id, is_active) VALUES ('', 'Test Contact Type', 1, 1)");
+    CRM_Upgrade_Incremental_php_FiveTwentyEight::populateMissingContactTypeName();
+    $contactType = $this->callAPISuccess('ContactType', 'getsingle', ['label' => 'Test Contact Type']);
+    $this->assertNotEmpty($contactType['name']);
+    $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
+  }
+
 }

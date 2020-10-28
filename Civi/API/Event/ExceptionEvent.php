@@ -12,8 +12,9 @@
 namespace Civi\API\Event;
 
 /**
- * Class ExceptionEvent
- * @package Civi\API\Event
+ * Handle any exceptions that occur while processing an API request.
+ *
+ * Event name: 'civi.api.exception'
  */
 class ExceptionEvent extends Event {
 

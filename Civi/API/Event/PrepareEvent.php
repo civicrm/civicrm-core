@@ -16,6 +16,10 @@ use Civi\API\Provider\WrappingProvider;
 /**
  * Class PrepareEvent
  * @package Civi\API\Event
+ *
+ * Apply any pre-execution filtering to the API request.
+ *
+ * Event name: 'civi.api.prepare'
  */
 class PrepareEvent extends Event {
 

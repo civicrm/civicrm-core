@@ -52,6 +52,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param int $id Group id.
    */
   public static function discard($id) {
+    if (!$id || !is_numeric($id)) {
+      throw new CRM_Core_Exception('Invalid group request attempted');
+    }
     CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
 
     $transaction = new CRM_Core_Transaction();
@@ -115,7 +118,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   public static function getGroupContacts($id) {
     $params = [['group', 'IN', [1 => $id], 0, 0]];
-    list($contacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
+    [$contacts] = CRM_Contact_BAO_Query::apiQuery($params, ['contact_id']);
     return $contacts;
   }
 
@@ -500,23 +503,23 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
   }
 
   /**
-   * Defines a new smart group.
+   * Takes a sloppy mismash of params and creates two entities: a Group and a SavedSearch
+   * Currently only used by unit tests.
    *
    * @param array $params
-   *   Associative array of parameters.
-   *
    * @return CRM_Contact_BAO_Group|NULL
-   *   The new group BAO (if created)
+   * @deprecated
    */
-  public static function createSmartGroup(&$params) {
+  public static function createSmartGroup($params) {
     if (!empty($params['formValues'])) {
       $ssParams = $params;
-      unset($ssParams['id']);
-      if (isset($ssParams['saved_search_id'])) {
-        $ssParams['id'] = $ssParams['saved_search_id'];
+      // Remove group parameters from sloppy mismash
+      unset($ssParams['id'], $ssParams['name'], $ssParams['title'], $ssParams['formValues'], $ssParams['saved_search_id']);
+      if (isset($params['saved_search_id'])) {
+        $ssParams['id'] = $params['saved_search_id'];
       }
-      $params['form_values'] = $params['formValues'];
-      $savedSearch = CRM_Contact_BAO_SavedSearch::create($params);
+      $ssParams['form_values'] = $params['formValues'];
+      $savedSearch = CRM_Contact_BAO_SavedSearch::create($ssParams);
 
       $params['saved_search_id'] = $savedSearch->id;
     }
@@ -912,7 +915,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $action = array_sum(array_keys($newLinks));
 
       // CRM-9936
-      if (array_key_exists('is_reserved', $object)) {
+      if (property_exists($object, 'is_reserved')) {
         //if group is reserved and I don't have reserved permission, suppress delete/edit
         if ($object->is_reserved && !$reservedPermission) {
           $action -= CRM_Core_Action::DELETE;
@@ -921,7 +924,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
       }
 
-      if (array_key_exists('is_active', $object)) {
+      if (property_exists($object, 'is_active')) {
         if ($object->is_active) {
           $action -= CRM_Core_Action::ENABLE;
         }
@@ -1027,6 +1030,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param string $parents
    * @param string $spacer
    * @param bool $titleOnly
+   * @param bool $public
    *
    * @return array
    */
@@ -1034,7 +1038,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $groupIDs,
     $parents = NULL,
     $spacer = '<span class="child-indent"></span>',
-    $titleOnly = FALSE
+    $titleOnly = FALSE,
+    $public = FALSE
   ) {
     if (empty($groupIDs)) {
       return [];
@@ -1052,7 +1057,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $groups = [];
     $args = [1 => [$groupIdString, 'String']];
     $query = "
-SELECT id, title, description, visibility, parents
+SELECT id, title, frontend_title, description, frontend_description, visibility, parents, saved_search_id
 FROM   civicrm_group
 WHERE  id IN $groupIdString
 ";
@@ -1073,22 +1078,32 @@ WHERE  id IN $groupIdString
     $roots = [];
     $tree = [];
     while ($dao->fetch()) {
+      $title = $dao->title;
+      $description = $dao->description;
+      if ($public) {
+        if (!empty($dao->frontend_title)) {
+          $title = $dao->frontend_title;
+        }
+        if (!empty($dao->frontend_description)) {
+          $description = $dao->frontend_description;
+        }
+      }
       if ($dao->parents) {
         $parentArray = explode(',', $dao->parents);
         $parent = self::filterActiveGroups($parentArray);
         $tree[$parent][] = [
           'id' => $dao->id,
-          'title' => $dao->title,
+          'title' => empty($dao->saved_search_id) ? $title : '* ' . $title,
           'visibility' => $dao->visibility,
-          'description' => $dao->description,
+          'description' => $description,
         ];
       }
       else {
         $roots[] = [
           'id' => $dao->id,
-          'title' => $dao->title,
+          'title' => empty($dao->saved_search_id) ? $title : '* ' . $title,
           'visibility' => $dao->visibility,
-          'description' => $dao->description,
+          'description' => $description,
         ];
       }
     }
@@ -1097,6 +1112,7 @@ WHERE  id IN $groupIdString
     for ($i = 0; $i < count($roots); $i++) {
       self::buildGroupHierarchy($hierarchy, $roots[$i], $tree, $titleOnly, $spacer, 0);
     }
+
     return $hierarchy;
   }
 
@@ -1119,8 +1135,9 @@ WHERE  id IN $groupIdString
       $hierarchy[$group['id']] = $spaces . $group['title'];
     }
     else {
-      $hierarchy[$group['id']] = [
-        'title' => $spaces . $group['title'],
+      $hierarchy[] = [
+        'id' => $group['id'],
+        'text' => $spaces . $group['title'],
         'description' => $group['description'],
         'visibility' => $group['visibility'],
       ];
@@ -1216,6 +1233,14 @@ WHERE {$whereClause}";
     $parentsOnly = $params['parentsOnly'] ?? NULL;
     if ($parentsOnly) {
       $clauses[] = '`groups`.parents IS NULL';
+    }
+
+    $savedSearch = $params['savedSearch'] ?? NULL;
+    if ($savedSearch == 1) {
+      $clauses[] = '`groups`.saved_search_id IS NOT NULL';
+    }
+    elseif ($savedSearch == 2) {
+      $clauses[] = '`groups`.saved_search_id IS NULL';
     }
 
     // only show child groups of a specific parent group
@@ -1324,7 +1349,7 @@ WHERE {$whereClause}";
       $this->{$fieldName} = "NULL";
     }
     else {
-      parent::assignTestValues($fieldName, $fieldDef, $counter);
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
     }
   }
 

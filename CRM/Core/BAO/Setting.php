@@ -515,7 +515,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   public static function onChangeEnvironmentSetting($oldValue, $newValue, $metadata) {
     if ($newValue != 'Production') {
       $mailing = Civi::settings()->get('mailing_backend');
-      if ($mailing['outBound_option'] != 2) {
+      if ($mailing['outBound_option'] != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
         Civi::settings()->set('mailing_backend_store', $mailing);
       }
       Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);

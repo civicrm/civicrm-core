@@ -131,7 +131,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->_defaults['installments'] = $this->_subscriptionDetails->installments;
     $this->_defaults['campaign_id'] = $this->_subscriptionDetails->campaign_id;
     $this->_defaults['financial_type_id'] = $this->_subscriptionDetails->financial_type_id;
-    $this->_defaults['is_notify'] = 1;
     foreach ($this->editableScheduleFields as $field) {
       $this->_defaults[$field] = $this->_subscriptionDetails->$field ?? NULL;
     }
@@ -206,7 +205,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $params['id'] = $this->_subscriptionDetails->recur_id;
     $message = '';
 
-    $params['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
+    $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
     $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
       try {

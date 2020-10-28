@@ -32,4 +32,40 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test isSSLDSN
+   * @dataProvider dsnProvider
+   * @param string $input
+   * @param bool $expected
+   */
+  public function testIsSSLDSN(string $input, bool $expected) {
+    $this->assertSame($expected, CRM_Utils_SQL::isSSLDSN($input));
+  }
+
+  /**
+   * Data provider for testIsSSLDSN
+   * @return array
+   */
+  public function dsnProvider():array {
+    return [
+      ['', FALSE],
+      ['mysqli://user:pass@localhost/drupal', FALSE],
+      ['mysqli://user:pass@localhost:3306/drupal', FALSE],
+      ['mysql://user:pass@localhost:3306/drupal', FALSE],
+      ['mysql://user:pass@localhost:3306/drupal', FALSE],
+      ['mysql://user:pass@localhost:3306/drupal?new_link=true', FALSE],
+      ['mysqli://user:pass@localhost:3306/drupal?ssl', FALSE],
+      ['mysqli://user:pass@localhost:3306/drupal?ssl=1', TRUE],
+      ['mysqli://user:pass@localhost:3306/drupal?new_link=true&ssl=1', TRUE],
+      ['mysql://user:pass@localhost:3306/drupal?ssl=1', TRUE],
+      ['mysqli://user:pass@localhost:3306/drupal?ca=%2Ftmp%2Fcacert.crt', TRUE],
+      ['mysqli://user:pass@localhost/drupal?ca=%2Ftmp%2Fcacert.crt&cert=%2Ftmp%2Fcert.crt&key=%2Ftmp%2F', TRUE],
+      ['mysqli://user:pass@localhost/drupal?ca=%2Fpath%20with%20spaces%2Fcacert.crt', TRUE],
+      ['mysqli://user:pass@localhost:3306/drupal?cipher=aes', TRUE],
+      ['mysqli://user:pass@localhost:3306/drupal?capath=%2Ftmp', TRUE],
+      ['mysqli://user:pass@localhost:3306/drupal?cipher=aes&capath=%2Ftmp&food=banana', TRUE],
+      ['mysqli://user:pass@localhost:3306/drupal?food=banana&cipher=aes', TRUE],
+    ];
+  }
+
 }

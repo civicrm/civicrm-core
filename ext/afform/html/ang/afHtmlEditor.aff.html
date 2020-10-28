@@ -1,0 +1,35 @@
+<div af-api4-ctrl="apiData" af-api4="['Afform', 'get', {layoutFormat: 'html', where: [['name', '=', options.name]]}]">
+
+  <div ng-if="apiData.result.length == 0">
+    {{ts('Failed to find requested form.')}}
+  </div>
+
+  <div ng-repeat="resultForm in apiData.result" ng-if="apiData.result.length > 0">
+    <div crm-ui-debug="resultForm"></div>
+
+    <div>
+      <a ng-href="#!/">{{ts('Back')}}</a>
+      |
+      <a af-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">{{ts('Save')}}</a>
+      <span ng-if="resultForm.server_route">
+        | <a target="_blank" ng-href="{{crmUrl(resultForm.server_route)}}">Open</a>
+      </span>
+    </div>
+
+    <fieldset>
+      <legend>{{ts('Properties')}}</legend>
+      <div><label>{{ts('Name')}}:</label> {{resultForm.name}}</div>
+      <div><label>{{ts('Title')}}:</label> <input ng-model="resultForm.title" type="text" /></div>
+      <div><label>{{ts('Server Route')}}:</label> <input ng-model="resultForm.server_route" type="text" /></div>
+      <div><label>{{ts('Permission')}}:</label> <input ng-model="resultForm.permission" type="text" /></div>
+      <div><label>{{ts('Description')}}:</label> <textarea ng-model="resultForm.description"></textarea></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>{{ts('Layout')}}</legend>
+      <div af-monaco ng-model="resultForm.layout"></div>
+    </fieldset>
+
+  </div>
+
+</div>

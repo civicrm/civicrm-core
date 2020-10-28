@@ -106,7 +106,7 @@ class CRM_Core_Payment_ProcessorForm {
     if (!empty($form->_values['is_monetary']) &&
       !$form->_paymentProcessor['class_name'] && empty($form->_values['is_pay_later'])
     ) {
-      CRM_Core_Error::fatal(ts('Payment processor is not set for this page'));
+      CRM_Core_Error::statusBounce(ts('Payment processor is not set for this page'));
     }
 
     if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
@@ -115,7 +115,7 @@ class CRM_Core_Payment_ProcessorForm {
       )
     ) {
 
-      CRM_Core_Error::fatal(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
+      CRM_Core_Error::statusBounce(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
           [1 => $form->_paymentProcessor['payment_processor_type']]
         )
       );
@@ -139,7 +139,7 @@ class CRM_Core_Payment_ProcessorForm {
     if (!empty($processorId)) {
       $form->addElement('hidden', 'hidden_processor', 1);
     }
-    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, $form->isBackOffice, $form->paymentInstrumentID);
+    CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, $billing_profile_id, $form->isBackOffice, $form->paymentInstrumentID ?? NULL);
   }
 
 }

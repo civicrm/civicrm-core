@@ -49,7 +49,7 @@
                             {if call_user_func(array('CRM_Core_Permission','check'), 'view my invoices') OR call_user_func(array('CRM_Core_Permission','check'), 'access CiviContribute')}
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
-                                    <i class="crm-i fa-print"></i>
+                                    <i class="crm-i fa-print" aria-hidden="true"></i>
                                     {if $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled' }
                                         <span>{ts}Print Invoice{/ts}</span>
                                     {else}
@@ -71,7 +71,7 @@
         {/if}
     {else}
         <div class="messages status no-popup">
-            <div class="icon inform-icon"></div>
+            {icon icon="fa-info-circle"}{/icon}
             {ts}There are no contributions on record for you.{/ts}
         </div>
     {/if}

@@ -141,7 +141,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
       $ppByName = self::getAllPaymentProcessorTypes('name');
       if (array_key_exists($paymentProcessorType->name, $ppByName)) {
         if ($ppByName[$paymentProcessorType->name] != $paymentProcessorType->id) {
-          CRM_Core_Error::fatal('This payment processor type already exists.');
+          throw new CRM_Core_Exception('This payment processor type already exists.');
         }
       }
     }

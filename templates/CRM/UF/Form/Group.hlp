@@ -63,7 +63,7 @@
   {ts}Add to Group{/ts}
 {/htxt}
 {htxt id='id-add_group'}
-{ts}Select a group if you are using this profile for adding new contacts, AND you want the new contacts to be automatically assigned to a group.{/ts}
+{ts}Select a group if you want contacts to be automatically added to that group when the profile is submitted.{/ts}
 {/htxt}
 
 {htxt id='id-notify_email-title'}

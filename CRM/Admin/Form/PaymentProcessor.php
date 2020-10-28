@@ -21,6 +21,16 @@
 class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   use CRM_Core_Form_EntityFormTrait;
 
+  /**
+   * @var int
+   * Test Payment Processor ID
+   */
+  protected $_testID;
+
+  /**
+   * @var \CRM_Core_DAO_PaymentProcessor
+   * Payment Processor DAO Object
+   */
   protected $_paymentProcessorDAO;
 
   /**

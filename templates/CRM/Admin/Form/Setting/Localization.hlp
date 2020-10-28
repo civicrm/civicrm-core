@@ -16,11 +16,6 @@
   </ul>
   {ts 1='href="http://php.net/manual/en/function.money-format.php"'}For a full list of options see the php <a %1>money_format documentation</a>.{/ts}
 {/capture}
-{htxt id="inheritLocale"}
-  <p>
-    {ts}If checked, CiviCRM will follow CMS language changes.{/ts}
-  </p>
-{/htxt}
 {htxt id="defaultCurrency"}
   <p>
     {ts}Default currency assigned to contributions and other monetary transactions.{/ts}

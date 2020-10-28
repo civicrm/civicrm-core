@@ -117,10 +117,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   index definitions after localization
    */
   public static function multilingualize($class, $originalIndices) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-    if (CRM_Utils_System::isNull($locales)) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if (!$locales) {
       return $originalIndices;
     }
     $classFields = $class::fields();
@@ -186,14 +184,86 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * Get the DAO for the class.
+   * Get the DAO for a BAO class.
    *
-   * @param string $className
+   * @param string $baoName
+   *
+   * @return string|CRM_Core_DAO
+   */
+  public static function getCanonicalClassName($baoName) {
+    return str_replace('_BAO_', '_DAO_', $baoName);
+  }
+
+  /**
+   * Get the BAO for a DAO class.
+   *
+   * @param string $daoName
+   *
+   * @return string|CRM_Core_DAO
+   */
+  public static function getBAOClassName($daoName) {
+    $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    return class_exists($baoName) ? $baoName : $daoName;
+  }
+
+  /**
+   * Convert possibly underscore separated words to camel case with special handling for 'UF'
+   * e.g membership_payment returns MembershipPayment
+   *
+   * @param string $name
+   * @param bool $legacyV3
+   * @return string
+   */
+  public static function convertEntityNameToCamel(string $name, $legacyV3 = FALSE): string {
+    // This map only applies to APIv3
+    $map = [
+      'acl' => 'Acl',
+      'ACL' => 'Acl',
+      'im' => 'Im',
+      'IM' => 'Im',
+    ];
+    if ($legacyV3 && isset($map[$name])) {
+      return $map[$name];
+    }
+
+    $fragments = explode('_', $name);
+    foreach ($fragments as & $fragment) {
+      $fragment = ucfirst($fragment);
+      // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in without underscores)
+      if (strpos($fragment, 'Uf') === 0 && strlen($name) > 2) {
+        $fragment = 'UF' . ucfirst(substr($fragment, 2));
+      }
+    }
+    // Special case: UFGroup, UFJoin, UFMatch, UFField (if passed in underscore-separated)
+    if ($fragments[0] === 'Uf') {
+      $fragments[0] = 'UF';
+    }
+    return implode('', $fragments);
+  }
+
+  /**
+   * Convert CamelCase to snake_case, with special handling for some entity names.
+   *
+   * Eg. Activity returns activity
+   *     UFGroup returns uf_group
+   *     OptionValue returns option_value
+   *
+   * @param string $name
    *
    * @return string
    */
-  public static function getCanonicalClassName($className) {
-    return str_replace('_BAO_', '_DAO_', $className);
+  public static function convertEntityNameToLower(string $name): string {
+    if ($name === strtolower($name)) {
+      return $name;
+    }
+    if ($name === 'PCP' || $name === 'IM' || $name === 'ACL') {
+      return strtolower($name);
+    }
+    return strtolower(ltrim(str_replace('U_F',
+      'uf',
+      // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
+      preg_replace('/(?=[A-Z])/', '_$0', $name)
+    ), '_'));
   }
 
   /**
@@ -210,7 +280,7 @@ class CRM_Core_DAO_AllCoreTables {
    * Get the classname for the table.
    *
    * @param string $tableName
-   * @return string
+   * @return string|CRM_Core_DAO|NULL
    */
   public static function getClassForTable($tableName) {
     //CRM-19677: on multilingual setup, trim locale from $tableName to fetch class name
@@ -226,7 +296,7 @@ class CRM_Core_DAO_AllCoreTables {
    *
    * @param string $daoName
    *   Ex: 'Contact'.
-   * @return string|NULL
+   * @return string|CRM_Core_DAO|NULL
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getFullName($daoName) {
@@ -242,7 +312,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'Contact'.
    */
   public static function getBriefName($className) {
-    return CRM_Utils_Array::value($className, array_flip(self::daoToClass()));
+    $className = self::getCanonicalClassName($className);
+    return array_search($className, self::daoToClass(), TRUE) ?: NULL;
   }
 
   /**

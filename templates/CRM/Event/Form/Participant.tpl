@@ -106,7 +106,7 @@
           }
 
         if ( showError ) {
-          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
+          cj('#validate_pricefield').show().html('<i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>{/literal} {ts escape='js'}This Option is already full for this event.{/ts}{literal}');
         }
         else {
           cj('#validate_pricefield').hide( ).html('');
@@ -175,7 +175,7 @@
         {else}
           {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/participant' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
         {/if}
-        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card event registration{/ts}</a>
+        <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card event registration{/ts}</a>
       </div>
     {/if}
     <div class="view-content">
@@ -196,7 +196,7 @@
       {if $action eq 8} {* If action is Delete *}
         <div class="crm-participant-form-block-delete messages status no-popup">
           <div class="crm-content">
-            <div class="icon inform-icon"></div> &nbsp;
+            {icon icon="fa-info-circle"}{/icon}
             {ts}WARNING: Deleting this registration will result in the loss of related payment records (if any).{/ts} {ts}Do you want to continue?{/ts}
           </div>
           {if $additionalParticipant}
@@ -437,7 +437,7 @@
     notificationStatusIds = notificationStatusIds.split(',');
     if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
       cj("#notify").show();
-      cj("#is_notify").prop('checked', true);
+      cj("#is_notify").prop('checked', false);
     }
     else {
       cj("#notify").hide();

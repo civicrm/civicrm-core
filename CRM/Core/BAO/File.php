@@ -677,7 +677,7 @@ AND       CEF.entity_id    = %2";
 
   /**
    * Delete a file attachment from an entity table / entity ID
-   *
+   * @throws CRM_Core_Exception
    */
   public static function deleteAttachment() {
     $params = [];
@@ -689,7 +689,7 @@ AND       CEF.entity_id    = %2";
 
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$_signableFields);
     if (!$signer->validate($signature, $params)) {
-      CRM_Core_Error::fatal('Request signature is invalid');
+      throw new CRM_Core_Exception('Request signature is invalid');
     }
 
     self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
@@ -726,17 +726,19 @@ AND       CEF.entity_id    = %2";
           $fileType == 'image/x-png' ||
           $fileType == 'image/png'
         ) {
-          $file_url[$fileID] = "
-              <a href='$url' class='crm-image-popup' title='$title'>
-                <i class='crm-i fa-file-image-o'></i>
-              </a>";
+          $file_url[$fileID] = <<<HEREDOC
+              <a href="$url" class="crm-image-popup" title="$title">
+                <i class="crm-i fa-file-image-o" aria-hidden="true"></i>
+              </a>
+HEREDOC;
         }
         // for non image files
         else {
-          $file_url[$fileID] = "
-              <a href='$url' title='$title'>
-                <i class='crm-i fa-paperclip'></i>
-              </a>";
+          $file_url[$fileID] = <<<HEREDOC
+              <a href="$url" title="$title">
+                <i class="crm-i fa-paperclip" aria-hidden="true"></i>
+              </a>
+HEREDOC;
         }
       }
     }

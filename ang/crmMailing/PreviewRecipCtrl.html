@@ -9,17 +9,17 @@
 
     <p ng-show="model.sample.length == model.sampleLimit">{{ts('Below is a sample of the first %1 recipients.', {1: model.sampleLimit})}}</p>
 
-    <p>{{ts('If individual contacts are separately modified, added, or removed, then the final list may change.')}}</p>
+    <p>{{:: ts('If individual contacts are separately modified, added, or removed, then the final list may change.') }}</p>
   </div>
 
   <div ng-show="model.sample == 0">
-    {{ts('No recipients')}}
+    {{:: ts('No recipients') }}
   </div>
   <table ng-show="model.sample.length > 0">
     <thead>
       <tr>
-        <th>{{ts('Name')}}</th>
-        <th>{{ts('Email')}}</th>
+        <th>{{:: ts('Name') }}</th>
+        <th>{{:: ts('Email') }}</th>
       </tr>
     </thead>
     <tbody>

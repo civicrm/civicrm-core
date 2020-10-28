@@ -588,7 +588,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_OptionValue' => [
         [
           'fieldName' => 'option_group_id',
-          'sample' => 'gender',
+          'sample' => 'Gender',
           'max' => 200,
         ],
         [
@@ -1102,7 +1102,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     ];
     CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    $this->assertEquals('5.00', $taxRates[$financialType['id']]);
+    $this->assertEquals('5.00', round($taxRates[$financialType['id']], 2));
   }
 
 }

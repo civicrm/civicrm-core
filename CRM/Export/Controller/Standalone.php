@@ -42,13 +42,15 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       $this->set('cids', implode(',', array_keys($perm['values'])));
     }
 
-    $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action);
+    $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action, $entity);
 
     // create and instantiate the pages
     $this->addPages($this->_stateMachine, $action);
 
     // add all the actions
     $this->addActions();
+    $dao = CRM_Core_DAO_AllCoreTables::getFullName($entity);
+    CRM_Utils_System::setTitle(ts('Export %1', [1 => $dao::getEntityTitle(TRUE)]));
   }
 
   /**
@@ -67,14 +69,33 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       }
     }
     // Set the "task" selector value to Export
-    $className = 'CRM_' . $this->get('entity') . '_Task';
+    $className = 'CRM_' . $this->getComponent($this->get('entity')) . '_Task';
     foreach ($className::tasks() as $taskId => $task) {
       $taskForm = (array) $task['class'];
-      if ($taskForm[0] == 'CRM_Export_Form_Select') {
+      if (strpos($taskForm[0], 'CRM_Export_Form_Select') === 0) {
         $values['task'] = $taskId;
       }
     }
     return $values;
+  }
+
+  /**
+   * Get the relevant entity name.
+   *
+   * @return string
+   */
+  public function getComponent() {
+    $components = CRM_Export_BAO_Export::getComponents();
+    return $components[$this->getEntity()];
+  }
+
+  /**
+   * Get the name used to construct the class.
+   *
+   * @return mixed
+   */
+  public function getEntity() {
+    return $this->get('entity');
   }
 
 }

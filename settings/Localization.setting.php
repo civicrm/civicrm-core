@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 /*
  * Settings metadata file
@@ -221,6 +219,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+    'description' => ts('If Yes, the initial session language will be set by the CMS, which can later be changed if using the CiviCRM language switcher.'),
   ],
   'dateformatDatetime' => [
     'group_name' => 'Localization Preferences',
@@ -525,7 +524,7 @@ return [
     'title' => ts('Default Language for contacts'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Default language (if any) for contact records'),
+    'description' => ts('Default language (if any) for contact records.'),
     'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
     . 'You may or may not wish to make an assumption here about whether it matches the site language',
   ],

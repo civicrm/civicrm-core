@@ -58,6 +58,9 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Search');
 
     //check for civicase access.
@@ -202,8 +205,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
-    // @todo - stop changing formValues - respect submitted form values, change a working array.
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     // @todo - stop changing formValues - respect submitted form values, change a working array.
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);

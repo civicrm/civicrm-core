@@ -2,7 +2,7 @@
 
 namespace Civi\Core;
 
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @see \CRM_Utils_Hook
  */
-class CiviEventDispatcher extends ContainerAwareEventDispatcher {
+class CiviEventDispatcher extends EventDispatcher {
 
   const DEFAULT_HOOK_PRIORITY = -100;
 
@@ -29,6 +29,28 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   private $autoListeners = [];
 
   /**
+   * A list of dispatch-policies (based on an exact-match to the event name).
+   *
+   * Note: $dispatchPolicyExact and $dispatchPolicyRegex should coexist; e.g.
+   * if one is NULL, then both are NULL. If one is an array, then both are arrays.
+   *
+   * @var array|null
+   *   Array(string $eventName => string $action)
+   */
+  private $dispatchPolicyExact = NULL;
+
+  /**
+   * A list of dispatch-policies (based on an regex-match to the event name).
+   *
+   * Note: $dispatchPolicyExact and $dispatchPolicyRegex should coexist; e.g.
+   * if one is NULL, then both are NULL. If one is an array, then both are arrays.
+   *
+   * @var array|null
+   *   Array(string $eventRegex => string $action)
+   */
+  private $dispatchPolicyRegex = NULL;
+
+  /**
    * Determine whether $eventName should delegate to the CMS hook system.
    *
    * @param string $eventName
@@ -40,9 +62,69 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   }
 
   /**
+   * Adds a service as event listener.
+   *
+   * This provides partial backwards compatibility with ContainerAwareEventDispatcher.
+   *
+   * @param string $eventName Event for which the listener is added
+   * @param array $callback The service ID of the listener service & the method
+   *                        name that has to be called
+   * @param int $priority The higher this value, the earlier an event listener
+   *                      will be triggered in the chain.
+   *                      Defaults to 0.
+   *
+   * @throws \InvalidArgumentException
+   */
+  public function addListenerService($eventName, $callback, $priority = 0) {
+    if (!\is_array($callback) || 2 !== \count($callback)) {
+      throw new \InvalidArgumentException('Expected an array("service", "method") argument');
+    }
+
+    $this->addListener($eventName, function($event) use ($callback) {
+      static $svc;
+      if ($svc === NULL) {
+        $svc = \Civi::container()->get($callback[0]);
+      }
+      return call_user_func([$svc, $callback[1]], $event);
+    }, $priority);
+  }
+
+  /**
    * @inheritDoc
    */
   public function dispatch($eventName, Event $event = NULL) {
+    // Dispatch policies add systemic overhead and (normally) should not be evaluated. JNZ.
+    if ($this->dispatchPolicyRegex !== NULL) {
+      switch ($mode = $this->checkDispatchPolicy($eventName)) {
+        case 'run':
+          // Continue on the normal execution.
+          break;
+
+        case 'drop':
+          // Quietly ignore the event.
+          return $event;
+
+        case 'warn':
+          // Run the event, but complain about it.
+          error_log("Unexpectedly dispatching event \"$eventName\".");
+          break;
+
+        case 'warn-drop':
+          // Ignore the event, but complaint about it.
+          error_log("Unexpectedly dispatching event \"$eventName\".");
+          return $event;
+
+        case 'fail':
+          throw new \RuntimeException("The dispatch policy prohibits event \"$eventName\".");
+
+        case 'not-ready':
+          throw new \RuntimeException("CiviCRM has not bootstrapped sufficiently to fire event \"$eventName\".");
+
+        default:
+          throw new \RuntimeException("The dispatch policy for \"$eventName\" is unrecognized ($mode).");
+
+      }
+    }
     $this->bindPatterns($eventName);
     return parent::dispatch($eventName, $event);
   }
@@ -114,6 +196,8 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
   }
 
   /**
+   * Attach any pattern-based listeners which may be interested in $eventName.
+   *
    * @param string $eventName
    *   Ex: 'civi.api.resolve' or 'hook_civicrm_dashboard'.
    */
@@ -130,6 +214,71 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
         ], self::DEFAULT_HOOK_PRIORITY);
       }
     }
+  }
+
+  /**
+   * Set the dispatch policy. This allows you to filter certain events.
+   * This can be useful during upgrades or debugging.
+   *
+   * Enforcement will add systemic overhead, so this should normally be NULL.
+   *
+   * @param array|null $dispatchPolicy
+   *   Each key is either the string-literal name of an event, or a regex delimited by '/'.
+   *   Each value is one of: 'run', 'drop', 'warn', 'fail'.
+   *   Exact name matches take precedence over regexes. Regexes are evaluated in order.
+   *
+   *   Ex: ['hook_civicrm_pre' => 'fail']
+   *   Ex: ['/^hook_/' => 'warn']
+   *
+   * @return static
+   */
+  public function setDispatchPolicy($dispatchPolicy) {
+    if (is_array($dispatchPolicy)) {
+      // Split $dispatchPolicy in two (exact rules vs regex rules).
+      $this->dispatchPolicyExact = [];
+      $this->dispatchPolicyRegex = [];
+      foreach ($dispatchPolicy as $pattern => $action) {
+        if ($pattern[0] === '/') {
+          $this->dispatchPolicyRegex[$pattern] = $action;
+        }
+        else {
+          $this->dispatchPolicyExact[$pattern] = $action;
+        }
+      }
+    }
+    else {
+      $this->dispatchPolicyExact = NULL;
+      $this->dispatchPolicyRegex = NULL;
+    }
+
+    return $this;
+  }
+
+  //  /**
+  //   * @return array|NULL
+  //   */
+  //  public function getDispatchPolicy() {
+  //    return  $this->dispatchPolicyRegex === NULL ? NULL : array_merge($this->dispatchPolicyExact, $this->dispatchPolicyRegex);
+  //  }
+
+  /**
+   * Determine whether the dispatch policy applies to a given event.
+   *
+   * @param string $eventName
+   *   Ex: 'civi.api.resolve' or 'hook_civicrm_dashboard'.
+   * @return string
+   *   Ex: 'run', 'drop', 'fail'
+   */
+  protected function checkDispatchPolicy($eventName) {
+    if (isset($this->dispatchPolicyExact[$eventName])) {
+      return $this->dispatchPolicyExact[$eventName];
+    }
+    foreach ($this->dispatchPolicyRegex as $eventPat => $action) {
+      if ($eventPat[0] === '/' && preg_match($eventPat, $eventName)) {
+        return $action;
+      }
+    }
+    return 'fail';
   }
 
 }

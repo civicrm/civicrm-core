@@ -62,36 +62,19 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
       CRM_Core_DAO::executeQuery($query);
     }
 
-    if (!(CRM_Utils_Array::value('id', $params))) {
-
-      if (!(CRM_Utils_Array::value('created_id', $params))) {
-        $session = CRM_Core_Session::singleton();
-        $params['created_id'] = $session->get('userID');
+    if (empty($params['id'])) {
+      if (empty($params['created_id'])) {
+        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
-      if (!(CRM_Utils_Array::value('created_date', $params))) {
+
+      if (empty($params['created_date'])) {
         $params['created_date'] = date('YmdHis');
       }
-
-      CRM_Utils_Hook::pre('create', 'Survey', NULL, $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('edit', 'Survey', $params['id'], $params);
     }
 
-    $dao = new CRM_Campaign_DAO_Survey();
-    $dao->copyValues($params);
-    $dao->save();
+    $dao = self::writeRecord($params);
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Survey', $dao->id, $dao);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Survey', $dao->id, $dao);
-    }
-
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
+    if (!empty($params['custom']) && is_array($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_survey', $dao->id);
     }
     return $dao;

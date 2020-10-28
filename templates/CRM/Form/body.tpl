@@ -17,7 +17,7 @@
 
 {if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
    <div class="messages crm-error">
-       <i class="crm-i fa-exclamation-triangle crm-i-red"></i>
+       <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
      {ts}Please correct the following errors in the form fields below:{/ts}
      <ul id="errorList">
      {foreach from=$form.errors key=errorName item=error}

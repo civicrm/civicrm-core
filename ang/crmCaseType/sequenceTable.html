@@ -6,7 +6,7 @@ Required vars: activitySet
   <thead>
   <tr>
     <th></th>
-    <th>{{ts('Activity')}}</th>
+    <th>{{:: ts('Activity') }}</th>
     <th></th>
   </tr>
   </thead>
@@ -14,14 +14,14 @@ Required vars: activitySet
   <tbody ui-sortable ng-model="activitySet.activityTypes">
   <tr ng-repeat="activity in activitySet.activityTypes">
     <td>
-      <i class="crm-i fa-arrows grip-n-drag"></i>
+      <i class="crm-i fa-arrows grip-n-drag" aria-hidden="true"></i>
     </td>
     <td>
-      <i class="crm-i {{ activityTypes[activity.name].icon }}"></i>
+      <i class="crm-i {{ activityTypes[activity.name].icon }}" aria-hidden="true"></i>
       {{ activity.name }}
     </td>
     <td>
-      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)" title="{{ts('Remove')}}"></a>
+      <a crm-icon="fa-trash" class="crm-hover-button" ng-click="removeItem(activitySet.activityTypes, activity)" title="{{:: ts('Remove') }}"></a>
     </td>
   </tr>
   </tbody>
@@ -33,7 +33,7 @@ Required vars: activitySet
            crm-options="activityTypeOptions"
            crm-var="newActivity"
            crm-on-add="addActivity(activitySet, newActivity)"
-           placeholder="{{ts('Add activity')}}"
+           placeholder="{{:: ts('Add activity') }}"
       ></span>
     </td>
   </tr>

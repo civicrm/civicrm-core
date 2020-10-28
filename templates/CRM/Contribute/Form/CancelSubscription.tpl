@@ -10,9 +10,9 @@
 
 <div class="crm-block crm-form-block crm-auto-renew-membership-cancellation">
 <div class="help">
-  <div class="icon inform-icon"></div>&nbsp;
+  {icon icon="fa-info-circle"}{/icon}
   {$cancelRecurDetailText}
-  {if !$cancelSupported}
+  {if $cancelRecurNotSupportedText}
     <div class="status-warning">{$cancelRecurNotSupportedText}</div>
   {/if}
 </div>

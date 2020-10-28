@@ -15,8 +15,6 @@
  */
 class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_contactID;
-  protected $_contributionTypeID;
-  protected $_apiversion;
   protected $_entity = 'MembershipType';
 
   /**
@@ -25,7 +23,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $this->_apiversion = 3;
     $this->_contactID = $this->organizationCreate();
   }
 
@@ -33,8 +30,15 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    * Get the membership without providing an ID.
    *
    * This should return an empty array but not an error.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGetWithoutId() {
+  public function testGetWithoutId($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -51,13 +55,15 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test get works.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
    */
-  public function testGet() {
+  public function testGet($version) {
+    $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
-
-    $params = [
-      'id' => $id,
-    ];
+    $params = ['id' => $id];
     $membershipType = $this->callAPIAndDocument('membership_type', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($membershipType['values'][$id]['name'], 'General');
     $this->assertEquals($membershipType['values'][$id]['member_of_contact_id'], $this->_contactID);
@@ -70,8 +76,13 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test create with missing mandatory field.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
    */
-  public function testCreateWithoutMemberOfContactId() {
+  public function testCreateWithoutMemberOfContactId($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -84,13 +95,19 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     ];
 
-    $this->callAPIFailure('membership_type', 'create', $params, 'Mandatory key(s) missing from params array: member_of_contact_id');
+    $msg = $version === 4 ? 'Mandatory values missing from Api4 MembershipType::create: member_of_contact_id' : 'Mandatory key(s) missing from params array: member_of_contact_id';
+    $this->callAPIFailure('membership_type', 'create', $params, $msg);
   }
 
   /**
    * Test successful create.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
    */
-  public function testCreate() {
+  public function testCreate($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '40+ Membership',
       'description' => 'people above 40 are given health instructions',
@@ -112,8 +129,15 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Domain ID can be intuited..
    * DomainID is now optional on API, check that it gets set correctly and that the domain_id is not overwritten when not specified in create.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateWithoutDomainId() {
+  public function testCreateWithoutDomainId($version) {
+    $this->_apiversion = $version;
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -142,23 +166,35 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    *  CRM-20010 Tests period_type is required for MemberType create
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
    */
-  public function testMemberTypePeriodiTypeRequired() {
+  public function testMemberTypePeriodTypeRequired($version) {
+    $this->_apiversion = $version;
     $this->callAPIFailure('MembershipType', 'create', [
-      'domain_id' => "Default Domain Name",
+      'domain_id' => 'Default Domain Name',
       'member_of_contact_id' => 1,
-      'financial_type_id' => "Member Dues",
-      'duration_unit' => "month",
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'month',
       'duration_interval' => 1,
-      'name' => "Standard Member",
+      'name' => 'Standard Member',
       'minimum_fee' => 100,
     ]);
   }
 
   /**
    * Test update.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testUpdate() {
+  public function testUpdate($version) {
+    $this->_apiversion = $version;
     $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'financial_type_id' => 2]);
     $newMemberOrgParams = [
       'organization_name' => 'New membership organisation',
@@ -183,13 +219,15 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test successful delete.
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param bool $version
    */
-  public function testDelete() {
+  public function testDelete($version) {
+    $this->_apiversion = $version;
     $membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->organizationCreate()]);
-    $params = [
-      'id' => $membershipTypeID,
-    ];
-
+    $params = ['id' => $membershipTypeID];
     $this->callAPIAndDocument('membership_type', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
@@ -254,11 +292,11 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $memType = [];
     $memType[1] = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'minimum_fee' => 100]);
     $priceSet = $this->callAPISuccess('price_set', 'create', [
-      'title' => "test priceset",
-      'name' => "test_priceset",
-      'extends' => "CiviMember",
+      'title' => 'test priceset',
+      'name' => 'test_priceset',
+      'extends' => 'CiviMember',
       'is_quick_config' => 1,
-      'financial_type_id' => "Member Dues",
+      'financial_type_id' => 'Member Dues',
     ]);
     $priceSet = $priceSet['id'];
     $field = $this->callAPISuccess('price_field', 'create', [
@@ -312,7 +350,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     ]);
     //Verify if membership type updates are copied to pricefield value.
     foreach ($priceFieldValue['values'] as $key => $value) {
-      $setId = $this->callAPISuccessGetValue('PriceField', ['return' => "price_set_id", 'id' => $value['price_field_id']]);
+      $setId = $this->callAPISuccessGetValue('PriceField', ['return' => 'price_set_id', 'id' => $value['price_field_id']]);
       if ($setId == $priceSet) {
         $this->assertEquals($value['label'], $updateParams['name']);
         $this->assertEquals($value['description'], $updateParams['description']);

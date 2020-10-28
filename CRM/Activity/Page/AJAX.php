@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -209,7 +208,7 @@ class CRM_Activity_Page_AJAX {
       }
       // email column links/icon
       if ($row['email']) {
-        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope"></i></a>';
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope" aria-hidden="true"></i></a>';
       }
       // edit links
       $row['actions'] = '';
@@ -219,7 +218,7 @@ class CRM_Activity_Page_AJAX {
         switch ($row['source']) {
           case 'caseRel':
             $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil"></i>' .
+              '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
               '</a>' .
               '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
               '<span class="icon delete-icon"></span>' .
@@ -228,7 +227,7 @@ class CRM_Activity_Page_AJAX {
 
           case 'caseRoles':
             $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Assign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_a_b" data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil"></i>' .
+              '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
               '</a>';
             break;
         }
@@ -276,7 +275,7 @@ class CRM_Activity_Page_AJAX {
     if (!$otherActivity->find(TRUE)) {
       return (['error_msg' => 'activity record is missing.']);
     }
-    $actDateTime = CRM_Utils_Date::isoToMysql($otherActivity->activity_date_time);
+    $actDateTime = $otherActivity->activity_date_time;
 
     // Create new activity record.
     $mainActivity = new CRM_Activity_DAO_Activity();
@@ -353,7 +352,7 @@ class CRM_Activity_Page_AJAX {
     if (!empty($params['assigneeContactIds'])) {
       $assigneeContacts = array_unique(explode(',', $params['assigneeContactIds']));
     }
-    foreach ($assigneeContacts as $key => $value) {
+    foreach ($assigneeContacts as $value) {
       $assigneeParams = [
         'activity_id' => $mainActivityId,
         'contact_id' => $value,
@@ -379,7 +378,7 @@ class CRM_Activity_Page_AJAX {
   /**
    * Get activities for the contact.
    *
-   * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getContactActivity() {
     $requiredParameters = [
@@ -420,10 +419,10 @@ class CRM_Activity_Page_AJAX {
       unset($optionalParameters['context']);
       foreach ($optionalParameters as $searchField => $dataType) {
         $formSearchField = $searchField;
-        if ($searchField == 'activity_type_id') {
+        if ($searchField === 'activity_type_id') {
           $formSearchField = 'activity_type_filter_id';
         }
-        elseif ($searchField == 'activity_type_exclude_id') {
+        elseif ($searchField === 'activity_type_exclude_id') {
           $formSearchField = 'activity_type_exclude_filter_id';
         }
         if (!empty($params[$searchField])) {
@@ -431,16 +430,13 @@ class CRM_Activity_Page_AJAX {
           if (in_array($searchField, ['activity_date_time_low', 'activity_date_time_high'])) {
             $activityFilter['activity_date_time_relative'] = 0;
           }
-          elseif ($searchField == 'activity_status_id') {
+          elseif ($searchField === 'activity_status_id') {
             $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
           }
         }
       }
 
       Civi::contactSettings()->set('activity_tab_filter', $activityFilter);
-    }
-    if (!empty($_GET['is_unit_test'])) {
-      return [$activities, $activityFilter];
     }
 
     CRM_Utils_JSON::output($activities);

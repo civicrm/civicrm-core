@@ -122,7 +122,7 @@ class CRM_Mailing_BAO_Query {
    * rather than a static function.
    */
   public static function getSearchFieldMetadata() {
-    $fields = ['mailing_job_start_date'];
+    $fields = ['mailing_job_start_date', 'is_archived'];
     $metadata = civicrm_api3('Mailing', 'getfields', [])['values'];
     $metadata = array_merge($metadata, civicrm_api3('MailingJob', 'getfields', [])['values']);
     return array_intersect_key($metadata, array_flip($fields));

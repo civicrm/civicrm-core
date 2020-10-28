@@ -26,46 +26,35 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @param array $params
    *
-   * @return object
+   * @return \CRM_Core_DAO_Phone
+   *
    * @throws API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function create($params) {
     // Ensure mysql phone function exists
     CRM_Core_DAO::checkSqlFunctionsExist();
-
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) ||
-      // if id is set & is_primary isn't we can assume no change
-      empty($params['id'])
-    ) {
-      CRM_Core_BAO_Block::handlePrimary($params, get_class());
-    }
-    $phone = self::add($params);
-
-    return $phone;
+    CRM_Core_BAO_Block::handlePrimary($params, get_class());
+    return self::writeRecord($params);
   }
 
   /**
    * Takes an associative array and adds phone.
+   *
+   * @deprecated use create.
    *
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return object
    *   CRM_Core_BAO_Phone object on success, null otherwise
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function add(&$params) {
-    // Ensure mysql phone function exists
-    CRM_Core_DAO::checkSqlFunctionsExist();
-
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Phone', $params['id'] ?? NULL, $params);
-
-    $phone = new CRM_Core_DAO_Phone();
-    $phone->copyValues($params);
-    $phone->save();
-
-    CRM_Utils_Hook::post($hook, 'Phone', $phone->id, $phone);
-    return $phone;
+  public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use the v4 api');
+    return self::create($params);
   }
 
   /**
@@ -76,6 +65,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    *
    * @return array
    *   array of phone objects
+   * @throws \CRM_Core_Exception
    */
   public static function &getValues($entityBlock) {
     $getValues = CRM_Core_BAO_Block::getValues('phone', $entityBlock);
@@ -102,7 +92,7 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
 
     $cond = NULL;
     if ($type) {
-      $phoneTypeId = array_search($type, CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'));
+      $phoneTypeId = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', $type);
       if ($phoneTypeId) {
         $cond = " AND civicrm_phone.phone_type_id = $phoneTypeId";
       }

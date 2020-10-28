@@ -20,11 +20,9 @@
   </div>
   {if $batchAmountMismatch}
     <div class="status message status-warning">
-      <i class="crm-i fa-exclamation-triangle"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
+      <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
-    <span class="crm-button crm-button_qf_Entry_upload_force-save">
-      {$form._qf_Entry_upload_force.html}
-    </span>
+    {$form._qf_Entry_upload_force.html}
     <div class="clear"></div>
   {/if}
   <table class="form-layout-compressed batch-totals">
@@ -55,10 +53,7 @@
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
           {if $field.name|substr:0:11 ne 'soft_credit' and $field.name ne 'trxn_id'}
-          <img src="{$config->resourceBase}i/copy.png"
-               alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}"
-               fname="{$field.name}" class="action-icon"
-               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>
+          {copyIcon name=$field.name title=$field.title}
           {/if}{$field.title}
         </div>
       {/foreach}
@@ -375,7 +370,7 @@ function updateContactInfo(blockNo, prefix) {
                 cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
-                cj('#field_' + blockNo + '_' + 'join_date').val(membershipJoinDate).trigger('change');
+                cj('#field_' + blockNo + '_' + 'membership_join_date').val(membershipJoinDate).trigger('change');
                 cj('#field_' + blockNo + '_' + 'membership_start_date').val(membershipStartDate).trigger('change');
               }
               });

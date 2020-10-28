@@ -10,15 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-
 namespace Civi\Api4\Action;
 
 use Civi\API\Exception\NotImplementedException;
@@ -42,7 +33,7 @@ class GetActions extends BasicGetAction {
     $entityReflection = new \ReflectionClass('\Civi\Api4\\' . $this->_entityName);
     foreach ($entityReflection->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC) as $method) {
       $actionName = $method->getName();
-      if ($actionName != 'permissions' && $actionName[0] != '_') {
+      if ($actionName != 'permissions' && $actionName != 'getInfo' && $actionName[0] != '_') {
         $this->loadAction($actionName, $method);
       }
     }
@@ -84,7 +75,7 @@ class GetActions extends BasicGetAction {
     try {
       if (!isset($this->_actions[$actionName]) && (!$this->_actionsToGet || in_array($actionName, $this->_actionsToGet))) {
         $action = \Civi\API\Request::create($this->getEntityName(), $actionName, ['version' => 4]);
-        if (is_object($action)) {
+        if (is_object($action) && (!$this->checkPermissions || $action->isAuthorized())) {
           $this->_actions[$actionName] = ['name' => $actionName];
           if ($this->_isFieldSelected('description', 'comment', 'see')) {
             $vars = ['entity' => $this->getEntityName(), 'action' => $actionName];

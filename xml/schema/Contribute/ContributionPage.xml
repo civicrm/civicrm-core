@@ -42,20 +42,6 @@
     <add>1.3</add>
   </field>
   <field>
-    <name>contribution_type_id</name>
-    <type>int unsigned</type>
-    <required>true</required>
-    <comment>default Contribution type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
-    <add>1.3</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
     <title>Financial Type</title>
     <type>int unsigned</type>
@@ -80,6 +66,7 @@
     <name>payment_processor</name>
     <type>varchar</type>
     <length>128</length>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <comment>Payment Processors configured for this contribution Page</comment>
     <pseudoconstant>
       <table>civicrm_payment_processor</table>

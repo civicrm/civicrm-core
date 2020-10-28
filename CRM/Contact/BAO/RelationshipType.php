@@ -85,15 +85,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     }
 
     // action is taken depending upon the mode
-    $relationshipType = new CRM_Contact_DAO_RelationshipType();
-
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'RelationshipType', CRM_Utils_Array::value('id', $params), $params);
-
-    $relationshipType->copyValues($params);
-    $relationshipType->save();
-
-    CRM_Utils_Hook::post($hook, 'RelationshipType', $relationshipType->id, $relationshipType);
+    $relationshipType = self::writeRecord($params);
 
     CRM_Core_PseudoConstant::relationshipType('label', TRUE);
     CRM_Core_PseudoConstant::relationshipType('name', TRUE);

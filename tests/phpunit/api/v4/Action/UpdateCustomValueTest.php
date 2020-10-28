@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -33,23 +31,20 @@ class UpdateCustomValueTest extends BaseCustomValueTest {
 
   public function testGetWithCustomData() {
 
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Red')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -57,8 +52,7 @@ class UpdateCustomValueTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    Contact::update()
-      ->setCheckPermissions(FALSE)
+    Contact::update(FALSE)
       ->addWhere('id', '=', $contactId)
       ->addValue('first_name', 'Red')
       ->addValue('last_name', 'Tester')

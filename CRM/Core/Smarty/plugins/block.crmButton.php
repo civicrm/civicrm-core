@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -38,9 +36,21 @@ function smarty_block_crmButton($params, $text, &$smarty) {
   // Always add class 'button' - fixme probably should be crm-button
   $params['class'] = empty($params['class']) ? 'button' : 'button ' . $params['class'];
   // Any FA icon works
-  $icon = CRM_Utils_Array::value('icon', $params, 'pencil');
+  if (array_key_exists('icon', $params) && !$params['icon']) {
+    // icon=0 should produce a button with no icon
+    $iconMarkup = '';
+  }
+  else {
+    $icon = $params['icon'] ?? 'fa-pencil';
+    // Assume for now that all icons are Font Awesome v4.x but handle if it's
+    // specified
+    if (strpos($icon, 'fa-') !== 0) {
+      $icon = "fa-$icon";
+    }
+    $iconMarkup = "<i class='crm-i $icon' aria-hidden=\"true\"></i> ";
+  }
   // All other params are treated as html attributes
   CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');
   $attributes = CRM_Utils_String::htmlAttributes($params);
-  return "<a $attributes><span><i class='crm-i fa-$icon'></i>&nbsp; $text</span></a>";
+  return "<a $attributes><span>$iconMarkup$text</span></a>";
 }

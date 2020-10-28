@@ -122,7 +122,6 @@ WHERE  email = %2
     }
 
     $contact_id = $q->contact_id;
-    $transaction = new CRM_Core_Transaction();
 
     $mailing_id = civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
@@ -235,6 +234,8 @@ WHERE  email = %2
     $do = CRM_Core_DAO::executeQuery("
             SELECT      grp.id as group_id,
                         grp.title as title,
+                        grp.frontend_title as frontend_title,
+                        grp.frontend_description as frontend_description,
                         grp.description as description
             FROM        civicrm_group grp
             LEFT JOIN   civicrm_group_contact gc
@@ -251,18 +252,18 @@ WHERE  email = %2
       $returnGroups = [];
       while ($do->fetch()) {
         $returnGroups[$do->group_id] = [
-          'title' => $do->title,
-          'description' => $do->description,
+          'title' => !empty($do->frontend_title) ? $do->frontend_title : $do->title,
+          'description' => !empty($do->frontend_description) ? $do->frontend_description : $do->description,
         ];
       }
       return $returnGroups;
     }
     else {
       while ($do->fetch()) {
-        $groups[$do->group_id] = $do->title;
+        $groups[$do->group_id] = !empty($do->frontend_title) ? $do->frontend_title : $do->title;
       }
     }
-
+    $transaction = new CRM_Core_Transaction();
     $contacts = [$contact_id];
     foreach ($groups as $group_id => $group_name) {
       $notremoved = FALSE;
@@ -366,8 +367,6 @@ WHERE  email = %2
       }
     }
 
-    $message = new Mail_mime("\n");
-
     list($addresses, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
@@ -378,37 +377,30 @@ WHERE  email = %2
       $html = CRM_Utils_Token::replaceUnsubscribeTokens($html, $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
       $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
-      $message->setHTMLBody($html);
     }
     if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
       $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceUnsubscribeTokens($text, $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
       $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
-      $message->setTxtBody($text);
     }
 
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
-    $headers = [
-      'Subject' => $component->subject,
-      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
-      'To' => $eq->email,
-      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+    $params = [
+      'subject' => $component->subject,
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'toEmail' => $eq->email,
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'html' => $html,
+      'text' => $text,
     ];
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($headers, 'u', $job, $queue_id, $eq->hash);
-
-    $b = CRM_Utils_Mail::setMimeParams($message);
-    $h = $message->headers($headers);
-
-    $mailer = \Civi::service('pear_mail');
-
-    if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($eq->email, $h, $b);
-      unset($errorScope);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', $job, $queue_id, $eq->hash);
+    if (CRM_Core_BAO_MailSettings::includeMessageId()) {
+      $params['messageId'] = $params['Message-ID'];
     }
+    CRM_Utils_Mail::send($params);
   }
 
   /**

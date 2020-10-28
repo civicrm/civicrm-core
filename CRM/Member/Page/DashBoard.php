@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -40,7 +38,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     }
     $this->assign('membershipSummary', TRUE);
     CRM_Utils_System::setTitle(ts('CiviMember'));
-    $membershipSummary = array();
+    $membershipSummary = [];
     $preMonth = date("Y-m-d", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
     $preMonthEnd = date("Y-m-t", mktime(0, 0, 0, date("m") - 1, 01, date("Y")));
 
@@ -58,7 +56,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
         !checkdate(substr($ym, 4, 2), 1, substr($ym, 0, 4)) ||
         substr($ym, 0, 1) == 0
       ) {
-        CRM_Core_Error::fatal(ts('Invalid date query "%1" in URL (valid syntax is yyyymm).', array(1 => $ym)));
+        CRM_Core_Error::statusBounce(ts('Invalid date query "%1" in URL (valid syntax is yyyymm).', array(1 => $ym)));
       }
 
       $isPreviousMonth = 0;

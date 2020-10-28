@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -52,19 +50,31 @@ class SqlExpressionParserTest extends UnitTestCase {
     $sqlFn = new $className($fnName . '(total)');
     $this->assertEquals($fnName, $sqlFn->getName());
     $this->assertEquals(['total'], $sqlFn->getFields());
-    $this->assertCount(1, $this->getArgs($sqlFn));
+    $args = $sqlFn->getArgs();
+    $this->assertCount(1, $args);
+    $this->assertNull($args[0]['prefix']);
+    $this->assertNull($args[0]['suffix']);
+    $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 
     $sqlFn = SqlExpression::convert($fnName . '(DISTINCT stuff)');
     $this->assertEquals($fnName, $sqlFn->getName());
     $this->assertEquals("Civi\Api4\Query\SqlFunction$fnName", get_class($sqlFn));
     $this->assertEquals($params, $sqlFn->getParams());
     $this->assertEquals(['stuff'], $sqlFn->getFields());
-    $this->assertCount(2, $this->getArgs($sqlFn));
+    $args = $sqlFn->getArgs();
+    $this->assertCount(1, $args);
+    $this->assertEquals('DISTINCT', $args[0]['prefix']);
+    $this->assertNull($args[0]['suffix']);
+    $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 
     try {
       $sqlFn = SqlExpression::convert($fnName . '(*)');
       if ($fnName === 'COUNT') {
-        $this->assertTrue(is_a($this->getArgs($sqlFn)[0], 'Civi\Api4\Query\SqlWild'));
+        $args = $sqlFn->getArgs();
+        $this->assertCount(1, $args);
+        $this->assertNull($args[0]['prefix']);
+        $this->assertNull($args[0]['suffix']);
+        $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlWild'));
       }
       else {
         $this->fail('SqlWild should only be allowed in COUNT.');
@@ -73,18 +83,6 @@ class SqlExpressionParserTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $this->assertContains('Illegal', $e->getMessage());
     }
-  }
-
-  /**
-   * @param \Civi\Api4\Query\SqlFunction $fn
-   * @return array
-   * @throws \ReflectionException
-   */
-  private function getArgs($fn) {
-    $ref = new \ReflectionClass($fn);
-    $args = $ref->getProperty('args');
-    $args->setAccessible(TRUE);
-    return $args->getValue($fn);
   }
 
 }

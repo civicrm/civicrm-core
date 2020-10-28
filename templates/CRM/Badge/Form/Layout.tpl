@@ -13,7 +13,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {else}
@@ -36,7 +36,7 @@
          <table>
            <tr>
             <td>{$form.image_1.html}
-               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
+               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
              <br/>
              <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
             </td>
@@ -56,7 +56,7 @@
          <table>
           <tr>
            <td>{$form.image_2.html}
-              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
+              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
             <br/>
             <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
            </td>

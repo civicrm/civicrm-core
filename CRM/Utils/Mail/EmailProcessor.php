@@ -134,10 +134,10 @@ class CRM_Utils_Mail_EmailProcessor {
     }
 
     $config = CRM_Core_Config::singleton();
-    $verpSeperator = preg_quote($config->verpSeparator);
-    $twoDigitStringMin = $verpSeperator . '(\d+)' . $verpSeperator . '(\d+)';
-    $twoDigitString = $twoDigitStringMin . $verpSeperator;
-    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeperator;
+    $verpSeparator = preg_quote($config->verpSeparator);
+    $twoDigitStringMin = $verpSeparator . '(\d+)' . $verpSeparator . '(\d+)';
+    $twoDigitString = $twoDigitStringMin . $verpSeparator;
+    $threeDigitString = $twoDigitString . '(\d+)' . $verpSeparator;
 
     // FIXME: legacy regexen to handle CiviCRM 2.1 address patterns, with domain id and possible VERP part
     $commonRegex = '/^' . preg_quote($dao->localpart) . '(b|bounce|c|confirm|o|optOut|r|reply|re|e|resubscribe|u|unsubscribe)' . $threeDigitString . '([0-9a-f]{16})(-.*)?@' . preg_quote($dao->domain) . '$/';
@@ -157,7 +157,7 @@ class CRM_Utils_Mail_EmailProcessor {
     try {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
-    catch (Exception$e) {
+    catch (Exception $e) {
       $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
       $message .= ts('Error message: ');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
@@ -224,9 +224,19 @@ class CRM_Utils_Mail_EmailProcessor {
 
         // preseve backward compatibility
         if ($usedfor == 0 || $is_create_activities) {
+          // Mail account may have 'Skip emails which do not have a Case ID
+          // or Case hash' option, if its enabled and email is not related
+          // to cases - then we need to put email to ignored folder.
+          $caseMailUtils = new CRM_Utils_Mail_CaseMail();
+          if (!empty($dao->is_non_case_email_skipped) && !$caseMailUtils->isCaseEmail($mail->subject)) {
+            $store->markIgnored($key);
+            continue;
+          }
+
           // if its the activities that needs to be processed ..
           try {
-            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail);
+            $createContact = !($dao->is_contact_creation_disabled_if_no_match ?? FALSE);
+            $mailParams = CRM_Utils_Mail_Incoming::parseMailingObject($mail, $createContact, FALSE);
           }
           catch (Exception $e) {
             echo $e->getMessage();
@@ -241,6 +251,7 @@ class CRM_Utils_Mail_EmailProcessor {
           if (!empty($dao->activity_status)) {
             $params['status_id'] = $dao->activity_status;
           }
+
           $result = civicrm_api('activity', 'create', $params);
 
           if ($result['is_error']) {

@@ -36,14 +36,23 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    * @return object
    *   activity_contact object
    */
-  public static function create(&$params) {
+  public static function create($params) {
+    $errorScope = CRM_Core_TemporaryErrorScope::useException();
     $activityContact = new CRM_Activity_DAO_ActivityContact();
-
     $activityContact->copyValues($params);
-    if (!$activityContact->find(TRUE)) {
+    try {
       return $activityContact->save();
     }
-    return $activityContact;
+    catch (PEAR_Exception $e) {
+      // This check used to be done first, creating an extra query before each insert.
+      // However, in none of the core tests was this ever called with values that already
+      // existed, meaning that this line would never or almost never be hit.
+      // hence it's better to save the select query here.
+      if ($activityContact->find(TRUE)) {
+        return $activityContact;
+      }
+      throw $e;
+    }
   }
 
   /**

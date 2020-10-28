@@ -28,11 +28,30 @@ if (!defined('CIVI_SETUP')) {
       $e->addInfo('system', 'settingsPath', sprintf('The settingsPath is defined.'));
     }
 
+    // If Civi is already installed, Drupal 8's status report page also calls us
+    // and so we need to modify the check slightly since we want the reverse
+    // conditions.
+    $installed = \Civi\Setup::instance()->checkInstalled();
+    $alreadyInstalled = $installed->isSettingInstalled() || $installed->isDatabaseInstalled();
+
     if (!\Civi\Setup\FileUtil::isCreateable($m->settingsPath)) {
-      $e->addError('system', 'settingsWritable', sprintf('The settings file "%s" cannot be created. Ensure the parent folder is writable.', $m->settingsPath));
+      if ($alreadyInstalled) {
+        $e->addInfo('system', 'settingsWritable', sprintf('The settings file "%s" is protected from writing.', $m->settingsPath));
+      }
+      else {
+        $e->addError('system', 'settingsWritable', sprintf('The settings file "%s" cannot be created. Ensure the parent folder is writable.', $m->settingsPath));
+      }
     }
     else {
-      $e->addInfo('system', 'settingsWritable', sprintf('The settings file "%s" can be created.', $m->settingsPath));
+      if ($alreadyInstalled) {
+        // Note if we were to output an error, we wouldn't be able to use
+        // `cv core:install` to do an in-place reinstall since it would fail
+        // requirements checks.
+        $e->addWarning('system', 'settingsWritable', sprintf('The settings file "%s" should not be writable.', $m->settingsPath));
+      }
+      else {
+        $e->addInfo('system', 'settingsWritable', sprintf('The settings file "%s" can be created.', $m->settingsPath));
+      }
     }
   });
 
@@ -59,11 +78,25 @@ if (!defined('CIVI_SETUP')) {
     $params['dbPass'] = addslashes($m->db['password']);
     $params['dbHost'] = addslashes($m->db['server']);
     $params['dbName'] = addslashes($m->db['database']);
+    // The '&' prefix is awkward, but we don't know what's already in the file.
+    // At the time of writing, it has ?new_link=true. If that is removed,
+    // then need to update this.
+    // The PHP_QUERY_RFC3986 is important because PEAR::DB will interpret plus
+    // signs as a reference to its old DSN format and mangle the DSN, so we
+    // need to use %20 for spaces.
+    $params['dbSSL'] = empty($m->db['ssl_params']) ? '' : addslashes('&' . http_build_query($m->db['ssl_params'], '', '&', PHP_QUERY_RFC3986));
     $params['cms'] = addslashes($m->cms);
     $params['CMSdbUser'] = addslashes($m->cmsDb['username']);
     $params['CMSdbPass'] = addslashes($m->cmsDb['password']);
     $params['CMSdbHost'] = addslashes($m->cmsDb['server']);
     $params['CMSdbName'] = addslashes($m->cmsDb['database']);
+    // The '&' prefix is awkward, but we don't know what's already in the file.
+    // At the time of writing, it has ?new_link=true. If that is removed,
+    // then need to update this.
+    // The PHP_QUERY_RFC3986 is important because PEAR::DB will interpret plus
+    // signs as a reference to its old DSN format and mangle the DSN, so we
+    // need to use %20 for spaces.
+    $params['CMSdbSSL'] = empty($m->cmsDb['ssl_params']) ? '' : addslashes('&' . http_build_query($m->cmsDb['ssl_params'], '', '&', PHP_QUERY_RFC3986));
     $params['siteKey'] = addslashes($m->siteKey);
 
     $extraSettings = array();

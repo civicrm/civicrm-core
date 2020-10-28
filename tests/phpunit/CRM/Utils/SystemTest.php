@@ -138,7 +138,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    * @dataProvider getExternURLs
    */
   public function testAlterExternUrlHook($path, $expected) {
-    Civi::service('dispatcher')->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
+    Civi::dispatcher()->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
     $externUrl = CRM_Utils_System::externUrl($path, $expected['query']);
     $this->assertContains('path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
     $this->assertContains($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');

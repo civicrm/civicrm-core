@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -139,23 +137,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     );
 
     // duplicate handling options
-    $duplicateOptions = [];
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update'), CRM_Import_Parser::DUPLICATE_UPDATE
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Fill'), CRM_Import_Parser::DUPLICATE_FILL
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK
-    );
-
-    $this->addGroup($duplicateOptions, 'onDuplicate',
-      ts('For Duplicate Contacts')
-    );
+    $this->addRadio('onDuplicate', ts('For Duplicate Contacts'), [
+      CRM_Import_Parser::DUPLICATE_SKIP => ts('Skip'),
+      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update'),
+      CRM_Import_Parser::DUPLICATE_FILL => ts('Fill'),
+      CRM_Import_Parser::DUPLICATE_NOCHECK => ts('No Duplicate Checking'),
+    ]);
 
     $mappingArray = CRM_Core_BAO_Mapping::getMappings('Import Contact');
 
@@ -164,26 +151,20 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
-    $contactOptions = [];
+    $contactTypeOptions = $contactTypeAttributes = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL, $js
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_INDIVIDUAL] = ts('Individual');
+      $contactTypeAttributes[CRM_Import_Parser::CONTACT_INDIVIDUAL] = $js;
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD, $js
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_HOUSEHOLD] = ts('Household');
+      $contactTypeAttributes[CRM_Import_Parser::CONTACT_HOUSEHOLD] = $js;
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION, $js
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_ORGANIZATION] = ts('Organization');
+      $contactTypeAttributes[CRM_Import_Parser::CONTACT_ORGANIZATION] = $js;
     }
-
-    $this->addGroup($contactOptions, 'contactType',
-      ts('Contact Type')
-    );
+    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
 
     $this->addElement('select', 'subType', ts('Subtype'));
     $this->addElement('select', 'dedupe', ts('Dedupe Rule'));

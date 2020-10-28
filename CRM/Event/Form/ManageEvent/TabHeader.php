@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -72,7 +70,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
     // @fixme I don't understand the event permissions check here - can we just get rid of it?
     $permissions = CRM_Event_BAO_Event::getAllPermissions();
-    if (CRM_Core_Permission::check('administer CiviCRM') || !empty($permissions[CRM_Core_Permission::EDIT])) {
+    if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
       $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
     $tabs['conference'] = ['title' => ts('Conference Slots')] + $default;
@@ -85,9 +83,9 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       unset($tabs['repeat']['class']);
     }
 
+    // @todo Move to eventcart extension
     // check if we're in shopping cart mode for events
-    $enableCart = Civi::settings()->get('enable_cart');
-    if (!$enableCart) {
+    if (!(bool) Civi::settings()->get('enable_cart')) {
       unset($tabs['conference']);
     }
 
@@ -107,14 +105,14 @@ LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_ta
 WHERE      e.id = %1
 ";
       //Check if repeat is configured
-      $eventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
+      CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
       $params = [
         1 => [$eventID, 'Integer'],
         2 => [$eventNameMapping->getId(), 'Integer'],
       ];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Unable to determine Event information');;
       }
       if (!$dao->is_location) {
         $tabs['location']['valid'] = FALSE;

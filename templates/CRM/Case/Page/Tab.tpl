@@ -12,7 +12,7 @@
 
 {elseif $redirectToCaseAdmin}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
+      {icon icon="fa-info-circle"}{/icon}
          <strong>{ts}Oops, It looks like there are no active case types.{/ts}</strong>
            {if call_user_func(array('CRM_Core_Permission','check'), ' administer CiviCase')}
              {capture assign=adminCaseTypeURL}{crmURL p='civicrm/a/#/caseType'}
@@ -44,7 +44,7 @@
           call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
         $allowToAddNewCase}
         <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL}" class="button no-popup"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Case{/ts}</span></a>
+        <a accesskey="N" href="{$newCaseURL}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
         </div>
     {/if}
 
@@ -52,7 +52,7 @@
           {include file="CRM/Case/Form/Selector.tpl"}
     {else}
        <div class="messages status no-popup">
-          <div class="icon inform-icon"></div>
+          {icon icon="fa-info-circle"}{/icon}
             {ts}There are no case records for this contact.{/ts}
           </div>
     {/if}

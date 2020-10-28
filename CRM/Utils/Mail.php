@@ -152,6 +152,8 @@ class CRM_Utils_Mail {
    * text    : text of the message
    * html    : html version of the message
    * replyTo : reply-to header in the email
+   * returnpath : email address for bounces to be sent to
+   * messageId : Message ID for this email mesage
    * attachments: an associative array of
    *   fullPath : complete pathname to the file
    *   mime_type: mime type of the attachment
@@ -223,7 +225,7 @@ class CRM_Utils_Mail {
     }
     $headers['Date'] = date('r');
     if ($includeMessageId) {
-      $headers['Message-ID'] = '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
+      $headers['Message-ID'] = $params['messageId'] ?? '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
     }
     if (!empty($params['autoSubmitted'])) {
       $headers['Auto-Submitted'] = "Auto-Generated";
@@ -261,7 +263,11 @@ class CRM_Utils_Mail {
         $msg->addAttachment(
           $attach['fullPath'],
           $attach['mime_type'],
-          $attach['cleanName']
+          $attach['cleanName'],
+          TRUE,
+          'base64',
+          'attachment',
+          (isset($attach['charset']) ? $attach['charset'] : '')
         );
       }
     }

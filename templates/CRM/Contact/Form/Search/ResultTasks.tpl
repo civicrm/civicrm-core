@@ -18,21 +18,21 @@
  <div id="search-status">
   <div class="float-right right">
     {if $action eq 256}
-        <a href="{$advSearchURL}">&raquo; {ts}Advanced Search{/ts}</a><br />
+        <a href="{$advSearchURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Advanced Search{/ts}</a><br />
         {if $context eq 'search'} {* Only show Search Builder link for basic search. *}
-            <a href="{$searchBuilderURL}">&raquo; {ts}Search Builder{/ts}</a><br />
+            <a href="{$searchBuilderURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Search Builder{/ts}</a><br />
         {/if}
         {if $context eq 'smog'}
-            {help id="id-smog-criteria" group_id=$group.id group_title=$group.title ssID=$ssID ssMappingID=$ssMappingID permissionedForGroup=$permissionedForGroup}
+            {help id="id-smog-criteria" group_title=$group.title}
         {elseif $context eq 'amtg'}
             {help id="id-amtg-criteria" group_title=$group.title}
         {else}
             {help id="id-basic-criteria"}
         {/if}
     {elseif $action eq 512}
-        <a href="{$searchBuilderURL}">&raquo; {ts}Search Builder{/ts}</a><br />
+        <a href="{$searchBuilderURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Search Builder{/ts}</a><br />
     {elseif $action eq 8192}
-        <a href="{$advSearchURL}">&raquo; {ts}Advanced Search{/ts}</a><br />
+        <a href="{$advSearchURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Advanced Search{/ts}</a><br />
     {/if}
   </div>
 

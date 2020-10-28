@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -30,8 +28,13 @@ namespace Civi\Api4;
  */
 class Domain extends Generic\DAOEntity {
 
-  public static function get() {
-    return new \Civi\Api4\Action\Domain\Get(__CLASS__, __FUNCTION__);
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Domain\Get
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Domain\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

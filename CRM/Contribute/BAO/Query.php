@@ -893,8 +893,10 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'receive_date',
       'contribution_cancel_date',
       'contribution_page_id',
+      'contribution_id',
     ];
     $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
+    $metadata['contribution_id'] = $metadata['id'];
     return array_intersect_key($metadata, array_flip($fields));
   }
 
@@ -913,10 +915,10 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addFormFieldsFromMetadata();
 
     $form->add('text', 'contribution_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $form->add('text', 'contribution_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     // Adding select option for curreny type -- CRM-4711
     $form->add('select', 'contribution_currency_type',
@@ -929,9 +931,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     );
 
     // CRM-13848
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::VIEW);
     $form->addSelect('financial_type_id',
-      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => $financialTypes]
+      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search')]
     );
 
     // use contribution_payment_instrument_id instead of payment_instrument_id
@@ -960,7 +961,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'), TRUE);
 
     $form->addYesNo('contribution_test', ts('Contribution is a Test?'), TRUE);
-
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_trxn_id', ts("Transaction ID"));
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));

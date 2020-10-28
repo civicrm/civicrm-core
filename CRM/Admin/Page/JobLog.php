@@ -71,21 +71,18 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
 
   /**
    * Browse all jobs.
-   *
-   * @param null $action
    */
-  public function browse($action = NULL) {
-
-    $jid = CRM_Utils_Request::retrieve('jid', 'Positive', $this);
+  public function browse() {
+    $jid = CRM_Utils_Request::retrieve('jid', 'Positive');
 
     $sj = new CRM_Core_JobManager();
 
-    $jobName = NULL;
     if ($jid) {
       $jobName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
+      $this->assign('jobName', $jobName);
+      $jobRunUrl = CRM_Utils_System::url('civicrm/admin/job', 'action=view&reset=1&context=joblog&id=' . $jid);
+      $this->assign('jobRunUrl', $jobRunUrl);
     }
-
-    $this->assign('jobName', $jobName);
 
     $dao = new CRM_Core_DAO_JobLog();
     $dao->orderBy('id desc');
@@ -98,7 +95,7 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     }
     $dao->find();
 
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
       unset($row);
       CRM_Core_DAO::storeValues($dao, $row);

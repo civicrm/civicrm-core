@@ -78,13 +78,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_params;
 
   /**
-   * Store the contribution Type ID
-   *
-   * @var array
-   */
-  public $_contributionType;
-
-  /**
    * The contribution values if an existing contribution
    * @var array
    */
@@ -277,7 +270,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
-      $this->applyCustomData('Contribution', CRM_Utils_Array::value('financial_type_id', $_POST), $this->_id);
+      $this->applyCustomData('Contribution', $this->getFinancialTypeID(), $this->_id);
     }
 
     $this->_lineItems = [];
@@ -369,7 +362,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['total_amount'] = CRM_Utils_Money::format($total_value, NULL, '%a');
       if (!empty($defaults['tax_amount'])) {
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
+        if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
           $defaults['total_amount'] = CRM_Utils_Money::format($total_value - $defaults['tax_amount'], NULL, '%a');
         }
       }
@@ -380,10 +373,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (isset($defaults[$amt])) {
         $defaults[$amt] = CRM_Utils_Money::format($defaults[$amt], NULL, '%a');
       }
-    }
-
-    if ($this->_contributionType) {
-      $defaults['financial_type_id'] = $this->_contributionType;
     }
 
     if (empty($defaults['payment_instrument_id'])) {
@@ -483,7 +472,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // FIXME: This probably needs to be done in preprocess
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && $this->_action & CRM_Core_Action::UPDATE
-      && CRM_Utils_Array::value('financial_type_id', $this->_values)
+      && !empty($this->_values['financial_type_id'])
     ) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($this->_values['financial_type_id']);
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($this->_id, 'edit');
@@ -612,7 +601,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Contribution');
-    $this->assign('customDataSubType', $this->_contributionType);
+    $this->assign('customDataSubType', $this->getFinancialTypeID());
     $this->assign('entityID', $this->_id);
 
     $contactField = $this->addEntityRef('contact_id', ts('Contributor'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
@@ -962,30 +951,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       CRM_Core_Error::statusBounce($e->getMessage(), $urlParams, ts('Payment Processor Error'));
     }
-    $session = CRM_Core_Session::singleton();
-    $buttonName = $this->controller->getButtonName();
-    if ($this->_context == 'standalone') {
-      if ($buttonName == $this->getButtonName('upload', 'new')) {
-        $session->replaceUserContext(CRM_Utils_System::url('civicrm/contribute/add',
-          'reset=1&action=add&context=standalone'
-        ));
-      }
-      else {
-        $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&cid={$this->_contactID}&selectedChild=contribute"
-        ));
-      }
-    }
-    elseif ($this->_context == 'contribution' && $this->_mode && $buttonName == $this->getButtonName('upload', 'new')) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
-        "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}&mode={$this->_mode}"
-      ));
-    }
-    elseif ($buttonName == $this->getButtonName('upload', 'new')) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
-        "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
-      ));
-    }
+    $this->setUserContext();
 
     //store contribution ID if not yet set (on create)
     if (empty($this->_id) && !empty($contribution->id)) {
@@ -1253,7 +1219,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // See if we need to include this paneName in the current form.
     if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
-      CRM_Utils_Array::value("hidden_{$type}", $defaults)
+      !empty($defaults["hidden_{$type}"])
     ) {
       $this->assign('showAdditionalInfo', TRUE);
       $pane['open'] = 'true';
@@ -1462,7 +1428,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($this->_priceSetId && CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
         //CRM-16833: Ensure tax is applied only once for membership conribution, when status changed.(e.g Pending to Completed).
         $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-        if (!(CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails))) {
+        if (empty($componentDetails['membership']) && empty($componentDetails['participant'])) {
           if (!($this->_action & CRM_Core_Action::UPDATE && (($this->_defaults['contribution_status_id'] != $submittedValues['contribution_status_id'])))) {
             $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
           }
@@ -1499,7 +1465,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // NOTE that this IS still a legitimate use of 'quick-config' for contributions under the current DB but
     // we should look at having a price field per contribution type & then there would be little reason
     // for the back-office contribution form postProcess to know if it is a quick-config form.
-    if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
+    if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && !empty($lineItem[$this->_priceSetId])
     ) {
       foreach ($lineItem[$this->_priceSetId] as &$values) {
         $values['financial_type_id'] = $submittedValues['financial_type_id'];
@@ -1737,7 +1703,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->assign('totalTaxAmount', $submittedValues['tax_amount']);
         $this->assign('getTaxDetails', $getTaxDetails);
         $this->assign('dataArray', $taxRate);
-        $this->assign('taxTerm', CRM_Utils_Array::value('tax_term', $invoiceSettings));
+        $this->assign('taxTerm', Civi::settings()->get('tax_term'));
       }
       else {
         $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
@@ -1748,7 +1714,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Calculate non deductible amount.
    *
-   * CRM-11956
+   * @see https://issues.civicrm.org/jira/browse/CRM-11956
    * if non_deductible_amount exists i.e. Additional Details field set was opened [and staff typed something] -
    * if non_deductible_amount does NOT exist - then calculate it depending on:
    * $financialType->is_deductible and whether there is a product (premium).
@@ -1806,6 +1772,53 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     return 0;
+  }
+
+  /**
+   * Get the financial Type ID for the contribution either from the submitted values or from the contribution values if possible.
+   *
+   * This is important for dev/core#1728 - ie ensure that if we are returned to the form for a form
+   * error that any custom fields based on the selected financial type are loaded.
+   *
+   * @return int
+   */
+  protected function getFinancialTypeID() {
+    if (!empty($this->_submitValues['financial_type_id'])) {
+      return $this->_submitValues['financial_type_id'];
+    }
+    if (!empty($this->_values['financial_type_id'])) {
+      return $this->_values['financial_type_id'];
+    }
+  }
+
+  /**
+   * Set context in session
+   */
+  public function setUserContext(): void {
+    $session = CRM_Core_Session::singleton();
+    $buttonName = $this->controller->getButtonName();
+    if ($this->_context == 'standalone') {
+      if ($buttonName == $this->getButtonName('upload', 'new')) {
+        $session->replaceUserContext(CRM_Utils_System::url('civicrm/contribute/add',
+          'reset=1&action=add&context=standalone'
+        ));
+      }
+      else {
+        $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
+          "reset=1&cid={$this->_contactID}&selectedChild=contribute"
+        ));
+      }
+    }
+    elseif ($this->_context == 'contribution' && $this->_mode && $buttonName == $this->getButtonName('upload', 'new')) {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
+        "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}&mode={$this->_mode}"
+      ));
+    }
+    elseif ($buttonName == $this->getButtonName('upload', 'new')) {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
+        "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
+      ));
+    }
   }
 
 }

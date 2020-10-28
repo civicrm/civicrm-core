@@ -14,14 +14,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace Civi\Api4\Utils;
 
-use Civi\Api4\CustomGroup;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 require_once 'api/v3/utils.php';
@@ -39,34 +36,48 @@ class CoreUtil {
    */
   public static function getBAOFromApiName($entityName) {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
-      return 'CRM_Contact_BAO_Contact';
+      return 'CRM_Core_BAO_CustomValue';
     }
     return \_civicrm_api3_get_BAO($entityName);
   }
 
   /**
-   * Get table name of given Custom group
+   * Get table name of given entity
    *
-   * @param string $customGroupName
+   * @param string $entityName
    *
    * @return string
    */
-  public static function getCustomTableByName($customGroupName) {
-    return CustomGroup::get()
-      ->addSelect('table_name')
-      ->addWhere('name', '=', $customGroupName)
-      ->execute()
-      ->first()['table_name'];
+  public static function getTableName($entityName) {
+    if (strpos($entityName, 'Custom_') === 0) {
+      $customGroup = substr($entityName, 7);
+      return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
+    }
+    return AllCoreTables::getTableForEntityName($entityName);
   }
 
   /**
    * Given a sql table name, return the name of the api entity.
    *
    * @param $tableName
-   * @return string
+   * @return string|NULL
    */
   public static function getApiNameFromTableName($tableName) {
-    return AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
+    $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
+    if (!$entityName) {
+      $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
+      $entityName = $customGroup ? "Custom_$customGroup" : NULL;
+    }
+    return $entityName;
+  }
+
+  /**
+   * @return string[]
+   */
+  public static function getOperators() {
+    $operators = \CRM_Core_DAO::acceptedSQLOperators();
+    $operators[] = 'CONTAINS';
+    return $operators;
   }
 
 }

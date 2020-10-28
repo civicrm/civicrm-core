@@ -23,7 +23,10 @@ trait Api3TestTrait {
    * @return array
    */
   public function versionThreeAndFour() {
-    return [[3], [4]];
+    return [
+      'APIv3' => [3],
+      'APIv4' => [4],
+    ];
   }
 
   /**
@@ -257,7 +260,6 @@ trait Api3TestTrait {
   public function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += [
       'version' => $this->_apiversion,
-      'debug' => 1,
     ];
     $result = $this->civicrm_api($entity, 'getvalue', $params);
     if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
@@ -302,7 +304,7 @@ trait Api3TestTrait {
    * @throws \Exception
    */
   public function runApi4Legacy($v3Entity, $v3Action, $v3Params = []) {
-    $v4Entity = self::convertEntityNameToApi4($v3Entity);
+    $v4Entity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($v3Entity);
     $v4Action = $v3Action = strtolower($v3Action);
     $v4Params = ['checkPermissions' => isset($v3Params['check_permissions']) ? (bool) $v3Params['check_permissions'] : FALSE];
     $sequential = !empty($v3Params['sequential']);
@@ -401,6 +403,9 @@ trait Api3TestTrait {
         // Being in the test class it's tested....
         $v3Params['option_group.name'] = $v3Params['option_group_id'];
         unset($v3Params['option_group_id']);
+      }
+      if (isset($field['pseudoconstant'], $v3Params[$name]) && $field['type'] === \CRM_Utils_Type::T_INT && !is_numeric($v3Params[$name])) {
+        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getFullName($v3Entity), $name, $v3Params[$name]);
       }
     }
 
@@ -641,9 +646,9 @@ trait Api3TestTrait {
 
     // Handle single api call
     list(, $chainEntity, $chainAction) = explode('.', $key);
-    $lcChainEntity = \_civicrm_api_get_entity_name_from_camel($chainEntity);
-    $chainEntity = self::convertEntityNameToApi4($chainEntity);
-    $lcMainEntity = \_civicrm_api_get_entity_name_from_camel($mainEntity);
+    $lcChainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($chainEntity);
+    $chainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($chainEntity);
+    $lcMainEntity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntity);
     $params = is_array($params) ? $params : [];
 
     // Api3 expects this to be inherited
@@ -675,21 +680,6 @@ trait Api3TestTrait {
       $params[$lcMainEntity . '_id'] = $result['id'];
     }
     return $this->runApi4Legacy($chainEntity, $chainAction, $params);
-  }
-
-  /**
-   * Fix the naming differences between api3 & api4 entities.
-   *
-   * @param string $legacyName
-   * @return string
-   */
-  public static function convertEntityNameToApi4($legacyName) {
-    $api4Name = \CRM_Utils_String::convertStringToCamel($legacyName);
-    $map = [
-      'Im' => 'IM',
-      'Acl' => 'ACL',
-    ];
-    return $map[$api4Name] ?? $api4Name;
   }
 
 }

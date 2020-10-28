@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * This is page is for Event Dashboard
  */
 class CRM_Event_Page_DashBoard extends CRM_Core_Page {
@@ -32,8 +24,7 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
     CRM_Utils_System::setTitle(ts('CiviEvent'));
 
     $eventSummary = CRM_Event_BAO_Event::getEventSummary();
-    $enableCart = Civi::settings()->get('enable_cart');
-    $eventSummary['tab'] = CRM_Event_Page_ManageEvent::tabs($enableCart);
+    $eventSummary['tab'] = CRM_Event_Page_ManageEvent::tabs();
 
     $actionColumn = FALSE;
     if (!empty($eventSummary) &&
@@ -50,6 +41,7 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
 
     $this->assign('actionColumn', $actionColumn);
     $this->assign('eventSummary', $eventSummary);
+    $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
   }
 
   /**

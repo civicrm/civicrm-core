@@ -110,6 +110,59 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test nestedGroup pseudoconstant
+   */
+  public function testNestedGroup() {
+    $params = [
+      'name' => 'groupa',
+      'title' => 'Parent Group A',
+      'description' => 'Parent Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      // mailing group
+      'group_type' => ['2' => 1],
+    ];
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $params = [
+      'name' => 'groupb',
+      'title' => 'Parent Group B',
+      'description' => 'Parent Group Two',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    ];
+    $group2 = CRM_Contact_BAO_Group::create($params);
+
+    $params = [
+      'name' => 'groupc',
+      'title' => 'Child Group C',
+      'description' => 'Child Group C',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'parents' => [
+        $group2->id => 1,
+      ],
+      'group_type' => ['2' => 1],
+    ];
+    $group3 = CRM_Contact_BAO_Group::create($params);
+
+    // Check with no group type restriction
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
+    $this->assertEquals([
+      $group1->id => 'Parent Group A',
+      $group2->id => 'Parent Group B',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
+
+    // Check restrict to mailing groups
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing');
+    $this->assertSame([
+      $group1->id => 'Parent Group A',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
+  }
+
+  /**
    * Test adding a smart group.
    */
   public function testAddSmart() {

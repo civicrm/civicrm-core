@@ -87,7 +87,7 @@
       <tr>
         <td>
           <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
-          <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
+          <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
           <div id="tagtree">
             {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
           </div>

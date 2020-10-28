@@ -239,7 +239,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $config = CRM_Core_Config::singleton();
     $separator = '&';

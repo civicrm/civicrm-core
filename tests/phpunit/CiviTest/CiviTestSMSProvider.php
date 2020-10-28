@@ -13,19 +13,19 @@
   * Test SMS provider to allow for testing
   */
 class CiviTestSMSProvider extends CRM_SMS_Provider {
-  protected $_providerInfo = array();
+  protected $_providerInfo = [];
   protected $_id = 0;
-  static private $_singleton = array();
+  static private $_singleton = [];
 
   public function __construct($provider, $skipAuth = TRUE) {
     $this->provider = $provider;
   }
 
-  public static function &singleton($providerParams = array(), $force = FALSE) {
+  public static function &singleton($providerParams = [], $force = FALSE) {
     if (isset($providerParams['provider'])) {
       $providers = CRM_SMS_BAO_Provider::getProviders(NULL, array('name' => $providerParams['provider']));
       $provider = current($providers);
-      $providerID = $provider['id'];
+      $providerID = $provider['id'] ?? NULL;
     }
     else {
       $providerID = $providerParams['provider_id'] ?? NULL;
@@ -34,7 +34,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
     $cacheKey   = (int) $providerID;
 
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
-      $provider = array();
+      $provider = [];
       if ($providerID) {
         $provider = CRM_SMS_BAO_Provider::getProviderInfo($providerID);
       }

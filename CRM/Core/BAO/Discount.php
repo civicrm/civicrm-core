@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
 
@@ -98,11 +96,12 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @return int
    *   $dao->id       discount id of the set which matches
    *                                 the date criteria
+   * @throws CRM_Core_Exception
    */
   public static function findSet($entityID, $entityTable) {
     if (empty($entityID) || empty($entityTable)) {
       // adding this here, to trap errors if values are not sent
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Invalid parameters passed to findSet function');
       return NULL;
     }
 

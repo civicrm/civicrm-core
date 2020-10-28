@@ -12,7 +12,7 @@
 {if $surveys}
   <div class="action-link">
     <a href="{$addSurveyUrl}" class="button">
-      <span><i class="crm-i fa-plus-circle"></i> {ts}Add Survey{/ts}</span>
+      <span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Survey{/ts}</span>
     </a>
   </div>
  {include file="CRM/common/enableDisableApi.tpl"}
@@ -40,7 +40,7 @@
           <td>{$survey.release_frequency}</td>
           <td>{$survey.max_number_of_contacts}</td>
           <td>{$survey.default_number_of_contacts}</td>
-          <td>{if $survey.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" /> {/if}</td>
+          <td>{icon condition=$survey.is_default}{ts}Default{/ts}{/icon}</td>
           <td id="row_{$survey.id}_status">{if $survey.is_active}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
      <td class="crm-report-optionList-action">{$survey.action}</td>
         </tr>
@@ -50,11 +50,11 @@
 
 {else}
   <div class="status">
-    <div class="icon inform-icon"></div>&nbsp;{ts}None found.{/ts}
+    {icon icon="fa-info-circle"}{/icon}{ts}None found.{/ts}
   </div>
 {/if}
 <div class="action-link">
   <a href="{$addSurveyUrl}" class="button">
-    <span><i class="crm-i fa-plus-circle"></i> {ts}Add Survey{/ts}</span>
+    <span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Survey{/ts}</span>
   </a>
 </div>

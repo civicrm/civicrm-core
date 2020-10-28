@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,10 +21,11 @@
  *
  */
 class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Registration {
-  // optional credit card return status code
+
   /**
-   * CRM-6060
+   * Optional credit card return status code
    * @var string
+   * @see https://issues.civicrm.org/jira/browse/CRM-6060
    */
   protected $_cc = NULL;
 

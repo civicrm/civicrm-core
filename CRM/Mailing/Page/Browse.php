@@ -64,7 +64,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public function preProcess() {
     Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
-    $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;
+    $this->_unscheduled = $archiveLinks = FALSE;
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
 
@@ -119,6 +119,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $newArgs = func_get_args();
     // since we want only first function argument
     $newArgs = $newArgs[0];
+    $this->_isArchived = $this->isArchived($newArgs);
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
       $mailerJobSize = Civi::settings()->get('mailerJobSize');
       CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
@@ -140,10 +141,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     $this->set('unscheduled', $this->_unscheduled);
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'archived') {
-      $this->_archived = TRUE;
-    }
-    $this->set('archived', $this->_archived);
+    $this->set('archived', $this->isArchived($newArgs));
 
     if (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
       $this->_scheduled = TRUE;
@@ -245,11 +243,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    // hack to display results as per search
-    $rows = $controller->getRows($controller);
-
-    $this->assign('rows', $rows);
-
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
@@ -260,7 +253,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
     }
-    elseif (CRM_Utils_Array::value(3, $newArgs) == 'archived') {
+
+    if ($this->isArchived($newArgs)) {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
     }
@@ -351,6 +345,19 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
 
     return implode(' AND ', $clauses);
+  }
+
+  /**
+   * Is the search limited to archived mailings.
+   *
+   * @param array $urlArguments
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isArchived($urlArguments): bool {
+    return in_array('archived', $urlArguments, TRUE) || CRM_Utils_Request::retrieveValue('is_archived', 'Boolean');
   }
 
 }

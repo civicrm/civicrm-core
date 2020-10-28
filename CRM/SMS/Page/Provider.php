@@ -112,7 +112,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    */
   public function browse($action = NULL) {
     $providers = CRM_SMS_BAO_Provider::getProviders();
-    $rows = array();
+    $rows = [];
     foreach ($providers as $provider) {
       $action = array_sum(array_keys($this->links()));
       // update enable/disable links.

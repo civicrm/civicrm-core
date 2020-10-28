@@ -10,20 +10,9 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Grant_BAO_Grant
  */
 class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
 
   /**
    * Get events Summary.
@@ -36,8 +25,13 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    */
   public static function getGrantSummary($admin = FALSE) {
     $query = "
-            SELECT status_id, count(id) as status_total
-            FROM civicrm_grant  GROUP BY status_id";
+      SELECT status_id, count(g.id) as status_total
+      FROM civicrm_grant g
+      JOIN civicrm_contact c
+        ON g.contact_id = c.id
+      WHERE c.is_deleted = 0
+      GROUP BY status_id
+    ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
 
@@ -97,7 +91,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Grant_BAO_ManageGrant
+   * @return CRM_Grant_DAO_Grant
    */
   public static function retrieve(&$params, &$defaults) {
     $grant = new CRM_Grant_DAO_Grant();
@@ -113,48 +107,17 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    * Add grant.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
-   *
    *
    * @return object
    */
-  public static function add(&$params, &$ids) {
+  public static function add($params, $ids = []) {
+    $id = $ids['grant_id'] ?? $params['id'] ?? NULL;
+    $hook = $id ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($hook, 'Grant', $id, $params);
 
-    if (!empty($ids['grant_id'])) {
-      CRM_Utils_Hook::pre('edit', 'Grant', $ids['grant_id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Grant', NULL, $params);
-    }
-
-    // first clean up all the money fields
-    $moneyFields = [
-      'amount_total',
-      'amount_granted',
-      'amount_requested',
-    ];
-    foreach ($moneyFields as $field) {
-      if (isset($params[$field])) {
-        $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
-      }
-    }
-    // convert dates to mysql format
-    $dates = [
-      'application_received_date',
-      'decision_date',
-      'money_transfer_date',
-      'grant_due_date',
-    ];
-
-    foreach ($dates as $d) {
-      if (isset($params[$d])) {
-        $params[$d] = CRM_Utils_Date::processDate($params[$d], NULL, TRUE);
-      }
-    }
     $grant = new CRM_Grant_DAO_Grant();
-    $grant->id = $ids['grant_id'] ?? NULL;
+    $grant->id = $id;
 
     $grant->copyValues($params);
 
@@ -200,27 +163,20 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
     }
 
-    if (!empty($ids['grant'])) {
-      CRM_Utils_Hook::post('edit', 'Grant', $grant->id, $grant);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Grant', $grant->id, $grant);
-    }
+    CRM_Utils_Hook::post($hook, 'Grant', $grant->id, $grant);
 
     return $result;
   }
 
   /**
-   * Create the event.
+   * Adds a grant.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
    *
    * @return object
    */
-  public static function create(&$params, &$ids) {
+  public static function create($params, $ids = []) {
     $transaction = new CRM_Core_Transaction();
 
     $grant = self::add($params, $ids);

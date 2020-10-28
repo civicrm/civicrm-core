@@ -136,17 +136,16 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $properties
    * @param bool $localizable is this a field that should be localized
    * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   * @param bool $triggerRebuild should we trigger the rebuild of the multilingual schema
    *
    * @return bool
    */
-  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
+  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL, $triggerRebuild = TRUE) {
+    $locales = CRM_Core_I18n::getMultilingual();
     $queries = [];
     if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
-      if ($domain->locales) {
+      if ($locales) {
         if ($localizable) {
-          $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
             if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
               $queries[] = "ALTER TABLE `$table` ADD COLUMN `{$column}_{$locale}` $properties";
@@ -164,8 +163,7 @@ class CRM_Upgrade_Incremental_Base {
         CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
       }
     }
-    if ($domain->locales) {
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    if ($locales && $triggerRebuild) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version, TRUE);
     }
     return TRUE;
@@ -246,12 +244,13 @@ class CRM_Upgrade_Incremental_Base {
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $table
-   * @param string|array $column
+   * @param string|array $columns
+   * @param string $prefix
    * @return bool
    */
-  public static function addIndex($ctx, $table, $column) {
-    $tables = [$table => (array) $column];
-    CRM_Core_BAO_SchemaHandler::createIndexes($tables);
+  public static function addIndex($ctx, $table, $columns, $prefix = 'index') {
+    $tables = [$table => (array) $columns];
+    CRM_Core_BAO_SchemaHandler::createIndexes($tables, $prefix);
 
     return TRUE;
   }
@@ -298,10 +297,8 @@ class CRM_Upgrade_Incremental_Base {
    * @return bool
    */
   public static function rebuildMultilingalSchema($ctx, $version = NULL) {
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    if ($domain->locales) {
-      $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
       CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version);
     }
     return TRUE;

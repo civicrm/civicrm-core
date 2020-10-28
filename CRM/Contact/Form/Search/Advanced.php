@@ -24,6 +24,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
+    // SearchFormName is deprecated & to be removed - the replacement is for the task to
+    // call $this->form->getSearchFormValues()
+    // A couple of extensions use it.
     $this->set('searchFormName', 'Advanced');
 
     parent::preProcess();
@@ -116,7 +119,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
       // see if we need to include this paneName in the current form
       if ($this->_searchPane == $type || !empty($_POST["hidden_{$type}"]) ||
-        CRM_Utils_Array::value("hidden_{$type}", $this->_formValues)
+        !empty($this->_formValues["hidden_{$type}"])
       ) {
         $allPanes[$name]['open'] = 'true';
 
@@ -189,7 +192,15 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'privacy_toggle' => 1,
       'operator' => 'AND',
     ], $defaults);
-    $this->normalizeDefaultValues($defaults);
+    $defaults = $this->normalizeDefaultValues($defaults);
+
+    //991/Subtypes not respected when editing smart group criteria
+    if (!empty($defaults['contact_type']) && !empty($this->_formValues['contact_sub_type'])) {
+      foreach ($this->_formValues['contact_sub_type'] as $subtype) {
+        $basicType = CRM_Contact_BAO_ContactType::getBasicType($subtype);
+        $defaults['contact_type'][$subtype] = $basicType . '__' . $subtype;
+      }
+    }
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
@@ -288,8 +299,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     else {
       $this->_sortByCharacter = NULL;
     }
-
-    CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
     $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $this->_returnProperties = &$this->returnProperties();

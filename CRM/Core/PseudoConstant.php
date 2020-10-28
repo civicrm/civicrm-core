@@ -194,7 +194,7 @@ class CRM_Core_PseudoConstant {
       'fresh' => FALSE,
       'context' => $context,
     ];
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getCanonicalClassName($daoName));
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
 
     // Custom fields are not in the schema
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
@@ -857,7 +857,7 @@ WHERE  id = %1";
    * @param bool $excludeHidden
    * @return array
    */
-  public static function nestedGroup($checkPermissions = TRUE, $groupType = NULL, $excludeHidden = TRUE) {
+  public static function nestedGroup(bool $checkPermissions = TRUE, $groupType = NULL, bool $excludeHidden = TRUE) {
     $groups = $checkPermissions ? self::group($groupType, $excludeHidden) : self::allGroup($groupType, $excludeHidden);
     return CRM_Contact_BAO_Group::getGroupsHierarchy($groups, NULL, '&nbsp;&nbsp;', TRUE);
   }
@@ -950,6 +950,23 @@ WHERE  id = %1";
     }
 
     return self::$relationshipType[$cacheKey];
+  }
+
+  /**
+   * Name => Label pairs for all relationship types
+   *
+   * @return array
+   */
+  public static function relationshipTypeOptions() {
+    $relationshipTypes = [];
+    $relationshipLabels = self::relationshipType();
+    foreach (self::relationshipType('name') as $id => $type) {
+      $relationshipTypes[$type['name_a_b']] = $relationshipLabels[$id]['label_a_b'];
+      if ($type['name_b_a'] && $type['name_b_a'] != $type['name_a_b']) {
+        $relationshipTypes[$type['name_b_a']] = $relationshipLabels[$id]['label_b_a'];
+      }
+    }
+    return $relationshipTypes;
   }
 
   /**
@@ -1376,19 +1393,21 @@ WHERE  id = %1
    * The static array option values is returned
    *
    *
-   * @param bool $optionGroupName
-   *   Get All Option Group values- default is to get only active ones.
+   * @param string $optionGroupName
+   *   Name of option group
    *
    * @param int $id
-   * @param null $condition
+   * @param string $condition
+   * @param string $column
+   *   Whether to return 'name' or 'label'
    *
    * @return array
-   *   array reference of all Option Group Name
+   *   array reference of all Option Values
    */
-  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL) {
-    $cacheKey = $optionGroupName . '_' . $condition;
+  public static function accountOptionValues($optionGroupName, $id = NULL, $condition = NULL, $column = 'label') {
+    $cacheKey = $optionGroupName . '_' . $condition . '_' . $column;
     if (empty(self::$accountOptionValues[$cacheKey])) {
-      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition);
+      self::$accountOptionValues[$cacheKey] = CRM_Core_OptionGroup::values($optionGroupName, FALSE, FALSE, FALSE, $condition, $column);
     }
     if ($id) {
       return self::$accountOptionValues[$cacheKey][$id] ?? NULL;
@@ -1527,7 +1546,7 @@ WHERE  id = %1
     }
     // Filter domain specific options
     if (in_array('domain_id', $availableFields)) {
-      $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID();
+      $wheres[] = 'domain_id = ' . CRM_Core_Config::domainID() . ' OR  domain_id is NULL';
     }
     $queryParams = [
       1 => [$params['keyColumn'], 'String', CRM_Core_DAO::QUERY_FORMAT_NO_QUOTES],
@@ -1551,7 +1570,7 @@ WHERE  id = %1
     $output = [];
     $query = "$select $from";
     if ($wheres) {
-      $query .= " WHERE " . implode($wheres, ' AND ');
+      $query .= " WHERE " . implode(' AND ', $wheres);
     }
     $query .= ' ' . $order;
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);

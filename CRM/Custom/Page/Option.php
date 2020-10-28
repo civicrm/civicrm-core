@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -213,7 +211,7 @@ WHERE  option_group_id = %1";
     );
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
-      CRM_Core_Error::fatal("You cannot add or edit multiple choice options in a reserved custom field-set.");
+      CRM_Core_Error::statusBounce("You cannot add or edit multiple choice options in a reserved custom field-set.");
     }
 
     $optionGroupId = $this->getOptionGroupId($this->_fid);

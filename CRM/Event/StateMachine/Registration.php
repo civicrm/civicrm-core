@@ -10,16 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * State machine for managing different states of the EventWizard process.
- *
  */
 class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
 
@@ -27,9 +18,9 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
    * Class constructor.
    *
    * @param object $controller
-   * @param \const|int $action
+   * @param int $action
    *
-   * @return \CRM_Event_StateMachine_Registration CRM_Event_StateMachine
+   * @throws \CRM_Core_Exception
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);

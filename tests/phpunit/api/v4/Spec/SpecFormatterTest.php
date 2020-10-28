@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -67,8 +65,9 @@ class SpecFormatterTest extends UnitTestCase {
       'id' => $customFieldId,
       'name' => $name,
       'data_type' => 'String',
-      'html_type' => 'Multi-Select',
+      'html_type' => 'Select',
       'column_name' => $name,
+      'serialize' => 1,
     ];
 
     /** @var \Civi\Api4\Service\Spec\CustomFieldSpec $field */

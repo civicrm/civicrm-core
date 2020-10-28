@@ -6,6 +6,7 @@
   <name>civicrm_website</name>
   <comment>Website information for a specific location.</comment>
   <add>3.2</add>
+  <icon>fa-desktop</icon>
   <field>
     <name>id</name>
     <type>int unsigned</type>

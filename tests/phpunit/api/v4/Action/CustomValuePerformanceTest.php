@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -37,16 +35,14 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
 
     $this->markTestIncomplete();
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('title', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('options', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -54,24 +50,21 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavAnimal')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavLetter')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavFood')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
@@ -80,8 +73,7 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
 
     $this->beginQueryCount();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Red')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -91,8 +83,7 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
       ->addValue('MyContactFields.FavFood', 'Coconuts')
       ->execute();
 
-    Contact::get()
-      ->setCheckPermissions(FALSE)
+    Contact::get(FALSE)
       ->addSelect('display_name')
       ->addSelect('MyContactFields.FavColor.label')
       ->addSelect('MyContactFields.FavColor.weight')

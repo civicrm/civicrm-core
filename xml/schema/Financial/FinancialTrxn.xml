@@ -18,34 +18,6 @@
     <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
-    <name>from_account_id</name>
-    <type>int unsigned</type>
-    <comment>FK to financial_account table.</comment>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>from_account_id</name>
-    <table>civicrm_financial_account</table>
-    <key>id</key>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
-    <name>to_account_id</name>
-    <type>int unsigned</type>
-    <comment>FK to financial_account table.</comment>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>to_account_id</name>
-    <table>civicrm_financial_account</table>
-    <key>id</key>
-    <add>3.2</add>
-    <drop>4.3</drop>
-  </foreignKey>
-  <field>
     <name>from_financial_account_id</name>
     <type>int unsigned</type>
     <title>Financial Transaction From Account</title>
@@ -100,15 +72,6 @@
     </html>
   </field>
   <field>
-    <name>trxn_type</name>
-    <title>Financial Transaction Type</title>
-    <type>enum</type>
-    <values>Debit,Credit</values>
-    <required>true</required>
-    <add>1.3</add>
-    <drop>4.3</drop>
-  </field>
-  <field>
     <name>total_amount</name>
     <title>Financial Total Amount</title>
     <type>decimal</type>
@@ -160,15 +123,6 @@
     <import>true</import>
     <comment>Is this entry either a payment or a reversal of a payment?</comment>
     <add>4.7</add>
-  </field>
-  <field>
-    <name>payment_processor</name>
-    <type>varchar</type>
-    <length>64</length>
-    <required>true</required>
-    <comment>derived from Processor setting in civicrm.settings.php.</comment>
-    <add>1.3</add>
-    <drop>4.3</drop>
   </field>
   <field>
     <name>trxn_id</name>

@@ -43,7 +43,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
 
   /**
    * Test getting a single extension
-   * CRM-20532
+   * @see https://issues.civicrm.org/jira/browse/CRM-20532
    */
   public function testExtensionGetSingleExtension() {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest']);
@@ -54,7 +54,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
 
   /**
    * Test single Extension get with specific fields in return
-   * CRM-20532
+   * @see https://issues.civicrm.org/jira/browse/CRM-20532
    */
   public function testSingleExtensionGetWithReturnFields() {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest', 'return' => ['name', 'status', 'key']]);
@@ -67,7 +67,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   /**
    * Test Extension Get returns detailed information
    * Note that this is likely to fail locally but will work on Jenkins due to the result count check
-   * CRM-20532
+   * @see https://issues.civicrm.org/jira/browse/CRM-20532
    */
   public function testExtensionGet() {
     $result = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 0]]);

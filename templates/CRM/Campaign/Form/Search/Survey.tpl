@@ -10,7 +10,7 @@
 
 {if !$hasSurveys}
     <div class="messages status no-popup">
-        <div class="icon inform-icon"></div> &nbsp;
+        {icon icon="fa-info-circle"}{/icon}
         {ts}None found.{/ts}
     </div>
 
@@ -210,6 +210,7 @@ function loadSurveyList( )
 
          //add id for yes/no column.
          CRM.$(nRow).children().eq(11).attr( 'id', rowId + '_status' );
+         CRM.$(nRow).children().eq(9).html(CRM.utils.formatIcon('fa-check', ts('Default'), nRow.cells[9].innerText));
 
          return nRow;
     },

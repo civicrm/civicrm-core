@@ -14,15 +14,20 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for all `Save` api actions.
+ * Create or update one or more $ENTITIES.
+ *
+ * Pass an array of one or more $ENTITY to save in the `records` param.
+ *
+ * If creating more than one $ENTITY with similar values, use the `defaults` param.
+ *
+ * Set `reload` if you need the api to return complete records for each saved $ENTITY
+ * (including values that were unchanged in from updated $ENTITIES).
  *
  * @method $this setRecords(array $records) Set array of records to be saved.
  * @method array getRecords()

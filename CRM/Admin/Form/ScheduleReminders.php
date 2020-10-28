@@ -250,7 +250,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->addEntityRef('recipient_manual_id', ts('Manual Recipients'), ['multiple' => TRUE, 'create' => TRUE]);
 
     $this->add('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::nestedGroup('Mailing'), FALSE, ['class' => 'crm-select2 huge']
+      CRM_Core_PseudoConstant::nestedGroup(), FALSE, ['class' => 'crm-select2 huge']
     );
 
     // multilingual only options
@@ -481,7 +481,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'subject',
       'absolute_date',
       'group_id',
-      'record_activity',
       'limit_to',
       'mode',
       'sms_provider_id',
@@ -492,7 +491,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params[$key] = $values[$key] ?? NULL;
     }
 
-    $params['is_repeat'] = CRM_Utils_Array::value('is_repeat', $values, 0);
+    // set boolean fields to false if not set.
+    foreach (['record_activity', 'is_repeat', 'is_active'] as $boolFieldName) {
+      $params[$boolFieldName] = $values[$boolFieldName] ?? 0;
+    }
 
     $moreKeys = [
       'start_action_offset',
@@ -558,8 +560,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['entity_value'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $entity_value);
       $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $entity_status);
     }
-
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
 
     if (empty($values['is_repeat'])) {
       $params['repetition_frequency_unit'] = 'null';

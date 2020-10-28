@@ -406,6 +406,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *
  * @return array
  *   Array of results
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases.

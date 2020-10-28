@@ -846,10 +846,6 @@ WHERE civicrm_event.is_active = 1
     // be clearer & safer here
     $permissions = CRM_Core_Permission::event(CRM_Core_Permission::VIEW);
 
-    // check if we're in shopping cart mode for events
-    $enable_cart = Civi::settings()->get('enable_cart');
-    if ($enable_cart) {
-    }
     while ($dao->fetch()) {
       if (!empty($permissions) && in_array($dao->event_id, $permissions)) {
         $info = [];
@@ -891,7 +887,9 @@ WHERE civicrm_event.is_active = 1
         $info['location'] = $address;
         $info['url'] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
 
-        if ($enable_cart) {
+        // @todo Move to eventcart extension
+        // check if we're in shopping cart mode for events
+        if ((bool) Civi::settings()->get('enable_cart')) {
           $reg = CRM_Event_Cart_BAO_EventInCart::get_registration_link($dao->event_id);
           $info['registration_link'] = CRM_Utils_System::url($reg['path'], $reg['query'], TRUE);
           $info['registration_link_text'] = $reg['label'];
@@ -1160,6 +1158,8 @@ WHERE civicrm_event.is_active = 1
           'conference_sessions' => $sessions,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
+          'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
+          'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? 'after' : 'before',
         ]);
 
         // CRM-13890 : NOTE wait list condition need to be given so that
@@ -2385,6 +2385,47 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
         ],
       ],
     ];
+  }
+
+  /**
+   * Get the appropriate links to iCal pages/feeds.
+   *
+   * @param int $eventId
+   *
+   * @return array
+   *   All of the icons to show.
+   */
+  public static function getICalLinks($eventId = NULL) {
+    $return = $eventId ? [] : [
+      [
+        'url' => CRM_Utils_System::url('civicrm/event/ical', 'reset=1&list=1&html=1', TRUE, NULL, TRUE),
+        'text' => ts('HTML listing of current and future public events.'),
+        'icon' => 'fa-th-list',
+      ],
+      [
+        'url' => CRM_Utils_System::url('civicrm/event/ical', 'reset=1&list=1&rss=1', TRUE, NULL, TRUE),
+        'text' => ts('Get RSS 2.0 feed for current and future public events.'),
+        'icon' => 'fa-rss',
+      ],
+    ];
+    $query = [
+      'reset' => 1,
+    ];
+    if ($eventId) {
+      $query['id'] = $eventId;
+    }
+    $return[] = [
+      'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
+      'text' => $eventId ? ts('Download iCalendar entry for this event.') : ts('Download iCalendar entry for current and future public events.'),
+      'icon' => 'fa-download',
+    ];
+    $query['list'] = 1;
+    $return[] = [
+      'url' => CRM_Utils_System::url('civicrm/event/ical', $query, TRUE, NULL, TRUE),
+      'text' => $eventId ? ts('iCalendar feed for this event.') : ts('iCalendar feed for current and future public events.'),
+      'icon' => 'fa-link',
+    ];
+    return $return;
   }
 
 }

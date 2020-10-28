@@ -31,33 +31,11 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
    * @return object
    */
   public static function create($params) {
-    // if id is set & is_primary isn't we can assume no change
-    if (is_numeric(CRM_Utils_Array::value('is_primary', $params)) || empty($params['id'])) {
-      CRM_Core_BAO_Block::handlePrimary($params, get_class());
-    }
+    CRM_Core_BAO_Block::handlePrimary($params, get_class());
 
-    $email = CRM_Core_BAO_Email::add($params);
-
-    return $email;
-  }
-
-  /**
-   * Takes an associative array and adds email.
-   *
-   * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_BAO_Email object on success, null otherwise
-   */
-  public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Email', CRM_Utils_Array::value('id', $params), $params);
 
-    if (isset($params['is_bulkmail']) && $params['is_bulkmail'] === 'null') {
-      CRM_Core_Error::deprecatedFunctionWarning('It is not valid to set bulkmail to null, it is boolean');
-      $params['bulkmail'] = 0;
-    }
     $email = new CRM_Core_DAO_Email();
     $email->copyValues($params);
     if (!empty($email->email)) {
@@ -96,6 +74,20 @@ WHERE  contact_id = {$params['contact_id']}
 
     CRM_Utils_Hook::post($hook, 'Email', $email->id, $email);
     return $email;
+  }
+
+  /**
+   * Takes an associative array and adds email.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   *
+   * @return object
+   *   CRM_Core_BAO_Email object on success, null otherwise
+   */
+  public static function add(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('apiv4 create');
+    return self::create($params);
   }
 
   /**
@@ -305,7 +297,7 @@ AND    reset_date IS NULL
 
     $contactFromEmails = [];
     // add logged in user's active email ids
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
+    $contactID = CRM_Core_Session::getLoggedInContactID();
     if ($contactID) {
       $contactEmails = self::allEmails($contactID);
       $fromDisplayName  = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
@@ -343,6 +335,26 @@ AND    reset_date IS NULL
    */
   public static function del($id) {
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
+  }
+
+  /**
+   * Get filters for entity reference fields.
+   *
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    $contactFields = CRM_Contact_BAO_Contact::getEntityRefFilters();
+    foreach ($contactFields as $index => &$contactField) {
+      if (!empty($contactField['entity'])) {
+        // For now email_getlist can't parse state, country etc.
+        unset($contactFields[$index]);
+      }
+      elseif ($contactField['key'] !== 'contact_id') {
+        $contactField['entity'] = 'Contact';
+        $contactField['key'] = 'contact_id.' . $contactField['key'];
+      }
+    }
+    return $contactFields;
   }
 
 }

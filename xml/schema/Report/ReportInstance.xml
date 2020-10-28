@@ -6,6 +6,8 @@
   <name>civicrm_report_instance</name>
   <comment>Users can save their report instance and put in a cron tab etc.</comment>
   <add>2.2</add>
+  <title>Report</title>
+  <icon>fa-bar-chart</icon>
   <field>
     <name>id</name>
     <title>Report Instance ID</title>

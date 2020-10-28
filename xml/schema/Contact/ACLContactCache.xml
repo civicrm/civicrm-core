@@ -38,6 +38,7 @@
     <table>civicrm_contact</table>
     <key>id</key>
     <add>3.1</add>
+    <drop>5.31</drop>
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>

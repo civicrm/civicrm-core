@@ -23,6 +23,7 @@
          <table id="options" class="row-highlight">
          <thead>
          <tr>
+            <th>{ts}ID{/ts}</th>
             <th>{ts}Field Label{/ts}</th>
             <th>{ts}Data Type{/ts}</th>
             <th>{ts}Field Type{/ts}</th>
@@ -36,6 +37,7 @@
         <tbody>
         {foreach from=$customField item=row}
         <tr id="CustomField-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
+            <td>{$row.id}</td>
             <td class="crm-editable" data-field="label">{$row.label}</td>
             <td>{$row.data_type}</td>
             <td>{$row.html_type}</td>

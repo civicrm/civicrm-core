@@ -36,6 +36,10 @@
         <td class="label">{$form.style.label}</td>
         <td>{$form.style.html} {help id="id-display_style"}</td>
     </tr>
+    <tr id="icon_row" class="hiddenElement">
+        <td class="label">{$form.icon.label}</td>
+        <td>{$form.icon.html}</td>
+    </tr>
     <tr class="html-adjust">
         <td>&nbsp;</td>
         <td>{$form.collapse_display.html} {$form.collapse_display.label} {help id="id-collapse"}</td>
@@ -88,7 +92,9 @@ CRM.$(function($) {
     if ($(this).val() == 'Tab') {
       $('#collapse_display').prop('checked', false);
     }
+    $('#icon_row').toggle($(this).val() !== 'Inline');
   });
+  $('#icon_row').toggle($("select#style").val() !== 'Inline');
 
   /**
    * Check if this is a contact-related set and show/hide other options accordingly
@@ -138,12 +144,12 @@ CRM.$(function($) {
       $("tr#multiple_row").show();
       if (onFormLoad !== true) {
         $('#collapse_display').prop('checked', false);
-        $("select#style").append(tabWithTableOption);
-        $("select#style").val('Tab with table');
+        $("select#style").append(tabWithTableOption).val('Tab with table');
       }
+      $('#icon_row').toggle($("select#style").val() !== 'Inline');
     }
     else {
-      $("tr#multiple_row").hide();
+      $("tr#multiple_row, #icon_row").hide();
       if ($("select#style").val() === 'Tab with table') {
         $("select#style").val('Inline');
       }

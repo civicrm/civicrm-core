@@ -68,21 +68,6 @@ AND    {$this->_componentClause}";
    * Build the form object.
    */
   public function buildQuickForm() {
-    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses(
-      'contribution', $this->_contributionIds[0]
-    );
-    $byName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    // FIXME: if it's invalid to transition from Pending to
-    // In Progress or Overdue, we should move that logic to
-    // CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses.
-    foreach (['Pending', 'In Progress', 'Overdue'] as $suppress) {
-      unset($status[CRM_Utils_Array::key($suppress, $byName)]);
-    }
-    $this->add('select', 'contribution_status_id',
-      ts('Contribution Status'),
-      $status,
-      TRUE
-    );
     $this->add('checkbox', 'is_email_receipt', ts('Send e-mail receipt'));
     $this->setDefaults(['is_email_receipt' => 1]);
 
@@ -106,7 +91,7 @@ AND    co.id IN ( $contribIDs )";
     $this->_rows = [];
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
     $defaults = [];
-    $now = date("Y-m-d");
+    $now = date('Y-m-d');
     $paidByOptions = ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument();
 
     while ($dao->fetch()) {
@@ -131,10 +116,10 @@ AND    co.id IN ( $contribIDs )";
       $row['trxn_date'] = $this->add('datepicker', "trxn_date_{$row['contribution_id']}", ts('Transaction Date'), [], FALSE, ['time' => FALSE]);
       $defaults["trxn_date_{$row['contribution_id']}"] = $now;
 
-      $this->add("text", "check_number_{$row['contribution_id']}", ts('Check Number'));
+      $this->add('text', "check_number_{$row['contribution_id']}", ts('Check Number'));
       $defaults["check_number_{$row['contribution_id']}"] = $dao->check_no;
 
-      $this->add("select", "payment_instrument_id_{$row['contribution_id']}", ts('Payment Method'), $paidByOptions);
+      $this->add('select', "payment_instrument_id_{$row['contribution_id']}", ts('Payment Method'), $paidByOptions);
       $defaults["payment_instrument_id_{$row['contribution_id']}"] = $dao->paid_by;
 
       $this->_rows[] = $row;
@@ -145,7 +130,7 @@ AND    co.id IN ( $contribIDs )";
     $this->addButtons([
       [
         'type' => 'next',
-        'name' => ts('Update Pending Status'),
+        'name' => ts('Record Payments'),
         'isDefault' => TRUE,
       ],
       [
@@ -182,7 +167,7 @@ AND    co.id IN ( $contribIDs )";
         $contribID = substr($name, 13);
 
         if ($fields["payment_instrument_id_{$contribID}"] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
-          $errors["payment_instrument_id_{$contribID}"] = ts("Payment Method should be Check when a check number is entered for a contribution.");
+          $errors["payment_instrument_id_{$contribID}"] = ts('Payment Method should be Check when a check number is entered for a contribution.');
         }
       }
     }
@@ -198,7 +183,7 @@ AND    co.id IN ( $contribIDs )";
     // submit the form with values.
     self::processForm($this, $params);
 
-    CRM_Core_Session::setStatus(ts('Contribution status has been updated for selected record(s).'), ts('Status Updated'), 'success');
+    CRM_Core_Session::setStatus(ts('Payments have been recorded for selected record(s).'), ts('Payments recorded'), 'success');
   }
 
   /**
@@ -212,125 +197,26 @@ AND    co.id IN ( $contribIDs )";
    * @throws \Exception
    */
   public static function processForm($form, $params) {
-    $statusID = $params['contribution_status_id'] ?? NULL;
-    $baseIPN = new CRM_Core_Payment_BaseIPN();
-
-    $transaction = new CRM_Core_Transaction();
-
-    // get the missing pieces for each contribution
-    $contribIDs = implode(',', $form->_contributionIds);
-    $details = self::getDetails($contribIDs);
-    $template = CRM_Core_Smarty::singleton();
-
-    // for each contribution id, we just call the baseIPN stuff
     foreach ($form->_rows as $row) {
-      $input = $ids = $objects = [];
-      $input['component'] = $details[$row['contribution_id']]['component'];
-
-      $ids['contact'] = $row['contact_id'];
-      $ids['contribution'] = $row['contribution_id'];
-      $ids['contributionRecur'] = NULL;
-      $ids['contributionPage'] = NULL;
-      $ids['membership'] = $details[$row['contribution_id']]['membership'] ?? NULL;
-      $ids['participant'] = $details[$row['contribution_id']]['participant'] ?? NULL;
-      $ids['event'] = $details[$row['contribution_id']]['event'] ?? NULL;
-
-      if (!$baseIPN->validateData($input, $ids, $objects, FALSE)) {
-        CRM_Core_Error::fatal();
-      }
-
-      $contribution = &$objects['contribution'];
-
-      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL,
-        'name'
-      );
-
-      if ($statusID == array_search('Cancelled', $contributionStatuses)) {
-        $baseIPN->cancelled($objects, $transaction);
-        $transaction->commit();
-        continue;
-      }
-      elseif ($statusID == array_search('Failed', $contributionStatuses)) {
-        $baseIPN->failed($objects, $transaction);
-        $transaction->commit();
-        continue;
-      }
-
-      // status is not pending
-      if ($contribution->contribution_status_id != array_search('Pending',
-          $contributionStatuses
-        )
-      ) {
-        $transaction->commit();
-        continue;
-      }
-
-      // set some fake input values so we can reuse IPN code
-      $input['amount'] = $contribution->total_amount;
-      $input['is_test'] = $contribution->is_test;
-      $input['fee_amount'] = $params["fee_amount_{$row['contribution_id']}"];
-      $input['check_number'] = $params["check_number_{$row['contribution_id']}"];
-      $input['payment_instrument_id'] = $params["payment_instrument_id_{$row['contribution_id']}"];
-      $input['net_amount'] = $contribution->total_amount - $input['fee_amount'];
-
-      if (!empty($params["trxn_id_{$row['contribution_id']}"])) {
-        $input['trxn_id'] = trim($params["trxn_id_{$row['contribution_id']}"]);
-      }
-      else {
-        $input['trxn_id'] = $contribution->invoice_id;
-      }
-      $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' . date('H:i:s');
-      $input['is_email_receipt'] = !empty($params['is_email_receipt']);
-
-      // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
-      $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
-
-      // reset template values before processing next transactions
-      $template->clearTemplateVars();
+      $contribData = civicrm_api3('Contribution', 'getSingle', ['id' => $row['contribution_id']]);
+      $trxnParams = [
+        'contribution_id' => $row['contribution_id'],
+        // We are safe assuming that payments will be for the total amount of
+        // the contribution because the contributions must be in "Pending"
+        // status.
+        'total_amount' => $contribData['total_amount'],
+        'fee_amount' => $params["fee_amount_{$row['contribution_id']}"],
+        'check_number' => $params["check_number_{$row['contribution_id']}"],
+        'payment_instrument_id' => $params["payment_instrument_id_{$row['contribution_id']}"],
+        'net_amount' => $contribData['total_amount'] - $params["fee_amount_{$row['contribution_id']}"],
+        // Not sure why to default to invoice_id, but that's what the form has
+        // been doing historically
+        'trxn_id' => $params["trxn_id_{$row['contribution_id']}"] ?? $contribData['invoice_id'],
+        'trxn_date' => $params["trxn_date_{$row['contribution_id']}"] ?? 'now',
+        'is_send_contribution_notification' => !empty($params['is_email_receipt']),
+      ];
+      $result = civicrm_api3('Payment', 'create', $trxnParams);
     }
-  }
-
-  /**
-   * @param string $contributionIDs
-   *
-   * @return array
-   */
-  public static function &getDetails($contributionIDs) {
-    if (empty($contributionIDs)) {
-      return [];
-    }
-    $query = "
-SELECT    c.id              as contribution_id,
-          c.contact_id      as contact_id     ,
-          mp.membership_id  as membership_id  ,
-          pp.participant_id as participant_id ,
-          p.event_id        as event_id
-FROM      civicrm_contribution c
-LEFT JOIN civicrm_membership_payment  mp ON mp.contribution_id = c.id
-LEFT JOIN civicrm_participant_payment pp ON pp.contribution_id = c.id
-LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
-WHERE     c.id IN ( $contributionIDs )";
-
-    $rows = [];
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    while ($dao->fetch()) {
-      $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';
-      $rows[$dao->contribution_id]['contact'] = $dao->contact_id;
-      if ($dao->membership_id) {
-        if (!array_key_exists('membership', $rows[$dao->contribution_id])) {
-          $rows[$dao->contribution_id]['membership'] = [];
-        }
-        $rows[$dao->contribution_id]['membership'][] = $dao->membership_id;
-      }
-      if ($dao->participant_id) {
-        $rows[$dao->contribution_id]['participant'] = $dao->participant_id;
-      }
-      if ($dao->event_id) {
-        $rows[$dao->contribution_id]['event'] = $dao->event_id;
-      }
-    }
-    return $rows;
   }
 
 }

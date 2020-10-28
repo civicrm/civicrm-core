@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MessageTemplate;
+
 /**
  *
  * @package CRM
@@ -19,7 +21,7 @@
  * This class generates form components for Message templates
  * used by membership, contributions, event registrations, etc.
  */
-class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
+class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   /**
    * which (and whether) mailing workflow this template belongs to
    * @var int
@@ -28,20 +30,26 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Is document file is already loaded as default value?
+   *
    * @var bool
    */
   protected $_is_document = FALSE;
 
+  /**
+   * PreProcess form - load existing values.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 'add'
-    );
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->assign('action', $this->_action);
-
-    $this->_BAOName = 'CRM_Core_BAO_MessageTemplate';
-    $this->set('BAOName', $this->_BAOName);
-    parent::preProcess();
+    $this->_values = [];
+    if ($this->_id) {
+      $this->_values = (array) MessageTemplate::get()->addWhere('id', '=', $this->_id)->setSelect(['*'])->execute()->first();
+    }
   }
 
   /**
@@ -159,6 +167,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     //get the tokens.
     $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array_merge($tokens, CRM_Core_SelectValues::domainTokens());
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
@@ -170,7 +179,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       )
     ) {
       $this->add('textarea', 'msg_html', ts('HTML Message'),
-        "cols=50 rows=6"
+        ['cols' => 50, 'rows' => 6]
       );
     }
     else {
@@ -185,7 +194,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
 
     $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
+      ['cols' => 50, 'rows' => 6]
     );
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
@@ -253,6 +262,10 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -295,12 +308,12 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         $params['is_active'] = TRUE;
       }
 
-      $messageTemplate = CRM_Core_BAO_MessageTemplate::add($params);
-      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate->msg_title]), ts('Saved'), 'success');
+      $messageTemplate = MessageTemplate::save()->setDefaults($params)->setRecords([['id' => $this->_id]])->execute()->first();
+      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate['msg_title']]), ts('Saved'), 'success');
 
       if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {
         // Save button was pressed
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates/add', "action=update&id={$messageTemplate->id}&reset=1"));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates/add', "action=update&id={$messageTemplate['id']}&reset=1"));
       }
       // Save and done button was pressed
       if ($this->_workflow_id) {

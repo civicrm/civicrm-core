@@ -182,14 +182,16 @@ function _civicrm_api3_job_geocode_spec(&$params) {
 }
 
 /**
- * Send the scheduled reminders for all contacts (either for activities or events).
+ * Send the scheduled reminders as configured.
  *
  * @param array $params
- *   (reference ) input parameters.
- *                        now - the time to use, in YmdHis format
- *                            - makes testing a bit simpler since we can simulate past/future time
+ *  - now - the time to use, in YmdHis format
+ *  - makes testing a bit simpler since we can simulate past/future time
  *
  * @return array
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_send_reminder($params) {
   //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
@@ -199,18 +201,12 @@ function civicrm_api3_job_send_reminder($params) {
   $params['rowCount'] = 0;
   $lock = Civi::lockManager()->acquire('worker.core.ActionSchedule');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another ActionSchedule process is running');
+    throw new API_Exception('Could not acquire lock, another ActionSchedule process is running');
   }
 
-  $result = CRM_Core_BAO_ActionSchedule::processQueue(CRM_Utils_Array::value('now', $params), $params);
+  CRM_Core_BAO_ActionSchedule::processQueue($params['now'] ?? NULL, $params);
   $lock->release();
-
-  if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success();
-  }
-  else {
-    return civicrm_api3_create_error($result['messages']);
-  }
+  return civicrm_api3_create_success(1, $params, 'ActionSchedule', 'send_reminder');
 }
 
 /**
@@ -470,7 +466,14 @@ function civicrm_api3_job_process_membership($params) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
   }
 
-  $result = CRM_Member_BAO_Membership::updateAllMembershipStatus();
+  // We need to pass this through as a simple array of membership status IDs as values.
+  if (!empty($params['exclude_membership_status_ids'])) {
+    is_array($params['exclude_membership_status_ids']) ?: $params['exclude_membership_status_ids'] = [$params['exclude_membership_status_ids']];
+  }
+  if (!empty($params['exclude_membership_status_ids']['IN'])) {
+    $params['exclude_membership_status_ids'] = $params['exclude_membership_status_ids']['IN'];
+  }
+  $result = CRM_Member_BAO_Membership::updateAllMembershipStatus($params);
   $lock->release();
 
   if ($result['is_error'] == 0) {
@@ -479,6 +482,25 @@ function civicrm_api3_job_process_membership($params) {
   else {
     return civicrm_api3_create_error($result['messages']);
   }
+}
+
+function _civicrm_api3_job_process_membership_spec(&$params) {
+  $params['exclude_test_memberships']['api.default'] = TRUE;
+  $params['exclude_test_memberships']['title'] = 'Exclude test memberships';
+  $params['exclude_test_memberships']['description'] = 'Exclude test memberships from calculations (default = TRUE)';
+  $params['exclude_test_memberships']['type'] = CRM_Utils_Type::T_BOOLEAN;
+  $params['only_active_membership_types']['api.default'] = TRUE;
+  $params['only_active_membership_types']['title'] = 'Exclude disabled membership types';
+  $params['only_active_membership_types']['description'] = 'Exclude disabled membership types from calculations (default = TRUE)';
+  $params['only_active_membership_types']['type'] = CRM_Utils_Type::T_BOOLEAN;
+  $params['exclude_membership_status_ids']['title'] = 'Exclude membership status IDs from calculations';
+  $params['exclude_membership_status_ids']['description'] = 'Default: Exclude Pending, Cancelled, Expired. Deceased will always be excluded';
+  $params['exclude_membership_status_ids']['type'] = CRM_Utils_Type::T_INT;
+  $params['exclude_membership_status_ids']['pseudoconstant'] = [
+    'table' => 'civicrm_membership_status',
+    'keyColumn' => 'id',
+    'labelColumn' => 'label',
+  ];
 }
 
 /**

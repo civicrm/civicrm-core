@@ -8,6 +8,7 @@
     data: null,
     settings: {collapsibleBehavior: 'accordion'},
     position: 'over-cms-menu',
+    toggleButton: true,
     attachTo: (CRM.menubar && CRM.menubar.position === 'above-crm-container') ? '#crm-container' : 'body',
     initialize: function() {
       var cache = CRM.cache.get('menubar');
@@ -231,16 +232,23 @@
       }
     },
     initializePosition: function() {
-      if (CRM.menubar.position === 'over-cms-menu' || CRM.menubar.position === 'below-cms-menu') {
+      if (CRM.menubar.toggleButton && (CRM.menubar.position === 'over-cms-menu' || CRM.menubar.position === 'below-cms-menu')) {
         $('#civicrm-menu')
           .on('click', 'a[href="#toggle-position"]', function(e) {
             e.preventDefault();
             CRM.menubar.togglePosition();
           })
-          .append('<li id="crm-menubar-toggle-position"><a href="#toggle-position" title="' + ts('Adjust menu position') + '"><i class="crm-i fa-arrow-up"></i></a>');
+          .append('<li id="crm-menubar-toggle-position"><a href="#toggle-position" title="' + ts('Adjust menu position') + '"><i class="crm-i fa-arrow-up" aria-hidden="true"></i></a>');
         CRM.menubar.position = CRM.cache.get('menubarPosition', CRM.menubar.position);
       }
       $('body').addClass('crm-menubar-visible crm-menubar-' + CRM.menubar.position);
+    },
+    removeToggleButton: function() {
+      $('#crm-menubar-toggle-position').remove();
+      CRM.menubar.toggleButton = false;
+      if (CRM.menubar.position === 'below-cms-menu') {
+        CRM.menubar.togglePosition();
+      }
     },
     initializeResponsive: function() {
       var $mainMenuState = $('#crm-menubar-state');
@@ -357,10 +365,6 @@
         var $selection = $('.crm-quickSearchField input:checked'),
           label = $selection.parent().text(),
           value = $selection.val();
-        // These fields are not supported by advanced search
-        if (!value || value === 'first_name' || value === 'last_name') {
-          value = 'sort_name';
-        }
         $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label});
       }
       $('.crm-quickSearchField').click(function() {

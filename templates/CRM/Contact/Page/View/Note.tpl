@@ -84,7 +84,7 @@
 
 {if ($permission EQ 'edit' OR $canAddNotes) AND ($action eq 16)}
    <div class="action-link">
-   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><i class="crm-i fa-comment"></i> {ts}Add Note{/ts}</span></a>
+   <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button medium-popup"><span><i class="crm-i fa-comment" aria-hidden="true"></i> {ts}Add Note{/ts}</span></a>
    </div>
    <div class="clear"></div>
 {/if}
@@ -204,13 +204,13 @@
             <td class="crm-note-comment">
                 {if $note.comment_count}
                     <span id="{$note.id}_show" style="display:block" class="icon_comments_show">
-                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Show comments for this note.{/ts}"><i class="crm-i fa-caret-right"></i></span></a>
+                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Show comments for this note.{/ts}"><i class="crm-i fa-caret-right" aria-hidden="true"></i></span></a>
                     </span>
                     <span id="{$note.id}_hide" style="display:none" class="icon_comments_hide">
-                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Hide comments for this note.{/ts}"><i class="crm-i fa-caret-down"></i></span></a>
+                        <a href="#" onclick="showHideComments({$note.id}); return false;" title="{ts}Hide comments for this note.{/ts}"><i class="crm-i fa-caret-down" aria-hidden="true"></i></span></a>
                     </span>
                 {else}
-                    <span class="crm-i fa-caret-right" id="{$note.id}_hide" style="display:none"></span>
+                    <span class="crm-i fa-caret-right" id="{$note.id}_hide" style="display:none" aria-hidden="true"></span>
                 {/if}
             </td>
             <td class="crm-note-note">
@@ -240,7 +240,7 @@
 </div>
 {elseif ($action eq 16)}
    <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}There are no Notes for this contact.{/ts}
    </div>
 {/if}

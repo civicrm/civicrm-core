@@ -74,7 +74,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
       $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = [
-      'transaction_date' => CRM_Utils_Date::isoToMysql($contribution->receive_date),
+      'transaction_date' => $contribution->receive_date,
       'contact_id' => $contribution->contact_id,
       'amount' => $lineItem->line_total,
       'currency' => $contribution->currency,
@@ -85,10 +85,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     ];
 
     if ($taxTrxnID) {
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
       $params['amount'] = $lineItem->tax_amount;
-      $params['description'] = $taxTerm;
+      $params['description'] = Civi::settings()->get('tax_term');
       $accountRelName = 'Sales Tax Account is';
     }
     else {
@@ -223,7 +221,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * Check if contact is present in financial_item table.
    *
-   * CRM-12929
+   * @see https://issues.civicrm.org/jira/browse/CRM-12929
    *
    * @param array $contactIds
    *   An array contact id's.

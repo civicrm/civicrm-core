@@ -8,7 +8,7 @@ namespace E2E\Core;
  * Check that the active prev-next service behaves as expected.
  *
  * @package E2E\Core
- * @group e2e
+ * @group e2e ornery
  */
 class PrevNextTest extends \CiviEndToEndTestCase {
 
@@ -48,7 +48,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $prefillLimit = 25;
     $sort = NULL;
 
-    $query = new \CRM_Contact_BAO_Query(array(), NULL, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, NULL, 'AND');
+    $query = new \CRM_Contact_BAO_Query([['sort_name', 'IS NOT NULL', 1, 0, 0]], NULL, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, NULL, 'AND');
     $sql = $query->searchQuery($start, $prefillLimit, $sort, FALSE, $query->_includeContactIds,
       FALSE, TRUE, TRUE);
     $selectSQL = "SELECT DISTINCT %1, contact_a.id, contact_a.sort_name";
@@ -92,11 +92,10 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertEquals(4, $this->prevNext->getCount($this->cacheKey));
     $this->assertEquals(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
 
-    $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    $this->assertEquals([100, 400, 200, 300], array_keys($all));
+    $all = $this->assertSelections([100, 400, 200, 300], 'getall', $this->cacheKey);
     $this->assertEquals([1], array_unique(array_values($all)));
 
-    $this->assertSelections([]);
+    $this->assertSelections([], 'get', $this->cacheKey);
   }
 
   public function testFetch() {
@@ -250,17 +249,15 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     // Add some data that we're actually working with.
     $this->testFillArray();
 
-    $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    $this->assertEquals([100, 400, 200, 300], array_keys($all));
+    $all = $this->assertSelections([100, 400, 200, 300], 'getall', $this->cacheKey);
 
     list ($id1, $id2, $id3) = array_keys($all);
     $this->prevNext->markSelection($this->cacheKey, 'select', [$id1, $id3]);
-    $this->assertSelections([$id1, $id3]);
+    $this->assertSelections([$id1, $id3], 'get', $this->cacheKey);
 
     $this->prevNext->deleteItem(NULL, $this->cacheKey);
-    $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    $this->assertEquals([], array_keys($all));
-    $this->assertSelections([]);
+    $this->assertSelections([], 'getall', $this->cacheKey);
+    $this->assertSelections([], 'get', $this->cacheKey);
 
     // Ensure background data was untouched.
     $this->assertSelections([100], 'get', $this->cacheKeyB);
@@ -326,14 +323,22 @@ class PrevNextTest extends \CiviEndToEndTestCase {
    *   Contact IDs that should be selected.
    * @param string $action
    * @param string|NULL $cacheKey
+   * @return array
+   *   Contact IDs that were returned by getSelection($cacheKey, $action)
    */
   protected function assertSelections($ids, $action = 'get', $cacheKey = NULL) {
     if ($cacheKey === NULL) {
       $cacheKey = $this->cacheKey;
     }
     $selected = $this->prevNext->getSelection($cacheKey, $action)[$cacheKey];
-    $this->assertEquals($ids, array_keys($selected), 'selected cache not correct for ' . $cacheKey . 'defined keys are ' . $this->cacheKey . 'and ' . $this->cacheKeyB);
+    $this->assertEquals($ids, array_keys($selected), 'selected cache not correct for ' . $cacheKey
+      . ' defined keys are ' . $this->cacheKey . 'and ' . $this->cacheKeyB
+      . ' result from getall is ' . print_r($this->prevNext->getSelection($cacheKey, 'getall'), 1)
+      . ' and the prevNext cache is ' . print_r($this->prevNext, TRUE)
+    );
+
     $this->assertCount(count($ids), $selected);
+    return $selected;
   }
 
 }

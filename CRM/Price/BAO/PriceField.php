@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * Business objects for managing price fields.
  *
  */
@@ -33,32 +25,13 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   private static $visibilityOptionsKeys;
 
   /**
-   * Takes an associative array and creates a price field object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * price field object. the params array could contain additional unused name/value
-   * pairs
+   * Create or update a PriceField.
    *
    * @param array $params
-   *   (reference) an assoc array of name/value pairs.
-   *
-   * @return CRM_Price_BAO_PriceField
+   * @return CRM_Price_DAO_PriceField
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'PriceField', CRM_Utils_Array::value('id', $params), $params);
-
-    $priceFieldBAO = new CRM_Price_BAO_PriceField();
-
-    $priceFieldBAO->copyValues($params);
-
-    if ($id = CRM_Utils_Array::value('id', $params)) {
-      $priceFieldBAO->id = $id;
-    }
-
-    $priceFieldBAO->save();
-    CRM_Utils_Hook::post($hook, 'PriceField', $priceFieldBAO->id, $priceFieldBAO);
-    return $priceFieldBAO;
+  public static function add($params) {
+    return self::writeRecord($params);
   }
 
   /**
@@ -323,9 +296,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
     //use value field.
     $valueFieldName = 'amount';
-    $seperator = '|';
+    $separator = '|';
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = $invoiceSettings['tax_term'] ?? NULL;
+    $taxTerm = Civi::settings()->get('tax_term');
     $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
     $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     switch ($field->html_type) {
@@ -339,7 +312,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $qf->assign('taxTerm', $taxTerm);
           $qf->assign('invoicing', $invoicing);
         }
-        $priceVal = implode($seperator, [
+        $priceVal = implode($separator, [
           $customOption[$optionKey][$valueFieldName] + $taxAmount,
           $count,
           $max_value,
@@ -405,10 +378,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $opt['label'] = !empty($opt['label']) ? $opt['label'] . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
             $preHelpText = $postHelpText = '';
             if (!empty($opt['help_pre'])) {
-              $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span>: ';
+              $preHelpText = '<span class="crm-price-amount-help-pre description">' . $opt['help_pre'] . '</span><span class="crm-price-amount-help-pre-separator">:&nbsp;</span>';
             }
             if (!empty($opt['help_post'])) {
-              $postHelpText = ': <span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
+              $postHelpText = '<span class="crm-price-amount-help-post-separator">:&nbsp;</span><span class="crm-price-amount-help-post description">' . $opt['help_post'] . '</span>';
             }
             if (isset($taxAmount) && $invoicing) {
               if ($displayOpt == 'Do_not_show') {
@@ -430,7 +403,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           }
           $count = CRM_Utils_Array::value('count', $opt, '');
           $max_value = CRM_Utils_Array::value('max_value', $opt, '');
-          $priceVal = implode($seperator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
+          $priceVal = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
           if (isset($opt['visibility_id'])) {
             $visibility_id = $opt['visibility_id'];
           }
@@ -526,7 +499,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
           }
 
-          $priceVal[$opt['id']] = implode($seperator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
+          $priceVal[$opt['id']] = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
 
           if (!in_array($opt['id'], $freezeOptions)) {
             $allowedOptions[] = $opt['id'];
@@ -589,7 +562,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             }
             $opt['label'] = $preHelpText . $opt['label'] . $postHelpText;
           }
-          $priceVal = implode($seperator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
+          $priceVal = implode($separator, [$opt[$valueFieldName] + $taxAmount, $count, $max_value]);
           $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $opt['label'],
             [
               'price' => json_encode([$opt['id'], $priceVal]),
@@ -892,14 +865,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
   public static function getVisibilityOptionID($visibilityName) {
 
     if (!isset(self::$visibilityOptionsKeys)) {
-      self::$visibilityOptionsKeys = CRM_Price_BAO_PriceField::buildOptions(
-        'visibility_id',
-        NULL,
-        [
-          'labelColumn' => 'name',
-          'flip' => TRUE,
-        ]
-      );
+      self::$visibilityOptionsKeys = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceField', 'visibility_id', [
+        'labelColumn' => 'name',
+        'flip' => TRUE,
+      ]);
     }
 
     if (isset(self::$visibilityOptionsKeys[$visibilityName])) {

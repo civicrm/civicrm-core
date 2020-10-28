@@ -132,6 +132,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *   Return the message text instead of sending the mail.
    *
    * @param array $fieldTypes
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function sendMail($contactID, $values, $isTest = FALSE, $returnMessageText = FALSE, $fieldTypes = NULL) {
     $gIds = [];
@@ -280,19 +282,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     ) {
       $template = CRM_Core_Smarty::singleton();
 
-      // get the billing location type
       if (!array_key_exists('related_contact', $values)) {
-        $billingLocationTypeId = CRM_Core_BAO_LocationType::getBilling();
-      }
-      else {
-        // presence of related contact implies onbehalf of org case,
-        // where location type is set to default.
-        $locType = CRM_Core_BAO_LocationType::getDefault();
-        $billingLocationTypeId = $locType->id;
-      }
-
-      if (!array_key_exists('related_contact', $values)) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, $billingLocationTypeId);
+        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, CRM_Core_BAO_LocationType::getBilling());
       }
       // get primary location email if no email exist( for billing location).
       if (!$email) {
@@ -447,9 +438,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         //send email with pdf invoice
         $template = CRM_Core_Smarty::singleton();
         $taxAmt = $template->get_template_vars('dataArray');
-        $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-        $invoicing = $prefixValue['invoicing'] ?? NULL;
-        if (isset($invoicing) && isset($prefixValue['is_email_pdf'])) {
+        $isEmailPDF = Civi::settings()->get('invoice_is_email_pdf');
+        $invoicing = Civi::settings()->get('invoicing');
+        if ($invoicing && !empty($isEmailPDF)) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
@@ -483,8 +474,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @param array $fieldTypes
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
-  protected static function getProfileNameAndFields($gid, $cid, &$params, $fieldTypes = []) {
+  protected static function getProfileNameAndFields($gid, $cid, $params, $fieldTypes = []) {
     $groupTitle = NULL;
     $values = [];
     if ($gid) {
@@ -492,14 +485,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
         foreach ($fields as $k => $v) {
           if (!$groupTitle) {
-            $groupTitle = $v["groupTitle"];
+            $groupTitle = $v['groupTitle'];
           }
           // suppress all file fields from display and formatting fields
           if (
-            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
-            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
-            CRM_Utils_Array::value('field_type', $v) == 'Formatting'
-          ) {
+            $v['data_type'] === 'File' || $v['name'] === 'image_URL' || $v['field_type'] === 'Formatting') {
             unset($fields[$k]);
           }
 
@@ -852,8 +842,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     $tsLocale = CRM_Core_I18n::getLocale();
     $config = CRM_Core_Config::singleton();
     $json = $jsonDecode = NULL;
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
+    $multilingual = CRM_Core_I18n::isMultilingual();
 
     $moduleDataFormat = [
       'soft_credit' => [
@@ -876,7 +865,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     if ($setDefault) {
       $jsonDecode = json_decode($params);
       $jsonDecode = (array) $jsonDecode->$module;
-      if (!$domain->locales && !empty($jsonDecode['default'])) {
+      if (!$multilingual && !empty($jsonDecode['default'])) {
         //monolingual state
         $jsonDecode += (array) $jsonDecode['default'];
         unset($jsonDecode['default']);
@@ -892,7 +881,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     }
 
     //check and handle multilingual honoree params
-    if (!$domain->locales) {
+    if (!$multilingual) {
       //if in singlelingual state simply return the array format
       $json = [$module => NULL];
       foreach ($moduleDataFormat[$module] as $key => $attribute) {
@@ -914,9 +903,9 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
       $json = [$module => NULL];
       foreach ($moduleDataFormat[$module] as $key => $attribute) {
         if ($key === 'multilingual') {
-          $json[$module][$config->lcMessages] = [];
+          $json[$module][$tsLocale] = [];
           foreach ($attribute as $attr) {
-            $json[$module][$config->lcMessages][$attr] = $params[$attr];
+            $json[$module][$tsLocale][$attr] = $params[$attr];
           }
         }
         else {

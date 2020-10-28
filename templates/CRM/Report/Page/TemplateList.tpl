@@ -27,7 +27,7 @@
                 {foreach from=$rows item=row}
                   <tr id="row_{counter}" class="crm-report-templateList">
                     <td class="crm-report-templateList-title" style="width:35%;">
-                      <a href="{$row.url}" title="{ts}Create report from this template{/ts}">&raquo; <strong>{$row.title}</strong></a>
+                      <a href="{$row.url}" title="{ts}Create report from this template{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a>
                       {if $row.instanceUrl}
                         <div style="font-size:10px;text-align:right;margin-top:3px;">
                           <a href="{$row.instanceUrl}">{ts}Existing Report(s){/ts}</a>
@@ -46,7 +46,7 @@
       {/foreach}
     {else}
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp; {ts}There are currently no Report Templates.{/ts}
+        {icon icon="fa-info-circle"}{/icon} {ts}There are currently no Report Templates.{/ts}
       </div>
     {/if}
   {/strip}

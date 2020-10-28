@@ -23,7 +23,7 @@
   {if $blockId gt 1}<fieldset><legend>{ts}Supplemental Address{/ts}</legend>{/if}
   <table class="form-layout-compressed crm-edit-address-form">
      {if $masterAddress.$blockId gt 0 }
-        <tr><td><div class="message status"><div class="icon inform-icon"></div>&nbsp; {ts 1=$masterAddress.$blockId}This address is shared with %1 contact record(s). Modifying this address will automatically update the shared address for these contacts.{/ts}</div></td></tr>
+        <tr><td><div class="message status">{icon icon="fa-info-circle"}{/icon} {ts 1=$masterAddress.$blockId}This address is shared with %1 contact record(s). Modifying this address will automatically update the shared address for these contacts.{/ts}</div></td></tr>
      {/if}
 
    {if $className eq 'CRM_Contact_Form_Contact'}
@@ -65,7 +65,7 @@
 
   {if $className eq 'CRM_Contact_Form_Contact'}
       <div id="addMoreAddress{$blockId}" class="crm-add-address-wrapper">
-          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><i class="crm-i fa-plus-circle"></i> {ts}Another Address{/ts}</span></a>
+          <a href="#" class="button" onclick="buildAdditionalBlocks( 'Address', '{$className}' );return false;"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Another Address{/ts}</span></a>
       </div>
   {/if}
 

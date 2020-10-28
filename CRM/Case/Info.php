@@ -228,6 +228,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   List of component names.
    * @param array $metadata
    *   Specification of the setting (per *.settings.php).
+   *
+   * @throws \CRM_Core_Exception.
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
     if (
@@ -238,8 +240,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
       self::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
-        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
-        CRM_Core_Error::fatal($msg);
+        throw new CRM_Core_Exception(ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission"));
       }
     }
   }
@@ -254,12 +255,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     $dao = new CRM_Core_DAO();
     $db = $dao->getDatabaseConnection();
 
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $multiLingual = (bool) $domain->locales;
+    $locales = CRM_Core_I18n::getMultilingual();
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('multilingual', $multiLingual);
-    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
+    $smarty->assign('multilingual', (bool) $locales);
+    $smarty->assign('locales', $locales);
 
     if (!$lineMode) {
 

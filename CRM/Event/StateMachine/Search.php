@@ -10,11 +10,7 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
+ * Class CRM_Event_StateMachine_Search
  */
 class CRM_Event_StateMachine_Search extends CRM_Core_StateMachine {
 
@@ -28,7 +24,7 @@ class CRM_Event_StateMachine_Search extends CRM_Core_StateMachine {
   /**
    * Class constructor.
    *
-   * @param object $controller
+   * @param CRM_Core_Controller $controller
    * @param int $action
    */
   public function __construct($controller, $action = CRM_Core_Action::NONE) {

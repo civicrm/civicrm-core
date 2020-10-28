@@ -109,7 +109,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $attrib = ['rows' => 8, 'cols' => 60];
-    $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE);
+    $this->add('wysiwyg', 'page_text', ts('Your Message'), NULL, FALSE);
 
     $maxAttachments = 1;
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_pcp', $this->_pageId, $maxAttachments);
@@ -300,7 +300,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
       if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
         $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
-        CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+        CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
       }
 
       //if more than one email present for PCP notification ,

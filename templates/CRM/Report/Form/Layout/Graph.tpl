@@ -34,14 +34,6 @@
            var divName = {/literal}"chart_{$uniqueId}"{literal};
            createChart( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, allData[chartID].object );
          });
-
-         $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
-           // image creator php file path and append image name
-           var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
-
-           //fetch object and 'POST' image
-           swfobject.getObjectById("chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
-         });
        });
 
     </script>

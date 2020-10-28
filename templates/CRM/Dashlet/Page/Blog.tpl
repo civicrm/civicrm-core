@@ -52,7 +52,7 @@
         </div>
         <div class="crm-accordion-body">
           <div>{$article.description}</div>
-          <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link}" title="{$article.title|escape}"><i class="crm-i fa-external-link"></i> {ts}read more{/ts}…</a></p>
+          <p class="crm-news-feed-item-link"><a target="_blank" href="{$article.link}" title="{$article.title|escape}"><i class="crm-i fa-external-link" aria-hidden="true"></i> {ts}read more{/ts}…</a></p>
         </div>
       </div>
     {/foreach}
@@ -60,7 +60,7 @@
   {/foreach}
   {if !$feeds}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}Sorry but we are not able to provide this at the moment.{/ts}
     </div>
   {/if}

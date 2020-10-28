@@ -32,6 +32,11 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
   }
 
+  /**
+   * Cleanup after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
     $this->membershipStatusDelete($this->_membershipStatusID);
     $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);

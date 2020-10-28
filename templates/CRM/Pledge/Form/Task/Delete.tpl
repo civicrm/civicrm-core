@@ -9,7 +9,7 @@
 *}
 {* Confirmation of participation deletes  *}
 <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
         <p>{ts}Are you sure you want to delete the selected pledges? This delete operation cannot be undone and will delete all transactions associated with these pledges.{/ts}</p>
         <p>{include file="CRM/Pledge/Form/Task.tpl"}</p>
 </div>

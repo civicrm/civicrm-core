@@ -22,6 +22,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     'Contribution',
     'Membership',
     'Contact',
+    'Individual',
+    'Household',
+    'Organization',
   ];
 
   /**
@@ -31,9 +34,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -517,7 +519,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           FROM civicrm_contribution contribution
           INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                 ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0
-          {$this->_aclFrom}
           LEFT JOIN civicrm_membership_payment mp
                 ON contribution.id = mp.contribution_id
           LEFT JOIN civicrm_membership m

@@ -43,7 +43,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL) {
+  public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL, $frontend = FALSE, $forceBackend = FALSE, $htmlize = TRUE) {
     if (isset(self::$ufClass)) {
       $className = self::$ufClass;
       $url = $className::url($path, $query, $absolute, $fragment);

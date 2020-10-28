@@ -7,6 +7,9 @@
   <comment>IM information for a specific location.</comment>
   <add>1.1</add>
   <log>true</log>
+  <title>Instant Messaging</title>
+  <titlePlural>Instant Messaging</titlePlural>
+  <icon>fa-comments-o</icon>
   <field>
     <name>id</name>
     <title>Instant Messenger ID</title>

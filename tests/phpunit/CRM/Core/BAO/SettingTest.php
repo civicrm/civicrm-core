@@ -91,6 +91,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
       'notes' => '<p>Give me money</p>',
       'tax_term' => 'Extortion',
       'tax_display_settings' => 'Exclusive',
+      // NOTE: This form of `invoicing` is accepted, but it may be normalized to the idiomatic form with a nested array.
       'invoicing' => 1,
       'is_email_pdf' => '1',
     ];
@@ -100,7 +101,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $getVersion = $this->callAPISuccessGetValue('Setting', ['name' => 'contribution_invoice_settings']);
     $this->assertEquals($settingsFromAPI, $settingsFromGet);
     $this->assertAPIArrayComparison($getVersion, $settingsFromGet);
-    $this->assertEquals($contributionSettings, $settingsFromGet);
+    $this->assertEquals(['invoicing' => ['invoicing' => 1]] + $contributionSettings, $settingsFromGet);
 
     // These are the preferred retrieval methods.
     $this->assertEquals('G_', Civi::settings()->get('invoice_prefix'));

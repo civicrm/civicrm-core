@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -34,7 +32,7 @@ class CRM_Core_Page_AJAX {
     }
 
     if (!$className) {
-      CRM_Core_Error::fatal(ts('Invalid className: %1', [1 => $className]));
+      throw new CRM_Core_Exception(ts('Invalid className: %1', [1 => $className]));
     }
 
     $fnName = NULL;

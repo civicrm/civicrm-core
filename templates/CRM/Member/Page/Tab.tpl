@@ -15,36 +15,25 @@
 {elseif $action eq 32768}  {* renew *}
     {include file="CRM/Member/Form/MembershipRenewal.tpl"}
 {elseif $action eq 16} {* Browse memberships for a contact *}
-    {if $permission EQ 'edit'}
-      {capture assign=newURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership"}{/capture}{/if}
-
     {if $action ne 1 and $action ne 2 and $permission EQ 'edit'}
         <div class="help">
-            {if $permission EQ 'edit'}
-              {capture assign="link"}class="action-item" href="{$newURL}"{/capture}
-              {ts 1=$link}Click <a %1>Add Membership</a> to record a new membership.{/ts}
-              {if $newCredit}
-                {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership&mode=live"}{/capture}
-                {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
-                {ts 1=$link}Click <a %1>Submit Credit Card Membership</a> to process a Membership on behalf of the member using their credit card.{/ts}
-                {/if}
+            {if $linkButtons.add_membership}
+              {ts}Click <em>Add Membership</em> to record a new membership.{/ts}
             {else}
-                {ts 1=$displayName}Current and inactive memberships for %1 are listed below.{/ts}
+              {ts 1=$displayName}Current and inactive memberships for %1 are listed below.{/ts}
+            {/if}
+            {if $linkButtons.creditcard_membership}
+              {ts}Click <em>Submit Credit Card Membership</em> to process a Membership on behalf of the member using their credit card.{/ts}
             {/if}
         </div>
 
         <div class="action-link">
-            <a accesskey="N" href="{$newURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Membership{/ts}</span></a>
-            {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Membership{/ts}</span></a><br /><br />
-            {else}
-                <br/ ><br/ >
-            {/if}
+          {include file="CRM/common/formButtons.tpl" location="top"}
         </div>
     {/if}
     {if NOT ($activeMembers or $inActiveMembers) and $action ne 2 and $action ne 1 and $action ne 8 and $action ne 4 and $action ne 32768}
          <div class="messages status no-popup">
-          <div class="icon inform-icon"></div>
+          {icon icon="fa-info-circle"}{/icon}
               {ts}No memberships have been recorded for this contact.{/ts}
          </div>
     {/if}
@@ -80,9 +69,9 @@
                 <td class="crm-membership-source">{$activeMember.source}</td>
                 <td class="crm-membership-auto_renew">
                   {if $activeMember.auto_renew eq 1}
-                      <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+                      {icon icon="fa-check"}{ts}Auto-renew active{/ts}{/icon}
                   {elseif $activeMember.auto_renew eq 2}
-                      <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+                      {icon icon="fa-exclamation-triangle"}{ts}Auto-renew error{/ts}{/icon}
                   {/if}
                 </td>
                 <td class="crm-membership-related_count">{$activeMember.related_count}</td>
@@ -130,9 +119,9 @@
                 <td class="crm-membership-source">{$inActiveMember.source}</td>
                 <td class="crm-membership-auto_renew">
                   {if $inActiveMember.auto_renew eq 1}
-                    <i class="crm-i fa-check" aria-hidden="true" title="{ts}Auto-renew active{/ts}"></i>
+                    {icon icon="fa-check"}{ts}Auto-renew active{/ts}{/icon}
                   {elseif $inActiveMember.auto_renew eq 2}
-                    <i class="crm-i fa-ban" aria-hidden="true" title="{ts}Auto-renew error{/ts}"></i>
+                    {icon icon="fa-exclamation-triangle"}{ts}Auto-renew error{/ts}{/icon}
                   {/if}
                 </td>
     <td>{$inActiveMember.action|replace:'xx':$inActiveMember.id}

@@ -28,7 +28,8 @@
     <pseudoconstant>
       <table>civicrm_option_group</table>
       <keyColumn>id</keyColumn>
-      <labelColumn>name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
@@ -81,6 +82,7 @@
   <field>
     <name>filter</name>
     <type>int unsigned</type>
+    <default>0</default>
     <comment>Bitwise logic can be used to create subsets of options within an option_group for different uses.</comment>
     <add>1.5</add>
   </field>

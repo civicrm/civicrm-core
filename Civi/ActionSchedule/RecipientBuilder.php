@@ -37,7 +37,7 @@ namespace Civi\ActionSchedule;
  * to fire the reminders X days after the registration date. The
  * MappingInterface::createQuery() could return a query like:
  *
- * @code
+ * ```
  * CRM_Utils_SQL_Select::from('civicrm_participant e')
  *   ->join('event', 'INNER JOIN civicrm_event event ON e.event_id = event.id')
  *   ->where('e.is_pay_later = 1')
@@ -46,7 +46,7 @@ namespace Civi\ActionSchedule;
  *   ->param('casDateField', 'e.register_date')
  *   ->param($defaultParams)
  *   ...etc...
- * @endcode
+ * ```
  *
  * In the RELATION_FIRST phase, RecipientBuilder adds a LEFT-JOIN+WHERE to find
  * participants who have *not* yet received any reminder, and filters those
@@ -138,7 +138,7 @@ class RecipientBuilder {
   public function build() {
     $this->buildRelFirstPass();
 
-    if ($this->prepareAddlFilter('c.id') && $this->notTemplate()) {
+    if ($this->prepareAddlFilter('c.id') && $this->mapping->sendToAdditional($this->actionSchedule->entity_value)) {
       $this->buildAddlFirstPass();
     }
 
@@ -146,7 +146,7 @@ class RecipientBuilder {
       $this->buildRelRepeatPass();
     }
 
-    if ($this->actionSchedule->is_repeat && $this->prepareAddlFilter('c.id')) {
+    if ($this->actionSchedule->is_repeat && $this->prepareAddlFilter('c.id') && $this->mapping->sendToAdditional($this->actionSchedule->entity_value)) {
       $this->buildAddlRepeatPass();
     }
   }
@@ -601,27 +601,6 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
    */
   protected function resetOnTriggerDateChange() {
     return $this->mapping->resetOnTriggerDateChange($this->actionSchedule);
-  }
-
-  /**
-   * Confirm this object isn't attached to a template.
-   * Returns TRUE if this action schedule isn't attached to a template.
-   * Templates are (currently) unique to events, so we only evaluate those.
-   *
-   * @return bool;
-   */
-  private function notTemplate() {
-    if ($this->mapping->getEntity() === 'civicrm_participant') {
-      $entityId = $this->actionSchedule->entity_value;
-      $query = new \CRM_Utils_SQL_Select('civicrm_event e');
-      $sql = $query
-        ->select('is_template')
-        ->where("e.id = {$entityId}")
-        ->toSQL();
-      $dao = \CRM_Core_DAO::executeQuery($sql);
-      return !(bool) $dao->fetchValue();
-    }
-    return TRUE;
   }
 
 }

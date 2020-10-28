@@ -7,6 +7,7 @@
   <comment>Contact objects are defined by a civicrm_contact record plus a related civicrm_contact_type record.</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-address-book-o</icon>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -244,19 +245,6 @@
     <comment>Legal Name.</comment>
     <fulltext/>
     <add>1.1</add>
-  </field>
-  <field>
-    <name>home_URL</name>
-    <rule>url</rule>
-    <title>Website</title>
-    <type>varchar</type>
-    <length>128</length>
-    <import>true</import>
-    <headerPattern>/^(home\sURL)|URL|web|site/i</headerPattern>
-    <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
-    <comment>optional "home page" URL for this contact.</comment>
-    <add>1.1</add>
-    <drop>3.2</drop>
   </field>
   <field>
     <name>image_URL</name>
@@ -509,32 +497,6 @@
     <add>4.4</add>
   </index>
   <field>
-    <name>greeting_type</name>
-    <type>varchar</type>
-    <length>128</length>
-    <import>true</import>
-    <comment>Preferred greeting format.</comment>
-    <add>1.1</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
-    <name>greeting_type_id</name>
-    <title>Greeting Type</title>
-    <type>int unsigned</type>
-    <comment>FK to civicrm_option_value.id, that has to be valid, registered Greeting type.</comment>
-    <add>2.2</add>
-    <drop>3.0</drop>
-  </field>
-  <field>
-    <name>custom_greeting</name>
-    <type>varchar</type>
-    <length>128</length>
-    <import>true</import>
-    <comment>Custom greeting message.</comment>
-    <add>1.1</add>
-    <drop>3.0</drop>
-  </field>
-  <field>
     <name>email_greeting_id</name>
     <type>int unsigned</type>
     <title>Email Greeting ID</title>
@@ -653,13 +615,14 @@
   </field>
   <field>
     <name>gender_id</name>
-    <title>Gender</title>
+    <title>Gender ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <optionGroupName>gender</optionGroupName>
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Gender</label>
     </html>
     <headerPattern>/^gender$/i</headerPattern>
     <comment>FK to gender ID</comment>
@@ -720,23 +683,6 @@
     </html>
     <contactType>Individual</contactType>
   </field>
-  <field>
-    <name>mail_to_household_id</name>
-    <title>Mail to Household ID</title>
-    <type>int unsigned</type>
-    <comment>OPTIONAL FK to civicrm_contact_household record. If NOT NULL, direct mail communications to household rather than individual location. </comment>
-    <export>true</export>
-    <add>1.1</add>
-    <drop>3.3</drop>
-  </field>
-  <foreignKey>
-    <name>mail_to_household_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>2.1</add>
-    <onDelete>SET NULL</onDelete>
-    <drop>3.3</drop>
-  </foreignKey>
   <field>
     <name>household_name</name>
     <type>varchar</type>
@@ -824,7 +770,7 @@
   </field>
   <field>
     <name>employer_id</name>
-    <title>Current Employer</title>
+    <title>Current Employer ID</title>
     <uniqueName>current_employer_id</uniqueName>
     <type>int unsigned</type>
     <comment>OPTIONAL FK to civicrm_contact record.</comment>
@@ -832,6 +778,7 @@
     <add>2.1</add>
     <html>
       <type>EntityRef</type>
+      <label>Current Employer</label>
     </html>
     <contactType>Individual</contactType>
   </field>
@@ -854,13 +801,8 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <permission>access deleted contacts</permission>
   </field>
-  <index>
-    <name>index_is_deleted</name>
-    <fieldName>is_deleted</fieldName>
-    <add>3.2</add>
-    <drop>4.4</drop>
-  </index>
   <index>
     <name>index_is_deleted_sort_name</name>
     <fieldName>is_deleted</fieldName>

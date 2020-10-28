@@ -42,7 +42,7 @@ class CRM_Financial_BAO_Payment {
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
     $lineItems = self::getPayableLineItems($params);
 
-    $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date'];
+    $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
     $paymentTrxnParams['is_payment'] = 1;
     // Really we should have a DB default.
@@ -79,6 +79,21 @@ class CRM_Financial_BAO_Payment {
       $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
     }
 
+    //If Payment is recorded on Failed contribution, update it to Pending.
+    if ($contributionStatus === 'Failed' && $params['total_amount'] > 0) {
+      //Enter a financial trxn to record a payment in receivable account
+      //as failed transaction does not insert any trxn values. Hence, if Payment is
+      //recorded on a failed contribution, the transition happens from Failed -> Pending -> Completed.
+      $ftParams = array_merge($paymentTrxnParams, [
+        'from_financial_account_id' => NULL,
+        'to_financial_account_id' => $accountsReceivableAccount,
+        'is_payment' => 0,
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      ]);
+      CRM_Core_BAO_FinancialTrxn::create($ftParams);
+      $contributionStatus = 'Pending';
+      self::updateContributionStatus($contribution['id'], $contributionStatus);
+    }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
@@ -141,6 +156,8 @@ class CRM_Financial_BAO_Payment {
           'id' => $contribution['id'],
           'is_post_payment_create' => TRUE,
           'is_email_receipt' => $params['is_send_contribution_notification'],
+          'trxn_date' => $params['trxn_date'],
+          'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
         ]);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
@@ -163,8 +180,39 @@ class CRM_Financial_BAO_Payment {
       //  change status to refunded.
       self::updateContributionStatus($contribution['id'], 'Refunded');
     }
+    self::updateRelatedContribution($params, $params['contribution_id']);
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
+  }
+
+  /**
+   * Function to update contribution's check_number and trxn_id by
+   *  concatenating values from financial trxn's check_number and trxn_id respectively
+   *
+   * @param array $params
+   * @param int $contributionID
+   */
+  public static function updateRelatedContribution($params, $contributionID) {
+    $contributionDAO = new CRM_Contribute_DAO_Contribution();
+    $contributionDAO->id = $contributionID;
+    $contributionDAO->find(TRUE);
+
+    foreach (['trxn_id', 'check_number'] as $fieldName) {
+      if (!empty($params[$fieldName])) {
+        $values = [];
+        if (!empty($contributionDAO->$fieldName)) {
+          $values = explode(',', $contributionDAO->$fieldName);
+        }
+        // if submitted check_number or trxn_id value is
+        //   already present then ignore else add to $values array
+        if (!in_array($params[$fieldName], $values)) {
+          $values[] = $params[$fieldName];
+        }
+        $contributionDAO->$fieldName = implode(',', $values);
+      }
+    }
+
+    $contributionDAO->save();
   }
 
   /**
@@ -439,6 +487,9 @@ class CRM_Financial_BAO_Payment {
     if ($outstandingBalance !== 0.0) {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
+    elseif ($params['total_amount'] < 0) {
+      $ratio = $params['total_amount'] / (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id'], TRUE);
+    }
     else {
       // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.
       $ratio = 0;
@@ -448,12 +499,16 @@ class CRM_Financial_BAO_Payment {
       $lineItems[$lineItemID]['id'] = $lineItemID;
       $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
       $lineItems[$lineItemID]['balance'] = $lineItem['subTotal'] - $lineItems[$lineItemID]['paid'];
-
       if (!empty($lineItemOverrides)) {
         $lineItems[$lineItemID]['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
       }
       else {
-        $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
+        if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
+          $lineItems[$lineItemID]['allocation'] = $lineItem['subTotal'] * $ratio;
+        }
+        else {
+          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
+        }
       }
     }
     return $lineItems;

@@ -47,46 +47,6 @@
     <add>1.1</add>
   </index>
   <field>
-    <name>contact_name</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>Name of the person responsible for this domain</comment>
-    <add>1.1</add>
-    <drop>1.9</drop>
-  </field>
-  <field>
-    <name>email_name</name>
-    <type>varchar</type>
-    <length>255</length>
-    <comment>The default email name that is used in the from address for all outgoing emails</comment>
-    <add>1.9</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
-    <name>email_address</name>
-    <type>varchar</type>
-    <length>255</length>
-    <comment>The default email address that is used as the from address for all outgoing emails</comment>
-    <add>1.9</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
-    <name>email_domain</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>The domain from which outgoing email for this domain will appear to originate</comment>
-    <add>1.1</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
-    <name>email_return_path</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>The domain from which outgoing email for this domain will appear to originate</comment>
-    <add>1.1</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
     <name>config_backend</name>
     <type>text</type>
     <title>Domain Configuration</title>
@@ -102,13 +62,6 @@
     <length>32</length>
     <comment>The civicrm version this instance is running</comment>
     <add>2.0</add>
-  </field>
-  <field>
-    <name>loc_block_id</name>
-    <type>int unsigned</type>
-    <comment>FK to Location Block ID. This is specifically not an FK to avoid circular constraints</comment>
-    <add>2.0</add>
-    <drop>4.3</drop>
   </field>
   <field>
     <name>contact_id</name>
@@ -128,6 +81,7 @@
     <type>text</type>
     <title>Supported Languages</title>
     <comment>list of locales supported by the current db state (NULL for single-lang install)</comment>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>2.1</add>
   </field>
   <field>

@@ -114,7 +114,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
+      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print" aria-hidden="true"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
       'Pay Now',
     ];
 
@@ -165,6 +165,31 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $dashboard->_contactId = $this->contactID;
     $dashboard->run();
     $_REQUEST = [];
+  }
+
+  /**
+   * Tests the event dashboard as a minimally permissioned user.
+   */
+  public function testEventDashboard() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'register for events',
+      'access Contact Dashboard',
+    ];
+    $event1id = $this->eventCreate()['id'];
+    $event2id = $this->eventCreate(['title' => 'Social Distancing Meetup Group'])['id'];
+    $params['contact_id'] = $this->contactID;
+    $params['event_id'] = $event1id;
+    $this->participantCreate($params);
+    $params['event_id'] = $event2id;
+    $this->participantCreate($params);
+    $this->runUserDashboard();
+    $expectedStrings = [
+      '<div class="header-dark">Your Event(s)</div>',
+      '<td class="crm-participant-event-id_1"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=1&amp;context=dashboard">Annual CiviCRM meet</a></td>',
+      '<td class="crm-participant-event-id_2"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=2&amp;context=dashboard">Social Distancing Meetup Group</a></td>',
+    ];
+    $this->assertPageContains($expectedStrings);
+    $this->individualCreate();
   }
 
 }

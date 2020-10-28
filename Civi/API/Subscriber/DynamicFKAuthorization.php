@@ -12,6 +12,7 @@
 namespace Civi\API\Subscriber;
 
 use Civi\API\Events;
+use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -36,7 +37,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         ['onApiAuthorize', Events::W_EARLY],
       ],
     ];
@@ -123,7 +124,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function __construct($kernel, $entityName, $actions, $lookupDelegateSql, $lookupCustomFieldSql, $allowedDelegates = NULL) {
     $this->kernel = $kernel;
-    $this->entityName = \CRM_Utils_String::convertStringToCamel($entityName);
+    $this->entityName = AllCoreTables::convertEntityNameToCamel($entityName, TRUE);
     $this->actions = $actions;
     $this->lookupDelegateSql = $lookupDelegateSql;
     $this->lookupCustomFieldSql = $lookupCustomFieldSql;
@@ -138,7 +139,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
    */
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     $apiRequest = $event->getApiRequest();
-    if ($apiRequest['version'] == 3 && \CRM_Utils_String::convertStringToCamel($apiRequest['entity']) == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
+    if ($apiRequest['version'] == 3 && AllCoreTables::convertEntityNameToCamel($apiRequest['entity'], TRUE) == $this->entityName && in_array(strtolower($apiRequest['action']), $this->actions)) {
       if (isset($apiRequest['params']['field_name'])) {
         $fldIdx = \CRM_Utils_Array::index(['field_name'], $this->getCustomFields());
         if (empty($fldIdx[$apiRequest['params']['field_name']])) {

@@ -28,7 +28,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     $this->set("context", $context);
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     parent::preProcess();
-    $session = CRM_Core_Session::singleton();
+
     if ($this->_id) {
       $permissions = [
         CRM_Core_Action::UPDATE => [
@@ -49,7 +49,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
       $createdID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
       if (!empty($permissions[$this->_action])) {
-        $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, $session->get('userID'), $permissions[$this->_action]['actionName']);
+        $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, CRM_Core_Session::getLoggedInContactID(), $permissions[$this->_action]['actionName']);
       }
     }
   }
@@ -169,6 +169,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();
@@ -180,7 +182,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     // store the submitted values in an array
     $params['modified_date'] = date('YmdHis');
-    $params['modified_id'] = $session->get('userID');
+    $params['modified_id'] = CRM_Core_Session::getLoggedInContactID();
     if (!empty($params['created_date'])) {
       $params['created_date'] = CRM_Utils_Date::processDate($params['created_date']);
     }
@@ -190,7 +192,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
       $params['created_date'] = date('YmdHis');
       if (empty($params['created_id'])) {
-        $params['created_id'] = $session->get('userID');
+        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
       }
       $details = "{$params['title']} batch has been created by this contact.";
       $activityTypeName = 'Create Batch';
@@ -218,8 +220,8 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Completed'),
       'priority_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'priority_id', 'Normal'),
       'activity_date_time' => date('YmdHis'),
-      'source_contact_id' => $session->get('userID'),
-      'source_contact_qid' => $session->get('userID'),
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
+      'source_contact_qid' => CRM_Core_Session::getLoggedInContactID(),
       'details' => $details,
     ];
 

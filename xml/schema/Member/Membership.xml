@@ -7,6 +7,7 @@
   <comment>Contact Membership records.</comment>
   <add>1.5</add>
   <log>true</log>
+  <icon>fa-id-badge</icon>
   <field>
     <name>id</name>
     <uniqueName>membership_id</uniqueName>
@@ -180,6 +181,7 @@
     <add>4.7</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>

@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -102,7 +100,7 @@ class TestCreationParameterProvider {
    * @return mixed
    */
   private function getOption(FieldSpec $field) {
-    $options = $field->getOptions();
+    $options = array_column($field->getOptions(), 'label', 'id');
     return array_rand($options);
   }
 

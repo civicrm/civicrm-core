@@ -45,7 +45,7 @@
 {crmScript file='js/crm.expandRow.js'}
 {else}
 <div class="messages status no-popup">
-         <div class="icon inform-icon"></div>
+         {icon icon="fa-info-circle"}{/icon}
              {ts}There are no Pledges for your record.{/ts}
          </div>
 {/if}

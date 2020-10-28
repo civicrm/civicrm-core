@@ -155,10 +155,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
       $html = CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($form, $formValues);
       $expectedValues = [
-        'Hello Anthony Collins',
+        'Hello Anthony',
         '$ 100.00',
         $displayDate,
         'Donation',
+        'Domain Name - Default Domain Name',
       ];
 
       foreach ($expectedValues as $val) {

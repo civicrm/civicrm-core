@@ -60,15 +60,15 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     $returnProperties = $mailing->getReturnProperties();
     $params = ['contact_id' => $session->get('userID')];
 
-    $details = CRM_Utils_Token::getTokenDetails($params,
+    [$details] = CRM_Utils_Token::getTokenDetails($params,
       $returnProperties,
       TRUE, TRUE, NULL,
       $mailing->getFlattenedTokens(),
       get_class($this)
     );
-    // $details[0] is an array of [ contactID => contactDetails ]
+    // $details is an array of [ contactID => contactDetails ]
     $mime = &$mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
-      TRUE, $details[0][$session->get('userID')], $attachments
+      TRUE, $details[$session->get('userID')], $attachments
     );
 
     if ($type == 'html') {

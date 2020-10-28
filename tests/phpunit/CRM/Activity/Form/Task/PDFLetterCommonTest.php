@@ -15,19 +15,25 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test create a document with basic tokens.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function testCreateDocumentBasicTokens() {
     $activity = $this->activityCreate();
     $data = [
-      ["Subject: {activity.subject}", "Subject: Discussion on warm beer"],
-      ["Date: {activity.activity_date_time}", "Date: " . \CRM_Utils_Date::customFormat(date('Ymd')) . " 12:00 AM"],
-      ["Duration: {activity.duration}", "Duration: 90"],
-      ["Location: {activity.location}", "Location: Baker Street"],
-      ["Details: {activity.details}", "Details: Lets schedule a meeting"],
-      ["Status ID: {activity.status_id}", "Status ID: 1"],
-      ["Status: {activity.status}", "Status: Scheduled"],
-      ["Activity Type ID: {activity.activity_type_id}", "Activity Type ID: 1"],
-      ["Activity Type: {activity.activity_type}", "Activity Type: Meeting"],
-      ["Activity ID: {activity.activity_id}", "Activity ID: " . $activity['id']],
+      ['Subject: {activity.subject}', 'Subject: Discussion on warm beer'],
+      ['Date: {activity.activity_date_time}', 'Date: ' . \CRM_Utils_Date::customFormat(date('Ymd')) . ' 12:00 AM'],
+      ['Duration: {activity.duration}', 'Duration: 90'],
+      ['Location: {activity.location}', 'Location: Baker Street'],
+      ['Details: {activity.details}', 'Details: Lets schedule a meeting'],
+      ['Status ID: {activity.status_id}', 'Status ID: 1'],
+      ['Status: {activity.status}', 'Status: Scheduled'],
+      ['Activity Type ID: {activity.activity_type_id}', 'Activity Type ID: 1'],
+      ['Activity Type: {activity.activity_type}', 'Activity Type: Meeting'],
+      ['Activity ID: {activity.activity_id}', 'Activity ID: ' . $activity['id']],
     ];
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
     $output = CRM_Activity_Form_Task_PDFLetterCommon::createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);

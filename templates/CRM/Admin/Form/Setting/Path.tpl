@@ -40,7 +40,7 @@
             <tr class="crm-path-form-block-customTemplateDir">
                 <td class="label">{$form.customTemplateDir.label}</td>
                 <td>{$form.customTemplateDir.html|crmAddClass:'huge40'}<br />
-                    <span class="description">{ts}Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named <em>templateFile.extra.tpl</em>.{/ts} {docURL page="Customize Built-in Screens" resource="wiki"}</span><br />
+                    <span class="description">{ts}Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named <em>templateFile.extra.tpl</em>.{/ts} {docURL page="sysadmin/setup/directories"}</span><br />
                     <span class="description">{ts}CiviCase configuration files can also be stored in this custom path.{/ts} {docURL page="user/case-management/set-up"}</span>
                 </td>
             </tr>

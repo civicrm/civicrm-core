@@ -75,6 +75,8 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     CRM_Utils_System::setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)'));
 
     $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
+    // dev/core#1812 Assign multilingual status.
+    $this->assign('isMultilingual', CRM_Core_I18n::isMultilingual());
 
     $this->addFormRule(['CRM_Admin_Form_Setting_Miscellaneous', 'formRule'], $this);
 

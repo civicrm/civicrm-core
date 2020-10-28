@@ -10,7 +10,7 @@
 {* this template is used for displaying PCP information *}
 {if $owner}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
   <p><strong>{ts}Personal Campaign Preview{/ts}</strong> - {ts}This is a preview of your Personal Campaign Page in support of{/ts} <a href="{$parentURL}"><strong>{$pageName}</strong></a>.</p>
         {ts}The current status of your page is{/ts}: <strong {if $pcp.status_id NEQ 2}class=disabled {/if}>{$owner.status}</strong>.
         {if $pcp.status_id NEQ 2}<br /><span class="description">{ts}You will receive an email notification when your page is Approved and you can begin promoting your campaign.{/ts}</span>{/if}
@@ -25,13 +25,13 @@
     {foreach from = $links key = k item = v}
           <tr>
             <td>
-                <a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title|escape:'html'}" {if $v.extra}{$v.extra}{/if}><strong>&raquo; {$v.name}</strong></a>
+                <a href="{crmURL p=$v.url q=$v.qs|replace:'%%pcpId%%':$replace.id|replace:'%%pageComponent%%':$replace.pageComponent|replace:'%%pcpBlock%%':$replace.block}" title="{$v.title|escape:'html'}" {if $v.extra}{$v.extra}{/if}><strong><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {$v.name}</strong></a>
        </td>
          <td>&nbsp;<cite>{$hints.$k}</cite></td>
       </tr>
         {/foreach}
        </table>
-     <i class="crm-i fa-lightbulb-o"></i>
+     <i class="crm-i fa-lightbulb-o" aria-hidden="true"></i>
      <strong>{ts}Tip{/ts}</strong> - <span class="description">{ts}You must be logged in to your account to access the editing options above. (If you visit this page without logging in, you will be viewing the page in "live" mode - as your visitors and friends see it.){/ts}</span>
 </div>
 {/if}

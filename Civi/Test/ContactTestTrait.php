@@ -18,7 +18,7 @@ trait ContactTestTrait {
   /**
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
-   * CRM-8180
+   * @see https://issues.civicrm.org/jira/browse/CRM-8180
    *
    * @return int
    *   Contact ID of the created user.
@@ -74,7 +74,7 @@ trait ContactTestTrait {
    * @return int
    *   id of Individual created
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function individualCreate($params = [], $seq = 0, $random = FALSE) {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);

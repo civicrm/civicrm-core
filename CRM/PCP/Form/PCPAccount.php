@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -53,11 +51,11 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       $contactID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $this->_id, 'contact_id');
     }
 
-    $this->_contactID = $contactID ?? $session->get('userID');
+    $this->_contactID = $contactID ?? CRM_Core_Session::getLoggedInContactID();
     if (!$this->_pageId) {
       if (!$this->_id) {
         $msg = ts('We can\'t load the requested web page due to an incomplete link. This can be caused by using your browser\'s Back button or by using an incomplete or invalid link.');
-        CRM_Core_Error::fatal($msg);
+        CRM_Core_Error::statusBounce($msg);
       }
       else {
         $this->_pageId = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $this->_id, 'page_id');
@@ -65,7 +63,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     }
 
     if (!$this->_pageId) {
-      CRM_Core_Error::fatal(ts('Could not find source page id.'));
+      CRM_Core_Error::statusBounce(ts('Could not find source page id.'));
     }
 
     $this->_single = $this->get('single');

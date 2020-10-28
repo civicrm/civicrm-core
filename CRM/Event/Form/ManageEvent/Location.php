@@ -9,13 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event;
+use Civi\Api4\LocBlock;
+use Civi\Api4\Email;
+use Civi\Api4\Phone;
+use Civi\Api4\Address;
+
 /**
  *
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -23,6 +27,11 @@
  * civicrm_event_page.
  */
 class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
+
+  /**
+   * @var \Civi\Api4\Generic\Result
+   */
+  protected $locationBlock;
 
   /**
    * How many locationBlocks should we display?
@@ -145,9 +154,11 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $this->assign('action', $this->_action);
 
     if ($this->_id) {
-      $this->_oldLocBlockId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-        $this->_id, 'loc_block_id'
-      );
+      $this->locationBlock = Event::get()
+        ->addWhere('id', '=', $this->_id)
+        ->setSelect(['loc_block.*', 'loc_block_id'])
+        ->execute()->first();
+      $this->_oldLocBlockId = $this->locationBlock['loc_block_id'];
     }
 
     // get the list of location blocks being used by other events
@@ -213,7 +224,6 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       );
     }
 
-    $this->_values['address'] = $this->_values['phone'] = $this->_values['email'] = [];
     // if 'create new loc' option is selected OR selected new loc is different
     // from old one, go ahead and delete the old loc provided thats not being
     // used by any other event
@@ -221,32 +231,43 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
       CRM_Event_BAO_Event::deleteEventLocBlock($this->_oldLocBlockId, $this->_id);
     }
 
-    // get ready with location block params
-    $params['entity_table'] = 'civicrm_event';
-    $params['entity_id'] = $this->_id;
+    $isUpdateToExistingLocationBlock = !$deleteOldBlock && !empty($params['loc_event_id']) && (int) $params['loc_event_id'] === $this->locationBlock['loc_block_id'];
+    // It should be impossible for there to be no default location type. Consider removing this handling
+    $defaultLocationTypeID = CRM_Core_BAO_LocationType::getDefault()->id ?? 1;
 
-    $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     foreach ([
-      'address',
-      'phone',
-      'email',
-    ] as $block) {
-      if (empty($params[$block]) || !is_array($params[$block])) {
-        continue;
-      }
-      foreach ($params[$block] as $count => & $values) {
-        if ($count == 1) {
-          $values['is_primary'] = 1;
+      'address' => $params['address'],
+      'phone' => $params['phone'],
+      'email' => $params['email'],
+    ] as $block => $locationEntities) {
+
+      $params[$block][1]['is_primary'] = 1;
+      foreach ($locationEntities as $index => $locationEntity) {
+        if (!$this->isLocationHasData($block, $locationEntity)) {
+          unset($params[$block][$index]);
+          continue;
         }
-        $values['location_type_id'] = ($defaultLocationType->id) ? $defaultLocationType->id : 1;
-        if (isset($this->_values[$block][$count])) {
-          $values['id'] = $this->_values[$block][$count]['id'];
+        $params[$block][$index]['location_type_id'] = $defaultLocationTypeID;
+        $fieldKey = (int) $index === 1 ? '_id' : '_2_id';
+        if ($isUpdateToExistingLocationBlock && !empty($this->locationBlock['loc_block.' . $block . $fieldKey])) {
+          $params[$block][$index]['id'] = $this->locationBlock['loc_block.' . $block . $fieldKey];
         }
       }
     }
+    $addresses = empty($params['address']) ? [] : Address::save(FALSE)->setRecords($params['address'])->execute();
+    $emails = empty($params['email']) ? [] : Email::save(FALSE)->setRecords($params['email'])->execute();
+    $phones = empty($params['phone']) ? [] : Phone::save(FALSE)->setRecords($params['phone'])->execute();
 
-    // create/update event location
-    $params['loc_block_id'] = CRM_Core_BAO_Location::create($params, TRUE, 'event')['id'];
+    $params['loc_block_id'] = LocBlock::save(FALSE)->setRecords([
+      [
+        'email_id' => $emails[0]['id'] ?? NULL,
+        'address_id' => $addresses[0]['id'] ?? NULL,
+        'phone_id' => $phones[0]['id'] ?? NULL,
+        'email_2_id' => $emails[1]['id'] ?? NULL,
+        'address_2_id' => $addresses[1]['id'] ?? NULL,
+        'phone_2_id' => $phones[1]['id'] ?? NULL,
+      ],
+    ])->execute()->first()['id'];
 
     // finally update event params
     $params['id'] = $this->_id;
@@ -264,6 +285,29 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    */
   public function getTitle() {
     return ts('Event Location');
+  }
+
+  /**
+   * Is there some data to save for the given entity
+   *
+   * @param string $block
+   * @param array $locationEntity
+   *
+   * @return bool
+   */
+  protected function isLocationHasData(string $block, array $locationEntity): bool {
+    if ($block === 'email') {
+      return !empty($locationEntity['email']);
+    }
+    if ($block === 'phone') {
+      return !empty($locationEntity['phone']);
+    }
+    foreach ($locationEntity as $value) {
+      if (!empty($value)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

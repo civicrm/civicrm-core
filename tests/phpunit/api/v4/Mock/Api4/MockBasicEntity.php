@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -28,23 +26,27 @@ use api\v4\Mock\MockEntityDataStorage;
  *
  * @package Civi\Api4
  */
-class MockBasicEntity extends Generic\AbstractEntity {
+class MockBasicEntity extends Generic\BasicEntity {
+
+  protected static $getter = [MockEntityDataStorage::CLASS, 'get'];
+  protected static $setter = [MockEntityDataStorage::CLASS, 'write'];
+  protected static $deleter = [MockEntityDataStorage::CLASS, 'delete'];
 
   /**
-   * @return Generic\BasicGetFieldsAction
+   * @inheritDoc
    */
-  public static function getFields() {
-    return new Generic\BasicGetFieldsAction(static::class, __FUNCTION__, function() {
+  public static function getFields($checkPermissions = TRUE) {
+    return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
       return [
         [
           'name' => 'id',
-          'type' => 'Integer',
+          'data_type' => 'Integer',
         ],
         [
           'name' => 'group',
           'options' => [
-            'one' => 'One',
-            'two' => 'Two',
+            'one' => 'First',
+            'two' => 'Second',
           ],
         ],
         [
@@ -58,63 +60,46 @@ class MockBasicEntity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'weight',
+          'data_type' => 'Integer',
+        ],
+        [
+          'name' => 'fruit',
+          'options' => [
+            [
+              'id' => 1,
+              'name' => 'apple',
+              'label' => 'Apple',
+              'color' => 'red',
+            ],
+            [
+              'id' => 2,
+              'name' => 'pear',
+              'label' => 'Pear',
+              'color' => 'green',
+            ],
+            [
+              'id' => 3,
+              'name' => 'banana',
+              'label' => 'Banana',
+              'color' => 'yellow',
+            ],
+          ],
         ],
       ];
-    });
+    }))->setCheckPermissions(TRUE);
   }
 
   /**
-   * @return Generic\BasicGetAction
-   */
-  public static function get() {
-    return new Generic\BasicGetAction('MockBasicEntity', __FUNCTION__, [MockEntityDataStorage::CLASS, 'get']);
-  }
-
-  /**
-   * @return Generic\BasicCreateAction
-   */
-  public static function create() {
-    return new Generic\BasicCreateAction(static::class, __FUNCTION__, [MockEntityDataStorage::CLASS, 'write']);
-  }
-
-  /**
-   * @return Generic\BasicSaveAction
-   */
-  public static function save() {
-    return new Generic\BasicSaveAction(self::getEntityName(), __FUNCTION__, 'id', [MockEntityDataStorage::CLASS, 'write']);
-  }
-
-  /**
-   * @return Generic\BasicUpdateAction
-   */
-  public static function update() {
-    return new Generic\BasicUpdateAction(self::getEntityName(), __FUNCTION__, 'id', [MockEntityDataStorage::CLASS, 'write']);
-  }
-
-  /**
+   * @param bool $checkPermissions
    * @return Generic\BasicBatchAction
    */
-  public static function delete() {
-    return new Generic\BasicBatchAction('MockBasicEntity', __FUNCTION__, 'id', [MockEntityDataStorage::CLASS, 'delete']);
-  }
-
-  /**
-   * @return Generic\BasicBatchAction
-   */
-  public static function batchFrobnicate() {
-    return new Generic\BasicBatchAction('MockBasicEntity', __FUNCTION__, ['id', 'number'], function ($item) {
+  public static function batchFrobnicate($checkPermissions = TRUE) {
+    return (new Generic\BasicBatchAction(__CLASS__, __FUNCTION__, ['id', 'number'], function($item) {
       return [
         'id' => $item['id'],
         'frobnication' => $item['number'] * $item['number'],
       ];
-    });
-  }
-
-  /**
-   * @return Generic\BasicReplaceAction
-   */
-  public static function replace() {
-    return new Generic\BasicReplaceAction('MockBasicEntity', __FUNCTION__);
+    }))->setCheckPermissions($checkPermissions);
   }
 
 }

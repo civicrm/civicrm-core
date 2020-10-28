@@ -13,23 +13,8 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
-
-  /**
-   * Static holder for the default LT.
-   * @var int
-   */
-  public static $_defaultMembershipStatus = NULL;
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
 
   /**
    * Fetch object based on array of properties.
@@ -68,29 +53,23 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
    * Takes an associative array and creates a membership Status object.
-   * See http://wiki.civicrm.org/confluence/display/CRM/Database+layer
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of name/value pairs.
    *
-   * @throws Exception
-   * @return CRM_Member_BAO_MembershipStatus
+   * @throws CRM_Core_Exception
+   * @return CRM_Member_DAO_MembershipStatus
    */
   public static function create($params) {
-    $ids = [];
-    if (!empty($params['id'])) {
-      $ids['membershipStatus'] = $params['id'];
-    }
-    else {
+    if (empty($params['id'])) {
       //don't allow duplicate names - if id not set
       $status = new CRM_Member_DAO_MembershipStatus();
       $status->name = $params['name'];
       if ($status->find(TRUE)) {
-        throw new Exception('A membership status with this name already exists.');
+        throw new CRM_Core_Exception('A membership status with this name already exists.');
       }
     }
-    $membershipStatusBAO = CRM_Member_BAO_MembershipStatus::add($params, $ids);
-    return $membershipStatusBAO;
+    return self::add($params);
   }
 
   /**
@@ -101,10 +80,12 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @param array $ids
    *   Array contains the id - this param is deprecated.
    *
-   *
-   * @return object
+   * @return CRM_Member_DAO_MembershipStatus
    */
   public static function add(&$params, $ids = []) {
+    if (!empty($ids)) {
+      CRM_Core_Error::deprecatedFunctionWarning('ids is a deprecated parameter');
+    }
     $id = $params['id'] ?? $ids['membershipStatus'] ?? NULL;
     if (!$id) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -200,60 +181,44 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   /**
    * Find the membership status based on start date, end date, join date & status date.
    *
+   * Loop through all the membership status definitions, ordered by their
+   * weight. For each, we loop through all possible variations of the given
+   * start, end, and join dates and adjust the starts and ends based on that
+   * membership status's rules, where the last computed set of adjusted start
+   * and end becomes a candidate. Then we compare that candidate to either
+   * "today" or some other given date, and if it falls between the adjusted
+   * start and end we have a match and we stop looping through status
+   * definitions. Then we call a hook in case that wasn't enough loops.
+   *
    * @param string $startDate
    *   Start date of the member whose membership status is to be calculated.
    * @param string $endDate
    *   End date of the member whose membership status is to be calculated.
    * @param string $joinDate
    *   Join date of the member whose membership status is to be calculated.
-   * @param \date|string $statusDate status date of the member whose membership status is to be calculated.
-   * @param bool $excludeIsAdmin the statuses those having is_admin = 1.
-   *   Exclude the statuses those having is_admin = 1.
+   * @param string $statusDate
+   *   Either the string "today" or a date against which we compare the adjusted start and end based on the status rules.
+   * @param bool $excludeIsAdmin
+   *   Exclude the statuses having is_admin = 1.
    * @param int $membershipTypeID
+   *   Not used directly but gets passed to the hook.
    * @param array $membership
-   *   Membership params as available to calling function - passed to the hook.
+   *   Membership params as available to calling function - not used directly but passed to the hook.
    *
    * @return array
    */
   public static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
-    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = []
+    $statusDate = 'now', $excludeIsAdmin = FALSE, $membershipTypeID = NULL, $membership = []
   ) {
     $membershipDetails = [];
 
-    if (!$statusDate || $statusDate == 'today') {
-      $statusDate = getdate();
-      $statusDate = date('Ymd',
-        mktime($statusDate['hours'],
-          $statusDate['minutes'],
-          $statusDate['seconds'],
-          $statusDate['mon'],
-          $statusDate['mday'],
-          $statusDate['year']
-        )
-      );
-    }
-    else {
-      $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
+    if (!$statusDate || $statusDate === 'today') {
+      $statusDate = 'now';
+      CRM_Core_Error::deprecatedFunctionWarning('pass now rather than today in');
     }
 
-    $dates = ['start', 'end', 'join'];
-    $events = ['start', 'end'];
-
-    foreach ($dates as $dat) {
-      if (${$dat . 'Date'} && ${$dat . 'Date'} != "null") {
-        ${$dat . 'Date'} = CRM_Utils_Date::customFormat(${$dat . 'Date'}, '%Y%m%d');
-
-        ${$dat . 'Year'} = substr(${$dat . 'Date'}, 0, 4);
-
-        ${$dat . 'Month'} = substr(${$dat . 'Date'}, 4, 2);
-
-        ${$dat . 'Day'} = substr(${$dat . 'Date'}, 6, 2);
-      }
-      else {
-        ${$dat . 'Date'} = '';
-      }
-    }
+    $statusDate = date('Ymd', strtotime($statusDate));
 
     //fix for CRM-3570, if we have statuses with is_admin=1,
     //exclude these statuses from calculatation during import.
@@ -269,48 +234,56 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
  ORDER BY weight ASC";
 
     $membershipStatus = CRM_Core_DAO::executeQuery($query);
-    $hour = $minute = $second = 0;
+
+    $dates = [
+      'start' => ($startDate && $startDate !== 'null') ? date('Ymd', strtotime($startDate)) : '',
+      'end' => ($endDate && $endDate !== 'null') ? date('Ymd', strtotime($endDate)) : '',
+      'join' => ($joinDate && $joinDate !== 'null') ? date('Ymd', strtotime($joinDate)) : '',
+    ];
 
     while ($membershipStatus->fetch()) {
       $startEvent = NULL;
       $endEvent = NULL;
-      foreach ($events as $eve) {
-        foreach ($dates as $dat) {
+      foreach (['start', 'end'] as $eve) {
+        foreach ($dates as $dat => $date) {
           // calculate start-event/date and end-event/date
-          if (($membershipStatus->{$eve . '_event'} == $dat . '_date') &&
-            ${$dat . 'Date'}
+          if (($membershipStatus->{$eve . '_event'} === $dat . '_date') &&
+            $date
           ) {
             if ($membershipStatus->{$eve . '_event_adjust_unit'} &&
               $membershipStatus->{$eve . '_event_adjust_interval'}
             ) {
+              $month = date('m', strtotime($date));
+              $day = date('d', strtotime($date));
+              $year = date('Y', strtotime($date));
               // add in months
-              if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'month') {
-                ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'} + $membershipStatus->{$eve . '_event_adjust_interval'},
-                  ${$dat . 'Day'},
-                  ${$dat . 'Year'}
+              if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'month') {
+                ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
+                  $month + $membershipStatus->{$eve . '_event_adjust_interval'},
+                  $day,
+                  $year
                 ));
               }
               // add in days
-              if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'day') {
-                ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'},
-                  ${$dat . 'Day'} + $membershipStatus->{$eve . '_event_adjust_interval'},
-                  ${$dat . 'Year'}
+              if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'day') {
+                ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
+                  $month,
+                  $day + $membershipStatus->{$eve . '_event_adjust_interval'},
+                  $year
                 ));
               }
               // add in years
-              if ($membershipStatus->{$eve . '_event_adjust_unit'} == 'year') {
-                ${$eve . 'Event'} = date('Ymd', mktime($hour, $minute, $second,
-                  ${$dat . 'Month'},
-                  ${$dat . 'Day'},
-                  ${$dat . 'Year'} + $membershipStatus->{$eve . '_event_adjust_interval'}
+              if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'year') {
+                ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,
+                  $month,
+                  $day,
+                  $year + $membershipStatus->{$eve . '_event_adjust_interval'}
                 ));
               }
               // if no interval and unit, present
             }
             else {
-              ${$eve . 'Event'} = ${$dat . 'Date'};
+              ${$eve . 'Event'} = $date;
             }
           }
         }

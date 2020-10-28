@@ -267,6 +267,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Get available Financial Types.
    *
+   * This logic is being moved into the financialacls extension.
+   *
+   * Rather than call this function consider using
+   *
+   * $types = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
+   *
    * @param array $financialTypes
    *   (reference ) an array of financial types
    * @param int|string $action
@@ -422,7 +428,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     foreach ($lineItems as $items) {
       if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
         if ($force) {
-          CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+          throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
           break;
         }
         $flag = FALSE;

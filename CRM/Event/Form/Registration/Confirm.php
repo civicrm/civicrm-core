@@ -439,33 +439,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $fields = [];
     foreach ($params as $key => $value) {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
-      //unset the billing parameters if it is pay later mode
-      //to avoid creation of billing location
-      // @todo - the reasoning for this is unclear - elsewhere we check what fields are provided by
-      // the form & if billing fields exist we create the address, relying on the form to collect
-      // only information we intend to store.
       if ($this->_allowWaitlist
         || $this->_requireApproval
         || (!empty($value['is_pay_later']) && !$this->_isBillingAddressRequiredForPayLater)
         || empty($value['is_primary'])
       ) {
-        $billingFields = [
-          "email-{$this->_bltID}",
-          'billing_first_name',
-          'billing_middle_name',
-          'billing_last_name',
-          "billing_street_address-{$this->_bltID}",
-          "billing_city-{$this->_bltID}",
-          "billing_state_province-{$this->_bltID}",
-          "billing_state_province_id-{$this->_bltID}",
-          "billing_postal_code-{$this->_bltID}",
-          "billing_country-{$this->_bltID}",
-          "billing_country_id-{$this->_bltID}",
-          "address_name-{$this->_bltID}",
-        ];
-        foreach ($billingFields as $field) {
-          unset($value[$field]);
-        }
+        // This is confusing because unnecessary code around it has been removed. It is not
+        // clear why we do this / whether we should.
         if (!empty($value['is_pay_later'])) {
           $this->_values['params']['is_pay_later'] = TRUE;
         }
@@ -1049,7 +1029,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // Add the billing names to the billing address, if a billing name is set
     if (!empty($params['billing_first_name'])) {
-      $params["address_name-{$form->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+      $params["address_name-{$form->_bltID}"] = $params['billing_first_name'] . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
       $fields["address_name-{$form->_bltID}"] = 1;
     }
 

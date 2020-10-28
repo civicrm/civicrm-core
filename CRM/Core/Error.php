@@ -184,6 +184,19 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
 
+    // Use the custom fatalErrorHandler if defined
+    if ($config->fatalErrorHandler && function_exists($config->fatalErrorHandler)) {
+      $name = $config->fatalErrorHandler;
+      $vars = [
+        'pearError' => $pearError,
+      ];
+      $ret = $name($vars);
+      if ($ret) {
+        // the call has been successfully handled so we just exit
+        self::abend(CRM_Core_Error::FATAL_ERROR);
+      }
+    }
+
     $template->assign_by_ref('error', $error);
     $errorDetails = CRM_Core_Error::debug('', $error, FALSE);
     $template->assign_by_ref('errorDetails', $errorDetails);
@@ -204,7 +217,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       exit;
     }
     $runOnce = TRUE;
-    self::abend(1);
+    self::abend(CRM_Core_Error::FATAL_ERROR);
   }
 
   /**
@@ -288,6 +301,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws Exception
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('throw new CRM_Core_Exception or use CRM_Core_Error::statusBounce', 'CRM_Core_Error::fatal');
     $vars = [
       'message' => $message,
       'code' => $code,
@@ -344,7 +358,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
       $out = [
         'status' => 'fatal',
-        'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
+        'content' => '<div class="messages status no-popup">' . CRM_Core_Page::crmIcon('fa-info-circle') . ' ' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
       ];
       if ($config->backtrace && CRM_Core_Permission::check('view debug output')) {
         $out['backtrace'] = self::parseBacktrace(debug_backtrace());
@@ -515,11 +529,14 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         $out = "\$$variable_name = $out";
       }
       else {
-        // use var_dump
-        ob_start();
-        var_dump($variable);
-        $dump = ob_get_contents();
-        ob_end_clean();
+        // Use Symfony var-dumper to avoid circular references that exhaust
+        // memory when using var_dump().
+        // Use its CliDumper since if we use the simpler `dump()` then it
+        // comes out as some overly decorated html which is hard to read.
+        $dump = (new \Symfony\Component\VarDumper\Dumper\CliDumper('php://output'))
+          ->dump(
+            (new \Symfony\Component\VarDumper\Cloner\VarCloner())->cloneVar($variable),
+            TRUE);
         $out = "\n\$$variable_name = $dump";
       }
       // reset if it is an array
@@ -572,6 +589,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
         watchdog('civicrm', '%message', ['%message' => $message], $priority ?? WATCHDOG_DEBUG);
       }
+      elseif ($config->userSystem->is_drupal and CIVICRM_UF == 'Drupal8') {
+        \Drupal::logger('civicrm')->log($priority ?? \Drupal\Core\Logger\RfcLogLevel::DEBUG, '%message', ['%message' => $message]);
+      }
     }
 
     return $str;
@@ -583,13 +603,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $string
    */
   public static function debug_query($string) {
-    if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
-      if (CIVICRM_DEBUG_LOG_QUERY === 'backtrace') {
-        CRM_Core_Error::backtrace($string, TRUE);
-      }
-      elseif (CIVICRM_DEBUG_LOG_QUERY) {
-        CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log', PEAR_LOG_DEBUG);
-      }
+    $debugLogQuery = CRM_Utils_Constant::value('CIVICRM_DEBUG_LOG_QUERY', FALSE);
+    if ($debugLogQuery === 'backtrace') {
+      CRM_Core_Error::backtrace($string, TRUE);
+    }
+    elseif ($debugLogQuery) {
+      CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log' . $debugLogQuery, PEAR_LOG_DEBUG);
     }
   }
 
@@ -608,7 +627,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @param string $prefix
    *
-   * @return Log
+   * @return Log_file
    */
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);
@@ -651,22 +670,30 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $prefixString = $prefix ? ($prefix . '.') : '';
 
-      $hash = self::generateLogFileHash($config);
-      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . '.log';
+      if (CRM_Utils_Constant::value('CIVICRM_LOG_HASH', TRUE)) {
+        $hash = self::generateLogFileHash($config) . '.';
+      }
+      else {
+        $hash = '';
+      }
+      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . 'log';
 
-      // Roll log file monthly or if greater than 256M.
+      // Roll log file monthly or if greater than our threshold.
       // Size-based rotation introduced in response to filesize limits on
       // certain OS/PHP combos.
-      if (file_exists($fileName)) {
-        $fileTime = date("Ym", filemtime($fileName));
-        $fileSize = filesize($fileName);
-        if (($fileTime < date('Ym')) ||
-          ($fileSize > 256 * 1024 * 1024) ||
-          ($fileSize < 0)
-        ) {
-          rename($fileName,
-            $fileName . '.' . date('YmdHi')
-          );
+      $maxBytes = CRM_Utils_Constant::value('CIVICRM_LOG_ROTATESIZE', 256 * 1024 * 1024);
+      if ($maxBytes) {
+        if (file_exists($fileName)) {
+          $fileTime = date("Ym", filemtime($fileName));
+          $fileSize = filesize($fileName);
+          if (($fileTime < date('Ym')) ||
+            ($fileSize > $maxBytes) ||
+            ($fileSize < 0)
+          ) {
+            rename($fileName,
+              $fileName . '.' . date('YmdHi')
+            );
+          }
         }
       }
       \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
@@ -1000,14 +1027,19 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Output a deprecated function warning to log file.  Deprecated class:function is automatically generated from calling function.
    *
-   * @param $newMethod
+   * @param string $newMethod
    *   description of new method (eg. "buildOptions() method in the appropriate BAO object").
+   * @param string $oldMethod
+   *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning($newMethod) {
-    $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-    $callerFunction = $dbt[1]['function'] ?? NULL;
-    $callerClass = $dbt[1]['class'] ?? NULL;
-    Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", ['civi.tag' => 'deprecated']);
+  public static function deprecatedFunctionWarning($newMethod, $oldMethod = NULL) {
+    if (!$oldMethod) {
+      $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+      $callerFunction = $dbt[1]['function'] ?? NULL;
+      $callerClass = $dbt[1]['class'] ?? NULL;
+      $oldMethod = "{$callerClass}::{$callerFunction}";
+    }
+    Civi::log()->warning("Deprecated function $oldMethod, use $newMethod.", ['civi.tag' => 'deprecated']);
   }
 
 }

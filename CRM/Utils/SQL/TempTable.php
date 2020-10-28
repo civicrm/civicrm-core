@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
  *   - All temp tables start with "civicrm_tmp".
@@ -51,7 +50,14 @@
  */
 class CRM_Utils_SQL_TempTable {
 
+  /**
+   * @deprecated
+   * The system will attempt to use the same as your other tables, and
+   * if you really need something else then use createWithColumns and
+   * specify it per-column there.
+   */
   const UTF8 = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
+
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
   // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
@@ -136,24 +142,15 @@ class CRM_Utils_SQL_TempTable {
   /**
    * Get the utf8 string for the table.
    *
-   * If the db collation is already utf8 by default (either
-   * utf8 or utf84mb) then rely on that. Otherwise set to utf8.
-   *
-   * Respecting the DB collation supports utf8mb4 adopters, which is currently
-   * not the norm in civi installs.
+   * Our tables are either utf8_unicode_ci OR utf8mb4_unicode_ci - check the contact table
+   * to see which & use the matching one. Or early adopters may have switched
+   * switched to other collations e.g. utf8mb4_0900_ai_ci (the default in mysql
+   * 8).
    *
    * @return string
    */
   public function getUtf8String() {
-    if (!$this->utf8) {
-      return '';
-    }
-    $dbUTF = CRM_Core_BAO_SchemaHandler::getDBCollation();
-    if (in_array($dbUTF, ['utf8_unicode_ci', 'utf8mb4_unicode_ci'])
-      && in_array($dbUTF, ['utf8', 'utf8mb4'])) {
-      return '';
-    }
-    return self::UTF8;
+    return $this->utf8 ? ('COLLATE ' . CRM_Core_BAO_SchemaHandler::getInUseCollation()) : '';
   }
 
   /**
@@ -169,7 +166,7 @@ class CRM_Utils_SQL_TempTable {
       $this->toSQL('CREATE'),
       $columns,
       $this->memory ? self::MEMORY : self::INNODB,
-      $this->utf8 ? self::UTF8 : ''
+      $this->getUtf8String()
     );
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
@@ -253,9 +250,11 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
+   * @deprecated
    * @return bool
    */
   public function isUtf8() {
+    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
     return $this->utf8;
   }
 
@@ -334,6 +333,7 @@ class CRM_Utils_SQL_TempTable {
    * @return $this
    */
   public function setUtf8($value = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
     $this->utf8 = $value;
     return $this;
   }

@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -143,7 +141,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
       $this->assign('owner', $owner);
 
-      $link = CRM_PCP_BAO_PCP::pcpLinks();
+      $link = CRM_PCP_BAO_PCP::pcpLinks($pcpInfo['id']);
 
       $hints = [
         CRM_Core_Action::UPDATE => ts('Change the content and appearance of your page'),

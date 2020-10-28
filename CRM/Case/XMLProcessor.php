@@ -62,12 +62,15 @@ class CRM_Case_XMLProcessor {
   }
 
   /**
+   * @deprecated
+   *
    * @param bool $indexName
    * @param bool $all
    *
    * @return array
    */
   public static function &allActivityTypes($indexName = TRUE, $all = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Case_PseudoConstant::caseActivityType');
     if (self::$activityTypes === NULL) {
       self::$activityTypes = CRM_Case_PseudoConstant::caseActivityType($indexName, $all);
     }

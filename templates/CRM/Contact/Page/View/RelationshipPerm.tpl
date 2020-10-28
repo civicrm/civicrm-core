@@ -24,9 +24,12 @@
 {/if}
 
 <span class="fa-stack" title="{$permText}">
-  <i class="crm-i fa-square fa-stack-2x {if $permType eq 1}crm-i-blue{else}crm-i-green{/if}"></i>
-  <i class="crm-i {if $permType eq 1}fa-pencil{else}fa-eye{/if} fa-inverse fa-stack-1x"></i>
+  <i class="crm-i fa-square fa-stack-2x {if $permType eq 1}crm-i-blue{else}crm-i-green{/if}" aria-hidden="true"></i>
+  <i class="crm-i {if $permType eq 1}fa-pencil{else}fa-eye{/if} fa-inverse fa-stack-1x" aria-hidden="true"></i>
 </span>
+{if !$displayText}
+<span class="sr-only">{$permText}</span>
+{/if}
 
 {* Used for viewing a relationship *}
 {if $displayText}

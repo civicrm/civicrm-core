@@ -18,6 +18,7 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration extends CRM_Core_Form {
+
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
@@ -77,14 +78,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @var array
    */
   public $_additionalParticipantIds;
-
-  /**
-   * The mode that we are in.
-   *
-   * @var string
-   * @protect
-   */
-  public $_mode;
 
   /**
    * The values for the contribution db object.
@@ -150,7 +143,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_isEventFull;
 
   public $_lineItem;
+
   public $_lineItemParticipantsCount;
+
   public $_availableRegistrations;
 
   /**
@@ -182,12 +177,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric', $this, FALSE, CRM_Core_Action::ADD);
-
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
-
-    // current mode
-    $this->_mode = ($this->_action == 1024) ? 'test' : 'live';
+    $this->setPaymentMode();
 
     $this->_values = $this->get('values');
     $this->_fields = $this->get('fields');
@@ -199,10 +191,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_isEventFull = $this->get('isEventFull');
     $this->_lineItemParticipantsCount = $this->get('lineItemParticipants');
     if (!is_array($this->_lineItem)) {
-      $this->_lineItem = array();
+      $this->_lineItem = [];
     }
     if (!is_array($this->_lineItemParticipantsCount)) {
-      $this->_lineItemParticipantsCount = array();
+      $this->_lineItemParticipantsCount = [];
     }
     $this->_availableRegistrations = $this->get('availableRegistrations');
     $this->_participantIDS = $this->get('participantIDs');
@@ -232,10 +224,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       // get all the values from the dao object
-      $this->_values = $this->_fields = array();
+      $this->_values = $this->_fields = [];
 
       //retrieve event information
-      $params = array('id' => $this->_eventId);
+      $params = ['id' => $this->_eventId];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
       // check for is_monetary status
       $isMonetary = $this->_values['event']['is_monetary'] ?? NULL;
@@ -305,12 +297,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       self::initEventFee($this, $this->_eventId);
 
       // get the profile ids
-      $ufJoinParams = array(
+      $ufJoinParams = [
         'entity_table' => 'civicrm_event',
         // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
         'module' => 'CiviEvent',
         'entity_id' => $this->_eventId,
-      );
+      ];
       list($this->_values['custom_pre_id'],
         $this->_values['custom_post_id']
         ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
@@ -347,7 +339,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if ($this->_values['event']['is_monetary']) {
         CRM_Core_Payment_Form::setPaymentFieldsByProcessor($this, $this->_paymentProcessor);
       }
-      $params = array('entity_id' => $this->_eventId, 'entity_table' => 'civicrm_event');
+      $params = ['entity_id' => $this->_eventId, 'entity_table' => 'civicrm_event'];
       $this->_values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
       $this->set('values', $this->_values);
@@ -355,9 +347,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       $this->_availableRegistrations
         = CRM_Event_BAO_Participant::eventFull(
-          $this->_values['event']['id'], TRUE,
-          CRM_Utils_Array::value('has_waitlist', $this->_values['event'])
-        );
+        $this->_values['event']['id'], TRUE,
+        CRM_Utils_Array::value('has_waitlist', $this->_values['event'])
+      );
       $this->set('availableRegistrations', $this->_availableRegistrations);
     }
     $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
@@ -440,14 +432,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('billingName', $name);
     $this->set('name', $name);
 
-    $vars = array(
+    $vars = [
       'amount',
       'currencyID',
       'credit_card_type',
       'trxn_id',
       'amount_level',
       'receive_date',
-    );
+    ];
 
     foreach ($vars as $v) {
       if (!empty($params[$v])) {
@@ -512,14 +504,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // we don't allow conflicting fields to be
       // configured via profile
-      $fieldsToIgnore = array(
+      $fieldsToIgnore = [
         'participant_fee_amount' => 1,
         'participant_fee_level' => 1,
-      );
+      ];
       if ($contactID) {
         //FIX CRM-9653
         if (is_array($id)) {
-          $fields = array();
+          $fields = [];
           foreach ($id as $profileID) {
             $field = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::ADD,
               NULL, NULL, FALSE, NULL,
@@ -643,7 +635,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     $eventFee = $form->_values['fee'] ?? NULL;
     if (!is_array($eventFee) || empty($eventFee)) {
-      $form->_values['fee'] = array();
+      $form->_values['fee'] = [];
     }
 
     //fix for non-upgraded price sets.CRM-4256.
@@ -665,8 +657,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
     if ($isPaidEvent && empty($form->_values['fee'])) {
-      if (CRM_Utils_System::getClassName($form) != 'CRM_Event_Form_Participant') {
-        CRM_Core_Error::fatal(ts('No Fee Level(s) or Price Set is configured for this event.<br />Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', array(1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $form->_eventId))));
+      if (!in_array(CRM_Utils_System::getClassName($form), ['CRM_Event_Form_Participant', 'CRM_Event_Form_Task_Register'])) {
+        CRM_Core_Error::statusBounce(ts('No Fee Level(s) or Price Set is configured for this event.<br />Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $form->_eventId)]));
       }
     }
   }
@@ -799,7 +791,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     $participantFields = CRM_Event_DAO_Participant::fields();
-    $participantParams = array(
+    $participantParams = [
       'id' => $params['participant_id'] ?? NULL,
       'contact_id' => $contactID,
       'event_id' => $form->_eventId ? $form->_eventId : $params['event_id'],
@@ -819,7 +811,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $params['currencyID'] ?? NULL,
       'campaign_id' => $params['campaign_id'] ?? NULL,
-    );
+    ];
 
     if ($form->_action & CRM_Core_Action::PREVIEW || CRM_Utils_Array::value('mode', $params) == 'test') {
       $participantParams['is_test'] = 1;
@@ -876,7 +868,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $priceSetId = $form->get('priceSetId');
     $addParticipantNum = substr($form->_name, 12);
-    $priceSetFields = $priceSetDetails = array();
+    $priceSetFields = $priceSetDetails = [];
     $hasPriceFieldsCount = FALSE;
     if ($priceSetId) {
       $priceSetDetails = $form->get('priceSet');
@@ -899,7 +891,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //first format the params.
     if ($singleFormParams) {
       $params = self::formatPriceSetParams($form, $params);
-      $params = array($params);
+      $params = [$params];
     }
 
     foreach ($params as $key => $values) {
@@ -975,7 +967,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $priceSetDetails = $form->get('priceSet');
 
     foreach ($params as $key => & $value) {
-      $vals = array();
+      $vals = [];
       if (strpos($key, 'price_') !== FALSE) {
         $fieldId = substr($key, 6);
         if (!array_key_exists($fieldId, $priceSetDetails['fields']) ||
@@ -987,10 +979,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $field = $priceSetDetails['fields'][$fieldId];
         if ($field['html_type'] == 'Text') {
           $fieldOption = current($field['options']);
-          $value = array($fieldOption['id'] => $value);
+          $value = [$fieldOption['id'] => $value];
         }
         else {
-          $value = array($value => TRUE);
+          $value = [$value => TRUE];
         }
       }
     }
@@ -1014,7 +1006,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $priceSet = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
 
-    $optionsCount = array();
+    $optionsCount = [];
     if (!$priceSetId ||
       !is_array($priceSet) ||
       empty($priceSet) ||
@@ -1024,7 +1016,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $optionsCount;
     }
 
-    $priceSetFields = $priceMaxFieldDetails = array();
+    $priceSetFields = $priceMaxFieldDetails = [];
     if (!empty($priceSet['optionsCountTotal'])) {
       $priceSetFields = $priceSet['optionsCountDetails']['fields'];
     }
@@ -1123,7 +1115,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param array $optionFullIds
    * @param CRM_Core_Form $form
    */
-  public static function resetElementValue($optionFullIds = array(), &$form) {
+  public static function resetElementValue($optionFullIds = [], &$form) {
     if (!is_array($optionFullIds) ||
       empty($optionFullIds) ||
       !$form->isSubmitted()
@@ -1173,7 +1165,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             foreach ($element->_options as $option) {
               if ($option['attr']['value'] === "crm_disabled_opt-{$value[0]}") {
                 $placeholder = html_entity_decode($option['text'], ENT_QUOTES, "UTF-8");
-                $element->updateAttributes(array('placeholder' => $placeholder));
+                $element->updateAttributes(['placeholder' => $placeholder]);
                 break;
               }
             }
@@ -1196,18 +1188,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param array $optionIds
    * @param CRM_Core_Form $form
    */
-  public static function resetSubmittedValue($elementName, $optionIds = array(), &$form) {
+  public static function resetSubmittedValue($elementName, $optionIds = [], &$form) {
     if (empty($elementName) ||
       !$form->elementExists($elementName) ||
       !$form->getSubmitValue($elementName)
     ) {
       return;
     }
-    foreach (array(
-      'constantValues',
-      'submitValues',
-      'defaultValues',
-    ) as $val) {
+    foreach (['constantValues', 'submitValues', 'defaultValues'] as $val) {
       $values = $form->{"_$val"};
       if (!is_array($values) || empty($values)) {
         continue;
@@ -1247,7 +1235,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return array
    */
   public static function validatePriceSet(&$form, $params) {
-    $errors = array();
+    $errors = [];
     $hasOptMaxValue = FALSE;
     if (!is_array($params) || empty($params)) {
       return $errors;
@@ -1268,7 +1256,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $errors;
     }
 
-    $optionsCountDetails = $optionsMaxValueDetails = array();
+    $optionsCountDetails = $optionsMaxValueDetails = [];
     if (
       isset($priceSetDetails['optionsMaxValueTotal'])
       && $priceSetDetails['optionsMaxValueTotal']
@@ -1289,7 +1277,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $feeBlock = $priceSetDetails['fields'];
     }
 
-    $optionMaxValues = $fieldSelected = array();
+    $optionMaxValues = $fieldSelected = [];
     foreach ($params as $pNum => $values) {
       if (!is_array($values) || $values == 'skip') {
         continue;
@@ -1342,13 +1330,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       //validate for price field selection.
       if (empty($fieldSelected[$pNum])) {
-        $errors[$pNum]['_qf_default'] = ts('Select at least one option from Event Fee(s).');
+        $errors[$pNum]['_qf_default'] = ts('SELECT at least one OPTION FROM EVENT Fee(s).');
       }
     }
 
     //validate for option max value.
     foreach ($optionMaxValues as $fieldId => $values) {
-      $options = CRM_Utils_Array::value('options', $feeBlock[$fieldId], array());
+      $options = CRM_Utils_Array::value('options', $feeBlock[$fieldId], []);
       foreach ($values as $optId => $total) {
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
         $opDbCount = CRM_Utils_Array::value('db_total_count', $options[$optId], 0);
@@ -1360,11 +1348,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           }
           elseif (($optMax - $opDbCount) == 1) {
             $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
-              = ts('Sorry, currently only a single space is available for this option.', array(1 => ($optMax - $opDbCount)));
+              = ts('Sorry, currently only a single space is available for this option.', [1 => ($optMax - $opDbCount)]);
           }
           else {
             $errors[$soldOutPnum[$optId]]["price_{$fieldId}"]
-              = ts('Sorry, currently only %1 spaces are available for this option.', array(1 => ($optMax - $opDbCount)));
+              = ts('Sorry, currently only %1 spaces are available for this option.', [1 => ($optMax - $opDbCount)]);
           }
         }
       }
@@ -1383,8 +1371,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_participantId = $participantID;
     $this->set('participantId', $this->_participantId);
 
-    $ids = $participantValues = array();
-    $participantParams = array('id' => $this->_participantId);
+    $ids = $participantValues = [];
+    $participantParams = ['id' => $this->_participantId];
     CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
     $this->_values['participant'] = $participantValues[$this->_participantId];
     $this->set('values', $this->_values);
@@ -1402,11 +1390,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Check if event is valid.
    *
+   * @param string $redirect
+   *
    * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
    * (probably extract relevant values here & call that with them & handle bounces & redirects here -as
    * those belong in the form layer)
    *
-   * @param string $redirect
    */
   public function checkValidEvent($redirect = NULL) {
     // is the event active (enabled)?
@@ -1434,7 +1423,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $startDate &&
       $startDate >= $now
     ) {
-      CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1', array(1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_start_date', $this->_values['event'])))), $redirect, ts('Sorry'));
+      CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1', [1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_start_date', $this->_values['event']))]), $redirect, ts('Sorry'));
     }
 
     $regEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
@@ -1446,7 +1435,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if (empty($regEndDate)) {
         $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
       }
-      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', array(1 => $endDate)), $redirect, ts('Sorry'));
+      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', [1 => $endDate]), $redirect, ts('Sorry'));
     }
   }
 
@@ -1486,14 +1475,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
-    $this->_participantInfo = array();
+    $this->_participantInfo = [];
 
     // CRM-4320, lets build array of cancelled additional participant ids
     // those are drop or skip by primary at the time of confirmation.
     // get all in and then unset those are confirmed.
     $cancelledIds = $this->_additionalParticipantIds;
 
-    $participantCount = array();
+    $participantCount = [];
     foreach ($params as $participantNum => $record) {
       if ($record == 'skip') {
         $participantCount[$participantNum] = 'skip';

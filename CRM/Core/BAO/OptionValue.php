@@ -55,18 +55,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    */
   public static function setDefaults(&$params) {
-    if (CRM_Utils_Array::value('label', $params, NULL) === NULL) {
-      $params['label'] = $params['name'];
-    }
-    if (CRM_Utils_Array::value('name', $params, NULL) === NULL) {
-      $params['name'] = $params['label'];
-    }
-    if (CRM_Utils_Array::value('weight', $params, NULL) === NULL) {
-      $params['weight'] = self::getDefaultWeight($params);
-    }
-    if (CRM_Utils_Array::value('value', $params, NULL) === NULL) {
-      $params['value'] = self::getDefaultValue($params);
-    }
+    $params['label'] = $params['label'] ?? $params['name'];
+    $params['name'] = $params['name'] ?? CRM_Utils_String::titleToVar($params['label']);
+    $params['weight'] = $params['weight'] ?? self::getDefaultWeight($params);
+    $params['value'] = $params['value'] ?? self::getDefaultValue($params);
   }
 
   /**
@@ -157,19 +149,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       CRM_Core_Error::deprecatedFunctionWarning('$params[\'id\'] should be set, $ids is deprecated');
     }
     $id = $params['id'] ?? $ids['optionValue'] ?? NULL;
-    // CRM-10921: do not reset attributes to default if this is an update
-    //@todo consider if defaults are being set in the right place. 'dumb' defaults like
-    // these would be usefully set @ the api layer so they are visible to api users
-    // complex defaults like the domain id below would make sense in the setDefauls function
-    // but unclear what other ways this function is being used
-    if (!$id) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-      $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
-      $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
-    }
+
     // Update custom field data to reflect the new value
-    elseif (isset($params['value'])) {
+    if ($id && isset($params['value'])) {
       CRM_Core_BAO_CustomOption::updateValue($id, $params['value']);
     }
 

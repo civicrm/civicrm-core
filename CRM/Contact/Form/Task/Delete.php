@@ -53,10 +53,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or CRM_Utils_Array::value('task', $values) == CRM_Contact_Task::RESTORE);
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this contact.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this contact.'));
     }
     elseif (!CRM_Core_Permission::check('delete contacts')) {
-      CRM_Core_Error::fatal(ts('You do not have permission to delete this contact.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact.'));
     }
 
     $this->assign('trash', Civi::settings()->get('contact_undelete') and !$this->_skipUndelete);
@@ -68,10 +68,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     if ($cid) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to delete this contact. Note: you can delete contacts if you can edit them.'));
       }
       elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
-        CRM_Core_Error::fatal(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
+        CRM_Core_Error::statusBounce(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
 
       $this->_contactIds = [$cid];
@@ -119,7 +119,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
             'count' => $sharedAddressCount,
           ]);
         }
-        CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
+        CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addresses Owner'));
       }
 
       // set in form controller so that queries are not fired again
@@ -182,30 +182,14 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
+    if ($this->_restore) {
+      $this->doRestore();
+      return;
+    }
     $session = CRM_Core_Session::singleton();
     $currentUserId = $session->get('userID');
 
-    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'basic');
-    $urlParams = 'force=1';
-    $urlString = "civicrm/contact/search/$context";
-
-    if (CRM_Utils_Rule::qfKey($this->_searchKey)) {
-      $urlParams .= "&qfKey=$this->_searchKey";
-    }
-    elseif ($context == 'search') {
-      $urlParams .= "&qfKey={$this->controller->_key}";
-      $urlString = 'civicrm/contact/search';
-    }
-    elseif ($context == 'smog') {
-      $urlParams .= "&qfKey={$this->controller->_key}&context=smog";
-      $urlString = 'civicrm/group/search';
-    }
-    else {
-      $urlParams = "reset=1";
-      $urlString = 'civicrm/dashboard';
-    }
-
-    // Delete/Restore Contacts. Report errors.
+    // Delete Contacts. Report errors.
     $deleted = 0;
     $not_deleted = [];
     foreach ($this->_contactIds as $cid) {
@@ -214,11 +198,11 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
         $session->setStatus(ts("'%1' cannot be deleted because the information is used for special system purposes.", [1 => $name]), 'Cannot Delete Domain Contact', 'error');
         continue;
       }
-      if ($currentUserId == $cid && !$this->_restore) {
+      if ($currentUserId == $cid) {
         $session->setStatus(ts("You are currently logged in as '%1'. You cannot delete yourself.", [1 => $name]), 'Unable To Delete', 'error');
         continue;
       }
-      if (CRM_Contact_BAO_Contact::deleteContact($cid, $this->_restore, $this->_skipUndelete)) {
+      if (CRM_Contact_BAO_Contact::deleteContact($cid, FALSE, $this->_skipUndelete)) {
         $deleted++;
       }
       else {
@@ -228,15 +212,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     }
     if ($deleted) {
       $title = ts('Deleted');
-      if ($this->_restore) {
-        $title = ts('Restored');
-        $status = ts('%1 has been restored from the trash.', [
-          1 => $name,
-          'plural' => '%count contacts restored from trash.',
-          'count' => $deleted,
-        ]);
-      }
-      elseif ($this->_skipUndelete) {
+      if ($this->_skipUndelete) {
         $status = ts('%1 has been permanently deleted.', [
           1 => $name,
           'plural' => '%count contacts permanently deleted.',
@@ -259,7 +235,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $session->setStatus('<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>' . $status, $title, 'error');
     }
 
-    if (isset($this->_sharedAddressMessage) && $this->_sharedAddressMessage['count'] > 0 && !$this->_restore) {
+    if (isset($this->_sharedAddressMessage) && $this->_sharedAddressMessage['count'] > 0) {
       if (count($this->_sharedAddressMessage['contactList']) == 1) {
         $message = ts('The following contact had been sharing an address with a contact you just deleted. Their address will no longer be shared, but has not been removed or altered.');
       }
@@ -268,17 +244,66 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       }
       $message .= '<ul><li>' . implode('</li><li>', $this->_sharedAddressMessage['contactList']) . '</li></ul>';
 
-      $session->setStatus($message, ts('Shared Addesses Owner Deleted'), 'info', ['expires' => 0]);
+      $session->setStatus($message, ts('Shared Addresses Owner Deleted'), 'info', ['expires' => 0]);
 
       $this->set('sharedAddressMessage', NULL);
     }
 
-    if ($this->_single && empty($this->_skipUndelete)) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_contactIds[0]}"));
+    $this->setRedirection();
+  }
+
+  /**
+   * Set the url for the contact to be redirected to.
+   */
+  protected function setRedirection() {
+
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'basic');
+    $urlParams = 'force=1';
+    $urlString = "civicrm/contact/search/$context";
+
+    if (CRM_Utils_Rule::qfKey($this->_searchKey)) {
+      $urlParams .= "&qfKey=$this->_searchKey";
+    }
+    elseif ($context === 'search') {
+      $urlParams .= "&qfKey={$this->controller->_key}";
+      $urlString = 'civicrm/contact/search';
+    }
+    elseif ($context === 'smog') {
+      $urlParams .= "&qfKey={$this->controller->_key}&context=smog";
+      $urlString = 'civicrm/group/search';
     }
     else {
-      $session->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
+      $urlParams = 'reset=1';
+      $urlString = 'civicrm/dashboard';
     }
+    if ($this->_single && empty($this->_skipUndelete)) {
+      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_contactIds[0]}"));
+    }
+    else {
+      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url($urlString, $urlParams));
+    }
+  }
+
+  /**
+   * Restore the selected contact/s from the trash.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function doRestore() {
+    $name = '';
+    if (count($this->_contactIds) === 1) {
+      $name = Civi\Api4\Contact::get()->addWhere('id', 'IN', $this->_contactIds)->setSelect(['display_name'])->execute()->first()['display_name'];
+    }
+    Civi\Api4\Contact::update()->addWhere('id', 'IN', $this->_contactIds)->setValues(['is_deleted' => 0])->execute();
+    $title = ts('Restored');
+    $status = ts('%1 has been restored from the trash.', [
+      1 => $name,
+      'plural' => '%count contacts restored from trash.',
+      'count' => count($this->_contactIds),
+    ]);
+    CRM_Core_Session::setStatus($status, $title, 'success');
+    $this->setRedirection();
   }
 
 }

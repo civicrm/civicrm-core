@@ -21,7 +21,7 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
   /**
    * Check that various columns are TIMESTAMP and not DATETIME. (CRM-9683, etal)
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkSchema() {
     $problems = [];

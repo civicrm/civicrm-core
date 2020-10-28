@@ -79,6 +79,11 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
     $this->addTask('Convert Report Form dates from jcalander to datepicker', 'convertReportsJcalendarToDatePicker');
   }
 
+  public function upgrade_5_25_beta3($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Convert CiviContribute settings', 'updateContributeSettings');
+  }
+
   /**
    * Convert date fields stored in civicrm_report_instance to that format for datepicker
    */

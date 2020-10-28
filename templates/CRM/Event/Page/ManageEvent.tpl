@@ -8,23 +8,15 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=newEventURL}{crmURL p='civicrm/event/add' q="action=add&reset=1"}{/capture}
-{capture assign=icalFile}{crmURL p='civicrm/event/ical' q="reset=1" fe=1}{/capture}
-{capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1" fe=1}{/capture}
-{capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1" fe=1}{/capture}
-{capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1}{/capture}
 
 <div class="crm-block crm-content-block">
 <div class="float-right">
-  <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
-  <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
-  <a href="{$icalFile}" title="{ts}Download iCalendar file for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-download"></i></a>
-  <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a>
-  {help id='icalendar'}
+  {include file="CRM/Event/Page/iCalLinks.tpl"}
 </div>
 
 <div class="action-link">
   <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
-    <span><i class="crm-i fa-calendar-plus-o"></i> {ts}Add Event{/ts}</span>
+    <span><i class="crm-i fa-calendar-plus-o" aria-hidden="true"></i> {ts}Add Event{/ts}</span>
   </a>
   <div class="clear"></div>
 </div>
@@ -145,7 +137,7 @@
 {else}
   {if $isSearch eq 1}
   <div class="status messages">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {capture assign=browseURL}{crmURL p='civicrm/event/manage' q="reset=1"}{/capture}
     {ts}No available Events match your search criteria. Suggestions:{/ts}
     <div class="spacer"></div>
@@ -159,7 +151,7 @@
   </div>
     {else}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {ts 1=$newEventURL}There are no events scheduled for the date range. You can <a href='%1'>add one</a>.{/ts}
   </div>
   {/if}

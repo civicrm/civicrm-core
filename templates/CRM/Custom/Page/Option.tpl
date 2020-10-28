@@ -12,7 +12,7 @@
 {else}
   {if $reusedNames}
       <div class="message status">
-        <div class="icon inform-icon"></div> &nbsp; {ts 1=$reusedNames}These Multiple Choice Options are shared by the following custom fields: %1{/ts}
+        {icon icon="fa-info-circle"}{/icon} {ts 1=$reusedNames}These Multiple Choice Options are shared by the following custom fields: %1{/ts}
       </div>
   {/if}
 
@@ -54,8 +54,8 @@
               "aoColumns"  : [
                               {sClass:'crm-custom_option-label'},
                               {sClass:'crm-custom_option-value'},
+                              {sClass:'crm-custom_option-description'},
                               {sClass:'crm-custom_option-default_value'},
-                              {sClass:'crm-custom_option-default_description'},
                               {sClass:'crm-custom_option-is_active'},
                               {sClass:'crm-custom_option-links'},
                               {sClass:'hiddenElement'}
@@ -87,7 +87,7 @@
                 $(nRow).addClass(cl).attr({id: 'OptionValue-' + id});
                 $('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-label" />');
                 $('td:eq(0)', nRow).prepend('<span class="crm-i fa-arrows crm-grip" />');
-                $('td:eq(2)', nRow).addClass('crmf-default_value');
+                $('td:eq(3)', nRow).addClass('crmf-default_value').html(CRM.utils.formatIcon('fa-check', ts('Default'), nRow.cells[3].innerText));
                 return nRow;
               },
               "fnDrawCallback": function() {

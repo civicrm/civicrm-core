@@ -39,6 +39,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_entity;
 
   /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * Turn off for this class as we use DAO methods that bypass business logic. Also, this test class
+   * takes a long time so might be good not to add another check.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = FALSE;
+
+  /**
    * Map custom group entities to civicrm components.
    * @var array
    */
@@ -111,13 +121,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Payment',
       'Order',
     ];
-    $this->onlyIDNonZeroCount['get'] = [
-      'ActivityType',
-      'Entity',
-      'Domain',
-      'Setting',
-      'User',
-    ];
     $this->deprecatedAPI = ['Location', 'ActivityType', 'SurveyRespondant'];
     $this->deletableTestObjects = [];
   }
@@ -128,6 +131,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         CRM_Core_DAO::deleteTestObjects($entityName, ['id' => $entityID]);
       }
     }
+    $this->deletableTestObjects = NULL;
   }
 
   /**
@@ -515,6 +519,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SystemLog',
       //skip this because it doesn't make sense to update logs,
       'Logging',
+      // Skip message template because workflow_id/workflow_name are sync'd.
+      'MessageTemplate',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -525,7 +531,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $e,
       ];
     }
-    return ['pledge'];
+    // WTF
+    return ['pledge', 'MessageTemplate'];
     return $entities;
   }
 
@@ -572,9 +579,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
 
     // The testSqlOperators fails sporadically on MySQL 5.5, which is deprecated anyway.
+    // Re:^^^ => the failure was probably correct behavior, and test is now fixed, but yeah 5.5 is deprecated, and don't care enough to verify.
     // Test data providers should be able to run in pre-boot environment, so we connect directly to SQL server.
     require_once 'DB.php';
-    $db = DB::connect(CIVICRM_DSN);
+    $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+    $db = DB::connect($dsn);
     if ($db->connection instanceof mysqli && $db->connection->server_version < 50600) {
       $entitiesWithout[] = 'Dedupe';
     }
@@ -923,7 +932,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // just to get a clearer message in the log
       $this->assertEquals("only id should be enough", $result['error_message']);
     }
-    if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
+    if (!in_array($Entity, $this->getOnlyIDNonZeroCount(), TRUE)) {
       $this->assertEquals(0, $result['count']);
     }
   }
@@ -982,7 +991,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
 
     $baos = $this->getMockableBAOObjects($entityName);
-    list($baoObj1, $baoObj2) = $baos;
+    [$baoObj1, $baoObj2] = $baos;
 
     // fetch first by ID
     $result = $this->callAPISuccess($entityName, 'get', [
@@ -1094,14 +1103,13 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $entities = array_keys($entities['values']);
     $totalEntities = count($entities);
     if ($totalEntities < 3) {
-      $ids = [];
       for ($i = 0; $i < 3 - $totalEntities; $i++) {
         $baoObj = CRM_Core_DAO::createTestObject($baoString, ['currency' => 'USD']);
-        $ids[] = $baoObj->id;
+        $this->deletableTestObjects[$baoString][] = $baoObj->id;
       }
       $totalEntities = 3;
     }
-    $entities = $this->callAPISuccess($entityName, 'get', ['options' => ['limit' => 0]]);
+    $entities = $this->callAPISuccess($entityName, 'get', ['options' => ['limit' => 0, 'sort' => 'id']]);
     $entities = array_keys($entities['values']);
     $this->assertGreaterThan(2, $totalEntities);
     $this->callAPISuccess($entityName, 'getsingle', ['id' => ['IN' => [$entities[0]]]]);
@@ -1205,7 +1213,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     $this->assertArrayHasKey('version', $result);
     $this->assertEquals(3, $result['version']);
-    if (!in_array($Entity, $this->onlyIDNonZeroCount['get'])) {
+    if (!in_array($Entity, $this->getOnlyIDNonZeroCount(), TRUE)) {
       $this->assertEquals(0, $result['count']);
     }
   }
@@ -1313,6 +1321,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
 
+    $floatFields = [];
     $baoString = _civicrm_api3_get_BAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
@@ -1434,6 +1443,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
         case CRM_Utils_Type::T_FLOAT:
         case CRM_Utils_Type::T_MONEY:
+          $floatFields[] = $field;
           $entity[$field] = '22.75';
           break;
 
@@ -1501,6 +1511,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity[$field] = CRM_Core_DAO::serializeField($checkEntity[$field], $specs['serialize']);
       }
 
+      foreach ($floatFields as $floatField) {
+        $checkEntity[$floatField] = rtrim($checkEntity[$floatField], "0");
+      }
+      unset($entity['xdebug']);
+      unset($checkEntity['xdebug']);
       $this->assertAPIArrayComparison($entity, $checkEntity, [], "checking if $fieldName was correctly updated\n" . print_r([
         'update-params' => $updateParams,
         'update-result' => $update,
@@ -1587,7 +1602,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $startCount = $this->callAPISuccess($entityName, 'getcount', []);
     $createcount = 2;
     $baos = $this->getMockableBAOObjects($entityName, $createcount);
-    list($baoObj1, $baoObj2) = $baos;
+    [$baoObj1, $baoObj2] = $baos;
 
     // make sure exactly 2 exist
     $result = $this->callAPISuccess($entityName, 'getcount', [],
@@ -1824,6 +1839,21 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertDBQuery('setValueDescription: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', [
       1 => [$eventId, 'Integer'],
     ]);
+  }
+
+  /**
+   * Get entities that have non-zero counts already.
+   *
+   * @return string[]
+   */
+  protected function getOnlyIDNonZeroCount(): array {
+    return [
+      'ActivityType',
+      'Entity',
+      'Domain',
+      'Setting',
+      'User',
+    ];
   }
 
 }

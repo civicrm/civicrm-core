@@ -17,7 +17,7 @@
             <input type="hidden" name="hidden_location" value="1" />
             <input type="hidden" name="hidden_custom" value="1" />
             <input type="hidden" name="qfKey" value="" />
-            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
+            <div style="height:1px; overflow:hidden;"><button type="submit" name="_qf_Advanced_refresh" class="crm-button crm-form-submit default">{ts}Go{/ts}</button></div>
           </div>
         </form>
         <ul>
@@ -144,10 +144,6 @@ $('#civicrm-menu').ready(function() {
     var $selection = $('.crm-quickSearchField input:checked'),
       label = $selection.parent().text(),
       value = $selection.val();
-    // These fields are not supported by advanced search
-    if (!value || value === 'first_name' || value === 'last_name') {
-      value = 'sort_name';
-    }
     $('#sort_name_navigation').attr({name: value, placeholder: label});
   }
   $('.crm-quickSearchField').click(function() {

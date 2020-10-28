@@ -21,6 +21,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   public function preProcess() {
     parent::preProcess();
+    $this->setSelectedChild('settings');
   }
 
   /**
@@ -156,21 +157,18 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->addProfileSelector('onbehalf_profile_id', ts('Organization Profile'), $allowCoreTypes, $allowSubTypes, $entities);
 
-    $options = [];
-    $options[] = $this->createElement('radio', NULL, NULL, ts('Optional'), 1);
-    $options[] = $this->createElement('radio', NULL, NULL, ts('Required'), 2);
-    $this->addGroup($options, 'is_for_organization', '');
+    $this->addRadio('is_for_organization', '', [1 => ts('Optional'), 2 => ts('Required')]);
     $this->add('textarea', 'for_organization', ts('On behalf of Label'), ['rows' => 2, 'cols' => 50]);
 
     // collect goal amount
     $this->add('text', 'goal_amount', ts('Goal Amount'), ['size' => 8, 'maxlength' => 12]);
-    $this->addRule('goal_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $this->addRule('goal_amount', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     // is confirmation page enabled?
     $this->addElement('checkbox', 'is_confirm_enabled', ts('Use a confirmation page?'));
 
     // is this page shareable through social media ?
-    $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
+    $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
 
     // is this page active ?
     $this->addElement('checkbox', 'is_active', ts('Is this Online Contribution Page Active?'));
@@ -348,8 +346,17 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     foreach ($ufJoinParams as $index => $ufJoinParam) {
       if (!empty($params[$index])) {
-        // first delete all past entries
-        CRM_Core_BAO_UFJoin::deleteAll($ufJoinParam);
+        // Look for an existing entry
+        $ufJoinDAO = new CRM_Core_DAO_UFJoin();
+        $ufJoinDAO->module = $ufJoinParam['module'];
+        $ufJoinDAO->entity_table = 'civicrm_contribution_page';
+        $ufJoinDAO->entity_id = $ufJoinParam['entity_id'];
+        $ufJoinDAO->find(TRUE);
+
+        if (!empty($ufJoinDAO->id)) {
+          $ufJoinParam['id'] = $ufJoinDAO->id;
+        }
+
         $ufJoinParam['uf_group_id'] = $params[$index];
         $ufJoinParam['weight'] = 1;
         $ufJoinParam['is_active'] = 1;

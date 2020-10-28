@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -34,15 +32,13 @@ class CreateCustomValueTest extends BaseCustomValueTest {
   public function testGetWithCustomData() {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'Color')
       ->addValue('option_values', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
@@ -50,8 +46,7 @@ class CreateCustomValueTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customField = CustomField::get()
-      ->setCheckPermissions(FALSE)
+    $customField = CustomField::get(FALSE)
       ->addWhere('label', '=', 'Color')
       ->execute()
       ->first();
@@ -59,16 +54,14 @@ class CreateCustomValueTest extends BaseCustomValueTest {
     $this->assertNotNull($customField['option_group_id']);
     $optionGroupId = $customField['option_group_id'];
 
-    $optionGroup = OptionGroup::get()
-      ->setCheckPermissions(FALSE)
+    $optionGroup = OptionGroup::get(FALSE)
       ->addWhere('id', '=', $optionGroupId)
       ->execute()
       ->first();
 
     $this->assertEquals('Color', $optionGroup['title']);
 
-    $createdOptionValues = OptionValue::get()
-      ->setCheckPermissions(FALSE)
+    $createdOptionValues = OptionValue::get(FALSE)
       ->addWhere('option_group_id', '=', $optionGroupId)
       ->execute()
       ->getArrayCopy();

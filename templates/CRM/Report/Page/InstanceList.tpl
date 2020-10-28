@@ -10,7 +10,7 @@
 {strip}
   <div class="action-link">
     {if $templateUrl}
-      <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle"></i> {$newButton}</span></a>
+      <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {$newButton}</span></a>
     {/if}
     {if $reportUrl}
       <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
@@ -29,7 +29,7 @@
               <table class="report-layout">
                 {foreach from=$rows item=row}
                   <tr id="row_{counter}" class="crm-report-instanceList">
-                    <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts}Run this report{/ts}">&raquo; <strong>{$row.title}</strong></a></td>
+                    <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts}Run this report{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a></td>
                     <td class="crm-report-instanceList-description">{$row.description}</td>
                     <td>
                     <a href="{$row.viewUrl}" class="action-item crm-hover-button">{ts}View Results{/ts}</a>
@@ -54,7 +54,7 @@
 
     <div class="action-link">
       {if $templateUrl}
-        <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle"></i> {$newButton}</span></a>
+        <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {$newButton}</span></a>
       {/if}
       {if $reportUrl}
         <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
@@ -64,7 +64,7 @@
   {else}
     <div class="crm-content-block">
       <div class="messages status no-popup">
-        <div class="icon inform-icon"></div>&nbsp;
+        {icon icon="fa-info-circle"}{/icon}
         {if $myReports}
           {ts}You do not have any private reports. To add a report to this section, edit the Report Settings for a report and set 'Add to My Reports' to Yes.{/ts} &nbsp;
         {else}

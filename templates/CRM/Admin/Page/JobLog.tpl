@@ -18,7 +18,10 @@
 {/if}
 
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+    {if $jobRunUrl}
+      <a href="{$jobRunUrl}" id="jobsList-run-top" class="button"><span><i class="crm-i fa-play" aria-hidden="true"></i> {ts}Execute Now{/ts}</span></a>
+    {/if}
   </div>
 
 {if $rows}
@@ -49,7 +52,7 @@
   </div>
 {elseif $action ne 1}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
+      {icon icon="fa-info-circle"}{/icon}
       {if $jobId}
         {ts}This scheduled job does not have any log entries.{/ts}
       {else}
@@ -59,6 +62,9 @@
 {/if}
 
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+    <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
+    {if $jobRunUrl}
+      <a href="{$jobRunUrl}" id="jobsList-run-bottom" class="button"><span><i class="crm-i fa-play" aria-hidden="true"></i> {ts}Execute Now{/ts}</span></a>
+    {/if}
   </div>
 </div>

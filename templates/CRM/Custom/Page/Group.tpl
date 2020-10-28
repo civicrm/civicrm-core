@@ -28,6 +28,7 @@
       <table id="options" class="row-highlight">
         <thead>
           <tr>
+            <th>{ts}ID{/ts}</th>
             <th>{ts}Set{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
             <th>{ts}Used For{/ts}</th>
@@ -40,6 +41,7 @@
         <tbody>
         {foreach from=$rows item=row}
         <tr id="CustomGroup-{$row.id}" data-action="setvalue" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+          <td>{$row.id}</td>
           <td class="crmf-title crm-editable">{$row.title}</td>
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.extends eq 'Contact'}{ts}All Contact Types{/ts}{else}{$row.extends_display}{/if}</td>

@@ -19,7 +19,7 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {if $action eq 8}
   <div class="messages status no-popup">
-     <div class="icon inform-icon"></div>
+     {icon icon="fa-info-circle"}{/icon}
         {ts}WARNING: Deleting this batch will result in the loss of all data entered for the batch.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
       </div>
 {else}

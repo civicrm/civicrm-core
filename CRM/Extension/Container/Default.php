@@ -26,7 +26,7 @@ class CRM_Extension_Container_Default extends CRM_Extension_Container_Basic {
    * @return array
    */
   public function checkRequirements() {
-    $errors = array();
+    $errors = [];
 
     // In current configuration, we don't construct the default container
     // unless baseDir is set, so this error condition is more theoretical.

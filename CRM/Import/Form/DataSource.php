@@ -50,7 +50,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->assign('uploadSize', $uploadSize);
 
-    $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
+    $this->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
     $this->setMaxFileSize($uploadFileSize);
     $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
       1 => $uploadSize,
@@ -95,26 +95,17 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    */
   protected function addContactTypeSelector() {
     //contact types option
-    $contactOptions = [];
+    $contactTypeOptions = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_INDIVIDUAL] = ts('Individual');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_HOUSEHOLD] = ts('Household');
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION
-      );
+      $contactTypeOptions[CRM_Import_Parser::CONTACT_ORGANIZATION] = ts('Organization');
     }
-
-    $this->addGroup($contactOptions, 'contactType',
-      ts('Contact Type')
-    );
+    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions);
 
     $this->setDefaults([
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,

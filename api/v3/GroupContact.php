@@ -72,7 +72,7 @@ function _civicrm_api3_group_contact_create_spec(&$params) {
  *
  * This api has a legacy/nonstandard signature.
  * On success, the return array will be structured as follows:
- * @code
+ * ```
  * array(
  *   "is_error" => 0,
  *   "version"  => 3,
@@ -83,16 +83,16 @@ function _civicrm_api3_group_contact_create_spec(&$params) {
  *     "total_count" => integer
  *   )
  * )
- * @endcode
+ * ```
  *
  * On failure, the return array will be structured as follows:
- * @code
+ * ```
  * array(
  *   'is_error' => 1,
  *   'error_message' = string,
  *   'error_data' = mixed or undefined
  * )
- * @endcode
+ * ```
  *
  * @param array $params
  *   Input parameters:

@@ -50,7 +50,7 @@
         <tr id="row_{$row.id}" class="crm-pdfFormat {cycle values="odd-row,even-row"} {$row.class}">
             <td class="crm-pdfFormat-name">{$row.name}</td>
             <td class="crm-pdfFormat-description">{$row.description}</td>
-            <td class="crm-pdfFormat-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
+            <td class="crm-pdfFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
           <td class="crm-pdfFormat-order nowrap">{$row.weight}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
@@ -60,7 +60,7 @@
     </div>
 {else}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}None found.{/ts}
     </div>
 {/if}

@@ -96,7 +96,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    */
   public function postProcess($params = NULL) {
     $fv = $params ?: $this->controller->exportValues($this->_name);
-    $config = CRM_Core_Config::singleton();
     $locName = NULL;
     //get the address format sequence from the config file
     $mailingFormat = Civi::settings()->get('mailing_format');
@@ -146,15 +145,12 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $returnProperties['last_name'] = 1;
     }
 
-    $individualFormat = FALSE;
-
     /*
      * CRM-8338: replace ids of household members with the id of their household
      * so we can merge labels by household.
      */
     if (isset($fv['merge_same_household'])) {
       $this->mergeContactIdsByHousehold();
-      $individualFormat = TRUE;
     }
 
     //get the contacts information
@@ -200,13 +196,12 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     //get the total number of contacts to fetch from database.
     $numberofContacts = count($this->_contactIds);
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts, TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, $primaryLocationOnly);
+    [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts, TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, $primaryLocationOnly);
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
 
-    // $details[0] is an array of [ contactID => contactDetails ]
+    // $details is an array of [ contactID => contactDetails ]
     // also get all token values
-    CRM_Utils_Hook::tokenValues($details[0],
+    CRM_Utils_Hook::tokenValues($details,
       $this->_contactIds,
       NULL,
       $messageToken,
@@ -224,11 +219,11 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     foreach ($this->_contactIds as $value) {
       foreach ($custom as $cfID) {
-        if (isset($details[0][$value]["custom_{$cfID}"])) {
-          $details[0][$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[0][$value]["custom_{$cfID}"], $cfID);
+        if (isset($details[$value]["custom_{$cfID}"])) {
+          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
         }
       }
-      $contact = $details['0'][$value] ?? NULL;
+      $contact = $details[$value] ?? NULL;
 
       if (is_a($contact, 'CRM_Core_Error')) {
         return NULL;
@@ -271,7 +266,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
                   'im',
                   'openid',
                 ])) {
-                  if ($k == 'im') {
+                  if ($k === 'im') {
                     $rows[$value][$k] = $v['1']['name'];
                   }
                   else {

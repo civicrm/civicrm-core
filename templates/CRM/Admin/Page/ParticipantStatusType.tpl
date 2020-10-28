@@ -33,9 +33,9 @@
           <td class="crmf-label crm-editable" data-field="label">{$row.label}</td>
           <td class="crmf-name">{$row.name} ({$row.id})</td>
           <td class="crmf-class {if !$row.is_reserved} crm-editable {/if}" data-type="select">{$row.class}</td>
-          <td class="center crmf-is_reserved">{if $row.is_reserved}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Reserved{/ts}" />{/if}</td>
+          <td class="center crmf-is_reserved">{icon condition=$row.is_reserved}{ts}Reserved{/ts}{/icon}</td>
         <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td class="center crmf-is_counted">{if $row.is_counted} <img src="{$config->resourceBase}i/check.gif" alt="{ts}Counted{/ts}" />{/if}</td>
+          <td class="center crmf-is_counted">{icon condition=$row.is_counted}{ts}Counted{/ts}{/icon}</td>
           <td class="crmf-weight">{$row.weight}</td>
           <td class="crmf-visibility">{$row.visibility}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>

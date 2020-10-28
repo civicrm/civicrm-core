@@ -29,6 +29,9 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
     parent::preProcess();
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function buildQuickForm() {
     $parent = $this->controller->getParent();
     $nameTextLabel = ($parent->_sms) ? ts('SMS Name') : ts('Mailing Name');
@@ -44,6 +47,8 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
 
+    CRM_Mailing_BAO_Query::buildSearchForm($this);
+
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
     // CRM-15434 - Fix mailing search by status in non-English languages
@@ -52,7 +57,6 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
       $this->addElement('checkbox', "mailing_status[$statusId]", NULL, $statusName);
     }
     $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
-    $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     // Search by language, if multi-lingual
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
@@ -77,9 +81,11 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = $statusVals = [];
+    $entityDefaults = parent::setDefaultValues();
     $parent = $this->controller->getParent();
 
     if ($parent->get('unscheduled')) {
@@ -99,11 +105,15 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
     if ($parent->_sms) {
       $defaults['sms'] = 1;
     }
-    return $defaults;
+    return array_merge($defaults, $entityDefaults);
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function postProcess() {
-    $params = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
+    $params = $this->_formValues;
 
     if (!empty($params['mailing_relative'])) {
       list($params['mailing_low'], $params['mailing_high']) = CRM_Utils_Date::getFromTo($params['mailing_relative'], $params['mailing_low'], $params['mailing_high']);
@@ -139,6 +149,28 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
         }
       }
     }
+  }
+
+  /**
+   * Handle force=1 in the url.
+   *
+   * Search field metadata is normally added in buildForm but we are bypassing that in this flow
+   * (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function handleForcedSearch() {
+    $this->setSearchMetadata();
+    $this->addContactSearchFields();
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Mailing' => CRM_Mailing_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }

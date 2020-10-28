@@ -10,14 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
-/**
  * This class is used by the Search functionality.
  *
  *  - the search controller is used for building/processing multiform
@@ -30,12 +22,16 @@
  */
 class CRM_Event_Controller_Search extends CRM_Core_Controller {
 
+  protected $entity = 'Participant';
+
   /**
    * Class constructor.
    *
    * @param string $title
    * @param bool|int $action
    * @param bool $modal
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
 
@@ -62,6 +58,7 @@ class CRM_Event_Controller_Search extends CRM_Core_Controller {
 
     // add all the actions
     $this->addActions($uploadDir, $uploadNames);
+    $this->set('entity', $this->entity);
   }
 
 }

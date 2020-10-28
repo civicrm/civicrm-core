@@ -32,9 +32,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -246,7 +245,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
           ],
         ],
         'order_bys' => [
@@ -301,8 +300,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_INT,
             'type' => CRM_Utils_Type::T_INT,
           ],
-          'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
-          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
+          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
           'contribution_source' => [
             'title' => ts('Source'),
             'name' => 'source',
@@ -318,6 +317,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         'order_bys' => [
           'contribution_id' => ['title' => ts('Contribution #')],
           'contribution_status_id' => ['title' => ts('Contribution Status')],
+          'receive_date'  => ['title' => ts('Date Received')],
         ],
         'grouping' => 'contri-fields',
       ],
@@ -365,7 +365,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           ],
           'trxn_date' => [
             'title' => ts('Transaction Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
+            'operatorType' => CRM_Report_Form::OP_DATETIME,
             'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ],
           'status_id' => [
@@ -384,6 +384,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         ],
         'order_bys' => [
           'payment_instrument_id' => ['title' => ts('Payment Method')],
+          'trxn_date' => ['title' => ts('Transaction Date')],
         ],
       ],
       'civicrm_entity_financial_trxn' => [
@@ -517,52 +518,31 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     }
   }
 
-  public function where() {
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (in_array($fieldName, [
-            'credit_accounting_code',
-            'credit_name',
-            'credit_contact_id',
-          ])) {
-            $field['dbAlias'] = "CASE
+  /**
+   * overriding to modify dbAlias for few fields.
+   *
+   * @param array $field Field specifications
+   * @param string $op Query operator (not an exact match to sql)
+   * @param mixed $value
+   * @param float $min
+   * @param float $max
+   *
+   * @return null|string
+   */
+  public function whereClause(&$field, $op, $value, $min, $max) {
+    if ($field['alias'] == 'financial_account_civireport_credit' &&
+      in_array($field['name'], ['accounting_code', 'id', 'contact_id'])
+    ) {
+      $field['dbAlias'] = "CASE
               WHEN financial_trxn_civireport.from_financial_account_id IS NOT NULL
               THEN  financial_account_civireport_credit_1.{$field['name']}
               ELSE  financial_account_civireport_credit_2.{$field['name']}
               END";
-          }
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
-            $from = $this->_params["{$fieldName}_from"] ?? NULL;
-            $to = $this->_params["{$fieldName}_to"] ?? NULL;
+    }
 
-            $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-          }
-          else {
-            $op = $this->_params["{$fieldName}_op"] ?? NULL;
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-    if (empty($clauses)) {
-      $this->_where = 'WHERE ( 1 )';
-    }
-    else {
-      $this->_where = 'WHERE ' . implode(' AND ', $clauses);
-    }
+    $clause = parent::whereClause($field, $op, $value, $min, $max);
+
+    return $clause;
   }
 
   public function postProcess() {
@@ -643,6 +623,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $creditCardTypes = CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id');
     foreach ($rows as $rowNum => $row) {
+      $entryFound = FALSE;
       // convert display name to links
       if (array_key_exists('civicrm_contact_sort_name', $row) &&
         !empty($rows[$rowNum]['civicrm_contact_sort_name']) &&

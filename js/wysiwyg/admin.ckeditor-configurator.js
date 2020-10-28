@@ -65,15 +65,7 @@
   }
 
   function validateJson() {
-    var val = $(this).val();
-    $(this).parent().removeClass('crm-error');
-    if (val[0] === '[' || val[0] === '{') {
-      try {
-        JSON.parse(val);
-      } catch (e) {
-        $(this).parent().addClass('crm-error');
-      }
-    }
+    // TODO: strict json isn't required so we can't use JSON.parse for error checking. Need something like angular.eval.
   }
 
   function addOption() {
@@ -109,7 +101,7 @@
     var selectorOpen = false,
       changedWhileOpen = false;
 
-    $('#toolbarModifierForm')
+    $('#CKEditorConfig')
       .on('submit', function(e) {
         $('.toolbar button:last', '#toolbarModifierWrapper')[0].click();
         $('.configContainer textarea', '#toolbarModifierWrapper').attr('name', 'config');
@@ -117,7 +109,8 @@
       .on('change', '.config-param', function(e) {
         changedWhileOpen = true;
         if (!selectorOpen) {
-          $('#toolbarModifierForm').submit().block();
+          $('#_qf_CKEditorConfig_submit-bottom').click();
+          $('#CKEditorConfig').block();
         }
       })
       .on('change', 'input.crm-config-option-name', changeOptionName)

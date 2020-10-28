@@ -56,14 +56,13 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       }
     }
 
-    if (
-      function_exists('module_exists') &&
-      module_exists('views') &&
+    if ($config->userSystem->viewsExists() &&
       (
         $config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix)
       )
     ) {
-      $dsnArray = DB::parseDSN($config->dsn);
+      $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
+      $dsnArray = DB::parseDSN($dsn);
       $tableNames = CRM_Core_DAO::getTableNames();
       asort($tableNames);
       $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= array(';

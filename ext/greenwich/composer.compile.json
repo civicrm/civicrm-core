@@ -1,0 +1,14 @@
+{
+  "compile": [
+    {
+      "title": "Greenwich CSS (<comment>dist/bootstrap3.css</comment>)",
+      "run": [
+        "@php-eval \\CCL::copy('../../bower_components/select2/select2-bootstrap.css', 'extern/select2/select2-bootstrap.scss');",
+        "@php-method \\CCL\\Tasks::scss"
+      ],
+      "watch-files": ["scss", "../../bower_components/select2/select2-bootstrap.css"],
+      "scss-files": {"dist/bootstrap3.css": "scss/main.scss"},
+      "scss-imports": ["scss", "extern/bootstrap3/assets/stylesheets", "extern/select2"]
+    }
+  ]
+}

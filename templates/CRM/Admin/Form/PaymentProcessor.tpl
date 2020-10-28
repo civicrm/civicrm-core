@@ -14,7 +14,7 @@
 
 {if $action eq 8}
   <div class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {$deleteMessage|escape}
   </div>
 {else}
@@ -73,15 +73,17 @@
             <td class="label">{$form.subject.label}</td><td>{$form.subject.html} {help id=$ppTypeName|cat:'-live-subject' title=$form.subject.label}</td>
         </tr>
 {/if}
+{if $form.url_site}
         <tr class="crm-paymentProcessor-form-block-url_site">
             <td class="label">{$form.url_site.label}</td><td>{$form.url_site.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-live-url-site' title=$form.url_site.label}</td>
         </tr>
+{/if}
 {if $form.url_api}
         <tr class="crm-paymentProcessor-form-block-url_api">
             <td class="label">{$form.url_api.label}</td><td>{$form.url_api.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-live-url-api' title=$form.url_api.label}</td>
         </tr>
 {/if}
-{if $is_recur}
+{if $form.url_recur}
         <tr class="crm-paymentProcessor-form-block-url_recur">
             <td class="label">{$form.url_recur.label}</td><td>{$form.url_recur.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-live-url-recur' title=$form.url_recur.label}</td>
         </tr>
@@ -114,15 +116,17 @@
             <td class="label">{$form.test_subject.label}</td><td>{$form.test_subject.html} {help id=$ppTypeName|cat:'-test-subject' title=$form.test_subject.label}</td>
         </tr>
 {/if}
+{if $form.test_url_site}
         <tr class="crm-paymentProcessor-form-block-test_url_site">
             <td class="label">{$form.test_url_site.label}</td><td>{$form.test_url_site.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-test-url-site' title=$form.test_url_site.label}</td>
         </tr>
+{/if}
 {if $form.test_url_api}
         <tr class="crm-paymentProcessor-form-block-test_url_api">
             <td class="label">{$form.test_url_api.label}</td><td>{$form.test_url_api.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-test-url-api' title=$form.test_url_api.label}</td>
         </tr>
 {/if}
-{if $is_recur}
+{if $form.test_url_recur}
         <tr class="crm-paymentProcessor-form-block-test_url_recur">
             <td class="label">{$form.test_url_recur.label}</td><td>{$form.test_url_recur.html|crmAddClass:huge} {help id=$ppTypeName|cat:'-test-url-recur' title=$form.test_url_recur.label}</td>
         </tr>

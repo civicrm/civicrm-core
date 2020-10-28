@@ -14,12 +14,11 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
@@ -34,7 +33,6 @@ use Civi\Api4\Utils\ReflectionUtils;
  *  - Expose the param in the Api Explorer (be sure to add a doc-block as it displays in the help panel).
  *  - Require a value for the param if you add the "@required" annotation.
  *
- * @method $this setCheckPermissions(bool $value) Enable/disable permission checks
  * @method bool getCheckPermissions()
  * @method $this setDebug(bool $value) Enable/disable debug output
  * @method bool getDebug()
@@ -172,6 +170,15 @@ abstract class AbstractAction implements \ArrayAccess {
     if ($val !== 4 && $val !== '4') {
       throw new \API_Exception('Cannot modify api version');
     }
+    return $this;
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return $this
+   */
+  public function setCheckPermissions(bool $checkPermissions) {
+    $this->checkPermissions = $checkPermissions;
     return $this;
   }
 
@@ -400,13 +407,15 @@ abstract class AbstractAction implements \ArrayAccess {
       'default' => ['administer CiviCRM'],
     ];
     $action = $this->getActionName();
-    if (isset($permissions[$action])) {
-      return $permissions[$action];
-    }
-    elseif (in_array($action, ['getActions', 'getFields'])) {
-      return $permissions['meta'];
-    }
-    return $permissions['default'];
+    // Map specific action names to more generic versions
+    $map = [
+      'getActions' => 'meta',
+      'getFields' => 'meta',
+      'replace' => 'delete',
+      'save' => 'create',
+    ];
+    $generic = $map[$action] ?? 'default';
+    return $permissions[$action] ?? $permissions[$generic] ?? $permissions['default'];
   }
 
   /**
@@ -468,6 +477,42 @@ abstract class AbstractAction implements \ArrayAccess {
       }
     }
     return $unmatched;
+  }
+
+  /**
+   * Replaces pseudoconstants in input values
+   *
+   * @param array $record
+   * @throws \API_Exception
+   */
+  protected function formatWriteValues(&$record) {
+    $optionFields = [];
+    // Collect fieldnames with a :pseudoconstant suffix & remove them from $record array
+    foreach (array_keys($record) as $expr) {
+      $suffix = strrpos($expr, ':');
+      if ($suffix) {
+        $fieldName = substr($expr, 0, $suffix);
+        $field = $this->entityFields()[$fieldName] ?? NULL;
+        if ($field) {
+          $optionFields[$fieldName] = [
+            'val' => $record[$expr],
+            'field' => $field,
+            'suffix' => substr($expr, $suffix + 1),
+            'depends' => $field['input_attrs']['controlField'] ?? NULL,
+          ];
+          unset($record[$expr]);
+        }
+      }
+    }
+    // Sort option lookups by dependency, so e.g. country_id is processed first, then state_province_id, then county_id
+    uasort($optionFields, function ($a, $b) {
+      return $a['field']['name'] === $b['depends'] ? -1 : 1;
+    });
+    // Replace pseudoconstants. Note this is a reverse lookup as we are evaluating input not output.
+    foreach ($optionFields as $fieldName => $info) {
+      $options = FormattingUtil::getPseudoconstantList($info['field'], $info['suffix'], $record, 'create');
+      $record[$fieldName] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+    }
   }
 
   /**

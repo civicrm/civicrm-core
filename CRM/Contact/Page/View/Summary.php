@@ -114,8 +114,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $session->pushUserContext($url);
     $this->assignFieldMetadataToTemplate('Contact');
 
-    $params = array();
-    $defaults = array();
+    $params = [];
+    $defaults = [];
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
@@ -183,7 +183,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
     if (!empty($communicationStyle)) {
       if (!empty($defaults['communication_style_id'])) {
-        $defaults['communication_style_display'] = $communicationStyle[CRM_Utils_Array::value('communication_style_id', $defaults)];
+        $defaults['communication_style_display'] = $communicationStyle[$defaults['communication_style_id']];
       }
       else {
         // Make sure the field is displayed as long as it is active, even if it is unset for this contact.
@@ -218,7 +218,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // get contact name of shared contact names
-    $sharedAddresses = array();
+    $sharedAddresses = [];
     $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
     foreach ($defaults['address'] as $key => $addressValue) {
       if (!empty($addressValue['master_id']) &&
@@ -274,7 +274,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    */
   public function getTemplateFileName() {
     if ($this->_contactId) {
-      $contactSubtypes = $this->get('contactSubtype') ? explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();
+      $contactSubtypes = $this->get('contactSubtype') ? explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : [];
 
       // there could be multiple subtypes. We check templates for each of the subtype, and return the first one found.
       foreach ($contactSubtypes as $csType) {
@@ -420,14 +420,13 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
         'hideCount' => !$group['is_multiple'],
         'class' => 'livePage',
-        'icon' => 'crm-i fa-gear',
+        'icon' => 'crm-i ' . ($group['icon'] ?: 'fa-gear'),
       ];
       $weight += 10;
     }
 
+    // Allow other modules to add or remove tabs
     $context = ['contact_id' => $this->_contactId];
-    // see if any other modules want to add any tabs
-    CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
 
     // now sort the tabs based on weight

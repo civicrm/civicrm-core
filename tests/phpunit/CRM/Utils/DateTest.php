@@ -36,39 +36,52 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     return TRUE;
   }
 
-  public function fromToData() {
+  /**
+   * Used by testGetFromTo
+   */
+  private function fromToData() {
     $cases = [];
     // Absolute dates
-    $cases[] = ['20170901000000', '20170913235959', 0, '09/01/2017', '09/13/2017'];
+    $cases['absolute'] = [
+      'expectedFrom' => '20170901000000',
+      'expectedTo' => '20170913235959',
+      'relative' => 0,
+      'from' => '09/01/2017',
+      'to' => '09/13/2017',
+    ];
     // "Today" relative date filter
     $date = new DateTime();
-    $expectedFrom = $date->format('Ymd') . '000000';
-    $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = [$expectedFrom, $expectedTo, 'this.day', '', ''];
+    $cases['today'] = [
+      'expectedFrom' => $date->format('Ymd') . '000000',
+      'expectedTo' => $date->format('Ymd') . '235959',
+      'relative' => 'this.day',
+      'from' => '',
+      'to' => '',
+    ];
     // "yesterday" relative date filter
     $date = new DateTime();
     $date->sub(new DateInterval('P1D'));
-    $expectedFrom = $date->format('Ymd') . '000000';
-    $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = [$expectedFrom, $expectedTo, 'previous.day', '', ''];
+    $cases['yesterday'] = [
+      'expectedFrom' => $date->format('Ymd') . '000000',
+      'expectedTo' => $date->format('Ymd') . '235959',
+      'relative' => 'previous.day',
+      'from' => '',
+      'to' => '',
+    ];
     return $cases;
   }
 
   /**
    * Test that getFromTo returns the correct dates.
-   *
-   * @dataProvider fromToData
-   * @param $expectedFrom
-   * @param $expectedTo
-   * @param $relative
-   * @param $from
-   * @param $to
    */
-  public function testGetFromTo($expectedFrom, $expectedTo, $relative, $from, $to) {
-    $obj = new CRM_Utils_Date();
-    list($calculatedFrom, $calculatedTo) = $obj->getFromTo($relative, $from, $to);
-    $this->assertEquals($expectedFrom, $calculatedFrom);
-    $this->assertEquals($expectedTo, $calculatedTo);
+  public function testGetFromTo() {
+    $cases = $this->fromToData();
+    foreach ($cases as $caseDescription => $case) {
+      $obj = new CRM_Utils_Date();
+      list($calculatedFrom, $calculatedTo) = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
+      $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
+      $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
+    }
   }
 
   /**
@@ -289,6 +302,18 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%p"), "pm");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%P"), "PM");
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
+  }
+
+  /**
+   * Test Earlier Day Relative term to absolute
+   */
+  public function testRelativeEarlierDay() {
+    $date = CRM_Utils_Date::relativeToAbsolute('earlier', 'day');
+
+    $this->assertEquals([
+      'from' => NULL,
+      'to' => date('Ymd000000', strtotime('-1 day')),
+    ], $date);
   }
 
 }

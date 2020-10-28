@@ -52,13 +52,15 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     // on page refresh.
     $this->setAttribute('autocomplete', 'off');
 
-    $sendOptions = [
-      $this->createElement('radio', NULL, NULL, ts('Send immediately'), 'send_immediate', ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;']),
-      $this->createElement('radio', NULL, NULL, ts('Send at:'), 'send_later', ['id' => 'send_later']),
-    ];
-    $this->addGroup($sendOptions, 'send_option', '', '<br>');
+    $this->addRadio('send_option', '', [
+      'send_immediate' => ts('Send immediately'),
+      'send_later' => ts('Send at:'),
+    ], [], '<br>', FALSE, [
+      'send_immediate' => ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;'],
+      'send_later' => ['id' => 'send_later'],
+    ]);
 
-    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => time()]);
+    $this->add('datepicker', 'start_date', '', NULL, FALSE, ['minDate' => date('Y-m-d')]);
 
     $this->addFormRule(['CRM_SMS_Form_Schedule', 'formRule'], $this);
 

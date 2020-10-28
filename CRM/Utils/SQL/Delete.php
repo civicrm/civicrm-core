@@ -13,7 +13,7 @@
  * Dear God Why Do I Have To Write This (Dumb SQL Builder)
  *
  * Usage:
- * @code
+ * ```
  * $del = CRM_Utils_SQL_Delete::from('civicrm_activity act')
  *     ->where('activity_type_id = #type', array('type' => 234))
  *     ->where('status_id IN (#statuses)', array('statuses' => array(1,2,3))
@@ -24,7 +24,7 @@
  *        'value' => $form['foo']
  *      ))
  * echo $del->toSQL();
- * @endcode
+ * ```
  *
  * Design principles:
  *  - Portable
@@ -48,7 +48,7 @@
  * xor output. The notations for input and output interpolation are a bit different,
  * and they may not be mixed.
  *
- * @code
+ * ```
  * // Interpolate on input. Set params when using them.
  * $select->where('activity_type_id = #type', array(
  *   'type' => 234,
@@ -58,7 +58,7 @@
  * $select
  *     ->where('activity_type_id = #type')
  *     ->param('type', 234),
- * @endcode
+ * ```
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing

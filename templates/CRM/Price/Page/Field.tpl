@@ -15,7 +15,7 @@
   {include file="CRM/Price/Form/Preview.tpl"}
 {elseif ($usedBy and $action eq 8) or $usedBy.civicrm_event or $usedBy.civicrm_contribution_page}
   <div id="price_set_used_by" class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {if $action eq 8}
       {ts 1=$usedPriceSetTitle}Unable to delete the '%1' Price Field - it is currently in use by one or more active events or contribution pages or contributions  or event templates.{/ts}
     {/if}
@@ -89,7 +89,7 @@
 {else}
   {if $action eq 16}
     <div class="messages status no-popup crm-empty-table">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       {ts}None found.{/ts}
     </div>
     <div class="action-link">

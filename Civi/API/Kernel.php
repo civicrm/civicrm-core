@@ -83,7 +83,7 @@ class Kernel {
     }
     catch (\Exception $e) {
       if ($apiRequest) {
-        $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest, $this));
+        $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
       }
 
       if ($e instanceof \PEAR_Exception) {
@@ -197,7 +197,7 @@ class Kernel {
    */
   public function resolve($apiRequest) {
     /** @var \Civi\API\Event\ResolveEvent $resolveEvent */
-    $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest, $this));
+    $resolveEvent = $this->dispatcher->dispatch('civi.api.resolve', new ResolveEvent($apiRequest, $this));
     $apiRequest = $resolveEvent->getApiRequest();
     if (!$resolveEvent->getApiProvider()) {
       throw new \Civi\API\Exception\NotImplementedException("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
@@ -216,7 +216,7 @@ class Kernel {
    */
   public function authorize($apiProvider, $apiRequest) {
     /** @var \Civi\API\Event\AuthorizeEvent $event */
-    $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest, $this));
+    $event = $this->dispatcher->dispatch('civi.api.authorize', new AuthorizeEvent($apiProvider, $apiRequest, $this));
     if (!$event->isAuthorized()) {
       throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
     }
@@ -235,7 +235,7 @@ class Kernel {
    */
   public function prepare($apiProvider, $apiRequest) {
     /** @var \Civi\API\Event\PrepareEvent $event */
-    $event = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest, $this));
+    $event = $this->dispatcher->dispatch('civi.api.prepare', new PrepareEvent($apiProvider, $apiRequest, $this));
     return [$event->getApiProvider(), $event->getApiRequest()];
   }
 
@@ -253,7 +253,7 @@ class Kernel {
    */
   public function respond($apiProvider, $apiRequest, $result) {
     /** @var \Civi\API\Event\RespondEvent $event */
-    $event = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result, $this));
+    $event = $this->dispatcher->dispatch('civi.api.respond', new RespondEvent($apiProvider, $apiRequest, $result, $this));
     return $event->getResponse();
   }
 

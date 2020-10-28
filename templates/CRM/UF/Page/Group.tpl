@@ -26,7 +26,7 @@
         <a href="#" onclick="html_code.profile.select(); return false;" class="button"><span>Select HTML Code</span></a>
     </div>
     <div class="action-link">
-        &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}">&raquo;  {ts}Back to Profile Listings{/ts}</a>
+        &nbsp; <a href="{crmURL p='civicrm/admin/uf/group' q="reset=1"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i>  {ts}Back to Profile Listings{/ts}</a>
     </div>
     </form>
 
@@ -38,7 +38,7 @@
 <div class="crm-content-block crm-block">
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
-        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
+        <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
     </div>
     {/if}
     {if $rows}
@@ -77,7 +77,7 @@
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
                   {/if}
                 </td>
-                <td class="crmf-description crm-editable" data-type="textarea">{$row.description}</td>
+                <td class="crmf-description crm-editable" data-type="textarea">{$row.description|escape}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
@@ -90,7 +90,7 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
@@ -122,7 +122,7 @@
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
                   {/if}
                 </td>
-                <td>{$row.description}</td>
+                <td>{$row.description|escape}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
@@ -135,19 +135,19 @@
 
             {if NOT ($action eq 1 or $action eq 2)}
             <div class="crm-submit-buttons">
-                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
+                <a href="{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}" id="newCiviCRMProfile-bottom" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Profile{/ts}</span></a>
             </div>
             {/if}
             </div>
         </div>{* reserved profile*}
 
   </div>
-{include file="CRM/common/TabSelected.tpl" defaultTab="user-profiles"}
+{include file="CRM/common/TabHeader.tpl"}
 
     {else}
     {if $action ne 1} {* When we are adding an item, we should not display this message *}
        <div class="messages status no-popup">
-         <div class="icon inform-icon"></div> &nbsp;
+         {icon icon="fa-info-circle"}{/icon}
          {capture assign=crmURL}{crmURL p='civicrm/admin/uf/group/add' q='action=add&reset=1'}{/capture}{ts 1=$crmURL}No CiviCRM Profiles have been created yet. You can <a href='%1'>add one now</a>.{/ts}
        </div>
     {/if}

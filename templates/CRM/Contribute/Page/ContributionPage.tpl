@@ -16,7 +16,7 @@
     {if NOT ($action eq 1 or $action eq 2) }
       <table class="form-layout-compressed">
       <tr>
-      <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Contribution Page{/ts}</span></a></td>
+      <td><a href="{$newPageURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Contribution Page{/ts}</span></a></td>
             <td style="vertical-align: top"><a class="button" href="{crmURL p="civicrm/admin/pcp" q="reset=1"}"><span>{ts}Manage Personal Campaign Pages{/ts}</span></a> {help id="id-pcp-intro" file="CRM/PCP/Page/PCP.hlp"}</td>
       </tr>
       </table>
@@ -99,7 +99,7 @@
       </div>
       {else}
       <div class="messages status no-popup">
-             <div class="icon inform-icon"></div> &nbsp;
+             {icon icon="fa-info-circle"}{/icon}
              {ts 1=$newPageURL}No contribution pages have been created yet. Click <a accesskey="N" href='%1'>here</a> to create a new contribution page.{/ts}
       </div>
         {/if}

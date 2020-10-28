@@ -34,7 +34,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     /** @var \Drupal\user\Entity\User $account */
-    $account = entity_create('user');
+    $account = \Drupal::entityTypeManager()->getStorage('user')->create();
     $account->setUsername($params['cms_name'])->setEmail($params[$mail]);
 
     // Allow user to set password only if they are an admin or if
@@ -49,13 +49,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($user_register_conf != 'visitors' && !$user->hasPermission('administer users')) {
       $account->block();
     }
-    elseif (!$verify_mail_conf) {
+    elseif ($verify_mail_conf) {
       $account->activate();
     }
 
     // Validate the user object
     $violations = $account->validate();
     if (count($violations)) {
+      foreach ($violations as $violation) {
+        CRM_Core_Session::setStatus($violation->getPropertyPath() . ': ' . $violation->getMessage(), '', 'alert');
+      }
       return FALSE;
     }
 
@@ -95,7 +98,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     // If this is a user creating their own account, login them in!
-    if ($account->isActive() && $user->isAnonymous()) {
+    if (!$verify_mail_conf && $account->isActive() && $user->isAnonymous()) {
       \user_login_finalize($account);
     }
 
@@ -106,7 +109,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    $user = entity_load('user', $ufID);
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($ufID);
     if ($user && $user->getEmail() != $email) {
       $user->setEmail($email);
 
@@ -131,7 +134,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!empty($params['name'])) {
       $name = $params['name'];
 
-      $user = entity_create('user');
+      $user = \Drupal::entityTypeManager()->getStorage('user')->create();
       $user->setUsername($name);
 
       // This checks for both username uniqueness and validity.
@@ -149,7 +152,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!empty($params['mail'])) {
       $mail = $params['mail'];
 
-      $user = entity_create('user');
+      $user = \Drupal::entityTypeManager()->getStorage('user')->create();
       $user->setEmail($mail);
 
       // This checks for both email uniqueness.
@@ -169,7 +172,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    return \Drupal::url('user.login', [], ['query' => $query]);
+    return \Drupal\Core\Url::fromRoute('user.login', [], ['query' => $query])->toString();
   }
 
   /**
@@ -280,7 +283,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE
+    $forceBackend = FALSE,
+    $htmlize = TRUE
   ) {
     $query = html_entity_decode($query);
 
@@ -408,7 +412,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $request = new \Symfony\Component\HttpFoundation\Request([], [], [], [], [], $_SERVER);
 
     // Create a kernel and boot it.
-    \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod')->prepareLegacyRequest($request);
+    $kernel = \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod');
+    $kernel->boot();
+    $kernel->preHandle($request);
+    $container = $kernel->rebuildContainer();
+    // Add our request to the stack and route context.
+    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
+    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
+    $container->get('request_stack')->push($request);
+    $container->get('router.request_context')->fromRequest($request);
 
     // Initialize Civicrm
     \Drupal::service('civicrm')->initialize();
@@ -418,7 +430,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     CRM_Utils_Hook::config($config);
 
     if ($loadUser) {
-      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getUsername()) {
+      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getAccountName()) {
         $this->loadUser($username);
       }
       elseif (!empty($params['name']) && !empty($params['pass']) && \Drupal::service('user.auth')->authenticate($params['name'], $params['pass'])) {
@@ -537,7 +549,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   public function getModules() {
     $modules = [];
 
-    $module_data = system_rebuild_module_data();
+    $module_data = \Drupal::service('extension.list.module')->reset()->getList();
     foreach ($module_data as $module_name => $extension) {
       if (!isset($extension->info['hidden']) && $extension->origin != 'core') {
         $extension->schema_version = drupal_get_installed_schema_version($module_name);
@@ -654,13 +666,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    *
    * For example, 'civicrm/contact/view?reset=1&cid=66' will be returned as:
    *
-   * @code
+   * ```
    * array(
    *   'path' => 'civicrm/contact/view',
    *   'route' => 'civicrm.civicrm_contact_view',
    *   'query' => array('reset' => '1', 'cid' => '66'),
    * );
-   * @endcode
+   * ```
    *
    * @param string $url
    *   The url to parse.
@@ -706,7 +718,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $timezone = drupal_get_user_timezone();
+    $timezone = date_default_timezone_get();
     return $timezone;
   }
 
@@ -801,6 +813,18 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getRoleNames() {
     return user_role_names();
+  }
+
+  /**
+   * Determine if the Views module exists.
+   *
+   * @return bool
+   */
+  public function viewsExists() {
+    if (\Drupal::moduleHandler()->moduleExists('views')) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

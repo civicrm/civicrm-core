@@ -167,25 +167,15 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
    * However, for Paypal Pro users payment express transactions can't work as they don't hold the component
    * which is required for them to be handled by either the Pro or Express class
    *
-   * So, the point of this test is simply to ensure it fails in a known way & with a better message than
-   * previously & that refactorings don't mess with that
-   *
-   * Obviously if the behaviour is fixed then the test should be updated!
+   * So, the point of this test is simply to ensure it fails in a known way
    */
   public function testIPNPaymentExpressNoError() {
     $this->setupRecurringPaymentProcessorTransaction();
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalExpressTransactionIPN());
-    try {
-      $paypalIPN->main();
-    }
-    catch (CRM_Core_Exception $e) {
-      $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
-      // no change
-      $this->assertEquals(2, $contribution['contribution_status_id']);
-      $this->assertEquals('Paypal IPNS not handled other than recurring_payments', $e->getMessage());
-      return;
-    }
-    $this->fail('The Paypal Express IPN should have caused an exception');
+    $paypalIPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
+    // no change
+    $this->assertEquals(2, $contribution['contribution_status_id']);
   }
 
   /**

@@ -6,6 +6,7 @@
   <name>civicrm_contribution</name>
   <add>1.3</add>
   <log>true</log>
+  <icon>fa-credit-card</icon>
   <field>
     <name>id</name>
     <uniqueName>contribution_id</uniqueName>
@@ -14,6 +15,9 @@
     <import>true</import>
     <title>Contribution ID</title>
     <comment>Contribution ID</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.3</add>
   </field>
   <primaryKey>
@@ -43,41 +47,8 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-    <name>solicitor_id</name>
-    <title>Solicitor ID</title>
-    <type>int unsigned</type>
-    <comment>FK to Solicitor ID</comment>
-    <add>1.4</add>
-    <drop>2.2</drop>
-  </field>
-  <foreignKey>
-    <name>solicitor_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>1.4</add>
-    <drop>2.2</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
-    <name>contribution_type_id</name>
-    <title>Contribution Type</title>
-    <export>false</export>
-    <type>int unsigned</type>
-    <comment>FK to Contribution Type</comment>
-    <add>1.3</add>
-    <drop>4.3</drop>
-  </field>
-  <foreignKey>
-    <name>contribution_type_id</name>
-    <table>civicrm_contribution_type</table>
-    <key>id</key>
-    <add>1.3</add>
-    <drop>4.3</drop>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <comment>FK to Financial Type for (total_amount - non_deductible_amount).</comment>
     <pseudoconstant>
@@ -88,6 +59,7 @@
     <export>true</export>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
     <add>4.3</add>
   </field>
@@ -110,6 +82,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Contribution Page</label>
     </html>
     <add>1.5</add>
   </field>
@@ -354,16 +327,6 @@
     <html>
       <type>Text</type>
     </html>
-  </field>
-  <field>
-    <name>note</name>
-    <type>text</type>
-    <comment>Note and/or Comment.</comment>
-    <import>true</import>
-    <headerPattern>/Note|Comment/i</headerPattern>
-    <dataPattern>//</dataPattern>
-    <add>1.4</add>
-    <drop>1.7</drop>
   </field>
   <index>
     <name>UI_contrib_trxn_id</name>

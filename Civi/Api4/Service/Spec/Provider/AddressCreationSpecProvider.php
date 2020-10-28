@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -29,7 +27,6 @@ class AddressCreationSpecProvider implements Generic\SpecProviderInterface {
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
-    $spec->getFieldByName('contact_id')->setRequired(TRUE);
     $spec->getFieldByName('location_type_id')->setRequired(TRUE);
   }
 

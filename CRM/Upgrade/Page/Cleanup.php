@@ -38,7 +38,7 @@ class CRM_Upgrade_Page_Cleanup extends CRM_Core_Page {
     $postMessage = ts('You can <a href="%1">click here</a> to try running the 4.2 upgrade script again. <a href="%2" target="_blank">(Review upgrade documentation)</a>',
       [
         1 => CRM_Utils_System::url('civicrm/upgrade', 'reset=1'),
-        2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Upgrades',
+        2 => CRM_Utils_System::docURL2('sysadmin/upgrade', TRUE),
       ]);
     $template->assign('postMessage', $postMessage);
 

@@ -10,16 +10,13 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
 namespace Civi\Api4\Result;
 
+/**
+ * Class ReplaceResult
+ *
+ * @package Civi\Api4\Result
+ */
 class ReplaceResult extends \Civi\Api4\Generic\Result {
   /**
    * @var array

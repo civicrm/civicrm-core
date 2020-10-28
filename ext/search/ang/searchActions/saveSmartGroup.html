@@ -1,0 +1,33 @@
+<form id="bootstrap-theme">
+  <div ng-controller="SaveSmartGroup">
+    <input class="form-control" id="api-save-search-select-group" ng-model="model.id" crm-entityref="groupEntityRefParams" >
+    <label ng-show="!model.id">{{:: ts('Or') }}</label>
+    <input class="form-control" placeholder="{{:: ts('Create new group') }}" ng-model="model.title" ng-show="!model.id">
+    <hr />
+    <div class="form-inline">
+     <label for="api-save-search-select-column">{{:: ts('Contact Column:') }}</label>
+      <input id="api-save-search-select-column" ng-model="model.api_params.select[0]" class="form-control" crm-ui-select="{data: columns}"/>
+    </div>
+    <hr />
+    <label>{{:: ts('Description:') }}</label>
+    <textarea class="form-control" ng-model="model.description"></textarea>
+    <div class="form-inline">
+      <label>{{:: ts('Group Type:') }} </label>
+      <div class="checkbox" ng-repeat="option in groupOptions.group_type track by option.id">&nbsp;
+        <label>
+          <input type="checkbox" checklist-model="model.group_type" checklist-value="option.id">
+          {{ option.label }}
+        </label>&nbsp;
+      </div>
+    </div>
+    <div class="form-inline">
+      <label>{{:: ts('Visibility:') }}</label>
+      <select class="form-control" ng-model="model.visibility" ng-options="item.id as item.label for item in groupOptions.visibility track by item.id" crm-ui-select></select>
+    </div>
+    <hr />
+    <div class="buttons pull-right">
+      <button type="button" ng-click="cancel()" class="btn btn-danger">{{:: ts('Cancel') }}</button>
+      <button ng-click="save()" class="btn btn-primary" ng-disabled="!model.title && !model.id">{{:: ts('Save') }}</button>
+    </div>
+  </div>
+</form>

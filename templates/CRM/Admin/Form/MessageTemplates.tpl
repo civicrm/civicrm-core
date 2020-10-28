@@ -22,7 +22,7 @@
 <div class="form-item" id="message_templates">
 {if $action eq 8}
    <div class="messages status no-popup">
-       <div class="icon inform-icon"></div>
+       {icon icon="fa-info-circle"}{/icon}
        {ts 1=$msg_title|escape}Do you want to delete the message template '%1'?{/ts}
    </div>
 {else}

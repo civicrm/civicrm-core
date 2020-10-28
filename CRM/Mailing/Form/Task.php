@@ -29,14 +29,14 @@ class CRM_Mailing_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form_Task $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcessCommon(&$form) {
-    $values = $form->controller->exportValues($form->get('searchFormName'));
+    $values = $form->getSearchFormValues();
 
     $form->_task = $values['task'] ?? NULL;
-    $mailingTasks = CRM_Mailing_Task::tasks();
-    $form->assign('taskName', CRM_Utils_Array::value('task', $values));
 
     // ids are mailing event queue ids
     $ids = [];

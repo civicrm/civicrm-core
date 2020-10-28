@@ -10,12 +10,6 @@
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-/**
  * form to process actions on Membership
  */
 class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPage {
@@ -27,14 +21,18 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   protected $_memPriceSetId = NULL;
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('membership');
+  }
+
+  /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
-    //parent::setDefaultValues();
     $defaults = [];
     if (isset($this->_id)) {
       $defaults = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
@@ -94,7 +92,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   /**
    * Build the form object.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
@@ -207,12 +206,13 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
-   *
    * @param $files
    * @param int $contributionPageId
    *
    * @return bool|array
    *   mixed true or array of errors
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function formRule($params, $files, $contributionPageId = NULL) {
     $errors = [];
@@ -315,8 +315,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

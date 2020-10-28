@@ -151,7 +151,7 @@ if (isset($_REQUEST['seedLanguage']) and isset($langs[$_REQUEST['seedLanguage']]
   $tsLocale = $_REQUEST['seedLanguage'];
 }
 
-$config = CRM_Core_Config::singleton(FALSE);
+CRM_Core_Config::singleton(FALSE);
 $GLOBALS['civicrm_default_error_scope'] = NULL;
 
 // The translation files are in the parent directory (l10n)
@@ -480,11 +480,11 @@ class InstallRequirements {
         )
       )
       ) {
-        @$this->requireMySQLVersion("5.1",
+        @$this->requireMySQLVersion(CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           array(
             ts("MySQL %1 Configuration", array(1 => $dbName)),
-            ts("MySQL version at least %1", array(1 => '5.1')),
-            ts("MySQL version %1 or higher is required, you are running MySQL %2.", array(1 => '5.1', 2 => mysqli_get_server_info($this->conn))),
+            ts("MySQL version at least %1", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER)),
+            ts("MySQL version %1 or higher is required, you are running MySQL %2.", array(1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER, 2 => mysqli_get_server_info($this->conn))),
             ts("MySQL %1", array(1 => mysqli_get_server_info($this->conn))),
           )
         );
@@ -1069,8 +1069,14 @@ class InstallRequirements {
         return TRUE;
       }
       else {
-        $testDetails[2] .= "{$majorHas}.{$minorHas}.";
-        $this->error($testDetails);
+        $versionDetails = mysqli_query($this->conn, 'SELECT version() as version')->fetch_assoc();
+        if (version_compare($versionDetails['version'], $min) == -1) {
+          $testDetails[2] .= "{$majorHas}.{$minorHas}.";
+          $this->error($testDetails);
+        }
+        else {
+          return TRUE;
+        }
       }
     }
   }
@@ -1132,12 +1138,13 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $tempTableName . ' (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a temp table.');
       $this->error($testDetails);
     }
-    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
   }
 
   /**
@@ -1201,18 +1208,19 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE civicrm_install_temp_table_test (test text)');
+    $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('install')->getName();
+    $result = mysqli_query($conn, 'CREATE TEMPORARY TABLE ' . $tempTableName . ' (test text)');
     if (!$result) {
       $testDetails[2] = ts('Could not create a table in the database.');
       $this->error($testDetails);
       return;
     }
 
-    $result = mysqli_query($conn, 'LOCK TABLES civicrm_install_temp_table_test WRITE');
+    $result = mysqli_query($conn, 'LOCK TABLES ' . $tempTableName . ' WRITE');
     if (!$result) {
       $testDetails[2] = ts('Could not obtain a write lock for the database table.');
       $this->error($testDetails);
-      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
       return;
     }
 
@@ -1220,11 +1228,11 @@ class InstallRequirements {
     if (!$result) {
       $testDetails[2] = ts('Could not release the lock for the database table.');
       $this->error($testDetails);
-      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+      $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
       return;
     }
 
-    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE civicrm_install_temp_table_test');
+    $result = mysqli_query($conn, 'DROP TEMPORARY TABLE ' . $tempTableName);
   }
 
   /**

@@ -9,7 +9,7 @@
 *}
 {if $groupCount == 0 and $mailingCount == 0}
   <div class="status">
-  <div class="icon inform-icon"></div>
+  {icon icon="fa-info-circle"}{/icon}
         {ts}To send a Mass SMS, you must have a valid group of recipients - either at least one group that's a Mailing List{/ts}
   </div>
 {else}

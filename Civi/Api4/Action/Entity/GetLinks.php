@@ -14,8 +14,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 
@@ -35,16 +33,14 @@ class GetLinks extends \Civi\Api4\Generic\BasicGetAction {
     foreach ($schema->getTables() as $table) {
       $entity = CoreUtil::getApiNameFromTableName($table->getName());
       // Since this is an api function, exclude tables that don't have an api
-      if (class_exists('\Civi\Api4\\' . $entity)) {
+      if (strpos($entity, 'Custom_') === 0 || class_exists('\Civi\Api4\\' . $entity)) {
         $item = [
           'entity' => $entity,
           'table' => $table->getName(),
           'links' => [],
         ];
         foreach ($table->getTableLinks() as $link) {
-          $link = $link->toArray();
-          $link['entity'] = CoreUtil::getApiNameFromTableName($link['targetTable']);
-          $item['links'][] = $link;
+          $item['links'][] = $link->toArray();
         }
         $result[] = $item;
       }

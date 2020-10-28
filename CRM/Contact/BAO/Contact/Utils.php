@@ -80,7 +80,7 @@ class CRM_Contact_BAO_Contact_Utils {
       }
 
       $profileURL = CRM_Utils_System::url('civicrm/profile/view',
-        "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4"
+        "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
       $imageInfo[$contactType]['summary-link'] = '<a href="' . $profileURL . '" class="crm-summary-link">' . $imageInfo[$contactType]['image'] . '</a>';
@@ -1113,12 +1113,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
-    if (!CRM_Utils_String::stringContainsTokens($templateString)) {
-      // Skip expensive smarty processing.
-      return;
-    }
-    $smarty = CRM_Core_Smarty::singleton();
-    $templateString = $smarty->fetch("string:$templateString");
+    $templateString = CRM_Utils_String::parseOneOffStringThroughSmarty($templateString);
   }
 
   /**

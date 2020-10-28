@@ -159,6 +159,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     }
 
     // build where clause
+    // FIXME: This handles scheduled reminder of type "Event Name" and "Event Type", gives incorrect result on "Event Template".
     if (!empty($selectedValues)) {
       $valueField = ($this->id == \CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID) ? 'event_type_id' : 'id';
       $query->where("r.{$valueField} IN (@selectedValues)")
@@ -184,6 +185,51 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       }
     }
     return $query;
+  }
+
+  /**
+   * Determine whether a schedule based on this mapping should
+   * send to additional contacts.
+   *
+   * @param string $entityId Either an event ID/event type ID, or a set of event IDs/types separated
+   *  by the separation character.
+   */
+  public function sendToAdditional($entityId): bool {
+    $selectedValues = (array) \CRM_Utils_Array::explodePadded($entityId);
+    switch ($this->id) {
+      case self::EVENT_TYPE_MAPPING_ID:
+        $valueTable = 'e';
+        $valueField = 'event_type_id';
+        $templateReminder = FALSE;
+        break;
+
+      case self::EVENT_NAME_MAPPING_ID:
+        $valueTable = 'e';
+        $valueField = 'id';
+        $templateReminder = FALSE;
+        break;
+
+      case self::EVENT_TPL_MAPPING_ID:
+        $valueTable = 't';
+        $valueField = 'id';
+        $templateReminder = TRUE;
+        break;
+    }
+    // Don't send to additional recipients if this event is deleted or a template.
+    $query = new \CRM_Utils_SQL_Select('civicrm_event e');
+    $query
+      ->select('e.id')
+      ->where("e.is_template = 0")
+      ->where("e.is_active = 1");
+    if ($templateReminder) {
+      $query->join('r', 'INNER JOIN civicrm_event t ON e.template_title = t.template_title AND t.is_template = 1');
+    }
+    $sql = $query
+      ->where("{$valueTable}.{$valueField} IN (@selectedValues)")
+      ->param('selectedValues', $selectedValues)
+      ->toSQL();
+    $dao = \CRM_Core_DAO::executeQuery($sql);
+    return (bool) $dao->N;
   }
 
 }

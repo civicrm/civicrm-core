@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -98,7 +96,7 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
    */
   public function postProcess() {
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $invalidRowCount = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
@@ -141,7 +139,7 @@ class CRM_Member_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
       $mapperFields[] = implode(' - ', $header);
     }
-    $parser->run($fileName, $seperator,
+    $parser->run($fileName, $separator,
       $mapperFields,
       $skipColumnHeader,
       CRM_Import_Parser::MODE_IMPORT,

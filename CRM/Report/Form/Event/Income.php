@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Form_Event_Income extends CRM_Report_Form {
   const ROW_COUNT_LIMIT = 2;

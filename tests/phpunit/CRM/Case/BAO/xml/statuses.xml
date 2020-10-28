@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<CaseType>
+  <name>Housing Support</name>
+  <ActivityTypes></ActivityTypes>
+  <Statuses>
+    <Status>Ongoing</Status>
+    <Status>Completed</Status>
+    <Status>This &amp; That</Status>
+  </Statuses>
+  <ActivitySets></ActivitySets>
+  <CaseRoles></CaseRoles>
+</CaseType>
+

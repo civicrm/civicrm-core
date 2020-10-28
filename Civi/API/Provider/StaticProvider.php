@@ -29,10 +29,10 @@ class StaticProvider extends AdhocProvider {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESOLVE => [
+      'civi.api.resolve' => [
         ['onApiResolve', Events::W_MIDDLE],
       ],
-      Events::AUTHORIZE => [
+      'civi.api.authorize' => [
         ['onApiAuthorize', Events::W_MIDDLE],
       ],
     ];

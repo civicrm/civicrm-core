@@ -22,35 +22,35 @@
         </div>
     {/if}
     <table class="form-layout-compressed">
-        <tr class="crm-contribution-contributionpage-amount-form-block-is_monetary"><th scope="row" class="label" width="20%">{$form.is_monetary.label}</th>
+        <tr class="crm-contribution-contributionpage-amount-form-block-is_monetary"><td scope="row" class="label" width="20%">{$form.is_monetary.label}</td>
           <td>{$form.is_monetary.html}<br />
           <span class="description">{ts}Uncheck this box if you are using this contribution page for free membership signup ONLY, or to solicit in-kind / non-monetary donations such as furniture, equipment.. etc.{/ts}</span></td>
         </tr>
-        <tr class="crm-contribution-contributionpage-amount-form-block-currency"><th scope="row" class="label" width="20%">{$form.currency.label}</th>
+        <tr class="crm-contribution-contributionpage-amount-form-block-currency"><td scope="row" class="label" width="20%">{$form.currency.label}</td>
           <td>{$form.currency.html}<br />
           <span class="description">{ts}Select the currency to be used for contributions submitted from this contribution page.{/ts}</span></td>
         </tr>
         {if $paymentProcessor}
-          <tr class="crm-contribution-contributionpage-amount-form-block-payment_processor"><th scope="row" class="label" width="20%">{$form.payment_processor.label}</th>
+          <tr class="crm-contribution-contributionpage-amount-form-block-payment_processor"><td scope="row" class="label" width="20%">{$form.payment_processor.label}</td>
             <td>{$form.payment_processor.html}<br />
             <span class="description">{ts}Select the payment processor to be used for contributions submitted from this contribution page (unless you are soliciting non-monetary / in-kind contributions only).{/ts} {docURL page="user/contributions/payment-processors"}</span></td>
           </tr>
         {/if}
-        <tr class="crm-contribution-contributionpage-amount-form-block-is_pay_later"><th scope="row" class="label">{$form.is_pay_later.label}</th>
+        <tr class="crm-contribution-contributionpage-amount-form-block-is_pay_later"><td scope="row" class="label">{$form.is_pay_later.label}</td>
           <td>{$form.is_pay_later.html}<br />
           <span class="description">{ts}Check this box if you want to give users the option to submit payment offline (e.g. mail in a check, call in a credit card, etc.).{/ts}</span></td>
         </tr>
         <tr id="payLaterFields" class="crm-contribution-form-block-payLaterFields"><td>&nbsp;</td>
             <td>
             <table class="form-layout">
-                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text"><th scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</th>
+                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text"><td scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</td>
                 <td>{$form.pay_later_text.html|crmAddClass:big}<br />
                     <span class="description">{ts}Text displayed next to the checkbox for the 'pay later' option on the contribution form. You may include HTML formatting tags.{/ts}</span></td></tr>
-                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt"><th scope="row" class="label">{$form.pay_later_receipt.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}</th>
+                <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt"><td scope="row" class="label">{$form.pay_later_receipt.label} <span class="crm-marker" title="This field is required.">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}</td>
                 <td>{$form.pay_later_receipt.html|crmAddClass:big}<br />
                   <span class="description">{ts}Instructions added to Confirmation and Thank-you pages, as well as the confirmation email, when the user selects the 'pay later' option (e.g. 'Mail your check to ... within 3 business days.').{/ts}</span></td></tr>
 
-                <tr><th scope="row" class="label">{$form.is_billing_required.label}</th>
+                <tr><td scope="row" class="label">{$form.is_billing_required.label}</td>
                 <td>{$form.is_billing_required.html}<br />
                     <span class="description">{ts}Check this box to require users who select the pay later option to provide billing name and address.{/ts}</span>
                 </td></tr>
@@ -58,12 +58,12 @@
             </td>
         </tr>
         <tr class="crm-contribution-contributionpage-amount-form-block-amount_block_is_active">
-          <th scope="row" class="label">{$form.amount_block_is_active.label}</th>
+          <td scope="row" class="label">{$form.amount_block_is_active.label}</td>
           <td>{$form.amount_block_is_active.html}<br />
           <span class="description">{ts}Uncheck this box if you are using this contribution page for membership signup and renewal only &ndash; and you do NOT want users to select or enter any additional contribution amounts.{/ts}</span></td>
         </tr>
         <tr id="priceSet" class="crm-contribution-contributionpage-amount-form-block-priceSet">
-          <th scope="row" class="label">{$form.price_set_id.label}</th>
+          <td scope="row" class="label">{$form.price_set_id.label}</td>
           {if $price eq true}
              <td>{$form.price_set_id.html}<br /><span class="description">{ts 1=$adminPriceSets}Select a pre-configured Price Set to offer multiple individually priced options for contributions. Otherwise, select &quot;-none-&quot; and enter one or more fixed contribution options in the table below. Create or edit Price Sets <a href='%1'>here</a>.{/ts}</span></td>
           {else}
@@ -77,7 +77,7 @@
 
 
   {if $recurringPaymentProcessor}
-        <tr id="recurringContribution" class="crm-contribution-form-block-is_recur"><th scope="row" class="label" width="20%">{$form.is_recur.label}</th>
+        <tr id="recurringContribution" class="crm-contribution-form-block-is_recur"><td scope="row" class="label" width="20%">{$form.is_recur.label}</td>
                <td>{$form.is_recur.html}<br />
                   <span class="description">{ts}Check this box if you want to give users the option to make recurring contributions. This feature requires that you use a payment processor which supports recurring billing / subscriptions functionality.{/ts} {docURL page="user/contributions/payment-processors"}</span>
                </td>
@@ -85,15 +85,15 @@
         <tr id="recurFields" class="crm-contribution-form-block-recurFields"><td>&nbsp;</td>
                <td>
                   <table class="form-layout-compressed">
-            <tr class="crm-contribution-form-block-recur_frequency_unit"><th scope="row" class="label">{$form.recur_frequency_unit.label}<span class="crm-marker" title="This field is required.">*</span></th>
+            <tr class="crm-contribution-form-block-recur_frequency_unit"><td scope="row" class="label">{$form.recur_frequency_unit.label}<span class="crm-marker" title="This field is required.">*</span></td>
                         <td>{$form.recur_frequency_unit.html}<br />
                         <span class="description">{ts}Select recurring units supported for recurring payments.{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-is_recur_interval"><th scope="row" class="label">{$form.is_recur_interval.label}</th>
+                    <tr class="crm-contribution-form-block-is_recur_interval"><td scope="row" class="label">{$form.is_recur_interval.label}</td>
                         <td>{$form.is_recur_interval.html}<br />
                         <span class="description">{ts}Can users also set an interval (e.g. every '3' months)?{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-is_recur_installments"><th scope="row" class="label">{$form.is_recur_installments.label}</th>
+                    <tr class="crm-contribution-form-block-is_recur_installments"><td scope="row" class="label">{$form.is_recur_installments.label}</td>
                         <td>{$form.is_recur_installments.html}<br />
                         <span class="description">{ts}Give the user a choice of installments (e.g. donate every month for 6 months)? If not, recurring donations will continue indefinitely.{/ts}</span></td>
                     </tr>
@@ -114,35 +114,35 @@
         <table class="form-layout-compressed">
             {* handle CiviPledge fields *}
             {if $civiPledge}
-            <tr class="crm-contribution-form-block-is_pledge_active"><th scope="row" class="label" width="20%">{$form.is_pledge_active.label}</th>
+            <tr class="crm-contribution-form-block-is_pledge_active"><td scope="row" class="label" width="20%">{$form.is_pledge_active.label}</td>
                 <td>{$form.is_pledge_active.html}<br />
                     <span class="description">{ts}Check this box if you want to give users the option to make a Pledge (a commitment to contribute a fixed amount on a recurring basis).{/ts}</span>
                 </td>
             </tr>
             <tr id="pledgeFields" class="crm-contribution-form-block-pledgeFields"><td></td><td>
                 <table class="form-layout-compressed">
-                    <tr class="crm-contribution-form-block-pledge_frequency_unit"><th scope="row" class="label">{$form.pledge_frequency_unit.label}<span class="crm-marker"> *</span></th>
+                    <tr class="crm-contribution-form-block-pledge_frequency_unit"><td scope="row" class="label">{$form.pledge_frequency_unit.label}<span class="crm-marker"> *</span></td>
                         <td>{$form.pledge_frequency_unit.html}<br />
                             <span class="description">{ts}Which frequencies can the user pick from (e.g. every 'week', every 'month', every 'year')?{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-is_pledge_interval"><th scope="row" class="label">{$form.is_pledge_interval.label}</th>
+                    <tr class="crm-contribution-form-block-is_pledge_interval"><td scope="row" class="label">{$form.is_pledge_interval.label}</td>
                         <td>{$form.is_pledge_interval.html}<br />
                             <span class="description">{ts}Can they also set an interval (e.g. every '3' months)?{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-initial_reminder_day"><th scope="row" class="label">{$form.initial_reminder_day.label}</th>
+                    <tr class="crm-contribution-form-block-initial_reminder_day"><td scope="row" class="label">{$form.initial_reminder_day.label}</td>
                         <td>{$form.initial_reminder_day.html}
                             <span class="label">{ts}Days prior to each scheduled payment due date.{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-max_reminders"><th scope="row" class="label">{$form.max_reminders.label}</th>
+                    <tr class="crm-contribution-form-block-max_reminders"><td scope="row" class="label">{$form.max_reminders.label}</td>
                         <td>{$form.max_reminders.html}
                             <span class="label">{ts}Reminders for each scheduled payment.{/ts}</span></td>
                     </tr>
-                    <tr class="crm-contribution-form-block-additional_reminder_day"><th scope="row" class="label">{$form.additional_reminder_day.label}</th>
+                    <tr class="crm-contribution-form-block-additional_reminder_day"><td scope="row" class="label">{$form.additional_reminder_day.label}</td>
                         <td>{$form.additional_reminder_day.html}
                             <span class="label">{ts}Days after the last one sent, up to the maximum number of reminders.{/ts}</span></td>
                     </tr>
                 {if $futurePaymentProcessor}
-                    <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><th scope="row" class="label">{$form.adjust_recur_start_date.label}</th>
+                    <tr id="adjustRecurringFields" class="crm-contribution-form-block-adjust_recur_start_date"><td scope="row" class="label">{$form.adjust_recur_start_date.label}</td>
                         <td>{$form.adjust_recur_start_date.html}<br/>
                           <div id="recurDefaults">
                             <span class="description">{$form.pledge_default_toggle.label}</span>
@@ -167,19 +167,19 @@
             {/if}
 
       <tr class="crm-contribution-form-block-amount_label">
-              <th scope="row" class="label" width="20%">{$form.amount_label.label}<span class="crm-marker"> *</span></th>
+              <td scope="row" class="label" width="20%">{$form.amount_label.label}<span class="crm-marker"> *</span></td>
         <td>{$form.amount_label.html}</td>
       </tr>
-            <tr class="crm-contribution-form-block-is_allow_other_amount"><th scope="row" class="label" width="20%">{$form.is_allow_other_amount.label}</th>
+            <tr class="crm-contribution-form-block-is_allow_other_amount"><td scope="row" class="label" width="20%">{$form.is_allow_other_amount.label}</td>
             <td>{$form.is_allow_other_amount.html}<br />
             <span class="description">{ts}Check this box if you want to give users the option to enter their own contribution amount. Your page will then include a text field labeled <strong>Other Amount</strong>.{/ts}</span></td></tr>
 
             <tr id="minMaxFields" class="crm-contribution-form-block-minMaxFields"><td>&nbsp;</td><td>
                <table class="form-layout-compressed">
-                <tr class="crm-contribution-form-block-min_amount"><th scope="row" class="label">{$form.min_amount.label}</th>
-                <td>{$form.min_amount.html|crmMoney}</td></tr>
-                <tr class="crm-contribution-form-block-max_amount"><th scope="row" class="label">{$form.max_amount.label}</th>
-                <td>{$form.max_amount.html|crmMoney}<br />
+                <tr class="crm-contribution-form-block-min_amount"><td scope="row" class="label">{$form.min_amount.label}</td>
+                <td>{$form.min_amount.html}</td></tr>
+                <tr class="crm-contribution-form-block-max_amount"><td scope="row" class="label">{$form.max_amount.label}</td>
+                <td>{$form.max_amount.html}<br />
                 <span class="description">{ts 1=5|crmMoney}If you have chosen to <strong>Allow Other Amounts</strong>, you can use the fields above to control minimum and/or maximum acceptable values (e.g. don't allow contribution amounts less than %1).{/ts}</span></td></tr>
                </table>
             </td></tr>
@@ -191,10 +191,10 @@
                   </div>
                     <br />
                     <table id="map-field-table">
-                        <tr class="columnheader" ><th scope="column">{ts}Contribution Label{/ts}</th><th scope="column">{ts}Amount{/ts}</th><th scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</th></tr>
+                        <tr class="columnheader" ><td scope="column">{ts}Contribution Label{/ts}</td><td scope="column">{ts}Amount{/ts}</td><td scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</td></tr>
                         {section name=loop start=1 loop=11}
                             {assign var=idx value=$smarty.section.loop.index}
-                            <tr><td class="even-row">{$form.label.$idx.html}</td><td>{$form.value.$idx.html|crmMoney}</td><td class="even-row">{$form.default.$idx.html}</td></tr>
+                            <tr><td class="even-row">{$form.label.$idx.html}</td><td>{$form.value.$idx.html}</td><td class="even-row">{$form.default.$idx.html}</td></tr>
                         {/section}
                     </table>
               </fieldset>

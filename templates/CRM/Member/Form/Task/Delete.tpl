@@ -10,7 +10,7 @@
 {* Confirmation of membership deletes  *}
 <div class="crm-block crm-form-block crm-member-task-delete-form-block">
   <div class="messages status no-popup">
-     <div class="icon inform-icon"></div>
+     {icon icon="fa-info-circle"}{/icon}
         <span>{ts}Are you sure you want to delete the selected memberships? This delete operation cannot be undone and will delete all transactions and activity associated with these memberships.{/ts}</span>
         <p>{include file="CRM/Member/Form/Task.tpl"}</p>
   </div>

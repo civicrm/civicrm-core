@@ -134,7 +134,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
     $activity = (object) $prefetch['activity'][$activityId];
 
-    if (in_array($field, ['activity_date_time', 'created_date'])) {
+    if (in_array($field, ['activity_date_time', 'created_date', 'modified_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity->$field));
     }
     elseif (isset($mapping[$field]) and (isset($activity->{$mapping[$field]}))) {
@@ -179,11 +179,12 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'subject' => ts('Activity Subject'),
         'details' => ts('Activity Details'),
         'activity_date_time' => ts('Activity Date-Time'),
+        'created_date' => ts('Activity Created Date'),
+        'modified_date' => ts('Activity Modified Date'),
         'activity_type_id' => ts('Activity Type ID'),
         'status' => ts('Activity Status'),
         'status_id' => ts('Activity Status ID'),
         'location' => ts('Activity Location'),
-        'created_date' => ts('Activity Creation Date'),
         'duration' => ts('Activity Duration'),
         'campaign' => ts('Activity Campaign'),
         'campaign_id' => ts('Activity Campaign ID'),

@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -210,7 +209,11 @@ SELECT module,is_reserved
 
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
-      $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
+      $this->addElement('xbutton', $this->_deleteButtonName, ts('Delete'), [
+        'type' => 'submit',
+        'value' => 1,
+        'class' => 'crm-button',
+      ]);
 
       return;
     }

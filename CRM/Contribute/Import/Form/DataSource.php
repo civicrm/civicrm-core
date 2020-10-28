@@ -31,19 +31,17 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     parent::buildQuickForm();
 
     $duplicateOptions = [];
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Insert new contributions'), CRM_Import_Parser::DUPLICATE_SKIP
-    );
-    $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update existing contributions'), CRM_Import_Parser::DUPLICATE_UPDATE
-    );
-    $this->addGroup($duplicateOptions, 'onDuplicate',
-      ts('Import mode')
-    );
+    $this->addRadio('onDuplicate', ts('Import mode'), [
+      CRM_Import_Parser::DUPLICATE_SKIP => ts('Insert new contributions'),
+      CRM_Import_Parser::DUPLICATE_UPDATE => ts('Update existing contributions'),
+    ]);
 
     $this->setDefaults(['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
-    $this->addElement('submit', 'loadMapping', ts('Load Mapping'), NULL, ['onclick' => 'checkSelect()']);
+    $this->addElement('xbutton', 'loadMapping', ts('Load Mapping'), [
+      'type' => 'submit',
+      'onclick' => 'checkSelect()',
+    ]);
 
     $this->addContactTypeSelector();
   }

@@ -91,7 +91,7 @@
     <div id='{$dialogId}' class="hiddenElement"></div>
   {elseif !$records}
     <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>
+      {icon icon="fa-info-circle"}{/icon}
       &nbsp;
       {ts 1=$customGroupTitle}No records of type '%1' found.{/ts}
     </div>
@@ -102,10 +102,10 @@
     <div class="action-link">
       {if $pageViewType eq 'customDataView'}
         <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$newCgCount&multiRecordDisplay=single&mode=add"}"
-         class="button action-item"><span><i class="crm-i fa-plus-circle"></i> {ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
+         class="button action-item"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
       {else}
         <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
-         class="button action-item"><span><i class="crm-i fa-plus-circle"></i> {ts}Add New Record{/ts}</span></a>
+         class="button action-item"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add New Record{/ts}</span></a>
       {/if}
     </div>
     <br />

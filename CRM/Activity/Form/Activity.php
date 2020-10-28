@@ -503,6 +503,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     if ($this->_action & CRM_Core_Action::VIEW) {
+      $this->_values['details'] = CRM_Utils_String::purifyHtml($this->_values['details'] ?? '');
       $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$this->_activityId}&action=view&cid={$this->_values['source_contact_id']}");
       CRM_Utils_Recent::add(CRM_Utils_Array::value('subject', $this->_values, ts('(no subject)')),
         $url,
@@ -582,7 +583,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     if (empty($defaults['priority_id'])) {
       $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
-      $defaults['priority_id'] = array_search('Normal', $priority);
+      $defaults['priority_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'priority_id', 'Normal');
     }
     if (empty($defaults['status_id'])) {
       $defaults['status_id'] = CRM_Core_OptionGroup::getDefaultValue('activity_status');
@@ -627,10 +628,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     $element = $this->add('select', 'activity_type_id', ts('Activity Type'),
-      ['' => '- ' . ts('select') . ' -'] + $this->_fields['followup_activity_type_id']['attributes'],
+      $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, [
         'onchange' => "CRM.buildCustomData( 'Activity', this.value, false, false, false, false, false, false, {$this->_currentlyViewedContactId});",
         'class' => 'crm-select2 required',
+        'placeholder' => TRUE,
       ]
     );
 
@@ -694,7 +696,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $responseOptions = CRM_Campaign_BAO_Survey::getResponsesOptions($surveyId);
         if ($responseOptions) {
           $this->add('select', 'result', ts('Result'),
-            ['' => ts('- select -')] + array_combine($responseOptions, $responseOptions)
+            array_combine($responseOptions, $responseOptions),
+            FALSE, ['placeholder' => TRUE]
           );
         }
         $surveyTitle = NULL;

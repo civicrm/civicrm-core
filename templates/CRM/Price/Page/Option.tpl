@@ -13,7 +13,7 @@
 {elseif $usedBy}
   <div class='spacer'></div>
   <div id="price_set_used_by" class="messages status no-popup">
-    <div class="icon inform-icon"></div>
+    {icon icon="fa-info-circle"}{/icon}
     {if $action eq 8}
       {ts 1=$usedPriceSetTitle}Unable to delete the '%1' Price Field Option - it is currently in use by one or more active events  or contribution pages or contributions.{/ts}
     {/if}
@@ -68,7 +68,7 @@
                 <td class="crm-price-option-count">{$row.count}</td>
                 <td class="crm-price-option-max">{$row.max_value}</td>
               {/if}
-              <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
+              <td class="crm-price-option-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}</td>
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight}</td>
               {if $getTaxDetails}

@@ -20,7 +20,7 @@
               <tr>
                 {include file="CRM/common/tasks.tpl" location="botton"}
                 {if $instanceUrl}
-                  <td>&nbsp;&nbsp;&raquo;&nbsp;<a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a></td>
+                  <td>&nbsp;&nbsp;<i class="crm-i fa-chevron-right" aria-hidden="true"></i> <a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a></td>
                 {/if}
               </tr>
             </table>
@@ -42,7 +42,7 @@
                       (function($) {
                         $('#groups').val('').change(function() {
                           CRM.confirm({
-                            message: ts({/literal}'{ts escape='js' 1='<em>%1</em>'}Add all contacts to %1 group?{/ts}'{literal}, {1: $('option:selected', '#groups').text()})
+                            message: ts({/literal}'{ts escape='js' 1='<em>%1</em>'}Add all contacts to %1 group?{/ts}'{literal}, {1: CRM._.escape($('option:selected', '#groups').text())})
                           })
                             .on({
                               'crmConfirm:yes': function() {

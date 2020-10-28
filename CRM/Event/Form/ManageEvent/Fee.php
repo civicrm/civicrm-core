@@ -289,7 +289,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
       // value
       $this->add('text', "value[$i]", ts('Value'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_OptionValue', 'value'));
-      $this->addRule("value[$i]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+      $this->addRule("value[$i]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
       // default
       $default[] = $this->createElement('radio', NULL, NULL, NULL, $i);
@@ -355,8 +355,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->add('datepicker', 'discount_end_date[' . $i . ']', ts('Discount End Date'), [], FALSE, ['time' => FALSE]);
     }
     $_showHide->addToTemplate();
-    $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
-      ['class' => 'crm-form-submit cancel']
+    $this->addElement('xbutton', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
+      [
+        'type' => 'submit',
+        'class' => 'crm-form-submit cancel',
+        'value' => 1,
+      ]
     );
     if (Civi::settings()->get('deferred_revenue_enabled')) {
       $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
@@ -515,7 +519,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       // value
       for ($j = 1; $j <= self::NUM_DISCOUNT; $j++) {
         $this->add('text', "discounted_value[$i][$j]", ts('Value'), ['size' => 10]);
-        $this->addRule("discounted_value[$i][$j]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+        $this->addRule("discounted_value[$i][$j]", ts('Please enter a valid money value for this field (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
       }
 
       // default
@@ -541,7 +545,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     }
 
     if (!empty($params['payment_processor'])) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, array_keys($params['payment_processor']));
+      $params['payment_processor'] = array_keys($params['payment_processor']);
     }
     else {
       $params['payment_processor'] = 'null';
@@ -810,7 +814,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         $params['value'][$index] = CRM_Utils_Rule::cleanMoney(trim($value));
       }
     }
-    foreach ($params['discounted_value'] as $index => $discountedValueSet) {
+    foreach ($params['discounted_value'] ?? [] as $index => $discountedValueSet) {
       foreach ($discountedValueSet as $innerIndex => $value) {
         if (CRM_Utils_System::isNull($value)) {
           unset($params['discounted_value'][$index][$innerIndex]);

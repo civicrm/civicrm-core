@@ -27,10 +27,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    */
   public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
-      CRM_Core_Error::fatal(ts('Case Id not found.'));
+      CRM_Core_Error::statusBounce(ts('Case Id not found.'));
     }
     if (count($form->_caseId) != 1) {
-      CRM_Core_Resources::fatal(ts('Expected one case-type'));
+      CRM_Core_Error::statusBounce(ts('Expected one case-type'));
     }
   }
 
@@ -128,7 +128,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       !$caseId ||
       !$caseType
     ) {
-      CRM_Core_Error::fatal('Required parameter missing for ChangeCaseType - end post processing');
+      CRM_Core_Error::statusBounce('Required parameter missing for ChangeCaseType - end post processing');
     }
 
     $config = CRM_Core_Config::singleton();
@@ -199,7 +199,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
       $newActivity = CRM_Activity_BAO_Activity::create($openCaseParams);
       if (is_a($newActivity, 'CRM_Core_Error')) {
-        CRM_Core_Error::fatal('Unable to update Open Case activity');
+        CRM_Core_Error::statusBounce('Unable to update Open Case activity');
       }
       else {
         // Create linkage to case

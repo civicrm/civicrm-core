@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Report_Utils_Report {
 
@@ -31,8 +29,7 @@ class CRM_Report_Utils_Report {
       );
     }
     else {
-      $config = CRM_Core_Config::singleton();
-      $args = explode('/', $_GET[$config->userFrameworkURLVar]);
+      $args = explode('/', CRM_Utils_System::currentPath());
 
       // remove 'civicrm/report' from args
       array_shift($args);
@@ -212,10 +209,6 @@ WHERE  inst.report_id = %1";
     //Force a download and name the file using the current timestamp.
     $datetime = date('Ymd-Gi', $_SERVER['REQUEST_TIME']);
     CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename=Report_' . $datetime . '.csv');
-    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
-    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
-    // and it continues to work on Libre Office, Numbers, Notes etc.
-    echo "\xEF\xBB\xBF";
     echo self::makeCsv($form, $rows);
     CRM_Utils_System::civiExit();
   }
@@ -231,7 +224,11 @@ WHERE  inst.report_id = %1";
    */
   public static function makeCsv(&$form, &$rows) {
     $config = CRM_Core_Config::singleton();
-    $csv = '';
+
+    // Output UTF BOM so that MS Excel copes with diacritics. This is recommended as
+    // the Windows variant but is tested with MS Excel for Mac (Office 365 v 16.31)
+    // and it continues to work on Libre Office, Numbers, Notes etc.
+    $csv = "\xEF\xBB\xBF";
 
     // Add headers if this is the first row.
     $columnHeaders = array_keys($form->_columnHeaders);
@@ -254,7 +251,7 @@ WHERE  inst.report_id = %1";
         $value = $row[$v] ?? NULL;
         if (isset($value)) {
           // Remove HTML, unencode entities, and escape quotation marks.
-          $value = str_replace('"', '""', html_entity_decode(strip_tags($value)));
+          $value = str_replace('"', '""', html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML401));
 
           if (CRM_Utils_Array::value('type', $form->_columnHeaders[$v]) & 4) {
             if (CRM_Utils_Array::value('group_by', $form->_columnHeaders[$v]) == 'MONTH' ||
@@ -298,15 +295,10 @@ WHERE  inst.report_id = %1";
    */
   public static function getInstanceID() {
 
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
-    if ($arg[1] == 'report' &&
-      CRM_Utils_Array::value(2, $arg) == 'instance'
-    ) {
-      if (CRM_Utils_Rule::positiveInteger($arg[3])) {
-        return $arg[3];
-      }
+    if (isset($arg[3]) && $arg[1] == 'report' && $arg[2] == 'instance' && CRM_Utils_Rule::positiveInteger($arg[3])) {
+      return $arg[3];
     }
   }
 
@@ -314,15 +306,11 @@ WHERE  inst.report_id = %1";
    * @return string
    */
   public static function getInstancePath() {
-    $config = CRM_Core_Config::singleton();
-    $arg = explode('/', $_GET[$config->userFrameworkURLVar]);
+    $arg = explode('/', CRM_Utils_System::currentPath());
 
-    if ($arg[1] == 'report' &&
-      CRM_Utils_Array::value(2, $arg) == 'instance'
-    ) {
+    if (isset($arg[3]) && $arg[1] == 'report' && $arg[2] == 'instance') {
       unset($arg[0], $arg[1], $arg[2]);
-      $path = trim(CRM_Utils_Type::escape(implode('/', $arg), 'String'), '/');
-      return $path;
+      return trim(CRM_Utils_Type::escape(implode('/', $arg), 'String'), '/');
     }
   }
 

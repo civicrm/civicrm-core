@@ -150,7 +150,7 @@ SELECT start_date, end_date, join_date, membership_type_id
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
     $membershipTypeID = empty($membershipParams['membership_type_id']) ? $dao->membership_type_id : $membershipParams['membership_type_id'];
-    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'today', CRM_Utils_Array::value('ignore_admin_only', $membershipParams), $membershipTypeID, $membershipParams);
+    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'now', CRM_Utils_Array::value('ignore_admin_only', $membershipParams), $membershipTypeID, $membershipParams);
     //make is error zero only when valid status found.
     if (!empty($result['id'])) {
       $result['is_error'] = 0;

@@ -42,10 +42,10 @@ class CRM_Contact_Form_Search_Criteria {
       // multiselect for groups
       if ($form->_group) {
         // Arrange groups into hierarchical listing (child groups follow their parents and have indentation spacing in title)
-        $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($form->_group, NULL, '&nbsp;&nbsp;', TRUE);
+        $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($form->_group, NULL, '- ', TRUE);
 
         $form->add('select', 'group', ts('Groups'), $groupHierarchy, FALSE,
-          ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
+         ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
         );
         $groupOptions = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('group_type');
         $form->add('select', 'group_type', ts('Group Types'), $groupOptions, FALSE,
@@ -244,7 +244,13 @@ class CRM_Contact_Form_Search_Criteria {
    */
   public static function getSearchFieldMetadata() {
     $fields = [
-      'sort_name' => ['title' => ts('Complete OR Partial Name'), 'template_grouping' => 'basic'],
+      'sort_name' => [
+        'title' => ts('Complete OR Partial Name'),
+        'template_grouping' => 'basic',
+        'template' => 'CRM/Contact/Form/Search/Criteria/Fields/sort_name.tpl',
+      ],
+      'first_name' => ['template_grouping' => 'basic'],
+      'last_name' => ['template_grouping' => 'basic'],
       'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
       'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
       'created_date' => ['name' => 'created_date', 'template_grouping' => 'changeLog'],
@@ -317,6 +323,8 @@ class CRM_Contact_Form_Search_Criteria {
     return [
       // For now an empty array is still left in place for ordering.
       'sort_name' => [],
+      'first_name' => [],
+      'last_name' => [],
       'email' => ['name' => 'email'],
       'contact_type' => ['name' => 'contact_type'],
       'group' => [
@@ -550,15 +558,12 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addSearchFieldMetadata(['Contact' => self::getFilteredSearchFieldMetadata('demographic')]);
     $form->addFormFieldsFromMetadata();
     // radio button for gender
-    $genderOptions = [];
+    $genderOptionsAttributes = [];
     $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($gender as $key => $var) {
-      $genderOptions[$key] = $form->createElement('radio', NULL,
-        ts('Gender'), $var, $key,
-        ['id' => "civicrm_gender_{$var}_{$key}"]
-      );
+      $genderOptionsAttributes[$key] = ['id' => "civicrm_gender_{$var}_{$key}"];
     }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
+    $form->addRadio('gender_id', ts('Gender'), $gender, ['allowClear' => TRUE], NULL, FALSE, $genderOptionsAttributes);
 
     $form->add('number', 'age_low', ts('Min Age'), ['class' => 'four', 'min' => 0]);
     $form->addRule('age_low', ts('Please enter a positive integer'), 'positiveInteger');
@@ -605,7 +610,6 @@ class CRM_Contact_Form_Search_Criteria {
 
     foreach ($groupDetails as $key => $group) {
       $_groupTitle[$key] = $group['name'];
-      CRM_Core_ShowHideBlocks::links($form, $group['name'], '', '');
 
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];

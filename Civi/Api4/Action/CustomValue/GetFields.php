@@ -10,14 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
- */
-
 namespace Civi\Api4\Action\CustomValue;
 
 use Civi\Api4\Service\Spec\SpecFormatter;

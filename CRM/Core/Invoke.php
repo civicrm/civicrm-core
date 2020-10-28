@@ -55,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || CRM_Utils_Array::value('snippet', $_REQUEST)) {
+    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
 
@@ -102,7 +102,7 @@ class CRM_Core_Invoke {
         return CRM_Utils_System::redirect();
       }
       else {
-        CRM_Core_Error::fatal('You do not have permission to execute this url');
+        CRM_Core_Error::statusBounce('You do not have permission to execute this url');
       }
     }
   }
@@ -151,6 +151,48 @@ class CRM_Core_Invoke {
   }
 
   /**
+   * Register an alternative phar:// stream wrapper to filter out insecure Phars
+   *
+   * PHP makes it possible to trigger Object Injection vulnerabilities by using
+   * a side-effect of the phar:// stream wrapper that unserializes Phar
+   * metadata. To mitigate this vulnerability, projects such as TYPO3 and Drupal
+   * have implemented an alternative Phar stream wrapper that disallows
+   * inclusion of phar files based on certain parameters.
+   *
+   * This code attempts to register the TYPO3 Phar stream wrapper using the
+   * interceptor defined in \Civi\Core\Security\PharExtensionInterceptor. In an
+   * environment where the stream wrapper was already registered via
+   * \TYPO3\PharStreamWrapper\Manager (i.e. Drupal), this code does not do
+   * anything. In other environments (e.g. WordPress, at the time of this
+   * writing), the TYPO3 library is used to register the interceptor to mitigate
+   * the vulnerability.
+   */
+  private static function registerPharHandler() {
+    try {
+      // try to get the existing stream wrapper, registered e.g. by Drupal
+      \TYPO3\PharStreamWrapper\Manager::instance();
+    }
+    catch (\LogicException $e) {
+      if ($e->getCode() === 1535189872) {
+        // no phar stream wrapper was registered by \TYPO3\PharStreamWrapper\Manager.
+        // This means we're probably not on Drupal and need to register our own.
+        \TYPO3\PharStreamWrapper\Manager::initialize(
+          (new \TYPO3\PharStreamWrapper\Behavior())
+            ->withAssertion(new \Civi\Core\Security\PharExtensionInterceptor())
+        );
+        if (in_array('phar', stream_get_wrappers())) {
+          stream_wrapper_unregister('phar');
+          stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
+        }
+      }
+      else {
+        // this is not an exception we can handle
+        throw $e;
+      }
+    }
+  }
+
+  /**
    * Given a menu item, call the appropriate controller and return the response
    *
    * @param array $item
@@ -160,6 +202,8 @@ class CRM_Core_Invoke {
   public static function runItem($item) {
     $ids = new CRM_Core_IDS();
     $ids->check($item);
+
+    self::registerPharHandler();
 
     $config = CRM_Core_Config::singleton();
     if ($config->userFramework == 'Joomla' && $item) {
@@ -180,7 +224,7 @@ class CRM_Core_Invoke {
 
       if (!array_key_exists('page_callback', $item)) {
         CRM_Core_Error::debug('Bad item', $item);
-        CRM_Core_Error::fatal(ts('Bad menu record in database'));
+        CRM_Core_Error::statusBounce(ts('Bad menu record in database'));
       }
 
       // check that we are permissioned to access this page
@@ -263,7 +307,7 @@ class CRM_Core_Invoke {
           $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
         }
         else {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Execute supplied menu action');
         }
         $result = $object->run($newArgs, $pageArgs);
       }

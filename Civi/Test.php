@@ -59,7 +59,8 @@ class Test {
   public static function dsn($part = NULL) {
     if (!isset(self::$singletons['dsn'])) {
       require_once "DB.php";
-      self::$singletons['dsn'] = \DB::parseDSN(CIVICRM_DSN);
+      $dsn = \CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      self::$singletons['dsn'] = \DB::parseDSN($dsn);
     }
 
     if ($part === NULL) {
@@ -100,12 +101,12 @@ class Test {
   /**
    * Create a builder for the headless environment.
    *
-   * @return \Civi\Test\CiviEnvBuilder
-   *
-   * @code
+   * ```
    * \Civi\Test::headless()->apply();
    * \Civi\Test::headless()->sqlFile('ex.sql')->apply();
-   * @endCode
+   * ```
+   *
+   * @return \Civi\Test\CiviEnvBuilder
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
@@ -130,12 +131,12 @@ class Test {
   /**
    * Create a builder for end-to-end testing on the live environment.
    *
-   * @return \Civi\Test\CiviEnvBuilder
-   *
-   * @code
+   * ```
    * \Civi\Test::e2e()->apply();
    * \Civi\Test::e2e()->install('foo.bar')->apply();
-   * @endCode
+   * ```
+   *
+   * @return \Civi\Test\CiviEnvBuilder
    */
   public static function e2e() {
     $builder = new \Civi\Test\CiviEnvBuilder('CiviEnvBuilder');

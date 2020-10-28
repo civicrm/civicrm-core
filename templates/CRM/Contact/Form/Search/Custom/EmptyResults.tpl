@@ -9,7 +9,7 @@
 *}
 {* Custom searches. Default template for NO MATCHES on submitted search request. *}
 <div class="messages status no-popup">
-  <div class="icon inform-icon"></div>&nbsp;
+  {icon icon="fa-info-circle"}{/icon}
   {if $qill}
     {ts}No matches found for:{/ts}
     {include file="CRM/common/displaySearchCriteria.tpl"}

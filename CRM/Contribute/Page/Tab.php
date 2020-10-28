@@ -42,12 +42,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * - Edit
    * - Cancel
    *
-   * @param bool $recurID
+   * @param int $recurID
    * @param string $context
    *
    * @return array
    */
-  public static function recurLinks($recurID = FALSE, $context = 'contribution') {
+  public static function recurLinks(int $recurID, $context = 'contribution') {
     $links = [
       CRM_Core_Action::VIEW => [
         'name' => ts('View'),
@@ -68,32 +68,28 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       ],
     ];
 
-    if ($recurID) {
-      $paymentProcessorObj = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorObject($recurID);
-      if ($paymentProcessorObj) {
-        if ($paymentProcessorObj->supports('cancelRecurring')) {
-          unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
-          $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
-          $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
-        }
+    $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
+    if ($paymentProcessorObj->supports('cancelRecurring')) {
+      unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
+      $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
+      $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
+    }
 
-        if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
-          $links[CRM_Core_Action::RENEW] = [
-            'name' => ts('Change Billing Details'),
-            'title' => ts('Change Billing Details'),
-            'url' => 'civicrm/contribute/updatebilling',
-            'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
-          ];
-        }
+    if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
+      $links[CRM_Core_Action::RENEW] = [
+        'name' => ts('Change Billing Details'),
+        'title' => ts('Change Billing Details'),
+        'url' => 'civicrm/contribute/updatebilling',
+        'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
+      ];
+    }
 
-        if (!$paymentProcessorObj->supports('ChangeSubscriptionAmount') && !$paymentProcessorObj->supports('EditRecurringContribution')) {
-          unset($links[CRM_Core_Action::UPDATE]);
-        }
-      }
-      else {
-        unset($links[CRM_Core_Action::DISABLE]);
-        unset($links[CRM_Core_Action::UPDATE]);
-      }
+    if (
+    (!CRM_Core_Permission::check('edit contributions') && $context === 'contribution') ||
+    (!$paymentProcessorObj->supports('ChangeSubscriptionAmount')
+      && !$paymentProcessorObj->supports('EditRecurringContribution')
+    )) {
+      unset($links[CRM_Core_Action::UPDATE]);
     }
 
     return $links;
@@ -236,7 +232,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       // Is recurring contribution active?
       $recurContributions[$recurId]['is_active'] = !in_array(CRM_Contribute_PseudoConstant::contributionStatus($recurDetail['contribution_status_id'], 'name'), CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses());
       if ($recurContributions[$recurId]['is_active']) {
-        $actionMask = array_sum(array_keys(self::recurLinks($recurId)));
+        $actionMask = array_sum(array_keys(self::recurLinks((int) $recurId)));
       }
       else {
         $actionMask = CRM_Core_Action::mask([CRM_Core_Permission::VIEW]);
@@ -255,7 +251,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         $recurContributions[$recurId]['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', $recurDetail['contribution_status_id']);
       }
 
-      $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks($recurId), $actionMask,
+      $recurContributions[$recurId]['action'] = CRM_Core_Action::formLink(self::recurLinks((int) $recurId), $actionMask,
         [
           'cid' => $this->_contactId,
           'crid' => $recurId,

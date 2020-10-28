@@ -1,4 +1,4 @@
-The following people and organizations sponsored and/or contributed new and improved features to the project.
+As of CiviCRM 5.25, contributor recognition is viewable in the release notes of each individual version. This file represents an archive of recognition for people and organizations that have sponsored and/or contributed to the project prior to version 5.25.
 
 ************************************************
 Code Contributors for 5.x

@@ -5,60 +5,98 @@ namespace Civi\Token;
  * Class TokenRow
  * @package Civi\Token
  *
- * A TokenRow is a helper providing simplified access to the
- * TokenProcessor.
+ * A TokenRow is a helper/stub providing simplified access to the TokenProcessor.
+ * There are two common cases for using the TokenRow stub:
  *
- * A TokenRow combines two elements:
- *   - context: This is backend data provided by the controller.
- *   - tokens: This is frontend data that can be mail-merged.
+ * (1) When setting up a job, you may specify general/baseline info.
+ * This is called the "context" data. Here, we create two rows:
  *
- * The context and tokens can be accessed using either methods
- * or attributes. The methods are appropriate for updates
- * (and generally accept a mix of arrays), and the attributes
- * are appropriate for reads.
+ * ```
+ * $proc->addRow()->context('contact_id', 123);
+ * $proc->addRow()->context('contact_id', 456);
+ * ```
  *
- * To update the context or the tokens, use the methods.
- * Note that the methods are fairly flexible about accepting
- * single values or arrays. If given an array, the values
- * will be merged recursively.
+ * (2) When defining a token (eg `{profile.viewUrl}`), you might read the
+ * context-data (`contact_id`) and set the token-data (`profile => viewUrl`):
  *
- * @code
- * $row
- *   ->context('contact_id', 123)
- *   ->context(array('contact_id' => 123))
- *   ->tokens('profile', array('viewUrl' => 'http://example.com'))
- *   ->tokens('profile', 'viewUrl, 'http://example.com');
+ * ```
+ * foreach ($proc->getRows() as $row) {
+ *   $row->tokens('profile', [
+ *     'viewUrl' => 'http://example.com/profile?cid=' . urlencode($row->context['contact_id'];
+ *   ]);
+ * }
+ * ```
  *
+ * The context and tokens can be accessed using either methods or attributes.
+ *
+ * ```
+ * # Setting context data
+ * $row->context('contact_id', 123);
+ * $row->context(['contact_id' => 123]);
+ *
+ * # Setting token data
+ * $row->tokens('profile', ['viewUrl' => 'http://example.com/profile?cid=123']);
+ * $row->tokens('profile', 'viewUrl, 'http://example.com/profile?cid=123');
+ *
+ * # Reading context data
  * echo $row->context['contact_id'];
- * echo $row->tokens['profile']['viewUrl'];
  *
- * $row->tokens('profile', array(
- *   'viewUrl' => 'http://example.com/view/' . urlencode($row->context['contact_id'];
- * ));
- * @endcode
+ * # Reading token data
+ * echo $row->tokens['profile']['viewUrl'];
+ * ```
+ *
+ * Note: The methods encourage a "fluent" style. They were written for PHP 5.3
+ * (eg before short-array syntax was supported) and are fairly flexible about
+ * input notations (e.g. `context(string $key, mixed $value)` vs `context(array $keyValuePairs)`).
+ *
+ * Note: An instance of `TokenRow` is a stub which only contains references to the
+ * main data in `TokenProcessor`. There may be several `TokenRow` stubs
+ * referencing the same `TokenProcessor`. You can think of `TokenRow` objects as
+ * lightweight and disposable.
  */
 class TokenRow {
 
   /**
+   * The token-processor is where most data is actually stored.
+   *
+   * Note: Not intended for public usage. However, this is marked public to allow
+   * interaction classes in this package (`TokenProcessor`<=>`TokenRow`<=>`TokenRowContext`).
+   *
    * @var TokenProcessor
    */
   public $tokenProcessor;
 
+  /**
+   * Row ID - the record within TokenProcessor that we're accessing.
+   *
+   * @var int
+   */
   public $tokenRow;
 
+  /**
+   * The MIME type associated with new token-values.
+   *
+   * This is generally manipulated as part of a fluent chain, eg
+   *
+   * $row->format('text/plain')->token(['display_name', 'Alice Bobdaughter']);
+   *
+   * @var string
+   */
   public $format;
 
   /**
    * @var array|\ArrayAccess
    *   List of token values.
-   *   Ex: array('contact' => array('display_name' => 'Alice')).
+   *   This is a facade for the TokenProcessor::$rowValues.
+   *   Ex: ['contact' => ['display_name' => 'Alice']]
    */
   public $tokens;
 
   /**
    * @var array|\ArrayAccess
    *   List of context values.
-   *   Ex: array('controller' => 'CRM_Foo_Bar').
+   *   This is a facade for the TokenProcessor::$rowContexts.
+   *   Ex: ['controller' => 'CRM_Foo_Bar']
    */
   public $context;
 

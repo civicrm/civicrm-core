@@ -1187,30 +1187,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for getPrimaryOpenId( ).
-   */
-  public function testGetPrimaryOpenId() {
-    //get the contact params
-    $params = $this->contactParams();
-    $params['openid'][2] = $params['openid'][1];
-    $params['openid'][2]['location_type_id'] = 2;
-    $params['openid'][2]['openid'] = 'http://primaryopenid.org/';
-    unset($params['openid'][1]['is_primary']);
-
-    //create contact
-    $contact = CRM_Contact_BAO_Contact::create($params);
-    $contactId = $contact->id;
-    //get the primary openid
-    $openID = CRM_Contact_BAO_Contact::getPrimaryOpenId($contactId);
-
-    //Now check the primary openid
-    $this->assertEquals($openID, strtolower($params['openid'][2]['openid']), 'Check Primary OpenID');
-
-    //cleanup DB by deleting the contact
-    $this->contactDelete($contactId);
-  }
-
-  /**
    * Test case for matchContactOnEmail( ).
    */
   public function testMatchContactOnEmail() {
@@ -1436,7 +1412,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'location_type_id' => 1,
           'contact_id' => $contactId,
         ];
-        CRM_Core_BAO_Email::add($params);
+        $this->callAPISuccess('Email', 'create', $params);
         $test->assertDBQuery('ex-1@example.com',
           'SELECT email FROM civicrm_email WHERE contact_id = %1 ORDER BY id DESC LIMIT 1',
           [1 => [$contactId, 'Integer']]
@@ -1470,7 +1446,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
           'location_type_id' => 1,
           'contact_id' => $contactId,
         ];
-        CRM_Core_BAO_Phone::add($params);
+        CRM_Core_BAO_Phone::create($params);
         $test->assertDBQuery('202-555-1000',
           'SELECT phone FROM civicrm_phone WHERE contact_id = %1 ORDER BY id DESC LIMIT 1',
           [1 => [$contactId, 'Integer']]
@@ -1678,6 +1654,139 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
         $this->assertEquals($addAddressA->$key, $addAddressB->$key);
       }
     }
+  }
+
+  /**
+   * Test that long unicode individual names are truncated properly when
+   * creating sort/display name.
+   *
+   * @dataProvider longUnicodeIndividualNames
+   *
+   * @param array $input
+   * @param array $expected
+   */
+  public function testLongUnicodeIndividualName(array $input, array $expected) {
+    // needs to be passed by reference
+    $params = [
+      'contact_type' => 'Individual',
+      'first_name' => $input['first_name'],
+      'last_name' => $input['last_name'],
+    ];
+    $contact = CRM_Contact_BAO_Contact::add($params);
+
+    $this->assertEquals($expected['sort_name'], $contact->sort_name);
+    $this->assertEquals($expected['display_name'], $contact->display_name);
+
+    $this->contactDelete($contact->id);
+  }
+
+  /**
+   * Data provider for testLongUnicodeIndividualName
+   * @return array
+   */
+  public function longUnicodeIndividualNames():array {
+    return [
+      'much less than 128' => [
+        [
+          'first_name' => 'асдадасда',
+          'last_name' => 'лнплнплнп',
+        ],
+        [
+          'sort_name' => 'лнплнплнп, асдадасда',
+          'display_name' => 'асдадасда лнплнплнп',
+        ],
+      ],
+      'less than 128 but still too big' => [
+        [
+          'first_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдаш',
+          'last_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпш',
+        ],
+        [
+          'sort_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпш, асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдаш',
+          'display_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдаш лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпш',
+        ],
+      ],
+      // note we have to account for the comma and space
+      'equal 128 sort_name' => [
+        [
+          'first_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасд',
+          'last_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнп',
+        ],
+        [
+          'sort_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнп, асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасд',
+          'display_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасд лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнп',
+        ],
+      ],
+      // note we have to account for the space
+      'equal 128 display_name' => [
+        [
+          'first_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдa',
+          'last_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнп',
+        ],
+        [
+          'sort_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнп, асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасд',
+          'display_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдa лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнп',
+        ],
+      ],
+      'longer than 128' => [
+        [
+          'first_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдаш',
+          'last_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпш',
+        ],
+        [
+          'sort_name' => 'лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпш, асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдада',
+          'display_name' => 'асдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдашасдадасдаш лнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнплнпшлнплнпл',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test that long unicode org names are truncated properly when creating
+   * sort/display name.
+   *
+   * @dataProvider longUnicodeOrgNames
+   *
+   * @param string $input
+   * @param string $expected
+   */
+  public function testLongUnicodeOrgName(string $input, string $expected) {
+    // needs to be passed by reference
+    $params = [
+      'contact_type' => 'Organization',
+      'organization_name' => $input,
+    ];
+    $contact = CRM_Contact_BAO_Contact::add($params);
+
+    $this->assertEquals($expected, $contact->sort_name);
+    $this->assertEquals($expected, $contact->display_name);
+
+    $this->contactDelete($contact->id);
+  }
+
+  /**
+   * Data provider for testLongUnicodeOrgName
+   * @return array
+   */
+  public function longUnicodeOrgNames():array {
+    return [
+      'much less than 128' => [
+        'асдадасда шшшшшшшшшш',
+        'асдадасда шшшшшшшшшш',
+      ],
+      'less than 128 but still too big' => [
+        'асдадасда шшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшасд',
+        'асдадасда шшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшасд',
+      ],
+      'equal 128' => [
+        'асдадасда шшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшасд',
+        'асдадасда шшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшасд',
+      ],
+      'longer than 128' => [
+        'асдадасда шшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшасдасд',
+        'асдадасда шшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшшш...',
+      ],
+    ];
   }
 
 }

@@ -29,10 +29,10 @@ The original form used table layout; don't know if we have an alternative, CSS-b
       <a crm-ui-lock binding="locks.caseTypeName"></a>
 
       <div ng-show="!isValidName(caseType.name)">
-        <em>{{ts('WARNING: The case type name includes deprecated characters.')}}</em>
+        <em>{{:: ts('WARNING: The case type name includes deprecated characters.') }}</em>
       </div>
       <div ng-show="caseType.id && !locks.caseTypeName">
-        <em>{{ts('WARNING: If any external files or programs reference the old "Name", then they must be updated manually.')}}</em>
+        <em>{{:: ts('WARNING: If any external files or programs reference the old "Name", then they must be updated manually.') }}</em>
       </div>
     </div>
     <div crm-ui-field="{name: 'caseTypeDetailForm.description', title: ts('Description')}">
@@ -42,7 +42,7 @@ The original form used table layout; don't know if we have an alternative, CSS-b
       <input name="is_active" type="checkbox" ng-model="caseType.is_active" ng-true-value="'1'" ng-false-value="'0'"/>
     </div>
     <fieldset class="crm-collapsible">
-      <legend class="collapsible-title">{{ ts('Activity assignment settings') }}</legend>
+      <legend class="collapsible-title">{{:: ts('Activity assignment settings') }}</legend>
       <div>
         <div crm-ui-field="{name: 'caseTypeDetailForm.activityAsgmtGrps', title: ts('Restrict to Groups'), help: hs('activityAsgmtGrps')}">
           <input

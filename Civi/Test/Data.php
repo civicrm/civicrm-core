@@ -18,7 +18,7 @@ class Data {
       \Civi\Test::schema()->setStrict(FALSE);
 
       // Ensure that when we populate the database it is done in utf8 mode
-      \Civi\Test::execute('SET NAMES utf8');
+      \Civi\Test::execute('SET NAMES utf8mb4');
       $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
       if (!isset(\Civi\Test::$statics['locale_data'])) {
@@ -43,6 +43,8 @@ class Data {
 
       \Civi\Test::schema()->setStrict(TRUE);
     });
+
+    civicrm_api('setting', 'create', ['installed' => 1, 'domain_id' => 'all', 'version' => 3]);
 
     // Rebuild triggers
     civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);

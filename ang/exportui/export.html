@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <th colspan="6">
-        <label>{{ ts('Contact Type') }}</label>
+        <label>{{:: ts('Contact Type') }}</label>
         <input class="twelve" crm-ui-select="{data: contact_types, placeholder: ts('All'), allowClear: true}" ng-model="data.contact_type" />
       </th>
     </tr>
@@ -21,7 +21,7 @@
         <input class="crm-action-menu fa-plus crm-export-add-field" crm-ui-select="{data: getFields, placeholder: ts('Add field')}" ng-model="new.col" />
         <span ng-if="data.columns.length">
           <button type="button" ng-click="saveMappingDialog()" crm-icon="fa-save">
-            {{ ts('Save Fields') }}
+            {{:: ts('Save Fields') }}
           </button>
         </span>
       </td>

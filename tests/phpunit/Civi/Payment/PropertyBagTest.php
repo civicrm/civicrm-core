@@ -3,23 +3,21 @@ namespace Civi\Payment;
 
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
+use PHPUnit\Framework\Error\Deprecated as DeprecatedError;
 
 /**
  * @group headless
  */
 class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
+  /**
+   * @return \Civi\Test\CiviEnvBuilder
+   */
   public function setUpHeadless() {
-    return \Civi\Test::headless()->apply();
-  }
-
-  protected function setUp() {
-    parent::setUp();
-    // $this->useTransaction(TRUE);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
+    static $reset = FALSE;
+    $return = \Civi\Test::headless()->apply($reset);
+    $reset = FALSE;
+    return $return;
   }
 
   /**
@@ -47,6 +45,56 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * Test we can set an amount.
+   *
+   * @see https://github.com/civicrm/civicrm-core/pull/18219
+   *
+   * @dataProvider setAmountDataProvider
+   *
+   * @param mixed $value input
+   * @param mixed $expect output expected. Typically a string like '1.23' or NULL
+   * @param string $expectedExceptionMessage if there is one expected.
+   */
+  public function testSetAmount($value, $expect, $expectedExceptionMessage = '') {
+    $propertyBag = new PropertyBag();
+    try {
+      $propertyBag->setAmount($value);
+    }
+    catch (\Exception $e) {
+      if ($expectedExceptionMessage) {
+        $this->assertEquals($expectedExceptionMessage, $e->getMessage(), 'Expected a different exception.');
+        // OK.
+        return;
+      }
+      // not expecting an exception, re-throw it.
+      throw $e;
+    }
+    $got = $propertyBag->getAmount();
+    $this->assertInternalType('string', $got);
+    $this->assertEquals($expect, $got);
+  }
+
+  /**
+   *
+   */
+  public function setAmountDataProvider() {
+    return [
+      [1, '1'],
+      [1.23, '1.23'],
+      [1.234, '1.234'],
+      [-1.23, '-1.23'],
+      ['1', '1'],
+      ['1.23', '1.23'],
+      ['1.234', '1.234'],
+      ['-1.23', '-1.23'],
+      ['1,000.23', NULL, 'setAmount requires a numeric amount value'],
+      ['1,000', NULL, 'setAmount requires a numeric amount value'],
+      ['1,23', NULL, 'setAmount requires a numeric amount value'],
+      ['1.230,12', NULL, 'setAmount requires a numeric amount value'],
+    ];
+  }
+
+  /**
    * Test we cannot set an invalid contact ID.
    *
    * @expectedException \InvalidArgumentException
@@ -61,34 +109,69 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    */
   public function testSetContactIDLegacyWay() {
     $propertyBag = new PropertyBag();
-    $propertyBag['contactID'] = 123;
-    $this->assertEquals(123, $propertyBag->getContactID());
-    $this->assertEquals(123, $propertyBag['contactID']);
-    // There should not be any warnings yet.
-    $this->assertEquals("", $propertyBag->lastWarning);
 
-    // Now access via legacy name - should work but generate warning.
-    $this->assertEquals(123, $propertyBag['contact_id']);
-    $this->assertEquals("We have translated 'contact_id' to 'contactID' for you, but please update your code to use the propper setters and getters.", $propertyBag->lastWarning);
+    // To prevent E_USER_DEPRECATED errors during phpunit tests we take a copy
+    // of the existing error_reporting.
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
 
-    // Repeat but this time set the property using a legacy name, fetch by new name.
-    $propertyBag = new PropertyBag();
-    $propertyBag['contact_id'] = 123;
-    $this->assertEquals("We have translated 'contact_id' to 'contactID' for you, but please update your code to use the propper setters and getters.", $propertyBag->lastWarning);
-    $this->assertEquals(123, $propertyBag->getContactID());
-    $this->assertEquals(123, $propertyBag['contactID']);
-    $this->assertEquals(123, $propertyBag['contact_id']);
+    foreach (['contactID', 'contact_id'] as $prop) {
+      // Set by array access should cause deprecated error.
+      try {
+        $propertyBag[$prop] = 123;
+        $this->fail("Using array access to set a property '$prop' should trigger deprecated notice.");
+      }
+      catch (DeprecatedError $e) {
+      }
+
+      // But it should still work.
+      error_reporting($ignoreUserDeprecatedErrors);
+      $propertyBag[$prop] = 123;
+      error_reporting($oldLevel);
+      $this->assertEquals(123, $propertyBag->getContactID());
+
+      // Getting by array access should also cause deprecation error.
+      try {
+        $_ = $propertyBag[$prop];
+        $this->fail("Using array access to get a property '$prop' should trigger deprecated notice.");
+      }
+      catch (DeprecatedError $e) {
+      }
+
+      // But again, it should work.
+      error_reporting($ignoreUserDeprecatedErrors);
+      $this->assertEquals(123, $propertyBag[$prop], "Getting '$prop' by array access should work");
+      error_reporting($oldLevel);
+    }
+  }
+
+  /**
+   * Test that emails set by the legacy method of 'email-5' can be retrieved with getEmail.
+   */
+  public function testSetBillingEmailLegacy() {
+    $localPropertyBag = PropertyBag::cast(['email-' . \CRM_Core_BAO_LocationType::getBilling() => 'a@b.com']);
+    $this->assertEquals('a@b.com', $localPropertyBag->getEmail());
+  }
+
+  /**
+   * Test that null is valid for recurring contribution ID.
+   *
+   * See https://github.com/civicrm/civicrm-core/pull/17292
+   */
+  public function testRecurProcessorIDNull() {
+    $bag = new PropertyBag();
+    $bag->setRecurProcessorID(NULL);
+    $value = $bag->getRecurProcessorID();
+    $this->assertNull($value);
   }
 
   /**
    */
   public function testMergeInputs() {
-    $propertyBag = new PropertyBag();
-    $propertyBag->mergeLegacyInputParams([
+    $propertyBag = PropertyBag::cast([
       'contactID' => 123,
       'contributionRecurID' => 456,
     ]);
-    $this->assertEquals("We have merged input params into the property bag for now but please rewrite code to not use this.", $propertyBag->lastWarning);
     $this->assertEquals(123, $propertyBag->getContactID());
     $this->assertEquals(456, $propertyBag->getContributionRecurID());
   }
@@ -97,6 +180,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    * Test we can set and access custom props.
    */
   public function testSetCustomProp() {
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+
+    // The proper way.
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('customThingForMyProcessor', 'fidget');
     $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
@@ -104,9 +191,34 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Test we can do this with array, although we should get a warning.
     $propertyBag = new PropertyBag();
+
+    // Set by array access should cause deprecated error.
+    try {
+      $propertyBag['customThingForMyProcessor'] = 'fidget';
+      $this->fail("Using array access to set an implicitly custom property should trigger deprecated notice.");
+    }
+    catch (DeprecatedError $e) {
+    }
+
+    // But it should still work.
+    error_reporting($ignoreUserDeprecatedErrors);
     $propertyBag['customThingForMyProcessor'] = 'fidget';
+    error_reporting($oldLevel);
     $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
-    $this->assertEquals("Unknown property 'customThingForMyProcessor'. We have merged this in for now as a custom property. Please rewrite your code to use PropertyBag->setCustomProperty if it is a genuinely custom property, or a standardised setter like PropertyBag->setContactID for standard properties", $propertyBag->lastWarning);
+
+    // Getting by array access should also cause deprecation error.
+    try {
+      $_ = $propertyBag['customThingForMyProcessor'];
+      $this->fail("Using array access to get an implicitly custom property should trigger deprecated notice.");
+    }
+    catch (DeprecatedError $e) {
+    }
+
+    // But again, it should work.
+    error_reporting($ignoreUserDeprecatedErrors);
+    $this->assertEquals('fidget', $propertyBag['customThingForMyProcessor']);
+    error_reporting($oldLevel);
+
   }
 
   /**
@@ -118,6 +230,37 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   public function testSetCustomPropFails() {
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('contactID', 123);
+  }
+
+  /**
+   * Test we get NULL for custom prop that was not set.
+   *
+   * This is only for backward compatibility/ease of transition. One day it would be nice to throw an exception instead.
+   *
+   * @expectedException \BadMethodCallException
+   * @expectedExceptionMessage Property 'aCustomProp' has not been set.
+   */
+  public function testGetCustomPropFails() {
+    $propertyBag = new PropertyBag();
+    // Tricky test. We need to ignore deprecation errors, we're testing deprecated behaviour,
+    // but we need to listen out for a different exception.
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+    error_reporting($ignoreUserDeprecatedErrors);
+
+    // Do the do.
+    try {
+      $v = $propertyBag['aCustomProp'];
+      error_reporting($oldLevel);
+      $this->fail("Expected BadMethodCallException from accessing an unset custom prop.");
+    }
+    catch (\BadMethodCallException $e) {
+      // reset error level.
+      error_reporting($oldLevel);
+      // rethrow for phpunit to catch.
+      throw $e;
+    }
+
   }
 
   /**
@@ -159,9 +302,14 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $this->fail("Expected an error trying to set $prop to " . json_encode($given) . " but did not get one.");
     }
 
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+
     // Check array access for the proper property name and any aliases.
+    // This is going to throw a bunch of deprecated errors, but we know this
+    // (and have tested it elsewhere) so we turn those off.
+    error_reporting($ignoreUserDeprecatedErrors);
     foreach (array_merge([$prop], $legacy_names) as $name) {
-      // Check array access
       foreach ($valid_values as $_) {
         list($given, $expect) = $_;
         $propertyBag = new PropertyBag();
@@ -172,6 +320,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
         break;
       }
     }
+    error_reporting($oldLevel);
   }
 
   /**
@@ -197,10 +346,67 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   public function testUtilsArray() {
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
+    // This will throw deprecation notices but we don't care.
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+    error_reporting($ignoreUserDeprecatedErrors);
     $this->assertEquals(123, \CRM_Utils_Array::value('contact_id', $propertyBag));
 
     // Test that using utils array value to get a nonexistent property returns the default.
     $this->assertEquals(456, \CRM_Utils_Array::value('ISawAManWhoWasntThere', $propertyBag, 456));
+    error_reporting($oldLevel);
+  }
+
+  /**
+   */
+  public function testEmpty() {
+    $propertyBag = new PropertyBag();
+    $propertyBag->setContactID(123);
+    $propertyBag->setRecurProcessorID('');
+    $propertyBag->setBillingPostalCode(NULL);
+    $propertyBag->setFeeAmount(0);
+    $propertyBag->setCustomProperty('custom_issue', 'black lives matter');
+    $propertyBag->setCustomProperty('custom_null', NULL);
+    $propertyBag->setCustomProperty('custom_false', FALSE);
+    $propertyBag->setCustomProperty('custom_zls', '');
+    $propertyBag->setCustomProperty('custom_0', 0);
+
+    // To prevent E_USER_DEPRECATED errors during phpunit tests we take a copy
+    // of the existing error_reporting.
+    $oldLevel = error_reporting();
+    $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
+    error_reporting($ignoreUserDeprecatedErrors);
+
+    // Tests on known properties.
+    $v = empty($propertyBag->getContactID());
+    $this->assertFalse($v, "empty on a set, known property should return False");
+    $v = empty($propertyBag['contactID']);
+    $this->assertFalse($v, "empty on a set, known property accessed by ArrayAccess with correct name should return False");
+    $v = empty($propertyBag['contact_id']);
+    $this->assertFalse($v, "empty on a set, known property accessed by ArrayAccess with legacy name should return False");
+    $v = empty($propertyBag['recurProcessorID']);
+    $this->assertTrue($v, "empty on an unset, known property accessed by ArrayAccess should return True");
+    $v = empty($propertyBag->getRecurProcessorID());
+    $this->assertTrue($v, "empty on a set, but '' value should return True");
+    $v = empty($propertyBag->getFeeAmount());
+    $this->assertTrue($v, "empty on a set, but 0 value should return True");
+    $v = empty($propertyBag->getBillingPostalCode());
+    $this->assertTrue($v, "empty on a set, but NULL value should return True");
+
+    // Test custom properties.
+    $v = empty($propertyBag->getCustomProperty('custom_issue'));
+    $this->assertFalse($v, "empty on a set custom property with non-empty value should return False");
+    foreach (['null', 'false', 'zls', '0'] as $_) {
+      $v = empty($propertyBag["custom_$_"]);
+      $this->assertTrue($v, "empty on a set custom property with $_ value should return TRUE");
+    }
+    $v = empty($propertyBag['nonexistent_custom_field']);
+    $this->assertTrue($v, "empty on a non-existent custom property should return True");
+
+    $v = empty($propertyBag['custom_issue']);
+    $this->assertFalse($v, "empty on a set custom property accessed by ArrayAccess should return False");
+
+    error_reporting($oldLevel);
   }
 
   /**
@@ -235,7 +441,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       ['paymentToken', [], $valid_strings, []],
       ['recurFrequencyInterval', ['frequency_interval'], $valid_ints, $invalid_ints],
       ['recurFrequencyUnit', [], [['month', 'month'], ['day', 'day'], ['year', 'year']], ['', NULL, 0]],
-      ['recurProcessorID', [], [['foo', 'foo']], [str_repeat('x', 256), NULL, '', 0]],
+      ['recurProcessorID', [], [['foo', 'foo']], [str_repeat('x', 256)]],
       ['transactionID', ['transaction_id'], $valid_strings, []],
       ['trxnResultCode', [], $valid_strings, []],
     ];
@@ -277,9 +483,16 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $this->assertEquals("Attempted to get 'contribution_recur_id' via getCustomProperty - must use using its getter.", $e->getMessage());
     }
 
-    // Nb. hmmm. the custom property getter does not throw an exception if the property is unset, it just returns NULL.
-    $result = $propertyBag->getter('something_custom');
-    $this->assertNull($result, "Failed testing the getter on an unset custom property when not providing a default");
+    // Nb. up to 5.26, the custom property getter did not throw an exception if the property is unset, it just returned NULL.
+    // Now, we return NULL for array access (legacy) but for modern access
+    // (getter, getPropX(), getCustomProperty())  then we throw an exception if
+    // it is not set.
+    try {
+      $result = $propertyBag->getter('something_custom');
+      $this->fail("Expected a BadMethodCallException when getting 'something_custom' which has not been set.");
+    }
+    catch (\BadMethodCallException $e) {
+    }
 
     try {
       $propertyBag->setter('some_custom_thing', 'foo');

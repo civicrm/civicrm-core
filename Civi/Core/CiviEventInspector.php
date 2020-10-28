@@ -7,10 +7,10 @@ namespace Civi\Core;
  * The event inspector is a development tool which provides metadata about events.
  * It can be used for code-generators and documentation-generators.
  *
- * @code
+ * ```
  * $i = new CiviEventInspector();
  * print_r(CRM_Utils_Array::collect('name', $i->getAll()));
- * @endCode
+ * ```
  *
  * An event definition includes these fields:
  *  - type: string, required. Ex: 'hook' or 'object'

@@ -13,7 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- *
  */
 
 /**
@@ -43,6 +42,7 @@ class CRM_Group_Page_AJAX {
         'status' => 'Integer',
         'parentsOnly' => 'Integer',
         'showOrgInfo' => 'Boolean',
+        'savedSearch' => 'Integer',
         // Ignore 'parent_id' as that case is handled above
       ];
       $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -62,10 +62,6 @@ class CRM_Group_Page_AJAX {
           $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
         }
       }
-    }
-
-    if (!empty($_GET['is_unit_test'])) {
-      return $groups;
     }
 
     CRM_Utils_JSON::output($groups);

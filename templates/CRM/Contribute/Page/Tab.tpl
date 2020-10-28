@@ -48,9 +48,9 @@
 
           {if $action eq 16 and $permission EQ 'edit'}
             <div class="action-link">
-              <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
+              <a accesskey="N" href="{$newContribURL}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Record Contribution (Check, Cash, EFT ...){/ts}</span></a>
               {if $newCredit}
-                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
+                <a accesskey="N" href="{$newCreditURL}" class="button"><span><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Submit Credit Card Contribution{/ts}</span></a>
               {/if}
               <br /><br />
             </div>
@@ -63,7 +63,7 @@
             {include file="CRM/Contribute/Form/Selector.tpl"}
           {else}
             <div class="messages status no-popup">
-              <div class="icon inform-icon"></div>
+              {icon icon="fa-info-circle"}{/icon}
               {ts}No contributions have been recorded from this contact.{/ts}
             </div>
           {/if}
@@ -79,11 +79,11 @@
           {if $recur}
             <div class="crm-block crm-contact-contribute-recur crm-contact-contribute-recur-active">
               <h3>{ts}Active Recurring Contributions{/ts}</h3>
-              {include file="CRM/Contribute/Page/ContributionRecur.tpl" recurRows=$activeRecurRows}
+              {include file="CRM/Contribute/Page/ContributionRecurSelector.tpl" recurRows=$activeRecurRows}
             </div>
             <div class="crm-block crm-contact-contribute-recur crm-contact-contribute-recur-inactive">
               <h3>{ts}Inactive Recurring Contributions{/ts}</h3>
-              {include file="CRM/Contribute/Page/ContributionRecur.tpl" recurRows=$inactiveRecurRows}
+              {include file="CRM/Contribute/Page/ContributionRecurSelector.tpl" recurRows=$inactiveRecurRows}
             </div>
           {/if}
         </div>

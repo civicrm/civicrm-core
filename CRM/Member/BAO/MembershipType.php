@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
@@ -637,7 +635,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * The function returns all the Organization for  all membershipTypes .
+   * The function returns all the Organization for all membershipTypes .
    *
    * @param int $membershipTypeId
    *
@@ -740,7 +738,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       if (!empty($results)) {
         $results['label'] = $results['name'] = $params['name'];
         $results['amount'] = empty($params['minimum_fee']) ? 0 : $params['minimum_fee'];
-        $optionsIds['id'] = $results['id'];
       }
       else {
         $results = [
@@ -756,12 +753,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       if ($previousID) {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
         if (!empty($optionsIds['option_id'])) {
-          $optionsIds['id'] = current(CRM_Utils_Array::value('option_id', $optionsIds));
+          $results['id'] = current($optionsIds['option_id']);
         }
       }
       $results['financial_type_id'] = $params['financial_type_id'] ?? NULL;
       $results['description'] = $params['description'] ?? NULL;
-      CRM_Price_BAO_PriceFieldValue::add($results, $optionsIds);
+      CRM_Price_BAO_PriceFieldValue::add($results);
     }
   }
 
@@ -817,6 +814,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Caching is by domain - if that hits any issues we should add a new function getDomainMembershipTypes
    * or similar rather than 'just add another param'! but this is closer to earlier behaviour so 'should' be OK.
    *
+   * @return array
+   *   List of membershipType details keyed by membershipTypeID
    * @throws \CiviCRM_API3_Exception
    */
   public static function getAllMembershipTypes() {
@@ -824,7 +823,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     if (!Civi::cache('metadata')->has($cacheString)) {
       $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-      $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related'];
+      $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related', 'auto_renew'];
       // In order to avoid down-stream e-notices we undo api v3 filtering of NULL values. This is covered
       // in Unit tests & ideally we might switch to apiv4 but I would argue we should build caching
       // of metadata entities like this directly into apiv4.
@@ -859,23 +858,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    */
   public static function getMembershipType($id) {
     return self::getAllMembershipTypes()[$id];
-  }
-
-  /**
-   * Get an array of all membership types the contact is permitted to access.
-   *
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function getPermissionedMembershipTypes() {
-    $types = self::getAllMembershipTypes();
-    $financialTypes = NULL;
-    $financialTypes = CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-    foreach ($types as $id => $type) {
-      if (!isset($financialTypes[$type['financial_type_id']])) {
-        unset($types[$id]);
-      }
-    }
-    return $types;
   }
 
 }

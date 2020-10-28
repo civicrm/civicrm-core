@@ -364,7 +364,7 @@
 
       // Adds controls to a widget.  id is for internal use and image file name in images/dashboard/ (a .gif).
       widget.addControl = function(id, control) {
-          var markup = '<a class="crm-i ' + control.icon + '" alt="' + control.description + '" title="' + control.description + '"></a>';
+          var markup = '<a class="crm-i ' + control.icon + '" alt="' + control.description + '" title="' + control.description + '" aria-hidden="true"></a>';
           control.element = $(markup).prependTo($('.widget-controls', widget.element)).click(control.callback);
       };
 
@@ -526,8 +526,8 @@
         html += '<form class="widget-settings">';
         html += '  <div class="widget-settings-inner"></div>';
         html += '  <div class="widget-settings-buttons">';
-        html += '    <input id="' + widget.id + '-settings-save" class="widget-settings-save" value="Save" type="submit" />';
-        html += '    <input id="' + widget.id + '-settings-cancel" class="widget-settings-cancel" value="Cancel" type="submit" />';
+        html += '    <button id="' + widget.id + '-settings-save" class="widget-settings-save" type="submit">Save</button>';
+        html += '    <button id="' + widget.id + '-settings-cancel" class="widget-settings-cancel" type="submit">Cancel</button>';
         html += '  </div>';
         html += '</form>';
         return html;

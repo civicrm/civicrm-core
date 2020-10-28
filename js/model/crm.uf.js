@@ -510,8 +510,8 @@
         options: YESNO
       },
       'add_to_group_id': {
-        title: ts('Add new contacts to a Group?'),
-        help: ts('Select a group if you are using this profile for adding new contacts, AND you want the new contacts to be automatically assigned to a group.'),
+        title: ts('Add contacts to a group?'),
+        help: ts('Select a group if you want contacts to be automatically added to that group when the profile is submitted.'),
         type: 'Number'
       },
       'cancel_URL': {

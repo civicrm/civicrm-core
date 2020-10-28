@@ -83,7 +83,9 @@ function civicrm_api3_message_template_get($params) {
  * Sends a template.
  *
  * @param array $params
+ *
  * @throws API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_message_template_send($params) {
   // Change external param names to internal ones
@@ -97,12 +99,12 @@ function civicrm_api3_message_template_send($params) {
     }
   }
   if (empty($params['messageTemplateID'])) {
-    if (empty($params['groupName']) || empty($params['valueName'])) {
+    if (empty($params['valueName'])) {
       // Can't use civicrm_api3_verify_mandatory for this because it would give the wrong field names
       throw new API_Exception(
-        "Mandatory key(s) missing from params array: requires id or option_group_name + option_value_name",
-        "mandatory_missing",
-        ["fields" => ['id', 'option_group_name', 'option_value_name']]
+        'Mandatory key(s) missing from params array: requires id or option_value_name',
+        'mandatory_missing',
+        ['fields' => ['id', 'option_value_name']]
       );
     }
   }
@@ -123,11 +125,6 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['id']['title'] = 'Message Template ID';
   $params['id']['api.aliases'] = ['messageTemplateID', 'message_template_id'];
   $params['id']['type'] = CRM_Utils_Type::T_INT;
-
-  $params['option_group_name']['description'] = 'option group name of the template (required if no id supplied)';
-  $params['option_group_name']['title'] = 'Option Group Name';
-  $params['option_group_name']['api.aliases'] = ['groupName'];
-  $params['option_group_name']['type'] = CRM_Utils_Type::T_STRING;
 
   $params['option_value_name']['description'] = 'option value name of the template (required if no id supplied)';
   $params['option_value_name']['title'] = 'Option Value Name';
@@ -184,4 +181,9 @@ function _civicrm_api3_message_template_send_spec(&$params) {
   $params['pdf_filename']['title'] = 'PDF Filename';
   $params['pdf_filename']['api.aliases'] = ['PDFFilename'];
   $params['pdf_filename']['type'] = CRM_Utils_Type::T_STRING;
+
+  $params['disable_smarty']['description'] = 'Disable Smarty. Normal CiviMail tokens are still supported. By default Smarty is enabled.';
+  $params['disable_smarty']['title'] = 'Disable Smarty';
+  $params['disable_smarty']['api.aliases'] = ['disableSmarty'];
+  $params['disable_smarty']['type'] = CRM_Utils_Type::T_BOOLEAN;
 }

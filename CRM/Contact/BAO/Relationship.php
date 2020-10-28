@@ -983,8 +983,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       $queryString .= " AND id !=" . CRM_Utils_Type::escape($relationshipId, 'Integer');
     }
 
-    $relationship = new CRM_Contact_BAO_Relationship();
-    $relationship->query($queryString);
+    $relationship = CRM_Core_DAO::executeQuery($queryString);
     while ($relationship->fetch()) {
       // Check whether the custom field values are identical.
       $result = self::checkDuplicateCustomFields($params, $relationship->id);
@@ -1467,7 +1466,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               if ($values[$rid]['rtype'] == 'b_a') {
                 $replace['clientid'] = $values[$rid]['cid'];
               }
-              $values[$rid]['case'] = '<a href="' . CRM_Utils_System::url('civicrm/case/ajax/details', sprintf('caseId=%d&cid=%d&snippet=4', $values[$rid]['case_id'], $values[$rid]['cid'])) . '" class="action-item crm-hover-button crm-summary-link"><i class="crm-i fa-folder-open-o"></i></a>';
+              $values[$rid]['case'] = '<a href="' . CRM_Utils_System::url('civicrm/case/ajax/details', sprintf('caseId=%d&cid=%d&snippet=4', $values[$rid]['case_id'], $values[$rid]['cid'])) . '" class="action-item crm-hover-button crm-summary-link"><i class="crm-i fa-folder-open-o" aria-hidden="true"></i></a>';
             }
           }
 
@@ -1489,13 +1488,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
   }
 
   /**
-   * Get get list of relationship type based on the target contact type.
+   * Get list of relationship type based on the target contact type.
+   * Both directions of relationships are included if their labels are not the same.
    *
    * @param string $targetContactType
-   *   It's valid contact tpye(may be Individual , Organization , Household).
+   *   A valid contact type (may be Individual, Organization, Household).
    *
    * @return array
-   *   array reference of all relationship types with context to current contact type .
+   *   array reference of all relationship types with context to current contact type.
    */
   public static function getRelationType($targetContactType) {
     $relationshipType = [];
@@ -1504,6 +1504,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     foreach ($allRelationshipType as $key => $type) {
       if ($type['contact_type_b'] == $targetContactType || empty($type['contact_type_b'])) {
         $relationshipType[$key . '_a_b'] = $type['label_a_b'];
+      }
+      if (($type['contact_type_a'] == $targetContactType || empty($type['contact_type_a']))
+        && $type['label_a_b'] != $type['label_b_a']
+      ) {
+        $relationshipType[$key . '_b_a'] = $type['label_b_a'];
       }
     }
 
@@ -2426,7 +2431,7 @@ SELECT count(*)
     AND is_current_member = 1";
     $result = CRM_Core_DAO::singleValueQuery($query);
     if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
-      CRM_Member_BAO_Membership::create($membershipValues);
+      civicrm_api3('Membership', 'create', $membershipValues);
     }
     return $membershipValues;
   }

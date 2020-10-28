@@ -134,7 +134,7 @@
       // When selecting a task
       .on('change', 'select#task', function(e) {
         var $form = $(this).closest('form'),
-        $go = $('input.crm-search-go-button', $form);
+        $go = $('button.crm-search-go-button', $form);
         var $selectedOption = $(this).find(':selected');
         if (!$selectedOption.val()) {
           // do not blank refresh the empty option.

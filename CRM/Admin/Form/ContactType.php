@@ -121,9 +121,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
         $params['is_active'] = 1;
       }
     }
-    if ($this->_action & CRM_Core_Action::ADD) {
-      $params['name'] = ucfirst(CRM_Utils_String::munge($params['label']));
-    }
+
     $contactType = CRM_Contact_BAO_ContactType::add($params);
     CRM_Core_Session::setStatus(ts("The Contact Type '%1' has been saved.",
       [1 => $contactType->label]

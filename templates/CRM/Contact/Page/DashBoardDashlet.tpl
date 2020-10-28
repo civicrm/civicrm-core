@@ -13,11 +13,11 @@
 {$communityMessages}
 <div class="crm-submit-buttons crm-dashboard-controls">
 <a href="#" id="crm-dashboard-configure" class="crm-hover-button show-add">
-  <i class="crm-i fa-wrench"></i> {ts}Configure Your Dashboard{/ts}
+  <i class="crm-i fa-wrench" aria-hidden="true"></i> {ts}Configure Your Dashboard{/ts}
 </a>
 
 <a style="float:right;" href="#" class="crm-hover-button show-refresh" style="margin-left: 6px;">
-  <i class="crm-i fa-refresh"></i> {ts}Refresh Dashboard Data{/ts}
+  <i class="crm-i fa-refresh" aria-hidden="true"></i> {ts}Refresh Dashboard Data{/ts}
 </a>
 
 </div>

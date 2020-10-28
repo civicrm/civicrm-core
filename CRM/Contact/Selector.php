@@ -61,6 +61,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     'status',
     'do_not_email',
     'do_not_phone',
+    'do_not_sms',
     'do_not_mail',
   ];
 
@@ -226,8 +227,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $displayRelationshipType,
       $operator
     );
-
-    $this->_options = &$this->_query->_options;
   }
 
   /**
@@ -805,9 +804,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           );
         }
         elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-          (!empty($row['city']) &&
-            CRM_Utils_Array::value('state_province', $row)
-          )
+          (!empty($row['city']) && !empty($row['state_province']))
         ) {
           $row['action'] = CRM_Core_Action::formLink(
             $links,
@@ -935,9 +932,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       }
 
       if ((!is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) &&
-        (empty($row['city']) ||
-          !CRM_Utils_Array::value('state_province', $row)
-        )
+        (empty($row['city']) || empty($row['state_province']))
       ) {
         $mask = $mask & 4095;
       }
@@ -1021,6 +1016,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    */
   public function fillupPrevNextCache($sort, $cacheKey, $start = 0, $end = self::CACHE_SIZE) {
     $coreSearch = TRUE;
+    // This ensures exceptions are caught in the try-catch.
+    $handling = CRM_Core_TemporaryErrorScope::useException();
     // For custom searches, use the contactIDs method
     if (is_a($this, 'CRM_Contact_Selector_Custom')) {
       $sql = $this->_search->contactIDs($start, $end, $sort, TRUE);
@@ -1049,7 +1046,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     try {
       Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\Exception $e) {
       if ($coreSearch) {
         // in the case of error, try rebuilding cache using full sql which is used for search selector display
         // this fixes the bugs reported in CRM-13996 & CRM-14438

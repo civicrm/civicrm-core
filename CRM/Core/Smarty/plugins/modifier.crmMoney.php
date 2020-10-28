@@ -13,8 +13,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
- * $Id$
- *
  */
 
 /**
@@ -25,12 +23,11 @@
  * @param string $currency
  *   The (optional) currency.
  *
- * @param null $format
- * @param bool $onlyNumber
- *
  * @return string
  *   formatted monetary amount
+ *
+ * @throws \CRM_Core_Exception
  */
-function smarty_modifier_crmMoney($amount, $currency = NULL, $format = NULL, $onlyNumber = FALSE) {
-  return CRM_Utils_Money::format($amount, $currency, $format, $onlyNumber);
+function smarty_modifier_crmMoney($amount, $currency = NULL) {
+  return CRM_Utils_Money::format($amount, $currency);
 }
