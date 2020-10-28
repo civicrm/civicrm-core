@@ -1,11 +1,12 @@
 <?php
 
-use CRM_Contributioncancelactions_ExtensionUtil as E;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\Contact;
 use Civi\Api4\MembershipType;
+use Civi\Api4\RelationshipType;
+use Civi\Api4\Relationship;
 
 /**
  * FIXME - Add test description.
@@ -61,12 +62,18 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testPaypalProCancel() {
+    $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
+    $this->createMembershipType();
+    Relationship::create()->setValues([
+      'contact_id_a' => $this->ids['contact'][0],
+      'contact_id_b' => Contact::create()->setValues(['first_name' => 'Bugs', 'last_name' => 'Bunny'])->execute()->first()['id'],
+      'relationship_type_id' => RelationshipType::get()->addWhere('name_a_b', '=', 'AB')->execute()->first()['id'],
+    ])->execute();
+
     $this->createMembershipOrder();
-    $membership = $this->callAPISuccessGetSingle('Membership', []);
-    $membership['owner_membership_id'] = $membership['id'];
-    $membership['contact_id'] = Contact::create()->setValues(['first_name' => 'Bugs', 'last_name' => 'Bunny'])->execute()->first()['id'];
-    unset($membership['id']);
-    $this->callAPISuccess('Membership', 'create', $membership);
+
+    $memberships = $this->callAPISuccess('Membership', 'get')['values'];
+    $this->assertCount(2, $memberships);
 
     $ipn = new CRM_Core_Payment_PayPalProIPN([
       'rp_invoice_id' => http_build_query([
@@ -92,8 +99,6 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function createMembershipOrder() {
-    $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
-    $this->createMembershipType();
     $priceFieldID = $this->callAPISuccessGetValue('price_field', [
       'return' => 'id',
       'label' => 'Membership Amount',
@@ -154,6 +159,8 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       'member_of_contact_id' => 1,
       'domain_id' => 1,
       'financial_type_id' => 2,
+      'relationship_type_id' => RelationshipType::create(FALSE)->setValues(['name_a_b' => 'AB', 'name_b_a' => 'BA'])->execute()->first()['id'],
+      'relationship_direction' => 'a_b',
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',

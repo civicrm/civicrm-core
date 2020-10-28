@@ -224,6 +224,13 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Process cancelled payment outcome.
    *
+   * @deprecated The intended replacement code is
+   *
+   * Contribution::update(FALSE)->setValues([
+   *  'cancel_date' => 'now',
+   *  'contribution_status_id:name' => 'Cancelled',
+   * ])->addWhere('id', '=', $contribution->id)->execute();
+   *
    * @param array $objects
    *
    * @return bool
@@ -231,15 +238,11 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function cancelled($objects) {
     $contribution = &$objects['contribution'];
-    $memberships = [];
-    if (!empty($objects['membership'])) {
-      $memberships = &$objects['membership'];
-      if (is_numeric($memberships)) {
-        $memberships = [$objects['membership']];
-      }
-    }
 
     if (empty($contribution->id)) {
+      // This code is believed to be unreachable.
+      // this entire function is due to be deprecated in the near future so
+      // this code will live in a deprecated function until it gets removed.
       $addLineItems = TRUE;
       // CRM-15546
       $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
@@ -253,6 +256,20 @@ class CRM_Core_Payment_BaseIPN {
       if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
         CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
       }
+      $memberships = [];
+      if (!empty($objects['membership'])) {
+        $memberships = &$objects['membership'];
+        if (is_numeric($memberships)) {
+          $memberships = [$objects['membership']];
+        }
+      }
+      if (!empty($memberships)) {
+        foreach ($memberships as $membership) {
+          if ($membership) {
+            $this->cancelMembership($membership, $membership->status_id);
+          }
+        }
+      }
     }
     else {
       Contribution::update(FALSE)->setValues([
@@ -261,14 +278,6 @@ class CRM_Core_Payment_BaseIPN {
       ])->addWhere('id', '=', $contribution->id)->execute();
     }
     $participant = &$objects['participant'];
-
-    if (!empty($memberships)) {
-      foreach ($memberships as $membership) {
-        if ($membership) {
-          $this->cancelMembership($membership, $membership->status_id);
-        }
-      }
-    }
 
     if ($participant) {
       $this->cancelParticipant($participant->id);
@@ -319,9 +328,10 @@ class CRM_Core_Payment_BaseIPN {
    * @param boolean $onlyCancelPendingMembership
    *   Do we only cancel pending memberships? OR memberships in any status? (see CRM-18688)
    * @fixme Historically failed() cancelled membership in any status, cancelled() cancelled only pending memberships so we retain that behaviour for now.
-   *
+   * @deprecated
    */
   private function cancelMembership($membership, $membershipStatusID, $onlyCancelPendingMembership = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
     // Cancel only Pending memberships
     $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
