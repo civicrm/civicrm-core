@@ -333,6 +333,23 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
       $title = $values['title'] ?? CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
 
+      // Some workflows do not set the Campaign ID, so get it from the contribution.
+      if(!isset($values['campaign_id'])) {
+        $values['campaign_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $values['contribution_id'], 'campaign_id');
+      }
+
+      // Look up related Campaign and set Campaign variables, if Campaign ID is set
+      if ($values['campaign_id']) {
+        $campaign = new CRM_Campaign_BAO_Campaign();
+        $campaign->id = $values['campaign_id'];
+
+        if ($campaign->find(TRUE)) {
+          $campaignTitle = $campaign->title;
+          $campaignDescription = $campaign->description;
+          $campaignGoals = $campaign->goal_general;
+        }
+      }
+
       // Set email variables explicitly to avoid leaky smarty variables.
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
       $tplParams = [
@@ -361,6 +378,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
         'honor_block_is_active' => $values['honor_block_is_active'] ?? NULL,
         'contributionStatus' => $values['contribution_status'] ?? NULL,
+        'campaignID' => $values['campaign_id'] ?? NULL,
+        'campaignTitle' => $campaignTitle ?? NULL,
+        'campaignDescription' => $campaignDescription ?? NULL,
+        'campaignGoals' => $campaignGoals ?? NULL,
       ];
 
       if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
