@@ -23,6 +23,17 @@ class OAuthClient extends Generic\DAOEntity {
     return $action->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * Initiate the "Authorization Code" workflow.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\OAuthClient\AuthorizationCode
+   */
+  public static function authorizationCode($checkPermissions = TRUE) {
+    $action = new \Civi\Api4\Action\OAuthClient\AuthorizationCode(static::class, __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
