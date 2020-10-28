@@ -185,7 +185,7 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'financial_type_id' => [
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'frequency_unit' => [

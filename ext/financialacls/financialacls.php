@@ -232,6 +232,44 @@ function financialacls_civicrm_membershipTypeValues($form, &$membershipTypeValue
   }
 }
 
+/**
+ * Remove unpermitted financial types from field Options in search context.
+ *
+ * Search context is described as
+ * 'search' => "search: searchable options are returned; labels are translated.",
+ * So this is appropriate to removing the options from search screens.
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_fieldOptions
+ *
+ * @param string $entity
+ * @param string $field
+ * @param array $options
+ * @param array $params
+ */
+function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params) {
+  if ($entity === 'Contribution' && $field === 'financial_type_id' && $params['context'] === 'search') {
+    $action = CRM_Core_Action::VIEW;
+    // At this stage we are only considering the view action. Code from
+    // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
+    $actions = [
+      CRM_Core_Action::VIEW => 'view',
+      CRM_Core_Action::UPDATE => 'edit',
+      CRM_Core_Action::ADD => 'add',
+      CRM_Core_Action::DELETE => 'delete',
+    ];
+    $cacheKey = 'available_types_' . $action;
+    if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
+      foreach ($options as $finTypeId => $type) {
+        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
+          unset($options[$finTypeId]);
+        }
+      }
+      \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey] = $options;
+    }
+    $options = \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey];
+  }
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**
