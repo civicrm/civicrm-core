@@ -116,6 +116,7 @@ class ConformanceTest extends UnitTestCase {
   public function testConformance($entity) {
     $entityClass = 'Civi\Api4\\' . $entity;
 
+    $this->checkEntityInfo($entityClass);
     $actions = $this->checkActions($entityClass);
 
     // Go no further if it's not a CRUD entity
@@ -136,7 +137,19 @@ class ConformanceTest extends UnitTestCase {
   }
 
   /**
-   * @param string $entityClass
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   */
+  protected function checkEntityInfo($entityClass) {
+    $info = $entityClass::getInfo();
+    $this->assertNotEmpty($info['name']);
+    $this->assertNotEmpty($info['title']);
+    $this->assertNotEmpty($info['title_plural']);
+    $this->assertNotEmpty($info['type']);
+    $this->assertNotEmpty($info['description']);
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param string $entity
    */
   protected function checkFields($entityClass, $entity) {

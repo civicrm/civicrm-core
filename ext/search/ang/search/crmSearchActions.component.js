@@ -13,7 +13,7 @@
         ctrl = this;
 
       this.$onInit = function() {
-        var entityTitle = searchMeta.getEntity(ctrl.entity).titlePlural;
+        var entityTitle = searchMeta.getEntity(ctrl.entity).title_plural;
         if (!ctrl.actions) {
           var actions = _.transform(_.cloneDeep(CRM.vars.search.actions), function (actions, action) {
             if (_.includes(action.entities, ctrl.entity)) {
