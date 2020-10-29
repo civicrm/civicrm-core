@@ -1,18 +1,18 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').component('crmSearchFunction', {
+  angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
       expr: '=',
       cat: '<'
     },
-    templateUrl: '~/searchAdmin/crmSearchFunction.html',
+    templateUrl: '~/crmSearchAdmin/crmSearchFunction.html',
     controller: function($scope, formatForSelect2, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
       this.$onInit = function() {
-        ctrl.functions = formatForSelect2(_.where(CRM.searchAdmin.functions, {category: ctrl.cat}), 'name', 'title');
+        ctrl.functions = formatForSelect2(_.where(CRM.crmSearchAdmin.functions, {category: ctrl.cat}), 'name', 'title');
         var fieldInfo = searchMeta.parseExpr(ctrl.expr);
         ctrl.path = fieldInfo.path + fieldInfo.suffix;
         ctrl.field = fieldInfo.field;
@@ -22,7 +22,7 @@
       };
 
       function initFunction() {
-        ctrl.fnInfo = _.find(CRM.searchAdmin.functions, {name: ctrl.fn});
+        ctrl.fnInfo = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fn});
         if (ctrl.fnInfo && _.includes(ctrl.fnInfo.params[0].prefix, 'DISTINCT')) {
           ctrl.modifierAllowed = true;
         }

@@ -8,7 +8,7 @@
       ids: '<'
     },
     templateUrl: '~/crmSearchActions/crmSearchActions.html',
-    controller: function($scope, crmApi4, dialogService, searchMeta) {
+    controller: function($scope, crmApi4, dialogService) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this,
         initialized = false,
@@ -23,16 +23,17 @@
       }
 
       function initialize() {
-        var entityTitle = searchMeta.getEntity(ctrl.entity).title_plural;
-        crmApi4(ctrl.entity, 'getActions', {
-          where: [['name', 'IN', ['update', 'delete']]],
-        }, ['name']).then(function(allowed) {
-          _.each(allowed, function(action) {
+        crmApi4({
+          entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural'], where: [['name', '=', ctrl.entity]]}, 0],
+          allowed: [ctrl.entity, 'getActions', {where: [['name', 'IN', ['update', 'delete']]]}, ['name']]
+        }).then(function(result) {
+          ctrl.entityInfo = result.entityInfo;
+          _.each(result.allowed, function(action) {
             CRM.crmSearchActions.tasks[action].entities.push(ctrl.entity);
           });
           var actions = _.transform(_.cloneDeep(CRM.crmSearchActions.tasks), function(actions, action) {
             if (_.includes(action.entities, ctrl.entity)) {
-              action.title = action.title.replace('%1', entityTitle);
+              action.title = action.title.replace('%1', ctrl.entityInfo.title_plural);
               actions.push(action);
             }
           }, []);
@@ -50,7 +51,8 @@
         }
         var data = {
           ids: ctrl.ids,
-          entity: ctrl.entity
+          entity: ctrl.entity,
+          entityInfo: ctrl.entityInfo
         };
         // If action uses a crmPopup form
         if (action.crmPopup) {

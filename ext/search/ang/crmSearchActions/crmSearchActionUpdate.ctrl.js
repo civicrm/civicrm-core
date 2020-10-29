@@ -1,19 +1,20 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').controller('crmSearchActionUpdate', function ($scope, $timeout, crmApi4, dialogService, searchMeta) {
+  angular.module('crmSearchActions').controller('crmSearchActionUpdate', function ($scope, $timeout, crmApi4, dialogService) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model,
       ctrl = $scope.$ctrl = this;
 
-    this.entity = searchMeta.getEntity(model.entity);
-    this.entityTitle = model.ids.length === 1 ? this.entity.title : this.entity.titlePlural;
+    this.entityTitle = model.ids.length === 1 ? model.entityInfo.title : model.entityInfo.title_plural;
     this.values = [];
     this.add = null;
+    this.fields = null;
 
-    function fieldInUse(fieldName) {
-      return _.includes(_.collect(ctrl.values, 0), fieldName);
-    }
+    crmApi4(model.entity, 'getFields', {action: 'update', loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon']})
+      .then(function(fields) {
+        ctrl.fields = fields;
+      });
 
     this.updateField = function(index) {
       // Debounce the onchange event using timeout
@@ -34,8 +35,16 @@
       });
     };
 
+    this.getField = function(fieldName) {
+      return _.where(ctrl.fields, {name: fieldName})[0];
+    };
+
+    function fieldInUse(fieldName) {
+      return _.includes(_.collect(ctrl.values, 0), fieldName);
+    }
+
     this.availableFields = function() {
-      var results = _.transform(ctrl.entity.fields, function(result, item) {
+      var results = _.transform(ctrl.fields, function(result, item) {
         var formatted = {id: item.name, text: item.label, description: item.description};
         if (fieldInUse(item.name)) {
           formatted.disabled = true;

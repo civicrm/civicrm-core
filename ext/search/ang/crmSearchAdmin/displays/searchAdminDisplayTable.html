@@ -3,6 +3,7 @@
     <label for="crm-search-admin-table-limit">{{ ts('Results to display (0 for no limit):') }}</label>
     <input id="crm-search-admin-table-limit" type="number" min="0" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
     <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> {{ ts('Use Pager') }}</label>
+    <label><input type="checkbox" ng-model="$ctrl.display.settings.actions"> {{ ts('Enable Actions') }}</label>
   </div>
 </fieldset>
 <div class="crm-flex-box crm-search-admin-table-columns-wrapper">

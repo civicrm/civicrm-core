@@ -14,6 +14,8 @@
         ctrl = this;
 
       this.page = 1;
+      this.selectedRows = [];
+      this.allRowsSelected = false;
 
       this.$onInit = function() {
         this.orderBy = _.cloneDeep(this.apiParams.orderBy || {});
@@ -29,7 +31,7 @@
         });
       };
 
-      function getResults() {
+      this.getResults = function() {
         var params = _.merge(_.cloneDeep(ctrl.apiParams), {limit: ctrl.limit, offset: (ctrl.page - 1) * ctrl.limit, orderBy: ctrl.orderBy});
         if (_.isEmpty(params.where)) {
           params.where = [];
@@ -46,13 +48,9 @@
           ctrl.results = results;
           ctrl.rowCount = results.count;
         });
-      }
-
-      this.changePage = function() {
-        getResults();
       };
 
-      $scope.$watch('$ctrl.filters', getResults, true);
+      $scope.$watch('$ctrl.filters', ctrl.getResults, true);
 
       /**
        * Returns crm-i icon class for a sortable column
@@ -78,7 +76,7 @@
           ctrl.orderBy = {};
         }
         ctrl.orderBy[col.key] = dir;
-        getResults();
+        ctrl.getResults();
       };
 
       $scope.formatResult = function(row, col) {
@@ -104,6 +102,44 @@
         }
         return value;
       }
+
+      $scope.selectAllRows = function() {
+        // Deselect all
+        if (ctrl.allRowsSelected) {
+          ctrl.allRowsSelected = false;
+          ctrl.selectedRows.length = 0;
+          return;
+        }
+        // Select all
+        ctrl.allRowsSelected = true;
+        if (ctrl.page === 1 && ctrl.results[1].length < ctrl.limit) {
+          ctrl.selectedRows = _.pluck(ctrl.results[1], 'id');
+          return;
+        }
+        // If more than one page of results, use ajax to fetch all ids
+        $scope.loadingAllRows = true;
+        var params = _.cloneDeep(ctrl.apiParams);
+        params.select = ['id'];
+        crmApi4(ctrl.apiEntity, 'get', params, ['id']).then(function(ids) {
+          $scope.loadingAllRows = false;
+          ctrl.selectedRows = _.toArray(ids);
+        });
+      };
+
+      $scope.selectRow = function(row) {
+        var index = ctrl.selectedRows.indexOf(row.id);
+        if (index < 0) {
+          ctrl.selectedRows.push(row.id);
+          ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
+        } else {
+          ctrl.allRowsSelected = false;
+          ctrl.selectedRows.splice(index, 1);
+        }
+      };
+
+      $scope.isRowSelected = function(row) {
+        return ctrl.allRowsSelected || _.includes(ctrl.selectedRows, row.id);
+      };
 
     }
   });

@@ -6,12 +6,12 @@
     undefined;
 
   // Declare module and route/controller/services
-  angular.module('searchAdmin', CRM.angRequires('searchAdmin'))
+  angular.module('crmSearchAdmin', CRM.angRequires('crmSearchAdmin'))
 
     .config(function($routeProvider) {
       $routeProvider.when('/list', {
         controller: 'searchList',
-        templateUrl: '~/searchAdmin/searchList.html',
+        templateUrl: '~/crmSearchAdmin/searchList.html',
         resolve: {
           // Load data for lists
           savedSearches: function(crmApi4) {
@@ -116,7 +116,7 @@
           if (bracketPos >= 0) {
             var parsed = expr.substr(bracketPos).match(/[ ]?([A-Z]+[ ]+)?([\w.:]+)/);
             fieldName = parsed[2];
-            result.fn = _.find(CRM.searchAdmin.functions, {name: expr.substring(0, bracketPos)});
+            result.fn = _.find(CRM.crmSearchAdmin.functions, {name: expr.substring(0, bracketPos)});
             result.modifier = _.trim(parsed[1]);
           }
           result.field = expr ? getField(fieldName, searchEntity) : undefined;
@@ -142,7 +142,7 @@
               if ((entityName === 'Contact' && field.name === 'id') || field.fk_entity === 'Contact') {
                 columns.push({
                   id: prefix + field.name,
-                  text: entity.titlePlural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
+                  text: entity.title_plural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
                   icon: entity.icon
                 });
               }
@@ -150,20 +150,6 @@
             entityCount[entityName] = 1 + (entityCount[entityName] || 1);
           });
         }
-      };
-    })
-
-    // Reformat an array of objects for compatibility with select2
-    // Todo this probably belongs in core
-    .factory('formatForSelect2', function() {
-      return function(input, key, label, extra) {
-        return _.transform(input, function(result, item) {
-          var formatted = {id: item[key], text: item[label]};
-          if (extra) {
-            _.merge(formatted, _.pick(item, extra));
-          }
-          result.push(formatted);
-        }, []);
       };
     });
 

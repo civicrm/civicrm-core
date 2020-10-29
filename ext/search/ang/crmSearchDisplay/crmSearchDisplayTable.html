@@ -1,3 +1,6 @@
+<div class="form-inline" ng-if="$ctrl.settings.actions">
+  <crm-search-actions entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-actions>
+</div>
 <table>
   <thead>
     <tr>
@@ -13,7 +16,7 @@
   <tbody>
     <tr ng-repeat="row in $ctrl.results">
       <td ng-if="$ctrl.settings.actions">
-        <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(loading === false && !loadingAllRows && row.id)">
+        <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(!loadingAllRows && row.id)">
       </td>
       <td ng-repeat="col in $ctrl.columns">
         {{ formatResult(row, col) }}
@@ -28,7 +31,7 @@
       boundary-links="true"
       total-items="$ctrl.rowCount"
       ng-model="$ctrl.page"
-      ng-change="$ctrl.changePage()"
+      ng-change="$ctrl.getResults()"
       items-per-page="$ctrl.limit"
       max-size="6"
       force-ellipses="true"

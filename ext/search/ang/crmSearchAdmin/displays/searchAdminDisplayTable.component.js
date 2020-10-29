@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').component('searchAdminDisplayTable', {
+  angular.module('crmSearchAdmin').component('searchAdminDisplayTable', {
     bindings: {
       display: '<',
       apiEntity: '<',
@@ -10,7 +10,7 @@
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
     },
-    templateUrl: '~/searchAdmin/displays/searchAdminDisplayTable.html',
+    templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
     controller: function($scope, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;

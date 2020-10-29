@@ -1,13 +1,12 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').controller('crmSearchActionDelete', function($scope, crmApi4, dialogService, searchMeta) {
+  angular.module('crmSearchActions').controller('crmSearchActionDelete', function($scope, crmApi4, dialogService) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model,
       ctrl = $scope.$ctrl = this;
 
-    this.entity = searchMeta.getEntity(model.entity);
-    this.entityTitle = model.ids.length === 1 ? this.entity.title : this.entity.titlePlural;
+    this.entityTitle = model.ids.length === 1 ? model.entityInfo.title : model.entityInfo.title_plural;
 
     this.cancel = function() {
       dialogService.cancel('crmSearchAction');

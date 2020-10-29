@@ -1,5 +1,5 @@
 <?php
-// Autoloader data for SearchDisplay module.
+// Search Display module - for rendering search displays.
 return [
   'js' => [
     'ang/crmSearchDisplay.module.js',

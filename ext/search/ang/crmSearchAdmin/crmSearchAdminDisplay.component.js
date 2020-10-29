@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').component('crmSearchAdminDisplay', {
+  angular.module('crmSearchAdmin').component('crmSearchAdminDisplay', {
     bindings: {
       savedSearch: '<',
       display: '<'
@@ -9,9 +9,9 @@
     template: function() {
       // Dynamic template generates switch condition for each display type
       var html =
-        '<div ng-include="\'~/searchAdmin/crmSearchAdminDisplay.html\'"></div>\n' +
+        '<div ng-include="\'~/crmSearchAdmin/crmSearchAdminDisplay.html\'"></div>\n' +
         '<div ng-switch="$ctrl.display.type">\n';
-      _.each(CRM.searchAdmin.displayTypes, function(type) {
+      _.each(CRM.crmSearchAdmin.displayTypes, function(type) {
         html +=
           '<div ng-switch-when="' + type.name + '">\n' +
           '  <search-admin-display-' + type.name + ' api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" display="$ctrl.display"></search-admin-display-' + type.name + '>\n' +

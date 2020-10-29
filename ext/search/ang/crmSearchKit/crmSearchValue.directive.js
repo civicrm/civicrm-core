@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').directive('crmSearchValue', function($interval, searchMeta, formatForSelect2) {
+  angular.module('crmSearchKit').directive('crmSearchValue', function($interval, formatForSelect2) {
     return {
       scope: {
         data: '=crmSearchValue'
@@ -102,10 +102,8 @@
 
         scope.$watchCollection('data', function(data) {
           destroyWidget();
-          var field = searchMeta.parseExpr(data.field).field;
-          if (field) {
-            var optionKey = data.field.split(':')[1] || 'id';
-            makeWidget(field, data.op, optionKey);
+          if (data.field) {
+            makeWidget(data.field, data.op, data.optionKey || 'id');
           }
         });
       }

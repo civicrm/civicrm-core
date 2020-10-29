@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').component('crmSearchClause', {
+  angular.module('crmSearchAdmin').component('crmSearchClause', {
     bindings: {
       fields: '<',
       clauses: '<',
@@ -11,12 +11,13 @@
       label: '@',
       deleteGroup: '&'
     },
-    templateUrl: '~/searchAdmin/crmSearchClause.html',
-    controller: function ($scope, $element, $timeout) {
+    templateUrl: '~/crmSearchAdmin/crmSearchClause.html',
+    controller: function ($scope, $element, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
-        ctrl = this;
+        ctrl = this,
+        meta = {};
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
-      this.operators = CRM.searchAdmin.operators;
+      this.operators = CRM.crmSearchAdmin.operators;
       this.sortOptions = {
         axis: 'y',
         connectWith: '.api4-clause-group-sortable',
@@ -28,6 +29,20 @@
 
       this.$onInit = function() {
         ctrl.hasParent = !!$element.attr('delete-group');
+      };
+
+      this.getField = function(expr) {
+        if (!meta[expr]) {
+          meta[expr] = searchMeta.parseExpr(expr);
+        }
+        return meta[expr].field;
+      };
+
+      this.getOptionKey = function(expr) {
+        if (!meta[expr]) {
+          meta[expr] = searchMeta.parseExpr(expr);
+        }
+        return meta[expr].suffix ? meta[expr].suffix.slice(1) : 'id';
       };
 
       this.addGroup = function(op) {

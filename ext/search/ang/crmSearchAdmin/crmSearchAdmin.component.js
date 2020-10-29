@@ -1,11 +1,11 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('searchAdmin').component('crmSearchAdmin', {
+  angular.module('crmSearchAdmin').component('crmSearchAdmin', {
     bindings: {
       savedSearch: '<'
     },
-    templateUrl: '~/searchAdmin/crmSearchAdmin.html',
+    templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
     controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
@@ -15,7 +15,7 @@
       this.selectedRows = [];
       this.limit = CRM.cache.get('searchPageSize', 30);
       this.page = 1;
-      this.displayTypes = _.indexBy(CRM.searchAdmin.displayTypes, 'name');
+      this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'name');
       // After a search this.results is an object of result arrays keyed by page,
       // Initially this.results is an empty string because 1: it's falsey (unlike an empty object) and 2: it doesn't throw an error if you try to access undefined properties (unlike null)
       this.results = '';
