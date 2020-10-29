@@ -81,26 +81,38 @@
 
       $scope.formatResult = function(row, col) {
         var value = row[col.key];
-        return formatFieldValue(col, value);
+        return formatFieldValue(row, col, value);
       };
 
-      function formatFieldValue(col, value) {
-        var type = col.dataType;
+      function formatFieldValue(row, col, value) {
+        var type = col.dataType,
+          result = value;
         if (_.isArray(value)) {
           return _.map(value, function(val) {
             return formatFieldValue(col, val);
           }).join(', ');
         }
         if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
-          return CRM.utils.formatDate(value, null, type === 'Timestamp');
+          result = CRM.utils.formatDate(value, null, type === 'Timestamp');
         }
         else if (type === 'Boolean' && typeof value === 'boolean') {
-          return value ? ts('Yes') : ts('No');
+          result = value ? ts('Yes') : ts('No');
         }
         else if (type === 'Money' && typeof value === 'number') {
-          return CRM.formatMoney(value);
+          result = CRM.formatMoney(value);
         }
-        return value;
+        result = _.escape(result);
+        if (col.link) {
+          result = '<a href="' + replaceTokens(col.link, row) + '">' + result + '</a>';
+        }
+        return result;
+      }
+
+      function replaceTokens(str, data) {
+        _.each(data, function(value, key) {
+          str = str.replace('[' + key + ']', value);
+        });
+        return str;
       }
 
       $scope.selectAllRows = function() {

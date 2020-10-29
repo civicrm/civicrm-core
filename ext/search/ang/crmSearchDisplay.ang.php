@@ -10,7 +10,7 @@ return [
     'ang/crmSearchDisplay',
   ],
   'basePages' => [],
-  'requires' => ['crmUi', 'api4', 'crmSearchActions', 'ui.bootstrap'],
+  'requires' => ['ngSanitize', 'crmUi', 'api4', 'crmSearchActions', 'ui.bootstrap'],
   'exports' => [
     'crm-search-display-table' => 'E',
   ],

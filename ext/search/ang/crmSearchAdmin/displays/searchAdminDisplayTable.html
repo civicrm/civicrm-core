@@ -6,8 +6,8 @@
     <label><input type="checkbox" ng-model="$ctrl.display.settings.actions"> {{ ts('Enable Actions') }}</label>
   </div>
 </fieldset>
-<div class="crm-flex-box crm-search-admin-table-columns-wrapper">
-  <fieldset class="crm-search-admin-table-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.sortableOptions">
+<div class="crm-flex-box crm-search-admin-edit-columns-wrapper">
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.sortableOptions">
     <legend>{{:: ts('Columns') }}</legend>
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
@@ -17,9 +17,13 @@
           <i class="crm-i fa-ban"></i>
         </button>
       </div>
+      <div class="form-inline">
+        <label>{{ ts('Link:') }} <input type="checkbox" ng-checked="!!col.link" ng-click="$ctrl.toggleLink(col)" /></label>
+        <input class="form-control" type="text" ng-model="col.link" ng-model-options="{updateOn: 'blur'}" ng-show="!!col.link" />
+      </div>
     </fieldset>
   </fieldset>
-  <fieldset class="crm-search-admin-table-columns" ng-model="$ctrl.hiddenColumns" ui-sortable="$ctrl.sortableOptions">
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.hiddenColumns" ui-sortable="$ctrl.sortableOptions">
     <legend>{{:: ts('Hidden Columns') }}</legend>
     <fieldset ng-repeat="col in $ctrl.hiddenColumns" class="crm-draggable">
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>

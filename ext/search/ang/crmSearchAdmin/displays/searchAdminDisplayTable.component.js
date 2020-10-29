@@ -25,8 +25,8 @@
       }
 
       this.sortableOptions = {
-        connectWith: '.crm-search-admin-table-columns',
-        containment: '.crm-search-admin-table-columns-wrapper'
+        connectWith: '.crm-search-admin-edit-columns',
+        containment: '.crm-search-admin-edit-columns-wrapper'
       };
 
       this.removeCol = function(index) {
@@ -37,6 +37,10 @@
       this.restoreCol = function(index) {
         ctrl.display.settings.columns.push(ctrl.hiddenColumns[index]);
         ctrl.hiddenColumns.splice(index, 1);
+      };
+
+      this.toggleLink = function(col) {
+        col.link = col.link ? '' : (window.location.pathname + window.location.search).replace('civicrm/admin/search', 'civicrm/');
       };
 
       this.$onInit = function () {
