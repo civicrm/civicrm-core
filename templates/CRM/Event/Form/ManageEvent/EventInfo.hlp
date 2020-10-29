@@ -106,6 +106,6 @@
   {ts}Social Sharing{/ts}
 {/htxt}
 {htxt id="id-is_share"}
-<p>{ts}When enabled, links allowing people to share this event with their social network will be displayed (e.g. Facebook "Like", Google+, and Twitter).{/ts}</p>
+<p>{ts}When enabled, links helping people share this event with their social network will be displayed (e.g. Facebook, Twitter, LinkedIn and email).{/ts}</p>
 <p>{ts}Social media links will be included on the Event Info page, Thank-you page, Tell-a-Friend page (if enabled), and in event confirmation emails.{/ts}</p>
 {/htxt}
