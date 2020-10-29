@@ -96,6 +96,7 @@ class CRM_Utils_ReCAPTCHA {
       TRUE
     );
     $form->registerRule('recaptcha', 'callback', 'validate', 'CRM_Utils_ReCAPTCHA');
+    $form->addRule('g-recaptcha-response', ts('Please go back and complete the CAPTCHA at the bottom of this form.'), 'recaptcha');
     if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
       $form->setElementError(
         'g-recaptcha-response',
@@ -115,6 +116,20 @@ class CRM_Utils_ReCAPTCHA {
       $captcha->add($form);
       $form->assign('isCaptcha', TRUE);
     }
+  }
+
+  /**
+   * @param $value
+   * @param CRM_Core_Form $form
+   *
+   * @return mixed
+   */
+  public static function validate($value, $form) {
+    $resp = recaptcha_check_answer(CRM_Core_Config::singleton()->recaptchaPrivateKey,
+      $_SERVER['REMOTE_ADDR'],
+      $_POST['g-recaptcha-response']
+    );
+    return $resp->is_valid;
   }
 
 }
