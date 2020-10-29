@@ -2434,6 +2434,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addChainSelect($elementName, $settings = []) {
+    $required = $settings['required'] ?? FALSE;
     $label = strpos($elementName, 'rovince') ? CRM_Core_DAO_StateProvince::getEntityTitle() : CRM_Core_DAO_County::getEntityTitle();
     $props = $settings += [
       'control_field' => str_replace(['state_province', 'StateProvince', 'county', 'County'], [
@@ -2447,11 +2448,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
       'data-none-prompt' => ts('- N/A -'),
       'multiple' => FALSE,
-      'required' => FALSE,
+      'required' => $required,
       'placeholder' => ts('- select %1 -', [1 => $label]),
     ];
     CRM_Utils_Array::remove($props, 'label', 'required', 'control_field', 'context');
-    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';
+    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2' . ($required ? ' required crm-field-required' : '');
     $props['data-select-prompt'] = $props['placeholder'];
     $props['data-name'] = $elementName;
 
@@ -2461,7 +2462,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // CRM-15225 - normally QF will reject any selected values that are not part of the field's options, but due to a
     // quirk in our patched version of HTML_QuickForm_select, this doesn't happen if the options are NULL
     // which seems a bit dirty but it allows our dynamically-popuplated select element to function as expected.
-    return $this->add('select', $elementName, $settings['label'], NULL, $settings['required'], $props);
+    return $this->add('select', $elementName, $settings['label'], NULL, $required, $props);
   }
 
   /**
