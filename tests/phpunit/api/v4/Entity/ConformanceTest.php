@@ -141,7 +141,7 @@ class ConformanceTest extends UnitTestCase {
     $info = $entityClass::getInfo();
     $this->assertNotEmpty($info['name']);
     $this->assertNotEmpty($info['title']);
-    $this->assertNotEmpty($info['titlePlural']);
+    $this->assertNotEmpty($info['title_plural']);
     $this->assertNotEmpty($info['type']);
     $this->assertNotEmpty($info['description']);
   }

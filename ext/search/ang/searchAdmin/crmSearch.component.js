@@ -27,7 +27,7 @@
 
       $scope.controls = {};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
-      $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'titlePlural', ['description', 'icon']);
+      $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'title_plural', ['description', 'icon']);
       this.perm = {
         editGroups: CRM.checkPerm('edit groups')
       };
@@ -44,7 +44,7 @@
           if (entity) {
             joinEntities.push({
               id: link.entity + ' AS ' + link.alias,
-              text: entity.titlePlural,
+              text: entity.title_plural,
               description: '(' + link.alias + ')',
               icon: entity.icon
             });
@@ -428,7 +428,7 @@
 
         var mainEntity = searchMeta.getEntity(ctrl.entity),
           result = [{
-            text: mainEntity.titlePlural,
+            text: mainEntity.title_plural,
             icon: mainEntity.icon,
             children: formatFields(ctrl.entity, '')
           }];
@@ -436,7 +436,7 @@
           var joinName = join[0].split(' AS '),
             joinEntity = searchMeta.getEntity(joinName[0]);
           result.push({
-            text: joinEntity.titlePlural + ' (' + joinName[1] + ')',
+            text: joinEntity.title_plural + ' (' + joinName[1] + ')',
             icon: joinEntity.icon,
             children: formatFields(joinEntity.name, joinName[1] + '.')
           });

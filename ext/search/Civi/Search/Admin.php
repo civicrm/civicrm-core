@@ -56,9 +56,9 @@ class Admin {
   public static function getSchema() {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'titlePlural', 'description', 'icon')
+      ->addSelect('name', 'title', 'title_plural', 'description', 'icon')
       ->addWhere('name', '!=', 'Entity')
-      ->addOrderBy('titlePlural')
+      ->addOrderBy('title_plural')
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();

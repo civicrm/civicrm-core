@@ -23,7 +23,7 @@
       }
 
       function initialize() {
-        var entityTitle = searchMeta.getEntity(ctrl.entity).titlePlural;
+        var entityTitle = searchMeta.getEntity(ctrl.entity).title_plural;
         crmApi4(ctrl.entity, 'getActions', {
           where: [['name', 'IN', ['update', 'delete']]],
         }, ['name']).then(function(allowed) {
