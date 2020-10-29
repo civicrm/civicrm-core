@@ -36,7 +36,7 @@ class OAuthLeagueFacade {
     $localOptions['clientId'] = $clientDef['guid'];
     $localOptions['clientSecret'] = $clientDef['secret'];
     // NOTE: If we ever have frontend users, this may need to change.
-    $localOptions['redirectUri'] = \CRM_Utils_System::url('civicrm/oauth-client/return', NULL, TRUE, NULL, FALSE);
+    $localOptions['redirectUri'] = \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
     $options = array_merge(
       $providerDef['options'] ?? [],
       $clientDef['options'] ?? [],

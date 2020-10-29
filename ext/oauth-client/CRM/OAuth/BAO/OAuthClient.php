@@ -59,4 +59,15 @@ class CRM_OAuth_BAO_OAuthClient extends CRM_OAuth_DAO_OAuthClient {
     return Civi::$statics[__FUNCTION__];
   }
 
+  /**
+   * Determine the "redirect_uri". When using authorization-code flow, the
+   * OAuth2 provider will redirect back to our "redirect_uri".
+   *
+   * @return string
+   */
+  public static function getRedirectUri() {
+    return \Civi::settings()->get('oauthClientRedirectUrl') ?:
+      \CRM_Utils_System::url('civicrm/oauth-client/return', NULL, TRUE, NULL, FALSE);
+  }
+
 }
