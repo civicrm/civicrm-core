@@ -28,7 +28,7 @@
         if ((entityName === 'Contact' && field.name === 'id') || field.fk_entity === 'Contact') {
           columns.push({
             id: prefix + field.name,
-            text: entity.titlePlural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
+            text: entity.title_plural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
             icon: entity.icon
           });
         }

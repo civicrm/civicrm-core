@@ -123,7 +123,7 @@ abstract class AbstractEntity {
     $info = [
       'name' => static::getEntityName(),
       'title' => static::getEntityTitle(),
-      'titlePlural' => static::getEntityTitle(TRUE),
+      'title_plural' => static::getEntityTitle(TRUE),
       'type' => self::stripNamespace(get_parent_class(static::class)),
     ];
     $reflection = new \ReflectionClass(static::class);
