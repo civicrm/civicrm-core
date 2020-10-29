@@ -15,7 +15,11 @@
     {if ($extends eq 'Contribution') || ($extends eq 'Membership')}
       <span id='amount_sum_label'>{ts}Total Amount{/ts}</span>
     {else}
-      <span id='amount_sum_label'>{ts}Total Fee(s){/ts}{if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}</span>
+      {if $isAdditionalParticipants}
+        <span id='amount_sum_label'>{ts}Total for this participant{/ts}</span>
+      {else}
+        <span id='amount_sum_label'>{ts}Total{/ts}</span>
+      {/if}
     {/if}
   </div>
   <div class="content calc-value" {if $hideTotal}style="display:none;"{/if} id="pricevalue"></div>
