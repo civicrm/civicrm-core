@@ -730,7 +730,7 @@ WHERE civicrm_address.geo_code_1 IS NOT NULL
    * @return array
    *   array of all the events that are searched
    */
-  public static function &getCompleteInfo(
+  public static function getCompleteInfo(
     $start = NULL,
     $type = NULL,
     $eventId = NULL,
@@ -839,15 +839,15 @@ WHERE civicrm_event.is_active = 1
 
     // check 'view event info' permission
     //@todo - per CRM-14626 we have resolved that 'view event info' means 'view ALL event info'
-    // and passing in the specific permission here will short-circuit the evaluation of permission to
-    // see specific events (doesn't seem relevant to this call
-    // however, since this function is accessed only by a convoluted call from a joomla block function
-    // it seems safer not to touch here. Suggestion is that CRM_Core_Permission::check(array or relevant permissions) would
-    // be clearer & safer here
-    $permissions = CRM_Core_Permission::event(CRM_Core_Permission::VIEW);
+    if (CRM_Core_Permission::check('view event info')) {
+      $permissions = TRUE;
+    }
+    else {
+      $permissions = CRM_Core_Permission::event(CRM_Core_Permission::VIEW);
+    }
 
     while ($dao->fetch()) {
-      if (!empty($permissions) && in_array($dao->event_id, $permissions)) {
+      if (!empty($permissions) && ($permissions === TRUE || in_array($dao->event_id, $permissions))) {
         $info = [];
         $info['uid'] = "CiviCRM_EventID_{$dao->event_id}_" . md5($config->userFrameworkBaseURL) . $url;
 
@@ -1075,7 +1075,7 @@ WHERE civicrm_event.is_active = 1
             $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify');
             if ($email) {
               //get values of corresponding profile fields for notification
-              list($profileValues) = self::buildCustomDisplay($gId,
+              [$profileValues] = self::buildCustomDisplay($gId,
                 NULL,
                 $contactID,
                 $template,
