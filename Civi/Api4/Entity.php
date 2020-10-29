@@ -50,7 +50,11 @@ class Entity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'title',
-          'description' => 'Localized title',
+          'description' => 'Localized title (singular)',
+        ],
+        [
+          'name' => 'title_plural',
+          'description' => 'Localized title (plural)',
         ],
         [
           'name' => 'type',
