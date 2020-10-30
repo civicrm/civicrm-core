@@ -8,6 +8,9 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-users</icon>
+  <paths>
+    <create>civicrm/group/add?reset=1</create>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>

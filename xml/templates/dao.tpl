@@ -37,6 +37,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @var bool
        */
       public static $_log = {$table.log|strtoupper};
+      {if $table.paths}
+     /**
+      * Paths for accessing this entity in the UI.
+      *
+      * @var string[]
+      */
+      protected static $_paths = {$table.paths|@print_array};
+   {/if}
 
 {foreach from=$table.fields item=field}
     /**

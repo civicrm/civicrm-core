@@ -90,6 +90,15 @@ abstract class AbstractEntity {
   }
 
   /**
+   * Overridable function to return menu paths related to this entity.
+   *
+   * @return array
+   */
+  protected static function getEntityPaths() {
+    return [];
+  }
+
+  /**
    * Magic method to return the action object for an api.
    *
    * @param string $action
@@ -125,6 +134,7 @@ abstract class AbstractEntity {
       'title' => static::getEntityTitle(),
       'title_plural' => static::getEntityTitle(TRUE),
       'type' => self::stripNamespace(get_parent_class(static::class)),
+      'paths' => static::getEntityPaths(),
     ];
     $reflection = new \ReflectionClass(static::class);
     $info += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
