@@ -107,6 +107,11 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
     }
 
     $this->assign('rows', $allMailSettings);
+
+    $setupActions = CRM_Core_BAO_MailSettings::getSetupActions();
+    if (count($setupActions) > 1 || !isset($setupActions['standard'])) {
+      $this->assign('setupActions', $setupActions);
+    }
   }
 
   /**

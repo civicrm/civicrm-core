@@ -58,9 +58,34 @@
       {ts}None found.{/ts}
     </div>
 {/if}
-  <div class="action-link">
-    {crmButton q="action=add&reset=1" id="newMailSettings"  icon="plus-circle"}{ts}Add Mail Account{/ts}{/crmButton}
-    {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
-  </div>
+    {if $setupActions}
+        <form>
+            <select id="crm-mail-setup" name="crm-mail-setup" class="crm-select2 crm-form-select" aria-label="{ts}Add Mail Account{/ts}">
+                <option value="" aria-hidden="true">{ts}Add Mail Account{/ts}</option>
+                {foreach from=$setupActions key=setupActionsName item=setupAction}
+                    <option value="{$setupActionsName|escape}">{$setupAction.title|escape}</option>
+                {/foreach}
+            </select>
+        </form>
+    {else}
+        <div class="action-link">
+            {crmButton q="action=add&reset=1" id="newMailSettings"  icon="plus-circle"}{ts}Add Mail Account{/ts}{/crmButton}
+            {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
+        </div>
+    {/if}
+
 {/if}
 </div>
+{literal}
+    <script type="text/javascript">
+        cj('#crm-mail-setup').val('');
+        cj('#crm-mail-setup').on('select2-selecting', function(event) {
+            if (!event.val) {
+                return;
+            }
+            event.stopPropagation();
+            var url = CRM.url('civicrm/ajax/setupMailAccount', {type: event.val});
+            window.location = url;
+        });
+    </script>
+{/literal}

@@ -24,6 +24,30 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
+   * Get a list of setup-actions.
+   *
+   * @return array
+   *   List of available actions. See description in the hook-docs.
+   * @see CRM_Utils_Hook::mailSetupActions()
+   */
+  public static function getSetupActions() {
+    $setupActions = [];
+    $setupActions['standard'] = [
+      'title' => ts('Standard Mail Account'),
+      'callback' => ['CRM_Core_BAO_MailSettings', 'setupStandardAccount'],
+    ];
+
+    CRM_Utils_Hook::mailSetupActions($setupActions);
+    return $setupActions;
+  }
+
+  public static function setupStandardAccount($setupAction) {
+    return [
+      'url' => CRM_Utils_System::url('civicrm/admin/mailSettings', 'action=add&reset=1', TRUE, NULL, FALSE),
+    ];
+  }
+
+  /**
    * Return the DAO object containing to the default row of
    * civicrm_mail_settings and cache it for further calls
    *

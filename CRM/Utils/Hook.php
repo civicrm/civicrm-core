@@ -1043,6 +1043,24 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * When adding a new "Mail Account" (`MailSettings`), present a menu of setup
+   * options.
+   *
+   * @param array $setupActions
+   *   Each item has a symbolic-key, and it has the properties:
+   *     - title: string
+   *     - callback: string|array, the function which starts the setup process.
+   *        The function is expected to return a 'url' for the config screen.
+   * @return mixed
+   */
+  public static function mailSetupActions(&$setupActions) {
+    return self::singleton()->invoke(['setupActions'], $setupActions, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_mailSetupActions'
+    );
+  }
+
+  /**
    * This hook is called when composing a mailing. You can include / exclude other groups as needed.
    *
    * @param mixed $form
