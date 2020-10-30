@@ -1896,14 +1896,15 @@ AND cc.sort_name LIKE '%$name%'";
   public static function mergeRelationships($mainId, $otherId, &$sqls) {
     // Delete circular relationships
     $sqls[] = "DELETE FROM civicrm_relationship
-      WHERE (contact_id_a = $mainId AND contact_id_b = $otherId)
-         OR (contact_id_b = $mainId AND contact_id_a = $otherId)";
+      WHERE (contact_id_a = $mainId AND contact_id_b = $otherId AND case_id IS NULL)
+         OR (contact_id_b = $mainId AND contact_id_a = $otherId AND case_id IS NULL)";
 
     // Delete relationship from other contact if main contact already has that relationship
     $sqls[] = "DELETE r2
       FROM civicrm_relationship r1, civicrm_relationship r2
       WHERE r1.relationship_type_id = r2.relationship_type_id
       AND r1.id <> r2.id
+      AND r1.case_id IS NULL AND r2.case_id IS NULL
       AND (
         r1.contact_id_a = $mainId AND r2.contact_id_a = $otherId AND r1.contact_id_b = r2.contact_id_b
         OR r1.contact_id_b = $mainId AND r2.contact_id_b = $otherId AND r1.contact_id_a = r2.contact_id_a
