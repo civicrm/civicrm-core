@@ -15,7 +15,7 @@ class OAuthProvider extends Generic\AbstractEntity {
    */
   public static function get($checkPermissions = TRUE) {
     $action = new Generic\BasicGetAction('OAuthProvider', __FUNCTION__, function () {
-      $cache = \Civi::cache('short');
+      $cache = \Civi::cache('long');
       if (!$cache->has('OAuthProvider_list')) {
         $providers = [];
         $event = GenericHookEvent::create([

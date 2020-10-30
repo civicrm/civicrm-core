@@ -193,19 +193,22 @@ function oauth_client_civicrm_themes(&$themes) {
  * Implements hook_civicrm_oauthProviders().
  */
 function oauth_client_civicrm_oauthProviders(&$providers) {
-  $ingest = function($file) use (&$providers) {
-    $parsed = json_decode(file_get_contents($file), 1);
-    foreach ($parsed as $provider) {
-      $providers[$provider['name']] = $provider;
+  $ingest = function($pat) use (&$providers) {
+    $files = (array) glob($pat);
+    foreach ($files as $file) {
+      if (!defined('CIVICRM_TEST') && preg_match(';\.test\.json$;', $file)) {
+        continue;
+      }
+      $name = preg_replace(';\.(dist\.|test\.|)json$;', '', basename($file));
+      $provider = json_decode(file_get_contents($file), 1);
+      $provider['name'] = $name;
+      $providers[$name] = $provider;
     }
   };
 
-  $ingest(__DIR__ . '/data/oauth-providers.dist.json');
-  if (defined('CIVICRM_TEST')) {
-    $ingest(__DIR__ . '/data/oauth-providers.test.json');
-  }
-  $localFile = Civi::paths()->getPath('[civicrm.private]/oauth-providers.local.json');
-  if (file_exists($localFile)) {
-    $ingest($localFile);
+  $ingest(__DIR__ . '/providers/*.json');
+  $localDir = Civi::paths()->getPath('[civicrm.private]/oauth-providers');
+  if (file_exists($localDir)) {
+    $ingest($localDir . '/*.json');
   }
 }

@@ -1,0 +1,9 @@
+{
+  "name": "test_example_2",
+  "title": "Second Test Example",
+  "class": "My\\Example2",
+  "options": {
+    "urlAuthorize": "https://example.com/two",
+    "scopes": ["scope-2-foo", "scope-2-bar"]
+  }
+}
