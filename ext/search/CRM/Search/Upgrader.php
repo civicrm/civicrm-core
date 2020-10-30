@@ -31,4 +31,14 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
       ->execute();
   }
 
+  public function upgrade_1000() {
+    $this->ctx->log->info('Applying update 1000 - install schema.');
+    // For early, early adopters who installed the extension pre-beta
+    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_display'")) {
+      $this->executeSqlFile('sql/auto_install.sql');
+    }
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET url = 'civicrm/admin/search', name = 'search_kit' WHERE url = 'civicrm/search'");
+    return TRUE;
+  }
+
 }
