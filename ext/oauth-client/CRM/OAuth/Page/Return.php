@@ -16,6 +16,7 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
       $tokenRecord = Civi::service('oauth2.token')->init([
         'client' => $client,
         'scope' => $state['scopes'],
+        'tag' => $state['tag'],
         'storage' => $state['storage'],
         'grant_type' => 'authorization_code',
         'cred' => ['code' => $authCode],

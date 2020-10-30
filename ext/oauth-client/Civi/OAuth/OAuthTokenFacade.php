@@ -16,6 +16,7 @@ class OAuthTokenFacade {
    *   - client: array, the OAuthClient record
    *   - scope: array|string|null, list of scopes to request. if omitted, inherit default from client/provider
    *   - storage: string, default: "OAuthSysToken"
+   *   - tag: string|null, a symbolic/freeform identifier for looking-up tokens
    *   - grant_type: string, ex "authorization_code", "client_credentials", "password"
    *   - cred: array, extra credentialing options to pass to the "token" URL (via getAccessToken($tokenOptions)),
    *        eg "username", "password", "code"
@@ -52,6 +53,7 @@ class OAuthTokenFacade {
     $tokenRecord = [
       'client_id' => $options['client']['id'],
       'grant_type' => $options['grant_type'],
+      'tag' => $options['tag'] ?? NULL,
       'scopes' => $this->splitScopes($scopeSeparator, $values['scope'] ?? $options['scope'] ?? NULL),
       'token_type' => $values['token_type'] ?? NULL,
       'access_token' => $accessToken->getToken(),
@@ -124,7 +126,7 @@ class OAuthTokenFacade {
 
   protected function findName(ResourceOwnerInterface $owner) {
     $values = $owner->toArray();
-    $fields = ['upn', 'userPrincipalName', 'mail', 'id'];
+    $fields = ['upn', 'userPrincipalName', 'mail', 'email', 'id'];
     foreach ($fields as $field) {
       if (isset($values[$field])) {
         return $values[$field];

@@ -16,7 +16,7 @@
  */
 class CRM_OAuth_BAO_OAuthSysToken extends CRM_OAuth_DAO_OAuthSysToken {
 
-  private static $returnFields = ['id', 'client_id', 'expires'];
+  private static $returnFields = ['id', 'client_id', 'expires', 'tag'];
 
   /**
    * Create a new OAuthSysToken based on array-data

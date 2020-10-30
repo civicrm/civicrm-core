@@ -10,6 +10,8 @@ use Civi\OAuth\OAuthException;
  *
  * @method $this setStorage(string $storage)
  * @method string getStorage()
+ * @method $this setTag(string $tag)
+ * @method string getTag()
  */
 abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchAction {
 
@@ -28,6 +30,14 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
    * @var string
    */
   protected $storage = 'OAuthSysToken';
+
+  /**
+   * Optionally tag the new token with a symbolic/freeform label. This tag can be
+   * used by automated mechanism to lookup/select a token.
+   *
+   * @var string|null
+   */
+  protected $tag = NULL;
 
   /**
    * The active client definition.

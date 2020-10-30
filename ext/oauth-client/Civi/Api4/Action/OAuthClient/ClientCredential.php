@@ -31,6 +31,7 @@ class ClientCredential extends AbstractGrantAction {
       'client' => $this->getClientDef(),
       'scope' => $this->getScopes(),
       'storage' => $this->getStorage(),
+      'tag' => $this->getTag(),
       'grant_type' => 'client_credentials',
     ]);
 

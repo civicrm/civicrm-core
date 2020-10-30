@@ -61,6 +61,7 @@ class AuthorizationCode extends AbstractGrantAction {
       'landingUrl' => $this->getLandingUrl(),
       'storage' => $this->getStorage(),
       'scopes' => $scopes,
+      'tag' => $this->getTag(),
     ]);
     $result[] = [
       'url' => $provider->getAuthorizationUrl([
