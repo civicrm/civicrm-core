@@ -10,6 +10,12 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
 
     if (CRM_Utils_Request::retrieve('error', 'String')) {
       $error = CRM_Utils_Array::subset($_GET, ['error', 'error_description', 'error_uri']);
+      $event = \Civi\Core\Event\GenericHookEvent::create([
+        'error' => $error['error'] ?? NULL,
+        'description' => $error['description'] ?? NULL,
+        'uri' => $error['uri'] ?? NULL,
+      ]);
+      Civi::dispatcher()->dispatch('hook_civicrm_oauthReturnError', $event);
     }
     elseif ($authCode = CRM_Utils_Request::retrieve('code', 'String')) {
       $client = \Civi\Api4\OAuthClient::get(0)->addWhere('id', '=', $state['clientId'])->execute()->single();
@@ -21,6 +27,16 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
         'grant_type' => 'authorization_code',
         'cred' => ['code' => $authCode],
       ]);
+
+      $nextUrl = $state['landingUrl'] ?? NULL;
+      $event = \Civi\Core\Event\GenericHookEvent::create([
+        'token' => $tokenRecord,
+        'nextUrl' => &$nextUrl,
+      ]);
+      Civi::dispatcher()->dispatch('hook_civicrm_oauthReturn', $event);
+      if ($nextUrl !== NULL) {
+        CRM_Utils_System::redirect($nextUrl);
+      }
     }
     else {
       throw new \Civi\OAuth\OAuthException("OAuth: Unrecognized return request");
