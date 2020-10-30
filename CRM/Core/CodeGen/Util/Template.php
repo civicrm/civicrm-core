@@ -78,7 +78,7 @@ class CRM_Core_CodeGen_Util_Template {
         '=> true,' => '=> TRUE,',
         '=> false,' => '=> FALSE,',
         'static ::' => 'static::',
-        'use\\' => 'use \\',
+        'use\\' => 'use ',
       ];
       $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
       $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
