@@ -122,7 +122,8 @@
     }
 
     $('[name=payment_processor_id], #currency').on('change.paymentBlock', function() {
-      buildPaymentBlock($('[name=payment_processor_id]').val());
+      var payment_processor_id = $('[name=payment_processor_id]:checked').val() == undefined ? $('[name=payment_processor_id]').val() : $('[name=payment_processor_id]:checked').val();
+      buildPaymentBlock(payment_processor_id);
     });
 
     $('#payment_instrument_id').on('change.paymentBlock', function() {
