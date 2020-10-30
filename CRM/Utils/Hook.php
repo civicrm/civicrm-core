@@ -2399,6 +2399,7 @@ abstract class CRM_Utils_Hook {
    *   - url: string (used in lieu of "path"/"query")
    *      Note: if making "url" CRM_Utils_System::url(), set $htmlize=false
    * @return mixed
+   * @deprecated
    */
   public static function crudLink($spec, $bao, &$link) {
     return self::singleton()->invoke(['spec', 'bao', 'link'], $spec, $bao, $link,
