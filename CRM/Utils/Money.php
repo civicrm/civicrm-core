@@ -67,7 +67,7 @@ class CRM_Utils_Money {
     }
 
     if (!empty($valueFormat) && $valueFormat !== '%!i') {
-      CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than !%i is deprecated, please report this on the GitLab Issue https://lab.civicrm.org/dev/core/-/issues/1494 with the relevant moneyValueFormat you use.');
+      CRM_Core_Error::deprecatedFunctionWarning('Having a Money Value format other than %!i is deprecated, please report this on the GitLab Issue https://lab.civicrm.org/dev/core/-/issues/1494 with the relevant moneyValueFormat you use.');
     }
 
     if ($onlyNumber) {
