@@ -24,6 +24,7 @@ class Admin {
     return [
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
+      'displayTypes' => Display::getDisplayTypes(['name', 'label', 'description', 'icon']),
     ];
   }
 
@@ -52,6 +53,7 @@ class Admin {
 
   /**
    * Fetch all entities the current user has permission to `get`
+   * @return array
    */
   public static function getSchema() {
     $schema = [];
@@ -84,9 +86,10 @@ class Admin {
   }
 
   /**
+   * @param array $allowedEntities
    * @return array
    */
-  public static function getLinks($allowedEntities) {
+  public static function getLinks(array $allowedEntities) {
     $results = [];
     $keys = array_flip(['alias', 'entity', 'joinType']);
     foreach (civicrm_api4('Entity', 'getLinks', ['where' => [['entity', 'IN', $allowedEntities]]], ['entity' => 'links']) as $entity => $links) {

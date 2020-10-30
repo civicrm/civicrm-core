@@ -7,9 +7,9 @@
  * extension.
  */
 class CRM_Search_ExtensionUtil {
-  const SHORT_NAME = "search";
-  const LONG_NAME = "org.civicrm.search";
-  const CLASS_PREFIX = "CRM_Search";
+  const SHORT_NAME = 'search';
+  const LONG_NAME = 'org.civicrm.search';
+  const CLASS_PREFIX = 'CRM_Search';
 
   /**
    * Translate a string using the extension's domain.
@@ -473,5 +473,11 @@ function _search_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _search_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_Search_DAO_SearchDisplay' => [
+      'name' => 'SearchDisplay',
+      'class' => 'CRM_Search_DAO_SearchDisplay',
+      'table' => 'civicrm_search_display',
+    ],
+  ]);
 }

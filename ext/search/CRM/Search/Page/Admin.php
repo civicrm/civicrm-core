@@ -14,15 +14,10 @@
  */
 class CRM_Search_Page_Admin extends CRM_Core_Page {
 
-  /**
-   * @var string[]
-   */
-  private $allowedEntities = [];
-
   public function run() {
     $breadCrumb = [
       'title' => ts('Search Kit'),
-      'url' => CRM_Utils_System::url('civicrm/search'),
+      'url' => CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, '/list'),
     ];
     CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
 
@@ -45,10 +40,9 @@ class CRM_Search_Page_Admin extends CRM_Core_Page {
 
     // Load angular module
     $loader = new Civi\Angular\AngularLoader();
-    $loader->setModules(['searchAdmin']);
-    $loader->setPageName('civicrm/search');
+    $loader->setPageName('civicrm/admin/search');
     $loader->useApp([
-      'defaultRoute' => '/create/Contact',
+      'defaultRoute' => '/list',
     ]);
     $loader->load();
     parent::run();

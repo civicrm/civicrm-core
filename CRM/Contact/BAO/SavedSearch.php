@@ -443,8 +443,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     $savedSearch = self::retrieve(['id' => $id]);
     // APIv4 search
     if (!empty($savedSearch->api_entity)) {
-      $groupName = self::getName($id);
-      return CRM_Utils_System::url('civicrm/search', NULL, FALSE, "/load/Group/$groupName");
+      return CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/$id");
     }
     // Classic search builder
     if (!empty($savedSearch->mapping_id)) {

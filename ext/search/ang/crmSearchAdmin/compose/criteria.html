@@ -1,0 +1,47 @@
+<div class="crm-flex-box">
+  <div>
+    <div ng-if=":: $ctrl.paramExists('join')">
+      <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join">
+        <div class="form-inline">
+          <label for="crm-search-join-{{ $index }}">{{:: ts('With') }}</label>
+          <input id="crm-search-join-{{ $index }}" class="form-control" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" ng-change="changeJoin($index)" />
+          <select class="form-control" ng-model="join[1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+        </div>
+        <fieldset class="api4-clause-fieldset">
+          <crm-search-clause clauses="join" format="json" skip="2" op="AND" label="{{ ts('If') }}" fields="fieldsForWhere" ></crm-search-clause>
+        </fieldset>
+      </fieldset>
+      <fieldset>
+        <div class="form-inline">
+          <input id="crm-search-add-join" class="form-control crm-action-menu fa-plus" ng-model="controls.join" crm-ui-select="{placeholder: ts('With'), data: getJoinEntities}" ng-change="addJoin()"/>
+        </div>
+      </fieldset>
+    </div>
+    <fieldset ng-if=":: $ctrl.paramExists('groupBy')">
+      <div class="form-inline" ng-repeat="groupBy in $ctrl.savedSearch.api_params.groupBy">
+        <label for="crm-search-groupBy-{{ $index }}">{{:: ts('Group By') }}</label>
+        <input id="crm-search-groupBy-{{ $index }}" class="form-control" ng-model="$ctrl.savedSearch.api_params.groupBy[$index]" crm-ui-select="{placeholder: ' ', data: fieldsForGroupBy}" ng-change="changeGroupBy($index)" />
+        <hr>
+      </div>
+      <div class="form-inline">
+        <input id="crm-search-add-groupBy" class="form-control crm-action-menu fa-plus" ng-model="controls.groupBy" crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy}" ng-change="addParam('groupBy')"/>
+      </div>
+      <fieldset id="crm-search-build-group-aggregate" ng-if="$ctrl.savedSearch.api_params.groupBy.length" class="crm-collapsible collapsed">
+        <legend class="collapsible-title">{{:: ts('Aggregate fields') }}</legend>
+        <div>
+          <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-if="$ctrl.canAggregate(col)">
+            <crm-search-function expr="$ctrl.savedSearch.api_params.select[$index]" cat="'aggregate'"></crm-search-function>
+          </fieldset>
+        </div>
+      </fieldset>
+    </fieldset>
+  </div>
+  <div>
+    <fieldset class="api4-clause-fieldset">
+      <crm-search-clause clauses="$ctrl.savedSearch.api_params.where" format="string" op="AND" label="{{ ts('Where') }}" fields="fieldsForWhere" ></crm-search-clause>
+    </fieldset>
+    <fieldset ng-if="$ctrl.paramExists('having') && $ctrl.savedSearch.api_params.groupBy.length" class="api4-clause-fieldset">
+      <crm-search-clause clauses="$ctrl.savedSearch.api_params.having" format="string" op="AND" label="{{ ts('Filter') }}" fields="fieldsForHaving" ></crm-search-clause>
+    </fieldset>
+  </div>
+</div>
