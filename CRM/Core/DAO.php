@@ -3151,4 +3151,13 @@ SELECT contact_id
     return array_flip(CRM_Utils_Array::collect('name', static::fields()));
   }
 
+  /**
+   * Returns system paths related to this entity (as defined in the xml schema)
+   *
+   * @return array
+   */
+  public static function getEntityPaths() {
+    return static::$_paths ?? [];
+  }
+
 }

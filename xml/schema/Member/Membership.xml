@@ -8,6 +8,12 @@
   <add>1.5</add>
   <log>true</log>
   <icon>fa-id-badge</icon>
+  <paths>
+    <create>civicrm/member/add?reset=1&amp;action=add&amp;context=standalone</create>
+    <view>civicrm/contact/view/membership?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
+    <edit>civicrm/contact/view/membership?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</edit>
+    <delete>civicrm/contact/view/membership?reset=1&amp;action=delete&amp;id=[id]&amp;cid=[contact_id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <uniqueName>membership_id</uniqueName>

@@ -78,6 +78,11 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Class name for dao-based entities',
         ],
         [
+          'name' => 'paths',
+          'data_type' => 'Array',
+          'description' => 'System paths for accessing this entity',
+        ],
+        [
           'name' => 'see',
           'data_type' => 'Array',
           'description' => 'Any @see annotations from docblock',

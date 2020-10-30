@@ -8,6 +8,12 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-address-book-o</icon>
+  <paths>
+    <create>civicrm/contact/add?reset=1&amp;ct=[contact_type]</create>
+    <view>civicrm/contact/view?reset=1&amp;cid=[id]</view>
+    <edit>civicrm/contact/add?reset=1&amp;action=update&amp;cid=[id]</edit>
+    <delete>civicrm/contact/view/delete?reset=1&amp;delete=1&amp;cid=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>

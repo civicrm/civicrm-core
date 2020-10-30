@@ -108,6 +108,7 @@ abstract class DAOEntity extends AbstractEntity {
     $info = parent::getInfo();
     $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
     if ($dao) {
+      $info['paths'] = $dao::getEntityPaths();
       $info['icon'] = $dao::$_icon;
       $info['dao'] = $dao;
     }
