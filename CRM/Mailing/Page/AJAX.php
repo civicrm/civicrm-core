@@ -21,6 +21,32 @@
 class CRM_Mailing_Page_AJAX {
 
   /**
+   * Kick off the "Add Mail Account" process for some given type of account.
+   *
+   * Ex: 'civicrm/ajax/setupMailAccount?type=standard'
+   * Ex: 'civicrm/ajax/setupMailAccount?type=oauth_1'
+   *
+   * @see CRM_Core_BAO_MailSettings::getSetupActions()
+   * @throws \CRM_Core_Exception
+   */
+  public static function setup() {
+    $type = CRM_Utils_Request::retrieve('type', 'String');
+    $setupActions = CRM_Core_BAO_MailSettings::getSetupActions();
+    $setupAction = $setupActions[$type] ?? NULL;
+    if ($setupAction === NULL) {
+      throw new \CRM_Core_Exception("Cannot setup mail account. Invalid type requested.");
+    }
+
+    $result = call_user_func($setupAction['callback'], $setupAction);
+    if (isset($result['url'])) {
+      CRM_Utils_System::redirect($result['url']);
+    }
+    else {
+      throw new \CRM_Core_Exception("Cannot setup mail account. Setup does not have a URL.");
+    }
+  }
+
+  /**
    * Fetch the template text/html messages
    */
   public static function template() {
