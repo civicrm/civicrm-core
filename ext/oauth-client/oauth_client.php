@@ -223,3 +223,19 @@ function oauth_client_civicrm_oauthProviders(&$providers) {
     $ingest($localDir . '/*.json');
   }
 }
+
+/**
+ * Implements hook_civicrm_mailSetupActions().
+ *
+ * @see CRM_Utils_Hook::mailSetupActions()
+ */
+function oauth_client_civicrm_mailSetupActions(&$setupActions) {
+  $setupActions = array_merge($setupActions, CRM_OAuth_MailSetup::buildSetupLinks());
+}
+
+/**
+ * Implements hook_civicrm_oauthReturn().
+ */
+function oauth_client_civicrm_oauthReturn($token, &$nextUrl) {
+  CRM_OAuth_MailSetup::onReturn($token, $nextUrl);
+}
