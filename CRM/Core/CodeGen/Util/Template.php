@@ -82,6 +82,7 @@ class CRM_Core_CodeGen_Util_Template {
       ];
       $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
       $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
+      $contents = preg_replace(";\nuse \\\;", "\nuse ", $contents);
 
       // Convert old array syntax to new square brackets
       $contents = CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
