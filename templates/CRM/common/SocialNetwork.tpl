@@ -17,10 +17,10 @@
         <a href="https://facebook.com/sharer/sharer.php?u={$url|escape:'url'}" target="_blank" class="btn btn-default" role="button">{ts}Share on Facebook{/ts}</a>
         <a href="ttps://www.linkedin.com/shareArticle?mini=true&amp;url={$url|escape:'url'}&amp;title={$title}" target="_blank" rel="noopener" class="btn btn-default">{ts}Share on LinkedIn{/ts}</a>
     {else}
-    	<button onclick="window.open('https://twitter.com/share?url={$url|escape:'url'}&amp;text={$title}','_blank')" type="button" class="btn btn-default"><i aria-hidden="true" class="crm-i fa-twitter"></i>&nbsp;&nbsp;{ts}Tweet{/ts}</button>
-        <button onclick="window.open('https://facebook.com/sharer/sharer.php?u={$url|escape:'url'}','_blank')" type="button" class="btn btn-default" role="button"><i aria-hidden="true" class="crm-i fa-facebook"></i>&nbsp;&nbsp;{ts}Share on Facebook{/ts}</button>
-        <button onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&amp;url={$url|escape:'url'}&amp;title={$title}','_blank')" type="button" rel="noopener" class="btn btn-default"><i aria-hidden="true" class="crm-i fa-linkedin"></i>&nbsp;&nbsp;{ts}Share on LinkedIn{/ts}</button>
-        <button onclick="window.open('mailto:?subject={$title}.&amp;body={$url|escape:'url'}','_self')" type="button" rel="noopener" class="btn btn-default"><i aria-hidden="true" class="crm-i fa-envelope"></i>&nbsp;&nbsp;{ts}Email{/ts}</button>
+    	<button onclick="window.open('https://twitter.com/share?url={$url|escape:'url'}&amp;text={$title}','_blank')" type="button" class="btn btn-default crm-button"><i aria-hidden="true" class="crm-i fa-twitter" id="crm-tw"></i>&nbsp;&nbsp;{ts}Tweet{/ts}</button>
+        <button onclick="window.open('https://facebook.com/sharer/sharer.php?u={$url|escape:'url'}','_blank')" type="button" class="btn btn-default crm-button" role="button"><i aria-hidden="true" class="crm-i fa-facebook" id="crm-tw"></i>&nbsp;&nbsp;{ts}Share on Facebook{/ts}</button>
+        <button onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&amp;url={$url|escape:'url'}&amp;title={$title}','_blank')" type="button" rel="noopener" class="btn btn-default crm-button"><i aria-hidden="true" class="crm-i fa-linkedin" id="crm-li"></i>&nbsp;&nbsp;{ts}Share on LinkedIn{/ts}</button>
+        <button onclick="window.open('mailto:?subject={$title}&amp;body={$url|escape:'url'}','_self')" type="button" rel="noopener" class="btn btn-default crm-button" id="crm-email"><i aria-hidden="true" class="crm-i fa-envelope"></i>&nbsp;&nbsp;{ts}Email{/ts}</button>
         {/if}
     {if $pageURL}
     	{if $emailMode neq true}
