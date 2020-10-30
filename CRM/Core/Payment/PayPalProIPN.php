@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *
  * @package CRM
@@ -327,8 +329,12 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       Civi::log()->debug('Returning since contribution status is Pending');
       return;
     }
-    elseif ($status === 'Refunded' || $status === 'Reversed') {
-      $this->cancelled($objects);
+    if ($status === 'Refunded' || $status === 'Reversed') {
+      Contribution::update(FALSE)->setValues([
+        'cancel_date' => 'now',
+        'contribution_status_id:name' => 'Cancelled',
+      ])->addWhere('id', '=', $contribution->id)->execute();
+      Civi::log()->debug("Setting contribution status to Cancelled");
       return;
     }
     elseif ($status !== 'Completed') {

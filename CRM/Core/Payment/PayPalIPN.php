@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *
  * @package CRM
@@ -348,7 +350,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
       if ($status === 'Refunded' || $status === 'Reversed') {
-        $this->cancelled($objects);
+        Contribution::update(FALSE)->setValues([
+          'cancel_date' => 'now',
+          'contribution_status_id:name' => 'Cancelled',
+        ])->addWhere('id', '=', $contributionID)->execute();
+        Civi::log()->debug("Setting contribution status to Cancelled");
         return;
       }
       if ($status !== 'Completed') {
