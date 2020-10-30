@@ -440,21 +440,17 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
-      //?? how on earth would we not have component be one of these?
-      // they are the only valid settings & this IPN file can't even be called without one of them
-      // grepping for this class doesn't find other paths to call this class
-      if ($this->_component == 'contribute' || $this->_component == 'event') {
-        if ($ids['contributionRecur']) {
-          // check if first contribution is completed, else complete first contribution
-          $first = TRUE;
-          $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-          if ($objects['contribution']->contribution_status_id == $completedStatusId) {
-            $first = FALSE;
-          }
-          $this->recur($input, $ids, $objects, $first);
-          return;
+      if ($ids['contributionRecur']) {
+        // check if first contribution is completed, else complete first contribution
+        $first = TRUE;
+        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+        if ($objects['contribution']->contribution_status_id == $completedStatusId) {
+          $first = FALSE;
         }
+        $this->recur($input, $ids, $objects, $first);
+        return;
       }
+
       $this->single($input, [
         'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
