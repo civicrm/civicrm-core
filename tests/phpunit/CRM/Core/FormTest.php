@@ -72,6 +72,14 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
           $form->_action = CRM_Core_Action::ADD;
         },
       ],
+      // Also a bit flawed, but catches simple stuff.
+      'Fulltext search' => [
+        'CRM_Contact_Form_Search_Custom',
+        function(CRM_Core_Form $form) {
+          $form->_action = CRM_Core_Action::BASIC;
+          $form->set('csid', 15);
+        },
+      ],
     ];
   }
 
