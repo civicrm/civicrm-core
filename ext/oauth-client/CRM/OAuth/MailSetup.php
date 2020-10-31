@@ -141,4 +141,28 @@ class CRM_OAuth_MailSetup {
     return $values;
   }
 
+  /**
+   * If we have a stored token for this for this, then use it.
+   *
+   * @see CRM_Utils_Hook::alterMailStore()
+   */
+  public static function alterMailStore(&$mailSettings) {
+    $token = civicrm_api4('OAuthSysToken', 'refresh', [
+      'checkPermissions' => FALSE,
+      'where' => [['tag', '=', 'MailSettings:' . $mailSettings['id']]],
+      'orderBy' => ['id' => 'DESC'],
+    ])->first();
+
+    if ($token === NULL) {
+      return;
+    }
+    // Not certain if 'refresh' will complain about staleness. Doesn't hurt to double-check.
+    if (empty($token['access_token']) || $token['expires'] < CRM_Utils_Time::getTimeRaw()) {
+      throw new \OAuthException("Found invalid token for mail store #" . $mailSettings['id']);
+    }
+
+    $mailSettings['auth'] = 'XOAuth2';
+    $mailSettings['password'] = $token['access_token'];
+  }
+
 }

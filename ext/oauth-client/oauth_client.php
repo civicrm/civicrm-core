@@ -239,3 +239,12 @@ function oauth_client_civicrm_mailSetupActions(&$setupActions) {
 function oauth_client_civicrm_oauthReturn($token, &$nextUrl) {
   CRM_OAuth_MailSetup::onReturn($token, $nextUrl);
 }
+
+/**
+ * Implements hook_civicrm_alterMailStore().
+ *
+ * @see CRM_Utils_Hook::alterMailStore()
+ */
+function oauth_client_civicrm_alterMailStore(&$mailSettings) {
+  CRM_OAuth_MailSetup::alterMailStore($mailSettings);
+}
