@@ -7,6 +7,9 @@ use Civi\Api4\Contact;
 use Civi\Api4\MembershipType;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\Relationship;
+use Civi\Api4\Event;
+use Civi\Api4\PriceField;
+use Civi\Api4\Participant;
 
 /**
  * FIXME - Add test description.
@@ -206,6 +209,53 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     }
     $result = $this->callAPISuccess('payment_processor', 'create', $params);
     return (int) $result['id'];
+  }
+
+  /**
+   * Test that a cancel from paypal pro results in an order being cancelled.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaypalStandardCancel() {
+    $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
+    $event = Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first();
+    $order = $this->callAPISuccess('Order', 'create', [
+      'contact_id' => $this->ids['contact'][0],
+      'financial_type_id' => 'Donation',
+      'invoice_id' => 123,
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'line_total' => 5,
+              'qty' => 1,
+              'financial_type_id' => 1,
+              'entity_table' => 'civicrm_participant',
+              'price_field_id' => PriceField::get()->addSelect('id')->addWhere('name', '=', 'contribution_amount')->execute()->first()['id'],
+            ],
+          ],
+          'params' => [
+            'contact_id' => $this->ids['contact'][0],
+            'event_id' => $event['id'],
+          ],
+        ],
+      ],
+    ]);
+    $ipn = new CRM_Core_Payment_PayPalIPN([
+      'mc_gross' => 200,
+      'contactID' => $this->ids['contact'][0],
+      'contributionID' => $order['id'],
+      'module' => 'event',
+      'invoice' => 123,
+      'eventID' => $event['id'],
+      'participantID' => Participant::get()->addWhere('event_id', '=', (int) $event['id'])->addSelect('id')->execute()->first()['id'],
+      'payment_status' => 'Refunded',
+      'processor_id' => $this->createPaymentProcessor(['payment_processor_type_id' => 'PayPal_Standard']),
+    ]);
+    $ipn->main();
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
   }
 
 }

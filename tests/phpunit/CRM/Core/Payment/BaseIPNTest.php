@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Class CRM_Core_Payment_BaseIPNTest
  * @group headless
@@ -405,15 +407,16 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
     $this->_setUpParticipantObjects('Pending from incomplete transaction');
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $additionalParticipantId = $this->participantCreate([
       'event_id' => $this->_eventId,
       'registered_by_id' => $this->_participantId,
       'status_id' => 'Pending from incomplete transaction',
     ]);
 
-    $transaction = new CRM_Core_Transaction();
-    $this->IPN->cancelled($this->objects);
+    Contribution::update(FALSE)->setValues([
+      'cancel_date' => 'now',
+      'contribution_status_id:name' => 'Cancelled',
+    ])->addWhere('id', '=', $this->_contributionId)->execute();
 
     $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
       'sequential' => 1,

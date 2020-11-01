@@ -237,6 +237,7 @@ class CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
    */
   public function cancelled($objects) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use Contribution create api to cancel the contribution');
     $contribution = &$objects['contribution'];
 
     if (empty($contribution->id)) {
@@ -270,17 +271,17 @@ class CRM_Core_Payment_BaseIPN {
           }
         }
       }
+      $participant = &$objects['participant'];
+
+      if ($participant) {
+        $this->cancelParticipant($participant->id);
+      }
     }
     else {
       Contribution::update(FALSE)->setValues([
         'cancel_date' => 'now',
         'contribution_status_id:name' => 'Cancelled',
       ])->addWhere('id', '=', $contribution->id)->execute();
-    }
-    $participant = &$objects['participant'];
-
-    if ($participant) {
-      $this->cancelParticipant($participant->id);
     }
 
     Civi::log()->debug("Setting contribution status to Cancelled");
@@ -308,6 +309,8 @@ class CRM_Core_Payment_BaseIPN {
   /**
    * Logic to cancel a participant record when the related contribution changes to failed/cancelled.
    * @todo This is part of a bigger refactor for dev/core/issues/927 - "duplicate" functionality exists in CRM_Contribute_BAO_Contribution::cancel()
+   *
+   * @deprecated
    *
    * @param $participantID
    *
