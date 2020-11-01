@@ -249,6 +249,11 @@ if (!CRM.vars) CRM.vars = {};
         opts = placeholder || placeholder === '' ? '' : '[value!=""]';
       $elect.find('option' + opts).remove();
       var newOptions = CRM.utils.renderOptions(options, val);
+      if (options.length == 0) {
+        $elect.removeClass('required');
+      } else if ($elect.hasClass('crm-field-required') && !$elect.hasClass('required')) {
+        $elect.addClass('required');
+      }
       if (typeof placeholder === 'string') {
         if ($elect.is('[multiple]')) {
           select.attr('placeholder', placeholder);
