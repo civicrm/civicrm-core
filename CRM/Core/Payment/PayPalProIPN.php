@@ -459,8 +459,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
       $this->single($input, [
         'related_contact' => $ids['related_contact'] ?? NULL,
-        'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-        'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+        'participant' => $ids['participant'] ?? NULL,
+        'contributionRecur' => $ids['contributionRecur'] ?? NULL,
       ], $objects, FALSE, FALSE);
     }
     catch (CRM_Core_Exception $e) {
