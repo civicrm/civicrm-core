@@ -44,9 +44,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   public static $_trxnIDs = NULL;
 
   /**
-   * Field for all the objects related to this contribution
+   * Field for all the objects related to this contribution.
+   *
+   * This is used from
+   * 1) deprecated function transitionComponents
+   * 2) function to send contribution receipts _assignMessageVariablesToTemplate
+   * 3) some invoice code that is copied from 2
+   * 4) odds & sods that need to be investigated and fixed.
+   *
+   * However, it is no longer used by completeOrder.
    *
    * @var \CRM_Member_BAO_Membership|\CRM_Event_BAO_Participant[]
+   *
+   * @deprecated
    */
   public $_relatedObjects = [];
 
