@@ -25,7 +25,7 @@ use Civi\Api4\Participant;
  *
  * @group headless
  */
-class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class CancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
   use \Civi\Test\Api3TestTrait;
 
@@ -65,7 +65,7 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testPaypalProCancel() {
-    $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
+    $this->createContact();
     $this->createMembershipType();
     Relationship::create()->setValues([
       'contact_id_a' => $this->ids['contact'][0],
@@ -218,8 +218,71 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
    * @throws \CRM_Core_Exception
    */
   public function testPaypalStandardCancel() {
-    $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
-    $event = Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first();
+    $this->createContact();
+    $orderID = $this->createEventOrder();
+    $ipn = new CRM_Core_Payment_PayPalIPN([
+      'mc_gross' => 200,
+      'contactID' => $this->ids['contact'][0],
+      'contributionID' => $orderID,
+      'module' => 'event',
+      'invoice' => 123,
+      'eventID' => $this->ids['event'][0],
+      'participantID' => Participant::get()->addWhere('event_id', '=', $this->ids['event'][0])->addSelect('id')->execute()->first()['id'],
+      'payment_status' => 'Refunded',
+      'processor_id' => $this->createPaymentProcessor(['payment_processor_type_id' => 'PayPal_Standard']),
+    ]);
+    $ipn->main();
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+  }
+
+  /**
+   * Test cancel order api
+   * @throws API_Exception
+   * @throws CRM_Core_Exception
+   */
+  public function testCancelOrderWithParticipant() {
+    $this->createContact();
+    $orderID = $this->createEventOrder();
+    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+    $this->callAPISuccess('Order', 'get', ['contribution_id' => $orderID]);
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+  }
+
+  /**
+   * Test cancel order api when a pledge is linked.
+   *
+   * The pledge status should be updated. I believe the contribution should also be unlinked but
+   * the goal at this point is no change.
+   *
+   * @throws CRM_Core_Exception
+   * @throws API_Exception
+   */
+  public function testCancelOrderWithPledge() {
+    $this->createContact();
+    $pledgeID = (int) $this->callAPISuccess('Pledge', 'create', ['contact_id' => $this->ids['contact'][0], 'amount' => 4, 'installments' => 2, 'frequency_unit' => 'month', 'original_installment_amount' => 2, 'create_date' => 'now', 'financial_type_id' => 'Donation', 'start_date' => '+5 days'])['id'];
+    $orderID = (int) $this->callAPISuccess('Order', 'create', ['contact_id' => $this->ids['contact'][0], 'total_amount' => 2, 'financial_type_id' => 'Donation', 'api.Payment.create' => ['total_amount' => 2]])['id'];
+    $pledgePayments = $this->callAPISuccess('PledgePayment', 'get')['values'];
+    $this->callAPISuccess('PledgePayment', 'create', ['id' => key($pledgePayments), 'pledge_id' => $pledgeID, 'contribution_id' => $orderID, 'status_id' => 'Completed', 'actual_amount' => 2]);
+    $beforePledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
+    $this->assertEquals(2, $beforePledge['pledge_total_paid']);
+    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
+    $afterPledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
+    $this->assertEquals('', $afterPledge['pledge_total_paid']);
+  }
+
+  /**
+   * Create an event and an order for a participant in that event.
+   *
+   * @return int
+   * @throws API_Exception
+   * @throws CRM_Core_Exception
+   */
+  protected function createEventOrder() {
+    $this->ids['event'][0] = (int) Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first()['id'];
     $order = $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->ids['contact'][0],
       'financial_type_id' => 'Donation',
@@ -237,25 +300,21 @@ class IPNCancelTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
           ],
           'params' => [
             'contact_id' => $this->ids['contact'][0],
-            'event_id' => $event['id'],
+            'event_id' => $this->ids['event'][0],
           ],
         ],
       ],
     ]);
-    $ipn = new CRM_Core_Payment_PayPalIPN([
-      'mc_gross' => 200,
-      'contactID' => $this->ids['contact'][0],
-      'contributionID' => $order['id'],
-      'module' => 'event',
-      'invoice' => 123,
-      'eventID' => $event['id'],
-      'participantID' => Participant::get()->addWhere('event_id', '=', (int) $event['id'])->addSelect('id')->execute()->first()['id'],
-      'payment_status' => 'Refunded',
-      'processor_id' => $this->createPaymentProcessor(['payment_processor_type_id' => 'PayPal_Standard']),
-    ]);
-    $ipn->main();
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
-    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Cancelled'], 1);
+    return (int) $order['id'];
+  }
+
+  /**
+   * Create a contact for use in the test.
+   *
+   * @throws API_Exception
+   */
+  protected function createContact(): void {
+    $this->ids['contact'][0] = Civi\Api4\Contact::create()->setValues(['first_name' => 'Brer', 'last_name' => 'Rabbit'])->execute()->first()['id'];
   }
 
 }

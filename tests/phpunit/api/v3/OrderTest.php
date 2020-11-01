@@ -469,59 +469,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test cancel order api
-   */
-  public function testCancelWithParticipant() {
-    $event = $this->eventCreate();
-    $this->_eventId = $event['id'];
-    $eventParams = [
-      'id' => $this->_eventId,
-      'financial_type_id' => 4,
-      'is_monetary' => 1,
-    ];
-    $this->callAPISuccess('event', 'create', $eventParams);
-    $participantParams = [
-      'financial_type_id' => 4,
-      'event_id' => $this->_eventId,
-      'role_id' => 1,
-      'status_id' => 1,
-      'fee_currency' => 'USD',
-      'contact_id' => $this->_individualId,
-    ];
-    $participant = $this->callAPISuccess('Participant', 'create', $participantParams);
-    $extraParams = [
-      'contribution_mode' => 'participant',
-      'participant_id' => $participant['id'],
-    ];
-    $contribution = $this->addOrder(TRUE, 100, $extraParams);
-    $paymentParticipant = [
-      'participant_id' => $participant['id'],
-      'contribution_id' => $contribution['id'],
-    ];
-    $this->callAPISuccess('ParticipantPayment', 'create', $paymentParticipant);
-    $params = [
-      'contribution_id' => $contribution['id'],
-    ];
-    $this->callAPISuccess('order', 'cancel', $params);
-    $order = $this->callAPISuccess('Order', 'get', $params);
-    $expectedResult = [
-      $contribution['id'] => [
-        'total_amount' => 100,
-        'contribution_id' => $contribution['id'],
-        'contribution_status' => 'Cancelled',
-        'net_amount' => 100,
-      ],
-    ];
-    $this->checkPaymentResult($order, $expectedResult);
-    $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $params);
-    $participant = $this->callAPISuccess('participant', 'get', ['id' => $participantPayment['participant_id']]);
-    $this->assertEquals($participant['values'][$participant['id']]['participant_status'], 'Cancelled');
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
-  }
-
-  /**
    * Test an exception is thrown if line items do not add up to total_amount, no tax.
    */
   public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfNoTaxSupplied() {
