@@ -112,13 +112,21 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
           $objects['contribution'] = &$contribution;
         }
         $input['payment_processor_id'] = $paymentProcessorID;
-        return $this->recur($input, [
+        $isFirstOrLastRecurringPayment = $this->recur($input, [
           'related_contact' => $ids['related_contact'] ?? NULL,
           'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
           'contributionRecur' => $contributionRecur->id,
-          'contact' => $ids['contact'] ?? NULL,
-          'contributionPage' => $ids['contributionPage'] ?? NULL,
-        ], $objects['contributionRecur'], $objects['contribution'], $first);
+        ], $contributionRecur, $objects['contribution'], $first);
+
+        if ($isFirstOrLastRecurringPayment) {
+          //send recurring Notification email for user
+          CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
+            $ids['contact'],
+            $ids['contributionPage'],
+            $contributionRecur,
+            (bool) $this->getMembershipID($contribution->id, $contributionRecur->id)
+          );
+        }
       }
 
       return TRUE;
@@ -189,27 +197,18 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       // so we just fix the recurring contribution and not change any of
       // the existing contributions
       // CRM-9036
-      return TRUE;
+      return FALSE;
     }
 
     // check if contribution is already completed, if so we ignore this ipn
     if ($contribution->contribution_status_id == 1) {
       CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
       echo 'Success: Contribution has already been handled<p>';
-      return TRUE;
+      return FALSE;
     }
 
     CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution);
-
-    if ($isFirstOrLastRecurringPayment) {
-      //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
-        $ids['contact'],
-        $ids['contributionPage'],
-        $recur,
-        (bool) $this->getMembershipID($contribution->id, $recur->id)
-      );
-    }
+    return $isFirstOrLastRecurringPayment;
   }
 
   /**
