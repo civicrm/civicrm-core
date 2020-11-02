@@ -270,6 +270,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_MessageTemplate::del($this->_id);
+
+      $this->postProcessHook();
     }
     elseif ($this->_action & CRM_Core_Action::VIEW) {
       // currently, the above action is used solely for previewing default workflow templates
@@ -309,6 +311,11 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       }
 
       $messageTemplate = MessageTemplate::save()->setDefaults($params)->setRecords([['id' => $this->_id]])->execute()->first();
+
+      // set the id on save, so it can be used in a extension using the posProcess hook
+      $this->_id = $messageTemplate['id'];
+      $this->postProcessHook();
+
       CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate['msg_title']]), ts('Saved'), 'success');
 
       if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {
