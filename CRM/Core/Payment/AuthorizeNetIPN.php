@@ -86,10 +86,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       $this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID);
 
-      if (!empty($ids['paymentProcessor']) && $contributionRecur->payment_processor_id != $ids['paymentProcessor']) {
-        Civi::log()->warning('Payment Processor does not match the recurring processor id.', ['civi.tag' => 'deprecated']);
-      }
-
       if ($component == 'contribute') {
         // check if first contribution is completed, else complete first contribution
         $first = TRUE;
