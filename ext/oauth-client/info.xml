@@ -23,6 +23,9 @@
   <compatibility>
     <ver>5.0</ver>
   </compatibility>
+  <requires>
+    <ext version="~4.5">org.civicrm.afform</ext>
+  </requires>
   <comments>This is a new, undeveloped module</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
