@@ -137,7 +137,7 @@ class CRM_Core_BAO_CustomOption {
         $action -= CRM_Core_Action::DELETE;
       }
 
-      if (in_array($field->html_type, ['CheckBox', 'Multi-Select'])) {
+      if ($field->html_type == 'CheckBox' || ($field->html_type == 'Select' && $field->serialize == 1)) {
         $options[$dao->id]['is_default'] = (isset($defVal) && in_array($dao->value, $defVal));
       }
       else {
