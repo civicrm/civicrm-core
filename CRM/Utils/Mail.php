@@ -31,6 +31,7 @@ class CRM_Utils_Mail {
   public static function createMailer() {
     $mailingInfo = Civi::settings()->get('mailing_backend');
 
+    /*@var Mail $mailer*/
     if ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB ||
       (defined('CIVICRM_MAILER_SPOOL') && CIVICRM_MAILER_SPOOL)
     ) {
@@ -94,7 +95,7 @@ class CRM_Utils_Mail {
       $mailer = self::_createMailer('mail', []);
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK) {
-      $mailer = self::_createMailer('mock', []);
+      $mailer = self::_createMailer('mock', $mailingInfo);
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
       CRM_Core_Error::debug_log_message(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
@@ -301,8 +302,13 @@ class CRM_Utils_Mail {
     }
 
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $result = $mailer->send($to, $headers, $message);
+      try {
+        $result = $mailer->send($to, $headers, $message);
+      }
+      catch (Exception $e) {
+        CRM_Core_Session::setStatus($e->getMessage(), ts('Mailing Error'), 'error');
+        return FALSE;
+      }
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
