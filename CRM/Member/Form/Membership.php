@@ -1502,6 +1502,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $params['contribution_id'] = $this->_onlinePendingContributionId;
         $params['componentId'] = $params['id'];
         $params['componentName'] = 'contribute';
+        // Only available statuses are Pending and completed so cancel or failed is not possible here.
         $result = CRM_Contribute_BAO_Contribution::transitionComponents($params, TRUE);
         if (!empty($result) && !empty($params['contribution_id'])) {
           $lineItem = [];
