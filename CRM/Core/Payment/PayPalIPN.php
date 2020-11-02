@@ -328,18 +328,17 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
-      if ($component == 'contribute') {
-        if ($ids['contributionRecur']) {
-          // check if first contribution is completed, else complete first contribution
-          $first = TRUE;
-          $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-          if ($objects['contribution']->contribution_status_id == $completedStatusId) {
-            $first = FALSE;
-          }
-          $this->recur($input, $ids, $objects, $first);
-          return;
+      if (!empty($ids['contributionRecur'])) {
+        // check if first contribution is completed, else complete first contribution
+        $first = TRUE;
+        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+        if ($objects['contribution']->contribution_status_id == $completedStatusId) {
+          $first = FALSE;
         }
+        $this->recur($input, $ids, $objects, $first);
+        return;
       }
+
       $status = $input['paymentStatus'];
       if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
         $this->failed($objects);
