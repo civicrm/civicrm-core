@@ -211,11 +211,12 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         // @todo add check as to whether the status is updated.
         if (!empty($value['contribution_status_id'])) {
           // @todo - use completeorder api or make api call do this.
-          CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution['id'],
-            $value['contribution_status_id'],
-            CRM_Utils_Array::value("field[{$contributionID}][contribution_status_id]", $this->_defaultValues),
-            $contribution['receive_date']
-          );
+          CRM_Contribute_BAO_Contribution::transitionComponents([
+            'contribution_id' => $contribution['id'],
+            'contribution_status_id' => $value['contribution_status_id'],
+            'previous_contribution_status_id' => CRM_Utils_Array::value("field[{$contributionID}][contribution_status_id]", $this->_defaultValues),
+            'receive_date' => $contribution['receive_date'],
+          ]);
         }
       }
       CRM_Core_Session::setStatus(ts("Your updates have been saved."), ts('Saved'), 'success');
