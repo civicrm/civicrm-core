@@ -433,7 +433,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->processContribution($params);
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
-      $this->processMembership($params);
+      $params['actualBatchTotal'] = $this->processMembership($params);
     }
 
     // update batch to close status
@@ -623,7 +623,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //process premiums
         if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
-            list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
+            [$products, $options] = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
 
             $value['hidden_Premium'] = 1;
             $value['product_option'] = CRM_Utils_Array::value(
@@ -663,13 +663,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * Process membership records.
    *
    * @param array $params
-   *   Associated array of submitted values.
+   *   Array of submitted values.
    *
+   * @return float
+   *   batch total monetary amount.
    *
-   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  private function processMembership(&$params) {
-
+  private function processMembership(array $params) {
+    $batchTotal = 0;
     // get the price set associated with offline membership
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
     $this->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
@@ -755,7 +758,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $value['total_amount'] = (float) $value['total_amount'];
         }
 
-        $params['actualBatchTotal'] += $value['total_amount'];
+        $batchTotal += $value['total_amount'];
 
         unset($value['financial_type']);
         unset($value['payment_instrument']);
@@ -890,7 +893,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
       }
     }
-    return TRUE;
+    return $batchTotal;
   }
 
   /**
