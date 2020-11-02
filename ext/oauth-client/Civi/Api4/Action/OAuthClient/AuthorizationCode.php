@@ -24,6 +24,8 @@ use Civi\Api4\Generic\Result;
  *
  * @method $this setLandingUrl(string $landingUrl)
  * @method string getLandingUrl()
+ * @method $this setPrompt(string $prompt)
+ * @method string getPrompt()
  *
  * @link https://tools.ietf.org/html/rfc6749#section-4.1
  */
@@ -38,6 +40,15 @@ class AuthorizationCode extends AbstractGrantAction {
    * @var string|null
    */
   protected $landingUrl = NULL;
+
+  /**
+   * @var string
+   *   Ex: 'none', 'consent', 'select_account'
+   *
+   * @see https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
+   * @see https://developers.google.com/identity/protocols/oauth2/web-server
+   */
+  protected $prompt = NULL;
 
   /**
    * Tee-up the authorization request.
@@ -63,11 +74,15 @@ class AuthorizationCode extends AbstractGrantAction {
       'scopes' => $scopes,
       'tag' => $this->getTag(),
     ]);
+    $authOptions = [
+      'state' => $stateId,
+      'scope' => $scopes,
+    ];
+    if ($this->prompt !== NULL) {
+      $authOptions['prompt'] = $this->prompt;
+    }
     $result[] = [
-      'url' => $provider->getAuthorizationUrl([
-        'state' => $stateId,
-        'scope' => $scopes,
-      ]),
+      'url' => $provider->getAuthorizationUrl($authOptions),
     ];
   }
 

@@ -46,6 +46,7 @@ class CRM_OAuth_MailSetup {
       ->addWhere('id', '=', $setupAction['oauth_client_id'])
       ->setStorage('OAuthSysToken')
       ->setTag('MailSettings:setup')
+      ->setPrompt('select_account')
       ->execute()
       ->single();
 
