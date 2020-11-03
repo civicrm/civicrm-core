@@ -74,6 +74,8 @@
     "adrienrn/php-mimetyper": "0.2.2",
     "civicrm/composer-downloads-plugin": "^3.0",
     "league/csv": "^9.2",
+    "league/oauth2-client": "^2.4",
+    "league/oauth2-google": "^3.0",
     "tplaner/when": "~3.0.0",
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^2 || ^3.0",
