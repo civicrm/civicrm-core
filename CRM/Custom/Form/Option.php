@@ -483,6 +483,7 @@ SELECT count(*)
       }
     }
 
+    CRM_Core_BAO_CustomOption::updateValue($customOption->id, $customOption->value);
     $customOption->save();
 
     $msg = ts('Your multiple choice option \'%1\' has been saved', [1 => $customOption->label]);
