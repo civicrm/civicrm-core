@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\OAuthClient;
 
 use Civi\Api4\Generic\Result;
+use Civi\OAuth\OAuthException;
 
 /**
  * Class AuthorizationCode
@@ -84,6 +85,27 @@ class AuthorizationCode extends AbstractGrantAction {
     $result[] = [
       'url' => $provider->getAuthorizationUrl($authOptions),
     ];
+  }
+
+  protected function validate() {
+    parent::validate();
+    if ($this->landingUrl) {
+      $landingUrlParsed = parse_url($this->landingUrl);
+      $landingUrlIp = gethostbyname($landingUrlParsed['host']);
+      $allowedBases = [
+        \Civi::paths()->getVariable('cms.root', 'url'),
+        \Civi::paths()->getVariable('civicrm.root', 'url'),
+      ];
+      $ok = max(array_map(function($allowed) use ($landingUrlParsed, $landingUrlIp) {
+        $allowedParsed = parse_url($allowed);
+        $allowedIp = gethostbyname($allowedParsed['host']);
+        $ok = $landingUrlIp === $allowedIp && $landingUrlParsed['scheme'] == $allowedParsed['scheme'];
+        return (int) $ok;
+      }, $allowedBases));
+      if (!$ok) {
+        throw new OAuthException("Cannot initiate OAuth. Unsupported landing URL.");
+      }
+    }
   }
 
   /**
