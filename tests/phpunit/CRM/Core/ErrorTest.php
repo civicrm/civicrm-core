@@ -46,6 +46,18 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $this->assertRegexp('/CRM_Core_ErrorTest->testFormatBacktrace_exception/', $msg);
   }
 
+  public function testExceptionLogging() {
+    $e = new \Exception("the exception");
+    Civi::log()->notice('There was an exception!', [
+      'exception' => $e,
+    ]);
+
+    $e = new Error('the error');
+    Civi::log()->notice('There was an error!', [
+      'exception' => $e,
+    ]);
+  }
+
   /**
    * We have two coding conventions for writing to log. Make sure that they work together.
    *
