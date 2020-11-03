@@ -1859,57 +1859,69 @@ class CRM_Utils_System {
   }
 
   /**
-   * Determine the standard URL for viewing or editing the specified link.
-   *
-   * This function delegates the decision-making to (a) the hook system and
-   * (b) the BAO system.
+   * Determine the standard URL for view/update/delete of a given entity.
    *
    * @param array $crudLinkSpec
    *   With keys:.
-   *   - action: int, CRM_Core_Action::UPDATE or CRM_Core_Action::VIEW [default: VIEW]
-   *   - entity_table: string, eg "civicrm_contact"
-   *   - entity_id: int
+   *   - action: sting|int, e.g. 'update' or CRM_Core_Action::UPDATE or 'view' or CRM_Core_Action::VIEW [default: 'view']
+   *   - entity|entity_table: string, eg "Contact" or "civicrm_contact"
+   *   - id|entity_id: int
+   *
+   * @param bool $absolute whether the generated link should have an absolute (external) URL beginning with http
    *
    * @return array|NULL
    *   NULL if unavailable, or an array. array has keys:
-   *   - path: string
-   *   - query: array
    *   - title: string
    *   - url: string
-   * @deprecated
    */
-  public static function createDefaultCrudLink($crudLinkSpec) {
-    $crudLinkSpec['action'] = CRM_Utils_Array::value('action', $crudLinkSpec, CRM_Core_Action::VIEW);
-    $daoClass = CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
-    if (!$daoClass) {
+  public static function createDefaultCrudLink($crudLinkSpec, $absolute = FALSE) {
+    $action = $crudLinkSpec['action'] ?? 'view';
+    if (is_numeric($action)) {
+      $action = CRM_Core_Action::description($action);
+    }
+    else {
+      $action = strtolower($action);
+    }
+
+    $daoClass = isset($crudLinkSpec['entity']) ? CRM_Core_DAO_AllCoreTables::getFullName($crudLinkSpec['entity']) : CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
+    $paths = $daoClass ? $daoClass::getEntityPaths() : [];
+    $path = $paths[$action] ?? NULL;
+    if (!$path) {
       return NULL;
     }
 
-    $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
-    if (!class_exists($baoClass)) {
-      return NULL;
+    if (empty($crudLinkSpec['id']) && !empty($crudLinkSpec['entity_id'])) {
+      $crudLinkSpec['id'] = $crudLinkSpec['entity_id'];
+    }
+    foreach ($crudLinkSpec as $key => $value) {
+      $path = str_replace('[' . $key . ']', $value, $path);
     }
 
-    $bao = new $baoClass();
-    $bao->id = $crudLinkSpec['entity_id'];
-    if (!$bao->find(TRUE)) {
-      return NULL;
+    switch ($action) {
+      case 'add':
+        $title = ts('New %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      case 'view':
+        $title = ts('View %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      case 'update':
+        $title = ts('Edit %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      case 'delete':
+        $title = ts('Delete %1', [1 => $daoClass::getEntityTitle()]);
+        break;
+
+      default:
+        $title = ts(ucfirst($action)) . ' ' . $daoClass::getEntityTitle();
     }
 
-    $link = [];
-    CRM_Utils_Hook::crudLink($crudLinkSpec, $bao, $link);
-    if (empty($link) && is_callable([$bao, 'createDefaultCrudLink'])) {
-      $link = $bao->createDefaultCrudLink($crudLinkSpec);
-    }
-
-    if (!empty($link)) {
-      if (!isset($link['url'])) {
-        $link['url'] = self::url($link['path'], $link['query'], TRUE, NULL, FALSE);
-      }
-      return $link;
-    }
-
-    return NULL;
+    return [
+      'title' => $title,
+      'url' => self::url($path, NULL, $absolute, NULL, FALSE),
+    ];
   }
 
   /**

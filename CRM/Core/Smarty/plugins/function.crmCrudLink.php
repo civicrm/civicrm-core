@@ -20,29 +20,26 @@
  *
  * @param array $params
  *   Array with keys:
- *   - table: string
+ *   - entity|table: string
  *   - id: int
- *   - action: string, 'VIEW' or 'UPDATE' [default: VIEW]
+ *   - action: string, 'view', 'update', 'delete', etc [default: view]
  *   - title: string [optionally override default title]
  * @param CRM_Core_Smarty $smarty
  *
  * @return string
  */
 function smarty_function_crmCrudLink($params, &$smarty) {
-  if (empty($params['action'])) {
-    $params['action'] = 'VIEW';
-  }
-
   $link = CRM_Utils_System::createDefaultCrudLink([
-    'action' => constant('CRM_Core_Action::' . $params['action']),
-    'entity_table' => $params['table'],
-    'entity_id' => $params['id'],
+    'action' => $params['action'] ?? 'view',
+    'entity' => $params['entity'] ?? NULL,
+    'entity_table' => $params['table'] ?? NULL,
+    'id' => $params['id'],
   ]);
 
   if ($link) {
     return sprintf('<a href="%s">%s</a>',
       htmlspecialchars($link['url']),
-      htmlspecialchars(CRM_Utils_Array::value('title', $params, $link['title']))
+      htmlspecialchars($params['title'] ?? $link['title'])
     );
   }
   else {
