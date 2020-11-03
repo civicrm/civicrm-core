@@ -8,9 +8,9 @@
   <log>true</log>
   <icon>fa-money</icon>
   <paths>
-    <create>civicrm/grant/add?reset=1&amp;action=add&amp;context=standalone</create>
+    <add>civicrm/grant/add?reset=1&amp;action=add&amp;context=standalone</add>
     <view>contact/view/grant?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
-    <edit>civicrm/contact/view/grant?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</edit>
+    <update>civicrm/contact/view/grant?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</update>
     <delete>civicrm/contact/view/grant?reset=1&amp;action=delete&amp;id=[id]&amp;cid=[contact_id]</delete>
   </paths>
   <field>

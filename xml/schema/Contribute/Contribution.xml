@@ -8,9 +8,9 @@
   <log>true</log>
   <icon>fa-credit-card</icon>
   <paths>
-    <create>civicrm/contribute/add?reset=1&amp;action=add&amp;context=standalone</create>
+    <add>civicrm/contribute/add?reset=1&amp;action=add&amp;context=standalone</add>
     <view>civicrm/contact/view/contribution?reset=1&amp;action=view&amp;id=[id]</view>
-    <edit>civicrm/contact/view/contribution?reset=1&amp;action=update&amp;id=[id]</edit>
+    <update>civicrm/contact/view/contribution?reset=1&amp;action=update&amp;id=[id]</update>
     <delete>civicrm/contact/view/contribution?reset=1&amp;action=delete&amp;id=[id]</delete>
   </paths>
   <field>

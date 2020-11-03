@@ -9,9 +9,9 @@
   <log>true</log>
   <icon>fa-id-badge</icon>
   <paths>
-    <create>civicrm/member/add?reset=1&amp;action=add&amp;context=standalone</create>
+    <add>civicrm/member/add?reset=1&amp;action=add&amp;context=standalone</add>
     <view>civicrm/contact/view/membership?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
-    <edit>civicrm/contact/view/membership?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</edit>
+    <update>civicrm/contact/view/membership?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</update>
     <delete>civicrm/contact/view/membership?reset=1&amp;action=delete&amp;id=[id]&amp;cid=[contact_id]</delete>
   </paths>
   <field>

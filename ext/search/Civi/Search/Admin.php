@@ -76,7 +76,7 @@ class Admin {
               $title = ts('View %1', [1 => $entity['title']]);
               break;
 
-            case 'edit':
+            case 'update':
               $title = ts('Edit %1', [1 => $entity['title']]);
               break;
 
