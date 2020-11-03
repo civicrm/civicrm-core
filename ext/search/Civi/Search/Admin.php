@@ -58,7 +58,7 @@ class Admin {
   public static function getSchema() {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'description', 'icon')
+      ->addSelect('name', 'title', 'title_plural', 'description', 'icon', 'paths')
       ->addWhere('name', '!=', 'Entity')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -68,6 +68,31 @@ class Admin {
     foreach ($entities as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {
+        // Add paths (but only RUD actions) with translated titles
+        foreach ($entity['paths'] as $action => $path) {
+          unset($entity['paths'][$action]);
+          switch ($action) {
+            case 'view':
+              $title = ts('View %1', [1 => $entity['title']]);
+              break;
+
+            case 'edit':
+              $title = ts('Edit %1', [1 => $entity['title']]);
+              break;
+
+            case 'delete':
+              $title = ts('Delete %1', [1 => $entity['title']]);
+              break;
+
+            default:
+              continue 2;
+          }
+          $entity['paths'][] = [
+            'path' => $path,
+            'title' => $title,
+            'action' => $action,
+          ];
+        }
         $entity['fields'] = civicrm_api4($entity['name'], 'getFields', [
           'select' => $getFields,
           'where' => [['name', 'NOT IN', ['api_key', 'hash']]],

@@ -39,12 +39,14 @@
         ctrl.hiddenColumns.splice(index, 1);
       };
 
-      this.toggleLink = function(col) {
-        col.link = col.link ? '' : (window.location.pathname + window.location.search).replace('civicrm/admin/search', 'civicrm/');
-      };
-
       this.$onInit = function () {
         ctrl.getFieldLabel = ctrl.crmSearchAdmin.getFieldLabel;
+        if (!ctrl.display.settings) {
+          ctrl.display.settings = {
+            limit: 20,
+            pager: true
+          };
+        }
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.apiParams.select, function(columns, fieldExpr) {
             columns.push(fieldToColumn(fieldExpr));
@@ -63,6 +65,16 @@
             }
           });
         }
+        ctrl.links = _.cloneDeep(searchMeta.getEntity(ctrl.apiEntity).paths || []);
+        _.each(ctrl.apiParams.join, function(join) {
+          var joinName = join[0].split(' AS '),
+            joinEntity = searchMeta.getEntity(joinName[0]);
+          _.each(joinEntity.paths, function(path) {
+            var link = _.cloneDeep(path);
+            link.path = link.path.replace(/\[/g, '[' + joinName[1] + '.');
+            ctrl.links.push(link);
+          });
+        });
       };
 
     }

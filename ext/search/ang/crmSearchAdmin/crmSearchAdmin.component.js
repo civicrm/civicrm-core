@@ -114,8 +114,7 @@
       this.addDisplay = function(type) {
         ctrl.savedSearch.displays.push({
           type: type,
-          label: '',
-          settings: {}
+          label: ''
         });
         $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
       };
@@ -285,7 +284,14 @@
       // Debounced callback for loadResults
       function _loadResultsCallback() {
         // Multiply limit to read 2 pages at once & save ajax requests
-        var params = angular.merge({debug: true, limit: ctrl.limit * 2}, ctrl.savedSearch.api_params);
+        var params = _.merge(_.cloneDeep(ctrl.savedSearch.api_params), {debug: true, limit: ctrl.limit * 2});
+        // Select the ids of joined entities (helps with displaying links)
+        _.each(params.join, function(join) {
+          var idField = join[0].split(' AS ')[1] + '.id';
+          if (!_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
+            params.select.push(idField);
+          }
+        });
         lockTableHeight();
         $scope.error = false;
         if (ctrl.stale) {
@@ -321,7 +327,7 @@
         })
           .finally(function() {
             if (ctrl.debug) {
-              ctrl.debug.params = JSON.stringify(_.extend({version: 4}, ctrl.savedSearch.api_params), null, 2);
+              ctrl.debug.params = JSON.stringify(params, null, 2);
               if (ctrl.debug.timeIndex) {
                 ctrl.debug.timeIndex = Number.parseFloat(ctrl.debug.timeIndex).toPrecision(2);
               }
@@ -466,6 +472,10 @@
 
       // Is a column eligible to use an aggregate function?
       this.canAggregate = function(col) {
+        // If the query does not use grouping, never
+        if (!ctrl.savedSearch.api_params.groupBy.length) {
+          return false;
+        }
         var info = searchMeta.parseExpr(col);
         // If the column is used for a groupBy, no
         if (ctrl.savedSearch.api_params.groupBy.indexOf(info.path) > -1) {
@@ -475,33 +485,65 @@
         return ctrl.savedSearch.api_params.groupBy.indexOf(info.prefix + 'id') < 0;
       };
 
-      $scope.formatResult = function formatResult(row, col) {
+      $scope.formatResult = function(row, col) {
         var info = searchMeta.parseExpr(col),
           key = info.fn ? (info.fn.name + ':' + info.path + info.suffix) : col,
           value = row[key];
         if (info.fn && info.fn.name === 'COUNT') {
           return value;
         }
+        // Output user-facing name/label fields as a link, if possible
+        if (info.field && _.includes(['display_name', 'title', 'label', 'subject'], info.field.name) && !info.fn && typeof value === 'string') {
+          var link = getEntityUrl(row, info);
+          if (link) {
+            return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + formatFieldValue(info.field, value) + '</a>';
+          }
+        }
         return formatFieldValue(info.field, value);
       };
 
+      // Attempts to construct a view url for a given entity
+      function getEntityUrl(row, info) {
+        var entity = searchMeta.getEntity(info.field.entity),
+          path = _.result(_.findWhere(entity.paths, {action: 'view'}), 'path');
+        // Only proceed if the path metadata exists for this entity
+        if (path) {
+          // Replace tokens in the path (e.g. [id])
+          var tokens = path.match(/\[\w*]/g) || [],
+            replacements = _.transform(tokens, function(replacements, token) {
+              var fieldName = info.prefix + token.slice(1, token.length - 1);
+              if (row[fieldName]) {
+                replacements.push(row[fieldName]);
+              }
+            });
+          // Only proceed if the row contains all the necessary data to resolve tokens
+          if (tokens.length === replacements.length) {
+            _.each(tokens, function(token, index) {
+              path = path.replace(token, replacements[index]);
+            });
+            return {url: CRM.url(path), title: path.title};
+          }
+        }
+      }
+
       function formatFieldValue(field, value) {
-        var type = field.data_type;
+        var type = field.data_type,
+          result = value;
         if (_.isArray(value)) {
           return _.map(value, function(val) {
             return formatFieldValue(field, val);
           }).join(', ');
         }
         if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
-          return CRM.utils.formatDate(value, null, type === 'Timestamp');
+          result = CRM.utils.formatDate(value, null, type === 'Timestamp');
         }
         else if (type === 'Boolean' && typeof value === 'boolean') {
-          return value ? ts('Yes') : ts('No');
+          result = value ? ts('Yes') : ts('No');
         }
         else if (type === 'Money' && typeof value === 'number') {
-          return CRM.formatMoney(value);
+          result = CRM.formatMoney(value);
         }
-        return value;
+        return _.escape(result);
       }
 
       $scope.fieldsForGroupBy = function() {
