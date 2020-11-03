@@ -8,7 +8,7 @@
   <log>true</log>
   <icon>fa-calendar</icon>
   <paths>
-    <create>civicrm/event/add?reset=1</create>
+    <add>civicrm/event/add?reset=1</add>
     <view>civicrm/event/info?reset=1&amp;id=[id]</view>
   </paths>
   <field>

@@ -9,7 +9,7 @@
   <log>true</log>
   <icon>fa-users</icon>
   <paths>
-    <create>civicrm/group/add?reset=1</create>
+    <add>civicrm/group/add?reset=1</add>
   </paths>
   <field>
     <name>id</name>

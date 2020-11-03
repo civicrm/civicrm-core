@@ -6,6 +6,11 @@
   <comment>Campaign Details.</comment>
   <add>3.3</add>
   <icon>fa-bullhorn</icon>
+  <paths>
+    <add>civicrm/campaign/add?reset=1</add>
+    <update>civicrm/campaign/add?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/campaign/add?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Campaign ID</title>
