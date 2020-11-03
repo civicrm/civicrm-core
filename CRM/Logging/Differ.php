@@ -403,11 +403,20 @@ ORDER BY log_date
    *
    * @param array $tables
    *   Array of tables to inspect.
+   * @param int $limit
+   *   Limit result to x
+   * @param int $offset
+   *   Offset result to y
    *
    * @return array
    */
-  public function getAllChangesForConnection($tables) {
-    $params = [1 => [$this->log_conn_id, 'String']];
+  public function getAllChangesForConnection($tables, $limit = 0, $offset = 0) {
+    $params = [
+      1 => [$this->log_conn_id, 'String'],
+      2 => [$limit, 'Integer'],
+      3 => [$offset, 'Integer'],
+    ];
+
     foreach ($tables as $table) {
       if (empty($sql)) {
         $sql = " SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
@@ -415,6 +424,12 @@ ORDER BY log_date
       else {
         $sql .= " UNION SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
       }
+    }
+    if ($limit) {
+      $sql .= " LIMIT %2";
+    }
+    if ($offset) {
+      $sql .= " OFFSET %3";
     }
     $diffs = [];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
@@ -425,6 +440,30 @@ ORDER BY log_date
       $diffs = array_merge($diffs, $this->diffsInTableForId($dao->table_name, $dao->id));
     }
     return $diffs;
+  }
+
+  /**
+   * Get count of all changes made in the connection.
+   *
+   * @param array $tables
+   *   Array of tables to inspect.
+   *
+   * @return array
+   */
+  public function getCountOfAllContactChangesForConnection($tables) {
+    $count = 0;
+    $params = [1 => [$this->log_conn_id, 'String']];
+    foreach ($tables as $table) {
+      if (empty($sql)) {
+        $sql = " SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
+      }
+      else {
+        $sql .= " UNION SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
+      }
+    }
+    $countSQL = " SELECT count(*) as countOfContacts FROM ({$sql}) count";
+    $count = CRM_Core_DAO::singleValueQuery($countSQL, $params);
+    return $count;
   }
 
   /**

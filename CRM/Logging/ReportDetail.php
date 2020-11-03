@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Logging_ReportDetail extends CRM_Report_Form {
+
+  const ROW_COUNT_LIMIT = 50;
   protected $cid;
 
   /**
@@ -172,6 +174,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
 
     // populate $rows with only the differences between $changed and $original (skipping certain columns and NULL ↔ empty changes unless raw requested)
     $skipped = ['id'];
+    $nRows = $rows = [];
     foreach ($this->diffs as $diff) {
       $table = $diff['table'];
       if (empty($metadata[$table])) {
@@ -228,10 +231,31 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           $to = '';
         }
       }
-
-      $rows[] = ['field' => $field . " (id: {$diff['id']})", 'from' => $from, 'to' => $to];
+      // Rework the results to provide grouping based on the ID
+      // We don't need that field displayed so we will output empty
+      if ($field == 'Modified Date') {
+        $nRows[$diff['id']][] = ['field' => '', 'from' => $from, 'to' => $to];
+      }
+      else {
+        $nRows[$diff['id']][] = ['field' => $field . " (id: {$diff['id']})", 'from' => $from, 'to' => $to];
+      }
     }
+    // Transform the output so that we can compact the changes into the proper amount of rows IF trData is holding more than 1 array
+    foreach ($nRows as $trData) {
+      if (count($trData) > 1) {
+        $keys = array_intersect(...array_map('array_keys', $trData));
+        $mergedRes = array_combine($keys, array_map(function ($key) use ($trData) {
+          // If more than 1 entry is found, we are assigning them as subarrays, then the tpls will be responsible for concatenating the results
+          return array_column($trData, $key);
+        }, $keys));
+        $rows[] = $mergedRes;
+      }
+      else {
+        // We always need the first row of that array
+        $rows[] = $trData[0];
+      }
 
+    }
     return $rows;
   }
 
@@ -266,6 +290,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    * Calculate all the contact related diffs for the change.
    */
   protected function calculateContactDiffs() {
+    $this->_rowsFound = $this->getCountOfAllContactChangesForConnection();
+    // Apply some limits before asking for all contact changes
+    $this->getLimit();
     $this->diffs = $this->getAllContactChangesForConnection();
   }
 
@@ -280,10 +307,28 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     }
     $this->setDiffer();
     try {
-      return $this->differ->getAllChangesForConnection($this->tables);
+      return $this->differ->getAllChangesForConnection($this->tables, $this->dblimit, $this->dboffset);
     }
     catch (CRM_Core_Exception $e) {
-      CRM_Core_Error::statusBounce(ts($e->getMessage()));
+      CRM_Core_Error::statusBounce($e->getMessage());
+    }
+  }
+
+  /**
+   * Get an count of contacts with changes.
+   *
+   * @return mixed
+   */
+  public function getCountOfAllContactChangesForConnection() {
+    if (empty($this->log_conn_id)) {
+      return [];
+    }
+    $this->setDiffer();
+    try {
+      return $this->differ->getCountOfAllContactChangesForConnection($this->tables);
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Core_Error::statusBounce($e->getMessage());
     }
   }
 
@@ -347,6 +392,61 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->altered_name = CRM_Utils_Request::retrieve('alteredName', 'String');
     $this->altered_by = CRM_Utils_Request::retrieve('alteredBy', 'String');
     $this->altered_by_id = CRM_Utils_Request::retrieve('alteredById', 'Integer');
+    $this->layout = CRM_Utils_Request::retrieve('layout', 'String');
+  }
+
+  /**
+   * Override to set limit
+   * @param int $rowCount
+   */
+  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+    parent::limit($rowCount);
+  }
+
+  /**
+   * Override to set pager with limit
+   * @param int $rowCount
+   */
+  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+    // We should not be rendering the pager in overlay mode
+    if (!isset($this->layout)) {
+      $this->_dashBoardRowCount = $rowCount;
+      $this->_limit = TRUE;
+      parent::setPager($rowCount);
+    }
+  }
+
+  /**
+   * This is a function similar to limit, in fact we copied it as-is and removed
+   * some `set` statements
+   *
+   */
+  public function getLimit($rowCount = self::ROW_COUNT_LIMIT) {
+    if ($this->addPaging) {
+
+      $pageId = CRM_Utils_Request::retrieve('crmPID', 'Integer');
+
+      // @todo all http vars should be extracted in the preProcess
+      // - not randomly in the class
+      if (!$pageId && !empty($_POST)) {
+        if (isset($_POST['PagerBottomButton']) && isset($_POST['crmPID_B'])) {
+          $pageId = max((int) $_POST['crmPID_B'], 1);
+        }
+        elseif (isset($_POST['PagerTopButton']) && isset($_POST['crmPID'])) {
+          $pageId = max((int) $_POST['crmPID'], 1);
+        }
+        unset($_POST['crmPID_B'], $_POST['crmPID']);
+      }
+
+      $pageId = $pageId ? $pageId : 1;
+      $offset = ($pageId - 1) * $rowCount;
+
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+      $this->_limit = " LIMIT $offset, $rowCount";
+      $this->dblimit = $rowCount;
+      $this->dboffset = $offset;
+    }
   }
 
 }
