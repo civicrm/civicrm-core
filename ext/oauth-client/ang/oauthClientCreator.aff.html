@@ -1,0 +1,14 @@
+<div oauth-util-import="CRM.oauthUtil.providers" to="theProviders"></div>
+
+<div ng-form="create" class="form-horizontal">
+  <div class="form-group">
+    <div>
+      <label for="guid">{{ts('Client ID')}}:</label>
+      <input class="form-control" ng-model="options.client.guid" type="text" id="guid" />
+    </div>
+    <div>
+      <label for="secret">{{ts('Client Secret')}}:</label>
+      <input class="form-control" ng-model="options.client.secret" type="text" id="secret" />
+    </div>
+  </div>
+</div>
