@@ -173,7 +173,7 @@ trait Api3TestTrait {
 
   /**
    * This function exists to wrap api getValue function & check the result
-   * so we can ensure they succeed & throw exceptions without litterering the test with checks
+   * so we can ensure they succeed & throw exceptions without littering the test with checks
    * There is a type check in this
    *
    * @param string $entity
