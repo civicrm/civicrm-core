@@ -26,4 +26,15 @@ namespace Civi\Api4;
  */
 class MailSettings extends Generic\DAOEntity {
 
+  /**
+   * Check whether the mail store is accessible.
+   *
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\MailSettings\TestConnection
+   */
+  public static function testConnection($checkPermissions = TRUE) {
+    $action = new \Civi\Api4\Action\MailSettings\TestConnection(static::class, __FUNCTION__);
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
 }
