@@ -817,11 +817,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Render an exception as HTML string.
    *
-   * @param Exception $e
+   * @param Throwable $e
    * @return string
    *   printable HTML text
    */
-  public static function formatHtmlException(Exception $e) {
+  public static function formatHtmlException(Throwable $e) {
     $msg = '';
 
     // Exception metadata
@@ -856,11 +856,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   /**
    * Write details of an exception to the log.
    *
-   * @param Exception $e
+   * @param Throwable $e
    * @return string
    *   printable plain text
    */
-  public static function formatTextException(Exception $e) {
+  public static function formatTextException(Throwable $e) {
     $msg = get_class($e) . ": \"" . $e->getMessage() . "\"\n";
 
     $ei = $e;
