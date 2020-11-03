@@ -758,8 +758,9 @@ class CRM_Core_DAO extends DB_DataObject {
         else {
           $maxLength = $field['maxlength'] ?? NULL;
           if (!is_array($value) && $maxLength && mb_strlen($value) > $maxLength && empty($field['pseudoconstant'])) {
-            Civi::log()->warning(ts('A string for field $dbName has been truncated. The original string was %1', [CRM_Utils_Type::escape($value, 'String')]));
-            // The string is too long - what to do what to do? Well losing data is generally bad so lets' truncate
+            // No ts() since this is a sysadmin-y string not seen by general users.
+            Civi::log()->warning('A string for field {dbName} has been truncated. The original string was {value}.', ['dbName' => $dbName, 'value' => $value]);
+            // The string is too long - what to do what to do? Well losing data is generally bad so let's truncate
             $value = CRM_Utils_String::ellipsify($value, $maxLength);
           }
           $this->$dbName = $value;
