@@ -1,0 +1,10 @@
+<select class="form-control">
+  <option value="" ng-selected="!$ctrl.column.link" >{{ ts('None') }}</option>
+  <option ng-repeat="link in $ctrl.links" value="{{ link.path }}" ng-selected="$ctrl.column.link === link.path">
+    {{ link.title }}
+  </option>
+  <option value="civicrm/" ng-selected="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)">
+    {{ ts('Other...') }}
+  </option>
+</select>
+<input class="form-control" type="text" ng-model="$ctrl.column.link" ng-model-options="{updateOn: 'blur'}" ng-show="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)" />

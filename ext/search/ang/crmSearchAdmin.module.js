@@ -88,7 +88,8 @@
       function getField(fieldName, entityName) {
         var dotSplit = fieldName.split('.'),
           joinEntity = dotSplit.length > 1 ? dotSplit[0] : null,
-          name = _.last(dotSplit).split(':')[0];
+          name = _.last(dotSplit).split(':')[0],
+          field;
         // Custom fields contain a dot in their fieldname
         // If 3 segments, the first is the joinEntity and the last 2 are the custom field
         if (dotSplit.length === 3) {
@@ -96,15 +97,20 @@
         }
         // If 2 segments, it's ambiguous whether this is a custom field or joined field. Search the main entity first.
         if (dotSplit.length === 2) {
-          var field = _.find(getEntity(entityName).fields, {name: dotSplit[0] + '.' + name});
+          field = _.find(getEntity(entityName).fields, {name: dotSplit[0] + '.' + name});
           if (field) {
+            field.entity = entityName;
             return field;
           }
         }
         if (joinEntity) {
           entityName = _.find(CRM.vars.search.links[entityName], {alias: joinEntity}).entity;
         }
-        return _.find(getEntity(entityName).fields, {name: name});
+        field = _.find(getEntity(entityName).fields, {name: name});
+        if (field) {
+          field.entity = entityName;
+          return field;
+        }
       }
       return {
         getEntity: getEntity,

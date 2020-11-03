@@ -18,13 +18,13 @@
       <td ng-if="$ctrl.settings.actions">
         <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(!loadingAllRows && row.id)">
       </td>
-      <td ng-repeat="col in $ctrl.columns" ng-bind-html="formatResult(row, col)">
+      <td ng-repeat="col in $ctrl.columns" ng-bind-html="formatResult(row, col)" title="{{:: col.title }}">
       </td>
       <td></td>
     </tr>
   </tbody>
 </table>
-<div class="text-center" ng-if="$ctrl.rowCount">
+<div class="text-center" ng-if="$ctrl.rowCount && $ctrl.settings.pager">
   <ul uib-pagination
       class="pagination"
       boundary-links="true"

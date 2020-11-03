@@ -36,6 +36,14 @@
         if (_.isEmpty(params.where)) {
           params.where = [];
         }
+        // Select the ids of joined entities (helps with displaying links)
+        _.each(params.join, function(join) {
+          var joinEntity = join[0].split(' AS ')[1],
+            idField = joinEntity + '.id';
+          if (!_.includes(params.select, idField) && !canAggregate('id', joinEntity + '.')) {
+            params.select.push(idField);
+          }
+        });
         _.each(ctrl.filters, function(value, key) {
           if (value) {
             params.where.push([key, 'CONTAINS', value]);
@@ -103,9 +111,17 @@
         }
         result = _.escape(result);
         if (col.link) {
-          result = '<a href="' + replaceTokens(col.link, row) + '">' + result + '</a>';
+          result = '<a href="' + getUrl(col.link, row) + '">' + result + '</a>';
         }
         return result;
+      }
+
+      function getUrl(link, row) {
+        var url = replaceTokens(link, row);
+        if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
+          url = CRM.url(url);
+        }
+        return _.escape(url);
       }
 
       function replaceTokens(str, data) {
@@ -113,6 +129,19 @@
           str = str.replace('[' + key + ']', value);
         });
         return str;
+      }
+
+      function canAggregate(fieldName, prefix) {
+        // If the query does not use grouping, never
+        if (!ctrl.apiParams.groupBy.length) {
+          return false;
+        }
+        // If the column is used for a groupBy, no
+        if (ctrl.apiParams.groupBy.indexOf(prefix + fieldName) > -1) {
+          return false;
+        }
+        // If the entity this column belongs to is being grouped by id, then also no
+        return ctrl.apiParams.groupBy.indexOf(prefix + 'id') < 0;
       }
 
       $scope.selectAllRows = function() {

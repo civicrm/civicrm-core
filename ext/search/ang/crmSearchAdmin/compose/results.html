@@ -22,9 +22,7 @@
       <td>
         <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(loading === false && !loadingAllRows && row.id)">
       </td>
-      <td ng-repeat="col in $ctrl.savedSearch.api_params.select">
-        {{ formatResult(row, col) }}
-      </td>
+      <td ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-bind-html="formatResult(row, col)"></td>
       <td></td>
     </tr>
   </tbody>
