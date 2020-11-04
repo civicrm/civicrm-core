@@ -24,9 +24,31 @@
   min-height: 200px;
 }
 
-#bootstrap-theme.crm-search ul.nav.nav-stacked {
+#bootstrap-theme.crm-search .nav-stacked {
   margin-left: 0;
   margin-right: 20px;
+}
+
+#bootstrap-theme.crm-search ul.nav-stacked {
+  margin-top: 20px;
+}
+
+#bootstrap-theme.crm-search input.ng-invalid {
+  border-color: #8A1F11;
+}
+#bootstrap-theme.crm-search input.ng-invalid::placeholder {
+  color: #8A1F11;
+}
+
+#bootstrap-theme.crm-search ul.nav-stacked li {
+  cursor: default;
+}
+
+#bootstrap-theme.crm-search ul.nav-stacked li a[disabled] {
+  text-decoration: line-through !important;
+  color: grey;
+  cursor: default;
+  pointer-events: none;
 }
 
 #bootstrap-theme.crm-search fieldset {
