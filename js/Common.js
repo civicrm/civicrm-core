@@ -1305,10 +1305,10 @@ if (!CRM.vars) CRM.vars = {};
 
     var extra = {
       expires: 0
-    };
+    }, label;
     if ($(this).length) {
       if (title === '') {
-        var label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
+        label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
         if (label.length) {
           label.addClass('crm-error');
           var $label = label.clone();
@@ -1328,7 +1328,9 @@ if (!CRM.vars) CRM.vars = {};
         ele.one('change', function () {
           if (msg && msg.close) msg.close();
           ele.removeClass('crm-error');
-          label.removeClass('crm-error');
+          if (label) {
+            label.removeClass('crm-error');
+          }
         });
       }, 1000);
     }

@@ -69,8 +69,10 @@
 
         $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
 
-        // Is this savedSearch record saved, unsaved or saving
-        $scope.status = this.savedSearch && this.savedSearch.id ? 'saved' : 'unsaved';
+        // After watcher runs for the first time and messes up the status, set it correctly
+        $timeout(function() {
+          $scope.status = ctrl.savedSearch && ctrl.savedSearch.id ? 'saved' : 'unsaved';
+        });
 
         loadFieldOptions();
       };
@@ -80,6 +82,9 @@
       }
 
       this.save = function() {
+        if (!validate()) {
+          return;
+        }
         $scope.status = 'saving';
         var params = _.cloneDeep(ctrl.savedSearch),
           apiCalls = {},
@@ -98,12 +103,17 @@
         delete params.displays;
         apiCalls.saved = ['SavedSearch', 'save', {records: [params], chain: chain}, 0];
         crmApi4(apiCalls).then(function(results) {
+          // Set new status to saved unless the user changed something in the interim
+          var newStatus = $scope.status === 'unsaved' ? 'unsaved' : 'saved';
           ctrl.savedSearch.id = results.saved.id;
-          ctrl.savedSearch.groups = results.saved.groups || [];
-          ctrl.savedSearch.displays = results.saved.displays || [];
-          if ($scope.status === 'saving') {
-            $scope.status = 'saved';
+          if (results.saved.groups && results.saved.groups.length) {
+            ctrl.savedSearch.groups[0].id = results.saved.groups[0].id;
           }
+          ctrl.savedSearch.displays = results.saved.displays || [];
+          // Wait until after onChangeAnything to update status
+          $timeout(function() {
+            $scope.status = newStatus;
+          });
         });
       };
 
@@ -123,6 +133,11 @@
         var display = ctrl.savedSearch.displays[index];
         if (display.id) {
           display.trashed = !display.trashed;
+          if ($scope.controls.tab === ('display_' + index) && display.trashed) {
+            $scope.selectTab('compose');
+          } else if (!display.trashed) {
+            $scope.selectTab('display_' + index);
+          }
         } else {
           $scope.selectTab('compose');
           ctrl.savedSearch.displays.splice(index, 1);
@@ -157,7 +172,9 @@
         if (!ctrl.groupExists && (!ctrl.savedSearch.groups.length || !ctrl.savedSearch.groups[0].id)) {
           ctrl.savedSearch.groups.length = 0;
         }
-        $scope.selectTab('compose');
+        if ($scope.controls.tab === 'group') {
+          $scope.selectTab('compose');
+        }
       };
 
       $scope.getJoinEntities = function() {
@@ -212,6 +229,39 @@
           });
         }
       };
+
+      function validate() {
+        var errors = [],
+          errorEl,
+          label,
+          tab;
+        if (!ctrl.savedSearch.label) {
+          errorEl = '#crm-saved-search-label';
+          label = ts('Search Label');
+          errors.push(ts('%1 is a required field.', {1: label}));
+        }
+        if (ctrl.groupExists && !ctrl.savedSearch.groups[0].title) {
+          errorEl = '#crm-search-admin-group-title';
+          label = ts('Group Title');
+          errors.push(ts('%1 is a required field.', {1: label}));
+          tab = 'group';
+        }
+        _.each(ctrl.savedSearch.displays, function(display, index) {
+          if (!display.trashed && !display.label) {
+            errorEl = '#crm-search-admin-display-label';
+            label = ts('Display Label');
+            errors.push(ts('%1 is a required field.', {1: label}));
+            tab = 'display_' + index;
+          }
+        });
+        if (errors.length) {
+          if (tab) {
+            $scope.selectTab(tab);
+          }
+          $(errorEl).crmError(errors.join('<br>'), ts('Error Saving'), {expires: 5000});
+        }
+        return !errors.length;
+      }
 
       /**
        * Called when clicking on a column header
