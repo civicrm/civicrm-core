@@ -95,9 +95,9 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       $paramsField = ['id' => $this->_fid];
       CRM_Core_BAO_CustomField::retrieve($paramsField, $fieldDefaults);
-
       if ($fieldDefaults['html_type'] == 'CheckBox'
-        || $fieldDefaults['html_type'] == 'Multi-Select'
+        // Multi-Select
+        || ($fieldDefaults['html_type'] == 'Select' && $fieldDefaults['serialize'] == 1)
       ) {
         if (!empty($fieldDefaults['default_value'])) {
           $defaultCheckValues = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -420,7 +420,8 @@ SELECT count(*)
       $customField->find(TRUE) &&
       (
         $customField->html_type == 'CheckBox' ||
-        $customField->html_type == 'Multi-Select'
+        // Multi Value Select
+        ($customField->html_type == 'Select' && $customField->serialize == 1)
       )
     ) {
       $defVal = explode(
