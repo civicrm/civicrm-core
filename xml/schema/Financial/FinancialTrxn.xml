@@ -167,6 +167,14 @@
     <title>Payment Processor</title>
     <type>int unsigned</type>
     <comment>Payment Processor for this financial transaction</comment>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
