@@ -71,6 +71,11 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
       'civicrm_mail_settings', 'is_contact_creation_disabled_if_no_match', "TINYINT DEFAULT 0 NOT NULL COMMENT 'If this option is enabled, CiviCRM will not create new contacts when filing emails'");
   }
 
+  public function upgrade_5_31_beta2($rev) {
+    $this->addTask('Restore null-ity of "civicrm_group.title" field', 'groupTitleRestore');
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
     $eWAYPaymentProcessorType = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_payment_processor_type WHERE class_name = 'Payment_eWAY'");
     if ($eWAYPaymentProcessorType) {
@@ -157,6 +162,30 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
     }
     else {
       $queries[] = "ALTER TABLE civicrm_group CHANGE `title` `title` varchar(255) NOT NULL COMMENT 'Name of Group.'";
+    }
+    foreach ($queries as $query) {
+      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
+
+  /**
+   * The prior task grouptitlefieldExpand went a bit too far in making the `title` NOT NULL.
+   *
+   * @link https://lab.civicrm.org/dev/translation/-/issues/58
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function groupTitleRestore(CRM_Queue_TaskContext $ctx) {
+    $locales = CRM_Core_I18n::getMultilingual();
+    $queries = [];
+    if ($locales) {
+      foreach ($locales as $locale) {
+        $queries[] = "ALTER TABLE civicrm_group CHANGE `title_{$locale}` `title_{$locale}` varchar(255) DEFAULT NULL COMMENT 'Name of Group.'";
+      }
+    }
+    else {
+      $queries[] = "ALTER TABLE civicrm_group CHANGE `title` `title` varchar(255) DEFAULT NULL COMMENT 'Name of Group.'";
     }
     foreach ($queries as $query) {
       CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
