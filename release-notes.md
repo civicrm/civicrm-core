@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.31.0
 
-Released November 4, 2020
+Released November 5, 2020
 
 - **[Synopsis](release-notes/5.31.0.md#synopsis)**
 - **[Features](release-notes/5.31.0.md#features)**
