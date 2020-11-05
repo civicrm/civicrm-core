@@ -28,7 +28,7 @@ class CRM_Mailing_MailStore {
    *   Name of the settings set from civimail_mail_settings to use (null for default).
    *
    * @throws Exception
-   * @return object
+   * @return CRM_Mailing_MailStore
    *   mail store implementation for processing CiviMail-bound emails
    */
   public static function getStore($name = NULL) {

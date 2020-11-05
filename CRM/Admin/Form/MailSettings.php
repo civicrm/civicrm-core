@@ -21,6 +21,8 @@
  */
 class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
 
+  protected $_testButtonName;
+
   /**
    * Build the form object.
    */
@@ -31,6 +33,16 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
+
+    $this->_testButtonName = $this->getButtonName('refresh', 'test');
+    $buttons = $this->getElement('buttons')->getElements();
+    $buttons[] = $this->createElement(
+      'xbutton',
+      $this->_testButtonName,
+      CRM_Core_Page::crmIcon('fa-chain') . ' ' . ts('Save & Test'),
+      ['type' => 'submit', 'class' => 'crm-button']
+    );
+    $this->getElement('buttons')->setElements($buttons);
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -184,6 +196,14 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     }
     else {
       CRM_Core_Session::setStatus("", ts('Changes Not Saved.'), "info");
+    }
+
+    if ($this->controller->getButtonName() == $this->_testButtonName) {
+      $test = civicrm_api4('MailSettings', 'testConnection', [
+        'where' => [['id', '=', $mailSettings->id]],
+      ])->single();
+      CRM_Core_Session::setStatus($test['details'], $test['title'],
+        $test['error'] ? 'error' : 'success');
     }
   }
 
