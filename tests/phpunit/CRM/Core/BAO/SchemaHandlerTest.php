@@ -377,24 +377,25 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    */
   public function testBuildFieldChangeSql() {
     $params = [
-      'table_name' => 'big_table',
+      'table_name' => 'civicrm_contact',
       'operation' => 'add',
       'name' => 'big_bob',
       'type' => 'text',
     ];
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals('ALTER TABLE big_table
+    $this->assertEquals('ALTER TABLE civicrm_contact
         ADD COLUMN `big_bob` text', trim($sql));
 
     $params['operation'] = 'modify';
     $params['comment'] = 'super big';
+    $params['fkName'] = CRM_Core_BAO_SchemaHandler::getIndexName('civicrm_contact', 'big_bob');
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals("ALTER TABLE big_table
+    $this->assertEquals("ALTER TABLE civicrm_contact
         MODIFY `big_bob` text COMMENT 'super big'", trim($sql));
 
     $params['operation'] = 'delete';
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals('ALTER TABLE big_table DROP COLUMN `big_bob`', trim($sql));
+    $this->assertEquals('ALTER TABLE civicrm_contact DROP COLUMN `big_bob`', trim($sql));
   }
 
 }

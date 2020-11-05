@@ -1712,12 +1712,11 @@ SELECT $columnName
    * @return bool
    */
   public static function getAlterFieldSQL($field, $operation) {
-    $indexExist = $operation === 'add' ? FALSE : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $field->id, 'is_searchable');
     $params = self::prepareCreateParams($field, $operation);
     // Let's suppress the required flag, since that can cause an sql issue... for unknown reasons since we are calling
     // a function only used by Custom Field creation...
     $params['required'] = FALSE;
-    return CRM_Core_BAO_SchemaHandler::getFieldAlterSQL($params, $indexExist);
+    return CRM_Core_BAO_SchemaHandler::getFieldAlterSQL($params);
   }
 
   /**

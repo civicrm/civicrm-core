@@ -85,7 +85,7 @@ class CRM_Core_BAO_SchemaHandler {
         $sql .= self::buildPrimaryKeySQL($field, $separator, $prefix);
       }
       foreach ($params['fields'] as $field) {
-        $sql .= self::buildSearchIndexSQL($field, $separator, $prefix);
+        $sql .= self::buildSearchIndexSQL($field, $separator);
       }
       if (isset($params['indexes'])) {
         foreach ($params['indexes'] as $index) {
@@ -155,13 +155,13 @@ class CRM_Core_BAO_SchemaHandler {
 
   /**
    * @param array $params
-   * @param $separator
-   * @param $prefix
-   * @param bool $indexExist
+   * @param string $separator
+   * @param string $prefix
+   * @param string|NULL $existingIndex
    *
    * @return NULL|string
    */
-  public static function buildSearchIndexSQL($params, $separator, $prefix, $indexExist = FALSE) {
+  public static function buildSearchIndexSQL($params, $separator, $prefix = '', $existingIndex = NULL) {
     $sql = NULL;
 
     // dont index blob
@@ -169,20 +169,19 @@ class CRM_Core_BAO_SchemaHandler {
       return $sql;
     }
 
-    //create index only for searchable fields during ADD,
-    //create index only if field is become searchable during MODIFY,
-    //drop index only if field is no longer searchable and it does not reference
-    //a forgein key (and indexExist is true)
-    if (!empty($params['searchable']) && !$indexExist) {
+    // Add index if field is searchable if it does not reference a foreign key
+    // (skip indexing FK fields because it would be redundant to have 2 indexes)
+    if (!empty($params['searchable']) && empty($params['fk_table_name']) && substr($existingIndex, 0, 5) !== 'INDEX') {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
       $sql .= "INDEX_{$params['name']} ( {$params['name']} )";
     }
-    elseif (empty($params['searchable']) && empty($params['fk_table_name']) && $indexExist) {
+    // Drop search index if field is no longer searchable
+    elseif (empty($params['searchable']) && substr($existingIndex, 0, 5) === 'INDEX') {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
-      $sql .= "DROP INDEX INDEX_{$params['name']}";
+      $sql .= "DROP INDEX $existingIndex";
     }
     return $sql;
   }
@@ -701,14 +700,13 @@ MODIFY      {$columnName} varchar( $length )
    * Build the sql to alter the field.
    *
    * @param array $params
-   * @param bool $indexExist
    *
    * @return string
    */
-  public static function buildFieldChangeSql($params, $indexExist) {
+  public static function buildFieldChangeSql($params) {
     $sql = str_repeat(' ', 8);
     $sql .= "ALTER TABLE {$params['table_name']}";
-    return $sql . self::getFieldAlterSQL($params, $indexExist);
+    return $sql . self::getFieldAlterSQL($params);
   }
 
   /**
@@ -718,11 +716,10 @@ MODIFY      {$columnName} varchar( $length )
    * by individual field we can do one or many.
    *
    * @param array $params
-   * @param bool $indexExist
    *
    * @return string
    */
-  public static function getFieldAlterSQL($params, $indexExist) {
+  public static function getFieldAlterSQL($params) {
     $sql = '';
     switch ($params['operation']) {
       case 'add':
@@ -736,16 +733,20 @@ MODIFY      {$columnName} varchar( $length )
 
       case 'modify':
         $separator = "\n";
-        $fkExists = CRM_Core_DAO::singleValueQuery("SHOW INDEX FROM `{$params['table_name']}` WHERE Key_name = 'FK_{$params['fkName']}'");
+        $existingIndex = NULL;
+        $dao = CRM_Core_DAO::executeQuery("SHOW INDEX FROM `{$params['table_name']}` WHERE Column_name = '{$params['name']}'");
+        if ($dao->fetch()) {
+          $existingIndex = $dao->Key_name;
+        }
         $fkSql = self::buildForeignKeySQL($params, ",\n", "ADD ", $params['table_name']);
-        if ($fkExists && !$fkSql) {
-          $sql .= "$separator DROP FOREIGN KEY FK_{$params['fkName']}";
+        if (substr($existingIndex, 0, 2) === 'FK' && !$fkSql) {
+          $sql .= "$separator DROP FOREIGN KEY {$existingIndex},\nDROP INDEX {$existingIndex}";
           $separator = ",\n";
         }
         $sql .= self::buildFieldSQL($params, $separator, "MODIFY ");
         $separator = ",\n";
-        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
-        if (!$fkExists && $fkSql) {
+        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $existingIndex);
+        if (!$existingIndex && $fkSql) {
           $sql .= $fkSql;
         }
         break;
