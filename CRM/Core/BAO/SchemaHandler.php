@@ -260,13 +260,10 @@ ALTER TABLE {$tableName}
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;
-      $fkName = "{$tableName}_{$params['name']}";
-      if (strlen($fkName) >= 48) {
-        $fkName = substr($fkName, 0, 32) . "_" . substr(md5($fkName), 0, 16);
-      }
+      $fkName = $params['fkName'] ?? self::getIndexName($tableName, $params['name']);
 
       $sql .= "CONSTRAINT FK_$fkName FOREIGN KEY ( `{$params['name']}` ) REFERENCES {$params['fk_table_name']} ( {$params['fk_field_name']} ) ";
-      $sql .= CRM_Utils_Array::value('fk_attributes', $params);
+      $sql .= $params['fk_attributes'] ?? '';
     }
     return $sql;
   }
@@ -774,9 +771,18 @@ MODIFY      {$columnName} varchar( $length )
 
       case 'modify':
         $separator = "\n";
+        $fkExists = CRM_Core_DAO::singleValueQuery("SHOW INDEX FROM `{$params['table_name']}` WHERE Key_name = 'FK_{$params['fkName']}'");
+        $fkSql = self::buildForeignKeySQL($params, ",\n", "ADD ", $params['table_name']);
+        if ($fkExists && !$fkSql) {
+          $sql .= "$separator DROP FOREIGN KEY FK_{$params['fkName']}";
+          $separator = ",\n";
+        }
         $sql .= self::buildFieldSQL($params, $separator, "MODIFY ");
         $separator = ",\n";
         $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
+        if (!$fkExists && $fkSql) {
+          $sql .= $fkSql;
+        }
         break;
 
       case 'delete':
@@ -790,6 +796,21 @@ MODIFY      {$columnName} varchar( $length )
         break;
     }
     return $sql;
+  }
+
+  /**
+   * Turns tableName + columnName into a safe & predictable index name
+   *
+   * @param $tableName
+   * @param $columnName
+   * @return string
+   */
+  public static function getIndexName($tableName, $columnName) {
+    $indexName = "{$tableName}_{$columnName}";
+    if (strlen($indexName) >= 48) {
+      $indexName = substr($indexName, 0, 32) . "_" . substr(md5($indexName), 0, 16);
+    }
+    return $indexName;
   }
 
   /**
