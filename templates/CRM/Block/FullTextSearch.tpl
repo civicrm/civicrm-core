@@ -24,7 +24,7 @@
 <div class="block-crm crm-container">
     <form method="post" id="id_fulltext_search">
     <div style="margin-bottom: 8px;">
-    <input type="text" name="text" id='text' value="" class="crm-form-text" style="width: 10em;" />&nbsp;<button type="submit" name="submit" id="fulltext_submit" class="crm-button crm-form-submit" onclick='submitForm();'>{ts}Go{/ts}</button>
+    <input type="text" name="text" id='text' value="" class="crm-form-text" />
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
   </div>
   <select class="form-select" id="fulltext_table" name="fulltext_table">
@@ -46,5 +46,6 @@
         <option value="Membership">{ts}Memberships{/ts}</option>
 {/if}
     </select> {help id="id-fullText" file="CRM/Contact/Form/Search/Custom/FullText.hlp"}
+    <div class="crm-submit-buttons"><button type="submit" name="submit" id="fulltext_submit" class="crm-button crm-form-submit" onclick='submitForm();'>{ts}Search{/ts}</button></div>
     </form>
 </div>
