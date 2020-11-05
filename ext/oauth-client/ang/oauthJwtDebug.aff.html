@@ -5,29 +5,27 @@
 
   <p>Some (but not all) OAuth2 tokens are based on <a href="https://en.wikipedia.org/wiki/JSON_Web_Token">JWT</a>. If a token is based on JWT, then we can examine its content to learn more about what the token signifies. This may help with debugging token-access issues.</p>
 
-  <h3>Token ID</h3>
+  <div af-api4-ctrl="tokens" af-api4="['OAuthSysToken', 'get', {'where': [['id', '=', routeParams.id]]}]"></div>
 
-  <input ng-model="routeParams.id" type="text"/>
-
-  <div class="btn-group">
-    <a class="btn btn-default"
-       af-api4-action="['OAuthSysToken', 'get', {where: [['id', '=', data.tokenId]]}]"
-       af-api4-start-msg="ts('Fetching...')"
-       af-api4-success-msg="ts('Fetched')"
-       af-api4-success="data.token = response"
-    >{{ts('Inspect')}}</a>
+  <div ng-if="tokens.result.length == 0">
+    No tokens found.
   </div>
 
+  <div ng-repeat="token in tokens.result">
 
-  <div ng-if="!!data.token">
+    <h3>Token Record</h3>
+
+    <pre>{{token|json}}</pre>
 
     <h3>Access Token: Raw</h3>
 
-    <pre>{{data.token[0].access_token}}</pre>
+    <pre>{{token.access_token}}</pre>
 
     <h3>Access Token: JWT Payload</h3>
 
-    <pre>{{data.token[0].access_token|unvalidatedJwtDecode|json}}</pre>
+    (This will only display meaningful data if the token is based on JWT.)
+
+    <pre>{{token.access_token|unvalidatedJwtDecode|json}}</pre>
 
   </div>
 
