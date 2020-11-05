@@ -91,7 +91,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(['CRM_Admin_Form_MailSettings', 'formRule']);
+    $this->addFormRule(['CRM_Admin_Form_MailSettings', 'formRule'], $this);
   }
 
   public function getDefaultEntity() {
@@ -119,15 +119,21 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @param array $fields
    *   Posted values of the form.
+   * @param array $files
+   *   Not used here.
+   * @param CRM_Core_Form $form
+   *   This form.
    *
    * @return array
    *   list of errors to be posted back to the form
    */
-  public static function formRule($fields) {
+  public static function formRule($fields, $files, $form) {
     $errors = [];
-    // Check for default from email address and organization (domain) name. Force them to change it.
-    if ($fields['domain'] == 'EXAMPLE.ORG') {
-      $errors['domain'] = ts('Please enter a valid domain for this mailbox account (the part after @).');
+    if ($form->_action != CRM_Core_Action::DELETE) {
+      // Check for default from email address and organization (domain) name. Force them to change it.
+      if ($fields['domain'] == 'EXAMPLE.ORG') {
+        $errors['domain'] = ts('Please enter a valid domain for this mailbox account (the part after @).');
+      }
     }
 
     return empty($errors) ? TRUE : $errors;
