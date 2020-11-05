@@ -98,44 +98,45 @@ class CRM_Financial_BAO_Payment {
 
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
-      return $trxn;
     }
-    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
+    else {
+      list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
 
-    foreach ($lineItems as $key => $value) {
-      if ($value['allocation'] === (float) 0) {
-        continue;
-      }
+      foreach ($lineItems as $key => $value) {
+        if ($value['allocation'] === (float) 0) {
+          continue;
+        }
 
-      if (!empty($ftIds[$value['price_field_value_id']])) {
-        $financialItemID = $ftIds[$value['price_field_value_id']];
-      }
-      else {
-        $financialItemID = self::getNewFinancialItemID($value, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
-      }
+        if (!empty($ftIds[$value['price_field_value_id']])) {
+          $financialItemID = $ftIds[$value['price_field_value_id']];
+        }
+        else {
+          $financialItemID = self::getNewFinancialItemID($value, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
+        }
 
-      $eftParams = [
-        'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $trxn->id,
-        'entity_id' => $financialItemID,
-        'amount' => $value['allocation'],
-      ];
-
-      civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
-
-      if (array_key_exists($value['price_field_value_id'], $taxItems)) {
-        // @todo - this is expected to be broken - it should be fixed to
-        // a) have the getPayableLineItems add the amount to allocate for tax
-        // b) call EntityFinancialTrxn directly - per above.
-        // - see https://github.com/civicrm/civicrm-core/pull/14763
-        $entityParams = [
-          'contribution_total_amount' => $contribution['total_amount'],
-          'trxn_total_amount' => $params['total_amount'],
-          'trxn_id' => $trxn->id,
-          'line_item_amount' => $taxItems[$value['price_field_value_id']]['amount'],
+        $eftParams = [
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $trxn->id,
+          'entity_id' => $financialItemID,
+          'amount' => $value['allocation'],
         ];
-        $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
-        CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+
+        civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+
+        if (array_key_exists($value['price_field_value_id'], $taxItems)) {
+          // @todo - this is expected to be broken - it should be fixed to
+          // a) have the getPayableLineItems add the amount to allocate for tax
+          // b) call EntityFinancialTrxn directly - per above.
+          // - see https://github.com/civicrm/civicrm-core/pull/14763
+          $entityParams = [
+            'contribution_total_amount' => $contribution['total_amount'],
+            'trxn_total_amount' => $params['total_amount'],
+            'trxn_id' => $trxn->id,
+            'line_item_amount' => $taxItems[$value['price_field_value_id']]['amount'],
+          ];
+          $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
+          CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+        }
       }
     }
 
