@@ -114,7 +114,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @throws \CiviCRM_API3_Exception
    */
   public static function bulkSave($bulkParams, $defaults = []) {
-    $addedColumns = $sql = $tables = $customFields = [];
+    $addedColumns = $sql = $customFields = [];
     foreach ($bulkParams as $index => $fieldParams) {
       $params = array_merge($defaults, $fieldParams);
       $customField = self::createCustomFieldRecord($params);
@@ -122,17 +122,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       if (!isset($params['custom_group_id'])) {
         $params['custom_group_id'] = civicrm_api3('CustomField', 'getvalue', ['id' => $customField->id, 'return' => 'custom_group_id']);
       }
-      if (!isset($params['table_name'])) {
-        if (!isset($tables[$params['custom_group_id']])) {
-          $tables[$params['custom_group_id']] = civicrm_api3('CustomGroup', 'getvalue', [
-            'id' => $params['custom_group_id'],
-            'return' => 'table_name',
-          ]);
-        }
-        $params['table_name'] = $tables[$params['custom_group_id']];
-      }
-      $sql[$params['table_name']][] = $fieldSQL;
-      $addedColumns[$params['table_name']][] = $customField->name;
+      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customField->custom_group_id, 'table_name');
+      $sql[$tableName][] = $fieldSQL;
+      $addedColumns[$tableName][] = $customField->name;
       $customFields[$index] = $customField;
     }
 
@@ -145,7 +137,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $logging->fixSchemaDifferencesFor($tableName, ['ADD' => $addedColumns[$tableName]]);
       }
 
-      Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
+      Civi::service('sql_triggers')->rebuild($tableName, TRUE);
     }
     CRM_Utils_System::flushCache();
     foreach ($customFields as $index => $customField) {
