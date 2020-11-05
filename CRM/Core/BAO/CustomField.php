@@ -85,9 +85,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return CRM_Core_DAO_CustomField
    */
   public static function create($params) {
+    $changeSerialize = self::getChangeSerialize($params);
     $customField = self::createCustomFieldRecord($params);
+    // When deserializing a field, the update needs to run before the schema change
+    if ($changeSerialize === 0) {
+      CRM_Core_DAO::singleValueQuery(self::getAlterSerializeSQL($customField));
+    }
     $op = empty($params['id']) ? 'add' : 'modify';
     self::createField($customField, $op);
+    // When serializing a field, the update needs to run after the schema change
+    if ($changeSerialize === 1) {
+      CRM_Core_DAO::singleValueQuery(self::getAlterSerializeSQL($customField));
+    }
 
     CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
 
@@ -114,10 +123,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @throws \CiviCRM_API3_Exception
    */
   public static function bulkSave($bulkParams, $defaults = []) {
-    $addedColumns = $sql = $customFields = [];
+    $addedColumns = $sql = $customFields = $pre = $post = [];
     foreach ($bulkParams as $index => $fieldParams) {
       $params = array_merge($defaults, $fieldParams);
+      $changeSerialize = self::getChangeSerialize($params);
       $customField = self::createCustomFieldRecord($params);
+      // Serialize/deserialize sql must run after/before the table is altered
+      if ($changeSerialize === 0) {
+        $pre[] = self::getAlterSerializeSQL($customField);
+      }
+      if ($changeSerialize === 1) {
+        $post[] = self::getAlterSerializeSQL($customField);
+      }
       $fieldSQL = self::getAlterFieldSQL($customField, empty($params['id']) ? 'add' : 'modify');
       if (!isset($params['custom_group_id'])) {
         $params['custom_group_id'] = civicrm_api3('CustomField', 'getvalue', ['id' => $customField->id, 'return' => 'custom_group_id']);
@@ -126,6 +143,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $sql[$tableName][] = $fieldSQL;
       $addedColumns[$tableName][] = $customField->name;
       $customFields[$index] = $customField;
+    }
+
+    foreach ($pre as $query) {
+      CRM_Core_DAO::executeQuery($query);
     }
 
     foreach ($sql as $tableName => $statements) {
@@ -139,6 +160,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       Civi::service('sql_triggers')->rebuild($tableName, TRUE);
     }
+
+    foreach ($post as $query) {
+      CRM_Core_DAO::executeQuery($query);
+    }
+
     CRM_Utils_System::flushCache();
     foreach ($customFields as $index => $customField) {
       CRM_Utils_Hook::post(empty($bulkParams[$index]['id']) ? 'create' : 'edit', 'CustomField', $customField->id, $customField);
@@ -1695,22 +1721,21 @@ SELECT $columnName
   }
 
   /**
-   * Reformat existing values for a field when changing its serialize attribute
+   * Get query to reformat existing values for a field when changing its serialize attribute
    *
    * @param CRM_Core_DAO_CustomField $field
-   * @throws CRM_Core_Exception
+   * @return string
    */
-  private static function alterSerialize($field) {
+  private static function getAlterSerializeSQL($field) {
     $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id, 'table_name');
     $col = $field->column_name;
     $sp = CRM_Core_DAO::VALUE_SEPARATOR;
     if ($field->serialize) {
-      $sql = "UPDATE `$table` SET `$col` = CONCAT('$sp', `$col`, '$sp') WHERE `$col` IS NOT NULL AND `$col` NOT LIKE '$sp%' AND `$col` != ''";
+      return "UPDATE `$table` SET `$col` = CONCAT('$sp', `$col`, '$sp') WHERE `$col` IS NOT NULL AND `$col` NOT LIKE '$sp%' AND `$col` != ''";
     }
     else {
-      $sql = "UPDATE `$table` SET `$col` = SUBSTRING_INDEX(SUBSTRING(`$col`, 2), '$sp', 1) WHERE `$col` LIKE '$sp%'";
+      return "UPDATE `$table` SET `$col` = SUBSTRING_INDEX(SUBSTRING(`$col`, 2), '$sp', 1) WHERE `$col` LIKE '$sp%'";
     }
-    CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -2006,9 +2031,6 @@ WHERE  id IN ( %1, %2 )
     $transaction = new CRM_Core_Transaction();
     $params = self::prepareCreate($params);
 
-    $alterSerialize = isset($params['serialize']) && !empty($params['id'])
-      && ($params['serialize'] != CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'serialize'));
-
     $customField = new CRM_Core_DAO_CustomField();
     $customField->copyValues($params);
     $customField->save();
@@ -2029,11 +2051,20 @@ WHERE  id IN ( %1, %2 )
     // make sure all values are present in the object for further processing
     $customField->find(TRUE);
 
-    if ($alterSerialize) {
-      self::alterSerialize($customField);
-    }
-
     return $customField;
+  }
+
+  /**
+   * @param $params
+   * @return int|null
+   */
+  protected static function getChangeSerialize($params) {
+    if (isset($params['serialize']) && !empty($params['id'])) {
+      if ($params['serialize'] != CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'serialize')) {
+        return (int) $params['serialize'];
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -2646,13 +2677,9 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
       'searchable' => $field->is_searchable,
     ];
 
-    if ($operation == 'delete') {
-      $fkName = "{$tableName}_{$field->column_name}";
-      if (strlen($fkName) >= 48) {
-        $fkName = substr($fkName, 0, 32) . '_' . substr(md5($fkName), 0, 16);
-      }
-      $params['fkName'] = $fkName;
-    }
+    // For adding/dropping FK constraints
+    $params['fkName'] = CRM_Core_BAO_SchemaHandler::getIndexName($tableName, $field->column_name);
+
     if ($field->data_type == 'Country' && !self::isSerialized($field)) {
       $params['fk_table_name'] = 'civicrm_country';
       $params['fk_field_name'] = 'id';
