@@ -11,11 +11,27 @@ class DbUtil {
    */
   public static function parseDsn($dsn) {
     $parsed = parse_url($dsn);
+    // parse_url parses 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb' like:
+    // [
+    //   'host'   => 'unix(',
+    //   'path'   => '/var/lib/mysql/mysql.sock)/otherdb',
+    //   ...
+    // ]
+    if ($parsed['host'] == 'unix(') {
+      preg_match('/(unix\(.*\))(\/(.+)?)?$/', $dsn, $matches);
+      $server = $matches[1];
+      $database = $matches[3] ?? NULL;
+    }
+    else {
+      $server = self::encodeHostPort($parsed['host'], $parsed['port'] ?? NULL);
+      $database = $parsed['path'] ? ltrim($parsed['path'], '/') : NULL;
+    }
+
     return array(
-      'server' => self::encodeHostPort($parsed['host'], $parsed['port'] ?? NULL),
+      'server' => $server,
       'username' => $parsed['user'] ?: NULL,
       'password' => $parsed['pass'] ?: NULL,
-      'database' => $parsed['path'] ? ltrim($parsed['path'], '/') : NULL,
+      'database' => $database,
       'ssl_params' => self::parseSSL($parsed['query'] ?? NULL),
     );
   }
@@ -41,9 +57,9 @@ class DbUtil {
    * @return \mysqli
    */
   public static function softConnect($db) {
-    list($host, $port) = self::decodeHostPort($db['server']);
+    list($host, $port, $socket) = self::decodeHostPort($db['server']);
     if (empty($db['ssl_params'])) {
-      $conn = @mysqli_connect($host, $db['username'], $db['password'], $db['database'], $port);
+      $conn = @mysqli_connect($host, $db['username'], $db['password'], $db['database'], $port, $socket);
     }
     else {
       $conn = NULL;
@@ -56,8 +72,7 @@ class DbUtil {
         $db['ssl_params']['capath'] ?? NULL,
         $db['ssl_params']['cipher'] ?? NULL
       );
-      // @todo socket parameter, but if you're using sockets do you need SSL?
-      if (@mysqli_real_connect($init, $host, $db['username'], $db['password'], $db['database'], $port, NULL, MYSQLI_CLIENT_SSL)) {
+      if (@mysqli_real_connect($init, $host, $db['username'], $db['password'], $db['database'], $port, $socket, MYSQLI_CLIENT_SSL)) {
         $conn = $init;
       }
     }
@@ -84,21 +99,34 @@ class DbUtil {
    *   Ex: '127.0.0.1:123'
    *   Ex: '[1234:abcd]'
    *   Ex: '[1234:abcd]:123'
+   *   Ex: 'localhost:/path/to/socket.sock
+   *   Ex: 'unix(/path/to/socket.sock)
    * @return array
-   *   Combination: [0 => string $host, 1 => numeric|NULL $port].
-   *   Ex: ['localhost', NULL].
-   *   Ex: ['127.0.0.1', 3306]
+   *   Combination: [0 => string $host, 1 => numeric|NULL $port, 2 => string|NULL].
+   *   Ex: ['localhost', NULL, NULL].
+   *   Ex: ['127.0.0.1', 3306, NULL]
    */
   public static function decodeHostPort($host) {
-    $hostParts = explode(':', $host);
-    if (count($hostParts) > 1 && strrpos($host, ']') !== strlen($host) - 1) {
-      $port = array_pop($hostParts);
-      $host = implode(':', $hostParts);
+    $port = NULL;
+    $socket = NULL;
+    if (preg_match('/^unix\(([^)]+)\)$/', $host, $matches) === 1) {
+      $host = 'localhost';
+      $socket = $matches[1];
     }
     else {
-      $port = NULL;
+      $hostParts = explode(':', $host);
+      if (count($hostParts) > 1 && strrpos($host, ']') !== strlen($host) - 1) {
+        $portOrSocket = array_pop($hostParts);
+        if (substr($portOrSocket, /*start*/ 0, /*length*/ 1) == '/') {
+          $socket = $portOrSocket;
+        }
+        else {
+          $port = $portOrSocket;
+        }
+        $host = implode(':', $hostParts);
+      }
     }
-    return array($host, $port);
+    return array($host, $port, $socket);
   }
 
   /**

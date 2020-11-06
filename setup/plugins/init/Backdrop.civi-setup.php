@@ -40,6 +40,7 @@ if (!defined('CIVI_SETUP')) {
     // Compute DSN.
     global $databases;
     $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($databases['default']['default']);
+    // @todo Does Backdrop support unixsocket in config? Set 'server' => 'unix(/path/to/socket.sock)'
     $model->db = $model->cmsDb = array(
       'server' => \Civi\Setup\DbUtil::encodeHostPort($databases['default']['default']['host'], $databases['default']['default']['port'] ?: NULL),
       'username' => $databases['default']['default']['username'],

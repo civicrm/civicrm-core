@@ -39,6 +39,7 @@ endif; ?>
           <p><?php echo ts('By default, CiviCRM uses the same database as your website. You may install on a separate database if you need more fine-grained control over permissions, replication, hardware capacity, etc.'); ?></p>
           <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@localhost/civicrm')); ?></p>
           <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@127.0.0.1:3306/otherdb')); ?></p>
+          <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb')); ?></p>
         </div>
       </td>
     </tr>
