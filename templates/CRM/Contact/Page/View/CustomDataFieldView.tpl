@@ -27,10 +27,10 @@
           </div>
         {else}
           <div class="crm-label">{$element.field_title}</div>
-          {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_id}
+          {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
             {*Contact ref id passed if user has sufficient permissions - so make a link.*}
             <div class="crm-content crm-custom-data crm-contact-reference">
-              <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$element.contact_ref_id`"}" title="view contact">{$element.field_value}</a>
+              {', '|implode:$element.contact_ref_links}
             </div>
           {elseif $element.field_data_type EQ 'Money'}
             <div class="crm-content crm-custom-data">{$element.field_value|crmMoney}</div>

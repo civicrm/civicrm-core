@@ -18,6 +18,7 @@
     $field.crmSelect2({
       placeholder: {/literal}'{ts escape="js"}- select contact -{/ts}'{literal},
       minimumInputLength: 1,
+      multiple: !!$field.attr('multiple'),
       ajax: {
         url: {/literal}"{$customUrls.$element_name}"{literal},
         quietMillis: 300,

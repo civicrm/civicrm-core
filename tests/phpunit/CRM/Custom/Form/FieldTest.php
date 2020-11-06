@@ -372,7 +372,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Autocomplete-Select',
           'serialize' => '1',
         ],
-        'null',
+        CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       ],
     ];
   }

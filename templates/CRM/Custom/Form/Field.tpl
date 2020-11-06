@@ -277,7 +277,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle((htmlType === 'Select' || htmlType === 'Autocomplete-Select') && dataType !== 'ContactReference');
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlType === 'Select' || htmlType === 'Autocomplete-Select');
     }
 
     function makeDefaultValueField(dataType) {
