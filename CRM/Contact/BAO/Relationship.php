@@ -58,6 +58,13 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if (self::checkValidRelationship($params, $params, 0)) {
       throw new CRM_Core_Exception('Invalid Relationship');
     }
+    if (isset($params['start_date']) || isset($params['end_date'])) {
+      $startDate = (!empty($params['start_date'])) ? date('Y-m-d', strtotime($params['start_date'])) : '';
+      $endDate = (!empty($params['end_date'])) ? date('Y-m-d', strtotime($params['end_date'])) : '';
+      $today = date('Y-m-d');
+      $params['is_active'] = (empty($startDate) || $startDate <= $today)
+        && (empty($endDate) || $endDate >= $today);
+    }
     $relationship = self::add($params);
     if (!empty($params['contact_id_a'])) {
       $ids = [
@@ -1924,18 +1931,20 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * Set 'is_valid' field to false for all relationships whose end date is in the past, ie. are expired.
+   * Update 'is_active' field based on the dates of relationship.
    *
    * @return bool
    *   True on success, false if error is encountered.
    * @throws \CiviCRM_API3_Exception
    */
-  public static function disableExpiredRelationships() {
-    $query = "SELECT id FROM civicrm_relationship WHERE is_active = 1 AND end_date < CURDATE()";
-
+  public static function updateRelationshipStatusBasedOnDates() {
+    $query = "SELECT id, is_active
+              FROM civicrm_relationship
+              WHERE (is_active = 0 AND start_date <= CURDATE() AND (end_date IS NULL OR end_date >= CURDATE()))
+              OR (is_active = 1 AND end_date < CURDATE())";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $result = CRM_Contact_BAO_Relationship::setIsActive($dao->id, FALSE);
+      $result = CRM_Contact_BAO_Relationship::setIsActive($dao->id, !(bool) $dao->is_active);
       // Result will be NULL if error occurred. We abort early if error detected.
       if ($result == NULL) {
         return FALSE;
