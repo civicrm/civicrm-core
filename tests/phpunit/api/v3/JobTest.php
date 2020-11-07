@@ -275,11 +275,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test disabling expired relationships.
+   * Test enableDisableRelationships does not change expired relationships.
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCallDisableExpiredRelationships() {
+  public function testEnableDisableRelationshipsDoesNotChangeExpiredRelationships() {
     $individualID = $this->individualCreate();
     $orgID = $this->organizationCreate();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', [$this, 'hookPreRelationship']);
@@ -295,10 +295,37 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'end_date' => 'yesterday',
     ]);
     $relationshipID = $result['id'];
-    $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
+    $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->callAPISuccess($this->_entity, 'disable_expired_relationships', []);
     $result = $this->callAPISuccess('relationship', 'get', []);
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
+    $this->contactDelete($individualID);
+    $this->contactDelete($orgID);
+  }
+
+  /**
+   * Test enableDisableRelationships enables relationships with valid dates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testEnableDisableRelationshipsEnablesRelationshipsWithValidDates() {
+    $individualID = $this->individualCreate();
+    $orgID = $this->organizationCreate();
+    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', [
+      'return' => 'id',
+      'name_a_b' => 'Employee of',
+    ]);
+    $yesterday = date('Y-m-d', strtotime('yesterday'));
+    // Using query instead of api as now relationship cannot be created  with valid dates
+    // and is_active = 0 as the new logic will convert is_active to 1 due to dates being valid.
+    $query = "INSERT INTO civicrm_relationship
+              (`relationship_type_id`, `contact_id_a`, `contact_id_b`, `is_active`, `start_date`)
+              VALUES ($relationshipTypeID, $individualID, $orgID, 0, '$yesterday')";
+    CRM_Core_DAO::executeQuery($query);
+    $relationshipID = CRM_Core_DAO::executeQuery("SELECT LAST_INSERT_ID()")->fetchValue();
+    $this->callAPISuccess($this->_entity, 'disable_expired_relationships', []);
+    $result = $this->callAPISuccess('relationship', 'get', []);
+    $this->assertEquals(1, $result['values'][$relationshipID]['is_active']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
   }

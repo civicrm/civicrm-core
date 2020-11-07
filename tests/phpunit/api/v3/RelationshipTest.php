@@ -321,7 +321,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $this->_relTypeID,
       'start_date' => '2010-10-30',
-      'end_date' => '2010-12-30',
       'is_active' => 1,
       'note' => 'note',
     ];
@@ -833,6 +832,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id_b' => $this->_cId_b2,
       'relationship_type_id' => $this->_relTypeID,
       'start_date' => '2008-12-20',
+      'end_date' => date('Y-m-d', strtotime('yesterday')),
       'is_active' => 0,
     ];
     $rel0 = $this->callAPISuccess('relationship', 'create', $rel2Params);
@@ -1414,7 +1414,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testDisableExpiredRelationships() {
+  public function testUpdateRelationshipStatusBasedOnDates() {
     // Step 1: Create a current employer relationship with Org A
     $params = [
       'relationship_type_id' => '5',
@@ -1449,7 +1449,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'is_permission_a_b' => 0,
       'is_permission_b_a' => 0,
     ];
-
+    $orgID3 = $this->organizationCreate();
     $relationshipB = $this->callAPISuccess('Relationship', 'create', $params);
     // ensure that the employer_id field is still set to contact b
     $this->assertEquals(
@@ -1459,8 +1459,16 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
         'return' => 'current_employer_id',
       ]));
 
+    //Create a disabled relationship with valid dates
+    $yesterday = date('Y-m-d', strtotime('yesterday'));
+    $query = "INSERT INTO civicrm_relationship
+              (`relationship_type_id`, `contact_id_a`, `contact_id_b`, `is_active`, `start_date`, `end_date`)
+              VALUES (5, $this->_cId_a, $orgID3, 0, '$yesterday', NULL)";
+    CRM_Core_DAO::executeQuery($query);
+    $relationshipCId = CRM_Core_DAO::executeQuery("SELECT LAST_INSERT_ID()")->fetchValue();
+
     // Step 3: Call schedule job disable_expired_relationships
-    CRM_Contact_BAO_Relationship::disableExpiredRelationships();
+    CRM_Contact_BAO_Relationship::updateRelationshipStatusBasedOnDates();
 
     // Result A: Ensure that employer field is not cleared
     $this->assertEquals(
@@ -1474,6 +1482,13 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       FALSE,
       (bool) $this->callAPISuccess('Relationship', 'getvalue', [
         'id' => $relationshipB['id'],
+        'return' => 'is_active',
+      ]));
+    // Result C: Ensure that the relationship with valid dates is activated
+    $this->assertEquals(
+      TRUE,
+      (bool) $this->callAPISuccess('Relationship', 'getvalue', [
+        'id' => $relationshipCId,
         'return' => 'is_active',
       ]));
   }
