@@ -208,8 +208,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $this->single($input, [
       'related_contact' => $ids['related_contact'] ?? NULL,
-      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+      'participant' => $ids['participant'] ?? NULL,
+      'contributionRecur' => $recur->id,
     ], $objects['contribution'], TRUE);
   }
 
@@ -363,7 +363,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $this->single($input, [
         'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => $ids['participant'] ?? NULL,
-        'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
+        'contributionRecur' => $contributionRecurID,
       ], $objects['contribution']);
     }
     catch (CRM_Core_Exception $e) {
