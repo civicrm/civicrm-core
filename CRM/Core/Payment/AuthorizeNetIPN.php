@@ -30,11 +30,13 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   }
 
   /**
-   * @param string $component
+   * Main IPN processing function.
    *
    * @return bool|void
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function main($component = 'contribute') {
+  public function main() {
     try {
       //we only get invoice num as a key player from payment gateway response.
       //for ARB we get x_subscription_id and x_subscription_paynum
@@ -45,7 +47,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       }
       $ids = $objects = $input = [];
 
-      $input['component'] = $component;
+      $input['component'] = 'contribute';
 
       // load post vars in $input
       $this->getInput($input, $ids);
@@ -86,42 +88,40 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       $this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID);
 
-      if ($component == 'contribute') {
-        // check if first contribution is completed, else complete first contribution
-        $first = TRUE;
-        if ($objects['contribution']->contribution_status_id == 1) {
-          $first = FALSE;
-          //load new contribution object if required.
-          // create a contribution and then get it processed
-          $contribution = new CRM_Contribute_BAO_Contribution();
-          $contribution->contact_id = $ids['contact'];
-          $contribution->financial_type_id = $objects['contributionType']->id;
-          $contribution->contribution_page_id = $ids['contributionPage'];
-          $contribution->contribution_recur_id = $ids['contributionRecur'];
-          $contribution->receive_date = $input['receive_date'];
-          $contribution->currency = $objects['contribution']->currency;
-          $contribution->amount_level = $objects['contribution']->amount_level;
-          $contribution->address_id = $objects['contribution']->address_id;
-          $contribution->campaign_id = $objects['contribution']->campaign_id;
+      // check if first contribution is completed, else complete first contribution
+      $first = TRUE;
+      if ($objects['contribution']->contribution_status_id == 1) {
+        $first = FALSE;
+        //load new contribution object if required.
+        // create a contribution and then get it processed
+        $contribution = new CRM_Contribute_BAO_Contribution();
+        $contribution->contact_id = $ids['contact'];
+        $contribution->financial_type_id = $objects['contributionType']->id;
+        $contribution->contribution_page_id = $ids['contributionPage'];
+        $contribution->contribution_recur_id = $ids['contributionRecur'];
+        $contribution->receive_date = $input['receive_date'];
+        $contribution->currency = $objects['contribution']->currency;
+        $contribution->amount_level = $objects['contribution']->amount_level;
+        $contribution->address_id = $objects['contribution']->address_id;
+        $contribution->campaign_id = $objects['contribution']->campaign_id;
 
-          $objects['contribution'] = &$contribution;
-        }
-        $input['payment_processor_id'] = $paymentProcessorID;
-        $isFirstOrLastRecurringPayment = $this->recur($input, [
-          'related_contact' => $ids['related_contact'] ?? NULL,
-          'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-          'contributionRecur' => $contributionRecur->id,
-        ], $contributionRecur, $objects['contribution'], $first);
+        $objects['contribution'] = &$contribution;
+      }
+      $input['payment_processor_id'] = $paymentProcessorID;
+      $isFirstOrLastRecurringPayment = $this->recur($input, [
+        'related_contact' => $ids['related_contact'] ?? NULL,
+        'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
+        'contributionRecur' => $contributionRecur->id,
+      ], $contributionRecur, $objects['contribution'], $first);
 
-        if ($isFirstOrLastRecurringPayment) {
-          //send recurring Notification email for user
-          CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
-            $ids['contact'],
-            $ids['contributionPage'],
-            $contributionRecur,
-            (bool) $this->getMembershipID($contribution->id, $contributionRecur->id)
-          );
-        }
+      if ($isFirstOrLastRecurringPayment) {
+        //send recurring Notification email for user
+        CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
+          $ids['contact'],
+          $ids['contributionPage'],
+          $contributionRecur,
+          (bool) $this->getMembershipID($contribution->id, $contributionRecur->id)
+        );
       }
 
       return TRUE;
