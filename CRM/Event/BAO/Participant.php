@@ -1922,7 +1922,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $start_date = $dao->start;
     }
     $timenow = new Datetime();
-    if (!$isBackOffice && !empty($time_limit)) {
+    if (!$isBackOffice && isset($time_limit)) {
       $cancelHours = abs($time_limit);
       $cancelInterval = new DateInterval("PT${cancelHours}H");
       $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
@@ -1930,9 +1930,9 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       if ($timenow > $cancelDeadline) {
         $details['eligible'] = FALSE;
         // Change the language of the status message based on whether the waitlist time limit is positive or negative.
-        $afterOrPrior = $time_limit < 0 ? 'after' : 'prior';
-        $moreOrLess = $time_limit < 0 ? 'more' : 'less';
-        $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 to the event's start time. Contact the event organizer if you have questions.",
+        $afterOrPrior = $time_limit <= 0 ? 'after' : 'prior to';
+        $moreOrLess = $time_limit <= 0 ? 'more' : 'fewer';
+        $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 the event's start time. Contact the event organizer if you have questions.",
         [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
 
       }
