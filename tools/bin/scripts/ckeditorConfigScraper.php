@@ -1,4 +1,8 @@
 <?php
+if (php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0)) {
+  header("HTTP/1.0 404 Not Found");
+  return;
+}
 /**
  * Scrape all config options from the CKEditor documentation site.
  */
