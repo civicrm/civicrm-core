@@ -179,7 +179,7 @@ function civicrm_api3_custom_field_get($params) {
         if (in_array($result['data_type'], $legacyDataTypes)) {
           $result['html_type'] = array_search($result['data_type'], $legacyDataTypes);
         }
-        if (!empty($result['serialize'])) {
+        if (!empty($result['serialize']) && $result['html_type'] !== 'Autocomplete-Select') {
           $result['html_type'] = str_replace('Select', 'Multi-Select', $result['html_type']);
         }
       }
