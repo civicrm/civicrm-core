@@ -2626,10 +2626,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $recurringContribution = civicrm_api3('ContributionRecur', 'getsingle', [
         'id' => $contributionParams['contribution_recur_id'],
       ]);
-      if (!empty($recurringContribution['campaign_id'])) {
-        // CRM-17718 the campaign id on the contribution recur record should get precedence.
-        $contributionParams['campaign_id'] = $recurringContribution['campaign_id'];
-      }
       if (!empty($recurringContribution['financial_type_id'])) {
         // CRM-17718 the campaign id on the contribution recur record should get precedence.
         $contributionParams['financial_type_id'] = $recurringContribution['financial_type_id'];
@@ -2652,10 +2648,20 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       else {
         $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       }
-      foreach (['contact_id', 'currency', 'source'] as $fieldName) {
-        $contributionParams[$fieldName] = $templateContribution[$fieldName];
+      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id'] as $fieldName) {
+        if (isset($templateContribution[$fieldName])) {
+          $contributionParams[$fieldName] = $templateContribution[$fieldName];
+        }
       }
-
+      if (!empty($recurringContribution['campaign_id'])) {
+        // CRM-17718 the campaign id on the contribution recur record should get precedence.
+        $contributionParams['campaign_id'] = $recurringContribution['campaign_id'];
+      }
+      if (!isset($contributionParams['campaign_id']) && isset($templateContribution['campaign_id'])) {
+        // Fall back on value from the previous contribution if not passed in as input
+        // or loadable from the recurring contribution.
+        $contributionParams['campaign_id'] = $templateContribution['campaign_id'];
+      }
       $contributionParams['source'] = $contributionParams['source'] ?: ts('Recurring contribution');
 
       //CRM-18805 -- Contribution page not recorded on recurring transactions, Recurring contribution payments
