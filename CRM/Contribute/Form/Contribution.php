@@ -1616,7 +1616,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
       //send receipt mail.
-      if ($contribution->id && !empty($formValues['is_email_receipt'])) {
+      // We only send this if the we have ticked we want to send an email receipt and also the contribution status is not pending or we are in live mode and the payment processsor supports sending receipts for pending contributions.
+      if ($contribution->id && !empty($formValues['is_email_receipt']) && ($contribution->contribution_status_id !== CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
+        || $this->_mode && $this->_paymentObject->isSendReceiptForPending())) {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contribution->id;
 
