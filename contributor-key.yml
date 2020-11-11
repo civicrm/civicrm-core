@@ -819,6 +819,8 @@
   name        : Justin Freeman
   organization: Agileware
 
+- github      : jvos
+
 - github      : kainuk
   name        : Klaas Eikelboom
   organization: CiviCoop
@@ -983,6 +985,10 @@
   organization: Circle Interactive
   jira        : marshCircle
 
+- github      : masetto
+  organization: PERORA SRL
+  name        : Samuele Masetto
+
 - github      : mathavanveda
   name        : Mathavan Veeramuthu
   organization: Veda Consulting
@@ -1002,6 +1008,10 @@
 - github      : martinh-pw
   name        : Martin Hansen
   organization: PeaceWorks Technology Solutions
+
+- github      : maxtsero
+  name        : Max Tsero
+  organization: Atomic Development
 
 - github      : mc0e
   name        : Andrew McNaughton
@@ -1028,6 +1038,10 @@
   organization: Electronic Frontier Foundation
   jira        : mfb
 
+- github      : mglaman
+  name        : Matt Glaman
+  organization: Centarro
+     
 - github      : mgribaudo
   name        : Marcello Gribaudo
   jira        : mgribaudo
