@@ -397,7 +397,6 @@ SELECT count(*)
     $oldWeight = NULL;
     if ($this->_id) {
       $customOption->id = $this->_id;
-      CRM_Core_BAO_CustomOption::updateCustomValues($params);
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'weight', 'id');
     }
     else {
@@ -484,7 +483,9 @@ SELECT count(*)
       }
     }
 
-    CRM_Core_BAO_CustomOption::updateValue($customOption->id, $customOption->value);
+    if ($this->_id) {
+      CRM_Core_BAO_CustomOption::updateValue($customOption->id, $customOption->value);
+    }
     $customOption->save();
 
     $msg = ts('Your multiple choice option \'%1\' has been saved', [1 => $customOption->label]);
