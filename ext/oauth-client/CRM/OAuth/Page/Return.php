@@ -6,16 +6,33 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
   const TTL = 3600;
 
   public function run() {
+    $json = function ($d) {
+      return json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    };
+
     $state = self::loadState(CRM_Utils_Request::retrieve('state', 'String'));
+    if (CRM_Core_Permission::check('manage OAuth client')) {
+      $this->assign('state', $state);
+      $this->assign('stateJson', $json($state ?? NULL));
+    }
 
     if (CRM_Utils_Request::retrieve('error', 'String')) {
+      CRM_Utils_System::setTitle(ts('OAuth Error'));
       $error = CRM_Utils_Array::subset($_GET, ['error', 'error_description', 'error_uri']);
       $event = \Civi\Core\Event\GenericHookEvent::create([
         'error' => $error['error'] ?? NULL,
         'description' => $error['description'] ?? NULL,
         'uri' => $error['uri'] ?? NULL,
+        'state' => $state,
       ]);
       Civi::dispatcher()->dispatch('hook_civicrm_oauthReturnError', $event);
+
+      Civi::log()->info('OAuth returned error', [
+        'error' => $error,
+        'state' => $state,
+      ]);
+
+      $this->assign('error', $error ?? NULL);
     }
     elseif ($authCode = CRM_Utils_Request::retrieve('code', 'String')) {
       $client = \Civi\Api4\OAuthClient::get(0)->addWhere('id', '=', $state['clientId'])->execute()->single();
@@ -37,17 +54,16 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
       if ($nextUrl !== NULL) {
         CRM_Utils_System::redirect($nextUrl);
       }
+
+      CRM_Utils_System::setTitle(ts('OAuth Token Created'));
+      if (CRM_Core_Permission::check('manage OAuth client')) {
+        $this->assign('token', CRM_OAuth_BAO_OAuthSysToken::redact($tokenRecord));
+        $this->assign('tokenJson', $json(CRM_OAuth_BAO_OAuthSysToken::redact($tokenRecord)));
+      }
     }
     else {
       throw new \Civi\OAuth\OAuthException("OAuth: Unrecognized return request");
     }
-
-    $json = function ($d) {
-      return json_encode($d, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    };
-    $this->assign('state', $json($state));
-    $this->assign('token', $json($tokenRecord ?? NULL));
-    $this->assign('error', $json($error ?? NULL));
 
     parent::run();
   }
