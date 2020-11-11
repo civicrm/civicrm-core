@@ -244,7 +244,7 @@ WHERE  f.custom_group_id = g.id
           $query = "
 UPDATE {$dao->tableName}
 SET    {$dao->columnName} = %1
-WHERE  id = %2";
+WHERE  {$dao->columnName} = %2";
           if ($dao->dataType == 'Auto-complete') {
             $dataType = "String";
           }
@@ -257,8 +257,8 @@ WHERE  id = %2";
               $dataType,
             ],
             2 => [
-              $params['optionId'],
-              'Integer',
+              $oldValue,
+              $dataType,
             ],
           ];
           break;
