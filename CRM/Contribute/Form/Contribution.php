@@ -1602,13 +1602,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // process associated membership / participant, CRM-4395
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
-        $this->statusMessage[] = CRM_Contribute_BAO_Contribution::transitionComponentWithReturnMessage($contribution->id,
-          $contribution->contribution_status_id,
-          CRM_Utils_Array::value('contribution_status_id',
-            $this->_values
-          ),
-          $contribution->receive_date
-        );
+        CRM_Contribute_BAO_Contribution::transitionComponents([
+          'contribution_id' => $contribution->id,
+          'contribution_status_id' => $contribution->contribution_status_id,
+          'previous_contribution_status_id' => $this->_values['contribution_status_id'] ?? NULL,
+          'receive_date' => $contribution->receive_date,
+        ]);
       }
 
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
