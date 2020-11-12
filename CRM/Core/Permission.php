@@ -1491,6 +1491,18 @@ class CRM_Core_Permission {
       ],
     ];
 
+    // Dashboard permissions
+    $permissions['dashboard'] = [
+      'get' => [
+        'access CiviCRM',
+      ],
+    ];
+    $permissions['dashboard_contact'] = [
+      'default' => [
+        'access CiviCRM',
+      ],
+    ];
+
     // Profile permissions
     $permissions['profile'] = [
       // the profile will take care of this
