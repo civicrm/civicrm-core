@@ -164,10 +164,13 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'get', [
       'contribution_recur_id' => $this->_contributionRecurID,
       'sequential' => 1,
-    ]);
-    $this->assertEquals(2, $contribution['count']);
-    $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
-    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
+    ])['values'];
+    $this->assertCount(2, $contribution);
+    $secondContribution = $contribution[1];
+    $this->assertEquals('second_one', $secondContribution['trxn_id']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($secondContribution['receive_date'])));
+    $this->assertEquals('expensive', $secondContribution['amount_level']);
+    $this->assertEquals($this->ids['campaign'][0], $secondContribution['campaign_id']);
   }
 
   /**

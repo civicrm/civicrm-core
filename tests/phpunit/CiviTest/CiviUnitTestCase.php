@@ -2504,6 +2504,7 @@ VALUES
    * @throws \CRM_Core_Exception
    */
   public function setupRecurringPaymentProcessorTransaction($recurParams = [], $contributionParams = []) {
+    $this->ids['campaign'][0] = $this->callAPISuccess('Campaign', 'create', ['title' => 'get the money'])['id'];
     $contributionParams = array_merge([
       'total_amount' => '200',
       'invoice_id' => $this->_invoiceID,
@@ -2515,6 +2516,8 @@ VALUES
       'is_test' => 0,
       'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
+      'amount_level' => 'expensive',
+      'campaign_id' => $this->ids['campaign'][0],
     ], $contributionParams);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
       'contact_id' => $this->_contactID,
