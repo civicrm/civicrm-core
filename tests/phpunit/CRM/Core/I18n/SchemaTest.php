@@ -106,10 +106,11 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
 
   public function testSchemaBuild() {
     CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $testCreateTable = CRM_Core_DAO::executeQuery("show create table civicrm_price_set", [], TRUE, NULL, FALSE, FALSE);
     while ($testCreateTable->fetch()) {
-      $this->assertContains("`title_en_US` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Displayed title for the Price Set.'", $testCreateTable->Create_Table);
-      $this->assertContains("`help_pre_en_US` text COLLATE utf8_unicode_ci COMMENT 'Description and/or help text to display before fields in form.'", $testCreateTable->Create_Table);
+      $this->assertContains("`title_en_US` varchar(255) COLLATE {$inUseCollation} NOT NULL COMMENT 'Displayed title for the Price Set.'", $testCreateTable->Create_Table);
+      $this->assertContains("`help_pre_en_US` text COLLATE {$inUseCollation} COMMENT 'Description and/or help text to display before fields in form.'", $testCreateTable->Create_Table);
     }
   }
 
