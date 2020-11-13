@@ -476,7 +476,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
 
   /**
    * @return array
-   * The set of joins for this query
+   *   The set of joins for this query
    */
   public function getJoins() {
     return $this->joins;
@@ -487,18 +487,18 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    * The string to search for
    *
    * @return bool
-   * Do any of the WHERE, GROUP BY, HAVING, or ORDER BY clauses contain $needle?
+   *   Do any of the WHERE, GROUP BY, HAVING, or ORDER BY clauses contain $needle?
    */
   public function latterClausesContainString($needle) {
     foreach ([$this->wheres, $this->groupBys, $this->havings, $this->orderBys] as $clauseName => $clauseType) {
       foreach ($clauseType as $clauseKey => $clauseDetail) {
-        if (strpos($clauseKey, $needle) !== false) {
-          return true;
+        if (strpos($clauseKey, $needle) !== FALSE) {
+          return TRUE;
           break 2;
         }
       }
     }
-    return false;
+    return FALSE;
   }
 
   /**
@@ -510,8 +510,8 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    */
   public function removeTable($key) {
     foreach ($this->selects as $count => $select) {
-      if (strpos($select, $key) !== false) {
-        unset($this->selects[$count]); // According to docs, unset does not reindex the array
+      if (strpos($select, $key) !== FALSE) {
+        unset($this->selects[$count]);
       }
     }
     unset($this->joins[$key]);

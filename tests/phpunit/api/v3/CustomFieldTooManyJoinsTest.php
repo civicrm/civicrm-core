@@ -20,7 +20,7 @@ class api_v3_CustomFieldTooManyJoinsTest extends CiviUnitTestCase {
 
   protected $createdCustomGroups = [];
 
-  function testTooManyJoins() {
+  public function testTooManyJoins() {
     $activityTypes = civicrm_api3('Activity', 'getoptions', [
       'sequential' => 1,
       'field' => "activity_type_id",
@@ -32,7 +32,7 @@ class api_v3_CustomFieldTooManyJoinsTest extends CiviUnitTestCase {
     for ($i = 0; $i < 130; $i++) {
       $customGroup = $this->customGroupCreate([
         'extends' => 'Activity',
-        'title' => "Test join limit $i"
+        'title' => "Test join limit $i",
       ]);
       $this->createdCustomGroups[] = $customGroup;
       $customField = $this->customFieldCreate([
@@ -49,24 +49,23 @@ class api_v3_CustomFieldTooManyJoinsTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown() {
-    foreach($this->createdCustomGroups as $customGroup) {
+    foreach ($this->createdCustomGroups as $customGroup) {
       $this->customGroupDelete($customGroup['id']);
     }
     parent::tearDown();
   }
 
-// Suggestion from Totten in developer chat
-// function testTooManyJoins() {
-//   $act = callApiSuccess('Activity', 'create', array(...));
-//   for ($i = 0; $i < 70; $i++) {
-//     $cg = callApiSuccess('CustomGroup', 'create', array(...'label' => "My custom group $i"...));
-//     $cf = callApiSuccess('CustomField', 'create', array(...'label' => "My custom field $i", 'custom_group_id' => $cg['id']...));
-//   }
-//   callApiSuccess('Activity', 'get', array('id' => $act['id']));
-// }
-// function tearDown() {
-//   // destroy the ~70 CustomGroups
-// }
+  // Suggestion from Totten in developer chat
+  // function testTooManyJoins() {
+  //   $act = callApiSuccess('Activity', 'create', array(...));
+  //   for ($i = 0; $i < 70; $i++) {
+  //     $cg = callApiSuccess('CustomGroup', 'create', array(...'label' => "My custom group $i"...));
+  //     $cf = callApiSuccess('CustomField', 'create', array(...'label' => "My custom field $i", 'custom_group_id' => $cg['id']...));
+  //   }
+  //   callApiSuccess('Activity', 'get', array('id' => $act['id']));
+  // }
+  // function tearDown() {
+  //   // destroy the ~70 CustomGroups
+  // }
 
 }
-

@@ -28,8 +28,13 @@ use Civi\API\Exception\UnauthorizedException;
 abstract class SelectQuery {
 
   const
-    SQL_JOIN_LIMIT = 60, // 60 joins plus the table in the "from" clause equals 61, the join limit for MySQL.
-    MAX_JOINS = 4, // Note that this refers to join depth, not total joins.
+
+    // 60 joins plus the table in the "from" clause equals 61, the join limit for MySQL.
+    SQL_JOIN_LIMIT = 60,
+
+    // Note that this refers to join depth, not total joins.
+    MAX_JOINS = 4,
+
     MAIN_TABLE_ALIAS = 'a';
 
   /**
@@ -171,7 +176,7 @@ abstract class SelectQuery {
       $mandatory = false;
       foreach ($this->joins as $check_key => $check_join) {
         // check the order - haystack, needle
-        if ((strpos($key, $check_join) !== false) 
+        if ((strpos($key, $check_join) !== false)
         || ($this->query->latterClausesContainString($key))) {
           $mandatory = true;
           break;
@@ -180,7 +185,7 @@ abstract class SelectQuery {
       if ($mandatory) {
         $classified['mandatory'][$key] = $join;
       }
-      else if (!isset($this->joins[$key])) {
+      elseif (!isset($this->joins[$key])) {
         $classified['depends'][$key] = $join;
       }
       else {
@@ -198,7 +203,7 @@ abstract class SelectQuery {
    */
   private function addJoinDependants($joins, $depends) {
     $additional = [];
-    foreach($joins as $joinKey => $join) {
+    foreach ($joins as $joinKey => $join) {
       foreach ($depends as $dependKey => $dependJoin) {
         if ($joinKey != $dependKey && (strpos($dependJoin, $joinKey) !== false)) {
           $additional[$dependKey] = $dependJoin;
@@ -223,10 +228,10 @@ abstract class SelectQuery {
 
   /**
    * Split the set of classified joins into multiple groups, each representing
-   * a query whose results can be collated (hopefully) into the result we 
+   * a query whose results can be collated (hopefully) into the result we
    * would have had if we could run a query with an arbitrary number of joins.
    * Note that this does not work if the query contains GROUP BY.
-   * 
+   *
    * @param array $classified
    * This is the output of $this->classifyJoins()
    * @return array
@@ -293,7 +298,7 @@ abstract class SelectQuery {
     foreach ($split_queries as $query) {
       $sql = $query->toSQL();
       $result_dao = \CRM_Core_DAO::executeQuery($sql);
-      while ($result_dao->fetch()) { // FIXME I have very low confidence that this will produce the desired outcome without understanding and tuning
+      while ($result_dao->fetch()) {
         if (in_array('count_rows', $this->select)) {
           return (int) $result_dao->c;
         }
