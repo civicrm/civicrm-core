@@ -35,6 +35,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     'contact_reference_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'enable_innodb_fts' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+    'default_pager_size' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   ];
 
   /**

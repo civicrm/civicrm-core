@@ -228,7 +228,7 @@ class CRM_Core_Selector_Controller {
       $params['rowCount'] = $storeRowCount;
     }
     elseif (!isset($params['rowCount'])) {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+      $params['rowCount'] = Civi::settings()->get('default_pager_size');
     }
 
     $this->_pager = new CRM_Utils_Pager($params);
