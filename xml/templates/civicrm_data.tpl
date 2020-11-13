@@ -301,8 +301,8 @@ VALUES
    (@option_group_id_pcm, '{ts escape="sql"}SMS{/ts}',         4, 'SMS', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_pcm, '{ts escape="sql"}Fax{/ts}',         5, 'Fax', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL, NULL),
 
-   (@option_group_id_act, '{ts escape="sql"}Meeting{/ts}',                1,  'Meeting',               NULL, 0, NULL, 1,  NULL,                                                                                         0, 1, 1, NULL, NULL, 'fa-slideshare'),
-   (@option_group_id_act, '{ts escape="sql"}Phone Call{/ts}',             2,  'Phone Call',            NULL, 0, NULL, 2,  NULL,                                                                                         0, 1, 1, NULL, NULL, 'fa-phone'),
+   (@option_group_id_act, '{ts escape="sql"}Meeting{/ts}',                1,  'Meeting',               NULL, 0, NULL, 1,  NULL,                                                                                         0, 0, 1, NULL, NULL, 'fa-slideshare'),
+   (@option_group_id_act, '{ts escape="sql"}Phone Call{/ts}',             2,  'Phone Call',            NULL, 0, NULL, 2,  NULL,                                                                                         0, 0, 1, NULL, NULL, 'fa-phone'),
    (@option_group_id_act, '{ts escape="sql"}Email{/ts}',                  3,  'Email',                 NULL, 1, NULL, 3,  '{ts escape="sql"}Email sent.{/ts}',                                                          0, 1, 1, NULL, NULL, 'fa-envelope-o'),
    (@option_group_id_act, '{ts escape="sql"}Outbound SMS{/ts}',           4,  'SMS',                   NULL, 1, NULL, 4,  '{ts escape="sql"}Text message (SMS) sent.{/ts}',                                             0, 1, 1, NULL, NULL, 'fa-mobile'),
    (@option_group_id_act, '{ts escape="sql"}Event Registration{/ts}',     5,  'Event Registration',    NULL, 1, NULL, 5,  '{ts escape="sql"}Online or offline event registration.{/ts}',                                0, 1, 1, @eventCompId, NULL, NULL),
@@ -324,7 +324,7 @@ VALUES
 
    (@option_group_id_act, '{ts escape="sql"}Membership Renewal Reminder{/ts}',        17, 'Membership Renewal Reminder',  NULL, 1, NULL, 17, '{ts escape="sql"}offline membership renewal reminder.{/ts}',                      0, 1, 1, @memberCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Change Case Start Date{/ts}',             18, 'Change Case Start Date',         NULL, 0,  0, 18, '', 0, 1, 1, @caseCompId, NULL , 'fa-calendar'),
-   (@option_group_id_act, '{ts escape="sql"}Bulk Email{/ts}',                         19, 'Bulk Email',         NULL, 1, NULL, 19, '{ts escape="sql"}Bulk Email Sent.{/ts}',                                                    0, 1, 1, NULL, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Bulk Email{/ts}',                         19, 'Bulk Email',         NULL, 1, NULL, 19, '{ts escape="sql"}Bulk Email Sent.{/ts}',                                                    0, 1, 1, @mailCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Assign Case Role{/ts}',                   20, 'Assign Case Role', NULL,0, 0, 20, '', 0, 1, 1, @caseCompId, NULL, 'fa-user-plus'),
    (@option_group_id_act, '{ts escape="sql"}Remove Case Role{/ts}',                   21, 'Remove Case Role', NULL,0, 0, 21, '', 0, 1, 1, @caseCompId, NULL, 'fa-user-times'),
    (@option_group_id_act, '{ts escape="sql"}Print/Merge Document{/ts}',               22, 'Print PDF Letter',    NULL, 0, NULL, 22, '{ts escape="sql"}Export letters and other printable documents.{/ts}',                     0, 1, 1, NULL, NULL, 'fa-file-pdf-o'),
@@ -340,7 +340,7 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}PhoneBank{/ts}',                          30, 'PhoneBank', NULL,0, 0, 29, '', 0, 1, 1, @campaignCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}WalkList{/ts}',                           31, 'WalkList', NULL,0, 0, 30, '', 0, 1, 1, @campaignCompId, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Petition Signature{/ts}',                 32, 'Petition', NULL,0, 0, 31, '', 0, 1, 1, @campaignCompId, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Mass SMS{/ts}',                           34, 'Mass SMS',         NULL, 1, NULL, 34, '{ts escape="sql"}Mass SMS{/ts}',                                                    0, 1, 1, NULL, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Mass SMS{/ts}',                           34, 'Mass SMS',         NULL, 1, NULL, 34, '{ts escape="sql"}Mass SMS{/ts}',                                                    0, 1, 1, @mailCompId, NULL, NULL),
 
 -- Additional Membership-related Activity Types
    (@option_group_id_act, '{ts escape="sql"}Change Membership Status{/ts}',           35, 'Change Membership Status',   NULL, 1, NULL, 35, '{ts escape="sql"}Change Membership Status.{/ts}',                         0, 1, 1, @memberCompId, NULL, NULL),
@@ -369,8 +369,8 @@ VALUES
  -- for selection changes
    (@option_group_id_act, '{ts escape="sql"}Change Registration{/ts}', 48, 'Change Registration', NULL, 1, NULL, 48, '{ts escape="sql"}Changes to an existing event registration.{/ts}', 0, 1, 1, @eventCompId, NULL, NULL),
  -- for Print or Email Contribution Invoices
-   (@option_group_id_act, '{ts escape="sql"}Downloaded Invoice{/ts}', 49, 'Downloaded Invoice',      NULL, 1, NULL, 49, '{ts escape="sql"}Downloaded Invoice.{/ts}',0, 1, 1, NULL, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Emailed Invoice{/ts}', 50, 'Emailed Invoice',      NULL, 1, NULL, 50, '{ts escape="sql"}Emailed Invoice.{/ts}',0, 1, 1, NULL, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Downloaded Invoice{/ts}', 49, 'Downloaded Invoice',      NULL, 1, NULL, 49, '{ts escape="sql"}Downloaded Invoice.{/ts}',0, 1, 1, @contributeCompId, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Emailed Invoice{/ts}', 50, 'Emailed Invoice',      NULL, 1, NULL, 50, '{ts escape="sql"}Emailed Invoice.{/ts}',0, 1, 1, @contributeCompId, NULL, NULL),
 
   -- for manual contact merge
    (@option_group_id_act, '{ts escape="sql"}Contact Merged{/ts}', 51, 'Contact Merged', NULL, 1, NULL, 51, '{ts escape="sql"}Contact Merged{/ts}',0, 1, 1, NULL, NULL, NULL),
