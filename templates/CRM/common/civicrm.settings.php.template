@@ -443,6 +443,7 @@ if (!defined('CIVICRM_PSR16_STRICT')) {
 // define('CIVICRM_LANGUAGE_MAPPING_ES', 'es_MX');
 // define('CIVICRM_LANGUAGE_MAPPING_PT', 'pt_BR');
 // define('CIVICRM_LANGUAGE_MAPPING_ZH', 'zh_TW');
+// define('CIVICRM_LANGUAGE_MAPPING_NL', 'nl_BE');
 
 /**
  * Native gettext improves performance of localized CiviCRM installations
