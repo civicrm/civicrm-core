@@ -148,4 +148,12 @@
     <required>true</required>
     <add>4.7</add>
   </field>
+  <field>
+    <name>directive</name>
+    <type>varchar</type>
+    <title>Angular directive</title>
+    <length>255</length>
+    <comment>Element name of angular directive to invoke (lowercase hyphenated format)</comment>
+    <add>5.33</add>
+  </field>
 </table>

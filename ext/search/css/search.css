@@ -1,22 +1,3 @@
-.crm-flex-box {
-  display: flex;
-}
-.crm-flex-box > * {
-  flex: 1;
-}
-.crm-flex-box > .crm-flex-2 {
-  flex: 2;
-}
-.crm-flex-box > .crm-flex-3 {
-  flex: 3;
-}
-.crm-flex-box > .crm-flex-4 {
-  flex: 4;
-}
-.crm-draggable {
-  cursor: move;
-}
-
 #bootstrap-theme #crm-search-results-page-size {
   width: 5em;
 }

@@ -121,6 +121,7 @@ class Manager {
       $angularModules['exportui'] = include "$civicrm_root/ang/exportui.ang.php";
       $angularModules['api4Explorer'] = include "$civicrm_root/ang/api4Explorer.ang.php";
       $angularModules['api4'] = include "$civicrm_root/ang/api4.ang.php";
+      $angularModules['crmDashboard'] = include "$civicrm_root/ang/crmDashboard.ang.php";
 
       foreach (\CRM_Core_Component::getEnabledComponents() as $component) {
         $angularModules = array_merge($angularModules, $component->getAngularModules());

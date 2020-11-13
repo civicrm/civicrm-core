@@ -19,6 +19,27 @@
    position: absolute;
 }
 
+.crm-container .crm-flex-box {
+  display: flex;
+}
+.crm-container .crm-flex-box > * {
+  flex: 1;
+  min-width: 0; /* prevents getting squashed by whitespace:nowrap content */
+}
+.crm-container .crm-flex-box > .crm-flex-2 {
+  flex: 2;
+}
+.crm-container .crm-flex-box > .crm-flex-3 {
+  flex: 3;
+}
+.crm-container .crm-flex-box > .crm-flex-4 {
+  flex: 4;
+}
+
+.crm-container .crm-draggable {
+  cursor: move;
+}
+
 .crm-container input {
   box-sizing: content-box;
 }

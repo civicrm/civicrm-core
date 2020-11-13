@@ -500,23 +500,6 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
-   * Function used for CiviCRM dashboard operations.
-   */
-  public static function dashboard() {
-    switch ($_REQUEST['op']) {
-      case 'save_columns':
-        CRM_Core_BAO_Dashboard::saveDashletChanges($_REQUEST['columns'] ?? NULL);
-        break;
-
-      case 'delete_dashlet':
-        $dashletID = CRM_Utils_Type::escape($_REQUEST['dashlet_id'], 'Positive');
-        CRM_Core_DAO_Dashboard::deleteRecord(['id' => $dashletID]);
-    }
-
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
    * Retrieve signature based on email id.
    */
   public static function getSignature() {

@@ -2208,7 +2208,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called while viewing contact dashboard.
+   * This hook is called while initializing the default dashlets for a contact dashboard.
    *
    * @param array $availableDashlets
    *   List of dashlets; each is formatted per api/v3/Dashboard
