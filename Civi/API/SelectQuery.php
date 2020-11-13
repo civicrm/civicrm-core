@@ -164,7 +164,7 @@ abstract class SelectQuery {
 
   /**
    * Classify the joins
-   * @return array 
+   * @return array
    */
   private function classifyJoins() {
     $classified = [
@@ -173,12 +173,12 @@ abstract class SelectQuery {
       'mandatory' => [],
     ];
     foreach ($this->query->getJoins() as $key => $join) {
-      $mandatory = false;
+      $mandatory = FALSE;
       foreach ($this->joins as $check_key => $check_join) {
         // check the order - haystack, needle
-        if ((strpos($key, $check_join) !== false)
+        if ((strpos($key, $check_join) !== FALSE)
         || ($this->query->latterClausesContainString($key))) {
-          $mandatory = true;
+          $mandatory = TRUE;
           break;
         }
       }
@@ -205,7 +205,7 @@ abstract class SelectQuery {
     $additional = [];
     foreach ($joins as $joinKey => $join) {
       foreach ($depends as $dependKey => $dependJoin) {
-        if ($joinKey != $dependKey && (strpos($dependJoin, $joinKey) !== false)) {
+        if ($joinKey != $dependKey && (strpos($dependJoin, $joinKey) !== FALSE)) {
           $additional[$dependKey] = $dependJoin;
         }
       }
