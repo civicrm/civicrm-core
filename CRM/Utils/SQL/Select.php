@@ -475,6 +475,49 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * @return array
+   * The set of joins for this query
+   */
+  public function getJoins() {
+    return $this->joins;
+  }
+
+  /**
+   * @param $needle string
+   * The string to search for
+   *
+   * @return bool
+   * Do any of the WHERE, GROUP BY, HAVING, or ORDER BY clauses contain $needle?
+   */
+  public function latterClausesContainString($needle) {
+    foreach ([$this->wheres, $this->groupBys, $this->havings, $this->orderBys] as $clauseName => $clauseType) {
+      foreach ($clauseType as $clauseKey => $clauseDetail) {
+        if (strpos($clauseKey, $needle) !== false) {
+          return true;
+          break 2;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Remove references to the specified table
+   *
+   * @param $key string
+   * The name of the table which should be removed from the SELECT and FROM
+   * clauses.
+   */
+  public function removeTable($key) {
+    foreach ($this->selects as $count => $select) {
+      if (strpos($select, $key) !== false) {
+        unset($this->selects[$count]); // According to docs, unset does not reindex the array
+      }
+    }
+    unset($this->joins[$key]);
+  }
+
+  /**
    * @return string
    *   SQL statement
    */

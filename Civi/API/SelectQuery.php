@@ -28,7 +28,8 @@ use Civi\API\Exception\UnauthorizedException;
 abstract class SelectQuery {
 
   const
-    MAX_JOINS = 4,
+    SQL_JOIN_LIMIT = 60, // 60 joins plus the table in the "from" clause equals 61, the join limit for MySQL.
+    MAX_JOINS = 4, // Note that this refers to join depth, not total joins.
     MAIN_TABLE_ALIAS = 'a';
 
   /**
@@ -123,30 +124,199 @@ abstract class SelectQuery {
       $this->query->limit($this->limit, $this->offset);
     }
 
-    $result_entities = [];
-    $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
+    if (count($this->query->getJoins()) > self::SQL_JOIN_LIMIT) {
+      return $this->splitQueryRunAndCollate();
+    }
+    else {
+      $result_entities = [];
+      $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
 
-    while ($result_dao->fetch()) {
-      if (in_array('count_rows', $this->select)) {
-        return (int) $result_dao->c;
+      while ($result_dao->fetch()) {
+        if (in_array('count_rows', $this->select)) {
+          return (int) $result_dao->c;
+        }
+        $result_entities[$result_dao->id] = [];
+        foreach ($this->selectFields as $column => $alias) {
+          $returnName = $alias;
+          $alias = str_replace('.', '_', $alias);
+          if (property_exists($result_dao, $alias) && $result_dao->$alias != NULL) {
+            $result_entities[$result_dao->id][$returnName] = $result_dao->$alias;
+          }
+          // Backward compatibility on fields names.
+          if ($this->isFillUniqueFields && !empty($this->apiFieldSpec[$alias]['uniqueName'])) {
+            $result_entities[$result_dao->id][$this->apiFieldSpec[$alias]['uniqueName']] = $result_dao->$alias;
+          }
+          foreach ($this->apiFieldSpec as $returnName => $spec) {
+            if (empty($result_entities[$result_dao->id][$returnName]) && !empty($result_entities[$result_dao->id][$spec['name']])) {
+              $result_entities[$result_dao->id][$returnName] = $result_entities[$result_dao->id][$spec['name']];
+            }
+          }
+        };
       }
-      $result_entities[$result_dao->id] = [];
-      foreach ($this->selectFields as $column => $alias) {
-        $returnName = $alias;
-        $alias = str_replace('.', '_', $alias);
-        if (property_exists($result_dao, $alias) && $result_dao->$alias != NULL) {
-          $result_entities[$result_dao->id][$returnName] = $result_dao->$alias;
+      return $result_entities;
+    }
+  }
+
+  /**
+   * Classify the joins
+   * @return array 
+   */
+  private function classifyJoins() {
+    $classified = [
+      'depends' => [],
+      'optional' => [],
+      'mandatory' => [],
+    ];
+    foreach ($this->query->getJoins() as $key => $join) {
+      $mandatory = false;
+      foreach ($this->joins as $check_key => $check_join) {
+        // check the order - haystack, needle
+        if ((strpos($key, $check_join) !== false) 
+        || ($this->query->latterClausesContainString($key))) {
+          $mandatory = true;
+          break;
         }
-        // Backward compatibility on fields names.
-        if ($this->isFillUniqueFields && !empty($this->apiFieldSpec[$alias]['uniqueName'])) {
-          $result_entities[$result_dao->id][$this->apiFieldSpec[$alias]['uniqueName']] = $result_dao->$alias;
+      }
+      if ($mandatory) {
+        $classified['mandatory'][$key] = $join;
+      }
+      else if (!isset($this->joins[$key])) {
+        $classified['depends'][$key] = $join;
+      }
+      else {
+        $classified['optional'][$key] = $join;
+      }
+    }
+    return $classified;
+  }
+
+  /**
+   * Recursively return entries from $depends which are referenced in $joins
+   * @param array $joins
+   * @param array $depends
+   * @return array
+   */
+  private function addJoinDependants($joins, $depends) {
+    $additional = [];
+    foreach($joins as $joinKey => $join) {
+      foreach ($depends as $dependKey => $dependJoin) {
+        if ($joinKey != $dependKey && (strpos($dependJoin, $joinKey) !== false)) {
+          $additional[$dependKey] = $dependJoin;
         }
-        foreach ($this->apiFieldSpec as $returnName => $spec) {
-          if (empty($result_entities[$result_dao->id][$returnName]) && !empty($result_entities[$result_dao->id][$spec['name']])) {
-            $result_entities[$result_dao->id][$returnName] = $result_entities[$result_dao->id][$spec['name']];
+      }
+    }
+    if (count($additional) === 0) {
+      return $additional;
+    }
+    else {
+      // Construct a new dependant list without the items in $additional
+      $newDepends = [];
+      foreach ($depends as $dKey => $dJoin) {
+        if (!isset($additional[$dKey])) {
+          $newDepends[$dKey] = $dJoin;
+        }
+      }
+      // Return $additional plus their dependants
+      return $additional + ($this->addJoinDependants($additional, $newDepends));
+    }
+  }
+
+  /**
+   * Split the set of classified joins into multiple groups, each representing
+   * a query whose results can be collated (hopefully) into the result we 
+   * would have had if we could run a query with an arbitrary number of joins.
+   * Note that this does not work if the query contains GROUP BY.
+   * 
+   * @param array $classified
+   * This is the output of $this->classifyJoins()
+   * @return array
+   */
+  private function splitClassifiedJoins($classified) {
+    $joinSet = [];
+    $count = 0;
+    // PHP creates a copy upon assignment
+    $joinSet[$count] = $classified['mandatory'];
+    $joinSet[$count] += $this->addJoinDependants($joinSet[$count], $classified['depends']);
+
+    foreach ($classified['optional'] as $optionalKey => $optionalJoin) {
+      $depends = $this->addJoinDependants([$optionalKey => $optionalJoin], $classified['depends']);
+      $numExtraJoins = count($depends) + 1;
+      if ((count($joinSet[$count]) + $numExtraJoins) >= self::SQL_JOIN_LIMIT) {
+        ++$count;
+        $joinSet[$count] = $classified['mandatory'];
+        $joinSet[$count] += $this->addJoinDependants($joinSet[$count], $classified['depends']);
+      }
+      // Note that if there are many mandatory joins, this can still exceed the limit due to dependants. It's very unlikely in practice, however.
+      $joinSet[$count][$optionalKey] = $optionalJoin;
+      foreach ($depends as $dependKey => $dependJoin) {
+        $joinSet[$count][$dependKey] = $dependJoin;
+      }
+    }
+    return $joinSet;
+  }
+
+  /**
+   * Produce a set of queries to fetch all the required data without exceeding the 61-table limit
+   *
+   * @param array $classified_joins     * This is the output of $this->classifyJoins()
+   * @param array $split_joins          * This is the output of $this->splitClassifiedJoins()
+   * @return array
+   */
+  private function splitQuery($classified_joins, $split_joins) {
+    $result = [];
+    // $c = 0;
+    foreach ($split_joins as $joins) {
+      $new_query = $this->query->copy();
+      foreach (array_merge($classified_joins['optional'], $classified_joins['depends']) as $joinKey => $joinValue) {
+        if (!isset($joins[$joinKey])) {
+          // Remove this table from the query
+          $new_query->removeTable($joinKey);
+        }
+        // else {
+        // }
+      }
+      $result[] = $new_query;
+    }
+    return $result;
+  }
+
+  /**
+   * The query contains too many joins (as determined by the calling function).
+   * Attempt to split it into multiple smaller queries, run them, and
+   * collate the results.
+   */
+  private function splitQueryRunAndCollate() {
+    $result_entities = [];
+    $classified_joins = $this->classifyJoins();
+    $split_joins = $this->splitClassifiedJoins($classified_joins);
+    $split_queries = $this->splitQuery($classified_joins, $split_joins);
+    foreach ($split_queries as $query) {
+      $sql = $query->toSQL();
+      $result_dao = \CRM_Core_DAO::executeQuery($sql);
+      while ($result_dao->fetch()) { // FIXME I have very low confidence that this will produce the desired outcome without understanding and tuning
+        if (in_array('count_rows', $this->select)) {
+          return (int) $result_dao->c;
+        }
+        if (!isset($result_entities[$result_dao->id])) {
+          $result_entities[$result_dao->id] = [];
+        }
+        foreach ($this->selectFields as $column => $alias) {
+          $returnName = $alias;
+          $alias = str_replace('.', '_', $alias);
+          if (property_exists($result_dao, $alias) && $result_dao->$alias != NULL) {
+            $result_entities[$result_dao->id][$returnName] = $result_dao->$alias;
+          }
+          // Backward compatibility on fields names.
+          if ($this->isFillUniqueFields && !empty($this->apiFieldSpec[$alias]['uniqueName'])) {
+            $result_entities[$result_dao->id][$this->apiFieldSpec[$alias]['uniqueName']] = $result_dao->$alias;
+          }
+          foreach ($this->apiFieldSpec as $returnName => $spec) {
+            if (empty($result_entities[$result_dao->id][$returnName]) && !empty($result_entities[$result_dao->id][$spec['name']])) {
+              $result_entities[$result_dao->id][$returnName] = $result_entities[$result_dao->id][$spec['name']];
+            }
           }
         }
-      };
+      }
     }
     return $result_entities;
   }
