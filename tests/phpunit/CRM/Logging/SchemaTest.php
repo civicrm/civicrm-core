@@ -376,6 +376,64 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test creating a table with SchemaHandler::createTable when logging
+   * is enabled.
+   */
+  public function testCreateTableWithLogging() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+
+    CRM_Core_BAO_SchemaHandler::createTable([
+      'name' => 'civicrm_test_table',
+      'is_multiple' => FALSE,
+      'attributes' => 'ENGINE=InnoDB',
+      'fields' => [
+        [
+          'name' => 'id',
+          'type' => 'int unsigned',
+          'primary' => TRUE,
+          'required' => TRUE,
+          'attributes' => 'AUTO_INCREMENT',
+          'comment' => 'Default MySQL primary key',
+        ],
+        [
+          'name' => 'activity_id',
+          'type' => 'int unsigned',
+          'required' => TRUE,
+          'comment' => 'FK to civicrm_activity',
+          'fk_table_name' => 'civicrm_activity',
+          'fk_field_name' => 'id',
+          'fk_attributes' => 'ON DELETE CASCADE',
+        ],
+        [
+          'name' => 'texty',
+          'type' => 'varchar(255)',
+          'required' => FALSE,
+        ],
+      ],
+    ]);
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_table");
+    $dao->fetch();
+    // using regex since not sure it's always int(10), so accept int(10), int(11), integer, etc...
+    $this->assertRegExp('/`id` int(.+) unsigned NOT NULL AUTO_INCREMENT/', $dao->Create_Table);
+    $this->assertRegExp('/`activity_id` int(.+) unsigned NOT NULL/', $dao->Create_Table);
+    $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
+    $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
+    $this->assertStringContainsString('FOREIGN KEY (`activity_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE CASCADE', $dao->Create_Table);
+
+    // Check log table.
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_test_table");
+    $dao->fetch();
+    $this->assertStringNotContainsString('AUTO_INCREMENT', $dao->Create_Table);
+    // This seems debatable whether `id` should lose its NOT NULL status
+    $this->assertRegExp('/`id` int(.+) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertRegExp('/`activity_id` int(.+) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
+    $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
+    $this->assertStringNotContainsString('FOREIGN KEY', $dao->Create_Table);
+  }
+
+  /**
    * Determine if we are running on MySQL 8 version 8.0.19 or later.
    *
    * @return bool
