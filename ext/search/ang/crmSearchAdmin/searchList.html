@@ -39,7 +39,8 @@
         </td>
         <td>{{ search.groups.join(', ') }}</td>
         <td class="text-right">
-          <a class="btn btn-xs btn-default" href="#/edit/{{ search.id }}">{{:: ts('Edit') }}</a>
+          <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}">{{:: ts('Edit') }}</a>
+          <a class="btn btn-xs btn-default" href="#/create/{{:: search.api_entity + '?params=' + $ctrl.encode(search.api_params) }}">{{:: ts('Clone') }}</a>
           <a href class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: search}" on-yes="$ctrl.deleteSearch(search)">{{:: ts('Delete') }}</a>
         </td>
       </tr>

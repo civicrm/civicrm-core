@@ -11,6 +11,10 @@
 
     this.searchPath = window.location.href.split('#')[0].replace('civicrm/admin/search', 'civicrm/search');
 
+    this.encode = function(params) {
+      return encodeURI(angular.toJson(params));
+    };
+
     this.deleteSearch = function(search) {
       var index = _.findIndex(savedSearches, {id: search.id});
       if (index > -1) {
