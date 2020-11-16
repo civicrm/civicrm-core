@@ -426,7 +426,13 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   public function testGetSelfServiceEligibility($selfSvcEnabled, $selfSvcHours, $hoursToEvent, $participantStatusId, $isBackOffice, $successExpected) {
     $participantId = $this->participantCreate(['contact_id' => $this->_contactId, 'event_id' => $this->_eventId, 'status_id' => $participantStatusId]);
     $now = new Datetime();
-    $startDate = $now->add(new DateInterval("PT{$hoursToEvent}H"))->format('Y-m-d H:i:s');
+    if ($hoursToEvent >= 0) {
+      $startDate = $now->add(new DateInterval("PT{$hoursToEvent}H"))->format('Y-m-d H:i:s');
+    }
+    else {
+      $hoursAfterEvent = abs($hoursToEvent);
+      $startDate = $now->sub(new DateInterval("PT{$hoursAfterEvent}H"))->format('Y-m-d H:i:s');
+    }
     $this->callAPISuccess('Event', 'create', [
       'id' => $this->_eventId,
       'allow_selfcancelxfer' => $selfSvcEnabled,
@@ -501,6 +507,14 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'participantStatusId' => 1,
       'isBackOffice' => FALSE,
       'successExpected' => TRUE,
+    ];
+    $scenarios[] = [
+      'selfSvcEnabled' => 1,
+      'selfSvcHours' => 0,
+      'hoursToEvent' => -6,
+      'participantStatusId' => 1,
+      'isBackOffice' => FALSE,
+      'successExpected' => FALSE,
     ];
     return $scenarios;
   }
