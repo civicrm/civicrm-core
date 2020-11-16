@@ -6,7 +6,7 @@
       savedSearch: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
-    controller: function($scope, $element, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
+    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
@@ -39,13 +39,17 @@
         this.savedSearch.groups = this.savedSearch.groups || [];
         this.groupExists = !!this.savedSearch.groups.length;
 
-        if (!this.savedSearch.api_params) {
-          this.savedSearch.api_params = {
-            version: 4,
-            select: getDefaultSelect(),
-            orderBy: {},
-            where: [],
-          };
+        if (!this.savedSearch.id) {
+          $scope.$bindToRoute({
+            param: 'params',
+            expr: '$ctrl.savedSearch.api_params',
+            default: {
+              version: 4,
+              select: getDefaultSelect(),
+              orderBy: {},
+              where: [],
+            }
+          });
         }
 
         $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
@@ -103,9 +107,12 @@
         delete params.displays;
         apiCalls.saved = ['SavedSearch', 'save', {records: [params], chain: chain}, 0];
         crmApi4(apiCalls).then(function(results) {
+          // After saving a new search, redirect to the edit url
+          if (!ctrl.savedSearch.id) {
+            $location.url('edit/' + results.saved.id);
+          }
           // Set new status to saved unless the user changed something in the interim
           var newStatus = $scope.status === 'unsaved' ? 'unsaved' : 'saved';
-          ctrl.savedSearch.id = results.saved.id;
           if (results.saved.groups && results.saved.groups.length) {
             ctrl.savedSearch.groups[0].id = results.saved.groups[0].id;
           }

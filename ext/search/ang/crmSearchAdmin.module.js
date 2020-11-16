@@ -21,7 +21,7 @@
                 'name',
                 'label',
                 'api_entity',
-                'form_values',
+                'api_params',
                 'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
                 'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
                 'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
