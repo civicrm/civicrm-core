@@ -20,14 +20,6 @@
      <weight>0</weight>
   </item>
   <item>
-     <path>civicrm/dashlet</path>
-     <title>CiviCRM Dashlets</title>
-     <page_type>1</page_type>
-     <page_callback>CRM_Contact_Page_Dashlet</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <weight>1</weight>
-  </item>
-  <item>
      <path>civicrm/contact/search</path>
      <title>Find Contacts</title>
      <page_callback>CRM_Contact_Controller_Search</page_callback>
@@ -293,12 +285,6 @@
      <path>civicrm/ajax/subtype</path>
      <page_callback>CRM_Contact_Page_AJAX::buildSubTypes</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
-     <path>civicrm/ajax/dashboard</path>
-     <page_callback>CRM_Contact_Page_AJAX::dashboard</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <page_type>3</page_type>
 </item>
 <item>
      <path>civicrm/ajax/signature</path>

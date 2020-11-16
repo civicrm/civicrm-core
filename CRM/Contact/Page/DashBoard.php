@@ -24,12 +24,6 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
    * Run dashboard.
    */
   public function run() {
-    // Add dashboard js and css
-    $resources = CRM_Core_Resources::singleton();
-    $resources->addScriptFile('civicrm', 'js/jquery/jquery.dashboard.js', 0, 'html-header', FALSE);
-    $resources->addStyleFile('civicrm', 'css/dashboard.css');
-    $this->assign('contactDashlets', CRM_Core_BAO_Dashboard::getContactDashletsForJS());
-
     CRM_Utils_System::setTitle(ts('CiviCRM Home'));
     $contactID = CRM_Core_Session::getLoggedInContactID();
 
@@ -50,7 +44,56 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
       }
     }
 
+    $loader = new Civi\Angular\AngularLoader();
+    $loader->setPageName('civicrm/dashboard');
+
+    // For each dashlet that requires an angular directive, load the angular module which provides that directive
+    $modules = [];
+    foreach (CRM_Core_BAO_Dashboard::getContactDashlets() as $dashlet) {
+      if (!empty($dashlet['directive'])) {
+        foreach ($loader->getAngular()->getModules() as $name => $module) {
+          if (!empty($module['exports'][$dashlet['directive']])) {
+            $modules[] = $name;
+            continue;
+          }
+        }
+      }
+    }
+    $loader->setModules($modules);
+
+    $loader->load();
+
     return parent::run();
+  }
+
+  /**
+   * partialsCallback from crmDashboard.ang.php
+   *
+   * Generates an html template for each angular-based dashlet.
+   *
+   * @param $moduleName
+   * @param $module
+   * @return array
+   */
+  public static function angularPartials($moduleName, $module) {
+    $partials = [];
+    foreach (CRM_Core_BAO_Dashboard::getContactDashlets() as $dashlet) {
+      if (!empty($dashlet['directive'])) {
+        $partials["~/$moduleName/directives/{$dashlet['directive']}.html"] = "<{$dashlet['directive']}></{$dashlet['directive']}>";
+      }
+    }
+    return $partials;
+  }
+
+  /**
+   * settingsFactory from crmDashboard.ang.php
+   *
+   * @return array
+   */
+  public static function angularSettings() {
+    return [
+      'dashlets' => CRM_Core_BAO_Dashboard::getContactDashlets(),
+    ];
   }
 
 }
