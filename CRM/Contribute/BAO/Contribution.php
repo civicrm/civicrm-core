@@ -2126,8 +2126,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @param array $params
    * @param bool $processContributionObject
    *
-   * @return array
-   *
    * @throws CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @deprecated
@@ -2159,7 +2157,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         array_search('Failed', $contributionStatuses),
       ])
     ) {
-      return $updateResult;
+      return;
     }
 
     if (!$componentName || !$componentId) {
@@ -2187,7 +2185,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
     // do check for required ids.
     if (empty($componentDetails['membership']) && empty($componentDetails['participant']) && empty($componentDetails['pledge_payment']) || empty($componentDetails['contact_id'])) {
-      return $updateResult;
+      return;
     }
 
     $input = $ids = [];
@@ -2249,7 +2247,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         ])
       ) {
         // this is case when we already processed contribution object.
-        return $updateResult;
+        return;
       }
       elseif (!$previousContriStatusId &&
         !in_array($contributionStatuses[$contribution->contribution_status_id], [
@@ -2258,7 +2256,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         ])
       ) {
         // this is case when we are going to process contribution object later.
-        return $updateResult;
+        return;
       }
 
       if (is_array($memberships)) {
@@ -2404,7 +2402,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               );
             }
 
-            $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
             if ($processContributionObject) {
               $processContribution = TRUE;
             }
@@ -2418,7 +2415,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         $updatedStatusId = array_search('Registered', $participantStatuses);
         CRM_Event_BAO_Participant::updateParticipantStatus($participant->id, $oldStatus, $updatedStatusId, TRUE);
 
-        $updateResult['updatedComponents']['CiviEvent'] = $updatedStatusId;
         if ($processContributionObject) {
           $processContribution = TRUE;
         }
@@ -2427,7 +2423,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if ($pledgePayment) {
         CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
 
-        $updateResult['updatedComponents']['CiviPledge'] = $contributionStatusId;
         if ($processContributionObject) {
           $processContribution = TRUE;
         }
@@ -2463,7 +2458,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
     }
 
-    return $updateResult;
   }
 
   /**
