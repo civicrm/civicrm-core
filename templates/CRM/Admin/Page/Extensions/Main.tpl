@@ -10,7 +10,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
     <table id="extensions" class="display">
       <thead>
         <tr>
-          <th>{ts}Extension name (key){/ts}</th>
+          <th>{ts}Name{/ts}</th>
           <th>{ts}Status{/ts}</th>
           <th>{ts}Version{/ts}</th>
           <th>{ts}Type{/ts}</th>
@@ -21,7 +21,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
         {foreach from=$localExtensionRows key=extKey item=row}
         <tr id="extension-{$row.file}" class="crm-entity crm-extension-{$row.file}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.upgradable} extension-upgradable{elseif $row.status eq 'installed'} extension-installed{/if}">
           <td class="crm-extensions-label">
-              <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>({$row.key})
+              <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>{$row.description}
               {if $extAddNewEnabled && $remoteExtensionRows[$extKey] && $remoteExtensionRows[$extKey].is_upgradeable}
                 {capture assign='upgradeURL'}{crmURL p='civicrm/admin/extensions' q="action=update&id=$extKey&key=$extKey"}{/capture}
                 <div class="crm-extensions-upgrade">{ts 1=$upgradeURL}Version {$remoteExtensionRows[$extKey].version} is available. <a href="%1">Upgrade</a>{/ts}</div>
