@@ -46,7 +46,7 @@
 
                 {section name=rows loop=$rowDisplayCount}
                     {assign var="j" value=$smarty.section.rows.index}
-                    <td class="odd-row">{$dataValues[$j][$i]}</td>
+                    <td class="odd-row">{$dataValues[$j][$i]|escape}</td>
                 {/section}
 
                 {* Display mapper <select> field for 'Map Fields', and mapper value for 'Preview' *}
