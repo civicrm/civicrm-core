@@ -56,7 +56,7 @@ INSERT INTO `civicrm_custom_field` (`custom_group_id`, `name`, `label`, `data_ty
 -- *
 -- *******************************************************/
 DROP TABLE IF EXISTS `civicrm_value_constituent_information_1`;
-CREATE TABLE `civicrm_value_constituent_information_1` (`id` int(10) unsigned NOT NULL auto_increment, `entity_id` int(10) unsigned NOT NULL,  `most_important_issue_1` varchar(255) default NULL,  `marital_status_2` varchar(255) default NULL, `marriage_date_3` datetime default NULL, PRIMARY KEY  (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`), INDEX `INDEX_most_important_issue_1` (`most_important_issue_1`), INDEX `INDEX_marital_status_2` (`marital_status_2`), INDEX `INDEX_marriage_date_3` (`marriage_date_3`), CONSTRAINT `FK_civicrm_value_constituent_information_1_entity_id` FOREIGN KEY (`entity_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `civicrm_value_constituent_information_1` (`id` int(10) unsigned NOT NULL auto_increment, `entity_id` int(10) unsigned NOT NULL,  `most_important_issue_1` varchar(255) default NULL,  `marital_status_2` varchar(255) default NULL, `marriage_date_3` datetime default NULL, PRIMARY KEY  (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`), INDEX `INDEX_most_important_issue_1` (`most_important_issue_1`), INDEX `INDEX_marital_status_2` (`marital_status_2`), INDEX `INDEX_marriage_date_3` (`marriage_date_3`), CONSTRAINT `FK_civicrm_value_constituent_information_1_entity_id` FOREIGN KEY (`entity_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 
 
@@ -73,7 +73,7 @@ INSERT INTO civicrm_custom_field ( custom_group_id, label, name, data_type, html
 INSERT INTO civicrm_option_value ( option_group_id, label, value, name, weight ) VALUES  ( @ogid, 'Bean Broth', 'bean', 'Bean_Broth', 1 ), ( @ogid, 'Chicken Combo', 'chicken', 'Chicken_Combo', 2), ( @ogid, 'Salmon Stew',  'salmon', 'Salmon_Stew',   3);
 
 DROP TABLE IF EXISTS `civicrm_value_food_preference_2`;
-CREATE TABLE civicrm_value_food_preference_2 ( id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key', entity_id INT(10) UNSIGNED NOT NULL COMMENT 'Table that this extends', soup_selection_4 VARCHAR(255) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY unique_entity_id (entity_id), CONSTRAINT `FK_civicrm_value_food_preference_2_entity_id` FOREIGN KEY (`entity_id`) REFERENCES `civicrm_participant` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE civicrm_value_food_preference_2 ( id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key', entity_id INT(10) UNSIGNED NOT NULL COMMENT 'Table that this extends', soup_selection_4 VARCHAR(255) DEFAULT NULL, PRIMARY KEY (id), UNIQUE KEY unique_entity_id (entity_id), CONSTRAINT `FK_civicrm_value_food_preference_2_entity_id` FOREIGN KEY (`entity_id`) REFERENCES `civicrm_participant` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- Donors’ custom data
 
@@ -90,4 +90,4 @@ INSERT INTO `civicrm_custom_field` (`custom_group_id`, `label`, `name`, `data_ty
 INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `weight`) VALUES (@ogid_contribution, 'Less than 1 year', '1', 'Less_than_1_year', 1), (@ogid_contribution, '1-3 years', '2', '1_3_years', 2),(@ogid_contribution, '4-6 years', '3', '4_6_years', 3),(@ogid_contribution, '7-9 years', '4', '7_9_years', 4),(@ogid_contribution, 'More than 9 years', '5', 'More_than_9_years', 5);
 
 DROP TABLE IF EXISTS `civicrm_value_donor_information_3`;
-CREATE TABLE IF NOT EXISTS `civicrm_value_donor_information_3` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key',  `entity_id` int(10) unsigned NOT NULL COMMENT 'Table that this extends', `known_areas_of_interest_5` text COLLATE utf8_unicode_ci, `how_long_have_you_been_a_donor_6` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE IF NOT EXISTS `civicrm_value_donor_information_3` ( `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Default MySQL primary key',  `entity_id` int(10) unsigned NOT NULL COMMENT 'Table that this extends', `known_areas_of_interest_5` text COLLATE utf8mb4_unicode_ci, `how_long_have_you_been_a_donor_6` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE KEY `unique_entity_id` (`entity_id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
