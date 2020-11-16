@@ -163,9 +163,9 @@
             <span class="description">{ts}When <strong>Status Override</strong> is active, the selected status will remain in force (it will NOT be subject to membership status rules) until it is cancelled or become inactive.{/ts}</span></td></tr>
         {/if}
 
-        {if $accessContribution and !$membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit) or $onlinePendingContributionId)}
+        {if $accessContribution and !$membershipMode AND ($action neq 2 or (!$rows.0.contribution_id AND !$softCredit))}
           <tr id="contri">
-            <td class="label">{if $onlinePendingContributionId}{ts}Update Payment Status{/ts}{else}{$form.record_contribution.label}{/if}</td>
+            <td class="label">{$form.record_contribution.label}</td>
             <td>{$form.record_contribution.html}<br />
               <span class="description">{ts}Check this box to enter or update payment information. You will also be able to generate a customized receipt.{/ts}</span></td>
           </tr>
@@ -251,7 +251,7 @@
   </div> <!-- end form-block -->
 
   {if $action neq 8} {* Jscript additions not need for Delete action *}
-    {if $accessContribution and !$membershipMode AND ($action neq 2 or !$rows.0.contribution_id or $onlinePendingContributionId)}
+    {if $accessContribution and !$membershipMode AND ($action neq 2 or !$rows.0.contribution_id)}
 
     {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="record_contribution"
@@ -268,7 +268,7 @@
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
-        var existingAmount = {/literal}{if !empty($onlinePendingContributionId)}1{else}0{/if}{literal};
+        var existingAmount = 0;
 
         if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
           isPriceSet = 1;
