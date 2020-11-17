@@ -1099,6 +1099,7 @@ WHERE civicrm_event.is_active = 1
 
     if ($values['event']['is_email_confirm'] || $returnMessageText) {
       list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+      $email = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantParams) ?? $email;
 
       //send email only when email is present
       if (isset($email) || $returnMessageText) {
