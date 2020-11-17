@@ -917,4 +917,29 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    $ufAccessURL = '';
+    $jAccessParams = '';
+    $config = CRM_Core_Config::singleton();
+    //condition based on Joomla version; <= 2.5 uses modal window; >= 3.0 uses full page with return value
+    if (version_compare(JVERSION, '3.0', 'lt')) {
+      JHTML::_('behavior.modal');
+      $ufAccessURL = $config->userFrameworkBaseURL . 'index.php?option=com_config&view=component&component=com_civicrm&tmpl=component';
+      $jAccessParams = 'rel="{handler: \'iframe\', size: {x: 875, y: 550}, onClose: function() {}}" class="modal"';
+    }
+    else {
+      $uri = (string) JUri::getInstance();
+      $return = urlencode(base64_encode($uri));
+      $ufAccessURL = $config->userFrameworkBaseURL . 'index.php?option=com_config&view=component&component=com_civicrm&return=' . $return;
+    }
+    return [
+      'ufAccessURL' => $ufAccessURL,
+      'jAccessParams' => $jAccessParams,
+    ];
+  }
+
 }

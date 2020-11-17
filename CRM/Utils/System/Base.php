@@ -1004,4 +1004,12 @@ abstract class CRM_Utils_System_Base {
   public function prePostRedirect() {
   }
 
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return [];
+  }
+
 }
