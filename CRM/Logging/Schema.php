@@ -805,18 +805,11 @@ COLS;
     // - drop non-column rows of the query (keys, constraints, etc.)
     // - set the ENGINE to the specified engine (default is INNODB)
     // - add log-specific columns (at the end of the table)
-    $mysqlEngines = [];
-    $engines = CRM_Core_DAO::executeQuery("SHOW ENGINES");
-    while ($engines->fetch()) {
-      if ($engines->Support === 'YES' || $engines->Support === 'DEFAULT') {
-        $mysqlEngines[] = $engines->Engine;
-      }
-    }
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], self::ENGINE));
-    $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
+    $engine = strtoupper(empty($this->logTableSpec[$table]['engine']) ? self::ENGINE : $this->logTableSpec[$table]['engine']);
+    $engine .= " " . ($this->logTableSpec[$table]['engine_config'] ?? '');
     if (strpos($engine, 'ROW_FORMAT') !== FALSE) {
       $query = preg_replace("/ROW_FORMAT=\w+/m", '', $query);
     }
