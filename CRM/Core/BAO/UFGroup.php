@@ -1431,6 +1431,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @return object
    */
   public static function add(&$params, $ids = []) {
+    This will breaks. It's awful.
     $fields = [
       'is_active',
       'add_captcha',
