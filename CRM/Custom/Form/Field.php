@@ -844,12 +844,7 @@ AND    option_group_id = %2";
       $params['is_search_range'] = 0;
     }
 
-    if ($params['data_type'] !== 'ContactReference' && ($params['html_type'] === 'Select' || $params['html_type'] === 'Autocomplete-Select')) {
-      $params['serialize'] = $params['serialize'] ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
-    }
-    else {
-      $params['serialize'] = $params['html_type'] == 'CheckBox' ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
-    }
+    $params['serialize'] = $this->determineSerializeType($params);
 
     $filter = 'null';
     if ($params['data_type'] == 'ContactReference' && !empty($params['filter_selected'])) {
@@ -952,6 +947,21 @@ AND    option_group_id = %2";
    */
   public function getDefaultEntity() {
     return 'CustomField';
+  }
+
+  /**
+   * Determine the serialize type based on form values.
+   * @param array $params The submitted form values.
+   * @return int|string
+   *   The serialize type - CRM_Core_DAO::SERIALIZE_XXX or the string 'null'
+   */
+  public function determineSerializeType($params) {
+    if ($params['data_type'] !== 'ContactReference' && ($params['html_type'] === 'Select' || $params['html_type'] === 'Autocomplete-Select')) {
+      return !empty($params['serialize']) ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
+    }
+    else {
+      return $params['html_type'] == 'CheckBox' ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 'null';
+    }
   }
 
 }
