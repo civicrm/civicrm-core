@@ -175,6 +175,10 @@ class AngularLoader {
         $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
       }
     }
+    // Add bundles
+    foreach ($this->angular->getResources($moduleNames, 'bundles', 'bundles') as $bundles) {
+      $res->addBundle($bundles);
+    }
 
     return $this;
   }
