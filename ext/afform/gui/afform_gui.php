@@ -167,7 +167,7 @@ function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
     'includeCustom' => TRUE,
     'loadOptions' => TRUE,
     'action' => 'create',
-    'select' => ['name', 'title', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
+    'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
     'where' => [['input_type', 'IS NOT NULL']],
   ];
 

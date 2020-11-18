@@ -2,7 +2,7 @@
   <fieldset class="af-gui-entity-values">
     <legend>{{ ts('Values:') }}</legend>
     <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in entity.data">
-      <label>{{ getMeta().fields[fieldName].title }}:</label><br />
+      <label>{{ getMeta().fields[fieldName].label }}:</label><br />
       <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
       <a href ng-click="removeValue(entity, fieldName)">
         <i class="crm-i fa-times"></i>
@@ -41,7 +41,7 @@
           <label>{{ fieldGroup.label }}</label>
           <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + fieldGroup.entityName + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="fieldGroup.fields">
             <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
-              {{ editor.getField(fieldGroup.entityType, field.name).title }}
+              {{ editor.getField(fieldGroup.entityType, field.name).label }}
             </div>
           </div>
         </div>

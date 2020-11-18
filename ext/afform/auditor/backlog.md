@@ -10,6 +10,7 @@ validator to catch. Loosely/informally:
 * `<af-form>`, `<af-entity>`, `<af-fieldset>`, `<af-field>` should have suitable relationships.
 * `<af-entity>` should reference legit entities.
 * `<af-field>` should reference legit fields.
+    * The optional override `defn='{label:...}` changed to `defn={title:...}`
     * Future consideration: how to validate when it's part of a subform?
 * `<af-fieldset>` should reference a declared model.
 * `<af-field defn="...">` should contain an object.

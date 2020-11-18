@@ -351,7 +351,7 @@ function _af_fill_field_metadata($entityType, DOMElement $afField) {
   $params = [
     'action' => 'create',
     'where' => [['name', '=', $afField->getAttribute('name')]],
-    'select' => ['title', 'input_type', 'input_attrs', 'options'],
+    'select' => ['label', 'input_type', 'input_attrs', 'options'],
     'loadOptions' => TRUE,
   ];
   if (in_array($entityType, CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
