@@ -2,6 +2,7 @@
 *.bak
 .use-civicrm-setup
 /ext/*
+!/ext/afform
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart

@@ -266,7 +266,7 @@
 
         $scope.valuesFields = function() {
           var fields = _.transform($scope.getMeta().fields, function(fields, field) {
-            fields.push({id: field.name, text: field.title, disabled: $scope.fieldInUse(field.name)});
+            fields.push({id: field.name, text: field.label, disabled: $scope.fieldInUse(field.name)});
           }, []);
           return {results: fields};
         };
@@ -304,7 +304,7 @@
 
           function filterFields(fields) {
             return _.transform(fields, function(fieldList, field) {
-              if (!search || _.contains(field.name, search) || _.contains(field.title.toLowerCase(), search)) {
+              if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
                 fieldList.push({
                   "#tag": "af-field",
                   name: field.name
@@ -806,10 +806,10 @@
 
         $scope.toggleLabel = function() {
           $scope.node.defn = $scope.node.defn || {};
-          if ($scope.node.defn.title === false) {
-            delete $scope.node.defn.title;
+          if ($scope.node.defn.label === false) {
+            delete $scope.node.defn.label;
           } else {
-            $scope.node.defn.title = false;
+            $scope.node.defn.label = false;
           }
         };
 

@@ -43,7 +43,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
 
     $myField = $parsed[0]['#children'][1]['#children'][0];
     $this->assertEquals('af-field', $myField['#tag']);
-    $this->assertEquals('First Name', $myField['defn']['title']);
+    $this->assertEquals('First Name', $myField['defn']['label']);
   }
 
   public function testDefnInjectionNested() {
@@ -55,19 +55,19 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
 
     $myField = $parsed[0]['#children'][1]['#children'][0]['#children'][0]['#children'][0];
     $this->assertEquals('af-field', $myField['#tag']);
-    $this->assertEquals('First Name', $myField['defn']['title']);
+    $this->assertEquals('First Name', $myField['defn']['label']);
   }
 
   public function testDefnOverrideTitle() {
     $inputHtml = sprintf(self::PERSON_TPL,
-      '<div af-fieldset="person"><af-field name="first_name" defn="{title: \'Given name\'}" /></div>');
+      '<div af-fieldset="person"><af-field name="first_name" defn="{label: \'Given name\'}" /></div>');
     $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
     $converter = new \CRM_Afform_ArrayHtml(TRUE);
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 
     $myField = $parsed[0]['#children'][1]['#children'][0];
     $this->assertEquals('af-field', $myField['#tag']);
-    $this->assertEquals('Given name', $myField['defn']['title']);
+    $this->assertEquals('Given name', $myField['defn']['label']);
     $this->assertEquals('Text', $myField['defn']['input_type']);
   }
 
