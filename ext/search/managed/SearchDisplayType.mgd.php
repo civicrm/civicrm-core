@@ -21,4 +21,15 @@ return [
       'icon' => 'fa-table',
     ],
   ],
+  [
+    'name' => 'SearchDisplayType:list',
+    'entity' => 'OptionValue',
+    'params' => [
+      'option_group_id' => 'search_display_type',
+      'name' => 'list',
+      'value' => 'list',
+      'label' => 'List',
+      'icon' => 'fa-list',
+    ],
+  ],
 ];

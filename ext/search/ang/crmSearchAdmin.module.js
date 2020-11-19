@@ -113,28 +113,37 @@
           return field;
         }
       }
+      function parseExpr(expr) {
+        var result = {fn: null, modifier: ''},
+          fieldName = expr,
+          bracketPos = expr.indexOf('(');
+        if (bracketPos >= 0) {
+          var parsed = expr.substr(bracketPos).match(/[ ]?([A-Z]+[ ]+)?([\w.:]+)/);
+          fieldName = parsed[2];
+          result.fn = _.find(CRM.crmSearchAdmin.functions, {name: expr.substring(0, bracketPos)});
+          result.modifier = _.trim(parsed[1]);
+        }
+        result.field = expr ? getField(fieldName, searchEntity) : undefined;
+        if (result.field) {
+          var split = fieldName.split(':'),
+            prefixPos = split[0].lastIndexOf(result.field.name);
+          result.path = split[0];
+          result.prefix = prefixPos > 0 ? result.path.substring(0, prefixPos) : '';
+          result.suffix = !split[1] ? '' : ':' + split[1];
+        }
+        return result;
+      }
       return {
         getEntity: getEntity,
         getField: getField,
-        parseExpr: function(expr) {
-          var result = {fn: null, modifier: ''},
-            fieldName = expr,
-            bracketPos = expr.indexOf('(');
-          if (bracketPos >= 0) {
-            var parsed = expr.substr(bracketPos).match(/[ ]?([A-Z]+[ ]+)?([\w.:]+)/);
-            fieldName = parsed[2];
-            result.fn = _.find(CRM.crmSearchAdmin.functions, {name: expr.substring(0, bracketPos)});
-            result.modifier = _.trim(parsed[1]);
+        parseExpr: parseExpr,
+        getDefaultLabel: function(col) {
+          var info = parseExpr(col),
+            label = info.field.label;
+          if (info.fn) {
+            label = '(' + info.fn.title + ') ' + label;
           }
-          result.field = expr ? getField(fieldName, searchEntity) : undefined;
-          if (result.field) {
-            var split = fieldName.split(':'),
-              prefixPos = split[0].lastIndexOf(result.field.name);
-            result.path = split[0];
-            result.prefix = prefixPos > 0 ? result.path.substring(0, prefixPos) : '';
-            result.suffix = !split[1] ? '' : ':' + split[1];
-          }
-          return result;
+          return label;
         },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {

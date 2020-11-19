@@ -1,15 +1,15 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchDisplay').component('crmSearchDisplayTable', {
+  angular.module('crmSearchDisplayTable').component('crmSearchDisplayTable', {
     bindings: {
       apiEntity: '<',
       apiParams: '<',
       settings: '<',
       filters: '<'
     },
-    templateUrl: '~/crmSearchDisplay/crmSearchDisplayTable.html',
-    controller: function($scope, crmApi4) {
+    templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
+    controller: function($scope, crmApi4, formatSearchValue, searchDisplayFieldCanAggregate) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
@@ -40,7 +40,7 @@
         _.each(params.join, function(join) {
           var joinEntity = join[0].split(' AS ')[1],
             idField = joinEntity + '.id';
-          if (!_.includes(params.select, idField) && !canAggregate('id', joinEntity + '.')) {
+          if (!_.includes(params.select, idField) && !searchDisplayFieldCanAggregate('id', joinEntity + '.', params)) {
             params.select.push(idField);
           }
         });
@@ -89,60 +89,8 @@
 
       $scope.formatResult = function(row, col) {
         var value = row[col.key];
-        return formatFieldValue(row, col, value);
+        return formatSearchValue(row, col, value);
       };
-
-      function formatFieldValue(row, col, value) {
-        var type = col.dataType,
-          result = value;
-        if (_.isArray(value)) {
-          return _.map(value, function(val) {
-            return formatFieldValue(col, val);
-          }).join(', ');
-        }
-        if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
-          result = CRM.utils.formatDate(value, null, type === 'Timestamp');
-        }
-        else if (type === 'Boolean' && typeof value === 'boolean') {
-          result = value ? ts('Yes') : ts('No');
-        }
-        else if (type === 'Money' && typeof value === 'number') {
-          result = CRM.formatMoney(value);
-        }
-        result = _.escape(result);
-        if (col.link) {
-          result = '<a href="' + getUrl(col.link, row) + '">' + result + '</a>';
-        }
-        return result;
-      }
-
-      function getUrl(link, row) {
-        var url = replaceTokens(link, row);
-        if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
-          url = CRM.url(url);
-        }
-        return _.escape(url);
-      }
-
-      function replaceTokens(str, data) {
-        _.each(data, function(value, key) {
-          str = str.replace('[' + key + ']', value);
-        });
-        return str;
-      }
-
-      function canAggregate(fieldName, prefix) {
-        // If the query does not use grouping, never
-        if (!ctrl.apiParams.groupBy.length) {
-          return false;
-        }
-        // If the column is used for a groupBy, no
-        if (ctrl.apiParams.groupBy.indexOf(prefix + fieldName) > -1) {
-          return false;
-        }
-        // If the entity this column belongs to is being grouped by id, then also no
-        return ctrl.apiParams.groupBy.indexOf(prefix + 'id') < 0;
-      }
 
       $scope.selectAllRows = function() {
         // Deselect all

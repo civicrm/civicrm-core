@@ -29,9 +29,56 @@
       html += '</div>';
       return html;
     },
-    controller: function($scope, $timeout) {
+    controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
+
+      function fieldToColumn(fieldExpr) {
+        var info = searchMeta.parseExpr(fieldExpr);
+        return {
+          expr: fieldExpr,
+          label: searchMeta.getDefaultLabel(fieldExpr),
+          dataType: (info.fn && info.fn.name === 'COUNT') ? 'Integer' : info.field.data_type
+        };
+      }
+
+      // Helper function to sort active from hidden columns and initialize each column with defaults
+      this.initColumns = function() {
+        if (!ctrl.display.settings.columns) {
+          ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
+            columns.push(fieldToColumn(fieldExpr));
+          });
+          return [];
+        } else {
+          var activeColumns = _.collect(ctrl.display.settings.columns, 'expr'),
+            hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
+            if (!_.includes(activeColumns, fieldExpr)) {
+              hiddenColumns.push(fieldToColumn(fieldExpr));
+            }
+          });
+          _.each(activeColumns, function(fieldExpr, index) {
+            if (!_.includes(ctrl.savedSearch.api_params.select, fieldExpr)) {
+              ctrl.display.settings.columns.splice(index, 1);
+            }
+          });
+          return hiddenColumns;
+        }
+      };
+
+      // Return all possible links to main entity or join entities
+      this.getLinks = function() {
+        var links = _.cloneDeep(searchMeta.getEntity(ctrl.savedSearch.api_entity).paths || []);
+        _.each(ctrl.savedSearch.api_params.join, function(join) {
+          var joinName = join[0].split(' AS '),
+            joinEntity = searchMeta.getEntity(joinName[0]);
+          _.each(joinEntity.paths, function(path) {
+            var link = _.cloneDeep(path);
+            link.path = link.path.replace(/\[/g, '[' + joinName[1] + '.');
+            links.push(link);
+          });
+        });
+        return links;
+      };
 
       this.preview = this.stale = false;
 

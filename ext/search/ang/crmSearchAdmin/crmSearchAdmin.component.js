@@ -518,14 +518,7 @@
         return ctrl.allRowsSelected || _.includes(ctrl.selectedRows, row.id);
       };
 
-      this.getFieldLabel = function(col) {
-        var info = searchMeta.parseExpr(col),
-          label = info.field.label;
-        if (info.fn) {
-          label = '(' + info.fn.title + ') ' + label;
-        }
-        return label;
-      };
+      this.getFieldLabel = searchMeta.getDefaultLabel;
 
       // Is a column eligible to use an aggregate function?
       this.canAggregate = function(col) {
