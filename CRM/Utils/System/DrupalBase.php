@@ -701,4 +701,12 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return FALSE;
   }
 
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return ['ufAccessURL' => url('admin/people/permissions')];
+  }
+
 }

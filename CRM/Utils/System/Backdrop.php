@@ -1049,4 +1049,12 @@ AND    u.status = 1
     }
   }
 
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return ['ufAccessURL' => url('admin/config/people/permissions')];
+  }
+
 }

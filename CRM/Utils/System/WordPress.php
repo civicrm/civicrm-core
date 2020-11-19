@@ -1244,4 +1244,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $_COOKIE[$name] = $value;
   }
 
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return ['ufAccessURL' => CRM_Utils_System::url('civicrm/admin/access/wp-permissions', 'reset=1')];
+  }
+
 }

@@ -827,4 +827,12 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return FALSE;
   }
 
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return ['ufAccessURL' => \Drupal\Core\Url::fromRoute('user.admin_permissions')->toString()];
+  }
+
 }
