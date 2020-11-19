@@ -36,6 +36,7 @@
       });
       $routeProvider.when('/create/:entity', {
         controller: 'searchCreate',
+        reloadOnSearch: false,
         template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
       });
       $routeProvider.when('/edit/:id', {
