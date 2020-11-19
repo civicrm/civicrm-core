@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e6ef8d4248bce0f976048cabc185289",
+    "content-hash": "0a477e3a819cc7555e2993da4e8e1754",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -454,7 +454,7 @@
                 }
             ],
             "description": "Composer plugin for downloading additional files within any composer package.",
-            "time": "2020-11-02T04:00:42+00:00"
+            "time": "2020-11-02T05:26:23+00:00"
         },
         {
             "name": "cweagans/composer-patches",
