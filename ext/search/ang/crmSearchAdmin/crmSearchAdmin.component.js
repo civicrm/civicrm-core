@@ -43,6 +43,7 @@
           $scope.$bindToRoute({
             param: 'params',
             expr: '$ctrl.savedSearch.api_params',
+            deep: true,
             default: {
               version: 4,
               select: getDefaultSelect(),
@@ -277,7 +278,7 @@
        */
       $scope.setOrderBy = function(col, $event) {
         var dir = $scope.getOrderBy(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
-        if (!$event.shiftKey) {
+        if (!$event.shiftKey || !ctrl.savedSearch.api_params.orderBy) {
           ctrl.savedSearch.api_params.orderBy = {};
         }
         ctrl.savedSearch.api_params.orderBy[col] = dir;
