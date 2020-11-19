@@ -231,6 +231,11 @@
         "url": "https://github.com/jquery-validation/jquery-validation/archive/1.19.1.zip",
         "ignore": [".*", "node_modules", "bower_components", "test", "demo", "lib"]
       },
+      "json-formatter": {
+        "url": "https://github.com/mohsen1/json-formatter/archive/v{$version}.zip",
+        "version": "0.7.0",
+        "ignore": ["demo", "test", "screenshot.png"]
+      },
       "jstree": {
         "url": "https://github.com/vakata/jstree/archive/3.3.8.zip",
         "ignore": [".*", "docs", "demo", "libs", "node_modules", "test", "libs", "jstree.jquery.json", "gruntfile.js", "package.json", "bower.json", "component.json", "LICENCE-MIT", "README.md"]

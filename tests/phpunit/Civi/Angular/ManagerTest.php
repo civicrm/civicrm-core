@@ -181,8 +181,12 @@ class ManagerTest extends \CiviUnitTestCase {
       'ngSanitize',
       'ui.utils',
     ];
+    $ignore = [
+      'jsonFormatter',
+    ];
     $input = ['crmMailing', 'crmCxn'];
     $actual = $this->angular->resolveDependencies($input);
+    $actual = array_diff($actual, $ignore);
     sort($expected);
     sort($actual);
     $this->assertEquals($expected, $actual);

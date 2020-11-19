@@ -111,6 +111,7 @@ class Manager {
       $angularModules['crmUi'] = include "$civicrm_root/ang/crmUi.ang.php";
       $angularModules['crmUtil'] = include "$civicrm_root/ang/crmUtil.ang.php";
       $angularModules['dialogService'] = include "$civicrm_root/ang/dialogService.ang.php";
+      $angularModules['jsonFormatter'] = include "$civicrm_root/ang/jsonFormatter.ang.php";
       $angularModules['ngRoute'] = include "$civicrm_root/ang/ngRoute.ang.php";
       $angularModules['ngSanitize'] = include "$civicrm_root/ang/ngSanitize.ang.php";
       $angularModules['ui.utils'] = include "$civicrm_root/ang/ui.utils.ang.php";
