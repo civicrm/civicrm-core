@@ -2124,7 +2124,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * This function by-passes hooks - to address this - don't use this function.
    *
    * @param array $params
-   * @param bool $processContributionObject
    *
    * @throws CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -2134,7 +2133,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * For failures use failPayment (preferably exposing by api in the process).
    *
    */
-  public static function transitionComponents($params, $processContributionObject = FALSE) {
+  public static function transitionComponents($params) {
     // get minimum required values.
     $contactId = $params['contact_id'] ?? NULL;
     $componentId = $params['component_id'] ?? NULL;
@@ -2232,10 +2231,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $processContribution = FALSE;
     if ($contributionStatusId == array_search('Cancelled', $contributionStatuses)) {
       // Call interim cancel function - with a goal to cleaning up the signature on it and switching to a tested api Contribution.cancel function.
-      list($updateResult, $processContribution) = self::cancel($processContributionObject, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
+      list($updateResult, $processContribution) = self::cancel(FALSE, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
     }
     elseif ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
-      list($updateResult, $processContribution) = self::processFail($processContributionObject, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
+      list($updateResult, $processContribution) = self::processFail(FALSE, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
     }
     elseif ($contributionStatusId == array_search('Completed', $contributionStatuses)) {
 
@@ -2402,10 +2401,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               );
             }
 
-            if ($processContributionObject) {
-              $processContribution = TRUE;
-            }
-
             CRM_Utils_Hook::post('edit', 'Membership', $membership->id, $membership);
           }
         }
@@ -2414,18 +2409,10 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if ($participant) {
         $updatedStatusId = array_search('Registered', $participantStatuses);
         CRM_Event_BAO_Participant::updateParticipantStatus($participant->id, $oldStatus, $updatedStatusId, TRUE);
-
-        if ($processContributionObject) {
-          $processContribution = TRUE;
-        }
       }
 
       if ($pledgePayment) {
         CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
-
-        if ($processContributionObject) {
-          $processContribution = TRUE;
-        }
       }
     }
 
