@@ -1,5 +1,5 @@
 <?php
-// Search Display module - for rendering search displays.
+// Search Display base module - provides services used commonly by search display implementations.
 return [
   'js' => [
     'ang/crmSearchDisplay.module.js',
@@ -10,7 +10,7 @@ return [
     'ang/crmSearchDisplay',
   ],
   'basePages' => [],
-  'requires' => ['ngSanitize', 'crmUi', 'api4', 'crmSearchActions', 'ui.bootstrap'],
+  'requires' => ['api4', 'ngSanitize'],
   'exports' => [
     'crm-search-display-table' => 'E',
   ],

@@ -23,6 +23,10 @@
   box-sizing: content-box;
 }
 
+.crm-container .crm-inline-block {
+  display: inline-block;
+}
+
 div.crm-container label {
   font-weight: normal;
   display: inline;
