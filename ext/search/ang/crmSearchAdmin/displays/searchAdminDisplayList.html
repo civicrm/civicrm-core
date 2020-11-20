@@ -15,7 +15,9 @@
   </div>
     <label for="crm-search-admin-display-limit">{{:: ts('Results to display (0 for no limit):') }}</label>
     <input id="crm-search-admin-display-limit" type="number" min="0" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
-    <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> {{:: ts('Use Pager') }}</label>
+    <div class="checkbox-inline form-control">
+      <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> <span>{{:: ts('Use Pager') }}</span></label>
+    </div>
   </div>
 </fieldset>
 <div class="crm-flex-box crm-search-admin-edit-columns-wrapper">
@@ -25,7 +27,9 @@
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" >
-        <label ng-show="col.label.length" title="{{:: ts('Show label for every record even when this field is blank') }}"><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Always show') }}</label>
+        <div class="form-control checkbox-inline" ng-show="col.label.length" title="{{:: ts('Show label for every record even when this field is blank') }}">
+          <label><input type="checkbox" ng-model="col.forceLabel"> <span>{{:: ts('Always show') }}</span></label>
+        </div>
         <button class="btn-xs pull-right" ng-click="$ctrl.removeCol($index)" title="{{:: ts('Hide') }}">
           <i class="crm-i fa-ban"></i>
         </button>
@@ -35,7 +39,9 @@
         <input class="form-control" ng-model="col.prefix" size="4">
         <label>{{:: ts('Suffix:') }}</label>
         <input class="form-control" ng-model="col.suffix" size="4">
-        <label><input type="checkbox" ng-model="col.break"> {{:: ts('New line') }}</label>
+        <div class="form-control checkbox-inline">
+          <label><input type="checkbox" ng-model="col.break"> <span>{{:: ts('New line') }}</span></label>
+        </div>
       </div>
       <div class="form-inline">
         <label>{{:: ts('Link:') }}</label>

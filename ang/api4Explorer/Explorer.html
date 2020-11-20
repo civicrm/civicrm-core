@@ -22,14 +22,18 @@
         </div>
         <div class="panel-body">
           <div class="api4-input form-inline">
-            <label class="form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-class="{'api4-option-selected': params[name]}" ng-repeat="(name, param) in ::getGenericParams(['bool'], false)">
-              <input type="checkbox" id="api4-param-{{:: name }}" ng-model="params[name]"/>
-              {{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span>
-            </label>
-            <label class="form-control" ng-mouseenter="help('selectRowCount', availableParams.select)" ng-mouseleave="help()" ng-class="{'api4-option-selected': isSelectRowCount()}" ng-if="::availableParams.select">
-              <input type="checkbox" id="api4-param-selectRowCount" ng-checked="isSelectRowCount()" ng-click="selectRowCount()" />
-              SelectRowCount
-            </label>
+            <div class="checkbox-inline form-control" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['bool'], false)">
+              <label>
+                <input type="checkbox" id="api4-param-{{:: name }}" ng-model="params[name]"/>
+                <span>{{:: name }}</span><span class="crm-marker" ng-if="::param.required"> *</span>
+              </label>
+            </div>
+            <div class="checkbox-inline form-control" ng-mouseenter="help('selectRowCount', availableParams.select)" ng-mouseleave="help()" ng-if="::availableParams.select">
+              <label>
+                <input type="checkbox" id="api4-param-selectRowCount" ng-checked="isSelectRowCount()" ng-click="selectRowCount()" />
+                <span>SelectRowCount</span>
+              </label>
+            </div>
           </div>
           <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['bool'], true)">
             <label>{{ name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
