@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" syntaxCheck="false" bootstrap="tests/phpunit/bootstrap.php">
+<phpunit backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/phpunit/bootstrap.php">
   <testsuites>
     <testsuite name="My Test Suite">
       <directory>./tests/phpunit</directory>
