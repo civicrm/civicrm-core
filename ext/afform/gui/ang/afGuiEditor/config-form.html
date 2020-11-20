@@ -28,4 +28,11 @@
   <input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, placeholder: ts('Open access')}" />
 </div>
 
+<div class="form-group">
+  <label for="af_config_form_is_dashlet">
+    <input type="checkbox" id="af_config_form_is_dashlet" ng-model="afform.is_dashlet">
+    {{ ts('Enable dashlet') }}
+  </label>
+</div>
+
 </ng-form>
