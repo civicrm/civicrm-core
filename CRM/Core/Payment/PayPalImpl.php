@@ -969,6 +969,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $paypalParams);
 
+    /*
+     * PayPal urlencodes the IPN Notify URL. For sites not using Clean URLs (or
+     * using Shortcodes in WordPress) this results in "%2F" becoming "%252F" and
+     * therefore incomplete transactions. We need to prevent that.
+     * @see https://lab.civicrm.org/dev/core/-/issues/1931
+     */
+    $paypalParams['notify_url'] = rawurldecode($paypalParams['notify_url']);
+
     $uri = '';
     foreach ($paypalParams as $key => $value) {
       if ($value === NULL) {
