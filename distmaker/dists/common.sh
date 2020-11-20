@@ -127,6 +127,7 @@ function dm_core_exts() {
   echo ext/afform
   echo ext/greenwich
   echo ext/contributioncancelactions
+  echo ext/oauth-client
 }
 
 ## Copy all packages
