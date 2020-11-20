@@ -43,6 +43,7 @@
           $scope.$bindToRoute({
             param: 'params',
             expr: '$ctrl.savedSearch.api_params',
+            deep: true,
             default: {
               version: 4,
               select: getDefaultSelect(),
@@ -277,7 +278,7 @@
        */
       $scope.setOrderBy = function(col, $event) {
         var dir = $scope.getOrderBy(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
-        if (!$event.shiftKey) {
+        if (!$event.shiftKey || !ctrl.savedSearch.api_params.orderBy) {
           ctrl.savedSearch.api_params.orderBy = {};
         }
         ctrl.savedSearch.api_params.orderBy[col] = dir;
@@ -518,14 +519,7 @@
         return ctrl.allRowsSelected || _.includes(ctrl.selectedRows, row.id);
       };
 
-      this.getFieldLabel = function(col) {
-        var info = searchMeta.parseExpr(col),
-          label = info.field.label;
-        if (info.fn) {
-          label = '(' + info.fn.title + ') ' + label;
-        }
-        return label;
-      };
+      this.getFieldLabel = searchMeta.getDefaultLabel;
 
       // Is a column eligible to use an aggregate function?
       this.canAggregate = function(col) {

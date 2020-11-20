@@ -4,7 +4,7 @@
       <th class="crm-search-result-select">
         <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="selectAllRows()" ng-disabled="!(loading === false && !loadingAllRows && $ctrl.results[$ctrl.page] && $ctrl.results[$ctrl.page][0].id)">
       </th>
-      <th ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-click="setOrderBy(col, $event)" title="{{:: ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') }}">
+      <th ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-click="setOrderBy(col, $event)" title="{{$index || !$ctrl.groupExists ? ts('Drag to reorder columns, click to sort results (shift-click to sort by multiple).') : ts('Column reserved for smart group.')}}">
         <i class="crm-i {{ getOrderBy(col) }}"></i>
         <span ng-class="{'crm-draggable': $index || !$ctrl.groupExists}">{{ $ctrl.getFieldLabel(col) }}</span>
         <span ng-switch="$index || !$ctrl.groupExists ? 'sortable' : 'locked'">

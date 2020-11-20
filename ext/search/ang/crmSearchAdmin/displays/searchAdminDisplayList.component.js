@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchAdmin').component('searchAdminDisplayTable', {
+  angular.module('crmSearchAdmin').component('searchAdminDisplayList', {
     bindings: {
       display: '<',
       apiEntity: '<',
@@ -10,7 +10,7 @@
     require: {
       crmSearchAdminDisplay: '^crmSearchAdminDisplay'
     },
-    templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
+    templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayList.html',
     controller: function($scope, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
@@ -31,9 +31,26 @@
         ctrl.hiddenColumns.splice(index, 1);
       };
 
+      this.symbols = {
+        ul: [
+          {char: '', label: ts('Default')},
+          {char: 'none', label: ts('None ( )')},
+          {char: 'circle', label: ts('Circle')},
+          {char: 'square', label: ts('Square')},
+        ],
+        ol: [
+          {char: '', label: ts('Numbered (1. 2. 3.)')},
+          {char: 'none', label: ts('None ( )')},
+          {char: 'lower-latin', label: ts('Lowercase (a. b. c.)')},
+          {char: 'upper-latin', label: ts('Uppercase (A. B. C.)')},
+          {char: 'upper-roman', label: ts('Roman (I. II. III.)')},
+        ]
+      };
+
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
+            style: 'ul',
             limit: 20,
             pager: true
           };

@@ -10,5 +10,5 @@ return [
     'ang/crmSearchKit',
   ],
   'basePages' => [],
-  'requires' => ['api4'],
+  'requires' => [],
 ];

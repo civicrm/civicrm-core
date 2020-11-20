@@ -1,29 +1,41 @@
 <fieldset>
   <div class="form-inline">
+    <label for="crm-search-admin-display-style">{{:: ts('Style:') }}</label>
+    <select id="crm-search-admin-display-style" class="form-control" ng-model="$ctrl.display.settings.style" ng-change="$ctrl.display.settings.symbol = ''">
+      <option value="ul">{{:: ts('Bulleted') }}</option>
+      <option value="ol">{{:: ts('Numbered') }}</option>
+    </select>
+    <label for="crm-search-admin-display-symbol">{{:: ts('Symbol:') }}</label>
+    <select id="crm-search-admin-display-symbol" class="form-control" ng-model="$ctrl.display.settings.symbol">
+      <option ng-repeat="symbol in $ctrl.symbols[$ctrl.display.settings.style]" value="{{ symbol.char }}">
+        {{ symbol.label }}
+      </option>
+    </select>
+  <div class="form-inline">
+  </div>
     <label for="crm-search-admin-display-limit">{{:: ts('Results to display (0 for no limit):') }}</label>
     <input id="crm-search-admin-display-limit" type="number" min="0" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
     <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> {{:: ts('Use Pager') }}</label>
-    <label><input type="checkbox" ng-model="$ctrl.display.settings.actions"> {{:: ts('Enable Actions') }}</label>
   </div>
 </fieldset>
 <div class="crm-flex-box crm-search-admin-edit-columns-wrapper">
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.sortableOptions">
-    <legend>{{:: ts('Columns') }}</legend>
+    <legend>{{:: ts('Fields') }}</legend>
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
       <div class="form-inline">
-        <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" />
+        <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" >
+        <label ng-show="col.label.length" title="{{:: ts('Show label for every record even when this field is blank') }}"><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Always show') }}</label>
         <button class="btn-xs pull-right" ng-click="$ctrl.removeCol($index)" title="{{:: ts('Hide') }}">
           <i class="crm-i fa-ban"></i>
         </button>
       </div>
       <div class="form-inline">
-        <label>{{:: ts('Alignment:') }}</label>
-        <select ng-model="col.alignment" class="form-control">
-          <option value="">{{:: ts('Left') }}</option>
-          <option value="text-center">{{:: ts('Center') }}</option>
-          <option value="text-right">{{:: ts('Right') }}</option>
-        </select>
+        <label>{{:: ts('Prefix:') }}</label>
+        <input class="form-control" ng-model="col.prefix" size="4">
+        <label>{{:: ts('Suffix:') }}</label>
+        <input class="form-control" ng-model="col.suffix" size="4">
+        <label><input type="checkbox" ng-model="col.break"> {{:: ts('New line') }}</label>
       </div>
       <div class="form-inline">
         <label>{{:: ts('Link:') }}</label>
@@ -36,7 +48,7 @@
     </fieldset>
   </fieldset>
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.hiddenColumns" ui-sortable="$ctrl.sortableOptions">
-    <legend>{{:: ts('Hidden Columns') }}</legend>
+    <legend>{{:: ts('Hidden Fields') }}</legend>
     <fieldset ng-repeat="col in $ctrl.hiddenColumns" class="crm-draggable">
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
       <div class="form-inline">
