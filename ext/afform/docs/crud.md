@@ -13,6 +13,7 @@ $ cv api4 afform.get +w name=helloWorld
         ],
         "title": "",
         "description": "",
+        "is_dashlet": false,
         "is_public": false,
         "server_route": "civicrm/hello-world",
         "layout": {

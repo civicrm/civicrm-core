@@ -114,6 +114,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'requires' => [],
         'title' => ts('%1 block (default)', [1 => $custom['title']]),
         'description' => '',
+        'is_dashlet' => FALSE,
         'is_public' => FALSE,
         'permission' => 'access CiviCRM',
         'join' => 'Custom_' . $custom['name'],

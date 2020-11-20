@@ -30,8 +30,8 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getBasicDirectives() {
     return [
-      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => 'access Foobar']],
-      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => 'access CiviCRM']],
+      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page', 'permission' => 'access Foobar', 'is_dashlet' => TRUE]],
+      ['mockBareFile', ['title' => '', 'description' => '', 'permission' => 'access CiviCRM', 'is_dashlet' => FALSE]],
       ['mockFoo', ['title' => '', 'description' => '', 'permission' => 'access CiviCRM']],
       ['mock-weird-name', ['title' => 'Weird Name', 'description' => '', 'permission' => 'access CiviCRM']],
     ];
@@ -58,6 +58,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
+    $this->assertEquals($get($originalMetadata, 'is_dashlet'), $get($result[0], 'is_dashlet'), $message);
     $this->assertEquals($get($originalMetadata, 'permission'), $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
@@ -68,6 +69,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->addWhere('name', '=', $formName)
       ->addValue('description', 'The temporary description')
       ->addValue('permission', 'access foo')
+      ->addValue('is_dashlet', TRUE)
       ->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
@@ -77,6 +79,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
+    $this->assertEquals(TRUE, $get($result[0], 'is_dashlet'), $message);
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertEquals('access foo', $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
