@@ -64,6 +64,16 @@ trait AfformSaveTrait {
     $isChanged = function($field) use ($item, $orig) {
       return ($item[$field] ?? NULL) !== ($orig[$field] ?? NULL);
     };
+
+    if ($isChanged('is_dashlet')) {
+      // FIXME: more targetted reconciliation
+      \CRM_Core_ManagedEntities::singleton()->reconcile();
+    }
+    elseif ($orig['is_dashlet'] && $isChanged('title')) {
+      // FIXME: more targetted reconciliation
+      \CRM_Core_ManagedEntities::singleton()->reconcile();
+    }
+
     // Right now, permission-checks are completely on-demand.
     if ($isChanged('server_route') /* || $isChanged('permission') */) {
       \CRM_Core_Menu::store();
