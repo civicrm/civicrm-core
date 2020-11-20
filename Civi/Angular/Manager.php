@@ -418,6 +418,7 @@ class Manager {
             case 'settingsFactory':
             case 'requires':
             case 'permissions':
+            case 'bundles':
               if (!empty($module[$resType])) {
                 $result[$moduleName] = $module[$resType];
               }
