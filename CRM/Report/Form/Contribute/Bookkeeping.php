@@ -42,365 +42,284 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
-    $this->_columns = [
-      'civicrm_contact' => [
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => [
-          'sort_name' => [
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ],
-          'first_name' => [
-            'title' => ts('First Name'),
-          ],
-          'middle_name' => [
-            'title' => ts('Middle Name'),
-          ],
-          'last_name' => [
-            'title' => ts('Last Name'),
-          ],
-          'id' => [
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ],
-          'gender_id' => [
-            'title' => ts('Gender'),
-          ],
-          'birth_date' => [
-            'title' => ts('Birth Date'),
-          ],
-          'age' => [
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
+    $this->_columns = array_merge(
+      $this->getColumns('Contact', [
+        'order_bys_defaults' => ['sort_name' => 'ASC '],
+        'fields_defaults' => ['sort_name'],
+        'fields_excluded' => ['id'],
+        'fields_required' => ['id'],
+        'filters_defaults' => ['is_deleted' => 0],
+        'no_field_disambiguation' => TRUE,
+      ]),
+      [
+        'civicrm_membership' => [
+          'dao' => 'CRM_Member_DAO_Membership',
+          'fields' => [
+            'id' => [
+              'title' => ts('Membership #'),
+              'no_display' => TRUE,
+              'required' => TRUE,
+            ],
           ],
         ],
-        'grouping' => 'contact-fields',
-        'order_bys' => [
-          'sort_name' => [
-            'title' => ts('Last Name, First Name'),
-            'default' => '1',
-            'default_weight' => '0',
-            'default_order' => 'ASC',
+        'civicrm_financial_account' => [
+          'dao' => 'CRM_Financial_DAO_FinancialAccount',
+          'fields' => [
+            'debit_accounting_code' => [
+              'title' => ts('Financial Account Code - Debit'),
+              'name' => 'accounting_code',
+              'alias' => 'financial_account_civireport_debit',
+              'default' => TRUE,
+            ],
+            'debit_contact_id' => [
+              'title' => ts('Financial Account Owner - Debit'),
+              'name' => 'organization_name',
+              'alias' => 'debit_contact',
+            ],
+            'credit_accounting_code' => [
+              'title' => ts('Financial Account Code - Credit'),
+              'name' => 'accounting_code',
+              'alias' => 'financial_account_civireport_credit',
+              'default' => TRUE,
+            ],
+            'credit_contact_id' => [
+              'title' => ts('Financial Account Owner - Credit'),
+              'name' => 'organization_name',
+              'alias' => 'credit_contact',
+            ],
+            'debit_name' => [
+              'title' => ts('Financial Account Name - Debit'),
+              'name' => 'name',
+              'alias' => 'financial_account_civireport_debit',
+              'default' => TRUE,
+            ],
+            'credit_name' => [
+              'title' => ts('Financial Account Name - Credit'),
+              'name' => 'name',
+              'alias' => 'financial_account_civireport_credit',
+              'default' => TRUE,
+            ],
           ],
-          'first_name' => [
-            'name' => 'first_name',
-            'title' => ts('First Name'),
-          ],
-          'gender_id' => [
-            'name' => 'gender_id',
-            'title' => ts('Gender'),
-          ],
-          'birth_date' => [
-            'name' => 'birth_date',
-            'title' => ts('Birth Date'),
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
-          ],
-        ],
-        'filters' => [
-          'sort_name' => [
-            'title' => ts('Contact Name'),
-            'operator' => 'like',
-          ],
-          'id' => [
-            'title' => ts('Contact ID'),
-            'no_display' => TRUE,
-          ],
-          'gender_id' => [
-            'title' => ts('Gender'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
-          ],
-          'birth_date' => [
-            'title' => ts('Birth Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
-          ],
-        ],
-      ],
-      'civicrm_membership' => [
-        'dao' => 'CRM_Member_DAO_Membership',
-        'fields' => [
-          'id' => [
-            'title' => ts('Membership #'),
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ],
-        ],
-      ],
-      'civicrm_financial_account' => [
-        'dao' => 'CRM_Financial_DAO_FinancialAccount',
-        'fields' => [
-          'debit_accounting_code' => [
-            'title' => ts('Financial Account Code - Debit'),
-            'name' => 'accounting_code',
-            'alias' => 'financial_account_civireport_debit',
-            'default' => TRUE,
-          ],
-          'debit_contact_id' => [
-            'title' => ts('Financial Account Owner - Debit'),
-            'name' => 'organization_name',
-            'alias' => 'debit_contact',
-          ],
-          'credit_accounting_code' => [
-            'title' => ts('Financial Account Code - Credit'),
-            'name' => 'accounting_code',
-            'alias' => 'financial_account_civireport_credit',
-            'default' => TRUE,
-          ],
-          'credit_contact_id' => [
-            'title' => ts('Financial Account Owner - Credit'),
-            'name' => 'organization_name',
-            'alias' => 'credit_contact',
-          ],
-          'debit_name' => [
-            'title' => ts('Financial Account Name - Debit'),
-            'name' => 'name',
-            'alias' => 'financial_account_civireport_debit',
-            'default' => TRUE,
-          ],
-          'credit_name' => [
-            'title' => ts('Financial Account Name - Credit'),
-            'name' => 'name',
-            'alias' => 'financial_account_civireport_credit',
-            'default' => TRUE,
+          'filters' => [
+            'debit_accounting_code' => [
+              'title' => ts('Financial Account Code - Debit'),
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'accounting_code', 'accounting_code'),
+              'name' => 'accounting_code',
+              'alias' => 'financial_account_civireport_debit',
+            ],
+            'debit_contact_id' => [
+              'title' => ts('Financial Account Owner - Debit'),
+              'operatorType' => CRM_Report_Form::OP_SELECT,
+              'type' => CRM_Utils_Type::T_INT,
+              'options' => ['' => '- Select Organization -'] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
+              'name' => 'contact_id',
+              'alias' => 'financial_account_civireport_debit',
+            ],
+            'credit_accounting_code' => [
+              'title' => ts('Financial Account Code - Credit'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'accounting_code', 'accounting_code'),
+              'name' => 'accounting_code',
+              'alias' => 'financial_account_civireport_credit',
+            ],
+            'credit_contact_id' => [
+              'title' => ts('Financial Account Owner - Credit'),
+              'operatorType' => CRM_Report_Form::OP_SELECT,
+              'type' => CRM_Utils_Type::T_INT,
+              'options' => ['' => '- Select Organization -'] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
+              'name' => 'contact_id',
+              'alias' => 'financial_account_civireport_credit',
+            ],
+            'debit_name' => [
+              'title' => ts('Financial Account Name - Debit'),
+              'type' => CRM_Utils_Type::T_STRING,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_PseudoConstant::financialAccount(),
+              'name' => 'id',
+              'alias' => 'financial_account_civireport_debit',
+            ],
+            'credit_name' => [
+              'title' => ts('Financial Account Name - Credit'),
+              'type' => CRM_Utils_Type::T_STRING,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_PseudoConstant::financialAccount(),
+              'name' => 'id',
+              'alias' => 'financial_account_civireport_credit',
+            ],
           ],
         ],
-        'filters' => [
-          'debit_accounting_code' => [
-            'title' => ts('Financial Account Code - Debit'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'accounting_code', 'accounting_code'),
-            'name' => 'accounting_code',
-            'alias' => 'financial_account_civireport_debit',
+        'civicrm_line_item' => [
+          'dao' => 'CRM_Price_DAO_LineItem',
+          'fields' => [
+            'financial_type_id' => [
+              'title' => ts('Financial Type'),
+              'default' => TRUE,
+            ],
           ],
-          'debit_contact_id' => [
-            'title' => ts('Financial Account Owner - Debit'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'type' => CRM_Utils_Type::T_INT,
-            'options' => ['' => '- Select Organization -'] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
-            'name' => 'contact_id',
-            'alias' => 'financial_account_civireport_debit',
+          'filters' => [
+            'financial_type_id' => [
+              'title' => ts('Financial Type'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
+            ],
           ],
-          'credit_accounting_code' => [
-            'title' => ts('Financial Account Code - Credit'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialAccount(NULL, NULL, 'accounting_code', 'accounting_code'),
-            'name' => 'accounting_code',
-            'alias' => 'financial_account_civireport_credit',
-          ],
-          'credit_contact_id' => [
-            'title' => ts('Financial Account Owner - Credit'),
-            'operatorType' => CRM_Report_Form::OP_SELECT,
-            'type' => CRM_Utils_Type::T_INT,
-            'options' => ['' => '- Select Organization -'] + CRM_Financial_BAO_FinancialAccount::getOrganizationNames(FALSE),
-            'name' => 'contact_id',
-            'alias' => 'financial_account_civireport_credit',
-          ],
-          'debit_name' => [
-            'title' => ts('Financial Account Name - Debit'),
-            'type' => CRM_Utils_Type::T_STRING,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialAccount(),
-            'name' => 'id',
-            'alias' => 'financial_account_civireport_debit',
-          ],
-          'credit_name' => [
-            'title' => ts('Financial Account Name - Credit'),
-            'type' => CRM_Utils_Type::T_STRING,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::financialAccount(),
-            'name' => 'id',
-            'alias' => 'financial_account_civireport_credit',
+          'order_bys' => [
+            'financial_type_id' => ['title' => ts('Financial Type')],
           ],
         ],
-      ],
-      'civicrm_line_item' => [
-        'dao' => 'CRM_Price_DAO_LineItem',
-        'fields' => [
-          'financial_type_id' => [
-            'title' => ts('Financial Type'),
-            'default' => TRUE,
+        'civicrm_batch' => [
+          'dao' => 'CRM_Batch_DAO_Batch',
+          'fields' => [
+            'title' => [
+              'title' => ts('Batch Title'),
+              'alias' => 'batch',
+              'default' => FALSE,
+            ],
+            'name' => [
+              'title' => ts('Batch Name'),
+              'alias' => 'batch',
+              'default' => TRUE,
+            ],
           ],
         ],
-        'filters' => [
-          'financial_type_id' => [
-            'title' => ts('Financial Type'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
+        'civicrm_contribution' => [
+          'dao' => 'CRM_Contribute_DAO_Contribution',
+          'fields' => [
+            'receive_date' => [
+              'default' => TRUE,
+            ],
+            'invoice_id' => [
+              'title' => ts('Invoice Reference'),
+              'default' => TRUE,
+            ],
+            'invoice_number' => [
+              'title' => ts('Invoice Number'),
+            ],
+            'contribution_status_id' => [
+              'title' => ts('Contribution Status'),
+              'default' => TRUE,
+            ],
+            'contribution_source' => [
+              'title' => ts('Source'),
+              'name' => 'source',
+            ],
+            'id' => [
+              'title' => ts('Contribution ID'),
+              'default' => TRUE,
+            ],
+          ],
+          'filters' => [
+            'contribution_id' => [
+              'title' => ts('Contribution ID'),
+              'name' => 'id',
+              'operatorType' => CRM_Report_Form::OP_INT,
+              'type' => CRM_Utils_Type::T_INT,
+            ],
+            'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
+            'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
+            'contribution_source' => [
+              'title' => ts('Source'),
+              'name' => 'source',
+              'type' => CRM_Utils_Type::T_STRING,
+            ],
+            'contribution_status_id' => [
+              'title' => ts('Contribution Status'),
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
+              'default' => [1],
+            ],
+          ],
+          'order_bys' => [
+            'contribution_id' => ['title' => ts('Contribution #')],
+            'contribution_status_id' => ['title' => ts('Contribution Status')],
+            'receive_date'  => ['title' => ts('Date Received')],
+          ],
+          'grouping' => 'contri-fields',
+        ],
+        'civicrm_financial_trxn' => [
+          'dao' => 'CRM_Financial_DAO_FinancialTrxn',
+          'fields' => [
+            'check_number' => [
+              'title' => ts('Cheque #'),
+              'default' => TRUE,
+            ],
+            'payment_instrument_id' => [
+              'title' => ts('Payment Method'),
+              'default' => TRUE,
+            ],
+            'currency' => [
+              'required' => TRUE,
+              'no_display' => TRUE,
+            ],
+            'trxn_date' => [
+              'title' => ts('Transaction Date'),
+              'default' => TRUE,
+              'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+            ],
+            'trxn_id' => [
+              'title' => ts('Trans #'),
+              'default' => TRUE,
+            ],
+            'card_type_id' => [
+              'title' => ts('Credit Card Type'),
+            ],
+          ],
+          'filters' => [
+            'payment_instrument_id' => [
+              'title' => ts('Payment Method'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
+            ],
+            'currency' => [
+              'title' => ts('Currency'),
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
+              'default' => NULL,
+              'type' => CRM_Utils_Type::T_STRING,
+            ],
+            'trxn_date' => [
+              'title' => ts('Transaction Date'),
+              'operatorType' => CRM_Report_Form::OP_DATETIME,
+              'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+            ],
+            'status_id' => [
+              'title' => ts('Financial Transaction Status'),
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
+              'default' => [1],
+            ],
+            'card_type_id' => [
+              'title' => ts('Credit Card Type'),
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),
+              'default' => NULL,
+              'type' => CRM_Utils_Type::T_STRING,
+            ],
+          ],
+          'order_bys' => [
+            'payment_instrument_id' => ['title' => ts('Payment Method')],
+            'trxn_date' => ['title' => ts('Transaction Date')],
           ],
         ],
-        'order_bys' => [
-          'financial_type_id' => ['title' => ts('Financial Type')],
-        ],
-      ],
-      'civicrm_batch' => [
-        'dao' => 'CRM_Batch_DAO_Batch',
-        'fields' => [
-          'title' => [
-            'title' => ts('Batch Title'),
-            'alias' => 'batch',
-            'default' => FALSE,
+        'civicrm_entity_financial_trxn' => [
+          'dao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
+          'fields' => [
+            'amount' => [
+              'title' => ts('Amount'),
+              'default' => TRUE,
+              'type' => CRM_Utils_Type::T_STRING,
+            ],
           ],
-          'name' => [
-            'title' => ts('Batch Name'),
-            'alias' => 'batch',
-            'default' => TRUE,
+          'filters' => [
+            'amount' => ['title' => ts('Amount')],
           ],
         ],
-      ],
-      'civicrm_contribution' => [
-        'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => [
-          'receive_date' => [
-            'default' => TRUE,
-          ],
-          'invoice_id' => [
-            'title' => ts('Invoice Reference'),
-            'default' => TRUE,
-          ],
-          'invoice_number' => [
-            'title' => ts('Invoice Number'),
-          ],
-          'contribution_status_id' => [
-            'title' => ts('Contribution Status'),
-            'default' => TRUE,
-          ],
-          'contribution_source' => [
-            'title' => ts('Source'),
-            'name' => 'source',
-          ],
-          'id' => [
-            'title' => ts('Contribution ID'),
-            'default' => TRUE,
-          ],
-        ],
-        'filters' => [
-          'contribution_id' => [
-            'title' => ts('Contribution ID'),
-            'name' => 'id',
-            'operatorType' => CRM_Report_Form::OP_INT,
-            'type' => CRM_Utils_Type::T_INT,
-          ],
-          'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
-          'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
-          'contribution_source' => [
-            'title' => ts('Source'),
-            'name' => 'source',
-            'type' => CRM_Utils_Type::T_STRING,
-          ],
-          'contribution_status_id' => [
-            'title' => ts('Contribution Status'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
-            'default' => [1],
-          ],
-        ],
-        'order_bys' => [
-          'contribution_id' => ['title' => ts('Contribution #')],
-          'contribution_status_id' => ['title' => ts('Contribution Status')],
-          'receive_date'  => ['title' => ts('Date Received')],
-        ],
-        'grouping' => 'contri-fields',
-      ],
-      'civicrm_financial_trxn' => [
-        'dao' => 'CRM_Financial_DAO_FinancialTrxn',
-        'fields' => [
-          'check_number' => [
-            'title' => ts('Cheque #'),
-            'default' => TRUE,
-          ],
-          'payment_instrument_id' => [
-            'title' => ts('Payment Method'),
-            'default' => TRUE,
-          ],
-          'currency' => [
-            'required' => TRUE,
-            'no_display' => TRUE,
-          ],
-          'trxn_date' => [
-            'title' => ts('Transaction Date'),
-            'default' => TRUE,
-            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          ],
-          'trxn_id' => [
-            'title' => ts('Trans #'),
-            'default' => TRUE,
-          ],
-          'card_type_id' => [
-            'title' => ts('Credit Card Type'),
-          ],
-        ],
-        'filters' => [
-          'payment_instrument_id' => [
-            'title' => ts('Payment Method'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
-          ],
-          'currency' => [
-            'title' => ts('Currency'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_OptionGroup::values('currencies_enabled'),
-            'default' => NULL,
-            'type' => CRM_Utils_Type::T_STRING,
-          ],
-          'trxn_date' => [
-            'title' => ts('Transaction Date'),
-            'operatorType' => CRM_Report_Form::OP_DATETIME,
-            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-          ],
-          'status_id' => [
-            'title' => ts('Financial Transaction Status'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
-            'default' => [1],
-          ],
-          'card_type_id' => [
-            'title' => ts('Credit Card Type'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_DAO_FinancialTrxn::buildOptions('card_type_id'),
-            'default' => NULL,
-            'type' => CRM_Utils_Type::T_STRING,
-          ],
-        ],
-        'order_bys' => [
-          'payment_instrument_id' => ['title' => ts('Payment Method')],
-          'trxn_date' => ['title' => ts('Transaction Date')],
-        ],
-      ],
-      'civicrm_entity_financial_trxn' => [
-        'dao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
-        'fields' => [
-          'amount' => [
-            'title' => ts('Amount'),
-            'default' => TRUE,
-            'type' => CRM_Utils_Type::T_STRING,
-          ],
-        ],
-        'filters' => [
-          'amount' => ['title' => ts('Amount')],
-        ],
-      ],
-    ];
+      ]
+    );
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
