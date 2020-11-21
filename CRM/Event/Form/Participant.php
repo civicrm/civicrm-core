@@ -797,8 +797,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     // $values['event_id'] is empty, then return
     // instead of proceeding further.
 
-    if ((CRM_Utils_Array::value('_qf_Participant_next', $values) == 'Delete') ||
-      (!$values['event_id'])
+    if ((($values['_qf_Participant_next'] ?? NULL) === 'Delete') ||
+      empty($values['event_id'])
     ) {
       return TRUE;
     }
