@@ -88,12 +88,14 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $limit2 = Contact::get(FALSE)->setLimit(2)->addSelect('sort_name', 'row_count')->execute();
     $this->assertCount(2, (array) $limit2);
     $this->assertCount($num, $limit2);
+    $msg = '';
     try {
       $limit2->single();
     }
     catch (\API_Exception $e) {
-      $this->assertRegExp(';Expected to find one Contact record;', $e->getMessage());
+      $msg = $e->getMessage();
     }
+    $this->assertRegExp(';Expected to find one Contact record;', $msg);
     $limit1 = Contact::get(FALSE)->setLimit(1)->execute();
     $this->assertCount(1, (array) $limit1);
     $this->assertCount(1, $limit1);
