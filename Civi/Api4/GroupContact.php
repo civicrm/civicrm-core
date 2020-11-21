@@ -28,7 +28,8 @@ namespace Civi\Api4;
  *
  * @package Civi\Api4
  */
-class GroupContact extends Generic\BridgeEntity {
+class GroupContact extends Generic\DAOEntity {
+  use Generic\Traits\EntityBridge;
 
   /**
    * @param bool $checkPermissions

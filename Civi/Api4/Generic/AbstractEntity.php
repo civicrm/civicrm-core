@@ -133,9 +133,12 @@ abstract class AbstractEntity {
       'name' => static::getEntityName(),
       'title' => static::getEntityTitle(),
       'title_plural' => static::getEntityTitle(TRUE),
-      'type' => self::stripNamespace(get_parent_class(static::class)),
+      'type' => [self::stripNamespace(get_parent_class(static::class))],
       'paths' => static::getEntityPaths(),
     ];
+    foreach (ReflectionUtils::getTraits(static::class) as $trait) {
+      $info['type'][] = self::stripNamespace($trait);
+    }
     $reflection = new \ReflectionClass(static::class);
     $info += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
     unset($info['package'], $info['method']);

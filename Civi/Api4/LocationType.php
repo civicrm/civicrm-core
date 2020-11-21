@@ -18,5 +18,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class LocationType extends Generic\DAOEntity {
+  use Generic\Traits\OptionList;
 
 }

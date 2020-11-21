@@ -27,7 +27,12 @@
       $scope.controls = {tab: 'compose'};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
       $scope.groupOptions = CRM.crmSearchActions.groupOptions;
-      $scope.entities = formatForSelect2(CRM.vars.search.schema, 'name', 'title_plural', ['description', 'icon']);
+      // Try to create a sensible list of entities one might want to search for,
+      // excluding those whos primary purpose is to provide joins or option lists to other entities
+      var primaryEntities = _.filter(CRM.vars.search.schema, function(entity) {
+        return !_.includes(entity.type, 'EntityBridge') && !_.includes(entity.type, 'OptionList');
+      });
+      $scope.entities = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
       this.perm = {
         editGroups: CRM.checkPerm('edit groups')
       };

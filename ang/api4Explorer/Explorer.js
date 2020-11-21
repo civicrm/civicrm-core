@@ -57,7 +57,7 @@
     $scope.controls = {};
     $scope.langs = ['php', 'js', 'ang', 'cli'];
     $scope.joinTypes = [{k: false, v: 'FALSE (LEFT JOIN)'}, {k: true, v: 'TRUE (INNER JOIN)'}];
-    $scope.bridgeEntities = _.filter(schema, {type: 'BridgeEntity'});
+    $scope.bridgeEntities = _.filter(schema, function(entity) {return _.includes(entity.type, 'EntityBridge');});
     $scope.code = {
       php: [
         {name: 'oop', label: ts('OOP Style'), code: ''},
@@ -873,6 +873,7 @@
       setHelp($scope.entity, {
         description: entityInfo.description,
         comment: entityInfo.comment,
+        type: entityInfo.type,
         see: entityInfo.see
       });
     }

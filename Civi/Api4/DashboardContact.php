@@ -26,6 +26,7 @@ namespace Civi\Api4;
  * @see \Civi\Api4\Dashboard
  * @package Civi\Api4
  */
-class DashboardContact extends Generic\BridgeEntity {
+class DashboardContact extends Generic\DAOEntity {
+  use Generic\Traits\EntityBridge;
 
 }

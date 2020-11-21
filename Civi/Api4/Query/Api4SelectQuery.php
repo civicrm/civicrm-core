@@ -594,7 +594,7 @@ class Api4SelectQuery {
   }
 
   /**
-   * Join onto a BridgeEntity table
+   * Join onto a Bridge table
    *
    * @param array $joinTree
    * @param string $joinEntity
@@ -604,13 +604,15 @@ class Api4SelectQuery {
    */
   protected function getBridgeJoin(&$joinTree, $joinEntity, $alias) {
     $bridgeEntity = array_shift($joinTree);
-    if (!is_a('\Civi\Api4\\' . $bridgeEntity, '\Civi\Api4\Generic\BridgeEntity', TRUE)) {
+    /* @var \Civi\Api4\Generic\DAOEntity $bridgeEntityClass */
+    $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
+    if (!in_array('EntityBridge', $bridgeEntityClass::getInfo()['type'], TRUE)) {
       throw new \API_Exception("Illegal bridge entity specified: " . $bridgeEntity);
     }
     $bridgeAlias = $alias . '_via_' . strtolower($bridgeEntity);
     $bridgeTable = CoreUtil::getTableName($bridgeEntity);
     $joinTable = CoreUtil::getTableName($joinEntity);
-    $bridgeEntityGet = \Civi\API\Request::create($bridgeEntity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()]);
+    $bridgeEntityGet = $bridgeEntityClass::get($this->getCheckPermissions());
     $fkToJoinField = $fkToBaseField = NULL;
     // Find the bridge field that links to the joinEntity (either an explicit FK or an entity_id/entity_table combo)
     foreach ($bridgeEntityGet->entityFields() as $name => $field) {
