@@ -27,6 +27,7 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class RelationshipCache extends Generic\AbstractEntity {
+  use Generic\Traits\EntityBridge;
 
   /**
    * @param bool $checkPermissions

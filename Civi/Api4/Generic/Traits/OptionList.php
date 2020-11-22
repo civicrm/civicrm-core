@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -10,22 +9,13 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
-namespace Civi\Api4;
+namespace Civi\Api4\Generic\Traits;
 
 /**
- * OptionValue entity.
+ * An optionList is a small entity whose primary purpose is to supply a semi-static list of options to fields in other entities.
  *
- * @see \Civi\Api4\OptionGroup
- * @package Civi\Api4
+ * The options appear in the field metadata for other entities that reference this one via pseudoconstant.
  */
-class OptionValue extends Generic\DAOEntity {
-  use Generic\Traits\OptionList;
+trait OptionList {
 
 }

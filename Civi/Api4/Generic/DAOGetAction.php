@@ -59,13 +59,13 @@ class DAOGetAction extends AbstractGetAction {
    *
    * - `Entity`: the name of the api entity to join onto.
    * - `Required`: `TRUE` for an `INNER JOIN`, `FALSE` for a `LEFT JOIN`.
-   * - `Bridge` (optional): Name of a BridgeEntity to incorporate into the join.
+   * - `Bridge` (optional): Name of a Bridge to incorporate into the join.
    * - `[field, op, value]...`: zero or more conditions for the ON clause, using the same nested format as WHERE and HAVING
    *     but with the difference that "value" is interpreted as an expression (e.g. can be the name of a field).
    *     Enclose literal values with quotes.
    *
    * @var array
-   * @see \Civi\Api4\Generic\BridgeEntity
+   * @see \Civi\Api4\Generic\Traits\EntityBridge
    */
   protected $join = [];
 

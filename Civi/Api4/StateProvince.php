@@ -24,5 +24,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class StateProvince extends Generic\DAOEntity {
+  use Generic\Traits\OptionList;
 
 }

@@ -58,8 +58,15 @@ class Entity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'type',
+          'data_type' => 'Array',
           'description' => 'Base class for this entity',
-          'options' => ['DAOEntity' => 'DAOEntity', 'BasicEntity' => 'BasicEntity', 'BridgeEntity' => 'BridgeEntity', 'AbstractEntity' => 'AbstractEntity'],
+          'options' => [
+            'AbstractEntity' => 'AbstractEntity',
+            'DAOEntity' => 'DAOEntity',
+            'BasicEntity' => 'BasicEntity',
+            'EntityBridge' => 'EntityBridge',
+            'OptionList' => 'OptionList',
+          ],
         ],
         [
           'name' => 'description',

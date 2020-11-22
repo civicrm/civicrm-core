@@ -9,13 +9,13 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Generic;
+namespace Civi\Api4\Generic\Traits;
 
 /**
  * A bridge is a small table that provides an intermediary link between two other tables.
  *
- * The API can automatically incorporate a bridgeEntity into a join expression.
+ * The API can automatically incorporate a Bridge into a join expression.
  */
-class BridgeEntity extends DAOEntity {
+trait EntityBridge {
 
 }
