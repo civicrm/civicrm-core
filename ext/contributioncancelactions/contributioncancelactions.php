@@ -12,14 +12,21 @@ use Civi\Api4\Participant;
  *
  * This enacts the following
  * - find and cancel any related pending memberships
- * - (not yet implemented) find and cancel any related pending participant records
- * - (not yet implemented) find any related pledge payment records. Remove the contribution id.
+ * - (not yet implemented) find and cancel any related pending participant
+ * records
+ * - (not yet implemented) find any related pledge payment records. Remove the
+ * contribution id.
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws \API_Exception
  */
 function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $objectRef) {
   if ($op === 'edit' && $objectName === 'Contribution') {
-    if ('Cancelled' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $objectRef->contribution_status_id)) {
+    if (in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $objectRef->contribution_status_id),
+      ['Cancelled', 'Failed']
+    )) {
       contributioncancelactions_cancel_related_pending_memberships((int) $objectId);
       contributioncancelactions_cancel_related_pending_participant_records((int) $objectId);
       contributioncancelactions_update_related_pledge((int) $objectId, (int) $objectRef->contribution_status_id);

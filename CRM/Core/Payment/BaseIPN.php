@@ -165,10 +165,13 @@ class CRM_Core_Payment_BaseIPN {
    *
    * @param array $objects
    *
+   * @deprecated use the api.
+   *
    * @return bool
    * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
    */
   public function failed($objects) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the api');
     $contribution = &$objects['contribution'];
     $memberships = [];
     if (!empty($objects['membership'])) {

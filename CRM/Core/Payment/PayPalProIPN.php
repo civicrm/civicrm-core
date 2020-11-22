@@ -293,6 +293,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param bool $first
    *
    * @return void
+   * @throws \API_Exception
    */
   public function single($input, $ids, $objects, $recur = FALSE, $first = FALSE) {
     $contribution = &$objects['contribution'];
@@ -322,7 +323,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
     $status = $input['paymentStatus'];
     if ($status === 'Denied' || $status === 'Failed' || $status === 'Voided') {
-      $this->failed($objects);
+      Contribution::update(FALSE)->setValues([
+        'cancel_date' => 'now',
+        'contribution_status_id:name' => 'Failed',
+      ])->addWhere('id', '=', $contribution->id)->execute();
+      Civi::log()->debug("Setting contribution status to Failed");
       return;
     }
     if ($status === 'Pending') {
