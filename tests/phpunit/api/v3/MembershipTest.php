@@ -139,24 +139,17 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test Activity creation on cancellation of membership contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testActivityForCancelledContribution() {
+  public function testActivityForCancelledContribution(): void {
     $contactId = $this->createLoggedInUser();
-    $membershipID = $this->contactMembershipCreate($this->_params);
 
-    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 'Member Dues',
-      'total_amount' => 100,
-      'contact_id' => $this->_params['contact_id'],
-    ]);
-    $this->callAPISuccess('MembershipPayment', 'create', [
-      'sequential' => 1,
-      'contribution_id' => $ContributionCreate['id'],
-      'membership_id' => $membershipID,
-    ]);
-
+    $this->createContributionAndMembershipOrder();
+    $membershipID = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'id']);
     $form = new CRM_Contribute_Form_Contribution();
-    $form->_id = $ContributionCreate['id'];
+    $form->_id = $this->ids['Contribution'][0];
     $form->testSubmit([
       'total_amount' => 100,
       'financial_type_id' => 1,
@@ -169,7 +162,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Activity', [
       'activity_type_id' => 'Membership Signup',
       'source_record_id' => $membershipID,
-      'subject' => 'General - Payment - Status: test status',
+      'subject' => 'General - Payment - Status: Pending',
     ]);
     $this->callAPISuccessGetSingle('Activity', [
       'activity_type_id' => 'Change Membership Status',

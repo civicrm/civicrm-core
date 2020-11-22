@@ -74,7 +74,7 @@ trait CRMTraits_Financial_OrderTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createContributionAndMembershipOrder() {
+  protected function createContributionAndMembershipOrder(): void {
     $this->ids['membership_type'][0] = $this->membershipTypeCreate();
     $orderID = $this->callAPISuccess('Order', 'create', [
       'financial_type_id' => 'Donation',
@@ -110,6 +110,10 @@ trait CRMTraits_Financial_OrderTrait {
             'contact_id' => $this->_contactID,
             'membership_type_id' => 'General',
             'source' => 'Payment',
+            // This is necessary because Membership_BAO otherwise ignores the
+            // pending status. I do have a fix but it's held up behind other pending-review PRs
+            // so this should be temporary until we get the membership PRs flowing.
+            'skipStatusCal' => TRUE,
           ],
           'line_item' => $this->getMembershipLineItem(),
         ],
