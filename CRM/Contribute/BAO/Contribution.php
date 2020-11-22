@@ -952,24 +952,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         if ($membership && $update) {
           $newStatus = array_search('Cancelled', $membershipStatuses);
 
-          // Create activity
-          $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
-          $activityParam = [
-            'subject' => "Status changed from {$allStatus[$membership->status_id]} to {$allStatus[$newStatus]}",
-            'source_contact_id' => CRM_Core_Session::singleton()->get('userID'),
-            'target_contact_id' => $membership->contact_id,
-            'source_record_id' => $membership->id,
-            'activity_type_id' => 'Change Membership Status',
-            'status_id' => 'Completed',
-            'priority_id' => 'Normal',
-            'activity_date_time' => 'now',
-          ];
-
           $membership->status_id = $newStatus;
           $membership->is_override = TRUE;
           $membership->status_override_end_date = 'null';
           $membership->save();
-          civicrm_api3('activity', 'create', $activityParam);
         }
       }
     }
