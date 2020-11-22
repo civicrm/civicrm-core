@@ -1267,58 +1267,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Process failed contribution.
-   *
-   * @param $memberships
-   * @param $contributionId
-   * @param array $membershipStatuses
-   * @param $participant
-   * @param $pledgePayment
-   * @param $pledgeID
-   * @param array $pledgePaymentIDs
-   * @param $contributionStatusId
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected static function processFail($memberships, $contributionId, array $membershipStatuses, array $participant, $pledgePayment, $pledgeID, array $pledgePaymentIDs, $contributionStatusId): void {
-    if (is_array($memberships)) {
-      foreach ($memberships as $membership) {
-        $update = TRUE;
-        //Update Membership status if there is no other completed contribution associated with the membership.
-        $relatedContributions = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id, TRUE);
-        foreach ($relatedContributions as $contriId) {
-          if ($contriId == $contributionId) {
-            continue;
-          }
-          $statusId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contriId, 'contribution_status_id');
-          if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusId) === 'Completed') {
-            $update = FALSE;
-          }
-        }
-        if ($membership && $update) {
-          $membership->status_id = array_search('Expired', $membershipStatuses);
-          $membership->is_override = TRUE;
-          $membership->status_override_end_date = 'null';
-          $membership->save();
-        }
-      }
-    }
-    if ($participant) {
-      $oldStatus = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-        $participant->id,
-        'status_id'
-      );
-      $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-      $updatedStatusId = array_search('Cancelled', $participantStatuses);
-      CRM_Event_BAO_Participant::updateParticipantStatus($participant->id, $oldStatus, $updatedStatusId, TRUE);
-    }
-
-    if ($pledgePayment) {
-      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
-    }
-  }
-
-  /**
    * @inheritDoc
    */
   public function addSelectWhereClause() {
@@ -2042,8 +1990,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     if (!$contributionId ||
       !in_array($contributionStatusId, [
         array_search('Completed', $contributionStatuses),
-        array_search('Cancelled', $contributionStatuses),
-        array_search('Failed', $contributionStatuses),
       ])
     ) {
       return;
@@ -2117,10 +2063,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         'status_id'
       );
     }
-    if ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
-      self::processFail($memberships, $contributionId, $membershipStatuses, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
-    }
-    elseif ($contributionStatusId == array_search('Completed', $contributionStatuses)) {
+    if ($contributionStatusId == array_search('Completed', $contributionStatuses)) {
 
       // only pending contribution related object processed.
       if ($previousContriStatusId &&
