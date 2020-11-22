@@ -918,34 +918,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * Cancel contribution.
-   *
-   * This function should only be called from transitioncomponents - it is an interim step in refactoring.
-   *
-   * @param $memberships
-   * @param $contributionId
-   * @param $membershipStatuses
-   * @param $participant
-   * @param $oldStatus
-   * @param $pledgePayment
-   * @param $pledgeID
-   * @param $pledgePaymentIDs
-   * @param $contributionStatusId
-   */
-  protected static function cancel($memberships, $contributionId, $membershipStatuses, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId) {
-    // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
-    $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-    if ($participant) {
-      $updatedStatusId = array_search('Cancelled', $participantStatuses);
-      CRM_Event_BAO_Participant::updateParticipantStatus($participant->id, $oldStatus, $updatedStatusId, TRUE);
-    }
-
-    if ($pledgePayment) {
-      CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
-    }
-  }
-
-  /**
    * Do any accounting updates required as a result of a contribution status change.
    *
    * Currently we have a bit of a roundabout where adding a payment results in this being called &
@@ -2145,11 +2117,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         'status_id'
       );
     }
-    if ($contributionStatusId == array_search('Cancelled', $contributionStatuses)) {
-      // Call interim cancel function - with a goal to cleaning up the signature on it and switching to a tested api Contribution.cancel function.
-      self::cancel($memberships, $contributionId, $membershipStatuses, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
-    }
-    elseif ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
+    if ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
       self::processFail($memberships, $contributionId, $membershipStatuses, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
     }
     elseif ($contributionStatusId == array_search('Completed', $contributionStatuses)) {
