@@ -12,7 +12,6 @@
 use Civi\Api4\Activity;
 use Civi\Api4\ContributionPage;
 use Civi\Api4\ContributionRecur;
-use Civi\Api4\Participant;
 use Civi\Api4\PaymentProcessor;
 
 /**
@@ -2602,7 +2601,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         // or loadable from the recurring contribution.
         $contributionParams['campaign_id'] = $templateContribution['campaign_id'];
       }
-      $contributionParams['source'] = $contributionParams['source'] ?: ts('Recurring contribution');
+      $contributionParams['source'] = $contributionParams['source'] ?? ts('Recurring contribution');
 
       //CRM-18805 -- Contribution page not recorded on recurring transactions, Recurring contribution payments
       //do not create CC or BCC emails or profile notifications.
@@ -4368,7 +4367,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionParams = array_merge([
       'contribution_status_id' => $completedContributionStatusID,
-      'source' => self::getRecurringContributionDescription($contribution, $participantID),
     ], array_intersect_key($input, array_fill_keys($inputContributionWhiteList, 1)
     ));
 
@@ -4570,40 +4568,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     return $ids;
-  }
-
-  /**
-   * Get the description (source field) for the recurring contribution.
-   *
-   * @param CRM_Contribute_BAO_Contribution $contribution
-   * @param int|null $participantID
-   *
-   * @return string
-   * @throws \CiviCRM_API3_Exception
-   * @throws \API_Exception
-   */
-  protected static function getRecurringContributionDescription($contribution, $participantID) {
-    if (!empty($contribution->source)) {
-      return $contribution->source;
-    }
-    elseif (!empty($contribution->contribution_page_id) && is_numeric($contribution->contribution_page_id)) {
-      $contributionPageTitle = civicrm_api3('ContributionPage', 'getvalue', [
-        'id' => $contribution->contribution_page_id,
-        'return' => 'title',
-      ]);
-      return ts('Online Contribution') . ': ' . $contributionPageTitle;
-    }
-    elseif ($participantID) {
-      $eventTitle = Participant::get(FALSE)
-        ->addSelect('event.title')
-        ->addWhere('id', '=', (int) $participantID)
-        ->execute()->first()['event.title'];
-      return ts('Online Event Registration') . ': ' . $eventTitle;
-    }
-    elseif (!empty($contribution->contribution_recur_id)) {
-      return 'recurring contribution';
-    }
-    return '';
   }
 
   /**

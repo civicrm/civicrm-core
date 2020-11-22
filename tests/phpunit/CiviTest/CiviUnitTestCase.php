@@ -2518,6 +2518,7 @@ VALUES
       'skipCleanMoney' => TRUE,
       'amount_level' => 'expensive',
       'campaign_id' => $this->ids['campaign'][0],
+      'source' => 'Online Contribution: Page name',
     ], $contributionParams);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
       'contact_id' => $this->_contactID,
