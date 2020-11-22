@@ -922,23 +922,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * This function should only be called from transitioncomponents - it is an interim step in refactoring.
    *
-   * @param $processContributionObject
    * @param $memberships
    * @param $contributionId
    * @param $membershipStatuses
-   * @param $updateResult
    * @param $participant
    * @param $oldStatus
    * @param $pledgePayment
    * @param $pledgeID
    * @param $pledgePaymentIDs
    * @param $contributionStatusId
-   *
-   * @return array
    */
-  protected static function cancel($processContributionObject, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId) {
+  protected static function cancel($memberships, $contributionId, $membershipStatuses, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId) {
     // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
-    $processContribution = FALSE;
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     if (is_array($memberships)) {
       foreach ($memberships as $membership) {
@@ -975,11 +970,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           $membership->status_override_end_date = 'null';
           $membership->save();
           civicrm_api3('activity', 'create', $activityParam);
-
-          $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
-          if ($processContributionObject) {
-            $processContribution = TRUE;
-          }
         }
       }
     }
@@ -987,22 +977,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if ($participant) {
       $updatedStatusId = array_search('Cancelled', $participantStatuses);
       CRM_Event_BAO_Participant::updateParticipantStatus($participant->id, $oldStatus, $updatedStatusId, TRUE);
-
-      $updateResult['updatedComponents']['CiviEvent'] = $updatedStatusId;
-      if ($processContributionObject) {
-        $processContribution = TRUE;
-      }
     }
 
     if ($pledgePayment) {
       CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
-
-      $updateResult['updatedComponents']['CiviPledge'] = $contributionStatusId;
-      if ($processContributionObject) {
-        $processContribution = TRUE;
-      }
     }
-    return [$updateResult, $processContribution];
   }
 
   /**
@@ -2231,7 +2210,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $processContribution = FALSE;
     if ($contributionStatusId == array_search('Cancelled', $contributionStatuses)) {
       // Call interim cancel function - with a goal to cleaning up the signature on it and switching to a tested api Contribution.cancel function.
-      list($updateResult, $processContribution) = self::cancel(FALSE, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
+      self::cancel($memberships, $contributionId, $membershipStatuses, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
     }
     elseif ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
       list($updateResult, $processContribution) = self::processFail(FALSE, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
