@@ -1336,22 +1336,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /**
    * Process failed contribution.
    *
-   * @param $processContributionObject
    * @param $memberships
    * @param $contributionId
    * @param array $membershipStatuses
-   * @param array $updateResult
    * @param $participant
    * @param $pledgePayment
    * @param $pledgeID
    * @param array $pledgePaymentIDs
    * @param $contributionStatusId
    *
-   * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function processFail($processContributionObject, $memberships, $contributionId, array $membershipStatuses, array $updateResult, $participant, $pledgePayment, $pledgeID, array $pledgePaymentIDs, $contributionStatusId): array {
-    $processContribution = FALSE;
+  protected static function processFail($memberships, $contributionId, array $membershipStatuses, array $participant, $pledgePayment, $pledgeID, array $pledgePaymentIDs, $contributionStatusId): void {
     if (is_array($memberships)) {
       foreach ($memberships as $membership) {
         $update = TRUE;
@@ -1371,11 +1367,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           $membership->is_override = TRUE;
           $membership->status_override_end_date = 'null';
           $membership->save();
-
-          $updateResult['updatedComponents']['CiviMember'] = $membership->status_id;
-          if ($processContributionObject) {
-            $processContribution = TRUE;
-          }
         }
       }
     }
@@ -1387,22 +1378,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
       $updatedStatusId = array_search('Cancelled', $participantStatuses);
       CRM_Event_BAO_Participant::updateParticipantStatus($participant->id, $oldStatus, $updatedStatusId, TRUE);
-
-      $updateResult['updatedComponents']['CiviEvent'] = $updatedStatusId;
-      if ($processContributionObject) {
-        $processContribution = TRUE;
-      }
     }
 
     if ($pledgePayment) {
       CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
-
-      $updateResult['updatedComponents']['CiviPledge'] = $contributionStatusId;
-      if ($processContributionObject) {
-        $processContribution = TRUE;
-      }
     }
-    return [$updateResult, $processContribution];
   }
 
   /**
@@ -2213,7 +2193,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       self::cancel($memberships, $contributionId, $membershipStatuses, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
     }
     elseif ($contributionStatusId == array_search('Failed', $contributionStatuses)) {
-      list($updateResult, $processContribution) = self::processFail(FALSE, $memberships, $contributionId, $membershipStatuses, $updateResult, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
+      self::processFail($memberships, $contributionId, $membershipStatuses, $participant, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
     }
     elseif ($contributionStatusId == array_search('Completed', $contributionStatuses)) {
 
