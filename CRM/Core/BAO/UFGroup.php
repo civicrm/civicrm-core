@@ -721,15 +721,20 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   }
 
   /**
-   * @param $ctype
+   * @param string $ctype
+   * @param int $permissionType				   
    *
    * @return mixed
    */
-  protected static function getCustomFields($ctype) {
+  protected static function getCustomFields($ctype, $permissionType = CRM_Core_Permission::VIEW) {
     $cacheKey = 'uf_group_custom_fields_' . $ctype;
     if (!Civi::cache('metadata')->has($cacheKey)) {
-      $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, TRUE, TRUE);
-
+      // Only Edit and View is supported in ACL for custom field.
+      if ($permissionType == CRM_Core_Permission::CREATE) {
+        $permissionType = CRM_Core_Permission::EDIT;
+      }
+      $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, TRUE, TRUE, $permissionType);
+	 
       // hack to add custom data for components
       $components = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
       foreach ($components as $value) {

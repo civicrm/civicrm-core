@@ -125,6 +125,12 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
     $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
     $this->_contactSubType = CRM_Contact_BAO_Contact::getContactSubType($this->_tableID, ',');
+	// check if the user has permission to edit the custom data for the contact.
+	if (!CRM_Core_BAO_CustomGroup::isCustomGroupAllowed(
+	  $this->_groupID, $entityId, CRM_Core_Permission::EDIT
+	)) {
+	  CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to add/edit this contact\'s custom data.'));
+	}																	 
     $this->assign('contact_type', $this->_contactType);
     $this->assign('contact_subtype', $this->_contactSubType);
     list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_tableID);
