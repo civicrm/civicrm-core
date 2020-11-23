@@ -25,6 +25,8 @@
  */
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
+  use CRMTraits_Financial_OrderTrait;
+
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -1350,41 +1352,29 @@ Expires: ',
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testContributionFormStatusUpdate() {
+  public function testContributionFormStatusUpdate(): void {
 
-    $this->_individualId = $this->createLoggedInUser();
-    $membershipId = $this->contactMembershipCreate([
-      'contact_id' => $this->_individualId,
-      'membership_type_id' => $this->membershipTypeAnnualFixedID,
-      'status_id' => 'New',
-    ]);
+    $this->_contactID = $this->createLoggedInUser();
+    $this->createContributionAndMembershipOrder();
 
     $params = [
       'total_amount' => 50,
       'financial_type_id' => 2,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->_contactID,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
     ];
 
-    $contriParams = [
-      'membership_id' => $membershipId,
-      'total_amount' => 50,
-      'financial_type_id' => 2,
-      'contact_id' => $this->_individualId,
-    ];
-    $contribution = CRM_Member_BAO_Membership::recordMembershipContribution($contriParams);
-
     //Update Contribution to Cancelled.
     $form = new CRM_Contribute_Form_Contribution();
-    $form->_id = $params['id'] = $contribution->id;
+    $form->_id = $params['id'] = $this->ids['Contribution'][0];
     $form->_mode = NULL;
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params, CRM_Core_Action::UPDATE);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
 
     //Assert membership status overrides when the contribution cancelled.
-    $this->assertEquals($membership['is_override'], TRUE);
+    $this->assertEquals(TRUE, $membership['is_override']);
     $this->assertEquals($membership['status_id'], $this->callAPISuccessGetValue('MembershipStatus', [
       'return' => 'id',
       'name' => 'Cancelled',
