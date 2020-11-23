@@ -61,7 +61,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * @param array $input
    * @param array $ids
-   * @param array $objects
+   * @param CRM_Contribute_BAO_ContributionRecur $recur
+   * @param CRM_Contribute_BAO_Contribution $contribution
    * @param bool $first
    *
    * @return void
@@ -69,7 +70,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function recur($input, $ids, $objects, $first) {
+  public function recur($input, $ids, $recur, $contribution, $first) {
     if (!isset($input['txnType'])) {
       Civi::log()->debug('PayPalIPN: Could not find txn_type in input request');
       echo "Failure: Invalid parameters<p>";
@@ -83,8 +84,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       echo 'Failure: Invalid parameters<p>';
       return;
     }
-
-    $recur = &$objects['contributionRecur'];
 
     // make sure the invoice ids match
     // make sure the invoice is valid and matches what we have in the contribution record
@@ -210,7 +209,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => $ids['participant'] ?? NULL,
       'contributionRecur' => $recur->id,
-    ], $objects['contribution'], TRUE);
+    ], $contribution, TRUE);
   }
 
   /**
@@ -373,7 +372,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         if ($objects['contribution']->contribution_status_id == $completedStatusId) {
           $first = FALSE;
         }
-        $this->recur($input, $ids, $objects, $first);
+        $this->recur($input, $ids, $objects['contributionRecur'], $objects['contribution'], $first);
         return;
       }
 
