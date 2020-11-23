@@ -68,4 +68,22 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
     return 'ORDER BY ' . implode(',', $order_array);
   }
 
+  /**
+   * Get the name of the table for the relevant entity.
+   *
+   * @return string
+   */
+  public function getTableName() {
+    return 'civicrm_case';
+  }
+
+  /**
+   * Get the entity alias field.
+   *
+   * @return string
+   */
+  public function getEntityAliasField() {
+    return 'case_id';
+  }
+
 }
