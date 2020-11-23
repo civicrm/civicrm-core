@@ -95,6 +95,63 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
   }
 
   /**
+   * Provide list of favourite contries.
+   *
+   * @param $availableCountries
+   * @return array
+   */
+  public static function favouriteContactCountries($availableCountries) {
+    static $cachedFavouriteContactCountries = [];
+    $favouriteContactCountries = Civi::settings()->get('favouriteContactCountries');
+
+    if (!empty($favouriteContactCountries) && !$cachedFavouriteContactCountries) {
+      $favouriteCountries = [];
+      foreach($favouriteContactCountries as $favouriteContactCountry) {
+        if (array_key_exists($favouriteContactCountry, $availableCountries)) {
+          $favouriteCountries[$favouriteContactCountry] = $availableCountries[$favouriteContactCountry];
+        }
+      }
+      $cachedFavouriteContactCountries = $favouriteCountries;
+    }
+    return $cachedFavouriteContactCountries;
+  }
+
+  /**
+   * Provide sorted list of countries with default country with first position
+   * then favourite countries then rest of countries.
+   *
+   * @param $availableCountries
+   * @return array
+   */
+  public static function _defaultContactCountries($availableCountries) {
+    // localise the country names if in an non-en_US locale
+    $tsLocale = CRM_Core_I18n::getLocale();
+    if ($tsLocale != '' and $tsLocale != 'en_US') {
+      $i18n = CRM_Core_I18n::singleton();
+      $i18n->localizeArray($availableCountries, [
+        'context' => 'country',
+      ]);
+      $availableCountries = CRM_Utils_Array::asort($availableCountries);
+    }
+    $favouriteContactCountries = CRM_Core_BAO_Country::favouriteContactCountries($availableCountries);
+    // if default country is set, percolate it to the top
+    if ($defaultContactCountry = CRM_Core_BAO_Country::defaultContactCountry()) {
+      $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
+      $defaultID = array_search($defaultContactCountry, $countryIsoCodes);
+      if ($defaultID !== FALSE) {
+        $default = [];
+        $default[$defaultID] = $availableCountries[$defaultID] ?? NULL;
+        $availableCountries = $default + $favouriteContactCountries + $availableCountries;
+      }
+    }
+    elseif (!empty($favouriteContactCountries)) {
+      $availableCountries = $favouriteContactCountries + $availableCountries;
+    }
+
+    return $availableCountries;
+  }
+
+  /**
    * Provide cached default country name.
    *
    * @return string
