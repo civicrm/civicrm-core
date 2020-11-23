@@ -2103,8 +2103,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     // if we already processed contribution object pass previous status id.
     $previousContriStatusId = $params['previous_contribution_status_id'] ?? NULL;
 
-    $updateResult = [];
-
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     // we process only ( Completed, Cancelled, or Failed ) contributions.
@@ -2186,8 +2184,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         'status_id'
       );
     }
-    // we might want to process contribution object.
-    $processContribution = FALSE;
     if ($contributionStatusId == array_search('Cancelled', $contributionStatuses)) {
       // Call interim cancel function - with a goal to cleaning up the signature on it and switching to a tested api Contribution.cancel function.
       self::cancel($memberships, $contributionId, $membershipStatuses, $participant, $oldStatus, $pledgePayment, $pledgeID, $pledgePaymentIDs, $contributionStatusId);
@@ -2373,35 +2369,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if ($pledgePayment) {
         CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgeID, $pledgePaymentIDs, $contributionStatusId);
       }
-    }
-
-    // process contribution object.
-    if ($processContribution) {
-      $contributionParams = [];
-      $fields = [
-        'contact_id',
-        'total_amount',
-        'receive_date',
-        'is_test',
-        'campaign_id',
-        'payment_instrument_id',
-        'trxn_id',
-        'invoice_id',
-        'financial_type_id',
-        'contribution_status_id',
-        'non_deductible_amount',
-        'receipt_date',
-        'check_number',
-      ];
-      foreach ($fields as $field) {
-        if (empty($params[$field])) {
-          continue;
-        }
-        $contributionParams[$field] = $params[$field];
-      }
-
-      $contributionParams['id'] = $contributionId;
-      $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
     }
 
   }
