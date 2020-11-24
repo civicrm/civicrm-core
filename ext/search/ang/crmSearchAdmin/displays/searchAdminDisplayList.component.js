@@ -34,15 +34,14 @@
       this.symbols = {
         ul: [
           {char: '', label: ts('Default')},
-          {char: 'none', label: ts('None ( )')},
-          {char: 'circle', label: ts('Circle')},
-          {char: 'square', label: ts('Square')},
+          {char: 'circle', label: ts('Circles')},
+          {char: 'square', label: ts('Squares')},
+          {char: 'none', label: ts('None')},
         ],
         ol: [
-          {char: '', label: ts('Numbered (1. 2. 3.)')},
-          {char: 'none', label: ts('None ( )')},
-          {char: 'lower-latin', label: ts('Lowercase (a. b. c.)')},
+          {char: '', label: ts('Default (1. 2. 3.)')},
           {char: 'upper-latin', label: ts('Uppercase (A. B. C.)')},
+          {char: 'lower-latin', label: ts('Lowercase (a. b. c.)')},
           {char: 'upper-roman', label: ts('Roman (I. II. III.)')},
         ]
       };
