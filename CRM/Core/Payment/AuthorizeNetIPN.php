@@ -45,7 +45,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         // Presence of the id means it is approved.
         return TRUE;
       }
-      $ids = $objects = $input = [];
+      $ids = $input = [];
 
       $input['component'] = 'contribute';
 
@@ -83,20 +83,15 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         throw new CRM_Core_Exception("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
       }
 
-      $objects['contact'] = &$contact;
-      $objects['contribution'] = &$contribution;
-
-      $contribution = &$objects['contribution'];
       $ids['paymentProcessor'] = $paymentProcessorID;
       $contribution->loadRelatedObjects($input, $ids);
       if (empty($contribution->_relatedObjects['paymentProcessor'])) {
         throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
       }
-      $objects = array_merge($objects, $contribution->_relatedObjects);
 
       // check if first contribution is completed, else complete first contribution
       $first = TRUE;
-      if ($objects['contribution']->contribution_status_id == 1) {
+      if ($contribution->contribution_status_id == 1) {
         $first = FALSE;
         //load new contribution object if required.
         // create a contribution and then get it processed
