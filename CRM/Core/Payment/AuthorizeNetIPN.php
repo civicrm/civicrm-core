@@ -86,7 +86,13 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $objects['contact'] = &$contact;
       $objects['contribution'] = &$contribution;
 
-      $this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID);
+      $contribution = &$objects['contribution'];
+      $ids['paymentProcessor'] = $paymentProcessorID;
+      $contribution->loadRelatedObjects($input, $ids);
+      if (empty($contribution->_relatedObjects['paymentProcessor'])) {
+        throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
+      }
+      $objects = array_merge($objects, $contribution->_relatedObjects);
 
       // check if first contribution is completed, else complete first contribution
       $first = TRUE;
