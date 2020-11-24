@@ -61,10 +61,6 @@ class CRM_Financial_BAO_Payment {
         $paymentTrxnParams['payment_instrument_id'] = $contribution['payment_instrument_id'];
       }
     }
-    if (empty($paymentTrxnParams['trxn_id']) && !empty($paymentTrxnParams['contribution_trxn_id'])) {
-      CRM_Core_Error::deprecatedFunctionWarning('contribution_trxn_id is deprecated - use trxn_id');
-      $paymentTrxnParams['trxn_id'] = $paymentTrxnParams['contribution_trxn_id'];
-    }
 
     $paymentTrxnParams['currency'] = $contribution['currency'];
 
