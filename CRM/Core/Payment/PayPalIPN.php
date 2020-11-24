@@ -262,7 +262,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function main() {
     try {
-      $objects = $ids = $input = [];
+      $ids = $input = [];
       $component = $this->retrieve('module', 'String');
       $input['component'] = $component;
 
@@ -350,16 +350,12 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         }
       }
 
-      $objects['contact'] = &$contact;
-      $objects['contribution'] = &$contribution;
-
       // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
       if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
         // We don't need to worry if about removing contribution page id as it will be set later in
         //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
         unset($ids['contributionPage']);
       }
-      $contribution = &$objects['contribution'];
       $ids['paymentProcessor'] = $paymentProcessorID;
       if (!$contribution->loadRelatedObjects($input, $ids)) {
         return;
@@ -367,7 +363,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       if (empty($contribution->_relatedObjects['paymentProcessor'])) {
         throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
       }
-      $objects = array_merge($objects, $contribution->_relatedObjects);
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
@@ -375,10 +370,10 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         // check if first contribution is completed, else complete first contribution
         $first = TRUE;
         $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        if ($objects['contribution']->contribution_status_id == $completedStatusId) {
+        if ($contribution->contribution_status_id == $completedStatusId) {
           $first = FALSE;
         }
-        $this->recur($input, $ids, $objects['contributionRecur'], $objects['contribution'], $first);
+        $this->recur($input, $ids, $contributionRecur, $contribution, $first);
         return;
       }
 
@@ -411,7 +406,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => $ids['participant'] ?? NULL,
         'contributionRecur' => $contributionRecurID,
-      ], $objects['contribution']);
+      ], $contribution);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage());
