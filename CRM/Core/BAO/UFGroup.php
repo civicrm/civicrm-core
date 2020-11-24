@@ -722,7 +722,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
   /**
    * @param string $ctype
-   * @param int $permissionType				   
+   * @param int $permissionType
    *
    * @return mixed
    */
@@ -734,7 +734,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         $permissionType = CRM_Core_Permission::EDIT;
       }
       $customFields = CRM_Core_BAO_CustomField::getFieldsForImport($ctype, FALSE, FALSE, FALSE, TRUE, TRUE, $permissionType);
-	 
+
       // hack to add custom data for components
       $components = ['Contribution', 'Participant', 'Membership', 'Activity', 'Case'];
       foreach ($components as $value) {

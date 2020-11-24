@@ -269,7 +269,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   Return only custom data for subtype.
    * @param bool $checkPermission
    *   If false, do not include permissioning clause.
-   * @param int $permissionType					   
+   * @param int $permissionType
    *
    * @return array
    *   an array of active custom fields.
@@ -284,7 +284,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $onlyParent = FALSE,
     $onlySubType = FALSE,
     $checkPermission = TRUE,
-    $permissionType = CRM_Core_Permission::VIEW											   
+    $permissionType = CRM_Core_Permission::VIEW
   ) {
     if (empty($customDataType)) {
       $customDataType = ['Contact', 'Individual', 'Organization', 'Household'];
@@ -333,7 +333,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     // also get the permission stuff here
     if ($checkPermission) {
-     $permissionClause = CRM_Core_Permission::customGroupClause($permissionType,																		  
+      $permissionClause = CRM_Core_Permission::customGroupClause($permissionType,
         "{$cgTable}."
       );
     }
@@ -448,7 +448,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         // also get the permission stuff here
         if ($checkPermission) {
-           $permissionClause = CRM_Core_Permission::customGroupClause($permissionType,																	   
+          $permissionClause = CRM_Core_Permission::customGroupClause($permissionType,
             "{$cgTable}.", TRUE
           );
         }
@@ -528,7 +528,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   If false, do not include permissioning clause.
    *
    * @param bool $withMultiple
-   * @param int $permissionType							   
+   * @param int $permissionType
    *
    * @return array
    */
@@ -539,7 +539,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $search = FALSE,
     $checkPermission = TRUE,
     $withMultiple = FALSE,
-	$permissionType = CRM_Core_Permission::VIEW
+    $permissionType = CRM_Core_Permission::VIEW
   ) {
     // Note: there are situations when we want getFieldsForImport() return fields related
     // ONLY to basic contact types, but NOT subtypes. And thats where $onlyParent is helpful
@@ -551,7 +551,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $onlyParent,
       FALSE,
       $checkPermission,
-      $permissionType		 
+      $permissionType
     );
 
     $importableFields = [];
