@@ -435,16 +435,26 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertEquals(2, $cancelledActivatesCount['count']);
   }
 
-  public function testThatFailedEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
+  /**
+   * Test that related pending participant records are cancelled.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testThatFailedEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities(): void {
     $this->_setUpParticipantObjects('Pending from incomplete transaction');
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $additionalParticipantId = $this->participantCreate([
       'event_id' => $this->_eventId,
       'registered_by_id' => $this->_participantId,
       'status_id' => 'Pending from incomplete transaction',
     ]);
 
-    $this->IPN->failed($this->objects);
+    Contribution::update(FALSE)->setValues([
+      'cancel_date' => 'now',
+      'contribution_status_id:name' => 'Failed',
+    ])->addWhere('id', '=', $this->ids['contribution'])->execute();
 
     $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
       'sequential' => 1,
@@ -586,7 +596,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function _setUpParticipantObjects($participantStatus = 'Attended') {
+  public function _setUpParticipantObjects($participantStatus = 'Attended'): void {
     $event = $this->eventCreate(['is_email_confirm' => 1]);
 
     $this->_eventId = $event['id'];
@@ -605,6 +615,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->find();
     $this->objects['contribution'] = $contribution;
+    $this->ids['contribution'] = $contribution->id;
     $this->input = [
       'component' => 'event',
       'total_amount' => 150.00,

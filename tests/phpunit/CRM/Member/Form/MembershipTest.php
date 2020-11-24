@@ -1030,36 +1030,6 @@ Expires: ',
   }
 
   /**
-   * Test membership form with Failed Contribution.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testFormWithFailedContribution() {
-    $form = $this->getForm();
-    $form->preProcess();
-    $this->createLoggedInUser();
-    $params = $this->getBaseSubmitParams();
-    unset($params['price_set_id']);
-    unset($params['credit_card_number']);
-    unset($params['cvv2']);
-    unset($params['credit_card_exp_date']);
-    unset($params['credit_card_type']);
-    unset($params['send_receipt']);
-    unset($params['is_recur']);
-
-    $params['record_contribution'] = TRUE;
-    $params['contribution_status_id'] = array_search('Failed', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
-    $form->_mode = NULL;
-    $form->_contactID = $this->_individualId;
-
-    $form->testSubmit($params);
-    $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $this->assertEquals($membership['status_id'], array_search('Pending', CRM_Member_PseudoConstant::membershipStatus(), TRUE));
-  }
-
-  /**
    * CRM-20955, CRM-20966:
    * Test creating two memberships with inheritance via price set in the back end,
    * checking that the correct primary & secondary memberships, contributions, line items
