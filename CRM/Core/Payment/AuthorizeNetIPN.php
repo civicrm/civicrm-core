@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PaymentProcessor;
+
 /**
  *
  * @package CRM
@@ -85,9 +87,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       $ids['paymentProcessor'] = $paymentProcessorID;
       $contribution->loadRelatedObjects($input, $ids);
-      if (empty($contribution->_relatedObjects['paymentProcessor'])) {
-        throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
-      }
 
       // check if first contribution is completed, else complete first contribution
       $first = TRUE;
@@ -339,12 +338,18 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
    *
    * @return int
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   protected function getPaymentProcessorID(): int {
     // Attempt to get payment processor ID from URL
-    if (!empty($this->_inputParameters['processor_id'])) {
+    if (!empty($this->_inputParameters['processor_id']) &&
+      'AuthNet' === PaymentProcessor::get(FALSE)
+        ->addSelect('payment_processor_type_id:name')
+        ->addWhere('id', '=', $this->_inputParameters['processor_id'])
+        ->execute()->first()['payment_processor_type_id:name']
+    ) {
       return (int) $this->_inputParameters['processor_id'];
     }
     // This is an unreliable method as there could be more than one instance.
