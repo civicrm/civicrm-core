@@ -282,21 +282,23 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => $ids['participant'] ?? NULL,
       'contributionRecur' => $recur->id ?? NULL,
-    ], $objects, TRUE, $first);
+    ], $objects['contribution'], TRUE, $first);
   }
 
   /**
    * @param array $input
    * @param array $ids
-   * @param array $objects
+   * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $recur
    * @param bool $first
    *
    * @return void
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function single($input, $ids, $objects, $recur = FALSE, $first = FALSE) {
-    $contribution = &$objects['contribution'];
+  public function single($input, $ids, $contribution, $recur = FALSE, $first = FALSE) {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if ((!$recur) || ($recur && $first)) {
@@ -355,7 +357,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects['contribution']);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution);
   }
 
   /**
@@ -466,7 +468,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => $ids['participant'] ?? NULL,
         'contributionRecur' => $ids['contributionRecur'] ?? NULL,
-      ], $objects, FALSE, FALSE);
+      ], $objects['contribution'], FALSE, FALSE);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage());
