@@ -1,11 +1,11 @@
 (function(angular, $, _) {
-  angular.module('statuspage', CRM.angRequires('statuspage'));
+  angular.module('crmStatusPage', CRM.angRequires('crmStatusPage'));
 
   // router
-  angular.module('statuspage').config( function($routeProvider) {
+  angular.module('crmStatusPage').config( function($routeProvider) {
     $routeProvider.when('/status', {
-      controller: 'statuspageStatusPage',
-      templateUrl: '~/statuspage/StatusPage.html',
+      controller: 'crmStatusPageCtrl',
+      templateUrl: '~/crmStatusPage/StatusPage.html',
 
       resolve: {
         statusData: function(crmApi) {
