@@ -85,10 +85,12 @@ class CRM_Core_Payment_BaseIPN {
    * @param int $paymentProcessorID
    *   Id of the payment processor ID in use.
    *
+   * @deprecated
+   *
    * @return bool
    */
   public function validateData($input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('unused');
     // Check if the contribution exists
     // make sure contribution exists and is valid
     $contribution = new CRM_Contribute_BAO_Contribution();
