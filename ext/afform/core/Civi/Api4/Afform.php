@@ -59,6 +59,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\Convert
+   */
+  public static function convert($checkPermissions = TRUE) {
+    return (new Action\Afform\Convert('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\Prefill
    */
   public static function prefill($checkPermissions = TRUE) {
