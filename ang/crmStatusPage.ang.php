@@ -7,6 +7,5 @@ return [
   'js' => ['ang/crmStatusPage.js', 'ang/crmStatusPage/*.js'],
   'css' => ['ang/crmStatusPage.css'],
   'partials' => ['ang/crmStatusPage'],
-  'settings' => [],
   'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'crmResource'],
 ];
