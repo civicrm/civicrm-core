@@ -360,9 +360,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       if (!$contribution->loadRelatedObjects($input, $ids)) {
         return;
       }
-      if (empty($contribution->_relatedObjects['paymentProcessor'])) {
-        throw new CRM_Core_Exception("Could not find payment processor for contribution record: " . $contribution->id);
-      }
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
