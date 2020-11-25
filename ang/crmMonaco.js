@@ -1,19 +1,19 @@
 (function(angular, $, _) {
-  angular.module('afMonaco', CRM.angRequires('afMonaco'));
+  angular.module('crmMonaco', CRM.angRequires('crmMonaco'));
 
-  // "afMonaco" is a basic skeletal directive.
-  // Example usage: <div af-monaco ng-model="my.content"></div>
-  angular.module('afMonaco').directive('afMonaco', function($timeout) {
+  // "crmMonaco" is a basic skeletal directive.
+  // Example usage: <div crm-monaco ng-model="my.content"></div>
+  angular.module('crmMonaco').directive('crmMonaco', function($timeout) {
     return {
       restrict: 'AE',
       require: 'ngModel',
-      template: '<div class="af-monaco-container"></div>',
+      template: '<div class="crm-monaco-container"></div>',
       link: function($scope, $el, $attr, ngModel) {
         var heightPct = 0.70;
         var editor;
-        require.config({paths: CRM.afMonaco.paths});
+        require.config({paths: CRM.crmMonaco.paths});
         require(['vs/editor/editor.main'], function() {
-          var editorEl = $el.find('.af-monaco-container');
+          var editorEl = $el.find('.crm-monaco-container');
           editorEl.css({height: Math.round(heightPct * $(window).height())});
           editor = monaco.editor.create(editorEl[0], {
             value: ngModel.$modelValue,
