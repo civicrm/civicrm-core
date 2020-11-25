@@ -29,22 +29,8 @@
   {ts}Resource URL{/ts}
 {/htxt}
 {htxt id='id-resource_url'}
-{ts}Absolute URL of the location where the civicrm module or component has been installed.{/ts}
-<table class="form-layout-compressed">
-    <tr><td>
-    <strong>{ts}Example{/ts}</strong><br />
-    {ts 1=http://www.example.com/}If your site's home url is %1 ... then your CiviCRM Resource URL would be:{/ts}
-    <div class="font-italic description">
-    {if $config->userSystem->is_drupal EQ '1'}
-     &nbsp;&nbsp; http://www.example.com/sites/all/modules/civicrm/
-    {elseif $config->userFramework EQ 'Joomla'}
-     &nbsp;&nbsp; http://www.example.com/administrator/components/com_civicrm/civicrm/
-    {else}
-     &nbsp;&nbsp; http://www.example.com/
-    {/if}
-    </div>
-    </td></tr>
-</table>
+{ts}Location where the civicrm module or component has been installed.{/ts}
+{ts}By default, your CiviCRM Resource URL should be:{/ts} <strong>{ts}[civicrm.root]/{/ts}</strong>
 {/htxt}
 
 {htxt id='id-image_url-title'}
