@@ -1,16 +1,38 @@
-<label for="af_config_form_title">
-  {{ ts('Title:') }} <span class="crm-marker">*</span>
-</label>
-<input ng-model="afform.title" class="form-control" id="af_config_form_title" required />
-<label for="af_config_form_description">
-  {{ ts('Description:') }}
-</label>
-<textarea ng-model="afform.description" class="form-control" id="af_config_form_description"></textarea>
-<label for="af_config_form_server_route">
-  {{ ts('URL:') }}
-</label>
-<input ng-model="afform.server_route" class="form-control" id="af_config_form_server_route" />
-<label for="af_config_form_permission">
-  {{ ts('Permission:') }}
-</label>
-<input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, placeholder: ts('Open access')}" />
+<ng-form name="config_form">
+
+<div class="form-group">
+  <label for="af_config_form_title">
+    {{ ts('Title:') }} <span class="crm-marker">*</span>
+  </label>
+  <input ng-model="afform.title" class="form-control" id="af_config_form_title" required />
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_description">
+    {{ ts('Description:') }}
+  </label>
+  <textarea ng-model="afform.description" class="form-control" id="af_config_form_description"></textarea>
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_server_route">
+    {{ ts('URL:') }}
+  </label>
+  <input ng-model="afform.server_route" class="form-control" id="af_config_form_server_route" />
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_permission">
+    {{ ts('Permission:') }}
+  </label>
+  <input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, placeholder: ts('Open access')}" />
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_is_dashlet">
+    <input type="checkbox" id="af_config_form_is_dashlet" ng-model="afform.is_dashlet">
+    {{ ts('Enable dashlet') }}
+  </label>
+</div>
+
+</ng-form>

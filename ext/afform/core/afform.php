@@ -127,6 +127,40 @@ function afform_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  */
 function afform_civicrm_managed(&$entities) {
   _afform_civix_civicrm_managed($entities);
+
+  /** @var \CRM_Afform_AfformScanner $scanner */
+  if (\Civi::container()->has('afform_scanner')) {
+    $scanner = \Civi::service('afform_scanner');
+  }
+  else {
+    // This might happen at oddballs points - e.g. while you're in the middle of re-enabling the ext.
+    // This AfformScanner instance only lives during this method call, and it feeds off the regular cache.
+    $scanner = new CRM_Afform_AfformScanner();
+  }
+
+  foreach ($scanner->getMetas() as $afform) {
+    if (empty($afform['is_dashlet']) || empty($afform['name'])) {
+      continue;
+    }
+    $entities[] = [
+      'module' => E::LONG_NAME,
+      'name' => 'afform_dashlet_' . $afform['name'],
+      'entity' => 'Dashboard',
+      'update' => 'always',
+      // ideal cleanup policy might be to (a) deactivate if used and (b) remove if unused
+      'cleanup' => 'always',
+      'params' => [
+        'version' => 3,
+        // Q: Should we loop through all domains?
+        'domain_id' => CRM_Core_BAO_Domain::getDomain()->id,
+        'is_active' => TRUE,
+        'name' => $afform['name'],
+        'label' => $afform['title'] ?? ts('(Untitled)'),
+        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+        'permission' => "@afform:" . $afform['name'],
+      ],
+    ];
+  }
 }
 
 /**

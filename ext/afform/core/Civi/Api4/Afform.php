@@ -132,6 +132,10 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'description',
         ],
         [
+          'name' => 'is_dashlet',
+          'data_type' => 'Boolean',
+        ],
+        [
           'name' => 'is_public',
           'data_type' => 'Boolean',
         ],
