@@ -77,26 +77,6 @@
   background-color: rgba(255, 255, 255, .9);
 }
 
-#bootstrap-theme.crm-search div.api4-input.form-inline label.form-control {
-  margin-right: 6px;
-}
-#bootstrap-theme.crm-search div.api4-input.form-inline label.form-control input[type=checkbox] {
-  margin: 0 2px 0 0;
-}
-
-#bootstrap-theme.crm-search div.api4-input.form-inline label.form-control:not(.api4-option-selected) {
-  transition: none;
-  box-shadow: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  font-weight: normal;
-}
-
-#bootstrap-theme.crm-search div.api4-input.form-inline .form-control label {
-  font-weight: normal;
-  position: relative;
-  top: -2px;
-}
 #bootstrap-theme.crm-search .api4-clause-fieldset fieldset {
   float: right;
   width: calc(100% - 58px);

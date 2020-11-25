@@ -1,0 +1,8 @@
+/* Supports adding form-control class to the checkbox-inline class to achieve an outer border around the checkbox&label */
+.form-control.checkbox-inline > label {
+  margin-left: 9px;
+}
+/* Adds a nice effect if you place the checkbox label text inside a <span> it will only be bold if the checkbox is checked */
+label input[type=checkbox]:not(:checked) + * {
+  font-weight: normal;
+}

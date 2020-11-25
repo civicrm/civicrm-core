@@ -103,27 +103,6 @@
   background-color: rgba(255, 255, 255, .9);
 }
 
-#bootstrap-theme.api4-explorer-page div.api4-input.form-inline label.form-control {
-  margin-right: 6px;
-}
-#bootstrap-theme.api4-explorer-page div.api4-input.form-inline label.form-control input[type=checkbox] {
-  margin: 0 2px 0 0;
-}
-
-#bootstrap-theme.api4-explorer-page div.api4-input.form-inline label.form-control:not(.api4-option-selected) {
-  transition: none;
-  box-shadow: none;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  font-weight: normal;
-}
-
-#bootstrap-theme.api4-explorer-page div.api4-input.form-inline .form-control label {
-  font-weight: normal;
-  position: relative;
-  top: -2px;
-}
-
 #bootstrap-theme.api4-explorer-page .api4-clause-fieldset fieldset {
   float: right;
   width: calc(100% - 58px);

@@ -2,8 +2,12 @@
   <div class="form-inline">
     <label for="crm-search-admin-display-limit">{{:: ts('Results to display (0 for no limit):') }}</label>
     <input id="crm-search-admin-display-limit" type="number" min="0" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
-    <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> {{:: ts('Use Pager') }}</label>
-    <label><input type="checkbox" ng-model="$ctrl.display.settings.actions"> {{:: ts('Enable Actions') }}</label>
+    <div class="checkbox-inline form-control">
+      <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> <span>{{:: ts('Use Pager') }}</span></label>
+    </div>
+    <div class="checkbox-inline form-control">
+      <label><input type="checkbox" ng-model="$ctrl.display.settings.actions"> <span>{{:: ts('Enable Actions') }}</span></label>
+    </div>
   </div>
 </fieldset>
 <div class="crm-flex-box crm-search-admin-edit-columns-wrapper">
