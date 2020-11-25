@@ -62,6 +62,7 @@
               alert('Error: unknown form "' + $scope.afGuiEditor.name + '"');
             }
           }
+          $scope.canvasTab = 'layout';
           $scope.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
           $scope.entities = findRecursive($scope.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
