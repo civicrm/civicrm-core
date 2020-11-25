@@ -24,6 +24,14 @@
   <p class="help-block">{{ts('Expose the form as a standalone page on the web site. (Example: "civicrm/my-form")')}}</p>
 </div>
 
+<div class="form-group" ng-if="!!afform.server_route">
+  <label for="af_config_form_is_public">
+    <input type="checkbox" id="af_config_form_is_public" ng-model="afform.is_public">
+    {{ ts('Enable frontend styling') }}
+  </label>
+  <p class="help-block">{{ts('The general look/feel should match the frontend')}}</p>
+</div>
+
 <div class="form-group">
   <label for="af_config_form_is_dashlet">
     <input type="checkbox" id="af_config_form_is_dashlet" ng-model="afform.is_dashlet">
