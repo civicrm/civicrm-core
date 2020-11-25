@@ -63,6 +63,7 @@
             }
           }
           $scope.canvasTab = 'layout';
+          $scope.layoutHtml = '';
           $scope.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
           $scope.entities = findRecursive($scope.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
@@ -77,6 +78,17 @@
             $scope.changesSaved = $scope.changesSaved === 1;
           }, true);
         }
+
+        $scope.updateLayoutHtml = function() {
+          $scope.layoutHtml = '...Loading...';
+          crmApi4('Afform', 'convert', {layout: [$scope.layout], from: 'deep', to: 'html', formatWhitespace: true})
+            .then(function(r){
+              $scope.layoutHtml = r[0].layout || '(Error)';
+            })
+            .catch(function(r){
+              $scope.layoutHtml = '(Error)';
+            });
+        };
 
         this.addEntity = function(type) {
           var meta = editor.meta.entities[type],
