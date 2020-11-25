@@ -627,18 +627,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
     }
 
-    // make sure contact exists and is valid
-    // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->id = $contribution->contact_id;
-    $contact->find(TRUE);
-    if ($contact->id != $ids['contact']) {
-      // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-      CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
-      echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
-      $ids['contact'] = $contribution->contact_id;
-    }
-
     if (!empty($ids['contributionRecur'])) {
       $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
       $contributionRecur->id = $ids['contributionRecur'];
@@ -649,7 +637,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       }
     }
 
-    $objects['contact'] = &$contact;
     $objects['contribution'] = &$contribution;
 
     // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
