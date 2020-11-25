@@ -157,7 +157,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     $result = [];
     $result['crmMailing'] = include "$civicrm_root/ang/crmMailing.ang.php";
     $result['crmMailingAB'] = include "$civicrm_root/ang/crmMailingAB.ang.php";
-    $result['crmD3'] = include "$civicrm_root/ang/crmD3.ang.php";
 
     return $result;
   }
