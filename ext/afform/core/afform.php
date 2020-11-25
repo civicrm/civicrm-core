@@ -392,8 +392,9 @@ function _af_fill_field_metadata($entityType, DOMElement $afField) {
     $params['values'] = ['contact_type' => $entityType];
     $entityType = 'Contact';
   }
-  $getFields = civicrm_api4($entityType, 'getFields', $params);
-  // Merge field definition data with whatever's already in the markup
+  // Merge field definition data with whatever's already in the markup.
+  // If the admin has chosen to include this field on the form, then it's OK for us to get metadata about the field - regardless of user's other permissions.
+  $getFields = civicrm_api4($entityType, 'getFields', $params + ['checkPermissions' => FALSE]);
   $deep = ['input_attrs'];
   foreach ($getFields as $fieldInfo) {
     $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
