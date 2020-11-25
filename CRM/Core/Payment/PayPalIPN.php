@@ -95,7 +95,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $now = date('YmdHis');
 
-    $sendNotification = FALSE;
     $subscriptionPaymentStatus = NULL;
     // set transaction type
     $txnType = $this->retrieve('txn_type', 'String');
@@ -113,7 +112,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         }
         $recur->processor_id = $this->retrieve('subscr_id', 'String');
         $recur->trxn_id = $recur->processor_id;
-        $sendNotification = TRUE;
         $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_START;
         break;
 
@@ -122,7 +120,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           $recur->contribution_status_id = $contributionStatuses['Completed'];
         }
         $recur->end_date = $now;
-        $sendNotification = TRUE;
         $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_END;
         break;
 
@@ -159,7 +156,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $recur->save();
 
-    if ($sendNotification) {
+    if (in_array($this->retrieve('txn_type', 'String'), ['subscr_signup', 'subscr_eot'])) {
       $autoRenewMembership = FALSE;
       if ($recur->id &&
         isset($ids['membership']) && $ids['membership']
