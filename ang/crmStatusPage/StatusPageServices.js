@@ -1,12 +1,12 @@
 (function(angular, $, _) {
 
-  angular.module('statuspage')
+  angular.module('crmStatusPage')
     .filter('trusted', function($sce){ return $sce.trustAsHtml; })
 
     // Todo: abstract this into a generic crmUi directive?
     .directive('statuspagePopupMenu', function($timeout) {
       return {
-        templateUrl: '~/statuspage/SnoozeOptions.html',
+        templateUrl: '~/crmStatusPage/SnoozeOptions.html',
         transclude: true,
 
         link: function(scope, element, attr) {

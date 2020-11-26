@@ -5,8 +5,6 @@ return [
   'js' => ['ang/crmAttachment.js'],
   'css' => ['ang/crmAttachment.css'],
   'partials' => ['ang/crmAttachment'],
-  'settings' => [
-    'token' => \CRM_Core_Page_AJAX_Attachment::createToken(),
-  ],
+  'settingsFactory' => ['CRM_Core_Page_AJAX_Attachment', 'angularSettings'],
   'requires' => ['angularFileUpload', 'crmResource'],
 ];

@@ -131,6 +131,15 @@ class CRM_Core_Page_AJAX_Attachment {
   }
 
   /**
+   * @return array
+   */
+  public static function angularSettings() {
+    return [
+      'token' => self::createToken(),
+    ];
+  }
+
+  /**
    * @return string
    */
   public static function createToken() {
