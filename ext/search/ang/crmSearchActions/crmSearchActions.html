@@ -1,5 +1,6 @@
 <div class="btn-group" title="{{:: ts('Perform action on selected items.') }}">
-  <button type="button" ng-disabled="!$ctrl.ids.length" class="btn form-control dropdown-toggle btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <button type="button" ng-disabled="!$ctrl.ids.length" class="btn dropdown-toggle btn-default" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="crm-i fa-pencil"></i>
     {{:: ts('Action') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" ng-if=":: $ctrl.actions">
