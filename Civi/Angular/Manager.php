@@ -105,7 +105,6 @@ class Manager {
       $angularModules['crmAttachment'] = include "$civicrm_root/ang/crmAttachment.ang.php";
       $angularModules['crmAutosave'] = include "$civicrm_root/ang/crmAutosave.ang.php";
       $angularModules['crmCxn'] = include "$civicrm_root/ang/crmCxn.ang.php";
-      // $angularModules['crmExample'] = include "$civicrm_root/ang/crmExample.ang.php";
       $angularModules['crmResource'] = include "$civicrm_root/ang/crmResource.ang.php";
       $angularModules['crmRouteBinder'] = include "$civicrm_root/ang/crmRouteBinder.ang.php";
       $angularModules['crmUi'] = include "$civicrm_root/ang/crmUi.ang.php";
