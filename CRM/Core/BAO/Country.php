@@ -95,30 +95,30 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
   }
 
   /**
-   * Provide list of favourite contries.
+   * Provide list of Pinned countries.
    *
    * @param $availableCountries
    * @return array
    */
-  public static function favouriteContactCountries($availableCountries) {
-    static $cachedFavouriteContactCountries = [];
-    $favouriteContactCountries = Civi::settings()->get('favouriteContactCountries');
+  public static function pinnedContactCountries($availableCountries) {
+    static $cachedPinnedContactCountries = [];
+    $pinnedContactCountries = Civi::settings()->get('pinnedContactCountries');
 
-    if (!empty($favouriteContactCountries) && !$cachedFavouriteContactCountries) {
-      $favouriteCountries = [];
-      foreach($favouriteContactCountries as $favouriteContactCountry) {
-        if (array_key_exists($favouriteContactCountry, $availableCountries)) {
-          $favouriteCountries[$favouriteContactCountry] = $availableCountries[$favouriteContactCountry];
+    if (!empty($pinnedContactCountries) && !$cachedPinnedContactCountries) {
+      $pinnedCountries = [];
+      foreach($pinnedContactCountries as $pinnedContactCountry) {
+        if (array_key_exists($pinnedContactCountry, $availableCountries)) {
+          $pinnedCountries[$pinnedContactCountry] = $availableCountries[$pinnedContactCountry];
         }
       }
-      $cachedFavouriteContactCountries = $favouriteCountries;
+      $cachedPinnedContactCountries = $pinnedCountries;
     }
-    return $cachedFavouriteContactCountries;
+    return $cachedPinnedContactCountries;
   }
 
   /**
    * Provide sorted list of countries with default country with first position
-   * then favourite countries then rest of countries.
+   * then Pinned countries then rest of countries.
    *
    * @param $availableCountries
    * @return array
@@ -133,7 +133,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
       ]);
       $availableCountries = CRM_Utils_Array::asort($availableCountries);
     }
-    $favouriteContactCountries = CRM_Core_BAO_Country::favouriteContactCountries($availableCountries);
+    $pinnedContactCountries = CRM_Core_BAO_Country::pinnedContactCountries($availableCountries);
     // if default country is set, percolate it to the top
     if ($defaultContactCountry = CRM_Core_BAO_Country::defaultContactCountry()) {
       $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
@@ -141,11 +141,11 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
       if ($defaultID !== FALSE) {
         $default = [];
         $default[$defaultID] = $availableCountries[$defaultID] ?? NULL;
-        $availableCountries = $default + $favouriteContactCountries + $availableCountries;
+        $availableCountries = $default + $pinnedContactCountries + $availableCountries;
       }
     }
-    elseif (!empty($favouriteContactCountries)) {
-      $availableCountries = $favouriteContactCountries + $availableCountries;
+    elseif (!empty($pinnedContactCountries)) {
+      $availableCountries = $pinnedContactCountries + $availableCountries;
     }
 
     return $availableCountries;

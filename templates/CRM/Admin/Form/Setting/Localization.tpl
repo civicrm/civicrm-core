@@ -92,9 +92,9 @@
                 <td class="label">{$form.defaultContactCountry.label} {help id='defaultContactCountry' title=$form.defaultContactCountry.label}</td>
                 <td>{$form.defaultContactCountry.html}</td>
             </tr>
-            <tr class="crm-localization-form-block-favouriteContactCountries">
-                <td class="label">{$form.favouriteContactCountries.label} {help id='favouriteContactCountries' title=$form.favouriteContactCountries.label}</td>
-                <td>{$form.favouriteContactCountries.html}</td>
+            <tr class="crm-localization-form-block-pinnedContactCountries">
+                <td class="label">{$form.pinnedContactCountries.label} {help id='pinnedContactCountries' title=$form.pinnedContactCountries.label}</td>
+                <td>{$form.pinnedContactCountries.html}</td>
             </tr>
            <tr class="crm-localization-form-block-defaultContactStateProvince">
                 <td class="label">{$form.defaultContactStateProvince.label} {help id='defaultContactCountry' title=$form.defaultContactStateProvince.label}</td>
