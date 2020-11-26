@@ -80,9 +80,6 @@ function civicrm_api3_generic_setValue($apiRequest) {
 
     case CRM_Utils_Type::T_STRING:
     case CRM_Utils_Type::T_TEXT:
-      if (!CRM_Utils_Rule::xssString($value)) {
-        return civicrm_api3_create_error(ts('Illegal characters in input (potential scripting attack)'), ['error_code' => 'XSS']);
-      }
       if (array_key_exists('maxlength', $def)) {
         $value = substr($value, 0, $def['maxlength']);
       }

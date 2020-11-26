@@ -802,22 +802,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @param $value
-   *
-   * @return bool
-   */
-  public static function xssString($value) {
-    if (is_string($value)) {
-      return preg_match('!<(vb)?script[^>]*>.*</(vb)?script.*>!ims',
-        $value
-      ) ? FALSE : TRUE;
-    }
-    else {
-      return TRUE;
-    }
-  }
-
-  /**
    * Validate json string for xss
    *
    * @param string $value
@@ -826,9 +810,6 @@ class CRM_Utils_Rule {
    *   False if invalid, true if valid / safe.
    */
   public static function json($value) {
-    if (!self::xssString($value)) {
-      return FALSE;
-    }
     $array = json_decode($value, TRUE);
     if (!$array || !is_array($array)) {
       return FALSE;
@@ -974,12 +955,9 @@ class CRM_Utils_Rule {
   protected static function arrayValue($array) {
     foreach ($array as $key => $item) {
       if (is_array($item)) {
-        if (!self::xssString($key) || !self::arrayValue($item)) {
+        if (!self::arrayValue($item)) {
           return FALSE;
         }
-      }
-      if (!self::xssString($key) || !self::xssString($item)) {
-        return FALSE;
       }
     }
     return TRUE;

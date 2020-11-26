@@ -330,7 +330,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'postalCode',
       'money',
       'positiveInteger',
-      'xssString',
       'fileExists',
       'settingPath',
       'autocomplete',
