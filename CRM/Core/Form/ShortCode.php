@@ -129,6 +129,14 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
         ],
       ],
       [
+        'key' => 'action',
+        'components' => ['pcp'],
+        'options' => [
+          'info' => ts('Info Page'),
+          'transact' => ts('Contribution Page'),
+        ],
+      ],
+      [
         'key' => 'mode',
         'components' => ['contribution', 'pcp', 'event'],
         'options' => [
