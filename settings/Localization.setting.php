@@ -542,7 +542,7 @@ return [
     ],
     'default' => [],
     'add' => '5.33',
-    'title' => ts('Pinned countries'),
+    'title' => ts('Pinned Countries'),
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Appear in Top section of select list'),
