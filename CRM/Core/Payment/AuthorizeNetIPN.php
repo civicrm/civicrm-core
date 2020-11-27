@@ -52,7 +52,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $input['component'] = 'contribute';
 
       // load post vars in $input
-      $this->getInput($input, $ids);
+      $this->getInput($input);
 
       // load post ids in $ids
       $this->getIDs($ids, $input);
@@ -65,19 +65,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       if (!$contribution->find(TRUE)) {
         throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
       }
-      $ids['contributionPage'] = $contribution->contribution_page_id;
 
-      // make sure contact exists and is valid
-      // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $contribution->contact_id;
-      $contact->find(TRUE);
-      if ($contact->id != $ids['contact']) {
-        // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-        CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
-        echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
-        $ids['contact'] = $contribution->contact_id;
-      }
+      $ids['contributionPage'] = $contribution->contribution_page_id;
 
       $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
       $contributionRecur->id = $ids['contributionRecur'];
@@ -95,7 +84,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         //load new contribution object if required.
         // create a contribution and then get it processed
         $contribution = new CRM_Contribute_BAO_Contribution();
-        $contribution->contact_id = $ids['contact'];
         $contribution->contribution_page_id = $ids['contributionPage'];
         $contribution->contribution_recur_id = $ids['contributionRecur'];
         $contribution->receive_date = $input['receive_date'];
@@ -110,7 +98,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       if ($isFirstOrLastRecurringPayment) {
         //send recurring Notification email for user
         CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
-          $ids['contact'],
+          $contributionRecur->contact_id,
           $ids['contributionPage'],
           $contributionRecur,
           (bool) $this->getMembershipID($contribution->id, $contributionRecur->id)
@@ -252,11 +240,9 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    */
   public function getIDs(&$ids, $input) {
-    $ids['contact'] = (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0);
     $ids['contribution'] = (int) $this->retrieve('x_invoice_num', 'Integer');
-    $contributionRecur = $this->getContributionRecurObject($input['subscription_id'], $ids['contact'], $ids['contribution']);
+    $contributionRecur = $this->getContributionRecurObject($input['subscription_id'], (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $ids['contribution']);
     $ids['contributionRecur'] = (int) $contributionRecur->id;
-    $ids['contact'] = $contributionRecur->contact_id;
   }
 
   /**
