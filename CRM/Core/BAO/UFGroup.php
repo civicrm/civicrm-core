@@ -1425,12 +1425,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    * @param array $ids
-   *   Reference array contains the id.
+   *   Deprecated array.
    *
    *
    * @return object
    */
   public static function add(&$params, $ids = []) {
+    if (empty($params['id']) && !empty($ids['ufgroup'])) {
+      $params['id'] = $ids['ufgroup'];
+      Civi::log()->warning('ids parameter is deprecated', ['civi.tag' => 'deprecated']);
+    }
     $fields = [
       'is_active',
       'add_captcha',

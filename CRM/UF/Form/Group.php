@@ -363,7 +363,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
     else {
       // get the submitted form values.
-      $ids = [];
       $params = $this->controller->exportValues($this->_name);
 
       if (!array_key_exists('is_active', $params)) {
@@ -371,7 +370,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
-        $ids['ufgroup'] = $this->_id;
+        $params['id'] = $this->_id;
         // CRM-5284
         // lets skip trying to mess around with profile weights and allow the user to do as needed.
       }
@@ -382,7 +381,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       // create uf group
-      $ufGroup = CRM_Core_BAO_UFGroup::add($params, $ids);
+      $ufGroup = CRM_Core_BAO_UFGroup::add($params);
 
       if (!empty($params['is_active'])) {
         //make entry in uf join table
