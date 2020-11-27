@@ -2410,32 +2410,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Generate a default CRUD URL for an entity.
-   *
-   * @param array $spec
-   *   With keys:.
-   *   - action: int, eg CRM_Core_Action::VIEW or CRM_Core_Action::UPDATE
-   *   - entity_table: string
-   *   - entity_id: int
-   * @param CRM_Core_DAO $bao
-   * @param array $link
-   *   To define the link, add these keys to $link:.
-   *   - title: string
-   *   - path: string
-   *   - query: array
-   *   - url: string (used in lieu of "path"/"query")
-   *      Note: if making "url" CRM_Utils_System::url(), set $htmlize=false
-   * @return mixed
-   * @deprecated
-   */
-  public static function crudLink($spec, $bao, &$link) {
-    return self::singleton()->invoke(['spec', 'bao', 'link'], $spec, $bao, $link,
-      self::$_nullObject, self::$_nullObject, self::$_nullObject,
-      'civicrm_crudLink'
-    );
-  }
-
-  /**
    * Modify the CiviCRM container - add new services, parameters, extensions, etc.
    *
    * ```

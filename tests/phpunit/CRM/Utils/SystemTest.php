@@ -250,6 +250,35 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertTrue(CRM_Utils_System::isNull($arr));
   }
 
+  public function crudLinkExamples() {
+    return [
+      'Contact:update' => [
+        ['entity' => 'Contact', 'action' => 'update', 'id' => 123],
+        ['title' => 'Edit Contact', 'url' => '/index.php?q=civicrm/contact/add&reset=1&action=update&cid=123'],
+      ],
+      'civicrm_contact:UPDATE' => [
+        ['entity_table' => 'civicrm_contact', 'action' => CRM_Core_Action::UPDATE, 'entity_id' => 123],
+        ['title' => 'Edit Contact', 'url' => '/index.php?q=civicrm/contact/add&reset=1&action=update&cid=123'],
+      ],
+      'civicrm_activity:ADD' => [
+        ['entity_table' => 'civicrm_activity', 'action' => CRM_Core_Action::ADD],
+        ['title' => 'New Activity', 'url' => '/index.php?q=civicrm/activity&reset=1&action=add&context=standalone'],
+      ],
+      'Contribution:delete' => [
+        ['entity' => 'Contribution', 'action' => 'DELETE', 'id' => 456],
+        ['title' => 'Delete Contribution', 'url' => '/index.php?q=civicrm/contact/view/contribution&reset=1&action=delete&id=456'],
+      ],
+    ];
+  }
+
+  /**
+   * @dataProvider crudLinkExamples
+   */
+  public function testCrudLink($params, $expectedResult) {
+    $result = CRM_Utils_System::createDefaultCrudLink($params);
+    $this->assertEquals($expectedResult, $result);
+  }
+
   /**
    * Test that flushing cache clears the asset cache.
    */
@@ -258,7 +287,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     // method to get it, so create a file in the folder using public methods,
     // then get the path from that, then flush the cache, then check if the
     // folder is empty.
-    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', array($this, 'flushCacheClearsAssetCache_buildAsset'));
+    \Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'flushCacheClearsAssetCache_buildAsset']);
     $fakeFile = \Civi::service("asset_builder")->getPath('fakeFile.json');
 
     CRM_Utils_System::flushCache();
