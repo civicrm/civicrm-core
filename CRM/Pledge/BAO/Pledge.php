@@ -285,7 +285,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @return mixed
    */
   public static function deletePledge($id) {
-    CRM_Utils_Hook::pre('delete', 'Pledge', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Pledge', $id);
 
     $transaction = new CRM_Core_Transaction();
 

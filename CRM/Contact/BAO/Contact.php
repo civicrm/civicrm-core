@@ -3473,9 +3473,9 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     $obj = new $daoName();
     $obj->id = $id;
     $obj->find();
-    $hookParams = [];
+
     if ($obj->fetch()) {
-      CRM_Utils_Hook::pre('delete', $type, $id, $hookParams);
+      CRM_Utils_Hook::pre('delete', $type, $id);
       $contactId = $obj->contact_id;
       $obj->delete();
     }

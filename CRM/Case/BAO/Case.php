@@ -187,7 +187,7 @@ WHERE civicrm_case.id = %1";
    *   is successful
    */
   public static function deleteCase($caseId, $moveToTrash = FALSE) {
-    CRM_Utils_Hook::pre('delete', 'Case', $caseId, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Case', $caseId);
 
     //delete activities
     $activities = self::getCaseActivityDates($caseId);

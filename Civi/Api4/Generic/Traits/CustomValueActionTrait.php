@@ -83,7 +83,7 @@ trait CustomValueActionTrait {
     $customTable = CoreUtil::getTableName($this->getEntityName());
     $ids = [];
     foreach ($items as $item) {
-      \CRM_Utils_Hook::pre('delete', $this->getEntityName(), $item['id'], \CRM_Core_DAO::$_nullArray);
+      \CRM_Utils_Hook::pre('delete', $this->getEntityName(), $item['id']);
       \CRM_Utils_SQL_Delete::from($customTable)
         ->where('id = #value')
         ->param('#value', $item['id'])

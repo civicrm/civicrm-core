@@ -171,7 +171,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
       return NULL;
     }
 
-    CRM_Utils_Hook::pre('delete', 'Event', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Event', $id);
 
     $extends = ['event'];
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);

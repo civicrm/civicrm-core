@@ -1122,7 +1122,7 @@ AND    record_type_id = $targetRecordID
    * @return mixed
    */
   public static function del($id) {
-    CRM_Utils_Hook::pre('delete', 'MailingJob', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'MailingJob', $id);
 
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
     $jobDAO->id = $id;

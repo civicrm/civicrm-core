@@ -340,7 +340,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    *   Campaign page id.
    */
   public static function deleteById($id) {
-    CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Campaign', $id);
 
     $transaction = new CRM_Core_Transaction();
 

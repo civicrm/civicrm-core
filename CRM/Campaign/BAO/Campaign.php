@@ -84,7 +84,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       return FALSE;
     }
 
-    CRM_Utils_Hook::pre('delete', 'Campaign', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Campaign', $id);
 
     $dao = new CRM_Campaign_DAO_Campaign();
     $dao->id = $id;

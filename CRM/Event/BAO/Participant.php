@@ -843,7 +843,7 @@ WHERE  civicrm_participant.id = {$participantId}
     if (!$participant->find()) {
       return FALSE;
     }
-    CRM_Utils_Hook::pre('delete', 'Participant', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Participant', $id);
 
     $transaction = new CRM_Core_Transaction();
 
