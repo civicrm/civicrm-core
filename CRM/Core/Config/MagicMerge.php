@@ -120,6 +120,7 @@ class CRM_Core_Config_MagicMerge {
       // renamed.
       'debug' => ['setting', 'debug_enabled'],
       'defaultContactCountry' => ['setting'],
+      'pinnedContactCountries' => ['setting'],
       'defaultContactStateProvince' => ['setting'],
       'defaultCurrency' => ['setting'],
       'defaultSearchProfileID' => ['setting'],

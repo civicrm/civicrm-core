@@ -546,7 +546,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Appear in Top section of select list'),
-    'help_text' => 'Selected countries will appear in top section of country list',
+    'help_text' => ts('Selected countries will appear in top section of country list'),
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
     ],
