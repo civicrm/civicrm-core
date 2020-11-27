@@ -55,7 +55,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if (!$id || !is_numeric($id)) {
       throw new CRM_Core_Exception('Invalid group request attempted');
     }
-    CRM_Utils_Hook::pre('delete', 'Group', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Group', $id);
 
     $transaction = new CRM_Core_Transaction();
 

@@ -1399,6 +1399,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    */
   public static function del($id) {
+    CRM_Utils_Hook::pre('delete', 'UFGroup', $id);
+
     //check whether this group contains  any profile fields
     $profileField = new CRM_Core_DAO_UFField();
     $profileField->uf_group_id = $id;
@@ -1416,6 +1418,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     $group = new CRM_Core_DAO_UFGroup();
     $group->id = $id;
     $group->delete();
+
+    CRM_Utils_Hook::post('delete', 'UFGroup', $id, $group);
     return 1;
   }
 

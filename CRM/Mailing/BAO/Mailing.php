@@ -2463,7 +2463,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       throw new CRM_Core_Exception(ts('No id passed to mailing del function'));
     }
 
-    CRM_Utils_Hook::pre('delete', 'Mailing', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Mailing', $id);
 
     // delete all file attachments
     CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing',

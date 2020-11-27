@@ -717,7 +717,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function del($id) {
     // delete from relationship table
-    CRM_Utils_Hook::pre('delete', 'Relationship', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Relationship', $id);
 
     $relationship = self::clearCurrentEmployer($id, CRM_Core_Action::DELETE);
     $relationship->delete();
