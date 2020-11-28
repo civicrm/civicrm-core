@@ -125,25 +125,21 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * Evaluate the content of a single token.
+   * Returns a mapping of alias tokens to actual token.
+   * For example to support {activity.activity_id} in addition to {activity.id} we return ['activity_id => 'id]
    *
-   * @param \Civi\Token\TokenRow $row
-   *   The record for which we want token values.
-   * @param string $entity
-   *   The name of the token entity.
-   * @param string $field
-   *   The name of the token field.
-   * @param mixed $prefetch
-   *   Any data that was returned by the prefetch().
-   *
-   * @throws \CRM_Core_Exception
+   * @return array
    */
-  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    // maps token name to api field
-    $mapping = [
+  protected function getAliasTokens() {
+    return [
       'activity_id' => 'id',
     ];
+  }
 
+  /**
+   * @inheritDoc
+   */
+  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
     $activityId = $row->context[$this->getEntityContextSchema()];
 
@@ -152,8 +148,8 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
     if (in_array($field, ['activity_date_time', 'created_date', 'modified_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity[$field]));
     }
-    elseif (isset($mapping[$field]) and (isset($activity[$mapping[$field]]))) {
-      $row->tokens($entity, $field, $activity[$mapping[$field]]);
+    elseif (isset($this->getAliasTokens()[$field]) and (isset($activity[$this->getAliasTokens()[$field]]))) {
+      $row->tokens($entity, $field, $activity[$this->getAliasTokens()[$field]]);
     }
     elseif (in_array($field, ['activity_type'])) {
       $row->tokens($entity, $field, $this->activityTypes[$activity['activity_type_id']]);
@@ -189,14 +185,14 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
   protected function getBasicTokens(): array {
     if (!isset($this->basicTokens)) {
       $this->basicTokens = [
-        'activity_id' => ts('Activity ID'),
+        'id' => ts('Activity ID'),
         'activity_type' => ts('Activity Type'),
+        'activity_type_id' => ts('Activity Type ID'),
         'subject' => ts('Activity Subject'),
         'details' => ts('Activity Details'),
         'activity_date_time' => ts('Activity Date-Time'),
         'created_date' => ts('Activity Created Date'),
         'modified_date' => ts('Activity Modified Date'),
-        'activity_type_id' => ts('Activity Type ID'),
         'status' => ts('Activity Status'),
         'status_id' => ts('Activity Status ID'),
         'location' => ts('Activity Location'),
