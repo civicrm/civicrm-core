@@ -157,7 +157,6 @@
     {/foreach}
   </div>
 </div>
-{include file="CRM/common/TabHeader.tpl"}
 
 {elseif $action ne 1 and $action ne 2 and $action ne 4 and $action ne 8}
   <div class="messages status no-popup">
