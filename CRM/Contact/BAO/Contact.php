@@ -3181,6 +3181,11 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         }
 
         // finally get menu item for -more- action widget.
+        while (!empty($contextMenu['moreActions'][$values['weight']])) {
+          // Quick & dirty way of handling 2 items with the same weight
+          // without clobbering one.
+          $values['weight']++;
+        }
         $contextMenu['moreActions'][$values['weight']] = [
           'title' => $values['title'],
           'ref' => $values['ref'],
@@ -3198,6 +3203,11 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           }
 
           // finally get menu item for -more- action widget.
+          while (!empty($contextMenu['otherActions'][$value['weight']])) {
+            // Quick & dirty way of handling 2 items with the same weight
+            // without clobbering one.
+            $value['weight']++;
+          }
           $contextMenu['otherActions'][$value['weight']] = [
             'title' => $value['title'],
             'ref' => $value['ref'],
