@@ -29,6 +29,8 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   private static $_surveyActionLinks;
   private static $_petitionActionLinks;
 
+  public $_tabs;
+
   /**
    * Get the action links for this page.
    *
@@ -439,6 +441,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     ];
 
     $subPageType = CRM_Utils_Request::retrieve('type', 'String', $this);
+    // Load the data for a specific tab
     if ($subPageType) {
       if (!isset($this->_tabs[$subPageType])) {
         CRM_Utils_System::permissionDenied();
@@ -447,17 +450,10 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       $this->{'browse' . ucfirst($subPageType)}();
       $this->assign('subPageType', ucfirst($subPageType));
     }
+    // Initialize tabs
     else {
-      //build the tabs.
       $this->buildTabs();
     }
-    CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting([
-        'tabSettings' => [
-          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
-        ],
-      ]);
   }
 
   /**
@@ -485,6 +481,13 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
     }
     $allTabs['campaign']['class'] = 'livePage';
     $this->assign('tabHeader', $allTabs);
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting([
+        'tabSettings' => [
+          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
+        ],
+      ]);
   }
 
 }
