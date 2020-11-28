@@ -65,3 +65,8 @@
     {ts}State/province listings are populated dynamically based on the selected Country for all standard contact address editing forms, as well as for <strong>Profile forms which include both a Country and a State/Province field</strong>.  This setting controls which countries' states and/or provinces are available in the State/Province selection field <strong>for Custom Fields</strong> or for Profile forms which do NOT include a Country field.{/ts}
   </p>
 {/htxt}
+{htxt id="pinnedContactCountries"}
+  <p>
+      {ts}Selected countries will appear in top section of country list.{/ts}
+  </p>
+{/htxt}

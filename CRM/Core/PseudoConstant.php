@@ -732,25 +732,7 @@ WHERE  id = %1";
 
       self::populate(self::$country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active', $whereClause);
 
-      // if default country is set, percolate it to the top
-      if (CRM_Core_BAO_Country::defaultContactCountry()) {
-        $countryIsoCodes = self::countryIsoCode();
-        $defaultID = array_search(CRM_Core_BAO_Country::defaultContactCountry(), $countryIsoCodes);
-        if ($defaultID !== FALSE) {
-          $default[$defaultID] = self::$country[$defaultID] ?? NULL;
-          self::$country = $default + self::$country;
-        }
-      }
-
-      // localise the country names if in an non-en_US locale
-      $tsLocale = CRM_Core_I18n::getLocale();
-      if ($tsLocale != '' and $tsLocale != 'en_US') {
-        $i18n = CRM_Core_I18n::singleton();
-        $i18n->localizeArray(self::$country, [
-          'context' => 'country',
-        ]);
-        self::$country = CRM_Utils_Array::asort(self::$country);
-      }
+      self::$country = CRM_Core_BAO_Country::_defaultContactCountries(self::$country);
     }
     if ($id) {
       if (array_key_exists($id, self::$country)) {
@@ -1579,12 +1561,19 @@ WHERE  id = %1
     }
     // Localize results
     if (!empty($params['localize']) || $pseudoconstant['table'] === 'civicrm_country' || $pseudoconstant['table'] === 'civicrm_state_province') {
-      $I18nParams = [];
-      if ($localizeContext) {
-        $I18nParams['context'] = $localizeContext;
+      if ($pseudoconstant['table'] === 'civicrm_country') {
+        $output = CRM_Core_BAO_Country::_defaultContactCountries($output);
+        // avoid further sorting
+        $order = '';
       }
-      $i18n = CRM_Core_I18n::singleton();
-      $i18n->localizeArray($output, $I18nParams);
+      else {
+        $I18nParams = [];
+        if ($localizeContext) {
+          $I18nParams['context'] = $localizeContext;
+        }
+        $i18n = CRM_Core_I18n::singleton();
+        $i18n->localizeArray($output, $I18nParams);
+      }
       // Maintain sort by label
       if ($order === 'ORDER BY %2') {
         $output = CRM_Utils_Array::asort($output);

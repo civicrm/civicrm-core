@@ -528,4 +528,27 @@ return [
     'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
     . 'You may or may not wish to make an assumption here about whether it matches the site language',
   ],
+  'pinnedContactCountries' => [
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'pinnedContactCountries',
+    'type' => 'Array',
+    'quick_form_type' => 'Element',
+    'html_type' => 'advmultiselect',
+    'html_attributes' => [
+      'size' => 5,
+      'style' => 'width:150px',
+      'class' => 'advmultiselect',
+    ],
+    'default' => [],
+    'add' => '5.33',
+    'title' => ts('Pinned Countries'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Appear in Top section of select list'),
+    'help_text' => ts('Selected countries will appear in top section of country list'),
+    'pseudoconstant' => [
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
+    ],
+  ],
 ];

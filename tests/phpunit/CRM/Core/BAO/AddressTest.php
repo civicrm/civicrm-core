@@ -644,4 +644,53 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * Pinned countries with Default country
+   */
+  public function testPinnedCountriesWithDefaultCountry() {
+    // Guyana, Netherlands, United States
+    $pinnedCountries = ['1093', '1152', '1228'];
+
+    // set default country to Netherlands
+    $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1152, 'pinnedContactCountries' => $pinnedCountries]);
+    // get the list of country
+    $availableCountries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
+    // get the order of country id using their keys
+    $availableCountries = array_keys($availableCountries);
+
+    // default country is set, so first country should be Netherlands, then rest from pinned countries.
+
+    // Netherlands
+    $this->assertEquals(1152, $availableCountries[0]);
+    // Guyana
+    $this->assertEquals(1093, $availableCountries[1]);
+    // United States
+    $this->assertEquals(1228, $availableCountries[2]);
+  }
+
+  /**
+   * Pinned countries with out Default country
+   */
+  public function testPinnedCountriesWithOutDefaultCountry() {
+    // Guyana, Netherlands, United States
+    $pinnedCountries = ['1093', '1152', '1228'];
+
+    // unset default country
+    $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => NULL, 'pinnedContactCountries' => $pinnedCountries]);
+
+    // get the list of country
+    $availableCountries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
+    // get the order of country id using their keys
+    $availableCountries = array_keys($availableCountries);
+
+    // no default country, so sequnece should be present as per pinned countries.
+
+    // Guyana
+    $this->assertEquals(1093, $availableCountries[0]);
+    // Netherlands
+    $this->assertEquals(1152, $availableCountries[1]);
+    // United States
+    $this->assertEquals(1228, $availableCountries[2]);
+  }
+
 }
