@@ -535,4 +535,24 @@ class CRM_Extension_Mapper {
     CRM_Extension_System::singleton()->getClassLoader()->refresh();
   }
 
+  /**
+   * This returns a formatted string containing an extension upgrade link for the UI.
+   * @todo We should improve this to return more appropriate text. eg. when an extension is not installed
+   *   it should not say "version xx is installed".
+   *
+   * @param array $remoteExtensionInfo
+   * @param array $localExtensionInfo
+   *
+   * @return string
+   */
+  public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo) {
+    if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'], $remoteExtensionInfo->version, '<')) {
+      return ts('Version %1 is installed. <a %2>Upgrade to version %3</a>.', [
+        1 => $localExtensionInfo['version'],
+        2 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id={$localExtensionInfo['key']}&key={$localExtensionInfo['key']}") . '"',
+        3 => $remoteExtensionInfo->version,
+      ]);
+    }
+  }
+
 }

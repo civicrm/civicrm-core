@@ -234,6 +234,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // build list of available downloads
     $remoteExtensionRows = [];
     $compat = CRM_Extension_System::getCompatibilityInfo();
+    $mapper = CRM_Extension_System::singleton()->getMapper();
 
     foreach ($remoteExtensions as $info) {
       if (!empty($compat[$info->key]['obsolete'])) {
@@ -257,7 +258,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       if (isset($localExtensionRows[$info->key])) {
         if (array_key_exists('version', $localExtensionRows[$info->key])) {
           if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
-            $row['is_upgradeable'] = TRUE;
+            $row['upgradelink'] = $mapper->getUpgradeLink($remoteExtensions[$info->key], $localExtensionRows[$info->key]);
           }
         }
       }
