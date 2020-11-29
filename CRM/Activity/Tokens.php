@@ -56,7 +56,8 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
   /**
    * Mapping from tokenName to api return field
-   * Use lists since we might need multiple fields
+   * Using arrays allows more complex tokens to be handled that require more than one API field.
+   * For example, an address token might want ['street_address', 'city', 'postal_code']
    *
    * @var array
    */
@@ -132,37 +133,37 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
     $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityContextSchema()];
 
-    $activity = (object) $prefetch['activity'][$activityId];
+    $activity = $prefetch['activity'][$activityId];
 
     if (in_array($field, ['activity_date_time', 'created_date', 'modified_date'])) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity->$field));
+      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity[$field]));
     }
-    elseif (isset($mapping[$field]) and (isset($activity->{$mapping[$field]}))) {
-      $row->tokens($entity, $field, $activity->{$mapping[$field]});
+    elseif (isset($mapping[$field]) and (isset($activity[$mapping[$field]]))) {
+      $row->tokens($entity, $field, $activity[$mapping[$field]]);
     }
     elseif (in_array($field, ['activity_type'])) {
-      $row->tokens($entity, $field, $this->activityTypes[$activity->activity_type_id]);
+      $row->tokens($entity, $field, $this->activityTypes[$activity['activity_type_id']]);
     }
     elseif (in_array($field, ['status'])) {
-      $row->tokens($entity, $field, $this->activityStatuses[$activity->status_id]);
+      $row->tokens($entity, $field, $this->activityStatuses[$activity['status_id']]);
     }
     elseif (in_array($field, ['campaign'])) {
-      $row->tokens($entity, $field, $this->campaigns[$activity->campaign_id]);
+      $row->tokens($entity, $field, $this->campaigns[$activity['campaign_id']]);
     }
     elseif (in_array($field, ['case_id'])) {
       // An activity can be linked to multiple cases so case_id is always an array.
       // We just return the first case ID for the token.
-      $row->tokens($entity, $field, is_array($activity->case_id) ? reset($activity->case_id) : $activity->case_id);
+      $row->tokens($entity, $field, is_array($activity['case_id']) ? reset($activity['case_id']) : $activity['case_id']);
     }
     elseif (array_key_exists($field, $this->customFieldTokens)) {
       $row->tokens($entity, $field,
-        isset($activity->$field)
-          ? \CRM_Core_BAO_CustomField::displayValue($activity->$field, $field)
+        isset($activity[$field])
+          ? \CRM_Core_BAO_CustomField::displayValue($activity[$field], $field)
           : ''
       );
     }
-    elseif (isset($activity->$field)) {
-      $row->tokens($entity, $field, $activity->$field);
+    elseif (isset($activity[$field])) {
+      $row->tokens($entity, $field, $activity[$field]);
     }
   }
 
