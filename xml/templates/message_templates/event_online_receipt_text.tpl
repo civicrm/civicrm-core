@@ -277,18 +277,6 @@ You were registered by: {$payer.name}
 {/foreach}
 {/foreach}
 {/if}
-{if $customGroup}
-{foreach from=$customGroup item=value key=customName}
-=========================================================={if $pricesetFieldsCount }===================={/if}
-
-{$customName}
-=========================================================={if $pricesetFieldsCount }===================={/if}
-
-{foreach from=$value item=v key=n}
-{$n}: {$v}
-{/foreach}
-{/foreach}
-{/if}
 
 {if $event.allow_selfcancelxfer }
 {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if $totalAmount}{ts}Cancellations are not refundable.{/ts}{/if}

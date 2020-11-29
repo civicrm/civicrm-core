@@ -474,25 +474,6 @@
 {/foreach}
 {/if}
 
-    {if $customGroup}
-      {foreach from=$customGroup item=value key=customName}
-       <tr>
-        <th {$headerStyle}>
-         {$customName}
-        </th>
-       </tr>
-       {foreach from=$value item=v key=n}
-        <tr>
-         <td {$labelStyle}>
-          {$n}
-         </td>
-         <td {$valueStyle}>
-          {$v}
-         </td>
-        </tr>
-       {/foreach}
-      {/foreach}
-     {/if}
     </table>
     {if $event.allow_selfcancelxfer }
      <tr>
