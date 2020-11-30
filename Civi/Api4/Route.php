@@ -26,7 +26,7 @@ namespace Civi\Api4;
  * Note: this is a read-only api as routes are set via xml files and hooks.
  *
  * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterMenu/
- *
+ * @searchable false
  * @package Civi\Api4
  */
 class Route extends \Civi\Api4\Generic\AbstractEntity {

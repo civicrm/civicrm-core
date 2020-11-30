@@ -23,7 +23,7 @@ namespace Civi\Api4;
  * Domains - multisite instances of CiviCRM.
  *
  * @see https://docs.civicrm.org/sysadmin/en/latest/setup/multisite/
- *
+ * @searchable false
  * @package Civi\Api4
  */
 class Domain extends Generic\DAOEntity {

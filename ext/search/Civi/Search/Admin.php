@@ -59,7 +59,7 @@ class Admin {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
       ->addSelect('name', 'title', 'type', 'title_plural', 'description', 'icon', 'paths')
-      ->addWhere('name', '!=', 'Entity')
+      ->addWhere('searchable', '=', TRUE)
       ->addOrderBy('title_plural')
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],

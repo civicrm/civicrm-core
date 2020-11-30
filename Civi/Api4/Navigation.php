@@ -21,6 +21,7 @@ namespace Civi\Api4;
 /**
  * Navigation entity.
  *
+ * @searchable false
  * @package Civi\Api4
  */
 class Navigation extends Generic\DAOEntity {

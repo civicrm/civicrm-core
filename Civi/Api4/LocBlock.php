@@ -13,8 +13,11 @@
 namespace Civi\Api4;
 
 /**
- * ContributionPage entity.
+ * LocBlock entity.
  *
+ * Links addresses, emails & phones to Events.
+ *
+ * @searchable false
  * @package Civi\Api4
  */
 class LocBlock extends Generic\DAOEntity {

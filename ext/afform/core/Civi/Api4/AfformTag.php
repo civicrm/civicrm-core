@@ -3,6 +3,7 @@ namespace Civi\Api4;
 
 /**
  * Class AfformTag
+ * @searchable false
  * @package Civi\Api4
  */
 class AfformTag extends Generic\AbstractEntity {

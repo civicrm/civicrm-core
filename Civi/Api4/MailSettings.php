@@ -22,6 +22,7 @@ namespace Civi\Api4;
 /**
  * MailSettings entity.
  *
+ * @searchable false
  * @package Civi\Api4
  */
 class MailSettings extends Generic\DAOEntity {
