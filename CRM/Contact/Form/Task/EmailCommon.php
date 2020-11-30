@@ -595,7 +595,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   public static function bounceIfSimpleMailLimitExceeded($count) {
     CRM_Core_Error::deprecatedFunctionWarning('This code is no longer used in core and will be removed');
 
-    $limit = Civi::settings()->get('simple_mail_limit');
+    $limit = Civi::settings()->get('simple_mail_limit') ?? CRM_Contact_Form_Task_EmailCommon::MAX_EMAILS_KILL_SWITCH;
     if ($count > $limit) {
       CRM_Core_Error::statusBounce(ts('Please do not use this task to send a lot of emails (greater than %1). Many countries have legal requirements when sending bulk emails and the CiviMail framework has opt out functionality and domain tokens to help meet these.',
         [1 => $limit]
