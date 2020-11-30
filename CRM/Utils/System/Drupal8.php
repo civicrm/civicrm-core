@@ -835,4 +835,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return ['ufAccessURL' => \Drupal\Core\Url::fromRoute('user.admin_permissions')->toString()];
   }
 
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    if (\Drupal::hasContainer()) {
+      $session = \Drupal::service('session');
+      if (!$session->isStarted()) {
+        $session->start();
+      }
+    }
+  }
+
 }
