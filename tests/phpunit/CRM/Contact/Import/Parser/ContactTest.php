@@ -527,6 +527,22 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test importing in the Preferred Language Field
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPreferredLanguageImport() {
+    $contactValues = [
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      'email' => 'bill.gates@microsoft.com',
+      'nick_name' => 'Billy-boy',
+      'preferred_language' => 'English (Australia)',
+    ];
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [NULL, NULL, 'Primary', NULL, NULL]);
+  }
+
+  /**
    * Test that the import parser adds the address to the primary location.
    *
    * @throws \Exception
