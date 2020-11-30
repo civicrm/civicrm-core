@@ -877,11 +877,28 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return string
    */
-  public static function getInUseCollation() {
+  public static function getInUseCollation(): string {
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
       $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_contact\'');
       $dao->fetch();
       \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__];
+  }
+
+  /**
+   * Does the database support utf8mb4.
+   *
+   * Utf8mb4 is required to support emojis but older databases may not have it enabled.
+   *
+   * This is aggressively cached despite just being a string function
+   * as it is expected it might be called many times.
+   *
+   * @return bool
+   */
+  public static function databaseSupportsUTF8MB4(): bool {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__] = stripos(self::getInUseCollation(), 'utf8mb4') === TRUE;
     }
     return \Civi::$statics[__CLASS__][__FUNCTION__];
   }
