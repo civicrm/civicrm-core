@@ -5,6 +5,7 @@
   <class>PaymentProcessor</class>
   <name>civicrm_payment_processor</name>
   <add>1.8</add>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Payment Processor ID</title>

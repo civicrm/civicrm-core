@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_queue</name>
   <comment>A collection of all intended recipients of a job</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <type>int unsigned</type>

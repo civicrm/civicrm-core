@@ -6,6 +6,7 @@
   <add>1.6</add>
   <log>true</log>
   <title>Recurring Contribution</title>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <uniqueName>contribution_recur_id</uniqueName>

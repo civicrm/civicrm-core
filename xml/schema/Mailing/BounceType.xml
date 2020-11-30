@@ -5,6 +5,7 @@
   <class>BounceType</class>
   <name>civicrm_mailing_bounce_type</name>
   <comment>Table to index the various bounce types and their properties</comment>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Bounce Type ID</title>

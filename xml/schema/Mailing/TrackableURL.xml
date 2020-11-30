@@ -6,6 +6,7 @@
   <name>civicrm_mailing_trackable_url</name>
   <comment>Stores URLs for which we should track click-throughs from mailings</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Trackable URL ID</title>

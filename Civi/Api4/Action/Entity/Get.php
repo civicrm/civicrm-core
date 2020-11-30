@@ -25,7 +25,7 @@ use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 /**
  * Get the names & docblocks of all APIv4 entities.
  *
- * Scans for api entities in core + enabled extensions.
+ * Scans for api entities in core, enabled components & enabled extensions.
  *
  * Also includes pseudo-entities from multi-record custom groups by default.
  *
@@ -50,6 +50,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
+    $enabledComponents = array_keys(\CRM_Core_Component::getEnabledComponents());
     foreach ($locations as $location) {
       $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
       if (is_dir($dir)) {
@@ -62,7 +63,10 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
             && is_a($entity, '\Civi\Api4\Generic\AbstractEntity', TRUE)
           ) {
             $info = $entity::getInfo();
-            $entities[$info['name']] = $info;
+            // Only include DAO entities from enabled components
+            if (empty($info['dao']) || !defined($info['dao'] . '::COMPONENT') || in_array(constant($info['dao'] . '::COMPONENT'), $enabledComponents)) {
+              $entities[$info['name']] = $info;
+            }
           }
         }
       }

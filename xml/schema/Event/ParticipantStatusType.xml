@@ -6,6 +6,7 @@
   <comment>various types of CiviEvent participant statuses</comment>
   <add>3.0</add>
   <log>true</log>
+  <component>CiviEvent</component>
   <field>
     <name>id</name>
     <title>Participant Status Type ID</title>

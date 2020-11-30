@@ -6,6 +6,7 @@
   <name>civicrm_currency</name>
   <add>1.7</add>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Currency ID</title>

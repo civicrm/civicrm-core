@@ -5,6 +5,7 @@
   <class>BouncePattern</class>
   <name>civicrm_mailing_bounce_pattern</name>
   <comment>Pseudo-constant table of patterns for bounce classification</comment>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Bounce Pattern ID</title>

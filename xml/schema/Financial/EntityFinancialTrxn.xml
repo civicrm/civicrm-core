@@ -5,6 +5,7 @@
   <class>EntityFinancialTrxn</class>
   <name>civicrm_entity_financial_trxn</name>
   <add>3.2</add>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Entity Financial Transaction ID</title>

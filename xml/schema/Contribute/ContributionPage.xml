@@ -7,6 +7,7 @@
   <comment>A Contribution object store meta information about a single customized contribution page</comment>
   <add>1.3</add>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Contribution Page ID</title>

@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_unsubscribe</name>
   <comment>Tracks when a recipient unsubscribes from a group/domain</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Unsubscribe ID</title>

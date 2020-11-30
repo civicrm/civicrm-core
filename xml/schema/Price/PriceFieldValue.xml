@@ -5,6 +5,7 @@
   <class>PriceFieldValue</class>
   <name>civicrm_price_field_value</name>
   <add>3.3</add>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Price Field Value ID</title>

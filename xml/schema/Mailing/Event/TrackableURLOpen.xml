@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_trackable_url_open</name>
   <comment>Tracks when a TrackableURL is clicked by a recipient.</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Trackable URL Open ID</title>

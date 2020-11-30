@@ -5,6 +5,7 @@
   <class>Cart</class>
   <useBao>1</useBao>
   <name>civicrm_event_carts</name>
+  <component>CiviEvent</component>
   <field>
     <name>id</name>
     <title>Cart ID</title>
