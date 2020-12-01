@@ -6,6 +6,7 @@
   <name>civicrm_participant_payment</name>
   <add>1.7</add>
   <log>true</log>
+  <component>CiviEvent</component>
   <field>
     <name>id</name>
     <title>Payment ID</title>

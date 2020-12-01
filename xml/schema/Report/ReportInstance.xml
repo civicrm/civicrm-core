@@ -8,6 +8,7 @@
   <add>2.2</add>
   <title>Report</title>
   <icon>fa-bar-chart</icon>
+  <component>CiviReport</component>
   <field>
     <name>id</name>
     <title>Report Instance ID</title>

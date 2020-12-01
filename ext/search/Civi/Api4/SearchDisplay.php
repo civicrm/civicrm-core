@@ -6,6 +6,7 @@ namespace Civi\Api4;
  *
  * Provided by the Search Kit extension.
  *
+ * @searchable false
  * @package Civi\Api4
  */
 class SearchDisplay extends Generic\DAOEntity {

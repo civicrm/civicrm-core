@@ -4,6 +4,7 @@ namespace Civi\Api4;
 
 /**
  * Class AfformPalette
+ * @searchable false
  * @package Civi\Api4
  */
 class AfformPalette extends Generic\AbstractEntity {

@@ -7,6 +7,7 @@
   <add>1.7</add>
   <log>true</log>
   <icon>fa-ticket</icon>
+  <component>CiviEvent</component>
   <field>
     <name>id</name>
     <uniqueName>participant_id</uniqueName>

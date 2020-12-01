@@ -27,5 +27,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class GroupOrganization extends Generic\DAOEntity {
+  use Generic\Traits\EntityBridge;
 
 }

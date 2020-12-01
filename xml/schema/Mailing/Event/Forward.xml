@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_forward</name>
   <comment>Tracks when a contact forwards a mailing to a (new) contact</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Forward ID</title>

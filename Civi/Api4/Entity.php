@@ -85,6 +85,10 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Class name for dao-based entities',
         ],
         [
+          'name' => 'searchable',
+          'description' => 'Should this entity be selectable in search kit UI',
+        ],
+        [
           'name' => 'paths',
           'data_type' => 'Array',
           'description' => 'System paths for accessing this entity',

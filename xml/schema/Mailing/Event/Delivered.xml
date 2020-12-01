@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_delivered</name>
   <comment>Tracks when a queued email is actually delivered to the MTA</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Delivered ID</title>

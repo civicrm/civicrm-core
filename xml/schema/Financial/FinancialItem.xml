@@ -7,6 +7,7 @@
   <add>4.3</add>
   <comment>Financial data for civicrm_line_item, etc.</comment>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <type>int unsigned</type>

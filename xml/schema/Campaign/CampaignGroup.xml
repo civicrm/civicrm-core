@@ -5,7 +5,7 @@
   <name>civicrm_campaign_group</name>
   <comment>Campaign Group Details.</comment>
   <add>3.3</add>
-
+  <component>CiviCampaign</component>
   <field>
     <name>id</name>
     <title>Campaign Group ID</title>

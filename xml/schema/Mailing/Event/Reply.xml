@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_reply</name>
   <comment>Tracks when a contact replies to a mailing</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Reply ID</title>

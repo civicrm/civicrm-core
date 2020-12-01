@@ -139,8 +139,9 @@ abstract class AbstractEntity {
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
       $info['type'][] = self::stripNamespace($trait);
     }
+    $info['searchable'] = !in_array('OptionList', $info['type']);
     $reflection = new \ReflectionClass(static::class);
-    $info += ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]);
+    $info = array_merge($info, ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]));
     unset($info['package'], $info['method']);
     return $info;
   }

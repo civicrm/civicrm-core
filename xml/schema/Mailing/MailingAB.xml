@@ -6,6 +6,7 @@
   <name>civicrm_mailing_abtest</name>
   <comment>Stores information about abtesting</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <type>int unsigned</type>

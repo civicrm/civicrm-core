@@ -6,6 +6,7 @@
   <name>civicrm_mailing_job</name>
   <comment>Stores information about the job that executes this mailing</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Mailing Job ID</title>

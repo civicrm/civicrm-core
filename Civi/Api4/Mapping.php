@@ -23,6 +23,7 @@ namespace Civi\Api4;
  *
  * This is a collection of MappingFields, for reuse in import, export, etc.
  *
+ * @searchable false
  * @package Civi\Api4
  */
 class Mapping extends Generic\DAOEntity {

@@ -8,6 +8,7 @@
   <add>1.5</add>
   <log>true</log>
   <icon>fa-id-badge</icon>
+  <component>CiviMember</component>
   <paths>
     <add>civicrm/member/add?reset=1&amp;action=add&amp;context=standalone</add>
     <view>civicrm/contact/view/membership?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>

@@ -30,6 +30,7 @@ namespace Civi\Api4;
  *
  * Creating a new ACL requires at minimum an entity table, entity ID and object_table.
  *
+ * @searchable false
  * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
  * @package Civi\Api4
  */

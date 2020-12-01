@@ -28,6 +28,7 @@ namespace Civi\Api4;
  *
  * Creating a new ActionSchedule requires at minimum a title, mapping_id and entity_value.
  *
+ * @searchable false
  * @see https://docs.civicrm.org/user/en/latest/email/scheduled-reminders/
  * @package Civi\Api4
  */

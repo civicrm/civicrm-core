@@ -5,6 +5,7 @@
   <class>Spool</class>
   <name>civicrm_mailing_spool</name>
   <comment>Stores the outbond mails</comment>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Spool ID</title>

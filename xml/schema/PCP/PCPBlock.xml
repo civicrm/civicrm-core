@@ -7,6 +7,7 @@
   <comment>A Personal Campaign Page Block stores admin configurable status options and rules</comment>
   <add>2.2</add>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>PCP Block ID</title>

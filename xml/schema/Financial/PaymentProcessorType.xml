@@ -5,6 +5,7 @@
   <class>PaymentProcessorType</class>
   <name>civicrm_payment_processor_type</name>
   <add>1.8</add>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Payment Processor Type ID</title>

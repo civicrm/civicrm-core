@@ -15,6 +15,8 @@ namespace Civi\Api4\Generic\Traits;
  * A bridge is a small table that provides an intermediary link between two other tables.
  *
  * The API can automatically incorporate a Bridge into a join expression.
+ *
+ * Note: at time of writing this trait does nothing except affect the "type" shown in Entity::get() metadata.
  */
 trait EntityBridge {
 

@@ -7,6 +7,7 @@
   <add>1.3</add>
   <comment>Formerly civicrm_contribution_type merged into this table in 4.3</comment>
   <log>true</log>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Financial Type ID</title>

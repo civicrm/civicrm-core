@@ -69,6 +69,14 @@ class ConformanceTest extends UnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getEntitiesHitech() {
+    // Ensure all components are enabled so their entities show up
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviGrant');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviPledge');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviReport');
     return $this->toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
   }
 
