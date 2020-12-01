@@ -168,6 +168,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       unset($params['revenue_recognition_date']);
     }
 
+    // Get Line Items if we don't have them already.
+    if (empty($params['line_item'])) {
+      if (isset($params['id'])) {
+        CRM_Price_BAO_LineItem::getLineItemArray($params, [$params['id']]);
+      }
+      else {
+        CRM_Price_BAO_LineItem::getLineItemArray($params);
+      }
+    }
+
     if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
       $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
@@ -4111,7 +4121,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         // Assign tax Amount on update of contribution
         if (!empty($params['prevContribution']->tax_amount)) {
           $params['tax_amount'] = 'null';
-          CRM_Price_BAO_LineItem::getLineItemArray($params, [$params['id']]);
           foreach ($params['line_item'] as $setID => $priceField) {
             foreach ($priceField as $priceFieldID => $priceFieldValue) {
               $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
@@ -4128,13 +4137,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams);
       $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
 
-      // Get Line Item on update of contribution
-      if (isset($params['id'])) {
-        CRM_Price_BAO_LineItem::getLineItemArray($params, [$params['id']]);
-      }
-      else {
-        CRM_Price_BAO_LineItem::getLineItemArray($params);
-      }
       foreach ($params['line_item'] as $setID => $priceField) {
         foreach ($priceField as $priceFieldID => $priceFieldValue) {
           $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
