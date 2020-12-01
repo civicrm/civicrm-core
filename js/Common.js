@@ -1048,6 +1048,8 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   $.fn.crmtooltip = function () {
+    var TOOLTIP_HIDE_DELAY = 300;
+
     $(document)
       .on('mouseover', 'a.crm-summary-link:not(.crm-processed)', function (e) {
         $(this).addClass('crm-processed crm-tooltip-active');
@@ -1062,8 +1064,13 @@ if (!CRM.vars) CRM.vars = {};
             .load(this.href);
         }
       })
-      .on('mouseout', 'a.crm-summary-link', function () {
-        $(this).removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
+      .on('mouseleave', 'a.crm-summary-link', function () {
+        var tooltipLink = $(this);
+        setTimeout(function () {
+          if (tooltipLink.filter(':hover').length === 0) {
+            tooltipLink.removeClass('crm-processed crm-tooltip-active crm-tooltip-down');
+          }
+        }, TOOLTIP_HIDE_DELAY);
       })
       .on('click', 'a.crm-summary-link', false);
   };
