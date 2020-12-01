@@ -2103,9 +2103,25 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
 
       case 'nll':
+        if ($type == 'String') {
+          $sqlOP = $this->getSQLOperator($op);
+          $clause = "( {$field['dbAlias']} $sqlOP OR {$field['dbAlias']} = '' )";
+        }
+        else {
+          $sqlOP = $this->getSQLOperator($op);
+          $clause = "( {$field['dbAlias']} $sqlOP )";
+        }
+        break;
+
       case 'nnll':
-        $sqlOP = $this->getSQLOperator($op);
-        $clause = "( {$field['dbAlias']} $sqlOP )";
+        if ($type == 'String') {
+          $sqlOP = $this->getSQLOperator($op);
+          $clause = "( {$field['dbAlias']} $sqlOP AND {$field['dbAlias']} <> '' )";
+        }
+        else {
+          $sqlOP = $this->getSQLOperator($op);
+          $clause = "( {$field['dbAlias']} $sqlOP )";
+        }
         break;
 
       case 'eq':
