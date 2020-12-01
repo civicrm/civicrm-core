@@ -10,12 +10,12 @@
   <field>
     <name>id</name>
     <uniqueName>contribution_soft_id</uniqueName>
-    <title>Soft Contribution ID</title>
+    <title>Soft Credit ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <import>true</import>
-    <title>Soft Contribution ID</title>
-    <comment>Soft Contribution ID</comment>
+    <title>Soft Credit ID</title>
+    <comment>Soft Credit ID</comment>
     <add>2.2</add>
   </field>
   <primaryKey>
@@ -24,7 +24,7 @@
   </primaryKey>
   <field>
     <name>contribution_id</name>
-    <title>Soft Contribution - Contribution</title>
+    <title>Soft Credit - Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to contribution table.</comment>
@@ -40,7 +40,7 @@
   <field>
     <name>contact_id</name>
     <uniqueName>contribution_soft_contact_id</uniqueName>
-    <title>Contact ID</title>
+    <title>Soft Credit Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <import>true</import>
@@ -58,13 +58,13 @@
   </foreignKey>
   <field>
     <name>amount</name>
-    <title>Soft Contribution Amount</title>
+    <title>Soft Credit Amount</title>
     <type>decimal</type>
     <required>true</required>
     <import>true</import>
     <headerPattern>/total(.?am(ou)?nt)?/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
-    <comment>Amount of this soft contribution.</comment>
+    <comment>Amount of this soft credit.</comment>
     <add>2.2</add>
   </field>
   <field>
