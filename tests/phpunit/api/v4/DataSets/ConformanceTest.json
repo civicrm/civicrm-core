@@ -38,5 +38,12 @@
       "activity_type_id:name": "Phone Call",
       "source_contact_id": "@ref test_contact_1.id"
     }
+  ],
+  "Contribution": [
+    {
+      "total_amount": 999.89,
+      "financial_type_id:name": "Donation",
+      "contact_id": "@ref test_contact_1.id"
+    }
   ]
 }
