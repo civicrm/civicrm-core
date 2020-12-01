@@ -21,10 +21,12 @@
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * Pre process the form.
+   * Classes extending CRM_Core_Form should implement this method.
+   *
+   * @return string
    */
-  public function preProcess() {
-    parent::preProcess();
+  public function getDefaultEntity() {
+    return 'Product';
   }
 
   /**
@@ -59,6 +61,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -114,12 +118,9 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
-    $this->add('Select', 'duration_unit', ts('Duration Unit'), CRM_Core_SelectValues::getPremiumUnits(), FALSE, ['placeholder' => ts('- select period -')]);
-
+    $this->addField('duration_unit', ['placeholder' => ts('- select period -')], FALSE);
     $this->add('text', 'duration_interval', ts('Duration'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'duration_interval'));
-
-    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), CRM_Core_SelectValues::getPremiumUnits(), FALSE, ['placeholder' => ts('- select period -')]);
-
+    $this->addField('frequency_unit', ['placeholder' => ts('- select period -')], FALSE);
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
     //Financial Type CRM-11106
