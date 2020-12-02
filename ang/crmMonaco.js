@@ -1,25 +1,30 @@
 (function(angular, $, _) {
-  angular.module('afMonaco', CRM.angRequires('afMonaco'));
+  angular.module('crmMonaco', CRM.angRequires('crmMonaco'));
 
-  // "afMonaco" is a basic skeletal directive.
-  // Example usage: <div af-monaco ng-model="my.content"></div>
-  angular.module('afMonaco').directive('afMonaco', function($timeout) {
+  // "crmMonaco" is a basic skeletal directive.
+  // Example usage: <div crm-monaco ng-model="my.content"></div>
+  // Example usage: <div crm-monaco="{readOnly: true}" ng-model="my.content"></div>
+  angular.module('crmMonaco').directive('crmMonaco', function($timeout, $parse) {
     return {
       restrict: 'AE',
       require: 'ngModel',
-      template: '<div class="af-monaco-container"></div>',
+      template: '<div class="crm-monaco-container"></div>',
       link: function($scope, $el, $attr, ngModel) {
         var heightPct = 0.70;
         var editor;
-        require.config({paths: CRM.afMonaco.paths});
+        require.config({paths: CRM.crmMonaco.paths});
         require(['vs/editor/editor.main'], function() {
-          var editorEl = $el.find('.af-monaco-container');
-          editorEl.css({height: Math.round(heightPct * $(window).height())});
-          editor = monaco.editor.create(editorEl[0], {
-            value: ngModel.$modelValue,
+          var options =  {
+            readOnly: false,
             language: 'html',
             // theme: 'vs-dark',
-            theme: 'vs',
+            theme: 'vs'
+          };
+          if ($attr.crmMonaco) {
+            angular.extend(options, $parse($attr.crmMonaco)($scope));
+          }
+          angular.extend(options, {
+            value: ngModel.$modelValue,
             minimap: {
               enabled: false
             },
@@ -35,6 +40,10 @@
               arrowSize: 30
             }
           });
+
+          var editorEl = $el.find('.crm-monaco-container');
+          editorEl.css({height: Math.round(heightPct * $(window).height())});
+          editor = monaco.editor.create(editorEl[0], options);
 
           editor.onDidChangeModelContent(_.debounce(function () {
             $scope.$apply(function () {

@@ -7,7 +7,7 @@ return [
   ],
   'css' => ['ang/afGuiEditor.css'],
   'partials' => ['ang/afGuiEditor'],
-  'requires' => ['crmUi', 'crmUtil', 'dialogService', 'api4'],
+  'requires' => ['crmUi', 'crmUtil', 'dialogService', 'api4', 'crmMonaco'],
   'settings' => [],
   'basePages' => [],
   'exports' => [

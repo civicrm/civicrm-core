@@ -144,19 +144,3 @@ function afform_html_civicrm_entityTypes(&$entityTypes) {
 function afform_html_civicrm_themes(&$themes) {
   _afform_html_civix_civicrm_themes($themes);
 }
-
-/**
- * Implements hook_civicrm_check().
- */
-function afform_html_civicrm_check(&$messages) {
-  $dir = E::path(AFFORM_HTML_MONACO);
-  if (!file_exists($dir)) {
-    $messages[] = new CRM_Utils_Check_Message(
-      'afform_html_monaco',
-      ts('Afform HTML is missing its "bower_components" folder. Please consult the README.md for current installation instructions.'),
-      ts('Afform HTML: Packages are missing'),
-      \Psr\Log\LogLevel::CRITICAL,
-      'fa-chain-broken'
-    );
-  }
-}

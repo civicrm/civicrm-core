@@ -215,7 +215,7 @@
       },
       "monaco-editor": {
         "url": "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.16.2.tgz",
-        "path": "ext/afform/html/bower_components/monaco-editor"
+        "path": "bower_components/monaco-editor"
       },
       "google-code-prettify": {
         "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
