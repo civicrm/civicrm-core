@@ -104,6 +104,6 @@ function contributioncancelactions_cancel_related_pending_memberships($contribut
     return;
   }
   foreach ($connectedMemberships as $membershipID) {
-    civicrm_api3('Membership', 'create', ['status_id' => 'Cancelled', 'id' => $membershipID, 'is_override' => 1]);
+    civicrm_api3('Membership', 'create', ['status_id' => 'Cancelled', 'id' => $membershipID, 'is_override' => 1, 'status_override_end_date' => 'null']);
   }
 }
