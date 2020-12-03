@@ -1680,8 +1680,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     if ((is_null($error)) && (civicrm_error(_civicrm_api3_deprecated_validate_formatted_contact($formatted)))) {
       $error = _civicrm_api3_deprecated_validate_formatted_contact($formatted);
     }
-
-    $newContact = $error;
+    if (!is_null($error)) {
+      return $error;
+    }
 
     if (is_null($error)) {
       if ($contactId) {
