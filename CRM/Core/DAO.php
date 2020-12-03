@@ -530,8 +530,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * Returns list of FK relationships.
    *
    *
-   * @return array
-   *   Array of CRM_Core_Reference_Interface
+   * @return CRM_Core_Reference_Basic[]
    */
   public static function getReferenceColumns() {
     return [];

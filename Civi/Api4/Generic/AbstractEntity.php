@@ -86,7 +86,9 @@ abstract class AbstractEntity {
    * @return string
    */
   protected static function getEntityTitle($plural = FALSE) {
-    return static::getEntityName();
+    $name = static::getEntityName();
+    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($name);
+    return $dao ? $dao::getEntityTitle($plural) : ($plural ? \CRM_Utils_String::pluralize($name) : $name);
   }
 
   /**
@@ -136,6 +138,13 @@ abstract class AbstractEntity {
       'type' => [self::stripNamespace(get_parent_class(static::class))],
       'paths' => static::getEntityPaths(),
     ];
+    // Add info for entities with a corresponding DAO
+    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
+    if ($dao) {
+      $info['paths'] = $dao::getEntityPaths();
+      $info['icon'] = $dao::$_icon;
+      $info['dao'] = $dao;
+    }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
       $info['type'][] = self::stripNamespace($trait);
     }
