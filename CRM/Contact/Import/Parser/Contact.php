@@ -739,7 +739,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
         //relationship contact insert
         foreach ($params as $key => $field) {
-          list($id, $first, $second) = CRM_Utils_System::explode('_', $key, 3);
+          [$id, $first, $second] = CRM_Utils_System::explode('_', $key, 3);
           if (!($first == 'a' && $second == 'b') && !($first == 'b' && $second == 'a')) {
             continue;
           }
@@ -972,100 +972,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $code = NULL;
 
       if (($code = CRM_Utils_Array::value('code', $newContact['error_message'])) && ($code == CRM_Core_Error::DUPLICATE_CONTACT)) {
-        $urls = [];
-        // need to fix at some stage and decide if the error will return an
-        // array or string, crude hack for now
-        if (is_array($newContact['error_message']['params'][0])) {
-          $cids = $newContact['error_message']['params'][0];
-        }
-        else {
-          $cids = explode(',', $newContact['error_message']['params'][0]);
-        }
-
-        foreach ($cids as $cid) {
-          $urls[] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $cid, TRUE);
-        }
-
-        $url_string = implode("\n", $urls);
-
-        // If we duplicate more than one record, skip no matter what
-        if (count($cids) > 1) {
-          $errorMessage = ts('Record duplicates multiple contacts');
-          $importRecordParams = [
-            $statusFieldName => 'ERROR',
-            "${statusFieldName}Msg" => $errorMessage,
-          ];
-
-          //combine error msg to avoid mismatch between error file columns.
-          $errorMessage .= "\n" . $url_string;
-          array_unshift($values, $errorMessage);
-          $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-          return CRM_Import_Parser::ERROR;
-        }
-
-        // Params only had one id, so shift it out
-        $contactId = array_shift($cids);
-        $cid = NULL;
-
-        $vals = ['contact_id' => $contactId];
-
-        if ($onDuplicate == CRM_Import_Parser::DUPLICATE_REPLACE) {
-          civicrm_api('contact', 'delete', $vals);
-          $cid = CRM_Contact_BAO_Contact::createProfileContact($formatted, $contactFields, $contactId, NULL, NULL, $formatted['contact_type']);
-        }
-        elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-          $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
-        }
-        elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
-          $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
-        }
-        // else skip does nothing and just returns an error code.
-        if ($cid) {
-          $contact = [
-            'contact_id' => $cid,
-          ];
-          $defaults = [];
-          $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
-        }
-
-        if (civicrm_error($newContact)) {
-          if (empty($newContact['error_message']['params'])) {
-            // different kind of error other than DUPLICATE
-            $errorMessage = $newContact['error_message'];
-            array_unshift($values, $errorMessage);
-            $importRecordParams = [
-              $statusFieldName => 'ERROR',
-              "${statusFieldName}Msg" => $errorMessage,
-            ];
-            $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-            return CRM_Import_Parser::ERROR;
-          }
-
-          $contactID = $newContact['error_message']['params'][0];
-          if (is_array($contactID)) {
-            $contactID = array_pop($contactID);
-          }
-          if (!in_array($contactID, $this->_newContacts)) {
-            $this->_newContacts[] = $contactID;
-          }
-        }
-        //CRM-262 No Duplicate Checking
-        if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
-          array_unshift($values, $url_string);
-          $importRecordParams = [
-            $statusFieldName => 'DUPLICATE',
-            "${statusFieldName}Msg" => "Skipping duplicate record",
-          ];
-          $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-          return CRM_Import_Parser::DUPLICATE;
-        }
-
-        $importRecordParams = [
-          $statusFieldName => 'IMPORTED',
-        ];
-        $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-        //return warning if street address is not parsed, CRM-5886
-        return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
+        return $this->handleDuplicateError($newContact, $statusFieldName, $values, $onDuplicate, $formatted, $contactFields);
       }
       else {
         // Not a dupe, so we had an error
@@ -2089,6 +1996,117 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $this->setImportableFieldsMetadata($this->getContactImportMetadata());
     // Probably no longer needed but here for now.
     $this->_relationships = $this->getRelationships();
+  }
+
+  /**
+   * @param array $newContact
+   * @param $statusFieldName
+   * @param array $values
+   * @param int $onDuplicate
+   * @param array $formatted
+   * @param array $contactFields
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function handleDuplicateError(array $newContact, $statusFieldName, array $values, int $onDuplicate, array $formatted, array $contactFields): int {
+    $urls = [];
+    // need to fix at some stage and decide if the error will return an
+    // array or string, crude hack for now
+    if (is_array($newContact['error_message']['params'][0])) {
+      $cids = $newContact['error_message']['params'][0];
+    }
+    else {
+      $cids = explode(',', $newContact['error_message']['params'][0]);
+    }
+
+    foreach ($cids as $cid) {
+      $urls[] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $cid, TRUE);
+    }
+
+    $url_string = implode("\n", $urls);
+
+    // If we duplicate more than one record, skip no matter what
+    if (count($cids) > 1) {
+      $errorMessage = ts('Record duplicates multiple contacts');
+      $importRecordParams = [
+        $statusFieldName => 'ERROR',
+        "${statusFieldName}Msg" => $errorMessage,
+      ];
+
+      //combine error msg to avoid mismatch between error file columns.
+      $errorMessage .= "\n" . $url_string;
+      array_unshift($values, $errorMessage);
+      $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+      return CRM_Import_Parser::ERROR;
+    }
+
+    // Params only had one id, so shift it out
+    $contactId = array_shift($cids);
+    $cid = NULL;
+
+    $vals = ['contact_id' => $contactId];
+
+    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_REPLACE) {
+      civicrm_api('contact', 'delete', $vals);
+      $cid = CRM_Contact_BAO_Contact::createProfileContact($formatted, $contactFields, $contactId, NULL, NULL, $formatted['contact_type']);
+    }
+    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+      $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
+    }
+    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+      $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
+    }
+    // else skip does nothing and just returns an error code.
+    if ($cid) {
+      $contact = [
+        'contact_id' => $cid,
+      ];
+      $defaults = [];
+      $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
+    }
+
+    if (civicrm_error($newContact)) {
+      if (empty($newContact['error_message']['params'])) {
+        // different kind of error other than DUPLICATE
+        $errorMessage = $newContact['error_message'];
+        array_unshift($values, $errorMessage);
+        $importRecordParams = [
+          $statusFieldName => 'ERROR',
+          "${statusFieldName}Msg" => $errorMessage,
+        ];
+        $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+        return CRM_Import_Parser::ERROR;
+      }
+
+      $contactID = $newContact['error_message']['params'][0];
+      if (is_array($contactID)) {
+        $contactID = array_pop($contactID);
+      }
+      if (!in_array($contactID, $this->_newContacts)) {
+        $this->_newContacts[] = $contactID;
+      }
+    }
+    //CRM-262 No Duplicate Checking
+    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
+      array_unshift($values, $url_string);
+      $importRecordParams = [
+        $statusFieldName => 'DUPLICATE',
+        "${statusFieldName}Msg" => "Skipping duplicate record",
+      ];
+      $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+      return CRM_Import_Parser::DUPLICATE;
+    }
+
+    $importRecordParams = [
+      $statusFieldName => 'IMPORTED',
+    ];
+    $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+    //return warning if street address is not parsed, CRM-5886
+    return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
   }
 
 }
