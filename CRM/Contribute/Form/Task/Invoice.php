@@ -265,7 +265,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       $amountPaid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribID, TRUE);
       if ($amountPaid >= $input['amount']) {
-        $invoicePaidDate = date('F j, Y', strtotime($singlePayment['trxn_date']));
+        $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribID, 'DESC');
+        $ftParams = ['id' => $trxnId['financialTrxnId']];
+        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams);
+        $invoicePaidDate = date('F j, Y', strtotime($trxn->trxn_date));
       }
       $amountDue = ($input['amount'] - $amountPaid);
 
@@ -578,4 +581,3 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   }
 
 }
-
