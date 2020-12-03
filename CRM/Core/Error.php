@@ -1039,7 +1039,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $callerClass = $dbt[1]['class'] ?? NULL;
       $oldMethod = "{$callerClass}::{$callerFunction}";
     }
-    Civi::log()->warning("Deprecated function $oldMethod, use $newMethod.", ['civi.tag' => 'deprecated']);
+    self::deprecatedWarning("Deprecated function $oldMethod, use $newMethod.");
+  }
+
+  /**
+   * Output a deprecated notice about a deprecated call path, rather than deprecating a whole function.
+   * @param string $message
+   */
+  public static function deprecatedWarning($message) {
+    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
   }
 
 }
