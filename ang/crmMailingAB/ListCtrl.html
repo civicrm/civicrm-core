@@ -13,13 +13,13 @@ Required vars: mailingABList
     <span>
       <select crm-ui-select style="width: 10em;" ng-model="filter.status">
         <option value="">{{:: ts('- Status -') }}</option>
-        <option ng-repeat="o in fields.status.options" ng-value="o.key">{{o.value}}</option>
+        <option ng-repeat="o in fields.status.options" value="{{o.key}}">{{o.value}}</option>
       </select>
     </span>
     <span>
       <select crm-ui-select style="width: 20em;" ng-model="filter.testing_criteria">
         <option value="">{{:: ts('- Test Type -') }}</option>
-        <option ng-repeat="o in fields.testing_criteria.options" ng-value="o.key">{{o.value}}</option>
+        <option ng-repeat="o in fields.testing_criteria.options" value="{{o.key}}">{{o.value}}</option>
       </select>
     </span>
   </form>

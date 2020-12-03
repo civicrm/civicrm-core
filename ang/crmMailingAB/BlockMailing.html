@@ -26,7 +26,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
             ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
             >
             <option value=""></option>
-            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" value="{{ frm.id }}">{{frm.msg_title}}</option>
           </select>
           <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{:: ts('Save As') }}"></a>
         </div>
@@ -42,7 +42,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
             ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
             >
             <option value=""></option>
-            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" value="{{ frm.id }}">{{frm.msg_title}}</option>
           </select>
           <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{:: ts('Save As') }}"></a>
         </div>
@@ -58,7 +58,7 @@ processed by Angular; if false, the field will be hidden and completely ignored 
             ng-change="loadTemplate(abtest.mailings.b, abtest.mailings.b.msg_template_id)"
             >
             <option value=""></option>
-            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" value="{{ frm.id }}">{{frm.msg_title}}</option>
           </select>
           <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.b)" class="crm-hover-button" title="{{:: ts('Save As') }}"></a>
         </div>
