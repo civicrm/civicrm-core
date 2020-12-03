@@ -4258,6 +4258,22 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $transaction->commit();
     \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
 
+    $result = civicrm_api4('ContributionSoft', 'get', [
+      'where' => [
+        ['contribution_id', '=', $contributionID],
+      ],
+      'checkPermissions' => FALSE,
+    ]);
+    $contributionSoft = $result->first();
+
+    if ($contributionSoft && $contributionSoft['pcp_id']) {
+      //Send notification to owner for PCP
+      $contributionDetails = $contributionResult['values'][$contributionResult['id']];
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->copyValues($contributionDetails);
+      CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
+    }
+
     // @todo - check if Contribution::create does this, test, remove.
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
       $contributionParams['contribution_status_id'], $input['amount']);

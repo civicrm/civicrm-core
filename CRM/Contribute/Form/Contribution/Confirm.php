@@ -1395,7 +1395,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param object $contribution
    * @param array $contributionSoft
-   *   Contribution object.
+   *   Contribution array.
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
