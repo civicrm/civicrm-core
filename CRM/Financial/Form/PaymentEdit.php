@@ -67,11 +67,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = $this->_values;
-    // Format money fields - localize for display
-    $moneyFields = ['total_amount', 'fee_amount', 'net_amount'];
-    foreach ($moneyFields as $field) {
-      $defaults[$field] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_values[$field]);
-    }
+    $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_values['total_amount']);
     return $defaults;
   }
 
@@ -195,7 +191,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       $previousFinanciaTrxn['contribution_id'] = $newFinancialTrxn['contribution_id'] = $this->_contributionID;
 
       $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
-      foreach (['total_amount', 'fee_amount', 'net_amount', 'currency', 'is_payment', 'status_id'] as $fieldName) {
+      foreach (['total_amount', 'currency', 'is_payment', 'status_id'] as $fieldName) {
         $newFinancialTrxn[$fieldName] = $this->_values[$fieldName];
       }
 
