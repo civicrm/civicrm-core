@@ -1483,7 +1483,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
-      civicrm_api3('ContributionSoft', 'get', ['contribution_id' => $this->_id, 'pcp_id' => NULL, 'api.ContributionSoft.delete' => 1]);
+      civicrm_api3('ContributionSoft', 'get', ['contribution_id' => $this->_id, 'pcp_id' => ['IS NULL' => 1], 'api.ContributionSoft.delete' => 1]);
     }
 
     // set the contact, when contact is selected
