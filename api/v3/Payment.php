@@ -94,6 +94,7 @@ function civicrm_api3_payment_cancel($params) {
   $eftParams = [
     'entity_table' => 'civicrm_contribution',
     'financial_trxn_id' => $params['id'],
+    'return' => ['entity', 'amount', 'entity_id', 'financial_trxn_id.check_number'],
   ];
   $entity = civicrm_api3('EntityFinancialTrxn', 'getsingle', $eftParams);
 
@@ -102,6 +103,7 @@ function civicrm_api3_payment_cancel($params) {
     'contribution_id' => $entity['entity_id'],
     'trxn_date' => $params['trxn_date'] ?? 'now',
     'cancelled_payment_id' => $params['id'],
+    'check_number' => $entity['financial_trxn_id.check_number'] ?? NULL,
   ];
 
   foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {
