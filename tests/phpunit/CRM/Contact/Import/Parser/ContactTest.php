@@ -121,10 +121,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * In this case the contact has no external identifier.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testImportParserWithUpdateWithoutExternalIdentifier() {
-    list($originalValues, $result) = $this->setUpBaseContact();
+  public function testImportParserWithUpdateWithoutExternalIdentifier(): void {
+    [$originalValues, $result] = $this->setUpBaseContact();
     $originalValues['nick_name'] = 'Old Bill';
     $this->runImport($originalValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
     $originalValues['id'] = $result['id'];
@@ -802,14 +802,16 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-19888 default country should be used if ambigous.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testImportAmbiguousStateCountry() {
+  public function testImportAmbiguousStateCountry(): void {
     $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1228]);
     $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
     $this->callAPISuccess('Setting', 'create', ['countryLimit' => [array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries)]]);
     $this->callAPISuccess('Setting', 'create', ['provinceLimit' => [array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries)]]);
     $mapper = [0 => NULL, 1 => NULL, 2 => 'Primary', 3 => NULL];
-    list($contactValues) = $this->setUpBaseContact();
+    [$contactValues] = $this->setUpBaseContact();
     $fields = array_keys($contactValues);
     $addressValues = [
       'street_address' => 'PO Box 2716',
