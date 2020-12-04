@@ -609,6 +609,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $contributionSoft = self::add($softParams);
       //Send notification to owner for PCP
       if ($contributionSoft->pcp_id && empty($pcpId)) {
+        throw new CRM_Core_Exception('is this line reached in tests?');
         CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, $contributionSoft);
       }
     }
