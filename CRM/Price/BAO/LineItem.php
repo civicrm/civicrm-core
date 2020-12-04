@@ -383,12 +383,23 @@ WHERE li.contribution_id = %1";
 
       foreach ($values as &$line) {
         if (empty($line['entity_table'])) {
+          if ($line['entity_table'] !== $entityTable) {
+            throw new CRM_Core_Exception('these should be defined earlier rather than relying on magic params');
+          }
           $line['entity_table'] = $entityTable;
         }
         if (empty($line['entity_id'])) {
+          if ($line['entity_id'] !== $entityId) {
+            throw new CRM_Core_Exception('these should be defined earlier rather than relying on magic params');
+          }
+
           $line['entity_id'] = $entityId;
         }
         if (!empty($line['membership_type_id'])) {
+          if ($line['entity_table'] !== 'civicrm_membership') {
+            throw new CRM_Core_Exception('these should be defined earlier rather than relying on magic params');
+          }
+
           $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {

@@ -3414,11 +3414,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionStatus = empty($params['contribution_status_id']) ? NULL : $contributionStatuses[$params['contribution_status_id']];
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'participant') {
+      throw new CRM_Core_Exception('these should be defined earlier rather than relying on magic params');
       $entityId = $params['participant_id'];
       $entityTable = 'civicrm_participant';
       $additionalParticipantId = CRM_Event_BAO_Participant::getAdditionalParticipantIds($entityId);
     }
     elseif (!empty($params['membership_id'])) {
+      throw new CRM_Core_Exception('these should be defined earlier rather than relying on magic params');
       //so far $params['membership_id'] should only be set coming in from membershipBAO::create so the situation where multiple memberships
       // are created off one contribution should be handled elsewhere
       $entityId = $params['membership_id'];
@@ -3430,6 +3432,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
+      throw new CRM_Core_Exception('these should be defined earlier rather than relying on magic params');
+
       $isRelatedId = TRUE;
     }
 
