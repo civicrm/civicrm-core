@@ -271,6 +271,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       add_action('wp_head', [__CLASS__, '_showHTMLHead']);
       // back-end views
       add_action('admin_head', [__CLASS__, '_showHTMLHead']);
+      $registered = TRUE;
     }
     CRM_Core_Region::instance('wp_head')->add([
       'markup' => $head,
