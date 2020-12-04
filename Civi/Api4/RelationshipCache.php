@@ -23,7 +23,7 @@ namespace Civi\Api4;
  * RelationshipCache - readonly table to facilitate joining and finding contacts by relationship.
  *
  * @see \Civi\Api4\Relationship
- *
+ * @bridge near_contact_id far_contact_id
  * @package Civi\Api4
  */
 class RelationshipCache extends Generic\AbstractEntity {
