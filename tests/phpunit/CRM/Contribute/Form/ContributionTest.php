@@ -1773,7 +1773,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     // The page contents load later by ajax, so there's just the surrounding
     // html available now, but we can check at least one thing while we're here.
-    $this->assertStringContainsString("selectedTab = 'widget';", $contents);
+    $this->assertContains("mainTabContainer", $contents);
   }
 
 }

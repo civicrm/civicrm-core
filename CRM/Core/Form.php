@@ -2693,6 +2693,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($selectedChild)) {
       $this->set('selectedChild', $selectedChild);
       $this->assign('selectedChild', $selectedChild);
+      Civi::resources()->addSetting(['tabSettings' => ['active' => $selectedChild]]);
     }
   }
 

@@ -37,4 +37,3 @@
   {/if}
   <div class="clear"></div>
 </div> {* crm-content-block ends here *}
-{include file="CRM/common/TabSelected.tpl" defaultTab="settings"}
