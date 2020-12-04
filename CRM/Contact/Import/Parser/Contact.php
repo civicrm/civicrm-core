@@ -1684,67 +1684,65 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       return $error;
     }
 
-    if (is_null($error)) {
-      if ($contactId) {
-        $this->formatParams($formatted, $onDuplicate, (int) $contactId);
-      }
-
-      // Resetting and rebuilding cache could be expensive.
-      CRM_Core_Config::setPermitCacheFlushMode(FALSE);
-
-      // If a user has logged in, or accessed via a checksum
-      // Then deliberately 'blanking' a value in the profile should remove it from their record
-      // @todo this should either be TRUE or FALSE in the context of import - once
-      // we figure out which we can remove all the rest.
-      // Also note the meaning of this parameter is less than it used to
-      // be following block cleanup.
-      $formatted['updateBlankLocInfo'] = TRUE;
-      if ((CRM_Core_Session::singleton()->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
-        $formatted['updateBlankLocInfo'] = FALSE;
-      }
-
-      list($data, $contactDetails) = CRM_Contact_BAO_Contact::formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
-
-      // manage is_opt_out
-      if (array_key_exists('is_opt_out', $contactFields) && array_key_exists('is_opt_out', $formatted)) {
-        $wasOptOut = $contactDetails['is_opt_out'] ?? FALSE;
-        $isOptOut = $formatted['is_opt_out'];
-        $data['is_opt_out'] = $isOptOut;
-        // on change, create new civicrm_subscription_history entry
-        if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
-          $shParams = [
-            'contact_id' => $contactDetails['contact_id'],
-            'status' => $isOptOut ? 'Removed' : 'Added',
-            'method' => 'Web',
-          ];
-          CRM_Contact_BAO_SubscriptionHistory::create($shParams);
-        }
-      }
-
-      $contact = CRM_Contact_BAO_Contact::create($data);
-      $cid = $contact->id;
-
-      // Process group and tag
-      if (isset($formatted['group'])) {
-        $method = 'Admin';
-        CRM_Contact_BAO_GroupContact::create($formatted['group'], $cid, FALSE, $method);
-      }
-
-      if (!empty($fields['tag']) && array_key_exists('tag', $formatted)) {
-        // Convert comma separated form values from select2 v3
-        $tags = is_array($formatted['tag']) ? $formatted['tag'] : array_fill_keys(array_filter(explode(',', $formatted['tag'])), 1);
-        CRM_Core_BAO_EntityTag::create($tags, 'civicrm_contact', $cid);
-      }
-
-      CRM_Core_Config::setPermitCacheFlushMode(TRUE);
-
-      $contact = [
-        'contact_id' => $cid,
-      ];
-
-      $defaults = [];
-      $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
+    if ($contactId) {
+      $this->formatParams($formatted, $onDuplicate, (int) $contactId);
     }
+
+    // Resetting and rebuilding cache could be expensive.
+    CRM_Core_Config::setPermitCacheFlushMode(FALSE);
+
+    // If a user has logged in, or accessed via a checksum
+    // Then deliberately 'blanking' a value in the profile should remove it from their record
+    // @todo this should either be TRUE or FALSE in the context of import - once
+    // we figure out which we can remove all the rest.
+    // Also note the meaning of this parameter is less than it used to
+    // be following block cleanup.
+    $formatted['updateBlankLocInfo'] = TRUE;
+    if ((CRM_Core_Session::singleton()->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+      $formatted['updateBlankLocInfo'] = FALSE;
+    }
+
+    list($data, $contactDetails) = CRM_Contact_BAO_Contact::formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
+
+    // manage is_opt_out
+    if (array_key_exists('is_opt_out', $contactFields) && array_key_exists('is_opt_out', $formatted)) {
+      $wasOptOut = $contactDetails['is_opt_out'] ?? FALSE;
+      $isOptOut = $formatted['is_opt_out'];
+      $data['is_opt_out'] = $isOptOut;
+      // on change, create new civicrm_subscription_history entry
+      if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
+        $shParams = [
+          'contact_id' => $contactDetails['contact_id'],
+          'status' => $isOptOut ? 'Removed' : 'Added',
+          'method' => 'Web',
+        ];
+        CRM_Contact_BAO_SubscriptionHistory::create($shParams);
+      }
+    }
+
+    $contact = CRM_Contact_BAO_Contact::create($data);
+    $cid = $contact->id;
+
+    // Process group and tag
+    if (isset($formatted['group'])) {
+      $method = 'Admin';
+      CRM_Contact_BAO_GroupContact::create($formatted['group'], $cid, FALSE, $method);
+    }
+
+    if (!empty($fields['tag']) && array_key_exists('tag', $formatted)) {
+      // Convert comma separated form values from select2 v3
+      $tags = is_array($formatted['tag']) ? $formatted['tag'] : array_fill_keys(array_filter(explode(',', $formatted['tag'])), 1);
+      CRM_Core_BAO_EntityTag::create($tags, 'civicrm_contact', $cid);
+    }
+
+    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
+
+    $contact = [
+      'contact_id' => $cid,
+    ];
+
+    $defaults = [];
+    $newContact = CRM_Contact_BAO_Contact::retrieve($contact, $defaults);
 
     //get the id of the contact whose street address is not parsable, CRM-5886
     if ($this->_parseStreetAddress && is_object($newContact) && property_exists($newContact, 'address') && $newContact->address) {
