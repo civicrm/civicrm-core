@@ -2000,7 +2000,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * This hook is called when loading CMS permissions; use this hook to modify
+   * This hook is called when exporting Civi's permission to the CMS. Use this hook to modify
    * the array of system permissions for CiviCRM.
    *
    * @param array $permissions
@@ -2014,6 +2014,31 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(['permissions'], $permissions,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission'
+    );
+  }
+
+  /**
+   * This hook is used to enumerate the list of available permissions. It may
+   * include concrete permissions defined by Civi, concrete permissions defined
+   * by the CMS, and/or synthetic permissions.
+   *
+   * @param array $permissions
+   *   Array of permissions, keyed by symbolic name. Each is an array with fields:
+   *     - group: string (ex: "civicrm", "cms")
+   *     - title: string (ex: "CiviEvent: Register for events")
+   *     - description: string (ex: "Register for events online")
+   *     - is_synthetic: bool (TRUE for synthetic permissions with a bespoke evaluation. FALSE for concrete permissions that registered+granted in the UF user-management layer.
+   *        Default TRUE iff name begins with '@')
+   *     - is_active: bool (TRUE if this permission is defined by. Default: TRUE)
+   *
+   * @return null
+   *   The return value is ignored
+   * @see Civi\Api4\Permission::get()
+   */
+  public static function permissionList(&$permissions) {
+    return self::singleton()->invoke(['permissions'], $permissions,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_permissionList'
     );
   }
 
