@@ -94,7 +94,7 @@ class ConformanceTest extends UnitTestCase {
     $manual['remove'] = ['CustomValue'];
 
     $scanned = [];
-    $srcDir = dirname(dirname(dirname(dirname(dirname(__DIR__)))));
+    $srcDir = dirname(__DIR__, 5);
     foreach ((array) glob("$srcDir/Civi/Api4/*.php") as $name) {
       $scanned[] = preg_replace('/\.php/', '', basename($name));
     }
@@ -118,9 +118,12 @@ class ConformanceTest extends UnitTestCase {
   /**
    * @param string $entity
    *   Ex: 'Contact'
+   *
    * @dataProvider getEntitiesLotech
+   *
+   * @throws \API_Exception
    */
-  public function testConformance($entity) {
+  public function testConformance($entity): void {
     $entityClass = 'Civi\Api4\\' . $entity;
 
     $this->checkEntityInfo($entityClass);
@@ -145,7 +148,7 @@ class ConformanceTest extends UnitTestCase {
   /**
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    */
-  protected function checkEntityInfo($entityClass) {
+  protected function checkEntityInfo($entityClass): void {
     $info = $entityClass::getInfo();
     $this->assertNotEmpty($info['name']);
     $this->assertNotEmpty($info['title']);
@@ -157,6 +160,8 @@ class ConformanceTest extends UnitTestCase {
   /**
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param string $entity
+   *
+   * @throws \API_Exception
    */
   protected function checkFields($entityClass, $entity) {
     $fields = $entityClass::getFields(FALSE)
@@ -174,8 +179,10 @@ class ConformanceTest extends UnitTestCase {
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    *
    * @return array
+   *
+   * @throws \API_Exception
    */
-  protected function checkActions($entityClass) {
+  protected function checkActions($entityClass): array {
     $actions = $entityClass::getActions(FALSE)
       ->execute()
       ->indexBy('name');
@@ -210,7 +217,7 @@ class ConformanceTest extends UnitTestCase {
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param int $id
    */
-  protected function checkUpdateFailsFromCreate($entityClass, $id) {
+  protected function checkUpdateFailsFromCreate($entityClass, $id): void {
     $exceptionThrown = '';
     try {
       $entityClass::create(FALSE)
@@ -243,7 +250,7 @@ class ConformanceTest extends UnitTestCase {
    * @param int $id
    * @param string $entity
    */
-  protected function checkGetCount($entityClass, $id, $entity) {
+  protected function checkGetCount($entityClass, $id, $entity): void {
     $getResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->selectRowCount()
