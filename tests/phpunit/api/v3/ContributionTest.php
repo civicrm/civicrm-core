@@ -4822,14 +4822,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testRepeatTransactionUpdateNextSchedContributionDate($dataSet) {
     $paymentProcessorID = $this->paymentProcessorCreate();
-    // Create the contribution before the recur so it doesn't trigger the update of next_sched_contribution_date
-    $contribution = $this->callAPISuccess('contribution', 'create', array_merge(
-        $this->_params,
-        [
-          'contribution_status_id' => 'Completed',
-          'receive_date' => $dataSet['repeat'][0]['receive_date'],
-        ])
-    );
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
       'contact_id' => $this->_individualId,
       'frequency_interval' => '1',
@@ -4840,21 +4832,33 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'payment_processor_id' => $paymentProcessorID,
     ], $dataSet['recur']));
-    // Link the existing contribution to the recur *after* creating the recur.
-    // If we just created the contribution now the next_sched_contribution_date would be automatically set
-    //   and we want to test the case when it is empty.
-    $this->callAPISuccess('contribution', 'create', [
-      'id' => $contribution['id'],
-      'contribution_recur_id' => $contributionRecur['id'],
+
+    // Create the contribution before the recur so it doesn't trigger the update of next_sched_contribution_date
+    $contribution = $this->callAPISuccess('Order', 'create', array_merge(
+        $this->_params,
+        [
+          'receive_date' => $dataSet['repeat'][0]['receive_date'],
+          'contribution_recur_id' => $contributionRecur['id'],
+          'contribution_status_id' => 'Pending',
+        ])
+    );
+
+    $recur = $this->callAPISuccessGetSingle('ContributionRecur', []);
+    $this->assertTrue(empty($recur['next_sched_contribution_date']));
+
+    $this->callAPISuccess('Payment', 'create', [
+      'trxn_id' => 'abx',
+      'payment_instrument_id' => 'Credit Card',
+      'total_amount' => 500,
+      'contribution_id' => $contribution['id'],
     ]);
 
-    $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', [
-      'id' => $contributionRecur['id'],
-      'return' => ['next_sched_contribution_date', 'contribution_status_id'],
-    ]);
-    // Check that next_sched_contribution_date is empty
-    $this->assertEquals('', $contributionRecur['next_sched_contribution_date'] ?? '');
+    $recur = $this->callAPISuccessGetSingle('ContributionRecur', []);
+    $this->assertTrue(!empty($recur['next_sched_contribution_date']));
 
+    // This is a bit artificial as this should not be non-null after the first payment has
+    // been made - but the original test created this scenario so we recreate i
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_contribution_recur SET next_sched_contribution_date = NULL');
     $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_status_id' => 'Completed',
       'contribution_recur_id' => $contributionRecur['id'],
