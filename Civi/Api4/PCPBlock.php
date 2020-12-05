@@ -23,6 +23,6 @@ namespace Civi\Api4;
  *
  * @package Civi\Api4
  */
-class PcpBlock extends Generic\DAOEntity {
+class PCPBlock extends Generic\DAOEntity {
 
 }

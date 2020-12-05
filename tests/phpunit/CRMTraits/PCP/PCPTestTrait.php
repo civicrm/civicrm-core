@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Email;
+use Civi\Api4\PCPBlock;
 
 /**
  * Trait CRMTraits_PCP_PCPTestTrait
@@ -86,7 +87,7 @@ trait CRMTraits_PCP_PCPTestTrait {
   protected function createPCPBlock(array $params):int {
     $blockParams = $this->pcpBlockParams();
     $params = array_merge($this->pcpParams(), $params);
-    $params['pcp_block_id']  = \Civi\Api4\PcpBlock::create()->setValues($blockParams)->execute()->first()['id'];
+    $params['pcp_block_id']  = PCPBlock::create()->setValues($blockParams)->execute()->first()['id'];
 
     $pcp = CRM_PCP_BAO_PCP::create($params);
     return (int) $pcp->id;
