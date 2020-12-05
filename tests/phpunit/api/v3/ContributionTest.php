@@ -3751,7 +3751,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ], [
       'Event',
     ]);
-    $this->checkReceiptDetails($mut, $contributionPage['id'], $contribution['id']);
+    $this->checkReceiptDetails($mut, $contributionPage['id'], $contribution['id'], $pageParams);
     $mut->stop();
   }
 
@@ -3786,21 +3786,24 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param CiviMailUtils $mut
    * @param int $pageID Page ID
    * @param int $contributionID Contribution ID
+   * @param array $pageParams
    *
    * @throws \CRM_Core_Exception
    */
-  public function checkReceiptDetails($mut, $pageID, $contributionID) {
+  public function checkReceiptDetails($mut, $pageID, $contributionID, $pageParams) {
     $pageReceipt = [
       'receipt_from_name' => "Page FromName",
       'receipt_from_email' => "page_from@email.com",
       'cc_receipt' => "page_cc@email.com",
       'receipt_text' => "Page Receipt Text",
+      'pay_later_receipt' => $pageParams['pay_later_receipt'],
     ];
     $customReceipt = [
       'receipt_from_name' => "Custom FromName",
       'receipt_from_email' => "custom_from@email.com",
       'cc_receipt' => "custom_cc@email.com",
       'receipt_text' => "Test Custom Receipt Text",
+      'pay_later_receipt' => 'Mail your check to test@example.com within 3 business days.',
     ];
     $this->callAPISuccess('ContributionPage', 'create', array_merge([
       'id' => $pageID,
@@ -3813,6 +3816,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ], $customReceipt));
 
     //Verify if custom receipt details are present in email.
+    //Page receipt details shouldn't be included.
     $mut->checkMailLog(array_values($customReceipt), array_values($pageReceipt));
   }
 
