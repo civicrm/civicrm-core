@@ -93,7 +93,12 @@ function civicrm_api3_order_create($params) {
         $supportedEntity = TRUE;
         switch ($entity) {
           case 'participant':
-            $entityParams['status_id'] = 'Pending from incomplete transaction';
+            if (isset($entityParams['participant_status_id'])
+              && (!CRM_Event_BAO_ParticipantStatusType::getIsValidStatusForClass($entityParams['participant_status_id'], 'Pending'))) {
+              throw new CiviCRM_API3_Exception('Creating a participant via the Order API with a non "pending" status is not supported');
+            }
+            $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
+            $entityParams['status_id'] = $entityParams['participant_status_id'];
             break;
 
           case 'membership':
