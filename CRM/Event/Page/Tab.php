@@ -90,7 +90,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Event_Form_Participant',
       'Create Participation',
-      $this->_action, FALSE, FALSE, TRUE
+      $this->_action
     );
 
     $controller->setEmbedded(TRUE);
