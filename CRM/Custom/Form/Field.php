@@ -161,7 +161,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['html_type'] = 'Text';
       $defaults['is_active'] = 1;
       $defaults['option_type'] = 1;
-      $defaults['is_search_range'] = 1;
+      $defaults['is_search_range'] = 0;
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_CustomField', ['custom_group_id' => $this->_gid]);
       $defaults['text_length'] = 255;
       $defaults['note_columns'] = 60;
