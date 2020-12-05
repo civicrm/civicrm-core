@@ -29,7 +29,7 @@
       $scope.groupOptions = CRM.crmSearchActions.groupOptions;
       // Try to create a sensible list of entities one might want to search for,
       // excluding those whos primary purpose is to provide joins or option lists to other entities
-      var primaryEntities = _.filter(CRM.vars.search.schema, function(entity) {
+      var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
         return !_.includes(entity.type, 'EntityBridge') && !_.includes(entity.type, 'OptionList');
       });
       $scope.entities = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
@@ -190,14 +190,16 @@
         }
       };
 
+      $scope.getJoin = searchMeta.getJoin;
+
       $scope.getJoinEntities = function() {
-        var joinEntities = _.transform(CRM.vars.search.links[ctrl.savedSearch.api_entity], function(joinEntities, link) {
-          var entity = searchMeta.getEntity(link.entity);
+        var joinEntities = _.transform(CRM.crmSearchAdmin.joins[ctrl.savedSearch.api_entity], function(joinEntities, join) {
+          var entity = searchMeta.getEntity(join.entity);
           if (entity) {
             joinEntities.push({
-              id: link.entity + ' AS ' + link.alias,
-              text: entity.title_plural,
-              description: '(' + link.alias + ')',
+              id: join.entity + ' AS ' + join.alias,
+              description: join.description,
+              text: join.label,
               icon: entity.icon
             });
           }
@@ -210,7 +212,12 @@
         $timeout(function() {
           if ($scope.controls.join) {
             ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
-            ctrl.savedSearch.api_params.join.push([$scope.controls.join, false]);
+            var join = searchMeta.getJoin($scope.controls.join),
+              params = [$scope.controls.join, false];
+            _.each(_.cloneDeep(join.conditions), function(condition) {
+              params.push(condition);
+            });
+            ctrl.savedSearch.api_params.join.push(params);
             loadFieldOptions();
           }
           $scope.controls.join = '';
@@ -648,33 +655,49 @@
       }
 
       function getAllFields(suffix, disabledIf) {
-        function formatFields(entityName, prefix) {
-          return _.transform(searchMeta.getEntity(entityName).fields, function(result, field) {
-            var item = {
-              id: prefix + field.name + (field.options ? suffix : ''),
-              text: field.label,
-              description: field.description
-            };
-            if (disabledIf(item.id)) {
-              item.disabled = true;
-            }
-            result.push(item);
-          }, []);
+        function formatFields(entityName, join) {
+          var prefix = join ? join.alias + '.' : '',
+            result = [];
+
+          function addFields(fields) {
+            _.each(fields, function(field) {
+              var item = {
+                id: prefix + field.name + (field.options ? suffix : ''),
+                text: field.label,
+                description: field.description
+              };
+              if (disabledIf(item.id)) {
+                item.disabled = true;
+              }
+              result.push(item);
+            });
+          }
+
+          // Add extra searchable fields from bridge entity
+          if (join && join.bridge) {
+            addFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
+              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity);
+            }));
+          }
+
+          addFields(searchMeta.getEntity(entityName).fields);
+          return result;
         }
 
         var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
           result = [{
             text: mainEntity.title_plural,
             icon: mainEntity.icon,
-            children: formatFields(ctrl.savedSearch.api_entity, '')
+            children: formatFields(ctrl.savedSearch.api_entity)
           }];
         _.each(ctrl.savedSearch.api_params.join, function(join) {
-          var joinName = join[0].split(' AS '),
-            joinEntity = searchMeta.getEntity(joinName[0]);
+          var joinInfo = searchMeta.getJoin(join[0]),
+            joinEntity = searchMeta.getEntity(joinInfo.entity);
           result.push({
-            text: joinEntity.title_plural + ' (' + joinName[1] + ')',
+            text: joinInfo.label,
+            description: joinInfo.description,
             icon: joinEntity.icon,
-            children: formatFields(joinEntity.name, joinName[1] + '.')
+            children: formatFields(joinEntity.name, joinInfo)
           });
         });
         return result;
@@ -702,10 +725,14 @@
           enqueue(mainEntity);
         }
         _.each(ctrl.savedSearch.api_params.join, function(join) {
-          var joinName = join[0].split(' AS '),
-            joinEntity = searchMeta.getEntity(joinName[0]);
+          var joinInfo = searchMeta.getJoin(join[0]),
+            joinEntity = searchMeta.getEntity(joinInfo.entity),
+            bridgeEntity = joinInfo.bridge ? searchMeta.getEntity(joinInfo.bridge) : null;
           if (typeof joinEntity.optionsLoaded === 'undefined') {
             enqueue(joinEntity);
+          }
+          if (bridgeEntity && typeof bridgeEntity.optionsLoaded === 'undefined') {
+            enqueue(bridgeEntity);
           }
         });
         if (!_.isEmpty(entities)) {
