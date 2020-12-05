@@ -15,6 +15,15 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.32.1
+
+Released December 5, 2020
+
+- **[Synopsis](release-notes/5.32.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.32.1.md#bugs)**
+- **[Credits](release-notes/5.32.1.md#credits)**
+- **[Feedback](release-notes/5.32.1.md#feedback)**
+
 ## CiviCRM 5.32.0
 
 Released December 2, 2020
