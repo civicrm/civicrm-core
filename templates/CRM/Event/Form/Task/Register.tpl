@@ -7,4 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/Event/Form/Participant.tpl"}
+{crmScope qfKey=$participantQfKey action=$participantAction}
+  {include file="CRM/Event/Form/Participant.tpl"}
+{/crmScope}
