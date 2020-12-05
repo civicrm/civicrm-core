@@ -132,6 +132,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
     $this->assign('remoteExtensionRows', $remoteExtensionRows);
+
+    Civi::resources()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting([
+        'tabSettings' => ['active' => $_GET['selectedChild'] ?? NULL],
+      ]);
   }
 
   /**
