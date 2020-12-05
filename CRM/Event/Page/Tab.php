@@ -90,7 +90,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Event_Form_Participant',
       'Create Participation',
-      $this->_action
+      $this->_action, FALSE, FALSE, TRUE
     );
 
     $controller->setEmbedded(TRUE);
@@ -122,7 +122,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission

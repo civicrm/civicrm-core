@@ -71,7 +71,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     $this->_contactId = NULL;
 
     //set ajax path, this used for custom data building
-    $this->assign('urlPath', $urlString);
+    $this->assign('urlPath', 'civicrm/contact/view/participant');
     $this->assign('urlPathVar', "_qf_Participant_display=true&qfKey={$this->controller->_key}");
   }
 
