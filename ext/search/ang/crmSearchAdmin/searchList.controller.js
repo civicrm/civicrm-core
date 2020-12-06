@@ -5,7 +5,7 @@
     var ts = $scope.ts = CRM.ts(),
       ctrl = $scope.$ctrl = this;
     this.savedSearches = savedSearches;
-    this.entityTitles = _.transform(CRM.vars.search.schema, function(titles, entity) {
+    this.entityTitles = _.transform(CRM.crmSearchAdmin.schema, function(titles, entity) {
       titles[entity.name] = entity.title_plural;
     }, {});
 

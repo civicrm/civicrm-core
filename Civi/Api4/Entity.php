@@ -98,6 +98,11 @@ class Entity extends Generic\AbstractEntity {
           'data_type' => 'Array',
           'description' => 'Any @see annotations from docblock',
         ],
+        [
+          'name' => 'bridge',
+          'data_type' => 'Array',
+          'description' => 'Connecting fields for EntityBridge types',
+        ],
       ];
     }))->setCheckPermissions($checkPermissions);
   }

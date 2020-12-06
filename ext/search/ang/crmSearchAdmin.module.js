@@ -3,6 +3,7 @@
 
   // Shared between router and searchMeta service
   var searchEntity,
+    joinIndex,
     undefined;
 
   // Declare module and route/controller/services
@@ -81,15 +82,33 @@
     })
 
     .factory('searchMeta', function() {
+      // JoinIndex lists each join by alias. It gets built once then cached.
+      function _getJoinIndex() {
+        if (!joinIndex) {
+          joinIndex = _.transform(CRM.crmSearchAdmin.joins, function(joinIndex, joins, base) {
+            _.each(joins, function(join) {
+              join.base = base;
+              joinIndex[join.alias] = join;
+            });
+          });
+        }
+        return joinIndex;
+      }
       function getEntity(entityName) {
         if (entityName) {
-          return _.find(CRM.vars.search.schema, {name: entityName});
+          return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
         }
+      }
+      function getJoin(fullNameOrAlias) {
+        var joinIndex = _getJoinIndex(),
+          alias = _.last(fullNameOrAlias.split(' AS '));
+        return joinIndex[alias];
       }
       function getField(fieldName, entityName) {
         var dotSplit = fieldName.split('.'),
           joinEntity = dotSplit.length > 1 ? dotSplit[0] : null,
           name = _.last(dotSplit).split(':')[0],
+          join,
           field;
         // Custom fields contain a dot in their fieldname
         // If 3 segments, the first is the joinEntity and the last 2 are the custom field
@@ -105,9 +124,13 @@
           }
         }
         if (joinEntity) {
-          entityName = _.find(CRM.vars.search.links[entityName], {alias: joinEntity}).entity;
+          join = getJoin(joinEntity);
+          entityName = getJoin(joinEntity).entity;
         }
         field = _.find(getEntity(entityName).fields, {name: name});
+        if (!field && join && join.bridge) {
+          field = _.find(getEntity(join.bridge).fields, {name: name});
+        }
         if (field) {
           field.entity = entityName;
           return field;
@@ -136,6 +159,7 @@
       return {
         getEntity: getEntity,
         getField: getField,
+        getJoin: getJoin,
         parseExpr: parseExpr,
         getDefaultLabel: function(col) {
           var info = parseExpr(col),
