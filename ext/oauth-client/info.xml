@@ -16,17 +16,14 @@
   </urls>
   <releaseDate>2020-10-23</releaseDate>
   <version>1.0</version>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
-  <develStage>alpha</develStage>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.33</ver>
   </compatibility>
   <requires>
     <ext version="~4.5">org.civicrm.afform</ext>
   </requires>
-  <comments>This is a new, undeveloped module</comments>
+  <comments>This extension provides a framework for oauth support</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
