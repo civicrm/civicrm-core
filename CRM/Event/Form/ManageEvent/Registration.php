@@ -126,7 +126,6 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
       if (!empty($defaults['is_multiple_registrations'])) {
         // CRM-4377: set additional participants’ profiles – set to ‘none’ if explicitly unset (non-active)
-
         $ufJoinAddParams = [
           'entity_table' => 'civicrm_event',
           'module' => 'CiviEvent_Additional',
@@ -151,6 +150,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           }
         }
         $this->assign('profilePostMultipleAdd', CRM_Utils_Array::value('additional_custom_post', $defaults, []));
+      }
+      else {
+        // Avoid PHP notices in the template
+        $this->assign('profilePostMultipleAdd', []);
       }
     }
     else {
