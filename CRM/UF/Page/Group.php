@@ -361,6 +361,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     }
 
     $this->assign('rows', $ufGroup);
+
+    Civi::resources()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting([
+        'tabSettings' => ['active' => $_GET['selectedChild'] ?? NULL],
+      ]);
   }
 
   /**
