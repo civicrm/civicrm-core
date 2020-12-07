@@ -780,6 +780,11 @@ SET    version = '$version'
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
+
+    // Re-Register Extension Class loader because we have changed the hook dispatch policy which might affect things.
+    $extensionSystem = CRM_Extension_System::singleton(TRUE);
+    $extensionClassLoader = $extensionSystem->getClassLoader();
+    $extensionClassLoader->refresh();
   }
 
   /**
