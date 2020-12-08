@@ -82,27 +82,50 @@
     })
 
     .factory('searchMeta', function() {
-      // JoinIndex lists each join by alias. It gets built once then cached.
-      function _getJoinIndex() {
-        if (!joinIndex) {
-          joinIndex = _.transform(CRM.crmSearchAdmin.joins, function(joinIndex, joins, base) {
-            _.each(joins, function(join) {
-              join.base = base;
-              joinIndex[join.alias] = join;
-            });
-          });
-        }
-        return joinIndex;
-      }
       function getEntity(entityName) {
         if (entityName) {
           return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
         }
       }
+      // Get join metadata matching a given expression like "Email AS Contact_Email_contact_id_01"
       function getJoin(fullNameOrAlias) {
-        var joinIndex = _getJoinIndex(),
-          alias = _.last(fullNameOrAlias.split(' AS '));
-        return joinIndex[alias];
+        var alias = _.last(fullNameOrAlias.split(' AS ')),
+          path = alias,
+          baseEntity = searchEntity,
+          label = [],
+          join,
+          result;
+        while (path.length) {
+          /* jshint -W083 */
+          join = _.find(CRM.crmSearchAdmin.joins[baseEntity], function(join) {
+            return new RegExp('^' + join.alias + '_\\d\\d').test(path);
+          });
+          if (!join) {
+            console.warn( 'Join ' + fullNameOrAlias + ' not found.');
+            return;
+          }
+          path = path.replace(join.alias + '_', '');
+          var num = parseInt(path.substr(0, 2), 10);
+          baseEntity = join.entity;
+          label.push(join.label + (num > 1 ? ' ' + num : ''));
+          path = path.replace(/^\d\d_?/, '');
+        }
+        result = _.assign(_.cloneDeep(join), {label: label.join(' - '), alias: alias});
+        // Add the numbered suffix to the join conditions
+        // If this is a deep join, also add the base entity prefix
+        var prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
+        _.each(result.conditions, function(condition) {
+          if (_.isArray(condition)) {
+            _.each(condition, function(ref, side) {
+              if (side !== 1 && _.includes(ref, '.')) {
+                condition[side] = ref.replace(join.alias + '.', alias + '.');
+              } else if (side !== 1 && prefix.length && !_.includes(ref, '"') && !_.includes(ref, "'")) {
+                condition[side] = prefix + '.' + ref;
+              }
+            });
+          }
+        });
+        return result;
       }
       function getField(fieldName, entityName) {
         var dotSplit = fieldName.split('.'),
