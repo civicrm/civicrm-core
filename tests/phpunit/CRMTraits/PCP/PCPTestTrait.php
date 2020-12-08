@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Email;
+use Civi\Api4\PCPBlock;
+
 /**
  * Trait CRMTraits_PCP_PCPTestTrait
  *
@@ -29,7 +32,7 @@ trait CRMTraits_PCP_PCPTestTrait {
     $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
     $supporterProfileId = $supporterProfile->id;
 
-    $params = [
+    return [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contribPageId,
       'supporter_profile_id' => $supporterProfileId,
@@ -39,9 +42,8 @@ trait CRMTraits_PCP_PCPTestTrait {
       'tellfriend_limit' => 1,
       'link_text' => 'Create your own PCP',
       'is_active' => 1,
+      'owner_notify_id:name' => 'owner_chooses',
     ];
-
-    return $params;
   }
 
   /**
@@ -49,14 +51,17 @@ trait CRMTraits_PCP_PCPTestTrait {
    *
    * Create the necessary initial objects for a pcp page, then return the
    * params needed to create the pcp page.
+   *
+   * @throw API_Exception
    */
   public function pcpParams() {
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
     $contactId = $contact->id;
+    Email::create()->setValues(['email' => 'dobby@example.org', 'contact_id' => $contactId])->execute();
     $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
     $contribPageId = $contribPage->id;
 
-    $params = [
+    return [
       'contact_id' => $contactId,
       'status_id' => '1',
       'title' => 'My PCP',
@@ -64,13 +69,12 @@ trait CRMTraits_PCP_PCPTestTrait {
       'page_text' => 'You better give more.',
       'donate_link_text' => 'Donate Now',
       'page_id' => $contribPageId,
+      'is_notify' => TRUE,
       'is_thermometer' => 1,
       'is_honor_roll' => 1,
       'goal_amount' => 10000.00,
       'is_active' => 1,
     ];
-
-    return $params;
   }
 
   /**
@@ -82,10 +86,8 @@ trait CRMTraits_PCP_PCPTestTrait {
    */
   protected function createPCPBlock(array $params):int {
     $blockParams = $this->pcpBlockParams();
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
-
     $params = array_merge($this->pcpParams(), $params);
-    $params['pcp_block_id'] = $pcpBlock->id;
+    $params['pcp_block_id']  = PCPBlock::create()->setValues($blockParams)->execute()->first()['id'];
 
     $pcp = CRM_PCP_BAO_PCP::create($params);
     return (int) $pcp->id;

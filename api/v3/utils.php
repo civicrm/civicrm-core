@@ -334,6 +334,7 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'Im' || $name === 'Acl' || $name === 'Pcp') {
     $name = strtoupper($name);
   }
+
   $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
   if ($dao || !$name) {
     return $dao;

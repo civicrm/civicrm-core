@@ -817,7 +817,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testSubmitWithPCP() {
+  public function testSubmitWithPCP(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
     $params = $this->pcpParams();
     $pcpID = $this->createPCPBlock($params);
     $form = new CRM_Contribute_Form_Contribution();
@@ -834,6 +836,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ], CRM_Core_Action::ADD);
     $softCredit = $this->callAPISuccessGetSingle('ContributionSoft', []);
     $this->assertEquals('Dobby', $softCredit['pcp_roll_nickname']);
+    $mut->checkMailLog(['Personal Campaign Page Owner Notification']);
   }
 
   /**
