@@ -780,6 +780,8 @@ SET    version = '$version'
     // Rebuild all triggers and re-enable logging if needed
     $logging = new CRM_Logging_Schema();
     $logging->fixSchemaDifferences();
+    // Force a rebuild of CiviCRM asset cache in case things have changed.
+    \Civi::service('asset_builder')->clear(FALSE);
   }
 
   /**
