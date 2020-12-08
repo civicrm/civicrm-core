@@ -59,6 +59,10 @@ class CRM_Upgrade_DispatchPolicy {
     // It's more restrictive, preventing interference from unexpected callpaths.
     $policies['upgrade.main'] = [
       'hook_civicrm_config' => 'run',
+      'hook_civicrm_container' => 'run',
+      'hook_civicrm_alterSettingsFolders' => 'run',
+      'hook_civicrm_alterSettingsMetaData' => 'run',
+      'hook_civicrm_permission' => 'run',
       '/^hook_civicrm_(pre|post)$/' => 'drop',
       '/^hook_civicrm_/' => $strict ? 'warn-drop' : 'drop',
       '/^civi\./' => 'run',
