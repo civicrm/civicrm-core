@@ -25,7 +25,7 @@
     {/if}
 
     {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor'}
-      <div class="header-dark">{$field.groupTitle} </div>
+      <div class="header-dark">{$field.groupDisplayTitle} </div>
     {/if}
     {assign var=fieldset  value=`$field.groupTitle`}
     {assign var=groupHelpPost  value=`$field.groupHelpPost`}
