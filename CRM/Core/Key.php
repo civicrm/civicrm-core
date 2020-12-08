@@ -32,10 +32,10 @@ class CRM_Core_Key {
   const HASH_ALGO = 'sha256';
 
   /**
-   * The length of a generated signature/digest (expressed in hex digits).
+   * The minimum length of a generated signature/digest (expressed in base36 digits).
    * @var int
    */
-  const HASH_LENGTH = 64;
+  const HASH_LENGTH = 25;
 
   public static $_key = NULL;
 
@@ -121,7 +121,8 @@ class CRM_Core_Key {
       $k = $key;
     }
 
-    if (!hash_equals($k, self::sign($name))) {
+    $expected = self::sign($name);
+    if (!hash_equals($k, $expected)) {
       return NULL;
     }
     return $key;
@@ -141,7 +142,7 @@ class CRM_Core_Key {
    */
   public static function valid($key) {
     // ensure that hash is a hex number (of expected length)
-    return preg_match('#[0-9a-f]{' . self::HASH_LENGTH . '}#i', $key) ? TRUE : FALSE;
+    return preg_match('#^[0-9a-zA-Z]{' . self::HASH_LENGTH . ',}+(_\d+)?$#', $key) ? TRUE : FALSE;
   }
 
   /**
@@ -157,8 +158,10 @@ class CRM_Core_Key {
     if (strpos($sessionID, $delim) !== FALSE || strpos($name, $delim) !== FALSE) {
       throw new \RuntimeException("Failed to generate signature. Malformed session-id or form-name.");
     }
+    // The "prefix" gives some advisory details to help with debugging.
+    $prefix = preg_replace('/[^a-zA-Z0-9]/', '', $name);
     // Note: Unsure why $sessionID is included, but it's always been there, and it doesn't seem harmful.
-    return hash_hmac(self::HASH_ALGO, $sessionID . $delim . $name, $privateKey);
+    return $prefix . base_convert(hash_hmac(self::HASH_ALGO, $sessionID . $delim . $name, $privateKey), 16, 36);
 
   }
 
