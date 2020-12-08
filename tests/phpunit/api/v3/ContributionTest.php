@@ -3432,9 +3432,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test if renewal activity is create after changing Pending contribution to Completed via offline
+   * Test if renewal activity is create after changing Pending contribution to
+   * Completed via offline
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testPendingToCompleteContribution() {
+  public function testPendingToCompleteContribution(): void {
     $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
@@ -3505,7 +3510,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $activity['count']);
     $this->assertEquals('Status changed from Grace to Current', $activity['values'][$activity['id']]['subject']);
-
+    $membershipLogs = $this->callAPISuccess('MembershipLog', 'get', ['sequential' => 1])['values'];
+    $this->assertEquals('Grace', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipLogs[0]['status_id']));
+    $this->assertEquals('Current', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipLogs[1]['status_id']));
     //Create another pending contribution for renewal
     $contribution = $this->callAPISuccess('contribution', 'create', [
       'domain_id' => 1,
@@ -3556,7 +3563,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
     //Existing membership should not get updated to expired.
     $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
-    $this->assertNotEquals($membership['status_id'], 4);
+    $this->assertNotEquals(4, $membership['status_id']);
   }
 
   /**
