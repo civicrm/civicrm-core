@@ -57,6 +57,14 @@ class CustomFieldAlterTest extends BaseCustomValueTest {
         ->addValue('data_type', 'Country')
         ->addValue('html_type', 'Select'), 0
       )
+      ->addChain('field4', CustomField::create()
+        ->addValue('custom_group_id', '$id')
+        ->addValue('serialize', TRUE)
+        ->addValue('is_required', TRUE)
+        ->addValue('label', 'TestContact')
+        ->addValue('data_type', 'ContactReference')
+        ->addValue('html_type', 'Autocomplete-Select'), 0
+      )
       ->execute()
       ->first();
 
@@ -144,6 +152,16 @@ class CustomFieldAlterTest extends BaseCustomValueTest {
     $this->assertCount(1, $result);
     // The two values originally entered will now be one value
     $this->assertEquals([1228], $result['A4']['MyFieldsToAlter.TestCountry']);
+
+    // Repeatedly change contact ref field to ensure FK index is correctly added/dropped with no SQL error
+    for ($i = 1; $i < 6; ++$i) {
+      CustomField::update(FALSE)
+        ->addWhere('id', '=', $customGroup['field4']['id'])
+        ->addValue('serialize', $i % 2 == 0)
+        ->addValue('is_required', $i % 2 == 0)
+        ->execute();
+    }
+
   }
 
 }

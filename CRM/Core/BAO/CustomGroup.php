@@ -1288,7 +1288,7 @@ ORDER BY civicrm_custom_group.weight,
         $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
 
         if ($serialize) {
-          if ($field['data_type'] != 'Country' && $field['data_type'] != 'StateProvince') {
+          if ($field['data_type'] != 'Country' && $field['data_type'] != 'StateProvince' && $field['data_type'] != 'ContactReference') {
             $defaults[$elementName] = [];
             $customOption = CRM_Core_BAO_CustomOption::getCustomOption($field['id'], $inactiveNeeded);
             if ($viewMode) {
@@ -1885,13 +1885,19 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
               $details[$groupID][$values['id']]['editable'] = TRUE;
             }
             // also return contact reference contact id if user has view all or edit all contacts perm
-            if ((CRM_Core_Permission::check('view all contacts') ||
-                CRM_Core_Permission::check('edit all contacts'))
-              &&
-              $details[$groupID][$values['id']]['fields'][$k]['field_data_type'] ==
-              'ContactReference'
+            if ($details[$groupID][$values['id']]['fields'][$k]['field_data_type'] === 'ContactReference'
+              && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
             ) {
-              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_id'] = $values['data'] ?? NULL;
+              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'] = [];
+              $path = CRM_Contact_DAO_Contact::getEntityPaths()['view'];
+              foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $contactId) {
+                $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+                if ($displayName) {
+                  $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
+                  $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . htmlspecialchars(ts('View Contact')) . '">' .
+                    $displayName . '</a>';
+                }
+              }
             }
           }
         }
@@ -1903,7 +1909,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $details[$groupID][0]['collapse_display'] = $group['collapse_display'] ?? NULL;
           $details[$groupID][0]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
           $details[$groupID][0]['style'] = $group['style'] ?? NULL;
-          $details[$groupID][0]['fields'][$k] = ['field_title' => CRM_Utils_Array::value('label', $properties)];
+          $details[$groupID][0]['fields'][$k] = ['field_title' => $properties['label'] ?? NULL];
         }
       }
     }

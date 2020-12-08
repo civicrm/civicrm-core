@@ -215,6 +215,7 @@ class CRM_Core_BAO_CustomQuery {
           case 'String':
           case 'StateProvince':
           case 'Country':
+          case 'ContactReference':
 
             if ($field['is_search_range'] && is_array($value)) {
               //didn't found any field under any of these three data-types as searchable by range
@@ -276,12 +277,6 @@ class CRM_Core_BAO_CustomQuery {
               }
               $this->_qill[$grouping][] = $field['label'] . " $qillOp $qillValue";
             }
-            break;
-
-          case 'ContactReference':
-            $label = $value ? CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name') : '';
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = $field['label'] . " $qillOp $label";
             break;
 
           case 'Int':

@@ -34,6 +34,7 @@ class CRM_Core_BAO_CustomValueTable {
     }
 
     $paramFieldsExtendContactForEntities = [];
+    $VS = CRM_Core_DAO::VALUE_SEPARATOR;
 
     foreach ($customParams as $tableName => $tables) {
       foreach ($tables as $index => $fields) {
@@ -187,8 +188,17 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'ContactReference':
-              if ($value == NULL) {
+              if ($value == NULL || $value === '' || $value === $VS . $VS) {
                 $type = 'Timestamp';
+                $value = NULL;
+              }
+              elseif (strpos($value, $VS) !== FALSE) {
+                $type = 'String';
+                // Validate the string contains only integers and value-separators
+                $validChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, $VS];
+                if (str_replace($validChars, '', $value)) {
+                  throw new CRM_Core_Exception('Contact ID must be of type Integer');
+                }
               }
               else {
                 $type = 'Integer';

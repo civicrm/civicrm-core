@@ -889,6 +889,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
           $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-form-contact-reference huge');
           $fieldAttributes['data-api-entity'] = 'Contact';
+          if (!empty($field->serialize) || $search) {
+            $fieldAttributes['multiple'] = TRUE;
+          }
           $element = $qf->add('text', $elementName, $label, $fieldAttributes, $useRequired && !$search);
 
           $urlParams = "context=customfield&id={$field->id}";
@@ -1071,13 +1074,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Autocomplete-Select':
       case 'Radio':
       case 'CheckBox':
-        if ($field['data_type'] == 'ContactReference' && $value) {
-          if (is_numeric($value)) {
-            $display = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'display_name');
+        if ($field['data_type'] == 'ContactReference' && (is_array($value) || is_numeric($value))) {
+          $displayNames = [];
+          foreach ((array) $value as $contactId) {
+            $displayNames[] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
           }
-          else {
-            $display = $value;
-          }
+          $display = implode(', ', $displayNames);
+        }
+        elseif ($field['data_type'] == 'ContactReference') {
+          $display = $value;
         }
         elseif (is_array($value)) {
           $v = [];
@@ -1707,7 +1712,7 @@ SELECT $columnName
 
   /**
    * @param CRM_Core_DAO_CustomField $field
-   * @param string $operation
+   * @param string $operation add|modify|delete
    *
    * @return bool
    */
@@ -2653,7 +2658,7 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
 
   /**
    * @param CRM_Core_DAO_CustomField $field
-   * @param 'add|modify' $operation
+   * @param 'add|modify|delete' $operation
    *
    * @return array
    */
@@ -2679,29 +2684,24 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     // For adding/dropping FK constraints
     $params['fkName'] = CRM_Core_BAO_SchemaHandler::getIndexName($tableName, $field->column_name);
 
-    if ($field->data_type == 'Country' && !self::isSerialized($field)) {
-      $params['fk_table_name'] = 'civicrm_country';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
+    $fkFields = [
+      'Country' => 'civicrm_country',
+      'StateProvince' => 'civicrm_state_province',
+      'ContactReference' => 'civicrm_contact',
+      'File' => 'civicrm_file',
+    ];
+    if (isset($fkFields[$field->data_type])) {
+      // Serialized fields store value-separated strings which are incompatible with FK constraints
+      if ($field->serialize) {
+        $params['type'] = 'varchar(255)';
+      }
+      else {
+        $params['fk_table_name'] = $fkFields[$field->data_type];
+        $params['fk_field_name'] = 'id';
+        $params['fk_attributes'] = 'ON DELETE SET NULL';
+      }
     }
-    elseif ($field->data_type == 'StateProvince' && !self::isSerialized($field)) {
-      $params['fk_table_name'] = 'civicrm_state_province';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
-    elseif ($field->data_type == 'StateProvince' || $field->data_type == 'Country') {
-      $params['type'] = 'varchar(255)';
-    }
-    elseif ($field->data_type == 'File') {
-      $params['fk_table_name'] = 'civicrm_file';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
-    elseif ($field->data_type == 'ContactReference') {
-      $params['fk_table_name'] = 'civicrm_contact';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
+
     if (isset($field->default_value)) {
       $params['default'] = "'{$field->default_value}'";
     }

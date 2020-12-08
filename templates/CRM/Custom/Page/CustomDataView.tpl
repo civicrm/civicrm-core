@@ -69,16 +69,12 @@
                         {/if}
                       {else}
                         <td class="html-adjust">
-                          {if $element.contact_ref_id}
-                            <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
-                          {/if}
-                          {if $element.field_data_type == 'Memo'}
+                          {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
+                            {', '|implode:$element.contact_ref_links}
+                          {elseif $element.field_data_type == 'Memo'}
                             {$element.field_value|nl2br}
                           {else}
                             {$element.field_value}
-                          {/if}
-                          {if $element.contact_ref_id}
-                            </a>
                           {/if}
                         </td>
                       {/if}
@@ -126,16 +122,12 @@
                   {/if}
                 {else}
                   <div class="content">
-                    {if $element.contact_ref_id}
-                      <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
-                    {/if}
-                    {if $element.field_data_type == 'Memo'}
+                    {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
+                      {', '|implode:$element.contact_ref_links}
+                    {elseif $element.field_data_type == 'Memo'}
                       {if $element.field_value}{$element.field_value|nl2br}{else}<br/>{/if}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
-                    {/if}
-                    {if $element.contact_ref_id}
-                      </a>
                     {/if}
                   </div>
                 {/if}

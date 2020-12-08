@@ -334,7 +334,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    */
   public static function preprocessContactReference($field) {
     $val = $field->getValue();
-    if ($val && is_numeric($val)) {
+    $multiple = $field->getAttribute('multiple');
+    $data = [];
+    if ($val) {
 
       $list = array_keys(CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_reference_options'
@@ -342,20 +344,28 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
       $return = array_unique(array_merge(['sort_name'], $list));
 
-      $contact = civicrm_api('contact', 'getsingle', ['id' => $val, 'return' => $return, 'version' => 3]);
+      $cids = is_array($val) ? $val : explode(',', $val);
 
-      if (!empty($contact['id'])) {
-        $view = [];
-        foreach ($return as $fld) {
-          if (!empty($contact[$fld])) {
-            $view[] = $contact[$fld];
+      foreach ($cids as $cid) {
+        $contact = civicrm_api('contact', 'getsingle', ['id' => $cid, 'return' => $return, 'version' => 3]);
+        if (!empty($contact['id'])) {
+          $view = [];
+          foreach ($return as $fld) {
+            if (!empty($contact[$fld])) {
+              $view[] = $contact[$fld];
+            }
           }
+          $data[] = [
+            'id' => $contact['id'],
+            'text' => implode(' :: ', $view),
+          ];
         }
-        $field->setAttribute('data-entity-value', json_encode([
-          'id' => $contact['id'],
-          'text' => implode(' :: ', $view),
-        ]));
       }
+    }
+
+    if ($data) {
+      $field->setAttribute('data-entity-value', json_encode($multiple ? $data : $data[0]));
+      $field->setValue(implode(',', $cids));
     }
   }
 
