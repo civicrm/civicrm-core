@@ -8,8 +8,7 @@
 --
 -- Generated from {$smarty.template}
 -- {$generated}
---
-{$database.comments}
+-- {$database.comment}
 
 {include file="drop.tpl"}
 
