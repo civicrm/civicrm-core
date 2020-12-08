@@ -45,6 +45,35 @@ class CRM_Contact_Form_Search_Custom_Base {
   }
 
   /**
+   * Override this when you want to implement a custom task list.
+   * By default the custom search has the same actions as a basic contact search, or
+   * an advanced search.
+   * Override this in your class and specify your own type.
+   *
+   * The type is passed the hook_civicrm_searchTasks.
+   *
+   * @return string
+   */
+  public function getObjectTypeForTaskList() {
+    return 'contact';
+  }
+
+  /**
+   * Override this when you want to make use of your own task list class.
+   * E.g. when you want to have the contribution tasks at your custom search
+   * return 'CRM_Contribute_Task'
+   * and return 'contribution' in getObjectTypeForTaskList
+   *
+   * @return string
+   */
+  public function getTasklistClass() {
+    if ($this->getObjectTypeForTaskList() != 'contact') {
+      return 'CRM_Contact_CustomSearchTask';
+    }
+    return 'CRM_Contact_Task';
+  }
+
+  /**
    * @return null|string
    */
   public function count() {

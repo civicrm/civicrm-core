@@ -55,7 +55,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
         $this->_pages[$t] = NULL;
       }
     }
-    else {
+    elseif ($task != NULL) {
       $this->_pages[$task] = NULL;
     }
 
@@ -90,6 +90,18 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
     $componentMode = $this->_controller->get('component_mode');
     $modeValue = CRM_Contact_Form_Search::getModeValue($componentMode);
     $taskClassName = $modeValue['taskClassName'];
+    if ($formName == 'Custom') {
+      // The task list is build for a custom search.
+      // Check which custom search class is used and check whether the custom search
+      // has another object for the searchTasks hook.
+      $csID = $componentMode = $this->_controller->get('csid') ?? CRM_Utils_Request::retrieve('csid', 'Integer');
+      $ssID = $componentMode = $this->_controller->get('ssID') ?? CRM_Utils_Request::retrieve('ssID', 'Integer');
+      $customSearchClass = CRM_Contact_BAO_SearchCustom::customClass($csID, $ssID);
+      if ($customSearchClass instanceof CRM_Contact_Form_Search_Custom_Base) {
+        $taskClassName = $customSearchClass->getTasklistClass();
+        $taskClassName::$objectType = $customSearchClass->getObjectTypeForTaskList();
+      }
+    }
     return $taskClassName::getTask($value);
   }
 
