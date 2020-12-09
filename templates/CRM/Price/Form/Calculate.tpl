@@ -31,6 +31,11 @@
 var thousandMarker = '{/literal}{$config->monetaryThousandSeparator}{literal}';
 var separator      = '{/literal}{$config->monetaryDecimalPoint}{literal}';
 var symbol         = '{/literal}{$currencySymbol}{literal}';
+// moneyFormat is part of a temporary fix. it should
+// not be expected to be present in future versions
+// see https://github.com/civicrm/civicrm-core/pull/19151
+
+var moneyFormat    = '{/literal}{$moneyFormat}{literal}';
 var optionSep      = '|';
 
 // Recalculate the total fees based on user selection
@@ -161,7 +166,13 @@ function display(totalfee) {
   // totalfee is monetary, round it to 2 decimal points so it can
   // go as a float - CRM-13491
   totalfee = Math.round(totalfee*100)/100;
-  var totalFormattedFee = symbol + ' ' + CRM.formatMoney(totalfee, true);
+  // dev/core#1019 Use the moneyFormat assigned to the template as an interim fix
+  // to support forms using a currency other that the site default. Also make sure to
+  // support various currency formatting options,
+  // temporary measure - pending
+  // our preferred fix.
+  // see https://github.com/civicrm/civicrm-core/pull/19151
+  var totalFormattedFee = CRM.formatMoney(totalfee, false, moneyFormat);
   cj('#pricevalue').html(totalFormattedFee);
 
   cj('#total_amount').val( totalfee );
