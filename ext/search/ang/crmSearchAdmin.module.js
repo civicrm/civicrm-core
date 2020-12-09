@@ -106,11 +106,13 @@
           }
           path = path.replace(join.alias + '_', '');
           var num = parseInt(path.substr(0, 2), 10);
-          baseEntity = join.entity;
           label.push(join.label + (num > 1 ? ' ' + num : ''));
           path = path.replace(/^\d\d_?/, '');
+          if (path.length) {
+            baseEntity = join.entity;
+          }
         }
-        result = _.assign(_.cloneDeep(join), {label: label.join(' - '), alias: alias});
+        result = _.assign(_.cloneDeep(join), {label: label.join(' - '), alias: alias, baseEntity: baseEntity});
         // Add the numbered suffix to the join conditions
         // If this is a deep join, also add the base entity prefix
         var prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
@@ -201,23 +203,21 @@
         },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {
-          var joins = _.pluck((api_params.join || []), 0),
-            entityCount = {};
+          var joins = _.pluck((api_params.join || []), 0);
           return _.transform([api_entity].concat(joins), function(columns, joinExpr) {
             var joinName = joinExpr.split(' AS '),
-              entityName = joinName[0],
-              entity = getEntity(entityName),
-              prefix = joinName[1] ? joinName[1] + '.' : '';
+              joinInfo = joinName[1] ? getJoin(joinName[1]) : {entity: joinName[0]},
+              entity = getEntity(joinInfo.entity),
+              prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             _.each(entity.fields, function(field) {
-              if ((entityName === 'Contact' && field.name === 'id') || field.fk_entity === 'Contact') {
+              if ((entity.name === 'Contact' && field.name === 'id') || (field.fk_entity === 'Contact' && joinInfo.baseEntity !== 'Contact')) {
                 columns.push({
                   id: prefix + field.name,
-                  text: entity.title_plural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
+                  text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,
                   icon: entity.icon
                 });
               }
             });
-            entityCount[entityName] = 1 + (entityCount[entityName] || 1);
           });
         }
       };

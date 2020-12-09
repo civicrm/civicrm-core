@@ -6,7 +6,7 @@
   <label for="crm-search-admin-group-title">{{ ts('Group Title:') }} <span class="crm-marker">*</span></label>
   <input id="crm-search-admin-group-title" class="form-control" placeholder="{{:: ts('Untitled') }}" ng-model="$ctrl.savedSearch.groups[0].title" ng-disabled="!smartGroupColumns.length" ng-required="smartGroupColumns.length">
   <label for="api-save-search-select-column">{{:: ts('Contact Column:') }}</label>
-  <input id="api-save-search-select-column" ng-model="$ctrl.savedSearch.api_params.select[0]" class="form-control" crm-ui-select="{data: smartGroupColumns}"/>
+  <input id="api-save-search-select-column" ng-model="$ctrl.savedSearch.api_params.select[0]" class="form-control huge" crm-ui-select="{data: smartGroupColumns}"/>
 </div>
 <fieldset ng-show="smartGroupColumns.length">
   <label>{{:: ts('Description:') }}</label>
