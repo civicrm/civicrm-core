@@ -299,7 +299,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount(1);
+    $this->addTaxAccountToFinancialType(1);
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit([
       'total_amount' => 100,

@@ -4725,7 +4725,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'is_active' => 1,
     ]);
-    $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $this->addTaxAccountToFinancialType($financialType['id']);
     $contribution = $this->setUpRepeatTransaction(
       [],
       'single',

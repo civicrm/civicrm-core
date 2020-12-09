@@ -1142,10 +1142,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   public function testgetSalesTaxFinancialAccounts() {
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
-    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
     $expectedResult = [$financialAccount->financial_account_id => $financialAccount->financial_account_id];
     $financialType = $this->createFinancialType();
-    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
     $expectedResult[$financialAccount->financial_account_id] = $financialAccount->financial_account_id;
     $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
     $this->assertTrue(($salesTaxFinancialAccount == $expectedResult), 'Function returned wrong values.');
@@ -1306,7 +1306,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
-    $financialAccount = $this->relationForFinancialTypeWithFinancialAccount($financialType['id']);
+    $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit([

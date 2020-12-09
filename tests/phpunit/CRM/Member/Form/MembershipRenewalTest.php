@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\LineItem;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -183,7 +184,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    */
   public function testSubmitWithTax() {
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->financialTypeID);
+    $this->addTaxAccountToFinancialType($this->financialTypeID);
     $form = $this->getForm();
     $form->testSubmit(array_merge($this->getBaseSubmitParams(), [
       'total_amount' => '50.00',
@@ -191,6 +192,30 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId, 'is_test' => TRUE, 'return' => ['total_amount', 'tax_amount']]);
     $this->assertEquals(50, $contribution['total_amount']);
     $this->assertEquals(4.55, $contribution['tax_amount']);
+  }
+
+  /**
+   * Test submitting with tax enabled but a rate of zero.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/2024
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testSubmitWithTaxOfZero() {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType($this->financialTypeID, ['tax_rate' => 0]);
+    $form = $this->getForm();
+    $form->testSubmit(array_merge($this->getBaseSubmitParams(), [
+      'total_amount' => '50.00',
+    ]));
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId, 'is_test' => TRUE, 'return' => ['total_amount', 'tax_amount']]);
+    $this->assertEquals(50, $contribution['total_amount']);
+    $this->assertEquals(0, $contribution['tax_amount']);
+    $lines = LineItem::get()->addWhere('contribution_id', '=', $contribution['id'])->execute();
+    $this->assertCount(1, $lines);
   }
 
   /**
@@ -487,7 +512,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'return' => ['tax_amount', 'trxn_id'],
     ]);
     $this->assertEquals($contribution['trxn_id'], 777);
-    $this->assertEquals(NULL, $contribution['tax_amount']);
+    $this->assertEquals(0.00, $contribution['tax_amount']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
