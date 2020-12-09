@@ -13,11 +13,11 @@
     <url desc="Issues">https://lab.civicrm.org/dev/report/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2020-12-02</releaseDate>
-  <version>1.0.beta2</version>
+  <releaseDate>2021-01-06</releaseDate>
+  <version>1.0.beta3</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.31</ver>
+    <ver>5.33</ver>
   </compatibility>
   <comments>This extension is still in beta. Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
