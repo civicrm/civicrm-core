@@ -10,16 +10,25 @@
  */
 namespace Civi\FlexMailer\ClickTracker;
 
-class HtmlClickTracker implements ClickTrackerInterface {
+class HtmlClickTracker extends BaseClickTracker implements ClickTrackerInterface {
 
   public function filterContent($msg, $mailing_id, $queue_id) {
+
+    $getTrackerURL = BaseClickTracker::$getTrackerURL;
+
     return self::replaceHrefUrls($msg,
-      function ($url) use ($mailing_id, $queue_id) {
+      function ($url) use ($mailing_id, $queue_id, $getTrackerURL) {
         if (strpos($url, '{') !== FALSE) {
-          return $url;
+          // If there are tokens in the URL use special treatment.
+
+          // Since we're dealing with HTML let's strip out the entities in the URL
+          // so that we can add them back in later.
+          $originalUrlDecoded = html_entity_decode($url);
+          $data = BaseClickTracker::getTrackerURLForUrlWithTokens($originalUrlDecoded, $mailing_id, $queue_id);
         }
-        $data = \CRM_Mailing_BAO_TrackableURL::getTrackerURL(
-          $url, $mailing_id, $queue_id);
+        else {
+          $data = $getTrackerURL($url, $mailing_id, $queue_id);
+        }
         $data = htmlentities($data, ENT_NOQUOTES);
         return $data;
       }

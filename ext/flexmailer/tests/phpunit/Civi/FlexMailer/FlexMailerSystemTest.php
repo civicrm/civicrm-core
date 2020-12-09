@@ -110,6 +110,19 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
   }
 
+  /**
+   *
+   * This takes CiviMail's own ones, but removes one that tested for a
+   * non-feature (i.e. that tokenised links are not handled).
+   *
+   * @return array
+   */
+  public function urlTrackingExamples() {
+    $cases = parent::urlTrackingExamples();
+    unset($cases[6]);
+    return $cases;
+  }
+
   public function testBasicHeaders() {
     parent::testBasicHeaders();
   }
