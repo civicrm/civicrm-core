@@ -118,11 +118,11 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if ($context == 'standalone') {
+    if ($context == 'standalone' || $context === 'search') {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
       $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission
