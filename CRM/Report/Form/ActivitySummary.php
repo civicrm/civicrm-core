@@ -20,6 +20,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   protected $_phoneField = FALSE;
   protected $_tempTableName;
   protected $_tempDurationSumTableName;
+  protected $_totalRows;
 
   /**
    * This report has not been optimised for group filtering.
@@ -466,7 +467,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->groupBy(FALSE);
 
     // build the query to calulate duration sum
-    $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    $sql = "SELECT SQL_CALC_FOUND_ROWS SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
 
     // create temp table to store duration
     $this->_tempDurationSumTableName = $this->createTemporaryTable('tempDurationSumTable', "
@@ -478,6 +479,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     {$sql}";
     CRM_Core_DAO::disableFullGroupByMode();
     CRM_Core_DAO::executeQuery($insertQuery);
+    $this->_totalRows = CRM_Core_DAO::singleValueQuery("SELECT FOUND_ROWS()");
     CRM_Core_DAO::reenableFullGroupByMode();
 
     $sql = "SELECT {$this->_tempTableName}.*,  {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
@@ -492,6 +494,16 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->where();
 
     return $sql;
+  }
+
+  /**
+   * Set pager.
+   *
+   * @param int $rowCount
+   */
+  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+    $this->_rowsFound = $this->_totalRows;
+    parent::setPager($rowCount);
   }
 
   /**
