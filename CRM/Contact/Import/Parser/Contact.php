@@ -1630,18 +1630,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $contact = CRM_Contact_BAO_Contact::create($data);
     $cid = $contact->id;
 
-    // Process group and tag
-    if (isset($formatted['group'])) {
-      $method = 'Admin';
-      CRM_Contact_BAO_GroupContact::create($formatted['group'], $cid, FALSE, $method);
-    }
-
-    if (!empty($fields['tag']) && array_key_exists('tag', $formatted)) {
-      // Convert comma separated form values from select2 v3
-      $tags = is_array($formatted['tag']) ? $formatted['tag'] : array_fill_keys(array_filter(explode(',', $formatted['tag'])), 1);
-      CRM_Core_BAO_EntityTag::create($tags, 'civicrm_contact', $cid);
-    }
-
     CRM_Core_Config::setPermitCacheFlushMode(TRUE);
 
     $contact = [
