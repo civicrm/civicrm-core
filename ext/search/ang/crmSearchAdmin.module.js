@@ -82,29 +82,54 @@
     })
 
     .factory('searchMeta', function() {
-      // JoinIndex lists each join by alias. It gets built once then cached.
-      function _getJoinIndex() {
-        if (!joinIndex) {
-          joinIndex = _.transform(CRM.crmSearchAdmin.joins, function(joinIndex, joins, base) {
-            _.each(joins, function(join) {
-              join.base = base;
-              joinIndex[join.alias] = join;
-            });
-          });
-        }
-        return joinIndex;
-      }
       function getEntity(entityName) {
         if (entityName) {
           return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
         }
       }
+      // Get join metadata matching a given expression like "Email AS Contact_Email_contact_id_01"
       function getJoin(fullNameOrAlias) {
-        var joinIndex = _getJoinIndex(),
-          alias = _.last(fullNameOrAlias.split(' AS '));
-        return joinIndex[alias];
+        var alias = _.last(fullNameOrAlias.split(' AS ')),
+          path = alias,
+          baseEntity = searchEntity,
+          label = [],
+          join,
+          result;
+        while (path.length) {
+          /* jshint -W083 */
+          join = _.find(CRM.crmSearchAdmin.joins[baseEntity], function(join) {
+            return new RegExp('^' + join.alias + '_\\d\\d').test(path);
+          });
+          if (!join) {
+            console.warn( 'Join ' + fullNameOrAlias + ' not found.');
+            return;
+          }
+          path = path.replace(join.alias + '_', '');
+          var num = parseInt(path.substr(0, 2), 10);
+          label.push(join.label + (num > 1 ? ' ' + num : ''));
+          path = path.replace(/^\d\d_?/, '');
+          if (path.length) {
+            baseEntity = join.entity;
+          }
+        }
+        result = _.assign(_.cloneDeep(join), {label: label.join(' - '), alias: alias, baseEntity: baseEntity});
+        // Add the numbered suffix to the join conditions
+        // If this is a deep join, also add the base entity prefix
+        var prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
+        _.each(result.conditions, function(condition) {
+          if (_.isArray(condition)) {
+            _.each(condition, function(ref, side) {
+              if (side !== 1 && _.includes(ref, '.')) {
+                condition[side] = ref.replace(join.alias + '.', alias + '.');
+              } else if (side !== 1 && prefix.length && !_.includes(ref, '"') && !_.includes(ref, "'")) {
+                condition[side] = prefix + '.' + ref;
+              }
+            });
+          }
+        });
+        return result;
       }
-      function getField(fieldName, entityName) {
+      function getFieldAndJoin(fieldName, entityName) {
         var dotSplit = fieldName.split('.'),
           joinEntity = dotSplit.length > 1 ? dotSplit[0] : null,
           name = _.last(dotSplit).split(':')[0],
@@ -120,7 +145,7 @@
           field = _.find(getEntity(entityName).fields, {name: dotSplit[0] + '.' + name});
           if (field) {
             field.entity = entityName;
-            return field;
+            return {field: field};
           }
         }
         if (joinEntity) {
@@ -133,7 +158,7 @@
         }
         if (field) {
           field.entity = entityName;
-          return field;
+          return {field: field, join: join};
         }
       }
       function parseExpr(expr) {
@@ -146,19 +171,23 @@
           result.fn = _.find(CRM.crmSearchAdmin.functions, {name: expr.substring(0, bracketPos)});
           result.modifier = _.trim(parsed[1]);
         }
-        result.field = expr ? getField(fieldName, searchEntity) : undefined;
-        if (result.field) {
+        var fieldAndJoin = expr ? getFieldAndJoin(fieldName, searchEntity) : undefined;
+        if (fieldAndJoin.field) {
           var split = fieldName.split(':'),
-            prefixPos = split[0].lastIndexOf(result.field.name);
+            prefixPos = split[0].lastIndexOf(fieldAndJoin.field.name);
           result.path = split[0];
           result.prefix = prefixPos > 0 ? result.path.substring(0, prefixPos) : '';
           result.suffix = !split[1] ? '' : ':' + split[1];
+          result.field = fieldAndJoin.field;
+          result.join = fieldAndJoin.join;
         }
         return result;
       }
       return {
         getEntity: getEntity,
-        getField: getField,
+        getField: function(fieldName, entityName) {
+          return getFieldAndJoin(fieldName, entityName).field;
+        },
         getJoin: getJoin,
         parseExpr: parseExpr,
         getDefaultLabel: function(col) {
@@ -167,27 +196,28 @@
           if (info.fn) {
             label = '(' + info.fn.title + ') ' + label;
           }
+          if (info.join) {
+            label = info.join.label + ': ' + label;
+          }
           return label;
         },
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {
-          var joins = _.pluck((api_params.join || []), 0),
-            entityCount = {};
+          var joins = _.pluck((api_params.join || []), 0);
           return _.transform([api_entity].concat(joins), function(columns, joinExpr) {
             var joinName = joinExpr.split(' AS '),
-              entityName = joinName[0],
-              entity = getEntity(entityName),
-              prefix = joinName[1] ? joinName[1] + '.' : '';
+              joinInfo = joinName[1] ? getJoin(joinName[1]) : {entity: joinName[0]},
+              entity = getEntity(joinInfo.entity),
+              prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             _.each(entity.fields, function(field) {
-              if ((entityName === 'Contact' && field.name === 'id') || field.fk_entity === 'Contact') {
+              if ((entity.name === 'Contact' && field.name === 'id') || (field.fk_entity === 'Contact' && joinInfo.baseEntity !== 'Contact')) {
                 columns.push({
                   id: prefix + field.name,
-                  text: entity.title_plural + (entityCount[entityName] ? ' ' + entityCount[entityName] : '') + ': ' + field.label,
+                  text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,
                   icon: entity.icon
                 });
               }
             });
-            entityCount[entityName] = 1 + (entityCount[entityName] || 1);
           });
         }
       };

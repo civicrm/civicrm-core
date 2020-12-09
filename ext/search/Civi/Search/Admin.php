@@ -130,10 +130,6 @@ class Admin {
         });
         $fields = array_column($entity['fields'], NULL, 'name');
         $bridge = in_array('EntityBridge', $entity['type']) ? $entity['name'] : NULL;
-        $baseEntity = $bridge && isset($entity['bridge'][1]) ? $allowedEntities[$fields[$entity['bridge'][1]]['fk_entity']] ?? NULL : NULL;
-        if ($bridge && !$baseEntity) {
-          continue;
-        }
         foreach ($references as $reference) {
           $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
           // Exclude any joins that are better represented by pseudoconstants
@@ -165,6 +161,7 @@ class Admin {
               continue;
             }
             $targetEntity = $allowedEntities[$targetEntityName];
+            // Non-bridge joins directly between 2 entities
             if (!$bridge) {
               // Add the straight 1-1 join
               $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
@@ -187,27 +184,42 @@ class Admin {
                 'multi' => TRUE,
               ];
             }
-            else {
+            // Bridge joins (sanity check - bridge must specify exactly 2 FK fields)
+            elseif (count($entity['bridge']) === 2) {
+              // Get the other entity being linked through this bridge
+              $baseKey = array_search($reference->getReferenceKey(), $entity['bridge']) ? $entity['bridge'][0] : $entity['bridge'][1];
+              $baseEntity = $allowedEntities[$fields[$baseKey]['fk_entity']] ?? NULL;
+              if (!$baseEntity) {
+                continue;
+              }
               // Add joins for the two entities that connect through this bridge (n-n)
               $symmetric = $baseEntity['name'] === $targetEntityName;
               $targetsTitle = $symmetric ? $allowedEntities[$bridge]['title_plural'] : $targetEntity['title_plural'];
+              $alias = $baseEntity['name'] . "_{$bridge}_" . $targetEntityName;
               $joins[$baseEntity['name']][] = [
                 'label' => $baseEntity['title'] . ' ' . $targetsTitle,
                 'description' => ts('Multiple %1 per %2', [1 => $targetsTitle, 2 => $baseEntity['title']]),
                 'entity' => $targetEntityName,
-                'conditions' => [$bridge],
+                'conditions' => array_merge(
+                  [$bridge],
+                  self::getJoinConditions('id', $alias . '.' . $baseKey, NULL, NULL)
+                ),
                 'bridge' => $bridge,
-                'alias' => $baseEntity['name'] . "_{$bridge}_" . $targetEntityName,
+                'alias' => $alias,
                 'multi' => TRUE,
               ];
               if (!$symmetric) {
+                $alias = $targetEntityName . "_{$bridge}_" . $baseEntity['name'];
                 $joins[$targetEntityName][] = [
                   'label' => $targetEntity['title'] . ' ' . $baseEntity['title_plural'],
                   'description' => ts('Multiple %1 per %2', [1 => $baseEntity['title_plural'], 2 => $targetEntity['title']]),
                   'entity' => $baseEntity['name'],
-                  'conditions' => [$bridge],
+                  'conditions' => array_merge(
+                    [$bridge],
+                    self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $targetTable, $dynamicCol ? $alias . '.' . $dynamicCol : NULL)
+                  ),
                   'bridge' => $bridge,
-                  'alias' => $targetEntityName . "_{$bridge}_" . $baseEntity['name'],
+                  'alias' => $alias,
                   'multi' => TRUE,
                 ];
               }

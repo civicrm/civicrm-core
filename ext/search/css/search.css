@@ -14,6 +14,10 @@
   margin-top: 20px;
 }
 
+#bootstrap-theme.crm-search .form-control.huge {
+  width: 275px;
+}
+
 #bootstrap-theme.crm-search input.ng-invalid {
   border-color: #8A1F11;
 }

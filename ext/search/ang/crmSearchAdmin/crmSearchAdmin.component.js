@@ -190,21 +190,49 @@
         }
       };
 
+      function addNum(name, num) {
+        return name + (num < 10 ? '_0' : '_') + num;
+      }
+
+      function getExistingJoins() {
+        return _.transform(ctrl.savedSearch.api_params.join || [], function(joins, join) {
+          joins[join[0].split(' AS ')[1]] = searchMeta.getJoin(join[0]);
+        }, {});
+      }
+
       $scope.getJoin = searchMeta.getJoin;
 
       $scope.getJoinEntities = function() {
-        var joinEntities = _.transform(CRM.crmSearchAdmin.joins[ctrl.savedSearch.api_entity], function(joinEntities, join) {
-          var entity = searchMeta.getEntity(join.entity);
-          if (entity) {
-            joinEntities.push({
-              id: join.entity + ' AS ' + join.alias,
+        var existingJoins = getExistingJoins();
+
+        function addEntityJoins(entity, stack, baseEntity) {
+          return _.transform(CRM.crmSearchAdmin.joins[entity], function(joinEntities, join) {
+            var num = 0;
+            // Add all joins that don't just point directly back to the original entity
+            if (!(baseEntity === join.entity && !join.multi)) {
+              do {
+                appendJoin(joinEntities, join, ++num, stack, entity);
+              } while (addNum((stack ? stack + '_' : '') + join.alias, num) in existingJoins);
+            }
+          }, []);
+        }
+
+        function appendJoin(collection, join, num, stack, baseEntity) {
+          var alias = addNum((stack ? stack + '_' : '') + join.alias, num),
+            opt = {
+              id: join.entity + ' AS ' + alias,
               description: join.description,
-              text: join.label,
-              icon: entity.icon
-            });
+              text: join.label + (num > 1 ? ' ' + num : ''),
+              icon: searchMeta.getEntity(join.entity).icon,
+              disabled: alias in existingJoins
+            };
+          if (alias in existingJoins) {
+            opt.children = addEntityJoins(join.entity, (stack ? stack + '_' : '') + alias, baseEntity);
           }
-        }, []);
-        return {results: joinEntities};
+          collection.push(opt);
+        }
+
+        return {results: addEntityJoins(ctrl.savedSearch.api_entity)};
       };
 
       $scope.addJoin = function() {
