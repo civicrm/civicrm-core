@@ -186,7 +186,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
         $currentPage = max((int ) @$_POST[self::PAGE_ID], 1);
       }
       elseif (isset($_POST[self::PAGE_ID_BOTTOM])) {
-        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM]);
+        $currentPage = max((int ) @$_POST[self::PAGE_ID_BOTTOM], 1);
       }
     }
     elseif (isset($_GET[self::PAGE_ID])) {
