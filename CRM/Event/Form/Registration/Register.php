@@ -319,6 +319,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // CRM-18399: used by template to pass pre profile id as a url arg
     $this->assign('custom_pre_id', $this->_values['custom_pre_id']);
 
+    // Required for currency formatting in the JS layer
+    $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
+
     CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
 
     $contactID = $this->getContactID();
