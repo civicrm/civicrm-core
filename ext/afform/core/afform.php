@@ -543,6 +543,23 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
 }
 
 /**
+ * Implements hook_civicrm_permissionList().
+ *
+ * @see CRM_Utils_Hook::permissionList()
+ */
+function afform_civicrm_permissionList(&$permissions) {
+  $scanner = Civi::service('afform_scanner');
+  foreach ($scanner->getMetas() as $name => $meta) {
+    $permissions['@afform:' . $name] = [
+      'group' => 'afform',
+      'title' => ts('Afform: Inherit permission of %1', [
+        1 => $name,
+      ]),
+    ];
+  }
+}
+
+/**
  * Clear any local/in-memory caches based on afform data.
  */
 function _afform_clear() {

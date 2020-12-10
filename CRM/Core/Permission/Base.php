@@ -163,6 +163,26 @@ class CRM_Core_Permission_Base {
   }
 
   /**
+   * Get the palette of available permissions in the CMS's user-management system.
+   *
+   * @return array
+   *   List of permissions, keyed by symbolic name. Each item may have fields:
+   *     - title: string
+   *     - description: string
+   *
+   *   The permission-name should correspond to the Civi notation used by
+   *   'CRM_Core_Permission::check()'. For CMS-specific permissions, these are
+   *   translated names (eg "WordPress:list_users" or "Drupal:post comments").
+   *
+   *   The list should include *only* CMS permissions. Exclude Civi-native permissions.
+   *
+   * @see \CRM_Core_Permission_Base::translatePermission()
+   */
+  public function getAvailablePermissions() {
+    return [];
+  }
+
+  /**
    * Get all the contact emails for users that have a specific permission.
    *
    * @param string $permissionName

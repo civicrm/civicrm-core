@@ -89,6 +89,36 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   /**
    * @inheritDoc
    */
+  public function getAvailablePermissions() {
+    // We want to list *only* WordPress perms, so we'll *skip* Civi perms.
+    $mungedCorePerms = array_map(
+      function($str) {
+        return CRM_Utils_String::munge(strtolower($str));
+      },
+      array_keys(\CRM_Core_Permission::basicPermissions(TRUE))
+    );
+
+    // WP doesn't have an API to list all capabilities. However, we can discover a
+    // pretty good list by inspecting the (super)admin roles.
+    $wpCaps = [];
+    foreach (wp_roles()->roles as $wpRole) {
+      $wpCaps = array_unique(array_merge(array_keys($wpRole['capabilities']), $wpCaps));
+    }
+
+    $permissions = [];
+    foreach ($wpCaps as $wpCap) {
+      if (!in_array($wpCap, $mungedCorePerms)) {
+        $permissions["WordPress:$wpCap"] = [
+          'title' => "WordPress: $wpCap",
+        ];
+      }
+    }
+    return $permissions;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function isModulePermissionSupported() {
     return TRUE;
   }

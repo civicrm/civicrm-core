@@ -101,6 +101,31 @@ class CRM_Core_Permission_Backdrop extends CRM_Core_Permission_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function getAvailablePermissions() {
+    // We want to list *only* Backdrop perms, so we'll *skip* Civi perms.
+    $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE);
+
+    $permissions = [];
+    $modules = system_get_info('module');
+    foreach ($modules as $moduleName => $module) {
+      $prefix = isset($module['name']) ? ($module['name'] . ': ') : '';
+      foreach (module_invoke($moduleName, 'permission') as $permName => $perm) {
+        if (isset($allCorePerms[$permName])) {
+          continue;
+        }
+
+        $permissions["Drupal:$permName"] = [
+          'title' => $prefix . strip_tags($perm['title']),
+          'description' => $perm['description'] ?? NULL,
+        ];
+      }
+    }
+    return $permissions;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function isModulePermissionSupported() {
     return TRUE;
   }
