@@ -147,7 +147,6 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'email' => 'john.smith@example.com',
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
-      'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur['id'],
     ]);
 

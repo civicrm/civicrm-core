@@ -19,7 +19,6 @@
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_contactID;
-  protected $_contributionTypeID;
   protected $_membershipTypeID;
   protected $_membershipStatusID;
   protected $_contribution = [];
