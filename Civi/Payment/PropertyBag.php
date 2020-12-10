@@ -2,7 +2,6 @@
 namespace Civi\Payment;
 
 use InvalidArgumentException;
-use Civi;
 use CRM_Core_Error;
 use CRM_Core_PseudoConstant;
 
@@ -213,19 +212,6 @@ class PropertyBag implements \ArrayAccess {
   public function offsetUnset ($offset) {
     $prop = $this->handleLegacyPropNames($offset);
     unset($this->props['default'][$prop]);
-  }
-
-  /**
-   * Save any legacy warnings to log.
-   *
-   * Called as a shutdown function.
-   */
-  public static function writeLegacyWarnings() {
-    if (!empty(static::$legacyWarnings)) {
-      $message = "Civi\\Payment\\PropertyBag related deprecation warnings:\n"
-        . implode("\n", array_keys(static::$legacyWarnings));
-      Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
-    }
   }
 
   /**
